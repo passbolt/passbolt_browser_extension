@@ -24,7 +24,7 @@ export const defaultTagDto = (data = {}) => {
   };
 };
 
-export const sharedTagDto = (data = {}) => sharedTagDto({
+export const sharedTagDto = (data = {}) => defaultTagDto({
   slug: "#shared-tag",
   is_shared: true,
   ...data

@@ -37,6 +37,7 @@ class TagEntity extends Entity {
     if (this.slug.startsWith('#') && !this.isShared) {
       const error = new EntityValidationError('Invalid tag');
       error.addError('is_shared', 'hashtag', 'A shared tag should start with a hashtag.');
+      // @todo should throw the error
     }
   }
 

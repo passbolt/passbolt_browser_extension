@@ -54,6 +54,7 @@ class GpgkeyEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
+        //@todo: enforce fingerprint checks with regexp like the other fingerprint schema
         "fingerprint": {
           "type": "string",
           "minLength": FINGERPRINT_MIN_LENGTH,

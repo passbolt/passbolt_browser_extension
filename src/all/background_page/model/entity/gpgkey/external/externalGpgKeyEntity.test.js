@@ -35,7 +35,6 @@ describe("ExternalGpgKey entity", () => {
       assertEntityProperty.notRequired(ExternalGpgKeyEntity, "key_id");
     });
 
-
     it("validates user_ids property", () => {
       const correctUserIds = [
         {email: "test@test.com", name: "user's name"},

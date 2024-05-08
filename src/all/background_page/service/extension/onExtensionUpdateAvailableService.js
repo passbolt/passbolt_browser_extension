@@ -31,7 +31,7 @@ class OnExtensionUpdateAvailableService {
     if (await isUserAuthenticated()) {
       await browser.storage.session.set({[PASSBOLT_EXTENSION_UPDATE]: true});
     } else {
-      await this.cleanAndReload();
+      await OnExtensionUpdateAvailableService.cleanAndReload();
     }
   }
 
@@ -52,7 +52,7 @@ class OnExtensionUpdateAvailableService {
     const shouldUpdate = await browser.storage.session.get(PASSBOLT_EXTENSION_UPDATE);
     if (shouldUpdate && shouldUpdate[PASSBOLT_EXTENSION_UPDATE]) {
       await browser.storage.session.remove(PASSBOLT_EXTENSION_UPDATE);
-      await this.cleanAndReload();
+      await OnExtensionUpdateAvailableService.cleanAndReload();
     }
   }
 }

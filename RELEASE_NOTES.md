@@ -1,8 +1,7 @@
-Song: https://www.youtube.com/watch?v=3L4YrGaR8E4
+Song: https://youtu.be/J87pJrxvJ5E?si=vGs8M6uyM6E7Lcps
 
-Passbolt v4.7.3 is a test release focused on addressing problems identified with MV3.
+Passbolt v4.7.4 is a maintenance release focused on fixing problems linked to the extension update and preparing the transition to MV3.
 
-## [4.7.3] - 2024-05-07
+## [4.7.4] - 2024-05-08
 ### Maintenance
-- PB-33235 Convert formData file into a json serializable in offscreen
-- PB-33297 Extension update available should store the state if user signed in
+- PB-33304 Fix extension update available service

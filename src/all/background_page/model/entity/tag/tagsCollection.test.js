@@ -14,9 +14,10 @@
 import {v4 as uuid} from "uuid";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultTagDto} from "./tagEntity.test.data";
+import {defaultTagDto, minimalTagDto} from "./tagEntity.test.data";
 import TagsCollection from "./tagsCollection";
 import TagEntity from "./tagEntity";
+import {defaultTagsDtos} from "./tagCollection.test.data";
 
 describe("TagsCollection", () => {
   describe("TagsCollection::constructor", () => {
@@ -24,155 +25,107 @@ describe("TagsCollection", () => {
       EntitySchema.validateSchema(TagsCollection.ENTITY_NAME, TagsCollection.getSchema());
     });
 
-    it("constructor works if valid minimal DTO is provided", () => {
-      const tag1 = defaultTagDto({slug: 'tag1'});
-      const tag2 = defaultTagDto({slug: 'tag2'});
-      const dto = [tag1, tag2];
-      const entity = new TagsCollection(dto);
-      expect(entity.toDto()).toEqual(dto);
-      expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
-      expect(entity.items[0].slug).toEqual('tag1');
-      expect(entity.items[1].slug).toEqual('tag2');
+    it("works if valid minimal DTOs are provided", () => {
+      expect.assertions(9);
+      const dto1 = minimalTagDto({slug: 'tag1'});
+      const dto2 = minimalTagDto({slug: 'tag2'});
+      const dto3 = minimalTagDto({slug: 'tag3'});
+      const dtos = [dto1, dto2, dto3];
+      const collection = new TagsCollection(dtos);
+      const expectToDtos = dtos.map(dto => ({...dto, is_shared: false})); // Is shared is marshalled.
+      expect(collection.items).toHaveLength(3);
+      expect(collection.toDto()).toEqual(expectToDtos);
+      expect(JSON.stringify(collection)).toEqual(JSON.stringify(expectToDtos));
+      expect(collection.items[0]).toBeInstanceOf(TagEntity);
+      expect(collection.items[0].slug).toEqual('tag1');
+      expect(collection.items[1]).toBeInstanceOf(TagEntity);
+      expect(collection.items[1].slug).toEqual('tag2');
+      expect(collection.items[2]).toBeInstanceOf(TagEntity);
+      expect(collection.items[2].slug).toEqual('tag3');
     });
 
-    it("constructor fails if reusing same tag", () => {
-      const tag1 = defaultTagDto();
-      const dto = [tag1, tag1];
-
-      const t = () => {
-        new TagsCollection(dto);
-      };
-      expect(t).toThrow(EntityCollectionError);
+    it("works if valid complete DTOs are provided", () => {
+      expect.assertions(9);
+      const dto1 = defaultTagDto({slug: 'tag1'});
+      const dto2 = defaultTagDto({slug: 'tag2'});
+      const dto3 = defaultTagDto({slug: 'tag'});
+      const dtos = [dto1, dto2, dto3];
+      const collection = new TagsCollection(dtos);
+      expect(collection.items).toHaveLength(3);
+      expect(collection.toDto()).toEqual(dtos);
+      expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
+      expect(collection.items[0]).toBeInstanceOf(TagEntity);
+      expect(collection.items[0].id).toEqual(dto1.id);
+      expect(collection.items[1]).toBeInstanceOf(TagEntity);
+      expect(collection.items[1].id).toEqual(dto2.id);
+      expect(collection.items[2]).toBeInstanceOf(TagEntity);
+      expect(collection.items[2].id).toEqual(dto3.id);
     });
 
-    /*
-     * it("constructor fails if reusing same slug", () => {
-     *   const tag1 = {
-     *     "id": "45ce85c9-e301-4de2-8b41-298507002861",
-     *     "slug": 'tag1',
-     *     "is_shared": false,
-     *   };
-     *   const tag2 = {
-     *     "id": "45ce85c9-e301-4de2-8b41-298507002862",
-     *     "slug": 'tag1',
-     *     "is_shared": false,
-     *   };
-     *   const dto = [tag1, tag2];
-     *
-     *   let t = () => {new TagsCollection(dto)};
-     *   expect(t).toThrow(EntityCollectionError);
-     * });
-     */
+    it("works if valid entities are provided", () => {
+      expect.assertions(7);
+      const entity1 = new TagEntity(defaultTagDto({slug: 'tag1'}));
+      const entity2 = new TagEntity(defaultTagDto({slug: 'tag2'}));
+      const entity3 = new TagEntity(defaultTagDto({slug: 'tag'}));
+      const entities = [entity1, entity2, entity3];
+      const collection = new TagsCollection(entities);
+      expect(collection.items).toHaveLength(3);
+      expect(collection.items[0]).toBeInstanceOf(TagEntity);
+      expect(collection.items[0].id).toEqual(entity1.id);
+      expect(collection.items[1]).toBeInstanceOf(TagEntity);
+      expect(collection.items[1].id).toEqual(entity2.id);
+      expect(collection.items[2]).toBeInstanceOf(TagEntity);
+      expect(collection.items[2].id).toEqual(entity3.id);
+    });
 
-    it("constructor fails if reusing same id", () => {
-      const tag1 = defaultTagDto();
-      const tag2 = defaultTagDto({id: tag1.id});
-      const dto = [tag1, tag2];
+    it("should throw if one of data item does not validate the collection entity schema", () => {
+      const dto1 = defaultTagDto({slug: "tag 1"});
+      const dto2 = defaultTagDto({slug: 42});
 
-      const t = () => {
-        new TagsCollection(dto);
-      };
-      expect(t).toThrow(EntityCollectionError);
+      expect.assertions(2);
+      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect(() => new TagsCollection([dto1, dto2]))
+        .not.toThrowCollectionValidationError("1.slug.type");
+      expect(() => new TagsCollection([dto1, dto2]))
+        .toThrowCollectionValidationError("slug.type");
+    });
+
+    it("should throw if one of data item does not validate the unique id build rule", () => {
+      const dto1 = defaultTagDto({slug: 'tag1'});
+      const dto2 = defaultTagDto({slug: 'tag2'});
+      const dto3 = defaultTagDto({id: dto2.id, slug: 'tag3'});
+
+      expect.assertions(2);
+      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect(() => new TagsCollection([dto1, dto2, dto3]))
+        .not.toThrowCollectionValidationError("2.id.unique_id");
+      expect(() => new TagsCollection([dto1, dto2, dto3]))
+        .toThrowError(new EntityCollectionError(1, TagsCollection.RULE_UNIQUE_ID, "The collection should only contain items with unique values for the property: id."));
+    });
+
+    // The unique slug build rule is not yet enforced
+    it.skip("should throw if one of data item does not validate the unique slug build rule", () => {
+      const dto1 = defaultTagDto({slug: 'tag1'});
+      const dto2 = defaultTagDto({slug: 'tag2'});
+      const dto3 = defaultTagDto({slug: dto2.slug});
+
+      expect.assertions(1);
+      expect(() => new TagsCollection([dto1, dto2, dto3]))
+        .toThrowCollectionValidationError("2.id.unique_slug");
     });
   });
 
-  describe("TagsCollection:push", () => {
-    it("it should allow to push new item from a dto", () => {
-      const collection = new TagsCollection([]);
-      const tag1 = defaultTagDto();
-      const tag2 = defaultTagDto();
-      const tag3 = defaultTagDto();
+  describe("TagsCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const count = 10_000;
+      const dtos = defaultTagsDtos(count);
 
-      expect.assertions(9);
-      collection.push(tag1);
-      expect(collection).toHaveLength(1);
-      expect(collection.items[0]).toBeInstanceOf(TagEntity);
-      expect(collection.items[0].id).toEqual(tag1.id);
-      collection.push(tag2);
-      expect(collection).toHaveLength(2);
-      expect(collection.items[1]).toBeInstanceOf(TagEntity);
-      expect(collection.items[1].id).toEqual(tag2.id);
-      collection.push(tag3);
-      expect(collection).toHaveLength(3);
-      expect(collection.items[2]).toBeInstanceOf(TagEntity);
-      expect(collection.items[2].id).toEqual(tag3.id);
-    });
-
-    it("it should allow to push new item from an entity", () => {
-      const collection = new TagsCollection([]);
-      const tag1 = new TagEntity(defaultTagDto());
-      const tag2 = new TagEntity(defaultTagDto());
-      const tag3 = new TagEntity(defaultTagDto());
-
-      expect.assertions(9);
-      collection.push(tag1);
-      expect(collection).toHaveLength(1);
-      expect(collection.items[0]).toBeInstanceOf(TagEntity);
-      expect(collection.items[0].id).toEqual(tag1.id);
-      collection.push(tag2);
-      expect(collection).toHaveLength(2);
-      expect(collection.items[1]).toBeInstanceOf(TagEntity);
-      expect(collection.items[1].id).toEqual(tag2.id);
-      collection.push(tag3);
-      expect(collection).toHaveLength(3);
-      expect(collection.items[2]).toBeInstanceOf(TagEntity);
-      expect(collection.items[2].id).toEqual(tag3.id);
-    });
-
-    it("it fails if the unique id build rule fails", () => {
-      const collection = new TagsCollection([]);
-      const tag1 = defaultTagDto();
-      const tag2 = defaultTagDto();
-      const tag3 = defaultTagDto({id: tag1.id});
-
-      expect.assertions(3);
-      expect(() => collection.push(tag1)).not.toThrow();
-      expect(() => collection.push(tag2)).not.toThrow();
-      expect(() => collection.push(tag3)).toThrow(EntityCollectionError);
-    });
-
-    it("it should allow to push new items from a dto", () => {
-      const collection = new TagsCollection([]);
-      const tag1 = defaultTagDto();
-      const tag2 = defaultTagDto();
-      const tag3 = defaultTagDto();
-
-      expect.assertions(7);
-      collection.push([tag1, tag2, tag3]);
-      expect(collection).toHaveLength(3);
-      expect(collection.items[0]).toBeInstanceOf(TagEntity);
-      expect(collection.items[0].id).toEqual(tag1.id);
-      expect(collection.items[1]).toBeInstanceOf(TagEntity);
-      expect(collection.items[1].id).toEqual(tag2.id);
-      expect(collection.items[2]).toBeInstanceOf(TagEntity);
-      expect(collection.items[2].id).toEqual(tag3.id);
-    });
-
-    it("it should allow to push new items from an array of entities", () => {
-      const collection = new TagsCollection([]);
-      const tag1 = new TagEntity(defaultTagDto());
-      const tag2 = new TagEntity(defaultTagDto());
-      const tag3 = new TagEntity(defaultTagDto());
-
-      expect.assertions(7);
-      collection.push([tag1, tag2, tag3]);
-      expect(collection).toHaveLength(3);
-      expect(collection.items[0]).toBeInstanceOf(TagEntity);
-      expect(collection.items[0].id).toEqual(tag1.id);
-      expect(collection.items[1]).toBeInstanceOf(TagEntity);
-      expect(collection.items[1].id).toEqual(tag2.id);
-      expect(collection.items[2]).toBeInstanceOf(TagEntity);
-      expect(collection.items[2].id).toEqual(tag3.id);
-    });
-
-    it("it fails if the unique id build rule fails", () => {
-      const tag1 = defaultTagDto();
-      const tag2 = defaultTagDto();
-      const tag3 = defaultTagDto({id: tag1.id});
-
-      expect.assertions(2);
-      expect(() => new TagsCollection([]).push([tag1, tag2, tag3])).toThrow(EntityCollectionError);
-      expect(() => new TagsCollection([]).push([tag1, tag1])).toThrow(EntityCollectionError);
+      const start = performance.now();
+      const collection = new TagsCollection(dtos);
+      console.log(collection.items);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(count);
+      expect(time).toBeLessThan(5_000);
     });
   });
 

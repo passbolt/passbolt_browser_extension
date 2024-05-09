@@ -15,7 +15,7 @@
 import TagEntity from "./tagEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultTagDto} from "./tagEntity.test.data";
+import {defaultTagDto, minimalTagDto} from "./tagEntity.test.data";
 
 describe("TagEntity", () => {
   describe("TagEntity::getSchema", () => {
@@ -44,10 +44,24 @@ describe("TagEntity", () => {
 
   describe("TagEntity:constructor", () => {
     it("should work if valid minimal DTO is provided", () => {
-      expect.assertions(1);
+      expect.assertions(4);
+      const dto = minimalTagDto();
+      const entity = new TagEntity(dto);
+      const expectedToDto = {...dto, is_shared: false}; // Is shared is marshalled.
+      expect(entity.toDto()).toEqual(expectedToDto);
+      expect(entity.id).toBeNull();
+      expect(entity.slug).toEqual(dto.slug);
+      expect(entity.isShared).toBeFalsy();
+    });
+
+    it("should work if complete DTO is provided", () => {
+      expect.assertions(4);
       const dto = defaultTagDto();
       const entity = new TagEntity(dto);
       expect(entity.toDto()).toEqual(dto);
+      expect(entity.id).toEqual(dto.id);
+      expect(entity.slug).toEqual(dto.slug);
+      expect(entity.isShared).toEqual(dto.is_shared);
     });
 
     // The entity should throw an exception, the code created the error but does not throw it.

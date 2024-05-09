@@ -9,28 +9,22 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.6.0
+ * @since         4.8.0
  */
-import {v4 as uuidv4} from "uuid";
 
-export const minimalTagDto = (data = {}) => ({
-  slug: "minimal-tag",
-  ...data
-});
+import {defaultTagDto} from "./tagEntity.test.data";
 
-export const defaultTagDto = (data = {}) => {
-  const id = data?.id || uuidv4();
-
-  return {
-    id: id,
-    slug: "personal-tag",
-    is_shared: false,
-    ...data
-  };
+/**
+ * Build dtos.
+ * @param {number} [count=10] The number of dtos.
+ * @returns {object}
+ */
+export const defaultTagsDtos = (count = 10) => {
+  const dtos = [];
+  for (let i = 0; i < count; i++) {
+    const groupDto = defaultTagDto({slug: `tag ${i}`});
+    dtos.push(groupDto);
+  }
+  return dtos;
 };
 
-export const sharedTagDto = (data = {}) => defaultTagDto({
-  slug: "#shared-tag",
-  is_shared: true,
-  ...data
-});

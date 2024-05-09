@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import {v4 as uuid} from "uuid";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {defaultTagDto, minimalTagDto} from "./tagEntity.test.data";
 import TagsCollection from "./tagsCollection";
@@ -82,12 +81,9 @@ describe("TagsCollection", () => {
       const dto1 = defaultTagDto({slug: "tag 1"});
       const dto2 = defaultTagDto({slug: 42});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => new TagsCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("1.slug.type");
-      expect(() => new TagsCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("slug.type");
+        .toThrowCollectionValidationError("1.slug.type");
     });
 
     it("should throw if one of data item does not validate the unique id build rule", () => {
@@ -95,12 +91,9 @@ describe("TagsCollection", () => {
       const dto2 = defaultTagDto({slug: 'tag2'});
       const dto3 = defaultTagDto({id: dto2.id, slug: 'tag3'});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => new TagsCollection([dto1, dto2, dto3]))
-        .not.toThrowCollectionValidationError("2.id.unique_id");
-      expect(() => new TagsCollection([dto1, dto2, dto3]))
-        .toThrowError(new EntityCollectionError(1, TagsCollection.RULE_UNIQUE_ID, "The collection should only contain items with unique values for the property: id."));
+        .toThrowCollectionValidationError("2.id.unique");
     });
 
     // The unique slug build rule is not yet enforced
@@ -113,6 +106,18 @@ describe("TagsCollection", () => {
       expect(() => new TagsCollection([dto1, dto2, dto3]))
         .toThrowCollectionValidationError("2.id.unique_slug");
     });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
+      const dto1 = defaultTagDto({slug: 'tag1'});
+      const dto2 = defaultTagDto({slug: 42});
+      const dto3 = defaultTagDto({slug: 'tag3'});
+
+      expect.assertions(3);
+      const collection = new TagsCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
+      expect(collection.items).toHaveLength(2);
+      expect(collection.items[0].id).toEqual(dto1.id);
+      expect(collection.items[1].id).toEqual(dto3.id);
+    });
   });
 
   describe("TagsCollection:pushMany", () => {
@@ -122,7 +127,6 @@ describe("TagsCollection", () => {
 
       const start = performance.now();
       const collection = new TagsCollection(dtos);
-      console.log(collection.items);
       const time = performance.now() - start;
       expect(collection).toHaveLength(count);
       expect(time).toBeLessThan(5_000);

@@ -12,7 +12,7 @@
  * @since         4.7.0
  */
 import {fetchOptionsHeaders} from "../../../serviceWorker/service/network/requestFetchOffscreenService.test.data";
-import {SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} from "./fetchOffscreenService";
+import {FETCH_OFFSCREEN_DATA_TYPE_JSON, SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} from "./fetchOffscreenService";
 
 export const defaultFetchMessage = message => ({
   target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN,
@@ -23,8 +23,11 @@ export const defaultFetchMessage = message => ({
       credentials: "include",
       headers: fetchOptionsHeaders(),
       body: {
-        prop1: "value 1",
-        prop2: "value 2"
+        data: {
+          prop1: "value 1",
+          prop2: "value 2"
+        },
+        dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON
       }
     }
   },

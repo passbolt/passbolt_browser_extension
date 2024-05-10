@@ -13,12 +13,15 @@
  */
 
 import Validator from "validator";
+import FormDataUtils from "../../../../all/background_page/utils/format/formDataUtils";
 
 export const SEND_MESSAGE_TARGET_FETCH_OFFSCREEN = "fetch-offscreen";
 export const SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER = "service-worker-fetch-offscreen-response-handler";
 export const SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_POLLING_HANDLER = "service-worker-fetch-offscreen-polling-handler";
 export const FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS = "success";
 export const FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR = "error";
+export const FETCH_OFFSCREEN_DATA_TYPE_JSON = "JSON";
+export const FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA = "FORM_DATA";
 const POLLING_COUNTER_UPDATE_LOCK = "POLLING_COUNTER_UPDATE_LOCK";
 const POLLING_PERIOD = 25_000;
 
@@ -54,7 +57,8 @@ export default class FetchOffscreenService {
       return;
     }
     const {id, resource, options} = message?.data || {};
-
+    // Update the body to fit the data type to send (JSON or FORM DATA)
+    options.body = options.body.dataType === FETCH_OFFSCREEN_DATA_TYPE_JSON ? options.body.data : FormDataUtils.arrayToFormData(options.body.data);
     await FetchOffscreenService.increaseAwaitingRequests();
     try {
       const response = await fetch(resource, options);

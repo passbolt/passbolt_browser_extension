@@ -21,6 +21,8 @@ import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 import User from "../../model/user";
 import Log from "../../model/log";
 import {BrowserExtensionIconService} from "../../service/ui/browserExtensionIcon.service";
+import storage from "../../sdk/storage";
+import {Config} from "../../model/config";
 
 class OnExtensionInstalledController {
   /**
@@ -29,6 +31,13 @@ class OnExtensionInstalledController {
    * @returns {Promise<void>}
    */
   static async exec(details) {
+    // Check if the storage have some data
+    if (Object.keys(storage._data).length === 0) {
+      // Fix the initialization of the storage after an update
+      await storage.init();
+      // Initialization of the config to get the user information
+      Config.init();
+    }
     switch (details.reason) {
       case browser.runtime.OnInstalledReason.INSTALL:
         await OnExtensionInstalledController.onInstall();

@@ -6,6 +6,7 @@ import toolbarService from "../toolbar/toolbarService";
 
 class SystemRequirementService {
   /**
+   * @deprecated
    * Initialize all requirement for proper operation
    * @return {Promise<void>}
    */

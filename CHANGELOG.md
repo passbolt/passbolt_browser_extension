@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.7.7] - 2024-05-10
+### Maintenance
+- PB-33321 Fix local storage loading on extension update
+
 ## [4.7.6] - 2024-05-08
 ### Maintenance
 - PB-33307 Add debug to capture onInstall reason details
@@ -1607,8 +1611,9 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.6...HEAD
-[4.7.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.6...v4.7.5
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.7...HEAD
+[4.7.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.6...v4.7.7
+[4.7.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.5...v4.7.6
 [4.7.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.4...v4.7.5
 [4.7.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.3...v4.7.4
 [4.7.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.1...v4.7.3

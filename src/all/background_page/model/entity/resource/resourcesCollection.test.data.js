@@ -64,3 +64,19 @@ export const resourceAllTypesDtosCollection = () => {
   resource5.permissions = [resource5.permission];
   return [resource1, resource2, resource3, resource4, resource5];
 };
+
+/**
+ * Build dtos.
+ * @param {number} [count=10] The number of dtos.
+ * @param {object} data The data to override the default dto.
+ * @param {object} options Options to pass to the resource dto factory.
+ * @returns {object}
+ */
+export const defaultResourcesDtos = (count = 10, data = {}, options = {}) => {
+  const dtos = [];
+  for (let i = 0; i < count; i++) {
+    const dto = defaultResourceDto(data, options);
+    dtos.push(dto);
+  }
+  return dtos;
+};

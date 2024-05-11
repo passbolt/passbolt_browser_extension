@@ -12,9 +12,10 @@
  * @since         2.13.0
  */
 import PermissionEntity from "./permissionEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 
 const ENTITY_NAME = 'Permissions';
 
@@ -23,10 +24,17 @@ const RULE_UNIQUE_ARO = 'unique_aro';
 const RULE_SAME_ACO = 'same_aco';
 const RULE_ONE_OWNER = 'owner';
 
-class PermissionsCollection extends EntityCollection {
+class PermissionsCollection extends EntityV2Collection {
   /**
    * @inheritDoc
-   * Some validation rules are to be expected:
+   */
+  get entityClass() {
+    return PermissionEntity;
+  }
+
+  /**
+   * @inheritDoc
+   * Validation rules are to be expected:
    * - All items should be a valid PermissionEntity
    * - All items should be about the same folder or resource
    * - There can be only one permission per user or group
@@ -34,32 +42,16 @@ class PermissionsCollection extends EntityCollection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by aco & aro.
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same aco.
-   * @todo The collection options.clone, doesn't work completely as expected here as the internal push function is creating the PermissionEntity.
+   * @throws {EntityCollectionError} Build Rule: Ensure there is at least one owner in the collection.
    */
   constructor(permissionsDto, options = {}) {
-    const assertAtLeastOneOwner = typeof options?.assertAtLeastOneOwner === 'undefined' || options.assertAtLeastOneOwner;
-
     super(EntitySchema.validate(
       PermissionsCollection.ENTITY_NAME,
       permissionsDto,
       PermissionsCollection.getSchema()
     ), options);
 
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(permission => {
-      this.push(permission);
-    });
-
-    /*
-     * Logical validation rules
-     * A permission list must contain at least one owner
-     */
-    if (assertAtLeastOneOwner) {
-      this.assertAtLeastOneOwner();
-    }
+    this.pushMany(this._props, {...options, clone: false});
 
     // We do not keep original props
     this._props = null;
@@ -97,9 +89,10 @@ class PermissionsCollection extends EntityCollection {
 
   /*
    * ==================================================
-   * Dynamic getters
+   * Validation
    * ==================================================
    */
+
   /**
    * Get permissions entity schema
    *
@@ -111,6 +104,66 @@ class PermissionsCollection extends EntityCollection {
       "items": PermissionEntity.getSchema(),
     };
   }
+
+  /**
+   * @inheritDoc
+   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
+   * @param {Set} [options.uniqueAroForeignKeysSetCache] A set of unique aro foreign keys.
+   * @throws {EntityValidationError} If a permission already exists with the same id.
+   * @throws {EntityValidationError} If a permission already exists with the same aro foreign keys.
+   * @throws {EntityValidationError} If the permission does not have target the same aco than the other permissions of the collection.
+   */
+  validateBuildRules(item, options = {}) {
+    this.assertItemSameAco(item);
+    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+    this.assertNotExist("aro_foreign_key", item._props.aro_foreign_key, {haystackSet: options?.uniqueAroForeignKeysSetCache});
+  }
+  /**
+   * Assert that the item pushed to the collection is about the same ACO.
+   *
+   * @param {PermissionEntity} permission The perm
+   * @throws {EntityValidationError} if a permission for another ACO already exist
+   */
+  assertItemSameAco(permission) {
+    if (!this.permissions.length) {
+      return;
+    }
+    const referencePermission = this.permissions[0];
+    if (!PermissionEntity.isAcoMatching(permission, referencePermission)) {
+      const error = new EntityValidationError();
+      const message = `The collection is already composed of this type of aco: ${referencePermission.aco} / aco_foreign_key: ${referencePermission.acoForeignKey}.`;
+      error.addError("aco_foreign_key", PermissionsCollection.RULE_SAME_ACO, message);
+      throw error;
+    }
+  }
+
+  /**
+   * Assert the collection contain at least one owner
+   *
+   * @return {void}
+   * @throws {CollectionValidationError} if not owner is found in the collection
+   */
+  assertAtLeastOneOwner() {
+    if (!this.length) {
+      return;
+    }
+
+    const hasOwnerPermission = this.items.some(permission => permission.isOwner());
+    if (hasOwnerPermission) {
+      return;
+    }
+
+    const collectionValidationError = new CollectionValidationError();
+    const message = 'Permission collection should contain at least one owner.';
+    collectionValidationError.addCollectionValidationError(PermissionsCollection.RULE_ONE_OWNER, message);
+    throw collectionValidationError;
+  }
+
+  /*
+   * ==================================================
+   * Dynamic getters
+   * ==================================================
+   */
 
   /**
    * Get permissions
@@ -148,35 +201,34 @@ class PermissionsCollection extends EntityCollection {
 
   /*
    * ==================================================
-   * Push items in the collection
+   * Setters
    * ==================================================
    */
+
   /**
-   * Push a copy of the permission to the list
-   * @param {PermissionEntity} permission DTO or PermissionEntity
-   * @throws {EntityValidationError} if a permission already exist or is not valid
+   * @inheritDoc
+   * @param {boolean} [options.assertAtLeastOneOwner=true] Assert the collection contains at least one owner.
    */
-  push(permission) {
-    if (!permission || typeof permission !== 'object') {
-      throw new TypeError(`PermissionsCollection push expect a permission DTO.`);
+  pushMany(data, entityOptions = {}, options = {}) {
+    const assertAtLeastOneOwner = entityOptions?.assertAtLeastOneOwner ?? true;
+    const uniqueIdsSetCache = new Set(this.extract("id"));
+    const uniqueAroForeignKeysSetCache = new Set(this.extract("aro_foreign_key"));
+    const onItemPushed = item => {
+      uniqueIdsSetCache.add(item.id);
+      uniqueAroForeignKeysSetCache.add(item.aroForeignKey);
+    };
+
+    options = {
+      onItemPushed: onItemPushed,
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueAroForeignKeysSetCache},
+      ...options
+    };
+
+    super.pushMany(data, entityOptions, options);
+
+    if (assertAtLeastOneOwner) {
+      this.assertAtLeastOneOwner();
     }
-    if (permission instanceof PermissionEntity) {
-      permission = permission.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS); // deep clone
-    }
-
-    const newPermission = new PermissionEntity(permission); // validate
-
-    /*
-     * Build rules
-     * Assert there is not already a permission with the same id
-     * Assert there is not already a permission with the same ACO/ARO
-     * Assert we're dealing with same resource / folder
-     */
-    this.assertSameAco(newPermission);
-    this.assertUniqueId(newPermission);
-    this.assertUniqueAro(newPermission);
-
-    super.push(newPermission);
   }
 
   /**
@@ -186,97 +238,35 @@ class PermissionsCollection extends EntityCollection {
    * @throws {EntityCollectionError} if the permission cannot be pushed or replaced
    */
   addOrReplace(permission) {
-    try {
+    permission = this.buildOrCloneEntity(permission);
+
+    const permissionToReplaceIndex = this.items.findIndex(item =>
+      (!item.id || item.id === permission._props.id)
+      && (PermissionEntity.isAcoAndAroMatching(item, permission))
+    );
+
+    // No matching item, add the permission to the collection.
+    if (permissionToReplaceIndex === -1) {
       this.push(permission);
+      return;
+    }
+
+    const replacedItem = this._items[permissionToReplaceIndex];
+    // Do not replace the matching permission if the new permission has a lower access.
+    if (permission.type <= replacedItem.type) {
+      return;
+    }
+
+    // Remove the element from the collection.
+    this._items.splice(permissionToReplaceIndex, 1);
+    try {
+      this.validateBuildRules(permission);
+      this._items.splice(permissionToReplaceIndex, 0, permission);
     } catch (error) {
-      const recover = [PermissionsCollection.RULE_UNIQUE_ID, PermissionsCollection.RULE_UNIQUE_ARO];
-      if (!recover.includes(error.rule)) {
-        throw error;
-      }
-      const existingPermission = this.permissions[error.position];
-      if (PermissionEntity.isAcoAndAroMatching(existingPermission, permission)) {
-        // if the match, keep the one with highest permission
-        this.permissions[error.position] = PermissionEntity.getHighestPermission(existingPermission, permission);
-      } else {
-        // same id but different aro and aco, it smells...
-        throw error;
-      }
+      // Rollback to the existing permission if an unexpected error occurred.
+      this._items.splice(permissionToReplaceIndex, 0, replacedItem);
+      throw error;
     }
-  }
-
-  /*
-   * ==================================================
-   * Permissions assertions
-   * ==================================================
-   */
-  /**
-   * Assert there the collection is always about the same ACO (resource/folder)
-   *
-   * @param {PermissionEntity} permission
-   * @throws {EntityValidationError} if a permission for another ACO already exist
-   */
-  assertSameAco(permission) {
-    if (!this.permissions.length) {
-      return;
-    }
-    if (!PermissionEntity.isAcoMatching(permission, this.permissions[0])) {
-      const msg = `The collection is already composed of this type of ACO: ${this.permissions[0].aco}.`;
-      throw new EntityCollectionError(0, PermissionsCollection.RULE_SAME_ACO, msg);
-    }
-  }
-
-  /**
-   * Assert there is no other permission with the same id in the collection
-   *
-   * @param {PermissionEntity} permission
-   * @throws {EntityValidationError} if a permission with the same id already exist
-   */
-  assertUniqueId(permission) {
-    if (!permission.id) {
-      return;
-    }
-    const length = this.permissions.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingPermission = this.permissions[i];
-      if (existingPermission.id && existingPermission.id === permission.id) {
-        throw new EntityCollectionError(i, PermissionsCollection.RULE_UNIQUE_ID, `Permission id ${permission.id} already exists.`);
-      }
-    }
-  }
-
-  /**
-   * Assert that there is no other permission for the same ARO (User or Group)
-   *
-   * @param {PermissionEntity} permission
-   * @throws {EntityValidationError} if a permission with the same aco id already exist
-   */
-  assertUniqueAro(permission) {
-    const length = this.permissions.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingPermission = this.permissions[i];
-      if (PermissionEntity.isAroMatching(permission, existingPermission)) {
-        const msg = `${permission.aro} id ${permission.aroForeignKey} already exists in the permission list.`;
-        throw new EntityCollectionError(i, PermissionsCollection.RULE_UNIQUE_ARO, msg);
-      }
-    }
-  }
-
-  /**
-   * Assert the collection contain at least one owner
-   *
-   * @return {void}
-   * @throws {EntityValidationError} if not owner is found in the collection
-   */
-  assertAtLeastOneOwner() {
-    for (const permission of this) {
-      if (permission.isOwner()) {
-        return;
-      }
-    }
-    const msg = 'Permission collection should contain at least one owner.';
-    throw new EntityCollectionError(0, PermissionsCollection.RULE_ONE_OWNER, msg);
   }
 
   /*
@@ -290,15 +280,19 @@ class PermissionsCollection extends EntityCollection {
    *
    * @param {PermissionsCollection} set1
    * @param {PermissionsCollection} set2
-   * @param {boolean} [ownerValidation] optional default true
+   * @param {boolean} [assertAtLeastOneOwner=true] Validate the collection has at least one owner.
    * @return {PermissionsCollection} set3
    */
-  static sum(set1, set2, ownerValidation) {
+  static sum(set1, set2, assertAtLeastOneOwner = true) {
     const set3 = new PermissionsCollection(set1.toDto(), {assertAtLeastOneOwner: false});
-    for (const set2Permission of set2) {
-      set3.addOrReplace(set2Permission);
-    }
-    if (typeof ownerValidation === 'undefined' || ownerValidation) {
+    set2.items.forEach((set2Permission, index) => {
+      try {
+        set3.addOrReplace(set2Permission);
+      } catch (error) {
+        set2.handlePushItemError(index, error);
+      }
+    });
+    if (assertAtLeastOneOwner) {
       set3.assertAtLeastOneOwner();
     }
     return set3;
@@ -310,17 +304,17 @@ class PermissionsCollection extends EntityCollection {
    *
    * @param {PermissionsCollection} set1
    * @param {PermissionsCollection} set2
-   * @param {boolean} [ownerValidation] optional default true
+   * @param {boolean} [assertAtLeastOneOwner=true] Validate the collection has at least one owner.
    * @return {PermissionsCollection} set3
    */
-  static diff(set1, set2, ownerValidation) {
+  static diff(set1, set2, assertAtLeastOneOwner = true) {
     const set3 = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     for (const permission of set1) {
       if (!set2.containAtLeastPermission(permission.aro, permission.aroForeignKey, permission.type)) {
         set3.push(permission);
       }
     }
-    if (typeof ownerValidation === 'undefined' || ownerValidation) {
+    if (assertAtLeastOneOwner) {
       set3.assertAtLeastOneOwner();
     }
     return set3;
@@ -344,38 +338,21 @@ class PermissionsCollection extends EntityCollection {
   }
 
   /**
-   * Return true if a set contain a permission equal or inferior for the given type and aro, aroForeign key
-   *
-   * @param {string} aro group or user
-   * @param {string} aroForeignKey uuid
-   * @param {number} type see permission entity types
-   * @returns {boolean}
-   */
-  containAtMostPermission(aro, aroForeignKey, type) {
-    for (const permission of this.items) {
-      if (permission.aro === aro && permission.aroForeignKey === aroForeignKey && permission.type <= type) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Clone permission set for another ACO
    *
    * @param {string} aco resource or folder
    * @param {string} acoId
-   * @param {boolean} [ownerValidation] optional, default true
+   * @param {boolean} [assertAtLeastOneOwner=true] Validate the collection has at least one owner.
    * @return {PermissionsCollection}
    */
-  cloneForAco(aco, acoId, ownerValidation) {
+  cloneForAco(aco, acoId, assertAtLeastOneOwner = true) {
     const permissions = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     for (const parentPermission of this.permissions) {
       const clone = parentPermission.copyForAnotherAco(aco, acoId);
       permissions.addOrReplace(clone);
     }
-    if (typeof ownerValidation === 'undefined' || ownerValidation) {
-      this.assertAtLeastOneOwner();
+    if (assertAtLeastOneOwner) {
+      permissions.assertAtLeastOneOwner();
     }
     return permissions;
   }

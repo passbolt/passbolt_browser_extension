@@ -15,7 +15,6 @@ import PermissionEntity from "./permissionEntity";
 import permissionEntity from "./permissionEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import PermissionsCollection from "./permissionsCollection";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import {
   defaultPermissionDto,
   minimumPermissionDto, ownerFolderPermissionDto,
@@ -104,12 +103,9 @@ describe("PermissionsCollection", () => {
       const dto1 = defaultPermissionDto({aco_foreign_key: acoForeignKey});
       const dto2 = defaultPermissionDto({aco_foreign_key: acoForeignKey, id: 42});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => new PermissionsCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("1.id.type");
-      expect(() => new PermissionsCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("id.type");
+        .toThrowCollectionValidationError("1.id.type");
     });
 
     it("should throw if one of data item does not validate the unique id build rule", () => {
@@ -117,12 +113,9 @@ describe("PermissionsCollection", () => {
       const dto1 = defaultPermissionDto({aco_foreign_key: acoForeignKey});
       const dto2 = defaultPermissionDto({aco_foreign_key: acoForeignKey, id: dto1.id});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => new PermissionsCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("1.id.unique");
-      expect(() => new PermissionsCollection([dto1, dto2]))
-        .toThrowError(new EntityCollectionError(1, PermissionsCollection.RULE_UNIQUE_ID, `Permission id ${dto2.id} already exists.`));
+        .toThrowCollectionValidationError("1.id.unique");
     });
 
     it("should throw if one of data item does not validate the unique user id build rule", () => {
@@ -130,24 +123,18 @@ describe("PermissionsCollection", () => {
       const dto1 = defaultPermissionDto({aco_foreign_key: acoForeignKey});
       const dto2 = defaultPermissionDto({aco_foreign_key: acoForeignKey, aro_foreign_key: dto1.aro_foreign_key});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => new PermissionsCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("1.aro_foreign_key.unique");
-      expect(() => new PermissionsCollection([dto1, dto2]))
-        .toThrowError(new EntityCollectionError(1, PermissionsCollection.RULE_UNIQUE_ARO, `User id ${dto2.aro_foreign_key} already exists in the permission list.`));
+        .toThrowCollectionValidationError("1.aro_foreign_key.unique");
     });
 
     it("should throw if one of data item does not validate the same aco_foreign_key build rule", () => {
       const dto1 = defaultPermissionDto();
       const dto2 = defaultPermissionDto();
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => new PermissionsCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("1.aco_foreign_key.same");
-      expect(() => new PermissionsCollection([dto1, dto2]))
-        .toThrowError(new EntityCollectionError(1, PermissionsCollection.RULE_SAME_ACO, "The collection is already composed of this type of ACO: Resource."));
+        .toThrowCollectionValidationError("1.aco_foreign_key.same_aco");
     });
 
     it("should throw if one of data item does not validate the owner build rule", () => {
@@ -155,12 +142,9 @@ describe("PermissionsCollection", () => {
       const dto1 = defaultPermissionDto({aco_foreign_key: acoForeignKey, type: PermissionEntity.PERMISSION_READ});
       const dto2 = defaultPermissionDto({aco_foreign_key: acoForeignKey, type: PermissionEntity.PERMISSION_UPDATE});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => new PermissionsCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("0.type.owner");
-      expect(() => new PermissionsCollection([dto1, dto2]))
-        .toThrowError(new EntityCollectionError(0, PermissionsCollection.RULE_ONE_OWNER, "Permission collection should contain at least one owner."));
+        .toThrowCollectionValidationError("owner");
     });
   });
 
@@ -173,7 +157,7 @@ describe("PermissionsCollection", () => {
       const collection = new PermissionsCollection(dtos);
       const time = performance.now() - start;
       expect(collection).toHaveLength(count);
-      expect(time).not.toBeLessThan(5_000);
+      expect(time).toBeLessThan(5_000);
     });
   });
 
@@ -186,37 +170,22 @@ describe("PermissionsCollection", () => {
     });
 
     it("should throw if the permission has the same id but does not validate the same aco build rule", () => {
-      expect.assertions(4);
-      const dto1 = ownerFolderPermissionDto();
+      expect.assertions(1);
+      const dto1 = updateFolderPermissionDto();
       const dto2 = ownerFolderPermissionDto({id: dto1.id});
-      const collection = new PermissionsCollection([dto1]);
-      // Prior to migration to collection V2 the throwned error is Collection error
+      const collection = new PermissionsCollection([dto1], {assertAtLeastOneOwner: false});
       expect(() => collection.addOrReplace(dto2))
-        .not.toThrowEntityValidationError("aco", "same_aco");
-      try {
-        collection.addOrReplace(dto2);
-      } catch (error) {
-        expect(error).toBeInstanceOf(EntityCollectionError);
-        expect(error.position).toEqual(0);
-        expect(error.rule).toEqual("same_aco");
-      }
+        .toThrowEntityValidationError("aco_foreign_key", "same_aco");
     });
 
-    it("should throw if the permission is owned by the same aro does not validate the same aco build rule", () => {
-      expect.assertions(4);
-      const dto1 = ownerMinimalFolderPermissionDto();
+    it("should throw if the permission is owned by a matching aro does not validate the same aco build rule", () => {
+      expect.assertions(1);
+      const dto1 = updateMinimalFolderPermissionDto();
       const dto2 = ownerMinimalFolderPermissionDto({aro: dto1.aro, aro_foreign_key: dto1.aro_foreign_key});
-      const collection = new PermissionsCollection([dto1]);
-      // Prior to migration to collection V2 the throwned error is Collection error
+      const collection = new PermissionsCollection([dto1], {assertAtLeastOneOwner: false});
+
       expect(() => collection.addOrReplace(dto2))
-        .not.toThrowEntityValidationError("aco", "same_aco");
-      try {
-        collection.addOrReplace(dto2);
-      } catch (error) {
-        expect(error).toBeInstanceOf(EntityCollectionError);
-        expect(error.position).toEqual(0);
-        expect(error.rule).toEqual("same_aco");
-      }
+        .toThrowEntityValidationError("aco_foreign_key", "same_aco");
     });
 
     it("should not throw if the owner build rules does not validate after adding or replacing a permission", () => {
@@ -232,7 +201,7 @@ describe("PermissionsCollection", () => {
     });
 
     it("adds a permission to the collection if the collection is empty", () => {
-      expect.assertions(2);
+      expect.assertions(3);
       const dto1 = ownerFolderPermissionDto();
       const collection = new PermissionsCollection([], {assertAtLeastOneOwner: false});
       collection.addOrReplace(dto1);
@@ -395,12 +364,9 @@ describe("PermissionsCollection", () => {
       const set1 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
       const set2 = new PermissionsCollection([dto2], {assertAtLeastOneOwner: false});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => PermissionsCollection.sum(set1, set2))
-        .not.toThrowCollectionValidationError("0.type.owner");
-      expect(() => PermissionsCollection.sum(set1, set2))
-        .toThrowError(new EntityCollectionError(0, PermissionsCollection.RULE_ONE_OWNER, "Permission collection should contain at least one owner."));
+        .toThrowCollectionValidationError("owner");
     });
 
     it("union returns set1 + set2 - not same aco throw error", () => {
@@ -409,12 +375,9 @@ describe("PermissionsCollection", () => {
       const set1 = new PermissionsCollection([dto1], {assertAtLeastOneOwner: false});
       const set2 = new PermissionsCollection([dto2], {assertAtLeastOneOwner: false});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => PermissionsCollection.sum(set1, set2))
-        .not.toThrowCollectionValidationError("1.aco_foreign_key.same");
-      expect(() => PermissionsCollection.sum(set1, set2))
-        .toThrowError(new EntityCollectionError(1, PermissionsCollection.RULE_SAME_ACO, "The collection is already composed of this type of ACO: Folder."));
+        .toThrowCollectionValidationError("0.aco_foreign_key.same_aco");
     });
   });
 

@@ -131,7 +131,7 @@ describe("ResourceSecretsCollection", () => {
   });
 
   describe("ResourceSecretsCollection:pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
       const count = 10_000;
       const dtos = defaultResourcesSecretsDtos(count);
 

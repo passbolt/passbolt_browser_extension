@@ -12,16 +12,22 @@
  * @since         2.13.0
  */
 import TagEntity from "./tagEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
 const ENTITY_NAME = 'Tags';
 
 const RULE_UNIQUE_ID = 'unique_id';
 const RULE_UNIQUE_SLUG = 'unique_slug';
 
-class TagsCollection extends EntityCollection {
+class TagsCollection extends EntityV2Collection {
+  /**
+   * @inheritDoc
+   */
+  get entityClass() {
+    return TagEntity;
+  }
+
   /**
    * @inheritDoc
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
@@ -33,7 +39,7 @@ class TagsCollection extends EntityCollection {
       TagsCollection.getSchema()
     ), options);
 
-    this.push(this._props, {clone: false});
+    this.pushMany(this._props, {...options, clone: false});
 
     // We do not keep original props
     this._props = null;
@@ -57,11 +63,12 @@ class TagsCollection extends EntityCollection {
   }
 
   /**
-   * Validate the collection build rules.
-   * @throws {EntityCollectionError} If multiple items have the same id.
+   * @inheritDoc
+   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
+   * @throws {EntityValidationError} If a tag already exists with the same id.
    */
-  validateBuildRules() {
-    this.assertUniqueByProperty("id");
+  validateBuildRules(item, options) {
+    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
   }
 
   /*
@@ -79,92 +86,27 @@ class TagsCollection extends EntityCollection {
 
   /*
    * ==================================================
-   * Assertions
-   * ==================================================
-   */
-  /**
-   * Assert there is no other tag with the same id in the collection
-   *
-   * @param {TagEntity} tag
-   * @throws {EntityValidationError} if a tag with the same id already exist
-   */
-  assertUniqueId(tag) {
-    if (!tag.id) {
-      return;
-    }
-    const length = this.tags.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingTag = this.tags[i];
-      if (existingTag.id && existingTag.id === tag.id) {
-        throw new EntityCollectionError(i, TagsCollection.RULE_UNIQUE_ID, `Tag id ${tag.id} already exists.`);
-      }
-    }
-  }
-
-  /**
-   * Assert there is no other tag with the same id in the collection
-   *
-   * @param {TagEntity} tag
-   * @throws {EntityValidationError} if a tag with the same id already exist
-   */
-  assertUniqueSlug(tag) {
-    const length = this.tags.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingTag = this.tags[i];
-      if (existingTag.slug && existingTag.slug === tag.slug) {
-        throw new EntityCollectionError(i, TagsCollection.RULE_UNIQUE_SLUG, `Tag slug ${tag.slug} already exists.`);
-      }
-    }
-  }
-
-  /*
-   * ==================================================
    * Setters
    * ==================================================
    */
-
   /**
-   * Push an item to the list
-   * @param {object|Entity} item The item to push
-   * @param {object} [entityOptions] Options for constructing the entity, identical to those accepted by the Entity
-   *   constructor that will be utilized for its creation.
-   * @private
+   * @inheritDoc
+   * This method creates caches of unique ids to improve the build rules performance.
    */
-  _pushItem(item, entityOptions = {}) {
-    if (!item || typeof item !== 'object') {
-      throw new TypeError(`TagsCollection push parameter should be an object.`);
-    }
+  pushMany(data, entityOptions = {}, options = {}) {
+    const uniqueIdsSetCache = new Set(this.extract("id"));
+    const onItemPushed = item => {
+      uniqueIdsSetCache.add(item.id);
+    };
 
-    if (item instanceof TagEntity) {
-      item = item.toDto(TagEntity?.ALL_CONTAIN_OPTIONS); // deep clone
-    }
+    options = {
+      onItemPushed: onItemPushed,
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache
+      },
+      ...options
+    };
 
-    const entity = new TagEntity(item, entityOptions);
-    super.push(entity);
-  }
-
-  /**
-   * Push one or multiple items to the list.
-   * @param {object|Entity|array} data The item(s) to add to the collection should be in the form of a DTO, an entity,
-   *   or an array comprising any of the aforementioned.
-   * @param {object} [entityOptions] Options for constructing the entity, identical to those accepted by the Entity
-   *   constructor that will be utilized for its creation.
-   * @throws {EntityCollectionError} If one build rule does not validate.
-   * @throws {EntityValidationError} If one entity schema rule doesn't validate
-   *   (@todo could be an EntityCollectionError to keep a trace of the position of the failing item.)
-   */
-  push(data, entityOptions = {}) {
-    if (Array.isArray(data)) {
-      data.forEach(itemDto => {
-        this._pushItem(itemDto, entityOptions);
-      });
-    } else {
-      this._pushItem(data, entityOptions);
-    }
-
-    this.validateBuildRules();
+    super.pushMany(data, entityOptions, options);
   }
 
   /**

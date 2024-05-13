@@ -30,14 +30,15 @@ class TagEntity extends Entity {
       TagEntity.getSchema()
     ), options);
 
-    // Additional build rules
+    // Marshall.
     if (typeof this._props.is_shared === 'undefined') {
       this._props.is_shared = this.slug.startsWith('#');
     }
+    // Additional build rules
     if (this.slug.startsWith('#') && !this.isShared) {
       const error = new EntityValidationError('Invalid tag');
       error.addError('is_shared', 'hashtag', 'A shared tag should start with a hashtag.');
-      // @todo should throw the error
+      // @todo should throw the error, not done to not introduce a regression. todo when ignoreInvalidEntity option will be enforced on critical journey.
     }
   }
 

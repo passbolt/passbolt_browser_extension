@@ -11,18 +11,23 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import SecretEntity from "../secretEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 const ENTITY_NAME = 'ResourceSecrets';
 
-const RULE_UNIQUE_ID = 'unique_id';
-const RULE_UNIQUE_USER_ID = 'unique_user_id';
-const RULE_SAME_RESOURCE = 'same_resource';
+const BUILD_RULE_SAME_RESOURCE = "same_resource";
 
-class ResourceSecretsCollection extends EntityCollection {
+class ResourceSecretsCollection extends EntityV2Collection {
+  /**
+   * @inheritDoc
+   */
+  get entityClass() {
+    return SecretEntity;
+  }
+
   /**
    * @inheritDoc
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
@@ -37,13 +42,7 @@ class ResourceSecretsCollection extends EntityCollection {
       ResourceSecretsCollection.getSchema()
     ), options);
 
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(secret => {
-      this.push(new SecretEntity(secret, {clone: false}));
-    });
+    this.pushMany(this._props, {...options, clone: false});
 
     // We do not keep original props
     this._props = null;
@@ -61,6 +60,56 @@ class ResourceSecretsCollection extends EntityCollection {
     };
   }
 
+  /*
+   * ==================================================
+   * Validation
+   * ==================================================
+   */
+
+  /**
+   * @inheritDoc
+   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
+   * @param {Set} [options.uniqueUsersIdsSetCache] A set of unique users ids.
+   * @throws {EntityValidationError} If a secret already exists with the same id.
+   * @throws {EntityValidationError} If a secret already exists with the same user id.
+   * @throws {EntityValidationError} If the secret does not have the same resource id than the other secrets of the collection.
+   */
+  validateBuildRules(item, options) {
+    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+    this.assertNotExist("user_id", item._props.user_id, {haystackSet: options?.uniqueUsersIdsSetCache});
+    this.assertSameResource(item);
+  }
+
+  /**
+   * Assert the collection is about the same resource.
+   *
+   * @param {SecretEntity} secret The secret
+   * @throws {EntityValidationError} if a secret for another resource already exist
+   * @private
+   */
+  assertSameResource(secret) {
+    if (!this.secrets.length) {
+      return;
+    }
+    if (typeof secret._props.resource_id === "undefined") {
+      return;
+    }
+
+    const collectionResourceId = this.secrets[0].resourceId;
+    if (secret._props.resource_id !== collectionResourceId) {
+      const error = new EntityValidationError();
+      const message = `The collection is already used for another resource with id ${collectionResourceId}.`;
+      error.addError("resource_id", ResourceSecretsCollection.BUILD_RULE_SAME_RESOURCE, message);
+      throw error;
+    }
+  }
+
+  /*
+   * ==================================================
+   * Getters
+   * ==================================================
+   */
+
   /**
    * Get secrets
    * @returns {Array<SecretEntity>}
@@ -71,92 +120,28 @@ class ResourceSecretsCollection extends EntityCollection {
 
   /*
    * ==================================================
-   * Assertions
-   * ==================================================
-   */
-  /**
-   * Assert there is no other secret with the same id in the collection
-   *
-   * @param {SecretEntity} secret
-   * @throws {EntityValidationError} if a secret with the same id already exist
-   */
-  assertUniqueId(secret) {
-    if (!secret.id) {
-      return;
-    }
-    const length = this.secrets.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingSecret = this.secrets[i];
-      if (existingSecret.id && existingSecret.id === secret.id) {
-        throw new EntityCollectionError(i, ResourceSecretsCollection.RULE_UNIQUE_ID, `Secret id ${secret.id} already exists.`);
-      }
-    }
-  }
-
-  /**
-   * Assert there is no other secret with the same user id in the collection
-   *
-   * @param {SecretEntity} secret
-   * @throws {EntityValidationError} if a secret with the same id already exist
-   */
-  assertUniqueUserId(secret) {
-    if (!secret.userId) {
-      return;
-    }
-    const length = this.secrets.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingSecret = this.secrets[i];
-      if (existingSecret.userId && existingSecret.userId === secret.userId) {
-        throw new EntityCollectionError(i, ResourceSecretsCollection.RULE_UNIQUE_USER_ID, `Secret for user id ${secret.userId} already exists.`);
-      }
-    }
-  }
-
-  /**
-   * Assert there the collection is always about the same resource
-   *
-   * @param {SecretEntity} secretEntity
-   * @throws {EntityValidationError} if a secret for another resource already exist
-   */
-  assertSameResource(secretEntity) {
-    if (!this.secrets.length) {
-      return;
-    }
-    if (!secretEntity.resourceId) {
-      return;
-    }
-    if (secretEntity.resourceId !== this.secrets[0].resourceId) {
-      const msg = `The collection is already used for another resource with id ${this.secrets[0].resourceId}.`;
-      throw new EntityCollectionError(0, ResourceSecretsCollection.RULE_SAME_RESOURCE, msg);
-    }
-  }
-
-  /*
-   * ==================================================
    * Setters
    * ==================================================
    */
   /**
-   * Push a copy of the secret to the list
-   * @param {object} secret DTO or SecretEntity
+   * @inheritDoc
+   * This method creates caches of unique ids and users ids to improve the build rules performance.
    */
-  push(secret) {
-    if (!secret || typeof secret !== 'object') {
-      throw new TypeError(`ResourceSecretsCollection push parameter should be an object.`);
-    }
-    if (secret instanceof SecretEntity) {
-      secret = secret.toDto(); // clone
-    }
-    const secretEntity = new SecretEntity(secret); // validate
+  pushMany(data, entityOptions = {}, options = {}) {
+    const uniqueIdsSetCache = new Set(this.extract("id"));
+    const uniqueUsersIdsSetCache = new Set(this.extract("user_id"));
+    const onItemPushed = item => {
+      uniqueIdsSetCache.add(item.id);
+      uniqueUsersIdsSetCache.add(item.userId);
+    };
 
-    // Build rules
-    this.assertUniqueId(secretEntity);
-    this.assertUniqueUserId(secretEntity);
-    this.assertSameResource(secretEntity);
+    options = {
+      onItemPushed: onItemPushed,
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueUsersIdsSetCache},
+      ...options
+    };
 
-    super.push(secretEntity);
+    super.pushMany(data, entityOptions, options);
   }
 
   /*
@@ -171,29 +156,12 @@ class ResourceSecretsCollection extends EntityCollection {
   static get ENTITY_NAME() {
     return ENTITY_NAME;
   }
-
   /**
-   * ResourceSecretsCollection.RULE_UNIQUE_ID
+   * ResourceSecretsCollection.BUILD_RULE_SAME_RESOURCE
    * @returns {string}
    */
-  static get RULE_UNIQUE_ID() {
-    return RULE_UNIQUE_ID;
-  }
-
-  /**
-   * ResourceSecretsCollection.RULE_UNIQUE_USER_ID
-   * @returns {string}
-   */
-  static get RULE_UNIQUE_USER_ID() {
-    return RULE_UNIQUE_USER_ID;
-  }
-
-  /**
-   * ResourceSecretsCollection.RULE_SAME_RESOURCE
-   * @returns {string}
-   */
-  static get RULE_SAME_RESOURCE() {
-    return RULE_SAME_RESOURCE;
+  static get BUILD_RULE_SAME_RESOURCE() {
+    return BUILD_RULE_SAME_RESOURCE;
   }
 }
 

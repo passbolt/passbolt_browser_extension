@@ -20,6 +20,8 @@ import WebIntegrationPagemod from "../../pagemod/webIntegrationPagemod";
 import WorkerService from "../worker/workerService";
 import PublicWebsiteSignInPagemod from "../../pagemod/publicWebsiteSignInPagemod";
 
+const PASSBOLT_EXTENSION_UPDATE = "passboltExtensionUpdate";
+
 class OnExtensionUpdateAvailableService {
   /**
    * Execute the OnExtensionUpdateAvailableService process
@@ -27,9 +29,9 @@ class OnExtensionUpdateAvailableService {
    */
   static async exec() {
     if (await isUserAuthenticated()) {
-      this.shouldReload = true;
+      await browser.storage.session.set({[PASSBOLT_EXTENSION_UPDATE]: true});
     } else {
-      await this.cleanAndReload();
+      await OnExtensionUpdateAvailableService.cleanAndReload();
     }
   }
 
@@ -47,9 +49,10 @@ class OnExtensionUpdateAvailableService {
    * It triggers a runtime reload if an extension update was available while the user was signed in.
    */
   static async handleUserLoggedOut() {
-    if (this.shouldReload) {
-      this.shouldReload = false;
-      await this.cleanAndReload();
+    const shouldUpdate = await browser.storage.session.get(PASSBOLT_EXTENSION_UPDATE);
+    if (shouldUpdate && shouldUpdate[PASSBOLT_EXTENSION_UPDATE]) {
+      await browser.storage.session.remove(PASSBOLT_EXTENSION_UPDATE);
+      await OnExtensionUpdateAvailableService.cleanAndReload();
     }
   }
 }

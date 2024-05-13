@@ -11,6 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.7.0
  */
+import FormDataUtils from "../../../../all/background_page/utils/format/formDataUtils";
+import {
+  FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA,
+  FETCH_OFFSCREEN_DATA_TYPE_JSON
+} from "../../../offscreens/service/network/fetchOffscreenService";
 
 const {SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} = require("../../../offscreens/service/network/fetchOffscreenService");
 
@@ -92,7 +97,7 @@ export class RequestFetchOffscreenService {
       RequestFetchOffscreenService.createIfNotExistOffscreenDocument);
 
     const offscreenFetchId = crypto.randomUUID();
-    const offscreenFetchData = RequestFetchOffscreenService.buildOffscreenData(offscreenFetchId, resource, options);
+    const offscreenFetchData = await RequestFetchOffscreenService.buildOffscreenData(offscreenFetchId, resource, options);
 
     return new Promise((resolve, reject) => {
       // Stack the response listener callbacks.
@@ -130,19 +135,21 @@ export class RequestFetchOffscreenService {
    * @param {object} fetchOptions The fetch options, similar to the native fetch option parameter.
    * @returns {object}
    */
-  static buildOffscreenData(id, resource, fetchOptions = {}) {
+  static async buildOffscreenData(id, resource, fetchOptions = {}) {
     const options = JSON.parse(JSON.stringify(fetchOptions));
 
     // Format FormData fetch options to allow its serialization.
     if (fetchOptions?.body instanceof FormData) {
-      const formDataValues = [];
-      for (const key of fetchOptions.body.keys()) {
-        formDataValues.push(`${encodeURIComponent(key)}=${encodeURIComponent(fetchOptions.body.get(key))}`);
-      }
-      options.body = formDataValues.join('&');
-      // Ensure the request content type reflect the content of its body.
-      options.headers = options.headers ?? {};
-      options.headers['Content-type'] = 'application/x-www-form-urlencoded';
+      const formDataSerialized = await FormDataUtils.formDataToArray(fetchOptions.body);
+      options.body = {
+        data: formDataSerialized,
+        dataType: FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA
+      };
+    } else {
+      options.body = {
+        data: fetchOptions.body,
+        dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON
+      };
     }
 
     return {id, resource, options};

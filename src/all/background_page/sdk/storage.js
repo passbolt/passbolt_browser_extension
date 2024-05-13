@@ -1,4 +1,5 @@
 /**
+ * @deprecated
  * Local Storage Wrapper Class
  * Ref. PASSBOLT-1725
  *

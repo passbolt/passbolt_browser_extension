@@ -30,17 +30,13 @@ class UsersCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by username.
    */
-  constructor(usersCollectionDto, options = {}) {
-    super(EntitySchema.validate(
+  constructor(dtos = [], options = {}) {
+    dtos = EntitySchema.validate(
       UsersCollection.ENTITY_NAME,
-      usersCollectionDto,
+      dtos,
       UsersCollection.getSchema()
-    ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
+    );
+    super(dtos, options);
   }
 
   /*

@@ -32,17 +32,13 @@ class ResourcesCollection extends EntityV2Collection {
    * @inheritDoc
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(resourcesCollectionDto, options = {}) {
-    super(EntitySchema.validate(
+  constructor(dtos = [], options = {}) {
+    dtos = EntitySchema.validate(
       ResourcesCollection.ENTITY_NAME,
-      resourcesCollectionDto,
+      dtos,
       ResourcesCollection.getSchema()
-    ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
+    );
+    super(dtos, options);
   }
 
   /*

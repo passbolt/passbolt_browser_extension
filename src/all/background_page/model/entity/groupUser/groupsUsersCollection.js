@@ -28,18 +28,13 @@ class GroupsUsersCollection extends EntityV2Collection {
   /**
    * @inheritDoc
    */
-  constructor(groupsUsersDto, options = {}) {
-    super(EntitySchema.validate(
+  constructor(dtos = [], options = {}) {
+    dtos = EntitySchema.validate(
       GroupsUsersCollection.ENTITY_NAME,
-      groupsUsersDto,
+      dtos,
       GroupsUsersCollection.getSchema()
-    ), options);
-
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
+    );
+    super(dtos, options);
   }
 
   /**

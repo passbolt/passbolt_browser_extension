@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.7.8] - 2024-05-14
+### Fixed
+- PB-33410 Fix Chrome Extension frozen and unusable after some period of inactivity
+
 ## [4.7.7] - 2024-05-10
 ### Maintenance
 - PB-33321 Fix local storage loading on extension update
@@ -1611,7 +1615,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.7...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.8...HEAD
+[4.7.8]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.7...v4.7.8
 [4.7.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.6...v4.7.7
 [4.7.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.5...v4.7.6
 [4.7.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.4...v4.7.5

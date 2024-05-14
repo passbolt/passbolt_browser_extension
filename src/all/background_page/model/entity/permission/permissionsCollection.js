@@ -44,17 +44,13 @@ class PermissionsCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same aco.
    * @throws {EntityCollectionError} Build Rule: Ensure there is at least one owner in the collection.
    */
-  constructor(permissionsDto, options = {}) {
-    super(EntitySchema.validate(
+  constructor(dtos = [], options = {}) {
+    dtos = EntitySchema.validate(
       PermissionsCollection.ENTITY_NAME,
-      permissionsDto,
+      dtos,
       PermissionsCollection.getSchema()
-    ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
+    );
+    super(dtos, options);
   }
 
   /*

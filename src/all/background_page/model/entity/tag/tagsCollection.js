@@ -32,17 +32,13 @@ class TagsCollection extends EntityV2Collection {
    * @inheritDoc
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(tagsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
+  constructor(dtos = [], options = {}) {
+    dtos = EntitySchema.validate(
       TagsCollection.ENTITY_NAME,
-      tagsCollectionDto,
+      dtos,
       TagsCollection.getSchema()
-    ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
+    );
+    super(dtos, options);
   }
 
   /*

@@ -34,17 +34,13 @@ class GroupsCollection extends EntityV2Collection {
    * @throws {CollectionValidationError} Build Rule: Ensure all items in the collection are unique by ID.
    * @throws {CollectionValidationError} Build Rule: Ensure all items in the collection are unique by name.
    */
-  constructor(groupsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
+  constructor(dtos = [], options = {}) {
+    dtos = EntitySchema.validate(
       GroupsCollection.ENTITY_NAME,
-      groupsCollectionDto,
+      dtos,
       GroupsCollection.getSchema()
-    ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
+    );
+    super(dtos, options);
   }
 
   /*

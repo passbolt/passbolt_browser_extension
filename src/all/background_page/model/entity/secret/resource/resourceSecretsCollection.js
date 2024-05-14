@@ -33,19 +33,14 @@ class ResourceSecretsCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection associated user ID is unique.
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same resource.
-   * @todo The collection options.clone, doesn't work here as the internal push function is recreating the SecretEntity.
    */
-  constructor(resourceSecretsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
+  constructor(dtos = [], options = {}) {
+    dtos = EntitySchema.validate(
       ResourceSecretsCollection.ENTITY_NAME,
-      resourceSecretsCollectionDto,
+      dtos,
       ResourceSecretsCollection.getSchema()
-    ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
+    );
+    super(dtos, options);
   }
 
   /**

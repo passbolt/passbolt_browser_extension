@@ -80,12 +80,9 @@ class CommentEntity extends Entity {
           "enum": CommentEntity.ALLOWED_FOREIGN_MODELS
         },
         "parent_id": {
-          "anyOf": [{
-            "type": "string",
-            "format": "uuid"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "uuid",
+          "nullable": true,
         },
         "content": {
           "type": "string",

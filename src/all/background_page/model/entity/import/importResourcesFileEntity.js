@@ -93,19 +93,13 @@ class ImportResourcesFileEntity extends Entity {
               "required": [],
               "properties": {
                 "password": {
-                  "anyOf": [{
-                    "type": "string",
-                  }, {
-                    "type": "null"
-                  }]
+                  "type": "string",
+                  "nullable": true,
                 },
                 "keyfile": {
-                  "anyOf": [{
-                    "type": "string",
-                    "format": "x-base64"
-                  }, {
-                    "type": "null"
-                  }]
+                  "type": "string",
+                  "format": "x-base64",
+                  "nullable": true,
                 }
               }
             }

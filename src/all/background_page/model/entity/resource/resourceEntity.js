@@ -95,36 +95,24 @@ class ResourceEntity extends Entity {
           "maxLength": RESOURCE_NAME_MAX_LENGTH
         },
         "username": {
-          "anyOf": [{
-            "type": "string",
-            "maxLength": RESOURCE_USERNAME_MAX_LENGTH
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "maxLength": RESOURCE_USERNAME_MAX_LENGTH,
+          "nullable": true,
         },
         "uri": {
-          "anyOf": [{
-            "type": "string",
-            "maxLength": RESOURCE_URI_MAX_LENGTH
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "maxLength": RESOURCE_URI_MAX_LENGTH,
+          "nullable": true,
         },
         "description": {
-          "anyOf": [{
-            "type": "string",
-            "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH,
+          "nullable": true,
         },
         "expired": {
-          "anyOf": [{
-            "type": "string",
-            "format": "date-time"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "date-time",
+          "nullable": true,
         },
         "deleted": {
           "type": "boolean"
@@ -146,12 +134,9 @@ class ResourceEntity extends Entity {
           "format": "uuid"
         },
         "folder_parent_id": {
-          "anyOf": [{
-            "type": "string",
-            "format": "uuid"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "uuid",
+          "nullable": true,
         },
         // Permissions
         "permission": PermissionEntity.getSchema(), // current user permission
@@ -167,10 +152,8 @@ class ResourceEntity extends Entity {
         "resource_type": ResourceTypeEntity.getSchema(),
         // other Associations
         "favorite": {
-          "anyOf": [
-            FavoriteEntity.getSchema(),
-            {"type": "null"}
-          ]
+          ...FavoriteEntity.getSchema(),
+          "nullable": true,
         },
         "secrets": ResourceSecretsCollection.getSchema(),
         "tags": TagsCollection.getSchema()

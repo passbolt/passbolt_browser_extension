@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import ResourceEntity from "./resourceEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import deduplicateObjects from "../../../utils/array/deduplicateObjects";
 import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
@@ -33,11 +32,6 @@ class ResourcesCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
   constructor(dtos = [], options = {}) {
-    dtos = EntitySchema.validate(
-      ResourcesCollection.ENTITY_NAME,
-      dtos,
-      ResourcesCollection.getSchema()
-    );
     super(dtos, options);
   }
 

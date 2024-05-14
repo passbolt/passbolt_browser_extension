@@ -85,6 +85,12 @@ describe("GroupsCollection", () => {
       expect(collection.items[2]._groups_users.items[0].id).toEqual(dto3.groups_users[0].id);
     });
 
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new GroupsCollection({}))
+        .toThrowEntityValidationError("items");
+    });
+
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = defaultGroupDto();
       const dto2 = defaultGroupDto({name: 42});

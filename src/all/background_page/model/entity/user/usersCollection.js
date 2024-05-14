@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import UserEntity from "./userEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
 const ENTITY_NAME = 'Users';
@@ -31,11 +30,6 @@ class UsersCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by username.
    */
   constructor(dtos = [], options = {}) {
-    dtos = EntitySchema.validate(
-      UsersCollection.ENTITY_NAME,
-      dtos,
-      UsersCollection.getSchema()
-    );
     super(dtos, options);
   }
 

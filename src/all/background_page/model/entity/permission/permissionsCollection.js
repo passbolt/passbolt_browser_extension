@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import PermissionEntity from "./permissionEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
@@ -45,11 +44,6 @@ class PermissionsCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure there is at least one owner in the collection.
    */
   constructor(dtos = [], options = {}) {
-    dtos = EntitySchema.validate(
-      PermissionsCollection.ENTITY_NAME,
-      dtos,
-      PermissionsCollection.getSchema()
-    );
     super(dtos, options);
   }
 

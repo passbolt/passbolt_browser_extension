@@ -74,6 +74,12 @@ describe("ResourceSecretsCollection", () => {
       expect(collection.items[1]._props.id).toEqual(dto2.id);
     });
 
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new ResourceSecretsCollection({}))
+        .toThrowEntityValidationError("items");
+    });
+
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = readSecret();
       const dto2 = readSecret({data: 42});

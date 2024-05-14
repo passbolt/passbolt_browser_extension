@@ -116,7 +116,7 @@ describe("RequestFetchOffscreenService", () => {
       options.body = {
         data: options.body,
         dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON
-      }
+      };
       // Ensure body remains a form data after serialization.
       expect(offscreenData).toEqual({id, resource, options});
     });

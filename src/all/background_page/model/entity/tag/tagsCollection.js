@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import TagEntity from "./tagEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
 const ENTITY_NAME = 'Tags';
@@ -33,11 +32,6 @@ class TagsCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
   constructor(dtos = [], options = {}) {
-    dtos = EntitySchema.validate(
-      TagsCollection.ENTITY_NAME,
-      dtos,
-      TagsCollection.getSchema()
-    );
     super(dtos, options);
   }
 

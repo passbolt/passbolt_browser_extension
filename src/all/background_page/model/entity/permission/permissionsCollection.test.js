@@ -20,8 +20,10 @@ import {
   defaultPermissionDto,
   minimumPermissionDto,
   ownerFolderPermissionDto,
-  ownerMinimalFolderPermissionDto, ownerPermissionDto,
-  readMinimalFolderPermissionDto, readPermissionDto,
+  ownerMinimalFolderPermissionDto,
+  ownerPermissionDto,
+  readMinimalFolderPermissionDto,
+  readPermissionDto,
   updateFolderPermissionDto,
   updateMinimalFolderPermissionDto
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
@@ -99,6 +101,12 @@ describe("PermissionsCollection", () => {
       expect(collection.items[2]._props.aro).toEqual(entity3.aro);
       expect(collection.items[2]._props.aro_foreign_key).toEqual(entity3.aroForeignKey);
       expect(collection.items[2]._props.type).toEqual(entity3.type);
+    });
+
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new PermissionsCollection({}))
+        .toThrowEntityValidationError("items");
     });
 
     it("should throw if one of data item does not validate the collection entity schema", () => {

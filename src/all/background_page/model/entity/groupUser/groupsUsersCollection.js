@@ -13,7 +13,6 @@
  */
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import GroupUserEntity from "./groupUserEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'GroupsUsers';
 
@@ -23,18 +22,6 @@ class GroupsUsersCollection extends EntityV2Collection {
    */
   get entityClass() {
     return GroupUserEntity;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  constructor(dtos = [], options = {}) {
-    dtos = EntitySchema.validate(
-      GroupsUsersCollection.ENTITY_NAME,
-      dtos,
-      GroupsUsersCollection.getSchema()
-    );
-    super(dtos, options);
   }
 
   /**

@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import SecretEntity from "../secretEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
@@ -35,11 +34,6 @@ class ResourceSecretsCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same resource.
    */
   constructor(dtos = [], options = {}) {
-    dtos = EntitySchema.validate(
-      ResourceSecretsCollection.ENTITY_NAME,
-      dtos,
-      ResourceSecretsCollection.getSchema()
-    );
     super(dtos, options);
   }
 

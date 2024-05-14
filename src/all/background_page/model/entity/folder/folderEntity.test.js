@@ -254,12 +254,11 @@ describe("FolderEntity", () => {
       const dto = defaultFolderDto({
         permissions: [ownerPermissionDto({id: "invalid-id"})]
       });
-      try {
-        new FolderEntity(dto);
-      } catch (error) {
-        expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('id', 'format')).toBeTruthy();
-      }
+      // The error is still incomplete, it should return an EntityValidationError with details on the permissions property.
+      expect(() => new FolderEntity(dto))
+        .not.toThrowCollectionValidationError("permissions.0.id.format");
+      expect(() => new FolderEntity(dto))
+        .toThrowCollectionValidationError("0.id.format");
     });
   });
 

@@ -16,13 +16,14 @@ import MfaAuthenticationRequiredError from "../error/mfaAuthenticationRequiredEr
 import NotFoundError from "../error/notFoundError";
 import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
 import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
+import PassboltBadResponseError from "../error/passboltBadResponseError";
 
 const AUTH_RESOURCE_NAME = '/auth';
 
 class AuthenticationStatusService {
   /**
    * Check if the current user is authenticated.
-   * @returns {Promise<bool>}
+   * @returns {Promise<boolean>}
    */
   static async isAuthenticated() {
     const apiClient = new ApiClient(this.apiClientOptions);
@@ -37,11 +38,19 @@ class AuthenticationStatusService {
     };
     const response = await apiClient.sendRequest('GET', url, null, fetchOptions);
 
+    let responseJson;
+    try {
+      //Get response on json format
+      responseJson = await response.json();
+    } catch (error) {
+      // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+      throw new PassboltBadResponseError();
+    }
+
     if (response.ok) {
       return true;
     }
 
-    const responseJson = await response.json();
     // MFA required.
     if (/mfa\/verify\/error\.json$/.test(response.url)) {
       //Retrieve the message error details from json

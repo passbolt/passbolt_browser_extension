@@ -15,11 +15,14 @@ import PermissionEntity from "./permissionEntity";
 import permissionEntity from "./permissionEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import PermissionsCollection from "./permissionsCollection";
+import permissionsCollection from "./permissionsCollection";
 import {
   defaultPermissionDto,
-  minimumPermissionDto, ownerFolderPermissionDto,
-  ownerMinimalFolderPermissionDto,
-  readMinimalFolderPermissionDto, updateFolderPermissionDto,
+  minimumPermissionDto,
+  ownerFolderPermissionDto,
+  ownerMinimalFolderPermissionDto, ownerPermissionDto,
+  readMinimalFolderPermissionDto, readPermissionDto,
+  updateFolderPermissionDto,
   updateMinimalFolderPermissionDto
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import {
@@ -145,6 +148,19 @@ describe("PermissionsCollection", () => {
       expect.assertions(1);
       expect(() => new PermissionsCollection([dto1, dto2]))
         .toThrowCollectionValidationError("owner");
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
+      const acoForeignKey = crypto.randomUUID();
+      const dto1 = readPermissionDto({aco_foreign_key: acoForeignKey});
+      const dto2 = defaultPermissionDto({aco_foreign_key: acoForeignKey, type: 42});
+      const dto3 = ownerPermissionDto({aco_foreign_key: acoForeignKey});
+
+      expect.assertions(3);
+      const collection = new permissionsCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
+      expect(collection.items).toHaveLength(2);
+      expect(collection.items[0].id).toEqual(dto1.id);
+      expect(collection.items[1].id).toEqual(dto3.id);
     });
   });
 

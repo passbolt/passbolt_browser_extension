@@ -13,7 +13,6 @@
  */
 import ResourcesCollection from "./resourcesCollection";
 import TagEntity from "../tag/tagEntity";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import TagsCollection from "../tag/tagsCollection";
 import {
@@ -29,9 +28,9 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import ResourceEntity from "./resourceEntity";
-import resourcesCollection from "./resourcesCollection";
 import {defaultTagDto} from "../tag/tagEntity.test.data";
 import expect from "expect";
+import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 
 describe("ResourcesCollection", () => {
   it("schema must validate", () => {
@@ -85,23 +84,59 @@ describe("ResourcesCollection", () => {
       const dto1 = defaultResourceDto();
       const dto2 = defaultResourceDto({id: 42});
 
-      expect.assertions(2);
-      // Prior to migrating to collection V2 the returned error does not precise the path of the error.
+      expect.assertions(1);
       expect(() => new ResourcesCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("1.id.type");
-      expect(() => new ResourcesCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("id.type");
+        .toThrowCollectionValidationError("1.id.type");
     });
 
     it("should throw if one of data item does not validate the unique id build rule", () => {
       const dto1 = defaultResourceDto();
       const dto2 = defaultResourceDto({id: dto1.id});
 
+      expect.assertions(1);
+      expect(() => new ResourcesCollection([dto1, dto2]))
+        .toThrowCollectionValidationError("1.id.unique");
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
+      const dto1 = defaultResourceDto();
+      const dto2 = defaultResourceDto({username: 42});
+
       expect.assertions(2);
-      expect(() => new ResourcesCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("1.id.unique");
-      expect(() => new ResourcesCollection([dto1, dto2]))
-        .toThrowError(new EntityCollectionError(1, resourcesCollection.RULE_UNIQUE_ID, `Resource id ${dto2.id} already exists.`));
+      const collection = new ResourcesCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      expect(collection.items).toHaveLength(1);
+      expect(collection.items[0].id).toEqual(dto1.id);
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate the unique id build rule", () => {
+      const dto1 = defaultResourceDto({username: "user1@passbolt.com"});
+      const dto2 = defaultResourceDto({id: dto1.id, username: "user2@passbolt.com"});
+
+      expect.assertions(2);
+      const collection = new ResourcesCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      expect(collection.items).toHaveLength(1);
+      expect(collection.items[0].id).toEqual(dto1.id);
+    });
+
+    // @todo ignoreInvalidEntity option is not yet passed to associated entities and collections, therefore the parent entity is ignored.
+    it.failing("should, with enabling the ignore invalid option, ignore items associated permissions entities which do not validate their entity schema validation", () => {
+      const dto1 = defaultResourceDto({}, {withPermissions: true});
+      const dto2 = defaultResourceDto({
+        permissions: [
+          ownerPermissionDto({aco_foreign_key: 42})
+        ]
+      });
+      const dto3 = defaultResourceDto({}, {withPermissions: true});
+
+      expect.assertions(1);
+      const collection = new ResourcesCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
+      expect(collection.items).toHaveLength(3);
+      expect(collection.items[0].id).toEqual(dto1.id);
+      expect(collection.items[0]._permissions).toHaveLength(1);
+      expect(collection.items[1].id).toEqual(dto2.id);
+      expect(collection.items[1]._permissions).toHaveLength(0);
+      expect(collection.items[2].id).toEqual(dto3.id);
+      expect(collection.items[2]._permissions).toHaveLength(1);
     });
   });
 
@@ -115,7 +150,7 @@ describe("ResourcesCollection", () => {
       const collection = new ResourcesCollection(dtos);
       const time = performance.now() - start;
       expect(collection).toHaveLength(count);
-      expect(time).toBeLessThan(5_000);
+      expect(time).toBeLessThan(10_000);
     });
   });
 

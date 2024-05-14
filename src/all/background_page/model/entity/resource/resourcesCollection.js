@@ -12,19 +12,22 @@
  * @since         2.13.0
  */
 import ResourceEntity from "./resourceEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import deduplicateObjects from "../../../utils/array/deduplicateObjects";
-import canSuggestUrl from "../../../utils/url/canSuggestUrl";
-import resourcesCollection from "./resourcesCollection";
 import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
 const ENTITY_NAME = 'Resources';
 const RULE_UNIQUE_ID = 'unique_id';
-const SUGGESTED_RESOURCES_LIMIT = 6;
 
-class ResourcesCollection extends EntityCollection {
+class ResourcesCollection extends EntityV2Collection {
+  /**
+   * @inheritDoc
+   */
+  get entityClass() {
+    return ResourceEntity;
+  }
+
   /**
    * @inheritDoc
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
@@ -36,24 +39,17 @@ class ResourcesCollection extends EntityCollection {
       ResourcesCollection.getSchema()
     ), options);
 
-    /*
-     * Check if resource ids are unique
-     * Why not this.push? It is faster than adding items one by one
-     */
-    const ids = this._props.map(resource => resource.id);
-    ids.sort().sort((a, b) => {
-      if (a === b) {
-        throw new EntityCollectionError(0, ResourcesCollection.RULE_UNIQUE_ID, `Resource id ${a} already exists.`);
-      }
-    });
-    // Directly push into the private property _items[]
-    this._props.forEach(resource => {
-      this._items.push(new ResourceEntity(resource, {clone: false}));
-    });
+    this.pushMany(this._props, {...options, clone: false});
 
     // We do not keep original props
     this._props = null;
   }
+
+  /*
+   * ==================================================
+   * Validation
+   * ==================================================
+   */
 
   /**
    * Get resources entity schema
@@ -66,6 +62,21 @@ class ResourcesCollection extends EntityCollection {
       "items": ResourceEntity.getSchema(),
     };
   }
+
+  /**
+   * @inheritDoc
+   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
+   * @throws {EntityValidationError} If a permission already exists with the same id.
+   */
+  validateBuildRules(item, options = {}) {
+    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+  }
+
+  /*
+   * ==================================================
+   * Dynamic getters
+   * ==================================================
+   */
 
   /**
    * Get resources
@@ -119,46 +130,6 @@ class ResourcesCollection extends EntityCollection {
    */
   getAllWhereOwner() {
     return new ResourcesCollection(this._items.filter(r => r.isOwner()));
-  }
-
-  /**
-   * Find the possible resources to suggest given an url
-   * @param url An url
-   * @return {ResourcesCollection} A list of resource
-   */
-  findSuggestedResources(url) {
-    const suggestedResources = [];
-    for (let index = 0; index < this._items.length; index++) {
-      if (this._items[index].uri) {
-        const canBeSuggested = canSuggestUrl(url, this._items[index].uri);
-        if (canBeSuggested) {
-          suggestedResources.push(this._items[index]);
-        }
-        if (suggestedResources.length === SUGGESTED_RESOURCES_LIMIT) {
-          break;
-        }
-      }
-    }
-    return new resourcesCollection(suggestedResources);
-  }
-
-  /**
-   * Returns the count of possible resources to suggest given an url
-   * @param currentUrl An url
-   * @return {*[]|number}
-   */
-  countSuggestedResources(url) {
-    let count = 0;
-    for (let index = 0; index < this._items.length; index++) {
-      if (this._items[index].uri) {
-        const canBeSuggested = canSuggestUrl(url, this._items[index].uri);
-        count = canBeSuggested ? count + 1 : count;
-        if (count === SUGGESTED_RESOURCES_LIMIT) {
-          break;
-        }
-      }
-    }
-    return count;
   }
 
   /*
@@ -237,51 +208,26 @@ class ResourcesCollection extends EntityCollection {
 
   /*
    * ==================================================
-   * Assertions
-   * ==================================================
-   */
-  /**
-   * Assert there is no other resource with the same id in the collection
-   *
-   * @param {ResourceEntity} resource
-   * @throws {EntityValidationError} if a resource with the same id already exist
-   */
-  assertUniqueId(resource) {
-    if (!resource.id) {
-      return;
-    }
-    const length = this.resources.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingResource = this.resources[i];
-      if (existingResource.id && existingResource.id === resource.id) {
-        throw new EntityCollectionError(i, ResourcesCollection.RULE_UNIQUE_ID, `Resource id ${resource.id} already exists.`);
-      }
-    }
-  }
-
-  /*
-   * ==================================================
    * Setters
    * ==================================================
    */
+
   /**
-   * Push a copy of the resource to the list
-   * @param {object} resource DTO or ResourceEntity
+   * @inheritDoc
    */
-  push(resource) {
-    if (!resource || typeof resource !== 'object') {
-      throw new TypeError(`ResourcesCollection push parameter should be an object.`);
-    }
-    if (resource instanceof ResourceEntity) {
-      resource = resource.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS); // deep clone
-    }
-    const resourceEntity = new ResourceEntity(resource); // validate
+  pushMany(data, entityOptions = {}, options = {}) {
+    const uniqueIdsSetCache = new Set(this.extract("id"));
+    const onItemPushed = item => {
+      uniqueIdsSetCache.add(item.id);
+    };
 
-    // Build rules
-    this.assertUniqueId(resourceEntity);
+    options = {
+      onItemPushed: onItemPushed,
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache},
+      ...options
+    };
 
-    super.push(resourceEntity);
+    super.pushMany(data, entityOptions, options);
   }
 
   /**

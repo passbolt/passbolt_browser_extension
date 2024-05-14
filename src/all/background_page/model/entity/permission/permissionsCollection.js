@@ -118,6 +118,7 @@ class PermissionsCollection extends EntityV2Collection {
     this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
     this.assertNotExist("aro_foreign_key", item._props.aro_foreign_key, {haystackSet: options?.uniqueAroForeignKeysSetCache});
   }
+
   /**
    * Assert that the item pushed to the collection is about the same ACO.
    *

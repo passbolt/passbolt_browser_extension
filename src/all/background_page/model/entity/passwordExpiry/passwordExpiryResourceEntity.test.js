@@ -35,7 +35,7 @@ describe("PasswordExpiryResource entity", () => {
       ];
       const failingScenarios = assertEntityProperty.FAIL_DATETIME_SCENARIO;
 
-      assertEntityProperty.assert(PasswordExpiryResourceEntity, "expired", successScenarios, failingScenarios, "type");
+      assertEntityProperty.assert(PasswordExpiryResourceEntity, "expired", successScenarios, failingScenarios, "format");
       assertEntityProperty.required(PasswordExpiryResourceEntity, "expired");
     });
 

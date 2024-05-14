@@ -86,13 +86,8 @@ describe("Gpgkey entity", () => {
     });
 
     it("validates expires property", () => {
-      const successScenarios = [
-        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = assertEntityProperty.FAIL_DATETIME_SCENARIO;
-
-      assertEntityProperty.assert(GpgkeyEntity, "expires", successScenarios, failingScenarios, "type");
+      assertEntityProperty.dateTime(GpgkeyEntity, "expires");
+      assertEntityProperty.nullable(GpgkeyEntity, "expires");
       assertEntityProperty.notRequired(GpgkeyEntity, "expires");
     });
 

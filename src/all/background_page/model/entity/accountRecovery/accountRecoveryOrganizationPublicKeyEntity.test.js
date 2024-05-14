@@ -45,12 +45,10 @@ describe("AccountRecoveryOrganizationPublicKey entity", () => {
     it("validates fingerprint property", () => {
       const successScenarios = [
         {scenario: "with a valid fingerprint string", value: "ABCD".repeat(10)},
-        {scenario: "with a null value", value: null},
       ];
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
-      ];
-      assertEntityProperty.assert(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint", successScenarios, failingScenarios, "type");
+      // the fingerprint is sanitized and therefore we can't pass a bad value
+      const failingScenarios = [];
+      assertEntityProperty.assert(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint", successScenarios, failingScenarios, "format");
       assertEntityProperty.nullable(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint");
       assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint");
     });

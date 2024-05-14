@@ -54,10 +54,7 @@ describe("AccountRecoveryOrganizationPolicy entity", () => {
     });
 
     it("validates public_key_id property", () => {
-      const uuidSuccessScenarios = [assertEntityProperty.SCENARIO_UUID];
-      const uuidFailingScenarios = [assertEntityProperty.SCENARIO_STRING];
-      assertEntityProperty.assert(AccountRecoveryOrganizationPolicyEntity, "public_key_id", uuidSuccessScenarios, uuidFailingScenarios, "type");
-
+      assertEntityProperty.uuid(AccountRecoveryOrganizationPolicyEntity, "public_key_id");
       assertEntityProperty.nullable(AccountRecoveryOrganizationPolicyEntity, "public_key_id");
       assertEntityProperty.notRequired(AccountRecoveryOrganizationPolicyEntity, "public_key_id");
     });

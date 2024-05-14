@@ -35,64 +35,28 @@ describe("Resource entity", () => {
     });
 
     it("validates username property", () => {
-      const successScenarios = [
-        ...assertEntityProperty.SUCCESS_STRING_SCENARIOS,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
-        {scenario: "a string too long", value: "a".repeat(255 + 1)}
-      ];
-
       assertEntityProperty.string(ResourceEntity, "username");
-      assertEntityProperty.assert(ResourceEntity, "username", successScenarios, failingScenarios, "type");
+      assertEntityProperty.maxLength(ResourceEntity, "username", 255);
       assertEntityProperty.nullable(ResourceEntity, "username");
       assertEntityProperty.notRequired(ResourceEntity, "username");
     });
 
     it("validates uri property", () => {
-      const successScenarios = [
-        ...assertEntityProperty.SUCCESS_STRING_SCENARIOS,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
-        {scenario: "a string too long", value: "a".repeat(1024 + 1)}
-      ];
-
       assertEntityProperty.string(ResourceEntity, "uri");
-      assertEntityProperty.assert(ResourceEntity, "uri", successScenarios, failingScenarios, "type");
+      assertEntityProperty.maxLength(ResourceEntity, "uri", 1024);
       assertEntityProperty.nullable(ResourceEntity, "uri");
       assertEntityProperty.notRequired(ResourceEntity, "uri");
     });
 
     it("validates description property", () => {
-      const successScenarios = [
-        ...assertEntityProperty.SUCCESS_STRING_SCENARIOS,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
-        {scenario: "a string too long", value: "a".repeat(10_000 + 1)}
-      ];
-
       assertEntityProperty.string(ResourceEntity, "description");
-      assertEntityProperty.assert(ResourceEntity, "description", successScenarios, failingScenarios, "type");
+      assertEntityProperty.maxLength(ResourceEntity, "description", 10_000);
       assertEntityProperty.nullable(ResourceEntity, "description");
       assertEntityProperty.notRequired(ResourceEntity, "description");
     });
 
     it("validates expired property", () => {
-      const successScenarios = [
-        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        ...assertEntityProperty.FAIL_DATETIME_SCENARIO,
-        {scenario: "a string too long", value: "a".repeat(10_000 + 1)}
-      ];
-
-      assertEntityProperty.assert(ResourceEntity, "expired", successScenarios, failingScenarios, "type");
+      assertEntityProperty.dateTime(ResourceEntity, "expired");
       assertEntityProperty.nullable(ResourceEntity, "expired");
       assertEntityProperty.notRequired(ResourceEntity, "expired");
     });
@@ -125,16 +89,7 @@ describe("Resource entity", () => {
     });
 
     it("validates folder_parent_id property", () => {
-      const successScenarios = [
-        assertEntityProperty.SCENARIO_UUID,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
-        {scenario: "a string too long", value: "a".repeat(10_000 + 1)}
-      ];
-
-      assertEntityProperty.assert(ResourceEntity, "folder_parent_id", successScenarios, failingScenarios, "type");
+      assertEntityProperty.uuid(ResourceEntity, "folder_parent_id");
       assertEntityProperty.nullable(ResourceEntity, "folder_parent_id");
       assertEntityProperty.notRequired(ResourceEntity, "folder_parent_id");
     });

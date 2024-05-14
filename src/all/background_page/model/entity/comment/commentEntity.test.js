@@ -53,14 +53,7 @@ describe("Comment entity", () => {
     });
 
     it("validates parent_id property", () => {
-      const successScenarios = [
-        assertEntityProperty.SCENARIO_UUID,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
-      ];
-      assertEntityProperty.assert(CommentEntity, "parent_id", successScenarios, failingScenarios, "type");
+      assertEntityProperty.uuid(CommentEntity, "parent_id");
       assertEntityProperty.nullable(CommentEntity, "parent_id");
       assertEntityProperty.notRequired(CommentEntity, "parent_id");
     });

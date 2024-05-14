@@ -42,12 +42,18 @@ describe("AccountRecoveryRequest entity", () => {
     it("validates fingerprint property", () => {
       const successScenarios = [
         {scenario: "with a valid fingerprint string", value: "ABCD".repeat(10)},
-        assertEntityProperty.SCENARIO_NULL,
       ];
       const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
+        assertEntityProperty.SCENARIO_INTEGER,
+        assertEntityProperty.SCENARIO_FLOAT,
       ];
       assertEntityProperty.assert(AccountRecoveryRequestEntity, "fingerprint", successScenarios, failingScenarios, "type");
+
+      const wrongLengthScenario = [
+        {scenario: "too long", value: "a".repeat(41)},
+        {scenario: "too short", value: "a".repeat(39)},
+      ];
+      assertEntityProperty.assert(AccountRecoveryRequestEntity, "fingerprint", successScenarios, wrongLengthScenario, "length");
       assertEntityProperty.nullable(AccountRecoveryRequestEntity, "fingerprint");
       assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "fingerprint");
     });

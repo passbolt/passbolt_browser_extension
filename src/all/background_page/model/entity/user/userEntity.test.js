@@ -71,15 +71,9 @@ describe("UserEntity", () => {
     });
 
     it("validates disabled property", () => {
-      const failScenario = [
-        assertEntityProperty.SCENARIO_EMPTY,
-        assertEntityProperty.SCENARIO_ARRAY,
-        assertEntityProperty.SCENARIO_OBJECT,
-        assertEntityProperty.SCENARIO_INTEGER
-      ];
-      assertEntityProperty.assert(UserEntity, "disabled", assertEntityProperty.SUCCESS_DATETIME_SCENARIO, failScenario, "type");
-      assertEntityProperty.notRequired(UserEntity, "disabled");
+      assertEntityProperty.dateTime(UserEntity, "disabled");
       assertEntityProperty.nullable(UserEntity, "disabled");
+      assertEntityProperty.notRequired(UserEntity, "disabled");
     });
 
     it("validates created property", () => {
@@ -95,48 +89,26 @@ describe("UserEntity", () => {
     });
 
     it("validates last_logged_in property", () => {
-      const successScenario = [
-        // Empty is considered a success scenario due to the sanitization done with _cleanupLastLoginDate in the constructor.
-        assertEntityProperty.SCENARIO_EMPTY,
-        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO
+      const failDatetimeScenario = [
+        {scenario: "not a date", value: "not-a-date"},
+        {scenario: "year, month, day, time and zulu", value: "2018-10-18T08:04:30+00:00Z"},
       ];
-      const failScenario = [
-        assertEntityProperty.SCENARIO_ARRAY,
-        assertEntityProperty.SCENARIO_OBJECT,
-        assertEntityProperty.SCENARIO_INTEGER,
-        assertEntityProperty.SCENARIO_TRUE,
-        assertEntityProperty.SCENARIO_FALSE
-      ];
-      assertEntityProperty.assert(UserEntity, "last_logged_in", successScenario, failScenario, "type");
-      assertEntityProperty.notRequired(UserEntity, "last_logged_in");
+
+      assertEntityProperty.assert(UserEntity, "last_logged_in", assertEntityProperty.SUCCESS_DATETIME_SCENARIO, failDatetimeScenario, "format");
       assertEntityProperty.nullable(UserEntity, "last_logged_in");
+      assertEntityProperty.notRequired(UserEntity, "last_logged_in");
     });
 
     it("validates is_mfa_enabled property", () => {
-      const failScenario = [
-        assertEntityProperty.SCENARIO_EMPTY,
-        assertEntityProperty.SCENARIO_STRING,
-        assertEntityProperty.SCENARIO_ARRAY,
-        assertEntityProperty.SCENARIO_OBJECT,
-        assertEntityProperty.SCENARIO_INTEGER
-      ];
-      assertEntityProperty.assert(UserEntity, "is_mfa_enabled", assertEntityProperty.SUCCESS_BOOLEAN_SCENARIO, failScenario, "type");
-      assertEntityProperty.notRequired(UserEntity, "is_mfa_enabled");
+      assertEntityProperty.boolean(UserEntity, "is_mfa_enabled");
       assertEntityProperty.nullable(UserEntity, "is_mfa_enabled");
+      assertEntityProperty.notRequired(UserEntity, "is_mfa_enabled");
     });
 
     it("validates locale property", () => {
-      const failScenario = [
-        ...assertEntityProperty.FAIL_LOCALE_SCENARIO,
-        assertEntityProperty.SCENARIO_EMPTY,
-        assertEntityProperty.SCENARIO_TRUE,
-        assertEntityProperty.SCENARIO_FALSE,
-        assertEntityProperty.SCENARIO_ARRAY, assertEntityProperty.SCENARIO_OBJECT,
-        assertEntityProperty.SCENARIO_INTEGER
-      ];
-      assertEntityProperty.assert(UserEntity, "locale", assertEntityProperty.SUCCESS_LOCALE_SCENARIO, failScenario, "type");
-      assertEntityProperty.notRequired(UserEntity, "locale");
+      assertEntityProperty.locale(UserEntity, "locale");
       assertEntityProperty.nullable(UserEntity, "locale");
+      assertEntityProperty.notRequired(UserEntity, "locale");
     });
   });
 

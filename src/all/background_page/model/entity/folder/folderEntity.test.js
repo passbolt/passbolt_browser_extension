@@ -44,14 +44,8 @@ describe("FolderEntity", () => {
     });
 
     it("validates folder_parent_id property", () => {
-      const successScenarios = [
-        assertEntityProperty.SCENARIO_UUID,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
-      ];
-      assertEntityProperty.assert(FolderEntity, "folder_parent_id", successScenarios, failingScenarios, "type");
+      assertEntityProperty.uuid(FolderEntity, "folder_parent_id");
+      assertEntityProperty.nullable(FolderEntity, "folder_parent_id");
       assertEntityProperty.notRequired(FolderEntity, "folder_parent_id");
     });
 

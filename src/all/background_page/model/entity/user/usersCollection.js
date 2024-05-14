@@ -36,11 +36,6 @@ class UsersCollection extends EntityV2Collection {
       usersCollectionDto,
       UsersCollection.getSchema()
     ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
   }
 
   /*

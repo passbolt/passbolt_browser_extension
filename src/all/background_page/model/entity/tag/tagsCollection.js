@@ -38,11 +38,6 @@ class TagsCollection extends EntityV2Collection {
       tagsCollectionDto,
       TagsCollection.getSchema()
     ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
   }
 
   /*

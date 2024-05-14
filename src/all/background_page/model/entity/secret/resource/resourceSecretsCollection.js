@@ -41,11 +41,6 @@ class ResourceSecretsCollection extends EntityV2Collection {
       resourceSecretsCollectionDto,
       ResourceSecretsCollection.getSchema()
     ), options);
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
   }
 
   /**

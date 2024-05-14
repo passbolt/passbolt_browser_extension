@@ -34,12 +34,6 @@ class GroupsUsersCollection extends EntityV2Collection {
       groupsUsersDto,
       GroupsUsersCollection.getSchema()
     ), options);
-
-
-    this.pushMany(this._props, {...options, clone: false});
-
-    // We do not keep original props
-    this._props = null;
   }
 
   /**

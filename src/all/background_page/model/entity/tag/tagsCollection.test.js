@@ -77,6 +77,12 @@ describe("TagsCollection", () => {
       expect(collection.items[2].id).toEqual(entity3.id);
     });
 
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new TagsCollection({}))
+        .toThrowEntityValidationError("items");
+    });
+
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = defaultTagDto({slug: "tag 1"});
       const dto2 = defaultTagDto({slug: 42});

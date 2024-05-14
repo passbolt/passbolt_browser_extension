@@ -80,6 +80,12 @@ describe("ResourcesCollection", () => {
       expect(collection.items[1].id).toEqual(entity2.id);
     });
 
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new ResourcesCollection({}))
+        .toThrowEntityValidationError("items");
+    });
+
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = defaultResourceDto();
       const dto2 = defaultResourceDto({id: 42});

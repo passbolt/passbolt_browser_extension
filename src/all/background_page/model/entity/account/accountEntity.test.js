@@ -90,7 +90,11 @@ describe("AccountEntity", () => {
 
     it("validates locale property", () => {
       assertEntityProperty.nullable(AccountEntity, "locale");
-      assertEntityProperty.locale(AccountEntity, "locale");
+      /*
+       * @todo: put back the following line and remove .assert call when schema will be updated
+       * assertEntityProperty.locale(AccountEntity, "locale");
+       */
+      assertEntityProperty.assert(AccountEntity, "locale", assertEntityProperty.SUCCESS_LOCALE_SCENARIO, assertEntityProperty.FAIL_LOCALE_SCENARIO, "format");
       assertEntityProperty.notRequired(AccountEntity, "locale");
     });
 

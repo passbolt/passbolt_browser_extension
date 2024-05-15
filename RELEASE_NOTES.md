@@ -1,7 +1,7 @@
-Song: https://youtu.be/J87pJrxvJ5E?si=vGs8M6uyM6E7Lcps
+Song: https://www.youtube.com/watch?v=YR5ApYxkU-U
 
-Passbolt v4.7.7 is a maintenance release focused on fixing problems linked to the extension update and preparing the transition to MV3.
+Passbolt v4.7.8 is a maintenance release fixing issue introduces on v4.7.0 which might lead to unresponsive browser extension.
 
-## [4.7.7] - 2024-05-10
-### Maintenance
-- PB-33321 Fix local storage loading on extension update
+## [4.7.8] - 2024-05-14
+### Fixed
+- PB-33410 Chrome Extension frozen and unusable after some period of inactivity

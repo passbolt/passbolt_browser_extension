@@ -11,28 +11,23 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import ProfileEntity from "../profile/profileEntity";
 import GpgkeyEntity from "../gpgkey/gpgkeyEntity";
 import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
 import AppEmailValidatorService from "../../../service/validator/appEmailValidatorService";
 import PendingAccountRecoveryRequestEntity from "../accountRecovery/pendingAccountRecoveryRequestEntity";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'User';
 
-class UserEntity extends Entity {
+class UserEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(userDto, options = {}) {
-    super(EntitySchema.validate(
-      UserEntity.ENTITY_NAME,
-      UserEntity._cleanupLastLoginDate(userDto),
-      UserEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Associations
     if (this._props.profile) {

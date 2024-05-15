@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 

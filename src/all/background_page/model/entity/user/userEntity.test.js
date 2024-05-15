@@ -186,6 +186,13 @@ describe("UserEntity", () => {
       expect(dtoWithContain.pending_account_recovery_request.status).toBe('pending');
     });
 
+    it("should marshall last_logged_in if empty string given", () => {
+      expect.assertions(1);
+      const dto = defaultUserDto({last_logged_in: ""});
+      const entity = new UserEntity(dto);
+      expect(entity.lastLoggedIn).toBeNull();
+    });
+
     it("should, with enabling the ignore invalid option, ignore groups users which do not validate their schema", () => {
       const dto = defaultUserDto({
         groups_users: [

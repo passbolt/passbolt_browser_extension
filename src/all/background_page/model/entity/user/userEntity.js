@@ -57,6 +57,17 @@ class UserEntity extends EntityV2 {
   }
 
   /**
+   * @inheritDoc
+   * Marshall the last_logged_in to null if empty string given
+   */
+  marshall() {
+    if (this._props.last_logged_in === "") {
+      this._props.last_logged_in = null;
+    }
+    super.marshall();
+  }
+
+  /**
    * Get user entity schema
    * @returns {Object} schema
    */
@@ -122,19 +133,6 @@ class UserEntity extends EntityV2 {
         "pending_account_recovery_request": PendingAccountRecoveryRequestEntity.getSchema()
       }
     };
-  }
-
-  /**
-   * API returns "" for users that never logged in, convert this to null
-   * @param {object} dto
-   * @return {object} dto
-   * @private
-   */
-  static _cleanupLastLoginDate(dto) {
-    if (dto && dto.last_logged_in === '') {
-      dto.last_logged_in = null;
-    }
-    return dto;
   }
 
   /*

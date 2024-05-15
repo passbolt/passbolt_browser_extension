@@ -13,8 +13,8 @@
  */
 import WorkerEntity from "./workerEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {readWorker} from "./workerEntity.test.data";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("Worker entity", () => {
   jest.useFakeTimers();
@@ -25,8 +25,39 @@ describe("Worker entity", () => {
     jest.clearAllTimers();
   });
 
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(WorkerEntity.ENTITY_NAME, WorkerEntity.getSchema());
+  describe("WorkerEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(WorkerEntity.ENTITY_NAME, WorkerEntity.getSchema());
+    });
+
+    it("validates id property", () => {
+      assertEntityProperty.uuid(WorkerEntity, "id");
+      assertEntityProperty.required(WorkerEntity, "id");
+    });
+
+    it("validates tabId property", () => {
+      assertEntityProperty.integer(WorkerEntity, "tabId");
+      assertEntityProperty.required(WorkerEntity, "tabId");
+    });
+
+    it("validates frameId property", () => {
+      assertEntityProperty.integer(WorkerEntity, "frameId");
+      assertEntityProperty.nullable(WorkerEntity, "frameId");
+      assertEntityProperty.notRequired(WorkerEntity, "frameId");
+    });
+
+    it("validates name property", () => {
+      assertEntityProperty.string(WorkerEntity, "name");
+      assertEntityProperty.required(WorkerEntity, "name");
+    });
+
+    it("validates status property", () => {
+      const successValues = ['waiting_connection', 'connected', 'reconnecting'];
+      const failValues = ["string"];
+
+      assertEntityProperty.enumeration(WorkerEntity, "status", successValues, failValues);
+      assertEntityProperty.required(WorkerEntity, "status");
+    });
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -39,41 +70,6 @@ describe("Worker entity", () => {
     };
     const entity = new WorkerEntity(dto);
     expect(entity.toDto()).toEqual(dto);
-  });
-
-  it("constructor returns validation error if dto required fields are missing", () => {
-    expect.assertions(2);
-    try {
-      new WorkerEntity({});
-    } catch (error) {
-      expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual({
-        id: {required: 'The id is required.'},
-        tabId: {required: 'The tabId is required.'},
-        name: {required: 'The name is required.'},
-        status: {required: 'The status is required.'}
-      });
-    }
-  });
-
-  it("constructor returns validation error if dto required fields are invalid", () => {
-    expect.assertions(2);
-    try {
-      new WorkerEntity({
-        "id": "🧟‍️",
-        "tabId": "🧟‍",
-        "name": [],
-        "status": "hello",
-      });
-    } catch (error) {
-      expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual({
-        id: {format: 'The id is not a valid uuid.'},
-        tabId: {type: 'The tabId is not a valid integer.'},
-        name: {type: 'The name is not a valid string.'},
-        status: {enum: "The status value is not included in the supported list."},
-      });
-    }
   });
 
   it("workerEntity:isConnected", () => {

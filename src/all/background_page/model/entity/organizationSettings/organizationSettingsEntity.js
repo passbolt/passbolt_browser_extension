@@ -73,11 +73,8 @@ class OrganizationSettingsEntity extends Entity {
           "type": "object"
         },
         "serverTimeDiff": {
-          "anyOf": [{
-            "type": "integer"
-          }, {
-            "type": "null"
-          }]
+          "type": "integer",
+          "nullable": true,
         },
       }
     };

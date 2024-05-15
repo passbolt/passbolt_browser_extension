@@ -54,6 +54,7 @@ class GpgkeyEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
+        //@todo: enforce fingerprint checks with regexp like the other fingerprint schema
         "fingerprint": {
           "type": "string",
           "minLength": FINGERPRINT_MIN_LENGTH,
@@ -66,21 +67,15 @@ class GpgkeyEntity extends Entity {
           "type": "boolean"
         },
         "type": {
-          "anyOf": [{
-            "type": "string"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "nullable": true,
         },
         "uid": {
           "type": "string"
         },
         "bits": {
-          "anyOf": [{
-            "type": "integer",
-          }, {
-            "type": "null"
-          }]
+          "type": "integer",
+          "nullable": true,
         },
         "key_id": {
           "type": "string",
@@ -92,12 +87,9 @@ class GpgkeyEntity extends Entity {
           "format": "date-time"
         },
         "expires": {
-          "anyOf": [{
-            "type": "string",
-            "format": "date-time"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "date-time",
+          "nullable": true,
         },
         "created": {
           "type": "string",

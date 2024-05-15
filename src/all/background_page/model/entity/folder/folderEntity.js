@@ -71,12 +71,9 @@ class FolderEntity extends Entity {
           "format": "uuid"
         },
         "folder_parent_id": {
-          "anyOf": [{
-            "type": "string",
-            "format": "uuid"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "uuid",
+          "nullable": true,
         },
         "name": {
           "type": "string",

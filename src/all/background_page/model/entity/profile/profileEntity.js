@@ -119,7 +119,7 @@ class ProfileEntity extends Entity {
   }
 
   /**
-   * PermissionEntity.ALL_CONTAIN_OPTIONS
+   * ProfileEntity.ALL_CONTAIN_OPTIONS
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {

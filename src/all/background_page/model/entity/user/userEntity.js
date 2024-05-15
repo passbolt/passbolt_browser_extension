@@ -92,12 +92,9 @@ class UserEntity extends Entity {
           "type": "boolean"
         },
         "disabled": {
-          "anyOf": [{
-            "type": "string",
-            "format": "date-time"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "date-time",
+          "nullable": true,
         },
         "created": {
           "type": "string",
@@ -108,27 +105,18 @@ class UserEntity extends Entity {
           "format": "date-time"
         },
         "last_logged_in": {
-          "anyOf": [{
-            "type": "string",
-            "format": "date-time"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "date-time",
+          "nullable": true,
         },
         "is_mfa_enabled": {
-          "anyOf": [{
-            "type": "boolean"
-          }, {
-            "type": "null"
-          }]
+          "type": "boolean",
+          "nullable": true,
         },
         "locale": {
-          "anyOf": [{
-            "type": "string",
-            "pattern": /^[a-z]{2}-[A-Z]{2}$/,
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "pattern": /^[a-z]{2}-[A-Z]{2}$/,
+          "nullable": true,
         },
         // Associated models
         "role": RoleEntity.getSchema(),

@@ -27,10 +27,59 @@ import {
 } from "./accountRecoveryOrganizationPolicyEntity.test.data";
 import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("AccountRecoveryOrganizationPolicy entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(AccountRecoveryOrganizationPolicyEntity.ENTITY_NAME, AccountRecoveryOrganizationPolicyEntity.getSchema());
+  describe("AccountRecoveryOrganizationPolicyEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(AccountRecoveryOrganizationPolicyEntity.ENTITY_NAME, AccountRecoveryOrganizationPolicyEntity.getSchema());
+    });
+
+    it("validates id property", () => {
+      assertEntityProperty.string(AccountRecoveryOrganizationPolicyEntity, "id");
+      assertEntityProperty.uuid(AccountRecoveryOrganizationPolicyEntity, "id");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPolicyEntity, "id");
+    });
+
+    it("validates policy property", () => {
+      const expectedValues = [
+        "disabled",
+        "mandatory",
+        "opt-in",
+        "opt-out"
+      ];
+      const unexpectedValues = ["1", "false", "test"];
+      assertEntityProperty.enumeration(AccountRecoveryOrganizationPolicyEntity, "policy", expectedValues, unexpectedValues);
+      assertEntityProperty.required(AccountRecoveryOrganizationPolicyEntity, "policy");
+    });
+
+    it("validates public_key_id property", () => {
+      assertEntityProperty.uuid(AccountRecoveryOrganizationPolicyEntity, "public_key_id");
+      assertEntityProperty.nullable(AccountRecoveryOrganizationPolicyEntity, "public_key_id");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPolicyEntity, "public_key_id");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(AccountRecoveryOrganizationPolicyEntity, "created");
+      assertEntityProperty.dateTime(AccountRecoveryOrganizationPolicyEntity, "created");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPolicyEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(AccountRecoveryOrganizationPolicyEntity, "modified");
+      assertEntityProperty.dateTime(AccountRecoveryOrganizationPolicyEntity, "modified");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPolicyEntity, "modified");
+    });
+
+    it("validates created_by property", () => {
+      assertEntityProperty.uuid(AccountRecoveryOrganizationPolicyEntity, "created_by");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPolicyEntity, "created_by");
+    });
+
+    it("validates modified_by property", () => {
+      assertEntityProperty.uuid(AccountRecoveryOrganizationPolicyEntity, "modified_by");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPolicyEntity, "modified_by");
+    });
   });
 
   each([
@@ -54,68 +103,6 @@ describe("AccountRecoveryOrganizationPolicy entity", () => {
       }
       expect(entity.toJSON()).toEqual(_props.dto);
     });
-  });
-
-  it("constructor returns validation error if dto required fields are missing", () => {
-    try {
-      new AccountRecoveryOrganizationPolicyEntity({});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('policy', 'required')).toBe(true);
-    }
-  });
-
-  it("constructor returns validation error if dto fields are invalid", () => {
-    try {
-      new AccountRecoveryOrganizationPolicyEntity({'id': 'not-valid-uuid'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('id', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPolicyEntity({'policy': 'not-valid-policy'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('policy', 'enum')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPolicyEntity({'created_by': 'not-valid-uuid'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('created_by', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPolicyEntity({'modified_by': 'not-valid-uuid'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('modified_by', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPolicyEntity({'created': 'not-valid-date'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('created', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPolicyEntity({'modified': 'not-valid-date'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('modified', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPolicyEntity({'public_key_id': 'not-valid-uuid'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('public_key_id', 'type')).toBe(true);
-    }
   });
 
   describe("AccountRecoveryOrganizationPolicy assertValidCreatorGpgkey", () => {

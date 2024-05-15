@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 
 const ENTITY_NAME = 'gpgkey';
@@ -22,18 +22,7 @@ const FINGERPRINT_MAX_LENGTH = 40;
 const KEY_ID_MIN_LENGTH = 8;
 const KEY_ID_MAX_LENGTH = 16;
 
-class GpgkeyEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(gpgkeyDto, options = {}) {
-    super(EntitySchema.validate(
-      GpgkeyEntity.ENTITY_NAME,
-      gpgkeyDto,
-      GpgkeyEntity.getSchema()
-    ), options);
-  }
-
+class GpgkeyEntity extends EntityV2 {
   /**
    * Get gpgkey entity schema
    * @returns {Object} schema

@@ -11,23 +11,25 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import AvatarUrlEntity from "./avatarUrlEntity";
 
 const ENTITY_NAME = 'Avatar';
 const AVATAR_URL_SIZE_SMALL = 'small';
 const AVATAR_URL_SIZE_MEDIUM = 'medium';
 
-class AvatarEntity extends Entity {
+class AvatarEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(avatarDto, options = {}) {
-    super(EntitySchema.validate(
-      AvatarEntity.ENTITY_NAME,
-      avatarDto,
-      AvatarEntity.getSchema()
-    ), options);
+  constructor(dto = {}, options = {}) {
+    super(dto, options);
+
+    // Associations
+    if (this._props.url) {
+      this._url = new AvatarUrlEntity(this._props.url, {...options, clone: false});
+      delete this._props.url;
+    }
   }
 
   /**
@@ -45,23 +47,6 @@ class AvatarEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        "url": {
-          "type": "object",
-          "required": [
-            AvatarEntity.AVATAR_URL_SIZE_MEDIUM,
-            AvatarEntity.AVATAR_URL_SIZE_SMALL
-          ],
-          "properties": {
-            "medium": {
-              "type": "string",
-              // "format": "x-url"
-            },
-            "small": {
-              "type": "string",
-              // "format": "x-url"
-            }
-          }
-        },
         "created": {
           "type": "string",
           "format": "date-time"
@@ -70,12 +55,13 @@ class AvatarEntity extends Entity {
           "type": "string",
           "format": "date-time"
         },
+        "url": AvatarUrlEntity.getSchema(),
       }
     };
   }
 
   /*
-   * ==================================================
+   * ==============================a====================
    * Dynamic properties getters
    * ==================================================
    */
@@ -89,18 +75,18 @@ class AvatarEntity extends Entity {
 
   /**
    * Get url (medium size)
-   * @returns {*}
+   * @returns {string}
    */
   get urlMedium() {
-    return this._props.url["medium"];
+    return this._url.medium;
   }
 
   /**
    * Get url (small size)
-   * @returns {*}
+   * @returns {string}
    */
   get urlSmall() {
-    return this._props.url["small"];
+    return this._url.small;
   }
 
   /**
@@ -117,6 +103,17 @@ class AvatarEntity extends Entity {
    */
   get modified() {
     return this._props.modified || null;
+  }
+
+  /**
+   * Return a DTO ready to be sent to API
+   * @param {object} [contain] optional for example {profile: {avatar:true}}
+   * @returns {*}
+   */
+  toDto(contain) {
+    const result = super.toDto(contain);
+    result.url = this._url.toDto();
+    return result;
   }
 
   /*

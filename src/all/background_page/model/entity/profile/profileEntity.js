@@ -12,22 +12,17 @@
  * @since         2.13.0
  */
 
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AvatarEntity from "../avatar/avatarEntity";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Profile';
 
-class ProfileEntity extends Entity {
+class ProfileEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(profileDto, options = {}) {
-    super(EntitySchema.validate(
-      ProfileEntity.ENTITY_NAME,
-      profileDto,
-      ProfileEntity.getSchema()
-    ), options);
+  constructor(dto = {}, options = {}) {
+    super(dto, options);
 
     // Association
     if (this._props.avatar) {

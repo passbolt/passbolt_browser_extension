@@ -11,23 +11,62 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import ProfileEntity from "./profileEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {
   defaultProfileDto,
   minimalProfileDto
 } from "passbolt-styleguide/src/shared/models/entity/profile/ProfileEntity.test.data";
-import each from "jest-each";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import ProfileEntity from "./profileEntity";
 import {defaultAvatarDto} from "passbolt-styleguide/src/shared/models/entity/avatar/avatarEntity.test.data";
 
 describe("ProfileEntity", () => {
-  describe("ProfileEntity:constructor", () => {
+  describe("::getSchema", () => {
     it("schema must validate", () => {
       EntitySchema.validateSchema(ProfileEntity.ENTITY_NAME, ProfileEntity.getSchema());
     });
 
-    it("constructor works if valid minimal DTO is provided", () => {
+    it("validates id property", () => {
+      assertEntityProperty.string(ProfileEntity, "id");
+      assertEntityProperty.uuid(ProfileEntity, "id");
+      assertEntityProperty.notRequired(ProfileEntity, "id");
+    });
+
+    it("validates user_id property", () => {
+      assertEntityProperty.string(ProfileEntity, "user_id");
+      assertEntityProperty.uuid(ProfileEntity, "user_id");
+      assertEntityProperty.notRequired(ProfileEntity, "user_id");
+    });
+
+    it("validates first_name property", () => {
+      assertEntityProperty.string(ProfileEntity, "first_name");
+      assertEntityProperty.minLength(ProfileEntity, "first_name", 1);
+      assertEntityProperty.maxLength(ProfileEntity, "first_name", 255);
+      assertEntityProperty.required(ProfileEntity, "first_name");
+    });
+
+    it("validates last_name property", () => {
+      assertEntityProperty.string(ProfileEntity, "last_name");
+      assertEntityProperty.minLength(ProfileEntity, "last_name", 1);
+      assertEntityProperty.maxLength(ProfileEntity, "last_name", 255);
+      assertEntityProperty.required(ProfileEntity, "last_name");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(ProfileEntity, "created");
+      assertEntityProperty.dateTime(ProfileEntity, "created");
+      assertEntityProperty.notRequired(ProfileEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(ProfileEntity, "modified");
+      assertEntityProperty.dateTime(ProfileEntity, "modified");
+      assertEntityProperty.notRequired(ProfileEntity, "modified");
+    });
+  });
+
+  describe("::constructor", () => {
+    it("works if valid minimal DTO is provided", () => {
       const dto = minimalProfileDto();
       const entity = new ProfileEntity(dto);
       expect(entity.id).toBeNull();
@@ -39,7 +78,7 @@ describe("ProfileEntity", () => {
       expect(entity.avatar).toBeNull();
     });
 
-    it("constructor works if valid DTO is provided with optional properties", () => {
+    it("works if valid DTO is provided with optional properties", () => {
       const dto = defaultProfileDto();
       const entity = new ProfileEntity(dto);
       expect(entity.id).toEqual(dto.id);
@@ -52,133 +91,12 @@ describe("ProfileEntity", () => {
       expect(entity.avatar.urlSmall).toEqual("/avatars/view/e6927385-195c-4c7f-a107-a202ea86de40/small.jpg");
     });
 
-    // Validate id
-    each([
-      {scenario: 'is not required but null', rule: 'type', value: null},
-      {scenario: 'valid uuid', rule: 'format', value: 'invalid-id'},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the id", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultProfileDto({
-          id: test.value
-        });
-        try {
-          new ProfileEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('id', test.rule)).toBeTruthy();
-        }
-      });
-    });
-
-    // Validate user_id
-    each([
-      {scenario: 'is not required but null', rule: 'type', value: null},
-      {scenario: 'valid uuid', rule: 'format', value: 'invalid-id'},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the user_id", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultProfileDto({
-          user_id: test.value
-        });
-        try {
-          new ProfileEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('user_id', test.rule)).toBeTruthy();
-        }
-      });
-    });
-
-    // Validate first_name
-    each([
-      {scenario: 'is required', rule: 'type'},
-      {scenario: 'is null', rule: 'type', value: null},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the first_name", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultProfileDto({
-          first_name: test.value
-        });
-        try {
-          new ProfileEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('first_name', test.rule)).toBeTruthy();
-        }
-      });
-    });
-
-    // Validate last_name
-    each([
-      {scenario: 'is required', rule: 'type'},
-      {scenario: 'is null', rule: 'type', value: null},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the last_name", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultProfileDto({
-          last_name: test.value
-        });
-        try {
-          new ProfileEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('last_name', test.rule)).toBeTruthy();
-        }
-      });
-    });
-
-    each([
-      {scenario: 'is not required but cannot be null', rule: null},
-      {scenario: 'valid url object', rule: 'type', value: 42},
-    ]).describe("Should validate the created", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultProfileDto({
-          created: test.value
-        });
-        try {
-          new ProfileEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('created', test.rule)).toBeTruthy();
-        }
-      });
-    });
-
-    each([
-      {scenario: 'is not required but cannot be null', rule: null},
-      {scenario: 'valid url object', rule: 'type', value: 42},
-    ]).describe("Should validate the modified", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultProfileDto({
-          modified: test.value
-        });
-        try {
-          new ProfileEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('modified', test.rule)).toBeTruthy();
-        }
-      });
-    });
-
-    it('Should not accept invalid associated avatar', async() => {
-      expect.assertions(2);
+    it("Should throw if invalid avatar provided", async() => {
+      expect.assertions(1);
       const dto = defaultProfileDto({
         avatar: defaultAvatarDto({id: "invalid-id"})
       });
-      try {
-        new ProfileEntity(dto);
-      } catch (error) {
-        expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('id', 'format')).toBeTruthy();
-      }
+      expect(() => new ProfileEntity(dto)).toThrowEntityValidationError("id", "format");
     });
   });
 

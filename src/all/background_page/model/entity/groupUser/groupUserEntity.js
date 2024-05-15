@@ -11,24 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import Validator from "validator";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'GroupUser';
 
-class GroupUserEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(groupUserDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupUserEntity.ENTITY_NAME,
-      groupUserDto,
-      GroupUserEntity.getSchema()
-    ), options);
-  }
-
+class GroupUserEntity extends EntityV2 {
   /**
    * Get groupUser entity schema
    * @returns {Object} schema
@@ -71,7 +59,7 @@ class GroupUserEntity extends Entity {
 
   /**
    * Return a DTO ready to be sent to API
-   * @returns {*}
+   * @returns {Object}
    */
   toDto() {
     return Object.assign({}, this._props);

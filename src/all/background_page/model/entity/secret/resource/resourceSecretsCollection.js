@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import SecretEntity from "../secretEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
@@ -33,14 +32,9 @@ class ResourceSecretsCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection associated user ID is unique.
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same resource.
-   * @todo The collection options.clone, doesn't work here as the internal push function is recreating the SecretEntity.
    */
-  constructor(resourceSecretsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      ResourceSecretsCollection.ENTITY_NAME,
-      resourceSecretsCollectionDto,
-      ResourceSecretsCollection.getSchema()
-    ), options);
+  constructor(dtos = [], options = {}) {
+    super(dtos, options);
   }
 
   /**

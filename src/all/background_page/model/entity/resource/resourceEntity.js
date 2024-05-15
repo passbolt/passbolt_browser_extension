@@ -90,6 +90,10 @@ class ResourceEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
+        "resource_type_id": {
+          "type": "string",
+          "format": "uuid"
+        },
         "name": {
           "type": "string",
           "maxLength": RESOURCE_NAME_MAX_LENGTH
@@ -138,23 +142,17 @@ class ResourceEntity extends Entity {
           "format": "uuid",
           "nullable": true,
         },
-        // Permissions
-        "permission": PermissionEntity.getSchema(), // current user permission
-        "permissions": PermissionsCollection.getSchema(), // all users permissions
         "personal": {
           "type": "boolean"
         },
-        // Resource types
-        "resource_type_id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "resource_type": ResourceTypeEntity.getSchema(),
-        // other Associations
+        // Associated models
         "favorite": {
           ...FavoriteEntity.getSchema(),
           "nullable": true,
         },
+        "permission": PermissionEntity.getSchema(), // current user permission
+        "permissions": PermissionsCollection.getSchema(), // all users permissions
+        "resource_type": ResourceTypeEntity.getSchema(),
         "secrets": ResourceSecretsCollection.getSchema(),
         "tags": TagsCollection.getSchema()
       }
@@ -177,6 +175,10 @@ class ResourceEntity extends Entity {
     if (!contain) {
       return result;
     }
+    // preserve null state
+    if (typeof this._favorite !== 'undefined' && contain.favorite) {
+      result.favorite = this._favorite === null ? null : this._favorite.toDto();
+    }
     if (this._permission && contain.permission) {
       result.permission = this._permission.toDto();
     }
@@ -190,10 +192,6 @@ class ResourceEntity extends Entity {
       result.secrets = this._secrets.toDto();
     }
 
-    // preserve null state
-    if (typeof this._favorite !== 'undefined' && contain.favorite) {
-      result.favorite = this._favorite === null ? null : this._favorite.toDto();
-    }
     return result;
   }
 

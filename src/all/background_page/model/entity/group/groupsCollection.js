@@ -12,7 +12,6 @@
  * @since         3.0.0
  */
 import GroupEntity from "./groupEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
 const ENTITY_NAME = 'Groups';
@@ -34,12 +33,8 @@ class GroupsCollection extends EntityV2Collection {
    * @throws {CollectionValidationError} Build Rule: Ensure all items in the collection are unique by ID.
    * @throws {CollectionValidationError} Build Rule: Ensure all items in the collection are unique by name.
    */
-  constructor(groupsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupsCollection.ENTITY_NAME,
-      groupsCollectionDto,
-      GroupsCollection.getSchema()
-    ), options);
+  constructor(dtos = [], options = {}) {
+    super(dtos, options);
   }
 
   /*

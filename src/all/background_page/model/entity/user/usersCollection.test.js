@@ -88,6 +88,12 @@ describe("UsersCollection", () => {
       expect(collection.items[0]._props.locale).toEqual(entity._props.locale);
     });
 
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new UsersCollection({}))
+        .toThrowEntityValidationError("items");
+    });
+
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = defaultUserDto();
       const dto2 = defaultUserDto({username: 42});

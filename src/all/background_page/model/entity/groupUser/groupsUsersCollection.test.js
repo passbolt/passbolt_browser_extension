@@ -66,6 +66,12 @@ describe("Groups users collection", () => {
       expect(collection.items[0]._props.is_admin).toEqual(entity._props.is_admin);
     });
 
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new GroupsUsersCollection({}))
+        .toThrowEntityValidationError("items");
+    });
+
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = defaultGroupUser();
       const dto2 = defaultGroupUser({id: 42});

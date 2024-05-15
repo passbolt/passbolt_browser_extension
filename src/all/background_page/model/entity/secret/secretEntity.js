@@ -11,25 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Secret';
 
-class SecretEntity extends Entity {
+class SecretEntity extends EntityV2 {
   /**
    * @inheritDoc
    * @throws {EntityValidationError} Build Rule: Verify the data is a valid openpgp message.
    */
-  constructor(secretDto, options = {}) {
-    super(EntitySchema.validate(
-      SecretEntity.ENTITY_NAME,
-      secretDto,
-      SecretEntity.getSchema()
-    ), options);
-
-    SecretEntity.assertValidMessage(this._props.data);
+  constructor(dto, options = {}) {
+    super(dto, options);
   }
 
   /**
@@ -68,6 +61,16 @@ class SecretEntity extends Entity {
         }
       }
     };
+  }
+
+  /**
+   * @inheritDoc
+   * @throw {EntityValidationError} If the data is not formatted as a valid pgp message.
+   *
+   */
+  // eslint-disable-next-line no-unused-vars
+  validateBuildRules(options = {}) {
+    SecretEntity.assertValidMessage(this._props.data);
   }
 
   /*

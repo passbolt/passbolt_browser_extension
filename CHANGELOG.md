@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.8.1] - 2024-05-17
+### Fix
+- PB-33595 As a user running an instance serving an invalid certificate I should be able to sync the gpgkeyring
+
 ## [4.8.0] - 2024-05-16
 ### Maintenance
 - PB-33541 Chrome Extension Manifest upgrade to version 3
@@ -1619,7 +1623,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.1...HEAD
+[4.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.0...4.8.1
 [4.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.8...4.8.0
 [4.7.8]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.7...v4.7.8
 [4.7.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.6...v4.7.7

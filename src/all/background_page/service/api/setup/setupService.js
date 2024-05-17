@@ -10,9 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import PassboltBadResponseError from "../../../error/passboltBadResponseError";
 import AbstractService from "../abstract/abstractService";
-import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
 const SETUP_SERVICE_RESOURCE_NAME = 'setup';
 
@@ -108,106 +106,6 @@ class SetupService extends AbstractService {
     const bodyString = this.apiClient.buildBody(abortDto);
     const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
     return response.body;
-  }
-
-  /**
-   * Find legacy setup info.
-   * @param {string} userId the user id
-   * @param {string} token the token
-   * @returns {Promise<*>} response body
-   * @throws {Error} if options are invalid or API error
-   * @deprecated will be removed with v4
-   */
-  async findLegacySetupInfo(userId, token) {
-    this.assertValidId(userId);
-    this.assertValidId(token);
-
-    const url = new URL(`${this.apiClient.baseUrl}/install/${userId}/${token}`);
-    let response, responseHtml, username, firstName, lastName;
-    try {
-      response = await fetch(url.toString());
-    } catch (error) {
-      if (navigator.onLine) {
-        // Catch Network error such as bad certificate or server unreachable.
-        throw new PassboltServiceUnavailableError("Unable to reach the server, an unexpected error occurred");
-      } else {
-        // Network connection lost.
-        throw new PassboltServiceUnavailableError("Unable to reach the server, you are not connected to the network");
-      }
-    }
-
-    try {
-      responseHtml = await response.text();
-      const parser = new DOMParser();
-      const parsedHtml = parser.parseFromString(responseHtml, 'text/html');
-      username = parsedHtml.getElementById('js_setup_user_username').value;
-      firstName = parsedHtml.getElementById('js_setup_user_first_name').value;
-      lastName = parsedHtml.getElementById('js_setup_user_last_name').value;
-    } catch (error) {
-      /*
-       * If the response cannot be parsed, it's not a Passbolt API response.
-       * It can be a for example a proxy timeout error (504).
-       */
-      throw new PassboltBadResponseError();
-    }
-
-    return {
-      username: username,
-      profile: {
-        first_name: firstName,
-        last_name: lastName
-      }
-    };
-  }
-
-  /**
-   * Find legacy recover info
-   * @param {string} userId the user id
-   * @param {string} token the token
-   * @returns {Promise<*>} response body
-   * @throws {Error} if options are invalid or API error
-   * @deprecated will be removed with v4
-   */
-  async findLegacyRecoverInfo(userId, token) {
-    this.assertValidId(userId);
-    this.assertValidId(token);
-
-    const url = new URL(`${this.apiClient.baseUrl}/recover/${userId}/${token}`);
-    let response, responseHtml, username, firstName, lastName;
-    try {
-      response = await fetch(url.toString());
-    } catch (error) {
-      if (navigator.onLine) {
-        // Catch Network error such as bad certificate or server unreachable.
-        throw new PassboltServiceUnavailableError("Unable to reach the server, an unexpected error occurred");
-      } else {
-        // Network connection lost.
-        throw new PassboltServiceUnavailableError("Unable to reach the server, you are not connected to the network");
-      }
-    }
-
-    try {
-      responseHtml = await response.text();
-      const parser = new DOMParser();
-      const parsedHtml = parser.parseFromString(responseHtml, 'text/html');
-      username = parsedHtml.getElementById('js_setup_user_username').value;
-      firstName = parsedHtml.getElementById('js_setup_user_first_name').value;
-      lastName = parsedHtml.getElementById('js_setup_user_last_name').value;
-    } catch (error) {
-      /*
-       * If the response cannot be parsed, it's not a Passbolt API response.
-       * It can be a for example a proxy timeout error (504).
-       */
-      throw new PassboltBadResponseError();
-    }
-
-    return {
-      username: username,
-      profile: {
-        first_name: firstName,
-        last_name: lastName
-      }
-    };
   }
 }
 

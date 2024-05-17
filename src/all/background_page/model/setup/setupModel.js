@@ -41,7 +41,7 @@ class SetupModel {
    * @throws {Error} if options are invalid or API error
    */
   async startSetup(userId, authenticationTokenToken) {
-    let user, accountRecoveryOrganizationPolicy, userDto, accountRecoveryOrganizationPolicyDto, userPassphrasePoliciesDto, userPassphrasePolicies;
+    let user, accountRecoveryOrganizationPolicy, userPassphrasePolicies;
 
     if (!Validator.isUUID(userId)) {
       throw new TypeError("userId should be a valid uuid.");
@@ -50,20 +50,10 @@ class SetupModel {
       throw new TypeError("authenticationTokenToken should be a valid uuid.");
     }
 
-    try {
-      const result = await this.setupService.findSetupInfo(userId, authenticationTokenToken);
-      userDto = result?.user;
-      accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
-      userPassphrasePoliciesDto = result?.user_passphrase_policy;
-    } catch (error) {
-      // If the entry point doesn't exist or return a 500, the API version is <v3.
-      const code = error.data && error.data.code;
-      if (code === 404 || code === 500) {
-        userDto = await this.setupService.findLegacySetupInfo(userId, authenticationTokenToken);
-      } else {
-        throw error;
-      }
-    }
+    const result = await this.setupService.findSetupInfo(userId, authenticationTokenToken);
+    const userDto = result?.user;
+    const accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
+    const userPassphrasePoliciesDto = result?.user_passphrase_policy;
 
     if (userDto) {
       user = new UserEntity(userDto);
@@ -89,7 +79,7 @@ class SetupModel {
    * @return {Promise<{user: UserEntity, userPassphrasePolicies: UserPassphrasePoliciesEntity}>}
    */
   async startRecover(userId, authenticationTokenToken) {
-    let user, userDto, userPassphrasePoliciesDto, userPassphrasePolicies;
+    let user, userPassphrasePolicies;
 
     if (!Validator.isUUID(userId)) {
       throw new TypeError("userId should be a valid uuid.");
@@ -98,19 +88,10 @@ class SetupModel {
       throw new TypeError("authenticationTokenToken should be a valid uuid.");
     }
 
-    try {
-      const result = await this.setupService.findRecoverInfo(userId, authenticationTokenToken);
-      userDto = result?.user;
-      userPassphrasePoliciesDto = result?.user_passphrase_policy;
-    } catch (error) {
-      // If the entry point doesn't exist or return a 500, the API version is <v3.
-      const code = error.data && error.data.code;
-      if (code === 404 || code === 500) {
-        userDto = await this.setupService.findLegacyRecoverInfo(userId, authenticationTokenToken);
-      } else {
-        throw error;
-      }
-    }
+    const result = await this.setupService.findRecoverInfo(userId, authenticationTokenToken);
+    const userDto = result?.user;
+    const userPassphrasePoliciesDto = result?.user_passphrase_policy;
+
     if (userDto) {
       user = new UserEntity(userDto);
     }

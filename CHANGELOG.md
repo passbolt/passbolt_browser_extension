@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [4.8.1] - 2024-05-17
+## [4.8.1] - 2024-05-18
 ### Fix
 - PB-33595 As a user running an instance serving an invalid certificate I should be able to sync the gpgkeyring
 

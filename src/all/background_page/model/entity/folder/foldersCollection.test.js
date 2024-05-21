@@ -11,8 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 import FoldersCollection from "./foldersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 
 describe("Folders collection entity", () => {
   it("schema must validate", () => {
@@ -280,5 +282,46 @@ describe("Folders collection entity", () => {
 
     path = collection.getFolderPath('e2172205-139c-4e4b-a03a-933528123111');
     expect(path).toEqual('/folder001/folder011/folder111');
+  });
+
+  it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
+    const dto1 = defaultFolderDto();
+    const dto2 = defaultFolderDto({name: 42});
+
+    expect.assertions(2);
+    const collection = new FoldersCollection([dto1, dto2], {ignoreInvalidEntity: true});
+    expect(collection.items).toHaveLength(1);
+    expect(collection.items[0].id).toEqual(dto1.id);
+  });
+
+  it("should, with enabling the ignore invalid option, ignore items which do not validate the unique id build rule", () => {
+    const dto1 = defaultFolderDto({name: "folder 1"});
+    const dto2 = defaultFolderDto({id: dto1.id, name: "folder 2"});
+
+    expect.assertions(2);
+    const collection = new FoldersCollection([dto1, dto2], {ignoreInvalidEntity: true});
+    expect(collection.items).toHaveLength(1);
+    expect(collection.items[0].id).toEqual(dto1.id);
+  });
+
+  // @todo ignoreInvalidEntity option is not yet passed to associated entities and collections, therefore the parent entity is ignored.
+  it.failing("should, with enabling the ignore invalid option, ignore items associated permissions entities which do not validate their entity schema validation", () => {
+    const dto1 = defaultFolderDto({}, {withPermissions: true});
+    const dto2 = defaultFolderDto({
+      permissions: [
+        ownerPermissionDto({aco_foreign_key: 42})
+      ]
+    });
+    const dto3 = defaultFolderDto({}, {withPermissions: true});
+
+    expect.assertions(1);
+    const collection = new FoldersCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
+    expect(collection.items).toHaveLength(3);
+    expect(collection.items[0].id).toEqual(dto1.id);
+    expect(collection.items[0]._permissions).toHaveLength(1);
+    expect(collection.items[1].id).toEqual(dto2.id);
+    expect(collection.items[1]._permissions).toHaveLength(0);
+    expect(collection.items[2].id).toEqual(dto3.id);
+    expect(collection.items[2]._permissions).toHaveLength(1);
   });
 });

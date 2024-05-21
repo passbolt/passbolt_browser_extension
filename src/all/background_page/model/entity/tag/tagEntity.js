@@ -33,6 +33,7 @@ class TagEntity extends EntityV2 {
     if (typeof this._props.is_shared === "undefined" && typeof this._props.slug === "string") {
       this._props.is_shared = this._props.slug?.startsWith('#');
     }
+    super.marshall();
   }
 
   /**
@@ -68,6 +69,7 @@ class TagEntity extends EntityV2 {
   // eslint-disable-next-line no-unused-vars
   validateBuildRules(options = {}) {
     if (this.slug.startsWith('#') && !this.isShared) {
+      //@todo: refactor and improve; this can't happen as the marshalling avoids that in anyway. However the opposite could happen (isShared = true, slug doesn't start with "#").
       const error = new EntityValidationError('Invalid tag');
       error.addError('is_shared', 'hashtag', 'A shared tag should start with a hashtag.');
       // @todo should throw the error, not done to not introduce a regression. todo when ignoreInvalidEntity option will be enforced on critical journey.

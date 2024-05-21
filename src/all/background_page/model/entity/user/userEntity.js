@@ -11,28 +11,23 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import ProfileEntity from "../profile/profileEntity";
 import GpgkeyEntity from "../gpgkey/gpgkeyEntity";
 import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
 import AppEmailValidatorService from "../../../service/validator/appEmailValidatorService";
 import PendingAccountRecoveryRequestEntity from "../accountRecovery/pendingAccountRecoveryRequestEntity";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'User';
 
-class UserEntity extends Entity {
+class UserEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(userDto, options = {}) {
-    super(EntitySchema.validate(
-      UserEntity.ENTITY_NAME,
-      UserEntity._cleanupLastLoginDate(userDto),
-      UserEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Associations
     if (this._props.profile) {
@@ -59,6 +54,17 @@ class UserEntity extends Entity {
       this._pending_account_recovery_request = new PendingAccountRecoveryRequestEntity(this._props.pending_account_recovery_request, {...options, clone: false});
       delete this._props.pending_account_recovery_request;
     }
+  }
+
+  /**
+   * @inheritDoc
+   * Marshall the last_logged_in to null if empty string given
+   */
+  marshall() {
+    if (this._props.last_logged_in === "") {
+      this._props.last_logged_in = null;
+    }
+    super.marshall();
   }
 
   /**
@@ -127,19 +133,6 @@ class UserEntity extends Entity {
         "pending_account_recovery_request": PendingAccountRecoveryRequestEntity.getSchema()
       }
     };
-  }
-
-  /**
-   * API returns "" for users that never logged in, convert this to null
-   * @param {object} dto
-   * @return {object} dto
-   * @private
-   */
-  static _cleanupLastLoginDate(dto) {
-    if (dto && dto.last_logged_in === '') {
-      dto.last_logged_in = null;
-    }
-    return dto;
   }
 
   /*

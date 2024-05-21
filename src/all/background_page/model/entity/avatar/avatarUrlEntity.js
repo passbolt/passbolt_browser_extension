@@ -9,29 +9,15 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.13.0
+ * @since         4.9.0
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
-import AvatarUrlEntity from "./avatarUrlEntity";
 
-const ENTITY_NAME = 'Avatar';
-const AVATAR_URL_SIZE_SMALL = 'small';
-const AVATAR_URL_SIZE_MEDIUM = 'medium';
+const ENTITY_NAME = "AvatarUrl";
+const AVATAR_URL_SIZE_SMALL = "small";
+const AVATAR_URL_SIZE_MEDIUM = "medium";
 
-class AvatarEntity extends EntityV2 {
-  /**
-   * @inheritDoc
-   */
-  constructor(dto = {}, options = {}) {
-    super(dto, options);
-
-    // Associations
-    if (this._props.url) {
-      this._url = new AvatarUrlEntity(this._props.url, {...options, clone: false});
-      delete this._props.url;
-    }
-  }
-
+class AvatarUrlEntity extends EntityV2 {
   /**
    * Get avatar entity schema
    * @returns {Object} schema
@@ -40,22 +26,16 @@ class AvatarEntity extends EntityV2 {
     return {
       "type": "object",
       "required": [
-        "url"
+        AvatarUrlEntity.AVATAR_URL_SIZE_MEDIUM,
+        AvatarUrlEntity.AVATAR_URL_SIZE_SMALL
       ],
       "properties": {
-        "id": {
+        "medium": {
           "type": "string",
-          "format": "uuid"
         },
-        "created": {
+        "small": {
           "type": "string",
-          "format": "date-time"
-        },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "url": AvatarUrlEntity.getSchema(),
+        }
       }
     };
   }
@@ -65,55 +45,21 @@ class AvatarEntity extends EntityV2 {
    * Dynamic properties getters
    * ==================================================
    */
-  /**
-   * Get avatar id
-   * @returns {(string|null)} uuid
-   */
-  get id() {
-    return this._props.id || null;
-  }
 
   /**
    * Get url (medium size)
    * @returns {string}
    */
-  get urlMedium() {
-    return this._url.medium;
+  get medium() {
+    return this._props.medium;
   }
 
   /**
    * Get url (small size)
    * @returns {string}
    */
-  get urlSmall() {
-    return this._url.small;
-  }
-
-  /**
-   * Get avatar creation date
-   * @returns {(string|null)} date
-   */
-  get created() {
-    return this._props.created || null;
-  }
-
-  /**
-   * Get avatar modification date
-   * @returns {(string|null)} date
-   */
-  get modified() {
-    return this._props.modified || null;
-  }
-
-  /**
-   * Return a DTO ready to be sent to API
-   * @param {object} [contain] optional for example {profile: {avatar:true}}
-   * @returns {*}
-   */
-  toDto(contain) {
-    const result = super.toDto(contain);
-    result.url = this._url.toDto();
-    return result;
+  get small() {
+    return this._props.small;
   }
 
   /*
@@ -122,7 +68,7 @@ class AvatarEntity extends EntityV2 {
    * ==================================================
    */
   /**
-   * AvatarEntity.ENTITY_NAME
+   * AvatarUrlEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
@@ -130,7 +76,7 @@ class AvatarEntity extends EntityV2 {
   }
 
   /**
-   * AvatarEntity.AVATAR_URL_SIZE_MEDIUM
+   * AvatarUrlEntity.AVATAR_URL_SIZE_MEDIUM
    * @returns {string}
    */
   static get AVATAR_URL_SIZE_MEDIUM() {
@@ -138,7 +84,7 @@ class AvatarEntity extends EntityV2 {
   }
 
   /**
-   * AvatarEntity.AVATAR_URL_SIZE_SMALL
+   * AvatarUrlEntity.AVATAR_URL_SIZE_SMALL
    * @returns {string}
    */
   static get AVATAR_URL_SIZE_SMALL() {
@@ -146,4 +92,4 @@ class AvatarEntity extends EntityV2 {
   }
 }
 
-export default AvatarEntity;
+export default AvatarUrlEntity;

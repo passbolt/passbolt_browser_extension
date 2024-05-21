@@ -11,26 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import GroupUserEntity from "../groupUser/groupUserEntity";
 import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
 import UserEntity from "../user/userEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Group';
 const GROUP_NAME_MIN_LENGTH = 1;
 const GROUP_NAME_MAX_LENGTH = 255;
 
-class GroupEntity extends Entity {
+class GroupEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(groupDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupEntity.ENTITY_NAME,
-      groupDto,
-      GroupEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Association
     if (this._props.groups_users) {

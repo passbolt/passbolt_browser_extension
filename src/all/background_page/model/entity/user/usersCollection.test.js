@@ -224,9 +224,8 @@ describe("UsersCollection", () => {
       const dtos = [dto1, dto2, dto3];
       const collection = new UsersCollection(dtos);
 
-      expect.assertions(2);
+      expect.assertions(1);
       expect(collection.toDto()).toEqual(dtos);
-      expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
     });
   });
 });

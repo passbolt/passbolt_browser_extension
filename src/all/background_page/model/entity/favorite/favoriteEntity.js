@@ -11,24 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Favorite';
 const FAVORITE_RESOURCE = 'Resource';
 
-class FavoriteEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(favoriteDto, options = {}) {
-    super(EntitySchema.validate(
-      FavoriteEntity.ENTITY_NAME,
-      favoriteDto,
-      FavoriteEntity.getSchema()
-    ), options);
-  }
-
+class FavoriteEntity extends EntityV2 {
   /**
    * Get favorite entity schema
    * @returns {Object} schema

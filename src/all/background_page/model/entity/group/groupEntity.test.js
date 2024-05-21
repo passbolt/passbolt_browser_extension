@@ -14,7 +14,10 @@
 import GroupEntity from "./groupEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultGroupDto, minimumGroupUserDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
+import {
+  defaultGroupDto,
+  minimumGroupUserDto
+} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
 import GroupUserEntity from "../groupUser/groupUserEntity";

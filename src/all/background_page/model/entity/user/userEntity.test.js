@@ -52,12 +52,18 @@ describe("UserEntity", () => {
     });
 
     it("validates username with custom validation rule", () => {
-      expect.assertions(1);
+      expect.assertions(2);
       const organizationSettings = customEmailValidationProOrganizationSettings();
       OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
       const dto = defaultUserDto({username: "ada@passbolt.c"});
       const entity = new UserEntity(dto);
       expect(entity.username).toEqual("ada@passbolt.c");
+      /*
+       * Ensure that the custom formula used to validate the format of the email is dynamic, and can be changed even if the
+       * entity schema is cached. This formula might loaded after the schema was cached and could lead to user not valid.
+       */
+      OrganizationSettingsModel.flushCache();
+      expect(() => new UserEntity(dto)).toThrowEntityValidationError("username", "custom");
     });
 
     it("validates active property", () => {
@@ -184,6 +190,13 @@ describe("UserEntity", () => {
       expect(dtoWithContain.gpgkey.armored_key.startsWith('-----BEGIN PGP PUBLIC KEY BLOCK-----')).toBe(true);
       expect(dtoWithContain.is_mfa_enabled).toBe(false);
       expect(dtoWithContain.pending_account_recovery_request.status).toBe('pending');
+    });
+
+    it("should marshall last_logged_in if empty string given", () => {
+      expect.assertions(1);
+      const dto = defaultUserDto({last_logged_in: ""});
+      const entity = new UserEntity(dto);
+      expect(entity.lastLoggedIn).toBeNull();
     });
 
     it("should, with enabling the ignore invalid option, ignore groups users which do not validate their schema", () => {

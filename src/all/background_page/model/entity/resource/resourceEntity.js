@@ -13,7 +13,6 @@
  */
 import PermissionEntity from "../permission/permissionEntity";
 import PermissionsCollection from "../permission/permissionsCollection";
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import FavoriteEntity from "../favorite/favoriteEntity";
 import ResourceTypeEntity from "../resourceType/resourceTypeEntity";
 import TagsCollection from "../tag/tagsCollection";
@@ -21,6 +20,7 @@ import ResourceSecretsCollection from "../secret/resource/resourceSecretsCollect
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
@@ -28,7 +28,7 @@ const RESOURCE_USERNAME_MAX_LENGTH = 255;
 const RESOURCE_URI_MAX_LENGTH = 1024;
 const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
 
-class ResourceEntity extends Entity {
+class ResourceEntity extends EntityV2 {
   /**
    * @inheritDoc
    * @throws {EntityValidationError} Build Rule: The collection of secrets, if provided, cannot be empty.
@@ -41,12 +41,8 @@ class ResourceEntity extends Entity {
    * @throws {EntityValidationError} Build Rule: Verify that the favorite associated foreign key corresponds with
    * the resource ID.
    */
-  constructor(resourceDto, options = {}) {
-    super(EntitySchema.validate(
-      ResourceEntity.ENTITY_NAME,
-      resourceDto,
-      ResourceEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Associations
     if (this._props.permission) {

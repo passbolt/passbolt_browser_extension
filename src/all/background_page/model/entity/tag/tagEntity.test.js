@@ -1,4 +1,3 @@
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -64,7 +63,19 @@ describe("TagEntity", () => {
       expect(entity.isShared).toEqual(dto.is_shared);
     });
 
-    // The entity should throw an exception, the code created the error but does not throw it.
+    it("should marshall is_shared depending on the slug", () => {
+      expect.assertions(4);
+      const dtoNotShared = minimalTagDto();
+      const entityNotShared = new TagEntity(dtoNotShared);
+      expect(entityNotShared.slug).toEqual(dtoNotShared.slug);
+      expect(entityNotShared.isShared).toBeFalsy();
+      const dtoShared = minimalTagDto({slug: "#shared-tag"});
+      const entityShared = new TagEntity(dtoShared);
+      expect(entityShared.slug).toEqual(dtoShared.slug);
+      expect(entityShared.isShared).toBeTruthy();
+    });
+
+    // The entity should throw an exception, the validation instantiated the error but does not throw it.
     it.skip("should throw an exception if a personal tag starts with a hashtag", () => {
       expect.assertions(1);
       const dto = defaultTagDto({slug: "#shared-tag", is_shared: false});

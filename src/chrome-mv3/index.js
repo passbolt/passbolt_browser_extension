@@ -12,7 +12,6 @@
  * @since         4.0.0
  */
 import PortManager from "../all/background_page/sdk/port/portManager";
-import LocalStorageService from "../all/background_page/service/localStorage/localStorageService";
 import SystemRequirementService from "../all/background_page/service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "../all/background_page/controller/extension/onExtensionInstalledController";
 import TabService from "../all/background_page/service/tab/tabService";
@@ -20,6 +19,7 @@ import OnExtensionUpdateAvailableService
   from "../all/background_page/service/extension/onExtensionUpdateAvailableService";
 import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarmService";
 import ResponseFetchOffscreenService from "./serviceWorker/service/network/responseFetchOffscreenService";
+import OnStartUpService from "../all/background_page/service/extension/onStartUpService";
 
 /**
  * Load all system requirement
@@ -29,7 +29,7 @@ SystemRequirementService.get();
 /**
  * Add listener on startup
  */
-browser.runtime.onStartup.addListener(LocalStorageService.flush);
+browser.runtime.onStartup.addListener(OnStartUpService.exec);
 
 /**
  * On installed the extension, add first install in the url tab of setup or recover

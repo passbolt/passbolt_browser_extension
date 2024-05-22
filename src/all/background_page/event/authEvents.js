@@ -21,6 +21,7 @@ import GetQualifiedSsoLoginErrorController from "../controller/sso/getQualifiedS
 import AuthLogoutController from "../controller/auth/authLogoutController";
 import GetServerKeyController from "../controller/auth/getServerKeyController";
 import ReplaceServerKeyController from "../controller/auth/replaceServerKeyController";
+import ReloadTabController from "../controller/tab/reloadTabController";
 
 /**
  * Listens to the authentication events
@@ -209,6 +210,11 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.sso.get-qualified-sso-login-error', async requestId => {
     const controller = new GetQualifiedSsoLoginErrorController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.tab.reload', async requestId => {
+    const controller = new ReloadTabController(worker, requestId);
     await controller._exec();
   });
 };

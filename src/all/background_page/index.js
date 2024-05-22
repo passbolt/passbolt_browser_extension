@@ -6,7 +6,6 @@
  */
 import PortManager from "./sdk/port/portManager";
 import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
-import LocalStorageService from "./service/localStorage/localStorageService";
 import OnExtensionInstalledController from "./controller/extension/onExtensionInstalledController";
 import TabService from "./service/tab/tabService";
 import User from "./model/user";
@@ -16,6 +15,7 @@ import CheckAuthStatusService from "./service/auth/checkAuthStatusService";
 import GlobalAlarmService from "./service/alarm/globalAlarmService";
 import PostLoginService from "./service/auth/postLoginService";
 import PostLogoutService from "./service/auth/postLogoutService";
+import OnStartUpService from "./service/extension/onStartUpService";
 
 const main = async() => {
   /**
@@ -70,7 +70,7 @@ browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableService.
 /**
  * Add listener on startup
  */
-browser.runtime.onStartup.addListener(LocalStorageService.flush);
+browser.runtime.onStartup.addListener(OnStartUpService.exec);
 
 /**
  * Add listener on tab updated

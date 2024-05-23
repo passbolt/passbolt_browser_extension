@@ -36,6 +36,7 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import PostLoginService from "../../service/auth/postLoginService";
+import BrowserTabService from "../../service/ui/browserTab.service";
 
 const mockGetSsoTokenFromThirdParty = jest.fn();
 const mockCloseHandler = jest.fn();
@@ -122,7 +123,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
     });
 
     it(`Should sign the user using a third party: ${scenario.providerId}`, async() => {
-      expect.assertions(5);
+      expect.assertions(6);
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
@@ -142,17 +143,20 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
       jest.spyOn(PassphraseStorageService, "set");
+      jest.spyOn(BrowserTabService, "getCurrent").mockImplementation(() => ({id: 1}));
       jest.spyOn(PostLoginService, "exec").mockImplementation(() => {});
 
       await controller.exec(scenario.providerId, true);
 
       expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, userPassphrase);
       expect(PassphraseStorageService.set).toHaveBeenCalledWith(userPassphrase, -1);
+      expect(BrowserTabService.getCurrent).toHaveBeenCalled();
       expect(PostLoginService.exec).toHaveBeenCalled();
 
       const expectedQuickAccessCallParameters =  [
         {name: "uiMode", value: "detached"},
-        {name: "feature", value: "login"}
+        {name: "feature", value: "login"},
+        {name: "tabId", value: 1}
       ];
 
       expect(spyOnOpenInDetachedMode).toHaveBeenCalledTimes(1);

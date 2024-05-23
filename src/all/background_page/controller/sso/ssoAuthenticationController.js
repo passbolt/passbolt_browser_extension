@@ -25,6 +25,7 @@ import PassphraseStorageService from "../../service/session_storage/passphraseSt
 import PostLoginService from "../../service/auth/postLoginService";
 import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 import PromiseTimeoutService from "../../utils/promise/promiseTimeoutService";
+import BrowserTabService from "../../service/ui/browserTab.service";
 
 class SsoAuthenticationController {
   /**
@@ -120,11 +121,17 @@ class SsoAuthenticationController {
     try {
       await PromiseTimeoutService.exec(this.worker.port.request('passbolt.port.check'));
       return;
-    } catch { }
+    } catch (error) {
+      console.debug("The port from the quickaccess is not connected anymore");
+      console.error(error);
+    }
 
+    // Get the current tab to add in the property of the detach quickaccess
+    const tab = await BrowserTabService.getCurrent();
     const queryParameters = [
       {name: "uiMode", value: "detached"},
-      {name: "feature", value: "login"}
+      {name: "feature", value: "login"},
+      {name: "tabId", value: tab.id}
     ];
     await QuickAccessService.openInDetachedMode(queryParameters);
   }

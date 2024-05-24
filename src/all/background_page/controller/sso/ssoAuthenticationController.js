@@ -24,6 +24,7 @@ import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginC
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import PostLoginService from "../../service/auth/postLoginService";
 import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
+import PromiseTimeoutService from "../../utils/promise/promiseTimeoutService";
 
 class SsoAuthenticationController {
   /**
@@ -116,6 +117,11 @@ class SsoAuthenticationController {
    * @returns {Promise<void>}
    */
   async ensureRedirectionInQuickaccessMode() {
+    try {
+      await PromiseTimeoutService.exec(this.worker.port.request('passbolt.port.check'));
+      return;
+    } catch { }
+
     const queryParameters = [
       {name: "uiMode", value: "detached"},
       {name: "feature", value: "login"}

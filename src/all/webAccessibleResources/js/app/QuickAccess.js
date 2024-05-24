@@ -21,6 +21,10 @@ async function main() {
   const portname = query.get('passbolt');
   const port = new Port(portname);
   await port.connect();
+
+  // Emit a success if the port is still connected
+  port.on("passbolt.port.check", requestId => port.emit(requestId, "SUCCESS"));
+
   const storage = browser.storage;
   const domContainer = document.querySelector('#quickaccess-container');
   // Extract parameters from the url.

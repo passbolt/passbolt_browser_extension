@@ -361,9 +361,12 @@ class UserSettings {
    * @TODO move to an API service
    */
   async sync() {
+    // Determine the fetch strategy, in some cases it could use a custom fetch as for MV3 to solve the invalid certificate issue.
+    // eslint-disable-next-line no-undef
+    const fetchStrategy = typeof customApiClientFetch !== "undefined" ? customApiClientFetch : fetch;
     // Get remote account settings (all)
     const url = `${this.getDomain()}/account/settings.json` + `?api-version=v2`;
-    const response = await fetch(url, {
+    const response = await fetchStrategy(url, {
       method: 'GET',
       credentials: 'include',
       headers: {

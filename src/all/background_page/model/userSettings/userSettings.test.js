@@ -88,4 +88,21 @@ describe("User settings validation security token", () => {
     const t = userSettings.validateSecurityToken({'code': '123', 'color': '#000', 'textcolor': '#FFF'});
     expect(t).toBe(true);
   });
+
+  it("should use a custom fetch strategy if provided.", async() => {
+    expect.assertions(2);
+    global.customApiClientFetch = () => ({
+      json: () => ({
+        header: {},
+        body: {}
+      }),
+      ok: true
+    });
+    jest.spyOn(global, "customApiClientFetch");
+    const userSettings = new UserSettings();
+    userSettings.setDomain("https://passbolt.dev");
+    await expect(() => userSettings.sync()).not.toThrow();
+    expect(global.customApiClientFetch).toHaveBeenCalled();
+    delete global.customApiClientFetch;
+  });
 });

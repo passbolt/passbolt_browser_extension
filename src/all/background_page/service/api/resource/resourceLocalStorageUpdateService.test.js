@@ -43,6 +43,8 @@ beforeEach(() => {
     delete resource4.secrets;
     return [resource1, resource2, resource3, resource4];
   });
+  // reset static data
+  ResourceLocalStorageUpdateService._cachedResources = null;
 });
 
 describe("ResourceLocalStorageUpdateService", () => {
@@ -92,6 +94,21 @@ describe("ResourceLocalStorageUpdateService", () => {
 
       await resourceLocalStorageUpdateService.exec(true);
       expect(resourceLocalStorageUpdateService.resourceService.findAll).toHaveBeenCalledTimes(2);
+    });
+
+    it("Should cache the data and not call the API to get all resources", async() => {
+      expect.assertions(3);
+      const options = new ApiClientOptions().setBaseUrl('https://localhost');
+      const resourceLocalStorageUpdateService = new ResourceLocalStorageUpdateService(account, options);
+
+      await resourceLocalStorageUpdateService.exec();
+      expect(resourceLocalStorageUpdateService.resourceService.findAll).toHaveBeenCalledWith({permission: true, favorite: true, tag: true});
+      expect(resourceLocalStorageUpdateService.resourceService.findAll).toHaveBeenCalledTimes(1);
+
+      jest.advanceTimersByTime(5001);
+
+      await resourceLocalStorageUpdateService.exec();
+      expect(resourceLocalStorageUpdateService.resourceService.findAll).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -47,7 +47,7 @@ class AccountRecoveryPrivateKeyPasswordsCollection extends EntityCollection {
     });
     // Directly push into the private property _items[]
     this._props.forEach(accountRecoveryPrivateKeyPassword => {
-      this._items.push(new AccountRecoveryPrivateKeyPasswordEntity(accountRecoveryPrivateKeyPassword, {clone: false}));
+      this._items.push(new AccountRecoveryPrivateKeyPasswordEntity(accountRecoveryPrivateKeyPassword, {...options, clone: false}));
     });
 
     // We do not keep original props

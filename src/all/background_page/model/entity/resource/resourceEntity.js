@@ -46,27 +46,27 @@ class ResourceEntity extends EntityV2 {
 
     // Associations
     if (this._props.permission) {
-      this._permission = new PermissionEntity(this._props.permission, {clone: false});
+      this._permission = new PermissionEntity(this._props.permission, {...options, clone: false});
       ResourceEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
-      this._permissions = new PermissionsCollection(this._props.permissions, {clone: false});
+      this._permissions = new PermissionsCollection(this._props.permissions, {...options, clone: false});
       ResourceEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
     if (this._props.secrets) {
-      this._secrets = new ResourceSecretsCollection(this._props.secrets, {clone: false});
+      this._secrets = new ResourceSecretsCollection(this._props.secrets, {...options, clone: false});
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
     if (this._props.favorite) {
-      this._favorite = new FavoriteEntity(this._props.favorite, {clone: false});
+      this._favorite = new FavoriteEntity(this._props.favorite, {...options, clone: false});
       ResourceEntity.assertValidFavorite(this._favorite, this.id);
       delete this._props.favorite;
     }
     if (this._props.tags) {
-      this._tags = new TagsCollection(this._props.tags, {clone: false});
+      this._tags = new TagsCollection(this._props.tags, {...options, clone: false});
       delete this._props.tags;
     }
   }

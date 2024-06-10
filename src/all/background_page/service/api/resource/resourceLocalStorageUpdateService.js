@@ -15,7 +15,6 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import ResourceService from "./resourceService";
 
-
 const TIMER = 5000;
 const lastTimeCalledPerAccount = {};
 const RESOURCE_UPDATE_LOCK = 'resourceUpdateLock';
@@ -23,6 +22,13 @@ const RESOURCE_UPDATE_LOCK = 'resourceUpdateLock';
  * The ResourceLocalStorageUpdateService perform a get or update the resources local storage
  */
 class ResourceLocalStorageUpdateService {
+  /**
+   * The resources collection dto cached.
+   * @type {Object}
+   * @private
+   */
+  static _cachedResources = null;
+
   /**
    *
    * @param {AccountEntity} account The user account
@@ -54,6 +60,10 @@ class ResourceLocalStorageUpdateService {
       return this.updateLocalStorage();
     }
 
+    if (ResourceLocalStorageUpdateService._cachedResources && ResourceLocalStorageUpdateService._cachedResources.length > 0) {
+      return new ResourcesCollection(ResourceLocalStorageUpdateService._cachedResources, {clone: false, validate: false});
+    }
+
     const resources = await ResourceLocalStorage.get();
     if (resources) {
       return new ResourcesCollection(resources, {clone: false});
@@ -80,9 +90,13 @@ class ResourceLocalStorageUpdateService {
   async updateLocalStorage() {
     let resourcesDto = await this.resourceService.findAll(ResourceLocalStorageUpdateService.DEFAULT_CONTAIN);
     resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
+
     const resourcesCollection = new ResourcesCollection(resourcesDto, {clone: false});
     await ResourceLocalStorage.set(resourcesCollection);
     lastTimeCalledPerAccount[this.account.id] = Date.now();
+
+    ResourceLocalStorageUpdateService._cachedResources = resourcesDto;
+
     return resourcesCollection;
   }
 

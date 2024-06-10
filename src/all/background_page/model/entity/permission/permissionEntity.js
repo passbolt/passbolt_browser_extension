@@ -34,11 +34,11 @@ class PermissionEntity extends EntityV2 {
 
     // Associated models
     if (this._props.user) {
-      this._user = new UserEntity(this._props.user, {clone: false});
+      this._user = new UserEntity(this._props.user, {...options, clone: false});
       delete this._props.user;
     }
     if (this._props.group) {
-      this._group = new GroupEntity(this._props.group, {clone: false});
+      this._group = new GroupEntity(this._props.group, {...options, clone: false});
       delete this._props.group;
     }
   }

@@ -51,22 +51,25 @@ class ResourceLocalStorage {
   /**
    * Set the resources in local storage.
    * @param {ResourcesCollection} resourcesCollection The resources to insert in the local storage.
-   * @return {void}
+   * @return {Promise<void>}
    */
   static async set(resourcesCollection) {
     await lock.acquire();
-    const resources = [];
-    if (resourcesCollection) {
-      if (!(resourcesCollection instanceof ResourcesCollection)) {
-        throw new TypeError('ResourceLocalStorage::set expects a ResourcesCollection');
+    try {
+      const resources = [];
+      if (resourcesCollection) {
+        if (!(resourcesCollection instanceof ResourcesCollection)) {
+          throw new TypeError('ResourceLocalStorage::set expects a ResourcesCollection');
+        }
+        for (const resourceEntity of resourcesCollection) {
+          ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
+          resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+        }
       }
-      for (const resourceEntity of resourcesCollection) {
-        ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
-        resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
-      }
+      await browser.storage.local.set({resources: resources});
+    } finally {
+      lock.release();
     }
-    await browser.storage.local.set({resources: resources});
-    lock.release();
   }
 
   /**
@@ -92,10 +95,8 @@ class ResourceLocalStorage {
       const resources = await ResourceLocalStorage.get();
       resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({resources: resources});
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 
@@ -112,10 +113,8 @@ class ResourceLocalStorage {
         resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       });
       await browser.storage.local.set({resources: resources});
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 
@@ -135,10 +134,8 @@ class ResourceLocalStorage {
       }
       resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       await browser.storage.local.set({resources: resources});
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 
@@ -160,10 +157,8 @@ class ResourceLocalStorage {
         resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       }
       await browser.storage.local.set({resources: resources});
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 
@@ -185,10 +180,8 @@ class ResourceLocalStorage {
         resources[resourceIndex].expired = passwordExpiryResourceEntity.expired;
       }
       await browser.storage.local.set({resources: resources});
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 
@@ -206,11 +199,9 @@ class ResourceLocalStorage {
           resources.splice(resourceIndex, 1);
         }
         await browser.storage.local.set({resources: resources});
-        lock.release();
       }
-    } catch (error) {
+    } finally {
       lock.release();
-      throw error;
     }
   }
 
@@ -270,10 +261,8 @@ class ResourceLocalStorage {
       const resourceIndex = resources.findIndex(item => item.id === resource.id);
       resources[resourceIndex] = resource;
       await browser.storage.local.set({resources: resources});
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 }

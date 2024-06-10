@@ -26,7 +26,7 @@ class ProfileEntity extends EntityV2 {
 
     // Association
     if (this._props.avatar) {
-      this._avatar = new AvatarEntity(this._props.avatar, {clone: false});
+      this._avatar = new AvatarEntity(this._props.avatar, {...options, clone: false});
       delete this._props.avatar;
     }
   }

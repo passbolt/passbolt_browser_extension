@@ -31,7 +31,7 @@ class ResourceTypeModel {
   /**
    * Update the resourceTypes local storage with the latest API resourceTypes the user has access.
    *
-   * @return {ResourceTypesCollection}
+   * @return {Promise<ResourceTypesCollection>}
    */
   async updateLocalStorage() {
     let resourceTypeDtos = [];
@@ -54,7 +54,7 @@ class ResourceTypeModel {
    * Get a collection of all resourceTypes from the local storage.
    * If the local storage is unset, initialize it.
    *
-   * @return {ResourceTypesCollection}
+   * @return {Promise<ResourceTypesCollection>}
    */
   async getOrFindAll() {
     const resourceTypeDtos = await ResourceTypeLocalStorage.get();

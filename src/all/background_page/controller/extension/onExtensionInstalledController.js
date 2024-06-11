@@ -23,6 +23,8 @@ import Log from "../../model/log";
 import {BrowserExtensionIconService} from "../../service/ui/browserExtensionIcon.service";
 import storage from "../../sdk/storage";
 import {Config} from "../../model/config";
+import AuthModel from "../../model/auth/authModel";
+import AppBootstrapPagemod from "../../pagemod/appBootstrapPagemod";
 
 class OnExtensionInstalledController {
   /**
@@ -44,6 +46,11 @@ class OnExtensionInstalledController {
         break;
       case browser.runtime.OnInstalledReason.UPDATE:
         await OnExtensionInstalledController.onUpdate();
+        break;
+      case browser.runtime.OnInstalledReason.CHROME_UPDATE:
+      case browser.runtime.OnInstalledReason.BROWSER_UPDATE:
+        // Force logout for users to not ask passphrase after a browser update which clear the session storage
+        await OnExtensionInstalledController.onBrowserUpdate();
         break;
       default:
         console.debug(`The install reason ${details.reason} is not supported`);
@@ -68,6 +75,45 @@ class OnExtensionInstalledController {
   }
 
   /**
+   * On update of the browser, logout the user. It helps mitigate issue where users update their browser, are still
+   * signed-in but session memory used to store user passphrase or other information is flushed. These behavior
+   * deteriorates the user experience, therefore it has been decided to sign the user out.
+   */
+  static async onBrowserUpdate() {
+    const user = User.getInstance();
+    // Check if user is valid
+    if (!user.isValid()) {
+      return;
+    }
+    let authStatus;
+    try {
+      const checkAuthStatusService = new CheckAuthStatusService();
+      // use the cached data as the worker could wake up every 30 secondes.
+      authStatus = await checkAuthStatusService.checkAuthStatus(false);
+    } catch (error) {
+      // Service is unavailable, do nothing...
+      Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
+      return;
+    }
+    // Do nothing if user is not authenticated
+    if (!authStatus.isAuthenticated) {
+      return;
+    }
+    // Logout authenticated user to prevent to ask passphrase for SSO users
+    const apiClientOptions = await user.getApiClientOptions();
+    const authModel = new AuthModel(apiClientOptions);
+    await authModel.logout();
+    /*
+     * Reload only tabs that match passbolt app url. Reload is necessary as the application loaded in the tab
+     * could be unresponsive due to the forced triggered sign-out.
+     * - When the tab is started the API didn't redirect the user as the user is still signed-in.
+     * - This script sign-out the user
+     * - The pagemod of the app starts and throw an error as the user has been signed-out
+     */
+    await browser.tabs.query({}).then(reloadTabsMatchPassboltAppUrl);
+  }
+
+  /**
    * Updates the Passbolt icon in the toolbar according to the sign-in status of the current user.
    * @returns {Promise<void>}
    */
@@ -81,11 +127,11 @@ class OnExtensionInstalledController {
     let authStatus;
     try {
       const checkAuthStatusService = new CheckAuthStatusService();
-      // user the cached data as the worker could wake up every 30 secondes.
+      // use the cached data as the worker could wake up every 30 secondes.
       authStatus = await checkAuthStatusService.checkAuthStatus(false);
     } catch (error) {
       // Service is unavailable, do nothing...
-      Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
+      Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
       return;
     }
 
@@ -126,6 +172,18 @@ const closeTabWebStore = tabs => {
   return Promise.all(tabs.map(tab => tab.url.match(urlWebStoreRegex) ? browser.tabs.remove(tab.id) : tab));
 };
 
+
+/**
+ * Reload the tabs that match passsbolt app url
+ * @param tabs
+ */
+const reloadTabsMatchPassboltAppUrl = async tabs => {
+  for (const tab of tabs) {
+    if (await AppBootstrapPagemod.assertUrlAttachConstraint(tab)) {
+      browser.tabs.reload(tab.id);
+    }
+  }
+};
 
 /**
  * Reload the tabs that match pagemod url

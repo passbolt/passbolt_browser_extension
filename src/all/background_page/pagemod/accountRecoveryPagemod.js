@@ -43,7 +43,7 @@ class AccountRecovery extends Pagemod {
     try {
       const tab = port._port.sender.tab;
       const account = await GetRequestLocalAccountService.getAccountMatchingContinueUrl(tab.url);
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
         event.listen({port, tab}, apiClientOptions, account);
       }

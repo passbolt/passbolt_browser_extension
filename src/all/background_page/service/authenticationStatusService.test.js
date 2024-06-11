@@ -22,9 +22,9 @@ beforeAll(() => {
   enableFetchMocks();
 });
 
-beforeEach(() => {
+beforeEach(async() => {
   jest.clearAllMocks();
-  MockExtension.withConfiguredAccount();
+  await MockExtension.withConfiguredAccount();
 });
 
 describe("AuthenticationStatusService::isAuthenticated", () => {

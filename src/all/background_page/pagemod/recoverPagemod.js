@@ -49,7 +49,7 @@ class Recover extends Pagemod {
     try {
       const tab = port._port.sender.tab;
       const account = BuildAccountRecoverService.buildFromRecoverUrl(tab.url);
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       await (new OrganizationSettingsModel(apiClientOptions)).getOrFind(true);
       for (const event of this.events) {
         event.listen({port, tab}, apiClientOptions, account);

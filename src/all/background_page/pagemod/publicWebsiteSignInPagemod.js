@@ -12,10 +12,9 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import User from "../model/user";
 import {PublicWebsiteSignInEvents} from "../event/publicWebsiteSignInEvents";
 import ParsePublicWebsiteUrlService from "../service/publicWebsite/parsePublicWebsiteUrlService";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 class PublicWebsiteSignIn extends Pagemod {
   /**
@@ -49,7 +48,7 @@ class PublicWebsiteSignIn extends Pagemod {
   async canBeAttachedTo(frameDetails) {
     return this.assertTopFrameAttachConstraint(frameDetails)
       && this.assertUrlAttachConstraint(frameDetails)
-      && this.assertUserValidConstraint();
+      && await this.assertUserValidConstraint();
   }
 
   /**
@@ -58,7 +57,7 @@ class PublicWebsiteSignIn extends Pagemod {
   async attachEvents(port) {
     try {
       const tab = port._port.sender.tab;
-      const account =  await GetLegacyAccountService.get();
+      const account =  await GetActiveAccountService.get();
       for (const event of this.events) {
         event.listen({port, tab}, null, account);
       }
@@ -89,11 +88,16 @@ class PublicWebsiteSignIn extends Pagemod {
 
   /**
    * Assert that the user is valid.
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
-  assertUserValidConstraint() {
-    const user = User.getInstance();
-    return user.isValid();
+  async assertUserValidConstraint() {
+    try {
+      await GetActiveAccountService.get();
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 }
 

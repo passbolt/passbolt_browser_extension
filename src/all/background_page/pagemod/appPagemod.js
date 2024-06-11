@@ -12,7 +12,6 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import AppInitController from "../controller/app/appInitController";
 import {AppEvents} from "../event/appEvents";
 import {ConfigEvents} from "../event/configEvents";
@@ -44,6 +43,7 @@ import {ClipboardEvents} from "../event/clipboardEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 class App extends Pagemod {
   /**
@@ -107,8 +107,8 @@ class App extends Pagemod {
       const appInitController = new AppInitController();
       await appInitController.main();
 
-      const account = await GetLegacyAccountService.get({role: true});
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      const account = await GetActiveAccountService.get({role: true});
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
         event.listen({port, tab}, apiClientOptions, account);
       }

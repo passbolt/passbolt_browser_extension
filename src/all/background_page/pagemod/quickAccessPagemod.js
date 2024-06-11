@@ -24,10 +24,10 @@ import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {TabEvents} from "../event/tabEvents";
 import {LocaleEvents} from "../event/localeEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import {ResourceTypeEvents} from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 class QuickAccess extends Pagemod {
   /**
@@ -66,8 +66,8 @@ class QuickAccess extends Pagemod {
   async attachEvents(port) {
     let account, apiClientOptions;
     try {
-      account = await GetLegacyAccountService.get();
-      apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      account = await GetActiveAccountService.get();
+      apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     } catch (error) {
       //Ensure the application does not crash completely if the legacy account cannot be retrieved
       console.error('quickaccessPagemod::attach legacy account cannot be retrieved, please contact your administrator.');

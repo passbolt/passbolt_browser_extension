@@ -11,6 +11,7 @@ import Validator from "validator";
 import {ValidatorRule} from "../utils/validatorRules";
 
 /**
+ * @deprecated
  * The class that deals with users.
  */
 const User = (function() {

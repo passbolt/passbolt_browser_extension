@@ -28,7 +28,7 @@ class GetLegacyAccountService {
    */
   static async get(option = {}) {
     const keyring = new Keyring();
-    const user = await User.getInstance().get();
+    const user = User.getInstance().get();
     const serverPublicKeyInfo = keyring.findPublic(Uuid.get(user.settings.domain));
     const userPublicKeyInfo = keyring.findPublic(user.id);
     const userPrivateKeyInfo = keyring.findPrivate();
@@ -37,7 +37,7 @@ class GetLegacyAccountService {
     let userEntity;
     if (option?.role) {
       // Load the application settings, necessary to validate the account username.
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(user.settings.domain);
+      const apiClientOptions = BuildApiClientOptionsService.buildFromDomain(user.settings.domain);
       userEntity = await (new UserModel(apiClientOptions)).findOne(user.id, {role: true});
     }
 

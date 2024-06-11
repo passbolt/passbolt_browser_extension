@@ -31,7 +31,7 @@ describe("PasswordExpiry service", () => {
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     const account = new AccountEntity(defaultAccountDto());
-    apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+    apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
   describe('::find', () => {

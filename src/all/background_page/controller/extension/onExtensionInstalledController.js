@@ -189,9 +189,9 @@ const reloadTabsMatchPassboltAppUrl = async tabs => {
  * Reload the tabs that match pagemod url
  * @param tabs
  */
-const reloadTabsMatchPagemodUrl = tabs => {
-  tabs.map(tab => {
-    if (PagemodManager.hasPagemodMatchUrlToReload(tab.url)) {
+const reloadTabsMatchPagemodUrl = async tabs => {
+  for (const tab of tabs) {
+    if (await PagemodManager.hasPagemodMatchUrlToReload(tab.url)) {
       browser.tabs.reload(tab.id);
     } else {
       // For other tabs detect and inject the new content script
@@ -202,7 +202,7 @@ const reloadTabsMatchPagemodUrl = tabs => {
       };
       WebNavigationService.exec(frameDetails);
     }
-  });
+  }
 };
 
 export default OnExtensionInstalledController;

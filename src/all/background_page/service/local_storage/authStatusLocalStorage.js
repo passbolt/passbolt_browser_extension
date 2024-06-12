@@ -13,7 +13,7 @@
  */
 import Log from "../../model/log";
 
-const AUTH_STATUS_STORAGE_KEY = 'auth_status';
+const AUTH_STATUS_STORAGE_KEY = '';
 
 class AuthStatusLocalStorage {
   /**

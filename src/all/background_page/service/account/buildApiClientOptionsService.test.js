@@ -25,7 +25,7 @@ describe("BuildAccountApiClientOptionsService", () => {
     // mocked function
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
     // execution
-    const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+    const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(account.domain));
@@ -41,7 +41,7 @@ describe("BuildAccountApiClientOptionsService", () => {
     // mocked function
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
     // execution
-    const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    const apiClientOptions = BuildApiClientOptionsService.buildFromDomain(domain);
     const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
@@ -57,7 +57,7 @@ describe("BuildAccountApiClientOptionsService", () => {
     // mocked function
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
     // execution
-    const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    const apiClientOptions = BuildApiClientOptionsService.buildFromDomain(domain);
     const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
@@ -73,7 +73,7 @@ describe("BuildAccountApiClientOptionsService", () => {
     // mocked function
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
     // execution
-    const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    const apiClientOptions = BuildApiClientOptionsService.buildFromDomain(domain);
     const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));

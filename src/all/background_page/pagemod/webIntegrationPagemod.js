@@ -12,12 +12,12 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import User from "../model/user";
 import {ConfigEvents} from "../event/configEvents";
 import {WebIntegrationEvents} from "../event/webIntegrationEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {PortEvents} from "../event/portEvents";
 import ParseWebIntegrationUrlService from "../service/webIntegration/parseWebIntegrationUrlService";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 class WebIntegration extends Pagemod {
   /**
@@ -62,7 +62,7 @@ class WebIntegration extends Pagemod {
    */
   async canBeAttachedTo(frameDetails) {
     return this.assertTopFrameAttachConstraint(frameDetails)
-      && this.assertUrlAttachConstraint(frameDetails);
+      && await this.assertUrlAttachConstraint(frameDetails);
   }
 
   /**
@@ -77,14 +77,16 @@ class WebIntegration extends Pagemod {
   /**
    * Assert that the attached frame is a top frame.
    * @param {Object} frameDetails
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
-  assertUrlAttachConstraint(frameDetails) {
-    const user = User.getInstance();
-    if (user.isValid()) {
+  async assertUrlAttachConstraint(frameDetails) {
+    try {
+      await GetActiveAccountService.get();
       return ParseWebIntegrationUrlService.test(frameDetails.url);
+    } catch (error) {
+      console.log(error);
+      return false;
     }
-    return false;
   }
 }
 

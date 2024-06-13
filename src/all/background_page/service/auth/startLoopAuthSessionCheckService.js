@@ -50,7 +50,6 @@ class StartLoopAuthSessionCheckService {
     if (alarm.name !== StartLoopAuthSessionCheckService.ALARM_NAME) {
       return;
     }
-
     const checkAuthService = new CheckAuthStatusService();
     const authStatus = await checkAuthService.checkAuthStatus(true);
     if (!authStatus.isAuthenticated) {

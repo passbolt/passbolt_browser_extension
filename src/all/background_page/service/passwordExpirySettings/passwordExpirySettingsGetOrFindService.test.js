@@ -31,7 +31,7 @@ describe("PasswordExpirySettingsGetOrFindService", () => {
       expect.assertions(1);
       // data
       const account = new AccountEntity(defaultAccountDto());
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const passwordExpirySettingsService = new PasswordExpirySettingsGetOrFindService(account, apiClientOptions);
       // mocked functions
       jest.spyOn(passwordExpirySettingsService.passwordExpirySettingsModel, "getOrFindOrDefault").mockImplementationOnce(jest.fn);

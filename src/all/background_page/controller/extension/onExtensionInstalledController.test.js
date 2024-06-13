@@ -13,11 +13,12 @@
  */
 
 import OnExtensionInstalledController from "./onExtensionInstalledController";
-import User from "../../model/user";
 import UserSettings from "../../model/userSettings/userSettings";
 import WebNavigationService from "../../service/webNavigation/webNavigationService";
 import AuthModel from "../../model/auth/authModel";
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
+import GetActiveAccountService from "../../service/account/getActiveAccountService";
+import User from "../../model/user";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -75,7 +76,7 @@ describe("OnExtensionInstalledController", () => {
       jest.spyOn(OnExtensionInstalledController, "onUpdate");
       jest.spyOn(WebNavigationService, "exec");
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => Promise.resolve(tabs));
-      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       // process
       await OnExtensionInstalledController.exec(details);

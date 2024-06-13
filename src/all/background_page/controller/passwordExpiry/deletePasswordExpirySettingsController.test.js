@@ -29,7 +29,7 @@ describe("DeletePasswordExpirySettingsController", () => {
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     account = new AccountEntity(defaultAccountDto());
-    apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+    apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
   it("Should delete the entity from the API given an ID", () => {

@@ -13,10 +13,10 @@
  */
 import InformCallToAction from "./informCallToActionPagemod";
 import {InformCallToActionEvents} from "../event/informCallToActionEvents";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 jest.spyOn(InformCallToActionEvents, "listen").mockImplementation(jest.fn());
 
@@ -43,8 +43,8 @@ describe("InFormCallToAction", () => {
       // mock functions
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       const mockedAccount = {user_id: uuid(), domain: "https://test.passbolt.local"};
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(mockedAccount);
-      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
+      jest.spyOn(GetActiveAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await InformCallToAction.attachEvents(port);
       // expectations

@@ -3,8 +3,16 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.8.2] - 2024-06-13
+### Improved
+- PB-33686 As a user I should be signed out after browser update
+
+### Fixed
+- PB-33727 Fix session extension, service worker awaken and user instance storage not set
+- PB-33801 Remove active account cache in memory
+
 ## [4.8.1] - 2024-05-18
-### Fix
+### Fixed
 - PB-33595 As a user running an instance serving an invalid certificate I should be able to sync the gpgkeyring
 
 ## [4.8.0] - 2024-05-16
@@ -1623,8 +1631,9 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.1...HEAD
-[4.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.0...4.8.1
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.2...HEAD
+[4.8.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.1...4.8.2
+[4.8.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.0...4.8.1
 [4.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.8...4.8.0
 [4.7.8]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.7...v4.7.8
 [4.7.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.6...v4.7.7

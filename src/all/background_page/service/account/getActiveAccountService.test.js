@@ -34,36 +34,20 @@ describe("GetActiveAccountService", () => {
     expect(GetLegacyAccountService.get).toHaveBeenCalledTimes(1);
   });
 
-  it("GetActiveAccountService:get should not call GetLegacyAccountService twice if option role is present from the beginning", async() => {
+  it("GetActiveAccountService:get should call GetLegacyAccountService each time", async() => {
     expect.assertions(3);
     // data
     const getActiveAccountService = new GetActiveAccountService();
     // spy function
-    jest.spyOn(UserModel.prototype, "findOne").mockImplementationOnce(() => ({role: {name: "admin"}}));
+    jest.spyOn(UserModel.prototype, "findOne").mockImplementation(() => ({role: {name: "admin"}}));
     jest.spyOn(GetLegacyAccountService, "get");
     // execution
     const account = await getActiveAccountService.get({role: true});
     const account2 = await getActiveAccountService.get({role: true});
     const account3 = await getActiveAccountService.get();
     // expectations
-    expect(GetLegacyAccountService.get).toHaveBeenCalledTimes(1);
+    expect(GetLegacyAccountService.get).toHaveBeenCalledTimes(3);
     expect(account).toStrictEqual(account2);
-    expect(account).toStrictEqual(account3);
-  });
-
-  it("GetActiveAccountService:get should call GetLegacyAccountService twice if option role is present", async() => {
-    expect.assertions(3);
-    // data
-    const getActiveAccountService = new GetActiveAccountService();
-    // spy function
-    jest.spyOn(UserModel.prototype, "findOne").mockImplementationOnce(() => ({role: {name: "admin"}}));
-    jest.spyOn(GetLegacyAccountService, "get");
-    // execution
-    const account = await getActiveAccountService.get();
-    const account2 = await getActiveAccountService.get({role: true});
-    // expectations
-    expect(GetLegacyAccountService.get).toHaveBeenCalledTimes(2);
-    expect(account.roleName).toBeNull();
-    expect(account2.roleName).toBeDefined();
+    expect(account3.roleName).toBeNull();
   });
 });

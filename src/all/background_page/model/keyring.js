@@ -227,15 +227,19 @@ class Keyring {
       url += `&modified_after=${latestSync}`;
     }
 
-    // Get the updated public keys from passbolt.
-    const response = await fetch(url, {
+    const fetchOptions = {
       method: 'GET',
       credentials: 'include',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
-    });
+    };
+    // eslint-disable-next-line no-undef
+    const fetchStrategy = typeof customApiClientFetch !== "undefined" ? customApiClientFetch : fetch;
+
+    // Get the updated public keys from passbolt.
+    const response = await fetchStrategy(url, fetchOptions);
     const json = await response.json();
 
     // Check response status

@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import User from "../model/user";
 import UserSettings from "../model/userSettings/userSettings";
 import AuthBootstrap from "./authBootstrapPagemod";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
@@ -20,6 +19,7 @@ import ScriptExecution from "../sdk/scriptExecution";
 import {PortEvents} from "../event/portEvents";
 import each from "jest-each";
 import Pagemod from "./pagemod";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -56,7 +56,7 @@ describe("AuthBootstrap", () => {
     it("Should be able to attach auth bootstrap pagemod to browser frame", async() => {
       expect.assertions(1);
       // mock functions
-      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       const result = await AuthBootstrap.canBeAttachedTo({frameId: Pagemod.TOP_FRAME_ID, url: "https://passbolt.dev/auth/login"});
       expect(result).toBeTruthy();
@@ -69,7 +69,7 @@ describe("AuthBootstrap", () => {
       it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async() => {
         expect.assertions(1);
         // mock functions
-        jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
+        jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
         jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
         const result = await AuthBootstrap.canBeAttachedTo({frameId: _props.frameId, url: _props.url});
         expect(result).toBeFalsy();
@@ -79,7 +79,7 @@ describe("AuthBootstrap", () => {
     it("Should have the constraint not valid if the user is not valid", async() => {
       expect.assertions(1);
       // mock functions
-      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => false);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => { throw new Error(); });
       // process
       const result = await AuthBootstrap.canBeAttachedTo({frameId: 0});
       // expectations

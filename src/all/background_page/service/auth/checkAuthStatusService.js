@@ -21,7 +21,7 @@ class CheckAuthStatusService {
    * Returns the authentication status of the current user.
    * It first interrogates the local storage and if necessary the API afterward.
    * @param {boolean} [flushCache] should the cache be flushed before or not.
-   * @return {Promise<{isAuthenticated: {bool}, isMfaRequired: {bool}}>}
+   * @return {Promise<{isAuthenticated: {boolean}, isMfaRequired: {boolean}}>}
    * @throws {Error} if something wrong happened on the API
    */
   async checkAuthStatus(flushCache = false) {

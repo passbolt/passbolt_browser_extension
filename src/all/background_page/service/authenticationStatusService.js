@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import User from "../model/user";
 import MfaAuthenticationRequiredError from "../error/mfaAuthenticationRequiredError";
 import NotFoundError from "../error/notFoundError";
 import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
-import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import PassboltBadResponseError from "../error/passboltBadResponseError";
+import GetActiveAccountService from "./account/getActiveAccountService";
+import BuildApiClientOptionsService from "./account/buildApiClientOptionsService";
 
 const AUTH_RESOURCE_NAME = '/auth';
 
@@ -26,7 +26,7 @@ class AuthenticationStatusService {
    * @returns {Promise<boolean>}
    */
   static async isAuthenticated() {
-    const apiClient = new ApiClient(this.apiClientOptions);
+    const apiClient = new ApiClient(await this.getApiClientOptions());
     const url = apiClient.buildUrl(`${apiClient.baseUrl.toString()}/is-authenticated`, null);
 
     const fetchOptions = {
@@ -68,11 +68,9 @@ class AuthenticationStatusService {
    * @returns {ApiClientOptions}
    * @private
    */
-  static get apiClientOptions() {
-    const domain = User.getInstance()?.settings?.getDomain();
-
-    return new ApiClientOptions()
-      .setBaseUrl(domain)
+  static async getApiClientOptions() {
+    const account = await GetActiveAccountService.get();
+    return BuildApiClientOptionsService.buildFromAccount(account)
       .setResourceName(AUTH_RESOURCE_NAME);
   }
 }

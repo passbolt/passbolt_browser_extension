@@ -61,7 +61,7 @@ class ToolbarService {
    */
   async handleUserLoggedIn() {
     this.account = await GetLegacyAccountService.get();
-    const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(this.account);
+    const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(this.account);
     this.resourceModel = new ResourceModel(apiClientOptions, this.account);
 
     BrowserExtensionIconService.activate();

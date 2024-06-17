@@ -17,18 +17,18 @@ class BuildApiClientOptionsService {
   /**
    * Build Api client options based on an account.
    * @param {AbstractAccountEntity} account The account to build the api client options based on
-   * @returns {Promise<ApiClientOptions>}
+   * @returns {ApiClientOptions}
    */
-  static async buildFromAccount(account) {
+  static buildFromAccount(account) {
     return this.buildFromDomain(account.domain);
   }
 
   /**
    * Build Api client options based on a domain.
    * @param {string} domain The domain to build the api client options based on.
-   * @returns {Promise<ApiClientOptions>}
+   * @returns {ApiClientOptions}
    */
-  static async buildFromDomain(domain) {
+  static buildFromDomain(domain) {
     return new ApiClientOptions()
       .setBaseUrl(domain);
   }

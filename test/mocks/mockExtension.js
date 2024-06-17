@@ -22,24 +22,22 @@ import {Uuid} from "../../src/all/background_page/utils/uuid";
 class MockExtension {
   /**
    * Mock the extension with a configured account. Ada by default.
-   * @returns {Promise<void>}
+   * @returns {void}
    */
   static async withConfiguredAccount(keyData = pgpKeys.ada) {
     const user = this.withMissingPrivateKeyAccount(keyData);
-
     // Mock user private key
     const keyring = new Keyring();
     await keyring.importPrivate(keyData.private);
     await keyring.importPublic(keyData.public, keyData.userId);
     await keyring.importPublic(pgpKeys.server.public, Uuid.get(user.settings.getDomain()));
-
     return user;
   }
 
   /**
    * Mock the extension with a partially configured account. Ada by default without the private key set.
    *
-   * @returns {Promise<User>}
+   * @returns {User}
    */
   static withMissingPrivateKeyAccount(keyData = pgpKeys.ada) {
     const user = User.getInstance();

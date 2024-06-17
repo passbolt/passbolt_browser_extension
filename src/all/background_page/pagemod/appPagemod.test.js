@@ -13,7 +13,6 @@
  */
 import {ConfigEvents} from "../event/configEvents";
 import App from "./appPagemod";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {UserEvents} from "../event/userEvents";
 import {KeyringEvents} from "../event/keyringEvents";
 import {AuthEvents} from "../event/authEvents";
@@ -46,6 +45,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import {userLoggedInAuthStatus} from "../controller/auth/authCheckStatus.test.data";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -96,19 +96,17 @@ describe("App", () => {
           }
         }
       };
-      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
-
       // mock functions
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(async() => userLoggedInAuthStatus());
       const mockedAccount = {user_id: uuid(), domain: "https://test-domain.passbolt.com"};
-      const mockApiClient = await BuildApiClientOptionsService.buildFromAccount(mockedAccount);
-      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
+      const mockApiClient = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
+      jest.spyOn(GetActiveAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await App.attachEvents(port);
       // expectations
       const expectedPortAndTab = {port: port, tab: port._port.sender.tab};
-      expect(GetLegacyAccountService.get).toHaveBeenCalledWith({role: true});
+      expect(GetActiveAccountService.get).toHaveBeenCalledWith({role: true});
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AppEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);

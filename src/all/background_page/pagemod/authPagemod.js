@@ -12,7 +12,6 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {UserEvents} from "../event/userEvents";
 import {KeyringEvents} from "../event/keyringEvents";
 import {AuthEvents} from "../event/authEvents";
@@ -21,6 +20,7 @@ import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {LocaleEvents} from "../event/localeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 class Auth extends Pagemod {
   /**
@@ -52,8 +52,8 @@ class Auth extends Pagemod {
   async attachEvents(port) {
     try {
       const tab = port._port.sender.tab;
-      const account = await GetLegacyAccountService.get();
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      const account = await GetActiveAccountService.get();
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
         event.listen({port, tab}, apiClientOptions, account);
       }

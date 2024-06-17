@@ -24,14 +24,13 @@ import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {TabEvents} from "../event/tabEvents";
 import {LocaleEvents} from "../event/localeEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import {ResourceTypeEvents} from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
-jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
@@ -66,8 +65,8 @@ describe("QuickAccess", () => {
       // mock functions
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       const mockedAccount = {user_id: uuid(), domain: "https://test.passbolt.local"};
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(mockedAccount);
-      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
+      jest.spyOn(GetActiveAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await QuickAccess.attachEvents(port);
       // expectations

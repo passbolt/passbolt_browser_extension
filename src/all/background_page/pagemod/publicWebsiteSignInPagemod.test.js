@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import User from "../model/user";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
@@ -19,8 +18,8 @@ import each from "jest-each";
 import Pagemod from "./pagemod";
 import {PublicWebsiteSignInEvents} from "../event/publicWebsiteSignInEvents";
 import PublicWebsiteSignIn from "./publicWebsiteSignInPagemod";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {v4 as uuid} from 'uuid';
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -57,7 +56,7 @@ describe("PublicWebsiteSign", () => {
     it("Should be able to attach auth bootstrap pagemod to browser frame", async() => {
       expect.assertions(1);
       // mock functions
-      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
       const result = await PublicWebsiteSignIn.canBeAttachedTo({frameId: Pagemod.TOP_FRAME_ID, url: "https://www.passbolt.com"});
       expect(result).toBeTruthy();
     });
@@ -76,7 +75,7 @@ describe("PublicWebsiteSign", () => {
     it("Should have the constraint not valid if the user is not valid", async() => {
       expect.assertions(1);
       // mock functions
-      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => false);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => { throw new Error(); });
       // process
       const result = await PublicWebsiteSignIn.canBeAttachedTo({frameId: 0, url: "https://www.passbolt.com"});
       // expectations
@@ -100,11 +99,11 @@ describe("PublicWebsiteSign", () => {
       };
 
       const mockedAccount = {user_id: uuid()};
-      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
+      jest.spyOn(GetActiveAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await PublicWebsiteSignIn.attachEvents(port);
       // expectations
-      expect(GetLegacyAccountService.get).toHaveBeenCalled();
+      expect(GetActiveAccountService.get).toHaveBeenCalled();
       expect(PublicWebsiteSignInEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, null, mockedAccount);
     });
   });

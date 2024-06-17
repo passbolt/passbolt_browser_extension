@@ -100,10 +100,14 @@ class PagemodManager {
   /**
    * Has pagemod that match tab url to reload
    * @param url The url
-   * @return {boolean}
+   * @return {Promise<boolean>}
    */
-  hasPagemodMatchUrlToReload(url) {
-    return this.pagemods.some(pagemod => pagemod.mustReloadOnExtensionUpdate && pagemod.assertUrlAttachConstraint({url}));
+  async hasPagemodMatchUrlToReload(url) {
+    for (const pagemod of this.pagemods) {
+      if (pagemod.mustReloadOnExtensionUpdate && await pagemod.assertUrlAttachConstraint({url})) {
+        return true;
+      }
+    }
   }
 }
 

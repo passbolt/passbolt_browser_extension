@@ -35,7 +35,7 @@ describe("PasswordExpiry model", () => {
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     const account = new AccountEntity(defaultAccountDto());
-    apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+    apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     model = new PasswordExpirySettingsModel(account, apiClientOptions);
     jest.spyOn(model.organisationSettingsModel, "getOrFind").mockImplementation(() => (Promise.resolve({
       isPluginEnabled: () => false

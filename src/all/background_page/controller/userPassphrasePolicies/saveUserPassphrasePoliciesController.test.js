@@ -31,7 +31,7 @@ describe("SaveUserPassphrasePoliciesController", () => {
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     const account = new AccountEntity(defaultAccountDto());
-    apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+    apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
   it("Should save the given dto on the API", async() => {

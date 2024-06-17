@@ -13,7 +13,6 @@
  */
 import {ConfigEvents} from "../event/configEvents";
 import Auth from "./authPagemod";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {UserEvents} from "../event/userEvents";
 import {KeyringEvents} from "../event/keyringEvents";
 import {AuthEvents} from "../event/authEvents";
@@ -23,6 +22,7 @@ import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
@@ -54,13 +54,13 @@ describe("Auth", () => {
       };
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       const mockedAccount = {user_id: uuid(), domain: "https://test-domain.passbolt.com"};
-      const mockApiClient = await BuildApiClientOptionsService.buildFromAccount(mockedAccount);
-      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
+      const mockApiClient = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
+      jest.spyOn(GetActiveAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await Auth.attachEvents(port);
       // expectations
       const expectedPortAndTab = {port: port, tab: port._port.sender.tab};
-      expect(GetLegacyAccountService.get).toHaveBeenCalledTimes(1);
+      expect(GetActiveAccountService.get).toHaveBeenCalledTimes(1);
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);

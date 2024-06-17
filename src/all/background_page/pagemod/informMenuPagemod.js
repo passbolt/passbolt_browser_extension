@@ -13,8 +13,8 @@
  */
 import Pagemod from "./pagemod";
 import {InformMenuEvents} from "../event/informMenuEvents";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 class InFormMenu extends Pagemod {
   /**
@@ -38,8 +38,8 @@ class InFormMenu extends Pagemod {
   async attachEvents(port) {
     try {
       const tab = port._port.sender.tab;
-      const account = await GetLegacyAccountService.get();
-      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      const account = await GetActiveAccountService.get();
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const name = this.appName;
       for (const event of this.events) {
         event.listen({port, tab, name}, apiClientOptions, account);

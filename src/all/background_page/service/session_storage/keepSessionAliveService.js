@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.7.0
  */
-import User from "../../model/user";
 import UserService from "../api/user/userService";
 import PassphraseStorageService from "./passphraseStorageService";
+import GetActiveAccountService from "../account/getActiveAccountService";
+import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 
 const SESSION_KEEP_ALIVE_ALARM = "SessionKeepAlive";
 const SESSION_CHECK_INTERNAL = 15;
@@ -59,13 +60,12 @@ class KeepSessionAliveService {
     if (alarm.name !== KeepSessionAliveService.ALARM_NAME) {
       return;
     }
-
     // The session is kept alive only for the duration users wanted their passphrase to be remembered.
     if (await PassphraseStorageService.get() === null) {
       return;
     }
-
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const account = await GetActiveAccountService.get();
+    const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     const userService = new UserService(apiClientOptions);
     userService.keepSessionAlive();
   }

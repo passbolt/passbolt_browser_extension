@@ -20,6 +20,7 @@ import OnExtensionUpdateAvailableService
 import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarmService";
 import ResponseFetchOffscreenService from "./serviceWorker/service/network/responseFetchOffscreenService";
 import OnStartUpService from "../all/background_page/service/extension/onStartUpService";
+import ToolbarService from "../all/background_page/service/toolbar/toolbarService";
 
 /**
  * Load all system requirement
@@ -70,3 +71,18 @@ browser.alarms.onAlarm.addListener(GlobalAlarmService.exec);
  * Handle offscreen fetch responses.
  */
 chrome.runtime.onMessage.addListener(ResponseFetchOffscreenService.handleFetchResponse);
+
+/**
+ * Handle suggested resources on toolbar icon
+ */
+browser.tabs.onUpdated.addListener(ToolbarService.handleSuggestedResourcesOnUpdatedTab);
+
+/**
+ * Handle suggested resources on toolbar icon
+ */
+browser.tabs.onActivated.addListener(ToolbarService.handleSuggestedResourcesOnActivatedTab);
+
+/**
+ * Handle suggested resources on toolbar icon
+ */
+browser.windows.onFocusChanged.addListener(ToolbarService.handleSuggestedResourcesOnFocusedWindow);

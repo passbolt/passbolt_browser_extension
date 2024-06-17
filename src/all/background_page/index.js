@@ -16,6 +16,7 @@ import GlobalAlarmService from "./service/alarm/globalAlarmService";
 import PostLoginService from "./service/auth/postLoginService";
 import PostLogoutService from "./service/auth/postLogoutService";
 import OnStartUpService from "./service/extension/onStartUpService";
+import ToolbarService from "./service/toolbar/toolbarService";
 
 const main = async() => {
   /**
@@ -96,3 +97,18 @@ browser.alarms.onAlarm.removeListener(GlobalAlarmService.exec);
  * Add a top-level alarm handler.
  */
 browser.alarms.onAlarm.addListener(GlobalAlarmService.exec);
+
+/**
+ * Handle suggested resources on toolbar icon
+ */
+browser.tabs.onUpdated.addListener(ToolbarService.handleSuggestedResourcesOnUpdatedTab);
+
+/**
+ * Handle suggested resources on toolbar icon
+ */
+browser.tabs.onActivated.addListener(ToolbarService.handleSuggestedResourcesOnActivatedTab);
+
+/**
+ * Handle suggested resources on toolbar icon
+ */
+browser.windows.onFocusChanged.addListener(ToolbarService.handleSuggestedResourcesOnFocusedWindow);

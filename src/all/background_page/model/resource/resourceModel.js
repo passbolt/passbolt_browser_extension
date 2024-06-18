@@ -206,6 +206,18 @@ class ResourceModel {
   }
 
   /**
+   * Find a resource given an id
+   *
+   * @param {string} resourceId the id of the resource to find
+   * @param {Object} [contains] optional example: {creator: true, modifier: true}
+   * @returns {Promise<ResourcesEntity>}
+   */
+  async findById(resourceId, contains) {
+    const resourcesDto  = await this.resourceService.get(resourceId, contains);
+    return new ResourceEntity(resourcesDto);
+  }
+
+  /**
    * Find all for share
    *
    * @param {array} resourcesIds resource uuids

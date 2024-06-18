@@ -14,6 +14,7 @@
 import ResourceEntity from "./resourceEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("Resource entity", () => {
@@ -107,6 +108,8 @@ describe("Resource entity", () => {
   });
 
   it("constructor works if valid DTO is provided", () => {
+    const creator = defaultUserDto();
+    const modifier = defaultUserDto();
     const dto = {
       "id": "10801423-4151-42a4-99d1-86e66145a08c",
       "name": "test",
@@ -144,7 +147,9 @@ describe("Resource entity", () => {
         "created": "2020-05-04T20:31:45+00:00",
         "modified": "2020-05-04T20:31:45+00:00"
       },
-      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff"
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "creator": creator,
+      "modifier": modifier,
     };
     const entity = new ResourceEntity(dto);
     expect(entity.toDto()).toEqual({
@@ -158,9 +163,11 @@ describe("Resource entity", () => {
       "modified": "2020-05-04T20:31:45+00:00",
       "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
       "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff"
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "creator": creator,
+      "modifier": modifier,
     });
-    const contain = {secrets: true, permissions: true, permission: true, tags: true, favorite: true};
+    const contain = {secrets: true, permissions: true, permission: true, tags: true, favorite: true, creator: true, modifier: true};
     expect(entity.toDto(contain)).toEqual({
       "id": "10801423-4151-42a4-99d1-86e66145a08c",
       "name": "test",
@@ -198,7 +205,9 @@ describe("Resource entity", () => {
         "created": "2020-05-04T20:31:45+00:00",
         "modified": "2020-05-04T20:31:45+00:00"
       },
-      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff"
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "creator": creator,
+      "modifier": modifier,
     });
   });
 

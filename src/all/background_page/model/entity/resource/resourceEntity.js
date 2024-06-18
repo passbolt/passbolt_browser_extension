@@ -21,6 +21,7 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import UserEntity from "../user/userEntity";
 
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
@@ -69,6 +70,14 @@ class ResourceEntity extends EntityV2 {
       this._tags = new TagsCollection(this._props.tags, {...options, clone: false});
       delete this._props.tags;
     }
+    if (this._props.creator) {
+      this._creator = new UserEntity(this._props.creator, {...options, clone: false});
+      delete this._props._creator;
+    }
+    if (this._props.modifier) {
+      this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
+      delete this._props._modifier;
+    }
   }
 
   /**
@@ -76,6 +85,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {Object} schema
    */
   static getSchema() {
+    const userSchema = UserEntity.getSchema();
     return {
       "type": "object",
       "required": [
@@ -150,7 +160,9 @@ class ResourceEntity extends EntityV2 {
         "permissions": PermissionsCollection.getSchema(), // all users permissions
         "resource_type": ResourceTypeEntity.getSchema(),
         "secrets": ResourceSecretsCollection.getSchema(),
-        "tags": TagsCollection.getSchema()
+        "tags": TagsCollection.getSchema(),
+        "creator": userSchema,
+        "modifier": userSchema,
       }
     };
   }
@@ -186,6 +198,12 @@ class ResourceEntity extends EntityV2 {
     }
     if (this._secrets && contain.secrets) {
       result.secrets = this._secrets.toDto();
+    }
+    if (this._creator && contain.creator) {
+      result.creator = this._creator.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
+    }
+    if (this._modifier && contain.modifier) {
+      result.modifier = this._modifier.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
     }
 
     return result;
@@ -609,7 +627,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {permission: true, permissions: true, secrets: true, favorite: true, tag: true};
+    return {permission: true, permissions: true, secrets: true, favorite: true, tag: true, creator: true, modifier: true};
   }
 
   static get URI_MAX_LENGTH() {

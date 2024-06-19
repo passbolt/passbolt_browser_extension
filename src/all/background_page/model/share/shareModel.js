@@ -16,6 +16,8 @@ import Keyring from "../keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import ShareService from "../../service/api/share/shareService";
+import UserAndGroupSearchResultsCollection from "../entity/userAndGroupSearchResultEntity/userAndGroupSearchResultCollection";
+import {assertString} from "../../utils/assertions";
 
 class ShareModel {
   /**
@@ -159,6 +161,22 @@ class ShareModel {
     }
 
     return secrets;
+  }
+
+  /**
+   * Dispatch a users and groups search on the API given a keyword.
+   * @param {string} keyword
+   * @returns {Promise<UserAndGroupSearchResultsCollection>}
+   * @throw {Error} if the keyword parameter is not a valid string
+   */
+  async search(keyword) {
+    assertString(keyword, "keyword is not a valid string");
+    const contains = {
+      profile: true,
+      user_count: true,
+    };
+    const result = await this.shareService.searchUsersAndGroups(keyword, contains);
+    return new UserAndGroupSearchResultsCollection(result);
   }
 }
 

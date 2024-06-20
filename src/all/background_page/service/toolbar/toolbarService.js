@@ -17,6 +17,8 @@ import Toolbar from "../../model/toolbar";
 import {TabController as tabsController} from "../../controller/tabsController";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import GetActiveAccountService from "../account/getActiveAccountService";
+import CheckAuthStatusService from "../auth/checkAuthStatusService";
+import Log from "../../model/log";
 
 class ToolbarService {
   constructor() {
@@ -104,7 +106,7 @@ class ToolbarService {
   async handleSuggestedResourcesOnFocusedWindow(windowId) {
     if (windowId === browser.windows.WINDOW_ID_NONE) {
       // If no window selected, reset the suggested resources badge.
-      this.resetSuggestedResourcesBadge();
+      await this.resetSuggestedResourcesBadge();
     } else {
       await this.updateSuggestedResourcesBadge();
     }
@@ -124,6 +126,10 @@ class ToolbarService {
    */
   async resetSuggestedResourcesBadge() {
     this.tabUrl = null;
+    // Should do nothing if the user is not authenticated
+    if (!await this.isUserAuthenticated()) {
+      return;
+    }
     BrowserExtensionIconService.setSuggestedResourcesCount(0);
   }
 
@@ -135,6 +141,11 @@ class ToolbarService {
     try {
       const account = await GetActiveAccountService.get();
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+      // Should do nothing if the user is not authenticated
+      if (!await this.isUserAuthenticated()) {
+        return;
+      }
+
       this.resourceModel = new ResourceModel(apiClientOptions, account);
 
       const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
@@ -157,6 +168,24 @@ class ToolbarService {
     } catch (error) {
       // Error happens only if no account is associate
       console.error(error);
+    }
+  }
+
+  /**
+   * Is the user authenticated
+   * @returns {Promise<{boolean}|boolean>}
+   */
+  async isUserAuthenticated() {
+    try {
+      const checkAuthStatusService = new CheckAuthStatusService();
+      // use the cached data as the worker could wake up every 30 secondes.
+      const authStatus = await checkAuthStatusService.checkAuthStatus(false);
+      return authStatus.isAuthenticated;
+    } catch (error) {
+      // Service is unavailable, do nothing...
+      Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
+      // The user is not authenticated
+      return false;
     }
   }
 

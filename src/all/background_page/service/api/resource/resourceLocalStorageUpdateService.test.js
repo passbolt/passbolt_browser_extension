@@ -43,8 +43,6 @@ beforeEach(() => {
     delete resource4.secrets;
     return [resource1, resource2, resource3, resource4];
   });
-  // reset static data
-  ResourceLocalStorageUpdateService._cachedResources = null;
 });
 
 describe("ResourceLocalStorageUpdateService", () => {

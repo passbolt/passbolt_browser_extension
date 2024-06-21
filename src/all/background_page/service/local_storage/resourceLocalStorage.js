@@ -15,13 +15,28 @@ import Log from "../../model/log";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import Lock from "../../utils/lock";
-import {assertType} from "../../utils/assertions";
+import {assertArray, assertType, assertUuid} from "../../utils/assertions";
 import PasswordExpiryResourceEntity from "../../model/entity/passwordExpiry/passwordExpiryResourceEntity";
 const lock = new Lock();
 
-const RESOURCES_LOCAL_STORAGE_KEY = 'resources';
+export const RESOURCES_LOCAL_STORAGE_KEY = 'resources';
 
 class ResourceLocalStorage {
+  /**
+   * Cached data.
+   * @type {Object}
+   * @private
+   */
+  static _cachedData = null;
+
+  /**
+   * Check if there is cached data.
+   * @returns {boolean}
+   */
+  static hasCachedData() {
+    return ResourceLocalStorage._cachedData !== null;
+  }
+
   /**
    * Flush the resources local storage
    *
@@ -30,7 +45,8 @@ class ResourceLocalStorage {
    */
   static async flush() {
     Log.write({level: 'debug', message: 'ResourceLocalStorage flushed'});
-    return await browser.storage.local.remove(RESOURCES_LOCAL_STORAGE_KEY);
+    await browser.storage.local.remove(RESOURCES_LOCAL_STORAGE_KEY);
+    ResourceLocalStorage._cachedData = null;
   }
 
   /**
@@ -40,12 +56,16 @@ class ResourceLocalStorage {
    * Therefore, any changes made to this duplicate will not affect the original data or a cache.
    *
    * @throws {Error} if operation failed
-   * @return {Promise} results object, containing every object in keys that was found in the storage area.
+   * @return {Promise<array>} results object, containing every object in keys that was found in the storage area.
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    const {resources} = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
-    return resources;
+    if (!ResourceLocalStorage._cachedData) {
+      const {resources} = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
+      ResourceLocalStorage._cachedData = resources;
+    }
+
+    return ResourceLocalStorage._cachedData;
   }
 
   /**
@@ -67,6 +87,7 @@ class ResourceLocalStorage {
         }
       }
       await browser.storage.local.set({resources: resources});
+      ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
     }
@@ -80,7 +101,7 @@ class ResourceLocalStorage {
    */
   static async getResourceById(id) {
     const resources = await ResourceLocalStorage.get();
-    return resources.find(item => item.id === id);
+    return resources?.find(item => item.id === id);
   }
 
 
@@ -92,9 +113,10 @@ class ResourceLocalStorage {
     await lock.acquire();
     try {
       ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
-      const resources = await ResourceLocalStorage.get();
+      const resources = await ResourceLocalStorage.get() || [];
       resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({resources: resources});
+      ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
     }
@@ -105,14 +127,16 @@ class ResourceLocalStorage {
    * @param {Array<ResourceEntity>} resourceEntities
    */
   static async addResources(resourceEntities) {
+    assertArray(resourceEntities, "The parameter resourcesEntities should be an array");
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get();
+      const resources = await ResourceLocalStorage.get() || [];
       resourceEntities.forEach(resourceEntity => {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
         resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       });
       await browser.storage.local.set({resources: resources});
+      ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
     }
@@ -127,13 +151,14 @@ class ResourceLocalStorage {
     await lock.acquire();
     try {
       ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
-      const resources = await ResourceLocalStorage.get();
+      const resources = await ResourceLocalStorage.get() || [];
       const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
       if (resourceIndex === -1) {
         throw new Error('The resource could not be found in the local storage');
       }
       resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       await browser.storage.local.set({resources: resources});
+      ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
     }
@@ -145,9 +170,10 @@ class ResourceLocalStorage {
    * @throws {Error} if the resource does not exist in the local storage
    */
   static async updateResourcesCollection(resourcesCollection) {
+    assertType(resourcesCollection, ResourcesCollection, 'The parameter resourcesEntities should be of ResourcesCollection type.');
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get();
+      const resources = await ResourceLocalStorage.get() || [];
       for (const resourceEntity of resourcesCollection) {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
         const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
@@ -157,6 +183,7 @@ class ResourceLocalStorage {
         resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       }
       await browser.storage.local.set({resources: resources});
+      ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
     }
@@ -170,7 +197,7 @@ class ResourceLocalStorage {
   static async updateResourcesExpiryDate(passwordExpiryResourcesCollection) {
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get();
+      const resources = await ResourceLocalStorage.get() || [];
       for (const passwordExpiryResourceEntity of passwordExpiryResourcesCollection) {
         assertType(passwordExpiryResourceEntity, PasswordExpiryResourceEntity, 'The given entity is not a PasswordExpiryResourceEntity');
         const resourceIndex = resources.findIndex(item => item.id === passwordExpiryResourceEntity.id);
@@ -180,6 +207,7 @@ class ResourceLocalStorage {
         resources[resourceIndex].expired = passwordExpiryResourceEntity.expired;
       }
       await browser.storage.local.set({resources: resources});
+      ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
     }
@@ -190,15 +218,17 @@ class ResourceLocalStorage {
    * @param {string} resourceId The resource id
    */
   static async delete(resourceId) {
+    assertUuid(resourceId, "The parameter resourceId should be a UUID.");
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get();
+      const resources = await ResourceLocalStorage.get() || [];
       if (resources) {
         const resourceIndex = resources.findIndex(item => item.id === resourceId);
         if (resourceIndex !== -1) {
           resources.splice(resourceIndex, 1);
         }
         await browser.storage.local.set({resources: resources});
+        ResourceLocalStorage._cachedData = resources;
       }
     } finally {
       lock.release();
@@ -240,29 +270,6 @@ class ResourceLocalStorage {
     }
     if (!resourceEntity.permission) {
       throw new TypeError('ResourceLocalStorage::set expects ResourceEntity permission to be set');
-    }
-  }
-
-  /*
-   * =================================================
-   * Deprecated methods
-   * Stop using DTOs instead one should use entities
-   * =================================================
-   */
-  /**
-   * Update a resource in the local storage.
-   * @param {object} resource The resource to update
-   * @deprecated
-   */
-  static async updateResourceLegacy(resource) {
-    await lock.acquire();
-    try {
-      const resources = await ResourceLocalStorage.get();
-      const resourceIndex = resources.findIndex(item => item.id === resource.id);
-      resources[resourceIndex] = resource;
-      await browser.storage.local.set({resources: resources});
-    } finally {
-      lock.release();
     }
   }
 }

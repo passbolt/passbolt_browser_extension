@@ -34,7 +34,7 @@ describe("AccountLocalStorage", () => {
   });
 
   describe("AccountLocalStorage::getAccountByUserIdAndType", () => {
-    it("Should return nothing if the target account is not found in the local storage", async() => {
+    it("Should return the target account stored in the local storage", async() => {
       const targetAccount = defaultAccountDto();
       const accountWithSameUserId = defaultAccountDto({type: AccountEntity.TYPE_ACCOUNT_RECOVERY});
       const accountWithSameType = defaultAccountDto({user_id: "7f077753-0835-4054-92ee-556660ea04f0"});
@@ -46,7 +46,7 @@ describe("AccountLocalStorage", () => {
       expect(result).toEqual(targetAccount);
     });
 
-    it("Should return the target account stored in the local storage", async() => {
+    it("Should return nothing if the target account is not found in the local storage", async() => {
       const targetAccount = defaultAccountDto();
       const accountWithSameUserId = defaultAccountDto({type: AccountEntity.TYPE_ACCOUNT_RECOVERY});
       const accountWithSameType = defaultAccountDto({user_id: "7f077753-0835-4054-92ee-556660ea04f0"});

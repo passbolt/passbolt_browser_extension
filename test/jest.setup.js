@@ -21,6 +21,7 @@ import MockNavigatorLocks from './mocks/mockNavigatorLocks';
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
 import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
+import ResourceLocalStorage from "../src/all/background_page/service/local_storage/resourceLocalStorage";
 
 global.console = {
   ...console,
@@ -54,6 +55,7 @@ beforeEach(async() => {
   await browser.storage.session.clear();
   // Flush caches
   OrganizationSettingsModel.flushCache();
+  ResourceLocalStorage.flush();
   Config.flush();
   const keyring = new Keyring();
   keyring.flush(Keyring.PUBLIC);

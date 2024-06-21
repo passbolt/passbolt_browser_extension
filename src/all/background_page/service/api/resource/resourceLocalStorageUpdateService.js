@@ -23,13 +23,6 @@ const RESOURCE_UPDATE_LOCK = 'resourceUpdateLock';
  */
 class ResourceLocalStorageUpdateService {
   /**
-   * The resources collection dto cached.
-   * @type {Object}
-   * @private
-   */
-  static _cachedResources = null;
-
-  /**
    *
    * @param {AccountEntity} account The user account
    * @param {ApiClientOptions} apiClientOptions The api client options
@@ -60,14 +53,17 @@ class ResourceLocalStorageUpdateService {
       return this.updateLocalStorage();
     }
 
-    if (ResourceLocalStorageUpdateService._cachedResources && ResourceLocalStorageUpdateService._cachedResources.length > 0) {
-      return new ResourcesCollection(ResourceLocalStorageUpdateService._cachedResources, {clone: false, validate: false});
+    const resourcesCollectionOptions = {clone: true};
+    if (ResourceLocalStorage.hasCachedData()) {
+      // Only data coming from the local storage require validation, data in runtime cache has already been validated.
+      resourcesCollectionOptions.validate = false;
     }
 
     const resources = await ResourceLocalStorage.get();
     if (resources) {
-      return new ResourcesCollection(resources, {clone: false});
+      return new ResourcesCollection(resources, resourcesCollectionOptions);
     }
+
     return this.updateLocalStorage();
   }
 
@@ -94,8 +90,6 @@ class ResourceLocalStorageUpdateService {
     const resourcesCollection = new ResourcesCollection(resourcesDto, {clone: false});
     await ResourceLocalStorage.set(resourcesCollection);
     lastTimeCalledPerAccount[this.account.id] = Date.now();
-
-    ResourceLocalStorageUpdateService._cachedResources = resourcesDto;
 
     return resourcesCollection;
   }

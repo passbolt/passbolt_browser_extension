@@ -72,7 +72,8 @@
     "firefox-profile": "4.3.2",
     "crypto-browserify": {
       "browserify-sign": "4.2.2"
-    }
+    },
+    "ws": "8.17.1"
   },
   "scripts": {
     "build": "npx grunt build",

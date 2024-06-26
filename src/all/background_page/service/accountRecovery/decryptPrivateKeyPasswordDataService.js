@@ -52,7 +52,7 @@ class DecryptPrivateKeyPasswordDataService {
     const privateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(privateKeyPasswordDecryptedDataDto);
 
     if (privateKeyPasswordDecryptedData.domain !== verificationDomain) {
-      console.debug(({ privateKeyPasswordId: privateKeyPassword.id, userId: privateKeyPasswordDecryptedData.privateKeyUserId, domain: privateKeyPasswordDecryptedData.domain }))
+      console.debug("The decrypted private key password data domain does not match the organization domain: ", ({ privateKeyPasswordId: privateKeyPassword.id, userId: privateKeyPasswordDecryptedData.privateKeyUserId, domain: privateKeyPasswordDecryptedData.domain }));      
       throw new Error("The domain contained in the private key password data does not match the expected target domain.");
     }
 

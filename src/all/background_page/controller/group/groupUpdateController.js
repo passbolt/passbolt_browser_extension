@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
@@ -23,6 +22,7 @@ import i18n from "../../sdk/i18n";
 import SecretEntity from "../../model/entity/secret/secretEntity";
 import SecretsCollection from "../../model/entity/secret/secretsCollection";
 import ProgressService from "../../service/progress/progressService";
+import GpgkeyModel from "../../model/gpgKey/gpgkeyModel";
 
 const INITIAL_PROGRESS_GOAL = 10;
 class GroupsUpdateController {
@@ -37,7 +37,7 @@ class GroupsUpdateController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.groupModel = new GroupModel(apiClientOptions);
-    this.keyring = new Keyring();
+    this.gpgkeyModel = new GpgkeyModel();
 
     this.progressService = new ProgressService(this.worker, i18n.t('Updating group ...'));
     this.getPassphraseService = new GetPassphraseService(account);
@@ -59,10 +59,9 @@ class GroupsUpdateController {
 
     try {
       const privateKey = await this.getPrivateKey();
-      const groupUpdateDryRunPromise = await this.simulateUpdateGroup(groupUpdateEntity);
-      const groupUpdateDryRunResultEntity = await groupUpdateDryRunPromise;
+      const groupUpdateDryRunResultEntity = await this.simulateUpdateGroup(groupUpdateEntity);
       if (groupUpdateDryRunResultEntity.neededSecrets.length > 0) {
-        await this.synchronizeKeys();
+        await this.synchronizeKeys(groupUpdateDryRunResultEntity);
         groupUpdateEntity.secrets = await this.encryptNeededSecrets(privateKey, groupUpdateDryRunResultEntity);
       }
       await this.updateGroup(groupUpdateEntity);
@@ -99,11 +98,14 @@ class GroupsUpdateController {
 
   /**
    * Synchronize the local keyring with the API.
+   * @param {GroupUpdateDryRunResultEntity}
    * @returns {Promise<int>}
    */
-  async synchronizeKeys() {
+  async synchronizeKeys(groupUpdateDryRunResult) {
+    const userIds = groupUpdateDryRunResult.neededSecrets.extract('user_id');
+    const uniqueUserIds = [...new Set(userIds)];
     await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
-    return this.keyring.sync();
+    await this.gpgkeyModel.findGpgKeys(uniqueUserIds);
   }
 
   /**
@@ -134,7 +136,7 @@ class GroupsUpdateController {
       // This check implies that neededSecret are sorted by userId to be the most efficient
       if (userId !== neededSecret.userId) {
         userId = neededSecret.userId;
-        userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+        userPublicArmoredKey = (await this.gpgkeyModel.getOrFindUserGpgKey(userId)).armoredKey;
         userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
       }
       await this.progressService.finishStep(i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: items.length}));

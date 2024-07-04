@@ -12,12 +12,12 @@
  * @since         4.6.0
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import Keyring from "../keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import ShareService from "../../service/api/share/shareService";
 import UserAndGroupSearchResultsCollection from "../entity/userAndGroupSearchResultEntity/userAndGroupSearchResultCollection";
 import {assertString} from "../../utils/assertions";
+import GpgkeyModel from "../gpgKey/gpgkeyModel";
 
 class ShareModel {
   /**
@@ -27,6 +27,7 @@ class ShareModel {
    */
   constructor(apiClientOptions) {
     this.shareService = new ShareService(apiClientOptions);
+    this.gpgkeyModel = new GpgkeyModel(apiClientOptions);
   }
 
   /**
@@ -131,7 +132,6 @@ class ShareModel {
    * ]
    */
   async bulkShareEncrypt(resources, resourcesNewUsers, privateKey, progressCallback) {
-    const keyring = new Keyring();
     const secrets = {};
 
     for (const resourceId in resourcesNewUsers) {
@@ -146,7 +146,7 @@ class ShareModel {
         const result = [];
         for (const i in encryptAllData) {
           const data = encryptAllData[i];
-          const userPublicArmoredKey = keyring.findPublic(data.userId).armoredKey;
+          const userPublicArmoredKey = (await this.gpgkeyModel.getOrFindUserGpgKey(data.userId)).armoredKey;
           const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
           const messageEncrypted = await EncryptMessageService.encrypt(data.message, userPublicKey, [privateKey]);
           result.push({

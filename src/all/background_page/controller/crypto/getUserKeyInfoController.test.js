@@ -53,7 +53,7 @@ describe("GetUserKeyInfocontroller", () => {
     });
 
     try {
-      await controller.exec("non existing user id");
+      await controller.exec(uuidv4());
     } catch (error) {
       expect(error).toStrictEqual(new Error('User key not found'));
     }

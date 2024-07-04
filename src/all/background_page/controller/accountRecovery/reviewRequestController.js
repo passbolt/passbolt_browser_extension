@@ -13,7 +13,6 @@
  */
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
@@ -25,6 +24,7 @@ import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/ac
 import UserEntity from "../../model/entity/user/userEntity";
 import PrivateGpgkeyEntity from "../../model/entity/gpgkey/privateGpgkeyEntity";
 import Validator from "validator";
+import GpgkeyModel from "../../model/gpgKey/gpgkeyModel";
 
 class ReviewRequestController {
   /**
@@ -39,8 +39,8 @@ class ReviewRequestController {
     this.requestId = requestId;
     this.account = account;
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
-    this.keyringModel = new Keyring();
     this.getPassphraseService = new GetPassphraseService(account);
+    this.gpgkeyModel = new GpgkeyModel();
   }
 
   /**
@@ -189,14 +189,10 @@ class ReviewRequestController {
    * @private
    */
   async _findUserPublicKey(userId) {
-    let userPublicKey = this.keyringModel.findPublic(userId);
+    const userPublicKey = await this.gpgkeyModel.getOrFindUserGpgKey(userId, true);
 
     if (!userPublicKey) {
-      await this.keyringModel.sync();
-      userPublicKey = this.keyringModel.findPublic(userId);
-      if (!userPublicKey) {
-        throw new Error("Cannot find the public key of the user requesting an account recovery.");
-      }
+      throw new Error("Cannot find the public key of the user requesting an account recovery.");
     }
 
     return userPublicKey.armoredKey;

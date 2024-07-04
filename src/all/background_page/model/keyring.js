@@ -18,6 +18,7 @@ import ExternalGpgKeyEntity from "./entity/gpgkey/external/externalGpgKeyEntity"
 import GetGpgKeyInfoService from "../service/crypto/getGpgKeyInfoService";
 import storage from "../sdk/storage";
 import Validator from "validator";
+import {assertArray, assertUuid} from "../utils/assertions";
 
 /**
  * Constants
@@ -212,10 +213,10 @@ class Keyring {
   /**
    * Sync the local keyring with the passbolt API.
    * Retrieve the latest updated Public Keys.
-   *
+   * @param {Array<Uuid>} [userIds = []] the user ids for whom to sync the keys
    * @returns {Promise<int>} number of updated keys
    */
-  async sync() {
+  async sync(userIds = []) {
     const latestSync = storage.getItem('latestSync');
 
     // Get the latest keys changes from the backend.
@@ -223,8 +224,13 @@ class Keyring {
     let url = `${userSettings.getDomain()}/gpgkeys.json` + `?api-version=v2`;
 
     // If a sync has already been performed.
-    if (latestSync !== null) {
+    if (latestSync !== null && !userIds) {
       url += `&modified_after=${latestSync}`;
+    }
+
+    if (userIds) {
+      this.assertAllUuids(userIds);
+      url += `&filter[has-user-id]=${userIds.join('&filter[has-user-id]=')}`;
     }
 
     const fetchOptions = {
@@ -270,7 +276,9 @@ class Keyring {
     }
     await Promise.all(imports);
 
-    storage.setItem('latestSync', json.header.servertime);
+    if (!userIds) {
+      storage.setItem('latestSync', json.header.servertime);
+    }
 
     return (json.body.length);
   }
@@ -346,6 +354,22 @@ class Keyring {
      * We consider that the keyring has never been synced.
      */
     storage.removeItem('latestSync');
+  }
+
+  /**
+   * asserts that the given data is an array of UUIDs
+   * @param {*} userIds the data to assert
+   * @throws {Error} if the data is not a valid array of UUIDs
+   */
+  assertAllUuids(userIds) {
+    try {
+      assertArray(userIds);
+      for (let i = 0; i < userIds.length; i++) {
+        assertUuid(userIds[i]);
+      }
+    } catch (e) {
+      throw new TypeError("The user ids should a valid array of UUIDs");
+    }
   }
 
   /*

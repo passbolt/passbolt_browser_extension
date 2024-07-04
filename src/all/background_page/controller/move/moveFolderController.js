@@ -22,6 +22,7 @@ import PermissionChangesCollection from "../../model/entity/permission/change/pe
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ShareModel from "../../model/share/shareModel";
+import GpgkeyModel from "../../model/gpgKey/gpgkeyModel";
 
 
 class MoveFolderController {
@@ -40,6 +41,7 @@ class MoveFolderController {
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
+    this.gpgkeyModel = new GpgkeyModel();
 
     // Work variables
     this.folderId = null;
@@ -260,8 +262,9 @@ class MoveFolderController {
     if (this.resourcesChanges.length) {
       const resourcesDto = this.resources.toDto({secrets: true});
       const changesDto = this.resourcesChanges.toDto();
+      const keysToSync = this.resourcesChanges.extract('aro_foreign_key');
       await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
-      await this.keyring.sync();
+      await this.gpgkeyModel.findGpgKeys(keysToSync);
       await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await this.progressService.finishStep(message);
       });

@@ -12,7 +12,6 @@
  * @since         2.9.0
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import User from "../../model/user";
 import ResourceModel from "../../model/resource/resourceModel";
@@ -24,6 +23,7 @@ import i18n from "../../sdk/i18n";
 import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
 import ProgressService from "../../service/progress/progressService";
 import ShareModel from "../../model/share/shareModel";
+import GpgkeyModel from "../../model/gpgKey/gpgkeyModel";
 
 class ResourceCreateController {
   /**
@@ -40,7 +40,7 @@ class ResourceCreateController {
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.folderModel = new FolderModel(apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
-    this.keyring = new Keyring();
+    this.gpgkeyModel = new GpgkeyModel();
     this.progressService = new ProgressService(this.worker, i18n.t('Creating password'));
     this.getPassphraseService = new GetPassphraseService(account);
   }
@@ -78,7 +78,7 @@ class ResourceCreateController {
       // Encrypt and sign
       await this.progressService.finishStep(i18n.t('Encrypting secret'), true);
       const userId = User.getInstance().get().id;
-      const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+      const userPublicArmoredKey = await this.gpgkeyModel.getOrFindUserGpgKey(userId).armoredKey;
       const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
       const secret = await EncryptMessageService.encrypt(plaintext, userPublicKey, [privateKey]);
       resource.secrets = new ResourceSecretsCollection([{data: secret}]);
@@ -124,7 +124,8 @@ class ResourceCreateController {
 
       // Sync keyring
       await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
-      await this.keyring.sync();
+      const userIds = changes.extract('aro_foreign_key');
+      await this.gpgkeyModel.findGpgKeys(userIds);
 
       // Share
       await this.progressService.finishStep(i18n.t('Start sharing'), true);

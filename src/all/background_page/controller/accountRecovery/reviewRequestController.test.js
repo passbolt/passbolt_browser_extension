@@ -94,6 +94,9 @@ describe("ReviewRequestController", () => {
           expect(params.get("contain[account_recovery_private_key_passwords]")).toBeTruthy();
           return mockApiResponse(requestDto);
         });
+
+        fetch.doMockOnceIf(/gpgkeys\.json/, () => mockApiResponse());
+
         // Mock API save account recovery response, return the request payload for assertion.
         fetch.doMockOnceIf(/account-recovery\/responses.json/, async req => mockApiResponse(JSON.parse(await req.text())));
 

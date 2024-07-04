@@ -13,7 +13,7 @@
  */
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import Keyring from "../../model/keyring";
+import GpgkeyModel from "../../model/gpgKey/gpgkeyModel";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 
 
@@ -26,7 +26,7 @@ class GetUserKeyInfoController {
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.keyring = new Keyring();
+    this.gpgkeyModel = new GpgkeyModel();
   }
 
   /**
@@ -51,18 +51,12 @@ class GetUserKeyInfoController {
    * @returns {Promise<ExternalGpgKeyEntity>}
    */
   async exec(userId) {
-    let keyInfo = this.keyring.findPublic(userId);
-
-    // If the key is not in the keyring, try to sync the keyring and try again
+    const keyInfo = await this.gpgkeyModel.getOrFindUserGpgKey(userId);
     if (!keyInfo) {
-      await this.keyring.sync();
-      keyInfo = this.keyring.findPublic(userId);
-
-      if (!keyInfo) {
-        //@todo maybe send a KeyringError instead
-        throw new Error('User key not found');
-      }
+      //@todo maybe send a KeyringError instead
+      throw new Error('User key not found');
     }
+
     const key = await OpenpgpAssertion.readKeyOrFail(keyInfo.armoredKey);
     return GetGpgKeyInfoService.getKeyInfo(key);
   }

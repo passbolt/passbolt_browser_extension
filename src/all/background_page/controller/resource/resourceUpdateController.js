@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
@@ -22,6 +21,7 @@ import i18n from "../../sdk/i18n";
 import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import ProgressService from "../../service/progress/progressService";
+import GpgkeyModel from "../../model/gpgKey/gpgkeyModel";
 
 class ResourceUpdateController {
   /**
@@ -37,7 +37,7 @@ class ResourceUpdateController {
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.userModel = new UserModel(apiClientOptions);
-    this.keyring = new Keyring();
+    this.gpgkeyModel = new GpgkeyModel();
     this.progressService = new ProgressService(this.worker, i18n.t("Updating password"));
     this.getPassphraseService = new GetPassphraseService(account);
   }
@@ -88,12 +88,15 @@ class ResourceUpdateController {
     try {
       this.progressService.start(4, i18n.t("Updating password"));
       const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
-      const goals = usersIds.length + 3; // encrypt * users + keyring sync + save + done
+      const goals = usersIds.length + 2 + (resourceEntity.isShared ? 1 : 0); // encrypt * users + keyring sync + save + done
       this.progressService.updateGoals(goals);
 
-      // Sync keyring
-      await this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
-      await this.keyring.sync();
+      //if more than 1 user, then the resource is shared
+      if (resourceEntity.isShared) {
+        // Sync keyring
+        await this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
+        await this.gpgkeyModel.findGpgKeys(usersIds);
+      }
 
       // Encrypt
       const plaintext = await this.resourceModel.serializePlaintextDto(resourceEntity.resourceTypeId, plaintextDto);
@@ -139,7 +142,7 @@ class ResourceUpdateController {
     for (let i = 0; i < usersIds.length; i++) {
       if (Object.prototype.hasOwnProperty.call(usersIds, i)) {
         const userId =  usersIds[i];
-        const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+        const userPublicArmoredKey = await this.gpgkeyModel.getOrFindUserGpgKey(userId).armoredKey;
         const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
         const data = await EncryptMessageService.encrypt(plaintextDto, userPublicKey, [privateKey]);
         secrets.push({user_id: userId, data: data});

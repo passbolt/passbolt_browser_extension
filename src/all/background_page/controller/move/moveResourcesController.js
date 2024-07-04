@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Keyring from "../../model/keyring";
 import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
@@ -22,6 +21,7 @@ import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import Log from "../../model/log";
 import ShareModel from "../../model/share/shareModel";
+import GpgkeyModel from "../../model/gpgKey/gpgkeyModel";
 
 
 class MoveResourcesController {
@@ -39,7 +39,7 @@ class MoveResourcesController {
     this.folderModel = new FolderModel(apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.shareModel = new ShareModel(apiClientOptions);
-    this.keyring = new Keyring();
+    this.gpgkeyModel = new GpgkeyModel();
     this.progressService = new ProgressService(this.worker);
     this.getPassphraseService = new GetPassphraseService(account);
   }
@@ -222,8 +222,9 @@ class MoveResourcesController {
     const resourcesDto = this.resources.toDto({secrets: true});
     const changesDto = this.changes.toDto();
     if (changesDto.length) {
+      const keysToSync = this.changes.extract('aro_foreign_key');
       await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
-      await this.keyring.sync();
+      await this.gpgkeyModel.findGpgKeys(keysToSync);
       await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await this.progressService.finishStep(message);
       });

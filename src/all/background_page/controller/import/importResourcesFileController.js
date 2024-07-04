@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import User from "../../model/user";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
@@ -30,6 +29,7 @@ import SecretEntity from "../../model/entity/secret/secretEntity";
 import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
 import ImportError from "../../error/importError";
 import ProgressService from "../../service/progress/progressService";
+import GpgkeyModel from "../../model/gpgKey/gpgkeyModel";
 
 const INITIAL_PROGRESS_GOAL = 100;
 class ImportResourcesFileController {
@@ -42,14 +42,12 @@ class ImportResourcesFileController {
   constructor(worker, apiClientOptions, account) {
     this.worker = worker;
 
-    // Crypto
-    this.keyring = new Keyring();
-
     // Models
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.folderModel = new FolderModel(apiClientOptions);
     this.tagModel = new TagModel(apiClientOptions, account);
+    this.gpgkeyModel = new GpgkeyModel();
 
     // Progress
     this.progressService = new ProgressService(this.worker, i18n.t("Importing ..."));
@@ -154,7 +152,7 @@ class ImportResourcesFileController {
       // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
       const secretDto = this.buildSecretDto(importResourceEntity);
       const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
-      const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+      const userPublicArmoredKey = await this.gpgkeyModel.getOrFindUserGpgKey(userId).armoredKey;
       const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
       const data = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, [privateKey]);
       const secret = new SecretEntity({data: data});

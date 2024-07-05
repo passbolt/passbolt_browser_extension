@@ -66,7 +66,6 @@ class ShareResourcesController {
     try {
       this.progressService.title = i18n.t("Share {{count}} password", {count: resources.length});
       this.progressService.start(progressGoal, i18n.t('Initialize'));
-      console.log(changes);
       const keysToSync = changes.map(change => change.aro_foreign_key);
       await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
       await this.gpgkeyModel.findGpgKeys(keysToSync);

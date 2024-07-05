@@ -23,6 +23,7 @@ import {ConfigEvents} from "../event/configEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {WebIntegrationEvents} from "../event/webIntegrationEvents";
 import {PortEvents} from "../event/portEvents";
+import MockExtension from "../../../../test/mocks/mockExtension";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -37,6 +38,7 @@ describe("WebIntegration", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
+    await MockExtension.withConfiguredAccount();
   });
 
   describe("WebIntegration::injectFile", () => {

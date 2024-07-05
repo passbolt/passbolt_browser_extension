@@ -13,7 +13,6 @@
  */
 import Keyring from "../keyring";
 import {assertUuid} from "../../utils/assertions";
-import ExternalGpgKeyEntity from "../entity/gpgkey/external/externalGpgKeyEntity";
 import ExternalGpgKeyCollection from "../entity/gpgkey/external/externalGpgKeyCollection";
 
 class GpgkeyModel {

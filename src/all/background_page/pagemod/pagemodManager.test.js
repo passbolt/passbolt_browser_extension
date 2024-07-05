@@ -23,6 +23,7 @@ import PublicWebsiteSignInPagemod from "./publicWebsiteSignInPagemod";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import {userLoggedInAuthStatus} from "../controller/auth/authCheckStatus.test.data";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import MockExtension from "../../../../test/mocks/mockExtension";
 
 jest.spyOn(pagemod.prototype, "injectFiles").mockImplementation(jest.fn());
 jest.spyOn(pagemod.prototype, "attachEvents").mockImplementation(jest.fn());
@@ -31,6 +32,7 @@ describe("PagemodManager", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
+    await MockExtension.withConfiguredAccount();
   });
 
   describe("PagemodManager::exec", () => {

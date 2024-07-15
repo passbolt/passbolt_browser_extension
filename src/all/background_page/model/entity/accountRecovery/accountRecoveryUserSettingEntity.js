@@ -32,7 +32,7 @@ class AccountRecoveryUserSettingEntity extends Entity {
     ), options);
 
     if (this._props.account_recovery_private_key) {
-      this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key, {clone: false});
+      this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key, {...options, clone: false});
       delete this._props.account_recovery_private_key;
     }
   }

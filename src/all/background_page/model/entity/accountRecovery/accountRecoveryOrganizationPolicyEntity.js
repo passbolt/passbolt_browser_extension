@@ -102,12 +102,9 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
           "format": "uuid"
         },
         "public_key_id": {
-          "anyOf": [{
-            "type": "string",
-            "format": "uuid"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "uuid",
+          "nullable": true,
         },
         "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
         "account_recovery_organization_revoked_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),

@@ -54,11 +54,8 @@ class WorkerEntity extends Entity {
           "type": "integer",
         },
         "frameId": {
-          "anyOf": [{
-            "type": "integer"
-          }, {
-            "type": "null"
-          }]
+          "type": "integer",
+          "nullable": true,
         },
         "name": {
           "type": "string",

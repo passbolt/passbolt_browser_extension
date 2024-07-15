@@ -25,7 +25,7 @@ import PermissionChangesCollection from "../../model/entity/permission/change/pe
 
 const {enableFetchMocks} = require("jest-fetch-mock");
 const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
-const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
+const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 const {users} = require("passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data");
 
 const {

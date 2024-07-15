@@ -12,13 +12,85 @@
  * @since         3.6.0
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountRecoveryRequestEntity from "./accountRecoveryRequestEntity";
-import {pendingAccountRecoveryRequestDto} from "./accountRecoveryRequestEntity.test.data";
+import {pendingAccountRecoveryRequestDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("AccountRecoveryRequest entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(AccountRecoveryRequestEntity.ENTITY_NAME, AccountRecoveryRequestEntity.getSchema());
+  describe("AccountRecoveryRequestEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(AccountRecoveryRequestEntity.ENTITY_NAME, AccountRecoveryRequestEntity.getSchema());
+    });
+
+    it("validates id property", () => {
+      assertEntityProperty.uuid(AccountRecoveryRequestEntity, "id");
+      assertEntityProperty.required(AccountRecoveryRequestEntity, "id");
+    });
+
+    it("validates user_id property", () => {
+      assertEntityProperty.uuid(AccountRecoveryRequestEntity, "user_id");
+      assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "user_id");
+    });
+
+
+    it("validates armored_key property", () => {
+      assertEntityProperty.string(AccountRecoveryRequestEntity, "armored_key");
+      assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "armored_key");
+      assertEntityProperty.notNullable(AccountRecoveryRequestEntity, "armored_key");
+    });
+
+    it("validates fingerprint property", () => {
+      const successScenarios = [
+        {scenario: "with a valid fingerprint string", value: "ABCD".repeat(10)},
+      ];
+      const failingScenarios = [
+        assertEntityProperty.SCENARIO_INTEGER,
+        assertEntityProperty.SCENARIO_FLOAT,
+      ];
+      assertEntityProperty.assert(AccountRecoveryRequestEntity, "fingerprint", successScenarios, failingScenarios, "type");
+
+      const wrongLengthScenario = [
+        {scenario: "too long", value: "a".repeat(41)},
+        {scenario: "too short", value: "a".repeat(39)},
+      ];
+      assertEntityProperty.assert(AccountRecoveryRequestEntity, "fingerprint", successScenarios, wrongLengthScenario, "length");
+      assertEntityProperty.nullable(AccountRecoveryRequestEntity, "fingerprint");
+      assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "fingerprint");
+    });
+
+    it("validates status property", () => {
+      const expectedValues = [
+        "pending",
+        "rejected",
+        "approved",
+        "completed"
+      ];
+      const unexpectedValues = ["1", "false", "test"];
+      assertEntityProperty.enumeration(AccountRecoveryRequestEntity, "status", expectedValues, unexpectedValues);
+      assertEntityProperty.required(AccountRecoveryRequestEntity, "status");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(AccountRecoveryRequestEntity, "created");
+      assertEntityProperty.dateTime(AccountRecoveryRequestEntity, "created");
+      assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(AccountRecoveryRequestEntity, "modified");
+      assertEntityProperty.dateTime(AccountRecoveryRequestEntity, "modified");
+      assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "modified");
+    });
+
+    it("validates created_by property", () => {
+      assertEntityProperty.uuid(AccountRecoveryRequestEntity, "created_by");
+      assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "created_by");
+    });
+
+    it("validates modified_by property", () => {
+      assertEntityProperty.uuid(AccountRecoveryRequestEntity, "modified_by");
+      assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "modified_by");
+    });
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -57,45 +129,5 @@ describe("AccountRecoveryRequest entity", () => {
     expect(resultDtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords.length).toBe(1);
     expect(resultDtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key)
       .toEqual(dto.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key);
-  });
-
-  it("constructor returns validation error if dto required fields are missing", () => {
-    try {
-      new AccountRecoveryRequestEntity({});
-    } catch (error) {
-      expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual({
-        id: {required: 'The id is required.'},
-        status: {required: 'The status is required.'},
-      });
-    }
-  });
-
-  it("constructor returns validation error if fields do not validate", () => {
-    expect.assertions(10);
-    try {
-      new AccountRecoveryRequestEntity({
-        "id": "not-a-uuid",
-        "user_id": "not-a-uuid",
-        "armored_key": true,
-        "fingerprint": "0C1",
-        "status": "not-a-status",
-        "created": "not-a-date",
-        "modified": "not-a-date",
-        "created_by": "not-a-uuid",
-        "modified_by": "not-a-uuid",
-      });
-    } catch (error) {
-      expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('id', 'format')).toBe(true);
-      expect(error.hasError('user_id', 'format')).toBe(true);
-      expect(error.hasError('armored_key', 'type')).toBe(true);
-      expect(error.hasError('fingerprint', 'type')).toBe(true);
-      expect(error.hasError('status', 'enum')).toBe(true);
-      expect(error.hasError('created', 'format')).toBe(true);
-      expect(error.hasError('modified', 'format')).toBe(true);
-      expect(error.hasError('created_by', 'format')).toBe(true);
-      expect(error.hasError('modified_by', 'format')).toBe(true);
-    }
   });
 });

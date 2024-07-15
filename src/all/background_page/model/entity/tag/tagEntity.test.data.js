@@ -11,20 +11,20 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.6.0
  */
-import {v4 as uuidv4} from "uuid";
 
-export const defaultTagDto = (data = {}) => {
-  const id = data?.id || uuidv4();
+export const minimalTagDto = (data = {}) => ({
+  slug: "minimal-tag",
+  ...data
+});
 
-  return {
-    id: id,
-    slug: "personal-tag",
-    is_shared: false,
-    ...data
-  };
-};
+export const defaultTagDto = (data = {}) => ({
+  id: crypto.randomUUID(),
+  slug: "personal-tag",
+  is_shared: false,
+  ...data
+});
 
-export const sharedTagDto = (data = {}) => sharedTagDto({
+export const sharedTagDto = (data = {}) => defaultTagDto({
   slug: "#shared-tag",
   is_shared: true,
   ...data

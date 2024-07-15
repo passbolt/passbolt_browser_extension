@@ -11,42 +11,37 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import GroupUserEntity from "../groupUser/groupUserEntity";
 import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
 import UserEntity from "../user/userEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Group';
 const GROUP_NAME_MIN_LENGTH = 1;
 const GROUP_NAME_MAX_LENGTH = 255;
 
-class GroupEntity extends Entity {
+class GroupEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(groupDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupEntity.ENTITY_NAME,
-      groupDto,
-      GroupEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Association
     if (this._props.groups_users) {
-      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {clone: false});
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {...options, clone: false});
       delete this._props.groups_users;
     }
     if (this._props.my_group_user) {
-      this._my_group_user = new GroupUserEntity(this._props.my_group_user, {clone: false});
+      this._my_group_user = new GroupUserEntity(this._props.my_group_user, {...options, clone: false});
       delete this._props.my_group_user;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator, {clone: false});
+      this._creator = new UserEntity(this._props.creator, {...options, clone: false});
       delete this._props.creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier, {clone: false});
+      this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
       delete this._props.modifier;
     }
   }
@@ -101,30 +96,6 @@ class GroupEntity extends Entity {
 
   /*
    * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-  /**
-   * Sanitize group dto:
-   * - Remove group users which don't validate if any.
-   *
-   * @param {object} dto the group dto
-   * @returns {object}
-   */
-  static sanitizeDto(dto) {
-    if (typeof dto !== "object") {
-      return dto;
-    }
-
-    if (Object.prototype.hasOwnProperty.call(dto, 'groups_users')) {
-      dto.groups_users = GroupsUsersCollection.sanitizeDto(dto.groups_users);
-    }
-
-    return dto;
-  }
-
-  /*
-   * ==================================================
    * Serialization
    * ==================================================
    */
@@ -152,7 +123,7 @@ class GroupEntity extends Entity {
       if (contain.creator === true) {
         result.creator = this._creator.toDto();
       } else {
-        result.creator = this._creator.toDto(contain.user);
+        result.creator = this._creator.toDto(contain.creator);
       }
     }
     if (this._modifier && contain.modifier) {
@@ -208,17 +179,6 @@ class GroupEntity extends Entity {
   }
 
   /**
-   * Get deleted flag info
-   * @returns {(boolean|null)} true if deleted
-   */
-  get isDeleted() {
-    if (typeof this._props.deleted === 'undefined') {
-      return null;
-    }
-    return this._props.deleted;
-  }
-
-  /**
    * Get created date
    * @returns {(string|null)} date
    */
@@ -260,7 +220,6 @@ class GroupEntity extends Entity {
 
   /**
    * Return current user group user
-   * @todo is it still used? Consider for removal
    * @returns {(GroupUserEntity|null)}
    */
   get myGroupUser() {

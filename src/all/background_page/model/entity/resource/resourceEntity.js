@@ -13,7 +13,6 @@
  */
 import PermissionEntity from "../permission/permissionEntity";
 import PermissionsCollection from "../permission/permissionsCollection";
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import FavoriteEntity from "../favorite/favoriteEntity";
 import ResourceTypeEntity from "../resourceType/resourceTypeEntity";
 import TagsCollection from "../tag/tagsCollection";
@@ -21,7 +20,8 @@ import ResourceSecretsCollection from "../secret/resource/resourceSecretsCollect
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
-
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import UserEntity from "../user/userEntity";
 
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
@@ -29,7 +29,7 @@ const RESOURCE_USERNAME_MAX_LENGTH = 255;
 const RESOURCE_URI_MAX_LENGTH = 1024;
 const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
 
-class ResourceEntity extends Entity {
+class ResourceEntity extends EntityV2 {
   /**
    * @inheritDoc
    * @throws {EntityValidationError} Build Rule: The collection of secrets, if provided, cannot be empty.
@@ -42,37 +42,41 @@ class ResourceEntity extends Entity {
    * @throws {EntityValidationError} Build Rule: Verify that the favorite associated foreign key corresponds with
    * the resource ID.
    */
-  constructor(resourceDto, options = {}) {
-    super(EntitySchema.validate(
-      ResourceEntity.ENTITY_NAME,
-      resourceDto,
-      ResourceEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Associations
     if (this._props.permission) {
-      this._permission = new PermissionEntity(this._props.permission, {clone: false});
+      this._permission = new PermissionEntity(this._props.permission, {...options, clone: false});
       ResourceEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
-      this._permissions = new PermissionsCollection(this._props.permissions, {clone: false});
+      this._permissions = new PermissionsCollection(this._props.permissions, {...options, clone: false});
       ResourceEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
     if (this._props.secrets) {
-      this._secrets = new ResourceSecretsCollection(this._props.secrets, {clone: false});
+      this._secrets = new ResourceSecretsCollection(this._props.secrets, {...options, clone: false});
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
     if (this._props.favorite) {
-      this._favorite = new FavoriteEntity(this._props.favorite, {clone: false});
+      this._favorite = new FavoriteEntity(this._props.favorite, {...options, clone: false});
       ResourceEntity.assertValidFavorite(this._favorite, this.id);
       delete this._props.favorite;
     }
     if (this._props.tags) {
-      this._tags = new TagsCollection(this._props.tags, {clone: false});
+      this._tags = new TagsCollection(this._props.tags, {...options, clone: false});
       delete this._props.tags;
+    }
+    if (this._props.creator) {
+      this._creator = new UserEntity(this._props.creator, {...options, clone: false});
+      delete this._props._creator;
+    }
+    if (this._props.modifier) {
+      this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
+      delete this._props._modifier;
     }
   }
 
@@ -81,6 +85,7 @@ class ResourceEntity extends Entity {
    * @returns {Object} schema
    */
   static getSchema() {
+    const userSchema = UserEntity.getSchema();
     return {
       "type": "object",
       "required": [
@@ -91,41 +96,33 @@ class ResourceEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
+        "resource_type_id": {
+          "type": "string",
+          "format": "uuid"
+        },
         "name": {
           "type": "string",
           "maxLength": RESOURCE_NAME_MAX_LENGTH
         },
         "username": {
-          "anyOf": [{
-            "type": "string",
-            "maxLength": RESOURCE_USERNAME_MAX_LENGTH
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "maxLength": RESOURCE_USERNAME_MAX_LENGTH,
+          "nullable": true,
         },
         "uri": {
-          "anyOf": [{
-            "type": "string",
-            "maxLength": RESOURCE_URI_MAX_LENGTH
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "maxLength": RESOURCE_URI_MAX_LENGTH,
+          "nullable": true,
         },
         "description": {
-          "anyOf": [{
-            "type": "string",
-            "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH,
+          "nullable": true,
         },
         "expired": {
-          "anyOf": [{
-            "type": "string",
-            "format": "date-time"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "date-time",
+          "nullable": true,
         },
         "deleted": {
           "type": "boolean"
@@ -147,34 +144,25 @@ class ResourceEntity extends Entity {
           "format": "uuid"
         },
         "folder_parent_id": {
-          "anyOf": [{
-            "type": "string",
-            "format": "uuid"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "uuid",
+          "nullable": true,
         },
-        // Permissions
-        "permission": PermissionEntity.getSchema(), // current user permission
-        "permissions": PermissionsCollection.getSchema(), // all users permissions
         "personal": {
           "type": "boolean"
         },
-        // Resource types
-        "resource_type_id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "resource_type": ResourceTypeEntity.getSchema(),
-        // other Associations
+        // Associated models
         "favorite": {
-          "anyOf": [
-            FavoriteEntity.getSchema(),
-            {"type": "null"}
-          ]
+          ...FavoriteEntity.getSchema(),
+          "nullable": true,
         },
+        "permission": PermissionEntity.getSchema(), // current user permission
+        "permissions": PermissionsCollection.getSchema(), // all users permissions
+        "resource_type": ResourceTypeEntity.getSchema(),
         "secrets": ResourceSecretsCollection.getSchema(),
-        "tags": TagsCollection.getSchema()
+        "tags": TagsCollection.getSchema(),
+        "creator": userSchema,
+        "modifier": userSchema,
       }
     };
   }
@@ -195,6 +183,10 @@ class ResourceEntity extends Entity {
     if (!contain) {
       return result;
     }
+    // preserve null state
+    if (typeof this._favorite !== 'undefined' && contain.favorite) {
+      result.favorite = this._favorite === null ? null : this._favorite.toDto();
+    }
     if (this._permission && contain.permission) {
       result.permission = this._permission.toDto();
     }
@@ -207,11 +199,13 @@ class ResourceEntity extends Entity {
     if (this._secrets && contain.secrets) {
       result.secrets = this._secrets.toDto();
     }
-
-    // preserve null state
-    if (typeof this._favorite !== 'undefined' && contain.favorite) {
-      result.favorite = this._favorite === null ? null : this._favorite.toDto();
+    if (this._creator && contain.creator) {
+      result.creator = this._creator.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
     }
+    if (this._modifier && contain.modifier) {
+      result.modifier = this._modifier.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
+    }
+
     return result;
   }
 
@@ -633,7 +627,7 @@ class ResourceEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {permission: true, permissions: true, secrets: true, favorite: true, tag: true};
+    return {permission: true, permissions: true, secrets: true, favorite: true, tag: true, creator: true, modifier: true};
   }
 
   static get URI_MAX_LENGTH() {

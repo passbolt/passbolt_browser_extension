@@ -12,42 +12,28 @@
  * @since         2.13.0
  */
 import FolderEntity from "./folderEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
 const ENTITY_NAME = 'Folders';
 const RULE_UNIQUE_ID = 'unique_id';
 
-class FoldersCollection extends EntityCollection {
+class FoldersCollection extends EntityV2Collection {
   /**
    * @inheritDoc
-   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(foldersCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      FoldersCollection.ENTITY_NAME,
-      foldersCollectionDto,
-      FoldersCollection.getSchema()
-    ), options);
+  get entityClass() {
+    return FolderEntity;
+  }
 
-    /*
-     * Check if folder ids are unique
-     * Why not this.push? It is faster than adding items one by one
-     */
-    const ids = this._props.map(folder => folder.id);
-    ids.sort().sort((a, b) => {
-      if (a === b) {
-        throw new EntityCollectionError(0, FoldersCollection.RULE_UNIQUE_ID, `Folder id ${a} already exists.`);
-      }
-    });
-    // Directly push into the private property _items[]
-    this._props.forEach(folder => {
-      this._items.push(new FolderEntity(folder, {clone: false}));
-    });
-
-    // We do not keep original props
-    this._props = null;
+  /**
+   * @inheritDoc
+   * @param {object} [options.ignoreInvalidEntity=false] Ignore invalid entities.
+   * @throws {CollectionValidationError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {CollectionValidationError} Build Rule: Ensure all items in the collection are unique by name.
+   */
+  constructor(dtos = [], options = {}) {
+    super(dtos, options);
   }
 
   /**
@@ -60,6 +46,15 @@ class FoldersCollection extends EntityCollection {
       "type": "array",
       "items": FolderEntity.getSchema(),
     };
+  }
+
+  /**
+   * @inheritDoc
+   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
+   * @throws {EntityValidationError} If a folder already exists with the same id.
+   */
+  validateBuildRules(item, options) {
+    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
   }
 
   /*
@@ -233,27 +228,22 @@ class FoldersCollection extends EntityCollection {
    * ==================================================
    */
   /**
-   * Push a copy of the folder to the list
-   * @param {object} folder DTO or FolderEntity
-   * @returns {FoldersCollection}
+   * @inheritDoc
+   * This method creates caches of unique ids to improve the build rules performance.
    */
-  push(folder) {
-    if (!folder || typeof folder !== 'object') {
-      throw new TypeError(`FoldersCollection push parameter should be an object.`);
-    }
-    if (folder instanceof FolderEntity) {
-      folder = folder.toDto(FolderEntity.ALL_CONTAIN_OPTIONS); // deep clone
-    }
-    const folderEntity = new FolderEntity(folder); // validate
+  pushMany(data, entityOptions = {}, options = {}) {
+    const uniqueIdsSetCache = new Set(this.extract("id"));
+    const onItemPushed = item => {
+      uniqueIdsSetCache.add(item.id);
+    };
 
-    /*
-     * Build rules
-     * Only one folder id instance
-     */
-    this.assertUniqueId(folderEntity);
+    options = {
+      onItemPushed: onItemPushed,
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache},
+      ...options
+    };
 
-    super.push(folderEntity);
-    return this;
+    super.pushMany(data, entityOptions, options);
   }
 
   /**

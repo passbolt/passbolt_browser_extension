@@ -46,7 +46,7 @@ class ResourceTypeLocalStorage {
   /**
    * Set the resourceTypes in local storage.
    * @param {ResourceTypesCollection} resourceTypesCollection The folders to insert in the local storage.
-   * @return {void}
+   * @return {Promise<void>}
    */
   static async set(resourceTypesCollection) {
     await lock.acquire();

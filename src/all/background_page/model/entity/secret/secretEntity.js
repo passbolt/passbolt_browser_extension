@@ -11,25 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Secret';
 
-class SecretEntity extends Entity {
+class SecretEntity extends EntityV2 {
   /**
    * @inheritDoc
    * @throws {EntityValidationError} Build Rule: Verify the data is a valid openpgp message.
    */
-  constructor(secretDto, options = {}) {
-    super(EntitySchema.validate(
-      SecretEntity.ENTITY_NAME,
-      secretDto,
-      SecretEntity.getSchema()
-    ), options);
-
-    SecretEntity.assertValidMessage(this._props.data);
+  constructor(dto, options = {}) {
+    super(dto, options);
   }
 
   /**
@@ -70,6 +63,16 @@ class SecretEntity extends Entity {
     };
   }
 
+  /**
+   * @inheritDoc
+   * @throw {EntityValidationError} If the data is not formatted as a valid pgp message.
+   *
+   */
+  // eslint-disable-next-line no-unused-vars
+  validateBuildRules(options = {}) {
+    SecretEntity.assertValidMessage(this._props.data);
+  }
+
   /*
    * ==================================================
    * Dynamic properties getters
@@ -93,18 +96,18 @@ class SecretEntity extends Entity {
 
   /**
    * Get secret user id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get userId() {
-    return this._props.user_id;
+    return this._props.user_id || null;
   }
 
   /**
    * Get secret resource id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get resourceId() {
-    return this._props.resource_id;
+    return this._props.resource_id || null;
   }
 
   /**
@@ -141,6 +144,7 @@ class SecretEntity extends Entity {
    * @param {string} message
    * @return {EntityValidationError} if the message is not a valid armored block
    * TODO a-fA-F0-9\=... before readArmored
+   * TODO this format validation should be part of the json schema.
    */
   static assertValidMessage(message) {
     const error = new EntityValidationError('This is not a valid OpenPGP armored message');

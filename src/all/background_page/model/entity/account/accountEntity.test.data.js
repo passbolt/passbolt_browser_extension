@@ -14,7 +14,7 @@
 
 import AccountEntity from "./accountEntity";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
-import {pgpKeys} from '../../../../../../test/fixtures/pgpKeys/keys';
+import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 
 export const defaultAccountDto = (data = {}) => {
   data = JSON.parse(JSON.stringify(data));

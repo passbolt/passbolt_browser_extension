@@ -11,11 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import GroupEntity from "../group/groupEntity";
 import UserEntity from "../user/userEntity";
 import Validator from "validator";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Permission';
 const PERMISSION_OWNER = 15;
@@ -26,24 +25,20 @@ const ARO_USER = 'User';
 const ACO_RESOURCE = 'Resource';
 const ACO_FOLDER = 'Folder';
 
-class PermissionEntity extends Entity {
+class PermissionEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(permissionDto, options = {}) {
-    super(EntitySchema.validate(
-      PermissionEntity.ENTITY_NAME,
-      permissionDto,
-      PermissionEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Associated models
     if (this._props.user) {
-      this._user = new UserEntity(this._props.user, {clone: false});
+      this._user = new UserEntity(this._props.user, {...options, clone: false});
       delete this._props.user;
     }
     if (this._props.group) {
-      this._group = new GroupEntity(this._props.group, {clone: false});
+      this._group = new GroupEntity(this._props.group, {...options, clone: false});
       delete this._props.group;
     }
   }

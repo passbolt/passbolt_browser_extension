@@ -9,14 +9,16 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.7.0
+ * @since         4.9.0
  */
 
-import {v4 as uuid} from "uuid";
-
-if (!global.crypto) {
-  global.crypto = {};
-}
-if (!global.crypto.randomUUID) {
-  global.crypto.randomUUID = uuid;
-}
+/**
+ * Default avatar url dto.
+ * @param {object} data The data to override
+ * @returns {object}
+ */
+export const defaultAvatarUrlDto = (data = {}) => ({
+  "medium": "img\/avatar\/user_medium.png",
+  "small": "img\/avatar\/user.png",
+  ...data
+});

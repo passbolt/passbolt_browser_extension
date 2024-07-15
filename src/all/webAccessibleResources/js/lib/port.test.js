@@ -42,22 +42,22 @@ describe("Port", () => {
     });
 
     it("Should raise an error if context is invalid and send destroy message", async() => {
-      expect.assertions(4);
+      expect.assertions(3);
 
       const portname = uuidv4();
       const port = new Port(portname);
+      const callback = jest.fn();
+      port.onConnectError(callback);
 
       jest.spyOn(browser.runtime, "connect").mockImplementationOnce(() => { throw new Error("context invalid"); });
-      jest.spyOn(port, "destroyContentScript");
-      jest.spyOn(port, "_onMessage");
+      jest.spyOn(port.onConnectErrorHandler, "callback");
 
       expect(port._connected).toBeFalsy();
       try {
         await port.connect();
       } catch (error) {
         expect(browser.runtime.connect).toHaveBeenCalledWith({name: portname});
-        expect(port.destroyContentScript).toHaveBeenCalled();
-        expect(port._onMessage).toHaveBeenCalledWith(JSON.stringify(["passbolt.content-script.destroy"]));
+        expect(port.onConnectErrorHandler.callback).toHaveBeenCalled();
       }
     });
   });

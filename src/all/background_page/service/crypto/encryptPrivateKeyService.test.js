@@ -13,7 +13,7 @@
  */
 
 import EncryptPrivateKeyService from "./encryptPrivateKeyService";
-import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
+import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 import DecryptPrivateKeyService from './decryptPrivateKeyService';
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 

@@ -11,17 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PermissionEntity from "../permission/permissionEntity";
 import PermissionsCollection from "../permission/permissionsCollection";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Folder';
 const FOLDER_NAME_MIN_LENGTH = 1;
 const FOLDER_NAME_MAX_LENGTH = 256;
 
-class FolderEntity extends Entity {
+class FolderEntity extends EntityV2 {
   /**
    * @inheritDoc
    * Note: Sanitize, if not provided, the DTO folder parent id should be null.
@@ -30,17 +30,8 @@ class FolderEntity extends Entity {
    * @throws {EntityValidationError} Build Rule: Verify that the permissions are designated for a folder, and their
    * associated aco foreign keys correspond with the folder ID.
    */
-  constructor(folderDto, options = {}) {
-    super(EntitySchema.validate(
-      FolderEntity.ENTITY_NAME,
-      folderDto,
-      FolderEntity.getSchema()
-    ), options);
-
-    // if no parent id specified set it to null
-    if (!Object.prototype.hasOwnProperty.call(this._props, 'folder_parent_id')) {
-      this._props.folder_parent_id = null;
-    }
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Associations
     if (this._props.permission) {
@@ -53,6 +44,17 @@ class FolderEntity extends Entity {
       FolderEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  marshall() {
+    // if no parent id specified set it to null
+    if (!Object.prototype.hasOwnProperty.call(this._props, 'folder_parent_id')) {
+      this._props.folder_parent_id = null;
+    }
+    super.marshall();
   }
 
   /**
@@ -71,12 +73,9 @@ class FolderEntity extends Entity {
           "format": "uuid"
         },
         "folder_parent_id": {
-          "anyOf": [{
-            "type": "string",
-            "format": "uuid"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "uuid",
+          "nullable": true,
         },
         "name": {
           "type": "string",

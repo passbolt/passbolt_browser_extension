@@ -85,18 +85,12 @@ class ExportResourcesFileEntity extends Entity {
           "enum": ExportResourcesFileEntity.SUPPORTED_FORMAT
         },
         "resources_ids": {
-          "anyOf": [{
-            "type": "array",
-          }, {
-            "type": "null"
-          }]
+          "type": "array",
+          "nullable": true,
         },
         "folders_ids": {
-          "anyOf": [{
-            "type": "array",
-          }, {
-            "type": "null"
-          }]
+          "type": "array",
+          "nullable": true,
         },
         "export_resources": ExternalResourcesCollection.getSchema(),
         "export_folders": ExternalFoldersCollection.getSchema(),
@@ -109,19 +103,13 @@ class ExportResourcesFileEntity extends Entity {
               "required": [],
               "properties": {
                 "password": {
-                  "anyOf": [{
-                    "type": "string",
-                  }, {
-                    "type": "null"
-                  }]
+                  "type": "string",
+                  "nullable": true,
                 },
                 "keyfile": {
-                  "anyOf": [{
-                    "type": "string",
-                    "format": "x-base64"
-                  }, {
-                    "type": "null"
-                  }]
+                  "type": "string",
+                  "format": "x-base64",
+                  "nullable": true,
                 }
               }
             }

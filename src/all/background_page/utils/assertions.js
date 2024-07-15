@@ -123,7 +123,7 @@ export const assertValidInitialisationVector = initialisationVector => {
 };
 
 /**
- * Assert that the given parameter is a valid UUID.
+ * Assert that the given parameter is a valid string.
  * @param {string} str the parameter to validate
  * @param {string} [errorMessage] the message to throw withing the Error if any
  * @throws {Error} if the parameter is not valid
@@ -156,6 +156,18 @@ export const assertType = (object, expectedType, errorMessage = "The given data 
  */
 export const assertBoolean = (value, errorMessage = "The given parameter is not a valid boolean") => {
   if (typeof value !== 'undefined' && typeof value !== 'boolean') {
+    throw new TypeError(errorMessage);
+  }
+};
+
+/**
+ * Assert that the given parameter is a valid array.
+ * @param {Array} data the parameter to validate
+ * @param {string} [errorMessage] the message to throw withing the Error if any
+ * @throws {Error} if the parameter is not valid
+ */
+export const assertArray = (data, errorMessage = "The given parameter is not a valid array") => {
+  if (!Array.isArray(data)) {
     throw new TypeError(errorMessage);
   }
 };

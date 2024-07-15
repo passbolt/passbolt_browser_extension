@@ -11,34 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import GroupUserEntity from "./groupUserEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-
 
 const ENTITY_NAME = 'GroupsUsers';
 
-class GroupsUsersCollection extends EntityCollection {
+class GroupsUsersCollection extends EntityV2Collection {
   /**
    * @inheritDoc
    */
-  constructor(groupsUsersDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupsUsersCollection.ENTITY_NAME,
-      groupsUsersDto,
-      GroupsUsersCollection.getSchema()
-    ), options);
-
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(groupUser => {
-      this.push(new GroupUserEntity(groupUser, {clone: false}));
-    });
-
-    // We do not keep original props
-    this._props = null;
+  get entityClass() {
+    return GroupUserEntity;
   }
 
   /**
@@ -101,26 +84,6 @@ class GroupsUsersCollection extends EntityCollection {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
-  }
-
-  /*
-   * ==================================================
-   * Setters
-   * ==================================================
-   */
-  /**
-   * Push a copy of the groupUser to the list
-   * @param {object} groupUser DTO or GroupUserEntity
-   */
-  push(groupUser) {
-    if (!groupUser || typeof groupUser !== 'object') {
-      throw new TypeError(`GroupUsersEntity push parameter should be an object.`);
-    }
-    if (groupUser instanceof GroupUserEntity) {
-      groupUser = groupUser.toDto(GroupUserEntity.ALL_CONTAIN_OPTIONS); // clone
-    }
-    groupUser = new GroupUserEntity(groupUser); // validate
-    super.push(groupUser);
   }
 
   /*

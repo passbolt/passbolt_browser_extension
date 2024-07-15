@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import each from "jest-each";
-import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
+import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 import ValidatePrivateGpgKeySetupController from './validatePrivateGpgKeySetupController';
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 

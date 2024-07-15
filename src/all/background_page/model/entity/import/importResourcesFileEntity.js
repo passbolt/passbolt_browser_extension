@@ -71,6 +71,7 @@ class ImportResourcesFileEntity extends Entity {
         },
         "file": {
           "type": "string",
+          //@todo replace with pattern check instead
           "format": "x-base64"
         },
         "file_type": {
@@ -92,19 +93,13 @@ class ImportResourcesFileEntity extends Entity {
               "required": [],
               "properties": {
                 "password": {
-                  "anyOf": [{
-                    "type": "string",
-                  }, {
-                    "type": "null"
-                  }]
+                  "type": "string",
+                  "nullable": true,
                 },
                 "keyfile": {
-                  "anyOf": [{
-                    "type": "string",
-                    "format": "x-base64"
-                  }, {
-                    "type": "null"
-                  }]
+                  "type": "string",
+                  "format": "x-base64",
+                  "nullable": true,
                 }
               }
             }

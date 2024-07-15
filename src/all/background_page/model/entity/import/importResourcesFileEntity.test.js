@@ -10,13 +10,89 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ImportResourcesFileEntity from "./importResourcesFileEntity";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("ImportResourcesFileEntity entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(ImportResourcesFileEntity.ENTITY_NAME, ImportResourcesFileEntity.getSchema());
+  describe("ExternalGpgKeyEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(ImportResourcesFileEntity.ENTITY_NAME, ImportResourcesFileEntity.getSchema());
+    });
+
+    it("validates ref property", () => {
+      const successScenarios = assertEntityProperty.SUCCESS_STRING_SCENARIOS;
+
+      const failingTypeScenarios = [
+        assertEntityProperty.SCENARIO_NULL,
+        assertEntityProperty.SCENARIO_INTEGER,
+        assertEntityProperty.SCENARIO_OBJECT,
+        assertEntityProperty.SCENARIO_FALSE,
+      ];
+
+      const failingPatternScenario = [
+        {scenario: "string not respecting pattern", value: "test//test"}
+      ];
+
+      assertEntityProperty.string(ImportResourcesFileEntity, "ref");
+      assertEntityProperty.assert(ImportResourcesFileEntity, "ref", successScenarios, failingTypeScenarios, "type");
+      assertEntityProperty.assert(ImportResourcesFileEntity, "ref", successScenarios, failingPatternScenario, "pattern");
+      assertEntityProperty.required(ImportResourcesFileEntity, "ref");
+    });
+
+    it("validates file property", () => {
+      const successScenarios = [
+        {scenario: "base64 string", value: "cGFzc2JvbHQ="},
+      ];
+
+      const failingTypeScenarios = [
+        assertEntityProperty.SCENARIO_NULL,
+        assertEntityProperty.SCENARIO_INTEGER,
+        assertEntityProperty.SCENARIO_OBJECT,
+        assertEntityProperty.SCENARIO_FALSE,
+      ];
+
+      const failingPatternScenario = [
+        {scenario: "string not using base64 charset", value: "!!!!"},
+      ];
+
+      assertEntityProperty.string(ImportResourcesFileEntity, "file");
+      assertEntityProperty.assert(ImportResourcesFileEntity, "file", successScenarios, failingTypeScenarios, "type");
+      assertEntityProperty.assert(ImportResourcesFileEntity, "file", successScenarios, failingPatternScenario, "format");
+      assertEntityProperty.required(ImportResourcesFileEntity, "file");
+    });
+
+    it("validates file_type property", () => {
+      const rightValues = ["csv", "kdbx"];
+      const wrongValues = ["test", "file"];
+      assertEntityProperty.string(ImportResourcesFileEntity, "file_type");
+      assertEntityProperty.enumeration(ImportResourcesFileEntity, "file_type", rightValues, wrongValues);
+      assertEntityProperty.required(ImportResourcesFileEntity, "file_type");
+    });
+
+    it("validates options property", () => {
+      const correctOptions = [
+        {folders: true, tags: false, credentials: {password: null, file: "test=="}},
+        {folders: false, tags: true, credentials: {password: "password", file: null}},
+      ];
+      const successScenarios = [
+        assertEntityProperty.SCENARIO_ARRAY,
+        {scenario: "with valid options", value: correctOptions}
+      ];
+
+      const failingScenarios = [
+        assertEntityProperty.SCENARIO_INTEGER,
+        assertEntityProperty.SCENARIO_STRING,
+        assertEntityProperty.SCENARIO_FALSE,
+        /*
+         * @todo add scenario when nested object will be checked
+         * {folders: null, tags: "3", credentials: null},
+         */
+      ];
+
+      assertEntityProperty.assert(ImportResourcesFileEntity, "options", successScenarios, failingScenarios, "type");
+      assertEntityProperty.notRequired(ImportResourcesFileEntity, "options");
+    });
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -37,47 +113,5 @@ describe("ImportResourcesFileEntity entity", () => {
     expect(entity.credentials).toEqual({});
     expect(entity.password).toBeUndefined();
     expect(entity.keyfile).toBeUndefined();
-  });
-
-  it("constructor returns validation error if dto required fields are missing", () => {
-    try {
-      new ImportResourcesFileEntity({});
-      expect(true).toBeFalsy();
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('file', 'required')).toBe(true);
-      expect(error.hasError('file_type', 'required')).toBe(true);
-      expect(error.hasError('ref', 'required')).toBe(true);
-    }
-  });
-
-  it("constructor returns validation error if dto fields are invalid", () => {
-    try {
-      new ImportResourcesFileEntity({
-        "ref": true,
-        "file_type": 145,
-        "file": "not a base64 string",
-        "options": {
-          "folders": "oui",
-          "tags": "non",
-          "credentials": {
-            "password": {},
-            "keyfile": "not a base64 string",
-          }
-        }
-      });
-      expect(true).toBeFalsy();
-    } catch (error) {
-      expect(error).toBeInstanceOf(EntityValidationError);
-      expect(error.hasError('file')).toBe(true);
-      expect(error.hasError('file_type')).toBe(true);
-      expect(error.hasError('ref')).toBe(true);
-      /*
-       * expect(error.hasError('tags')).toBe(true);
-       * expect(error.hasError('folders')).toBe(true);
-       * expect(error.hasError('password')).toBe(true);
-       * expect(error.hasError('keyfile')).toBe(true);
-       */
-    }
   });
 });

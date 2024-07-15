@@ -33,7 +33,7 @@ const {
   ecc_brainpoolp512r1KeyDto,
   invalidKeyDto
 } = require('./getGpgKeyInfoService.test.data');
-const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
+const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 
 
 describe("GpgKeyInfo service", () => {

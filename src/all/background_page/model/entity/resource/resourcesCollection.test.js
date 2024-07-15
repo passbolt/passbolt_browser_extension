@@ -13,7 +13,6 @@
  */
 import ResourcesCollection from "./resourcesCollection";
 import TagEntity from "../tag/tagEntity";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import TagsCollection from "../tag/tagsCollection";
 import {
@@ -22,264 +21,254 @@ import {
   TEST_RESOURCE_TYPE_PASSWORD_STRING,
   TEST_RESOURCE_TYPE_TOTP
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {resourceAllTypesDtosCollection} from "./resourcesCollection.test.data";
+import {defaultResourcesDtos, resourceAllTypesDtosCollection} from "./resourcesCollection.test.data";
 import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import ResourceEntity from "./resourceEntity";
+import {defaultTagDto} from "../tag/tagEntity.test.data";
+import expect from "expect";
+import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 
-describe("Resources Collection", () => {
+describe("ResourcesCollection", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(ResourcesCollection.ENTITY_NAME, ResourcesCollection.getSchema());
   });
-  it("constructor works if valid minimal DTO is provided", () => {
-    const resource1 = {
-      "name": "resource1",
-    };
-    const resource2 = {
-      "name": "resource2",
-    };
-    const dto = [resource1, resource2];
-    const collection = new ResourcesCollection(dto);
-    expect(collection.toDto()).toEqual(dto);
-    expect(JSON.stringify(collection)).toEqual(JSON.stringify(dto));
-    expect(collection.items[0].name).toEqual('resource1');
-    expect(collection.items[1].name).toEqual('resource2');
+
+  describe("::constructor", () => {
+    it("works with empty data", () => {
+      expect.assertions(1);
+      const collection = new ResourcesCollection([]);
+      expect(collection).toHaveLength(0);
+    });
+
+    it("works if valid minimal DTO is provided", () => {
+      expect.assertions(5);
+      const dto1 = {"name": "resource1"};
+      const dto2 = {"name": "resource2"};
+      const dtos = [dto1, dto2];
+      const collection = new ResourcesCollection(dtos);
+      expect(collection.toDto()).toEqual(dtos);
+      expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
+      expect(collection).toHaveLength(2);
+      expect(collection.items[0].name).toEqual('resource1');
+      expect(collection.items[1].name).toEqual('resource2');
+    });
+
+    it("works if valid complete DTOs are provided", () => {
+      expect.assertions(4);
+      const dto1 = defaultResourceDto({"name": "resource1"});
+      const dto2 = defaultResourceDto({"name": "resource2"});
+      const dtos = [dto1, dto2];
+      const collection = new ResourcesCollection(dtos);
+      expect(collection).toHaveLength(2);
+      expect(collection.toDto()).toEqual(dtos);
+      expect(collection.items[0].id).toEqual(dto1.id);
+      expect(collection.items[1].id).toEqual(dto2.id);
+    });
+
+    it("works if valid complete entities are provided", () => {
+      expect.assertions(3);
+      const entity1 = new ResourceEntity(defaultResourceDto());
+      const entity2 = new ResourceEntity(defaultResourceDto());
+      const dtos = [entity1, entity2];
+      const collection = new ResourcesCollection(dtos);
+      expect(collection).toHaveLength(2);
+      expect(collection.items[0].id).toEqual(entity1.id);
+      expect(collection.items[1].id).toEqual(entity2.id);
+    });
+
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new ResourcesCollection({}))
+        .toThrowEntityValidationError("items");
+    });
+
+    it("should throw if one of data item does not validate the collection entity schema", () => {
+      const dto1 = defaultResourceDto();
+      const dto2 = defaultResourceDto({id: 42});
+
+      expect.assertions(1);
+      expect(() => new ResourcesCollection([dto1, dto2]))
+        .toThrowCollectionValidationError("1.id.type");
+    });
+
+    it("should throw if one of data item does not validate the unique id build rule", () => {
+      const dto1 = defaultResourceDto();
+      const dto2 = defaultResourceDto({id: dto1.id});
+
+      expect.assertions(1);
+      expect(() => new ResourcesCollection([dto1, dto2]))
+        .toThrowCollectionValidationError("1.id.unique");
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
+      const dto1 = defaultResourceDto();
+      const dto2 = defaultResourceDto({username: 42});
+
+      expect.assertions(2);
+      const collection = new ResourcesCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      expect(collection.items).toHaveLength(1);
+      expect(collection.items[0].id).toEqual(dto1.id);
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate the unique id build rule", () => {
+      const dto1 = defaultResourceDto({username: "user1@passbolt.com"});
+      const dto2 = defaultResourceDto({id: dto1.id, username: "user2@passbolt.com"});
+
+      expect.assertions(2);
+      const collection = new ResourcesCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      expect(collection.items).toHaveLength(1);
+      expect(collection.items[0].id).toEqual(dto1.id);
+    });
+
+    // @todo ignoreInvalidEntity option is not yet passed to associated entities and collections, therefore the parent entity is ignored.
+    it.failing("should, with enabling the ignore invalid option, ignore items associated permissions entities which do not validate their entity schema validation", () => {
+      const dto1 = defaultResourceDto({}, {withPermissions: true});
+      const dto2 = defaultResourceDto({
+        permissions: [
+          ownerPermissionDto({aco_foreign_key: 42})
+        ]
+      });
+      const dto3 = defaultResourceDto({}, {withPermissions: true});
+
+      expect.assertions(1);
+      const collection = new ResourcesCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
+      expect(collection.items).toHaveLength(3);
+      expect(collection.items[0].id).toEqual(dto1.id);
+      expect(collection.items[0]._permissions).toHaveLength(1);
+      expect(collection.items[1].id).toEqual(dto2.id);
+      expect(collection.items[1]._permissions).toHaveLength(0);
+      expect(collection.items[2].id).toEqual(dto3.id);
+      expect(collection.items[2]._permissions).toHaveLength(1);
+    });
   });
 
-  it("constructor works if valid DTO is provided", () => {
-    const resource1 = {
-      "id": "10801423-4151-42a4-99d1-86e66145a08c",
-      "name": "resource1",
-      "username": "",
-      "uri": "",
-      "description": "",
-      "deleted": false,
-      "created": "2020-05-04T20:31:45+00:00",
-      "modified": "2020-05-04T20:31:45+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff"
-    };
-    const resource2 = {
-      "id": "692af28a-58eb-4306-aab7-ab284b6141b3",
-      "name": "resource2",
-      "username": "",
-      "uri": "",
-      "description": "",
-      "deleted": false,
-      "created": "2020-05-08T10:03:11+00:00",
-      "modified": "2020-05-08T10:03:11+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "folder_parent_id": null
-    };
-    const dto = [resource1, resource2];
-    const entity = new ResourcesCollection(dto);
-    expect(entity.toDto()).toEqual(dto);
-    expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
-    expect(entity.items[0].name).toEqual('resource1');
-    expect(entity.items[1].name).toEqual('resource2');
-    expect(entity.folderParentIds).toEqual(['e2172205-139c-4e4b-a03a-933528123fff']);
+  describe(":pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const count = 10_000;
+      const options = {withCreator: true, withModifier: true, withPermissions: 10, withFavorite: true};
+      const dtos = defaultResourcesDtos(count, {}, options);
+
+      const start = performance.now();
+      const collection = new ResourcesCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(count);
+      expect(time).toBeLessThan(10_000);
+    });
   });
 
-  it("constructor fails if reusing same resource", () => {
-    const resource1 = {
-      "id": "692af28a-58eb-4306-aab7-ab284b6141b3",
-      "name": "resource1"
-    };
-    const dto = [resource1, resource1];
+  describe("::removeTagById", () => {
+    it("removeTagById works", () => {
+      const tagDto1 = defaultTagDto({slug: "tag 1"});
+      const tagDto2 = defaultTagDto({slug: "tag 2"});
+      const resourceDto1 = defaultResourceDto({tags: [tagDto1, tagDto2]});
+      const resourceDto2 = defaultResourceDto({tags: [tagDto1]});
+      const resourceDto3 = defaultResourceDto({tags: [tagDto2]});
+      const resourceDto4 = defaultResourceDto();
+      const dtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
+      const resourcesCollection = new ResourcesCollection(dtos);
 
-    const t = () => {
-      new ResourcesCollection(dto);
-    };
-    expect(t).toThrow(EntityCollectionError);
+      // remove existing tag
+      expect(resourcesCollection.removeTagById(tagDto1.id)).toBe(true);
+      expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tagDto2]);
+      expect(resourcesCollection.resources[1].tags.toDto()).toEqual([]);
+      expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tagDto2]);
+      expect(resourcesCollection.resources[3].tags).toBeNull();
+
+      // try to remove non existing tag
+      expect(resourcesCollection.removeTagById(crypto.randomUUID())).toBe(false);
+      expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tagDto2]);
+      expect(resourcesCollection.resources[1].tags.toDto()).toEqual([]);
+      expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tagDto2]);
+      expect(resourcesCollection.resources[3].tags).toBeNull();
+    });
   });
 
-  it("constructor fails if reusing same id", () => {
-    const resource1 = {
-      "id": "10801423-4151-42a4-99d1-86e66145a08c",
-      "name": "resource1",
-    };
-    const resource2 = {
-      "name": "resource2"
-    };
-    const resource3 = {
-      "id": "10801423-4151-42a4-99d1-86e66145a08c",
-      "name": "resource3",
-    };
-    const dto = [resource1, resource2, resource3];
+  describe("::replaceTag", () => {
+    it("update tag works", () => {
+      const tagDto1 = defaultTagDto({slug: "tag 1"});
+      const updatedTagDto1 = defaultTagDto({id: tagDto1.id, slug: "updated tag 1"});
+      const tagDto2 = defaultTagDto({slug: "tag 2"});
+      const tagDto3 = defaultTagDto({slug: "tag 3"});
+      const resourceDto1 = defaultResourceDto({tags: [tagDto1, tagDto2]});
+      const resourceDto2 = defaultResourceDto({tags: [tagDto1]});
+      const resourceDto3 = defaultResourceDto({tags: [tagDto2]});
+      const resourceDto4 = defaultResourceDto();
+      const dtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
+      const resourcesCollection = new ResourcesCollection(dtos);
 
-    const t = () => {
-      new ResourcesCollection(dto);
-    };
-    expect(t).toThrow(EntityCollectionError);
+      // Try to update existing tag
+      expect(resourcesCollection.replaceTag(tagDto1.id, new TagEntity(updatedTagDto1))).toBe(true);
+      expect(resourcesCollection.resources[0].tags.toDto()).toEqual([updatedTagDto1, tagDto2]);
+      expect(resourcesCollection.resources[1].tags.toDto()).toEqual([updatedTagDto1]);
+      expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tagDto2]);
+      expect(resourcesCollection.resources[3].tags).toBeNull();
+
+      // Try to update non existing tag
+      expect(resourcesCollection.replaceTag(tagDto3.id, new TagEntity(tagDto3))).toBe(false);
+      expect(resourcesCollection.resources[0].tags.toDto()).toEqual([updatedTagDto1, tagDto2]);
+      expect(resourcesCollection.resources[1].tags.toDto()).toEqual([updatedTagDto1]);
+      expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tagDto2]);
+      expect(resourcesCollection.resources[3].tags).toBeNull();
+    });
   });
 
-  it("constructor works with empty collection", () => {
-    const collection = new ResourcesCollection([]);
-    expect(collection.folderParentIds).toEqual([]);
+  describe("::bulkReplaceTagsCollection", () => {
+    it("bulk replace tag works", () => {
+      const tagDto1 = defaultTagDto({slug: "tag 1"});
+      const tagDto2 = defaultTagDto({slug: "tag 2"});
+      const tagDto3 = defaultTagDto({slug: "tag 3"});
+      const resourceDto1 = defaultResourceDto({tags: [tagDto1, tagDto2]});
+      const resourceDto2 = defaultResourceDto({tags: [tagDto1]});
+      const resourceDto3 = defaultResourceDto({tags: [tagDto2]});
+      const resourceDto4 = defaultResourceDto();
+      const dtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
+      const resourcesCollection = new ResourcesCollection(dtos);
+
+      const tagsCollections = [];
+      const resourceIds = [];
+
+      // resource not in collection
+      resourceIds.push(crypto.randomUUID());
+      tagsCollections.push(new TagsCollection([tagDto1, tagDto3]));
+
+      // resource tag not edited
+      resourceIds.push(resourceDto1.id);
+      tagsCollections.push(new TagsCollection([tagDto1, tagDto2]));
+
+      // resource tags edited
+      resourceIds.push(resourceDto2.id);
+      tagsCollections.push(new TagsCollection([tagDto2, tagDto3]));
+
+      // resource tags removed
+      resourceIds.push(resourceDto3.id);
+      tagsCollections.push(new TagsCollection([]));
+
+      // resource tags added
+      resourceIds.push(resourceDto4.id);
+      tagsCollections.push(new TagsCollection([tagDto1]));
+
+      const result = resourcesCollection.bulkReplaceTagsCollection(resourceIds, tagsCollections);
+
+      expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tagDto1, tagDto2]);
+      expect(resourcesCollection.resources[1].tags.toDto()).toEqual([tagDto2, tagDto3]);
+      expect(resourcesCollection.resources[2].tags.toDto()).toEqual([]);
+      expect(resourcesCollection.resources[3].tags.toDto()).toEqual([tagDto1]);
+      expect(result).toEqual(4);
+    });
   });
 
-  it("removeTagById works", () => {
-    const tag1 = {
-      "id": "45ce85c9-e301-4de2-8b41-298507002861",
-      "is_shared": false,
-      "slug": 'tag1'
-    };
-    const tag2 = {
-      "id": "45ce85c9-e301-4de2-8b41-298507002862",
-      "is_shared": false,
-      "slug": 'tag2'
-    };
-    const dto = [{
-      "name": "resource1",
-      "tags": [tag1, tag2]
-    }, {
-      "name": "resource2",
-      "tags": [tag1]
-    }, {
-      "name": "resource3",
-      "tags": [tag2]
-    }, {
-      "name": "resource4"
-    }];
-    const resourcesCollection = new ResourcesCollection(dto);
-
-    // remove existing tag
-    expect(resourcesCollection.removeTagById('45ce85c9-e301-4de2-8b41-298507002861')).toBe(true);
-    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tag2]);
-    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([]);
-    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
-    expect(resourcesCollection.resources[3].tags).toBeNull();
-
-    // try to remove non existing tag
-    expect(resourcesCollection.removeTagById('45ce85c9-e301-4de2-8b41-298507002863')).toBe(false);
-    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tag2]);
-    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([]);
-    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
-    expect(resourcesCollection.resources[3].tags).toBeNull();
-  });
-
-  it("update tag works", () => {
-    const tag1 = {
-      "id": "45ce85c9-e301-4de2-8b41-298507002861",
-      "is_shared": false,
-      "slug": 'tag1'
-    };
-    const updatedTag1 = {
-      "id": "45ce85c9-e301-4de2-8b41-298507002861",
-      "is_shared": false,
-      "slug": 'updated_tag1'
-    };
-    const tag2 = {
-      "id": "45ce85c9-e301-4de2-8b41-298507002862",
-      "is_shared": false,
-      "slug": 'tag2'
-    };
-    const tag3 = {
-      "id": "45ce85c9-e301-4de2-8b41-298507002863",
-      "is_shared": false,
-      "slug": 'tag3'
-    };
-    const dto = [{
-      "name": "resource1",
-      "tags": [tag1, tag2]
-    }, {
-      "name": "resource2",
-      "tags": [tag1]
-    }, {
-      "name": "resource3",
-      "tags": [tag2]
-    }, {
-      "name": "resource4"
-    }];
-    const resourcesCollection = new ResourcesCollection(dto);
-
-    // Try to update existing tag
-    expect(resourcesCollection.replaceTag(updatedTag1.id, new TagEntity(updatedTag1))).toBe(true);
-    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([updatedTag1, tag2]);
-    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([updatedTag1]);
-    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
-    expect(resourcesCollection.resources[3].tags).toBeNull();
-
-    // Try to update non existing tag
-    expect(resourcesCollection.replaceTag(tag3.id, new TagEntity(tag3))).toBe(false);
-    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([updatedTag1, tag2]);
-    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([updatedTag1]);
-    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
-    expect(resourcesCollection.resources[3].tags).toBeNull();
-  });
-
-  it("bulk replace tag works", () => {
-    const tag1 = {"id": "45ce85c9-e301-4de2-8b41-298507002861", "is_shared": false, "slug": 'tag1'};
-    const tag2 = {"id": "45ce85c9-e301-4de2-8b41-298507002862", "is_shared": false, "slug": 'tag2'};
-    const tag3 = {"id": "45ce85c9-e301-4de2-8b41-298507002863", "is_shared": false, "slug": 'tag3'};
-    const dto = [{
-      "id": "45ce85c9-e301-4de2-8b41-298507002851",
-      "name": "resource1",
-      "tags": [tag1, tag2]
-    }, {
-      "id": "45ce85c9-e301-4de2-8b41-298507002852",
-      "name": "resource2",
-      "tags": [tag1]
-    }, {
-      "id": "45ce85c9-e301-4de2-8b41-298507002853",
-      "name": "resource3",
-      "tags": [tag2]
-    }, {
-      "id": "45ce85c9-e301-4de2-8b41-298507002854",
-      "name": "resource4"
-    }];
-    const resourcesCollection = new ResourcesCollection(dto);
-
-    const tagsCollections = [];
-    const resourceIds = [];
-
-    // resource not in collection
-    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002850");
-    tagsCollections.push(new TagsCollection([tag1, tag3]));
-
-    // resource tag not edited
-    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002851");
-    tagsCollections.push(new TagsCollection([tag1, tag2]));
-
-    // resource tags edited
-    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002852");
-    tagsCollections.push(new TagsCollection([tag2, tag3]));
-
-    // resource tags removed
-    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002853");
-    tagsCollections.push(new TagsCollection([]));
-
-    // resource tags added
-    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002854");
-    tagsCollections.push(new TagsCollection([tag1]));
-
-    const result = resourcesCollection.bulkReplaceTagsCollection(resourceIds, tagsCollections);
-
-    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tag1, tag2]);
-    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([tag2, tag3]);
-    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([]);
-    expect(resourcesCollection.resources[3].tags.toDto()).toEqual([tag1]);
-    expect(result).toEqual(4);
-  });
-
-  describe("sanitizeDto", () => {
+  describe("::sanitizeDto", () => {
     it("sanitizeDto should remove duplicated resource ids", () => {
-      const resource1 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a08c",
-        "name": "resource1",
-      };
-      const resource2 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a08c",
-        "name": "resource1",
-      };
+      const resourceDto1 = defaultResourceDto();
+      const resourceDto2 = defaultResourceDto({id: resourceDto1.id});
 
-      const santitizedDto = ResourcesCollection.sanitizeDto([resource1, resource2]);
+      const santitizedDto = ResourcesCollection.sanitizeDto([resourceDto1, resourceDto2]);
       expect(santitizedDto).toHaveLength(1);
-      expect(santitizedDto).toEqual(expect.arrayContaining([resource1]));
+      expect(santitizedDto).toEqual(expect.arrayContaining([resourceDto1]));
 
       const collection = new ResourcesCollection(santitizedDto);
       expect(collection).toHaveLength(1);
@@ -294,7 +283,7 @@ describe("Resources Collection", () => {
     });
   });
 
-  describe("ResourceCollection::filterByResourceTypes", () => {
+  describe("::filterByResourceTypes", () => {
     it("should filter the collection by all supported resources types and keep all resources having a defined resource type.", () => {
       const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
       const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
@@ -356,7 +345,7 @@ describe("Resources Collection", () => {
     });
   });
 
-  describe("ResourceCollection::filterBySuggestedResources", () => {
+  describe("::filterBySuggestedResources", () => {
     it("should filter the collection by resources that could be suggested for a given url.", () => {
       const suggestedResource1 = defaultResourceDto({uri: "https://passbolt.com"});
       const suggestedResource2 = defaultResourceDto({uri: "passbolt.com"});

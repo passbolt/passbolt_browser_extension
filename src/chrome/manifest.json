@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "__MSG_appName__",
   "short_name": "passbolt",
-  "version": "4.9.0",
+  "version": "4.9.1",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
   "externally_connectable": {},

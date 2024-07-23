@@ -149,7 +149,8 @@ class ResourceEntity extends EntityV2 {
           "nullable": true,
         },
         "personal": {
-          "type": "boolean"
+          "type": "boolean",
+          "nullable": true,
         },
         // Associated models
         "favorite": {

@@ -11,13 +11,58 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ResourceTypeEntity from "./resourceTypeEntity";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("Resource Type entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(ResourceTypeEntity.ENTITY_NAME, ResourceTypeEntity.getSchema());
+  describe("ResourceTypeEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(ResourceTypeEntity.ENTITY_NAME, ResourceTypeEntity.getSchema());
+    });
+
+    it("validates id property", () => {
+      assertEntityProperty.uuid(ResourceTypeEntity, "id");
+      assertEntityProperty.required(ResourceTypeEntity, "id");
+    });
+
+    it("validates name property", () => {
+      assertEntityProperty.string(ResourceTypeEntity, "name");
+      assertEntityProperty.minLength(ResourceTypeEntity, "name", 1);
+      assertEntityProperty.maxLength(ResourceTypeEntity, "name", 255);
+      assertEntityProperty.required(ResourceTypeEntity, "name");
+    });
+
+    it("validates slug property", () => {
+      assertEntityProperty.string(ResourceTypeEntity, "slug");
+      assertEntityProperty.minLength(ResourceTypeEntity, "slug", 1);
+      assertEntityProperty.maxLength(ResourceTypeEntity, "slug", 64);
+      assertEntityProperty.required(ResourceTypeEntity, "slug");
+    });
+
+    it("validates definition property", () => {
+      const successScenarios = [assertEntityProperty.SCENARIO_OBJECT];
+      /*
+       * @todo: //add failing scenarios when nested object will be checked
+       */
+      const failingScenarios = [];
+
+      assertEntityProperty.assert(ResourceTypeEntity, "definition", successScenarios, failingScenarios, "type");
+      assertEntityProperty.notRequired(ResourceTypeEntity, "definition");
+    });
+
+    it("validates description property", () => {
+      const successScenarios = [
+        ...assertEntityProperty.SUCCESS_STRING_SCENARIOS,
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+      const failingScenarios = [
+        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
+      ];
+
+      assertEntityProperty.assert(ResourceTypeEntity, "description", successScenarios, failingScenarios, "type");
+      assertEntityProperty.notRequired(ResourceTypeEntity, "description");
+    });
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -50,23 +95,5 @@ describe("Resource Type entity", () => {
     };
     const resourceTypeEntity = new ResourceTypeEntity(dto);
     expect(resourceTypeEntity.toDto()).toEqual(filtered);
-  });
-
-  it("constructor returns validation error if dto required fields are missing", () => {
-    let t = () => { new ResourceTypeEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'slug': 'test'}); };
-    expect(t).toThrow(EntityValidationError);
-    t = () => { new ResourceTypeEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'name': 'test'}); };
-    expect(t).toThrow(EntityValidationError);
-    t = () => { new ResourceTypeEntity({'name': 'test', 'slug': 'test'}); };
-    expect(t).toThrow(EntityValidationError);
-  });
-
-  it("constructor returns validation error if dto fields are invalid", () => {
-    let t = () => { new ResourceTypeEntity({'id': 'nope', 'name': 'test', 'slug': 'test'}); };
-    expect(t).toThrow(EntityValidationError);
-    t = () => { new ResourceTypeEntity({'id': 'nope', 'name': Array(255).join("a"), 'slug': 'test'}); };
-    expect(t).toThrow(EntityValidationError);
-    t = () => { new ResourceTypeEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'name': 'test', 'slug': 'test', 'description': Array(257).join("a")}); };
-    expect(t).toThrow(EntityValidationError);
   });
 });

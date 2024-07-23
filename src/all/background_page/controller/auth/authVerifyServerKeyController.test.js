@@ -18,7 +18,7 @@ import {Uuid} from "../../utils/uuid";
 import ServerKeyChangedError from "../../error/serverKeyChangedError";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 
 jest.mock('../../model/gpgAuthToken', () => function() {
   return {token: "gpgauthv1.3.0|36|A89F6AB1-5BEE-32D8-a18B-461B810902E2|gpgauthv1.3.0", validate: () => true};

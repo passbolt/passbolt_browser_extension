@@ -105,15 +105,12 @@ class UserModel {
    *
    * @param {string} userId The user id to find
    * @param {Object?} contains (optional) example: {permissions: true}
-   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<UserEntity>}
    */
-  async findOne(userId, contains, preSanitize) {
-    let userDto = await this.userService.get(userId, contains);
-    if (preSanitize) {
-      userDto = UserEntity.sanitizeDto(userDto);
-    }
-    return new UserEntity(userDto);
+  async findOne(userId, contains, ignoreInvalidEntity) {
+    const userDto = await this.userService.get(userId, contains);
+    return new UserEntity(userDto, {ignoreInvalidEntity: ignoreInvalidEntity});
   }
 
   /**
@@ -122,15 +119,12 @@ class UserModel {
    * @param {Object} [contains] optional example: {groups_users: true}
    * @param {Object} [filters] optional
    * @param {Object} [orders] optional
-   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<UsersCollection>}
    */
-  async findAll(contains, filters, orders, preSanitize) {
-    let usersDto = await this.userService.findAll(contains, filters, orders);
-    if (preSanitize) {
-      usersDto = UsersCollection.sanitizeDto(usersDto);
-    }
-    return new UsersCollection(usersDto, {clone: false});
+  async findAll(contains, filters, orders, ignoreInvalidEntity) {
+    const usersDto = await this.userService.findAll(contains, filters, orders);
+    return new UsersCollection(usersDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
   }
 
   /**
@@ -173,17 +167,14 @@ class UserModel {
    * Update a user using Passbolt API and add result to local storage
    *
    * @param {UserEntity} userEntity
-   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<UserEntity>}
    * @public
    */
-  async update(userEntity, preSanitize) {
+  async update(userEntity, ignoreInvalidEntity) {
     const data = userEntity.toDto({profile: {avatar: false}});
-    let userDto = await this.userService.update(userEntity.id, data);
-    if (preSanitize) {
-      userDto = UserEntity.sanitizeDto(userDto);
-    }
-    const updatedUserEntity = new UserEntity(userDto);
+    const userDto = await this.userService.update(userEntity.id, data);
+    const updatedUserEntity = new UserEntity(userDto, {ignoreInvalidEntity});
     await UserLocalStorage.updateUser(updatedUserEntity);
     return updatedUserEntity;
   }
@@ -193,16 +184,13 @@ class UserModel {
    *
    * @param {string} userId The user id to update the avatar for
    * @param {AvatarUpdateEntity} avatarUpdateEntity The avatar update entity
-   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<UserEntity>}
    * @public
    */
-  async updateAvatar(userId, avatarUpdateEntity, preSanitize) {
-    let userDto = await this.userService.updateAvatar(userId, avatarUpdateEntity.file, avatarUpdateEntity.filename);
-    if (preSanitize) {
-      userDto = UserEntity.sanitizeDto(userDto);
-    }
-    return new UserEntity(userDto);
+  async updateAvatar(userId, avatarUpdateEntity, ignoreInvalidEntity) {
+    const userDto = await this.userService.updateAvatar(userId, avatarUpdateEntity.file, avatarUpdateEntity.filename);
+    return  new UserEntity(userDto, {ignoreInvalidEntity});
   }
 
   /**

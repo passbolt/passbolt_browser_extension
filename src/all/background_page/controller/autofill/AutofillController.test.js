@@ -19,7 +19,7 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
 import InformMenuPagemod from "../../pagemod/informMenuPagemod";
 import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";

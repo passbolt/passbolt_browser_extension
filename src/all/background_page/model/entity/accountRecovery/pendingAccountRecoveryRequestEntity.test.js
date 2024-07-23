@@ -13,11 +13,11 @@
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import PendingAccountRecoveryEntity from "./pendingAccountRecoveryRequestEntity";
+import PendingAccountRecoveryRequestEntity from "./pendingAccountRecoveryRequestEntity";
 
 describe("PendingAccountRecoveryRequest entity", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(PendingAccountRecoveryEntity.ENTITY_NAME, PendingAccountRecoveryEntity.getSchema());
+    EntitySchema.validateSchema(PendingAccountRecoveryRequestEntity.ENTITY_NAME, PendingAccountRecoveryRequestEntity.getSchema());
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -30,14 +30,14 @@ describe("PendingAccountRecoveryRequest entity", () => {
       "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
       "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
     };
-    const entity = new PendingAccountRecoveryEntity(dto);
+    const entity = new PendingAccountRecoveryRequestEntity(dto);
     expect(entity.toDto()).toEqual(dto);
   });
 
   it("constructor returns validation error if dto required fields are missing", () => {
     expect.assertions(2);
     try {
-      new PendingAccountRecoveryEntity({});
+      new PendingAccountRecoveryRequestEntity({});
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
@@ -50,7 +50,7 @@ describe("PendingAccountRecoveryRequest entity", () => {
   it("constructor returns validation error if fields do not validate", () => {
     expect.assertions(7);
     try {
-      new PendingAccountRecoveryEntity({
+      new PendingAccountRecoveryRequestEntity({
         "id": "not-a-uuid",
         "status": "not-a-status",
         "created": "not-a-date",

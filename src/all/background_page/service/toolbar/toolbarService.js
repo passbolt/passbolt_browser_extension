@@ -15,14 +15,15 @@ import {BrowserExtensionIconService} from "../ui/browserExtensionIcon.service";
 import ResourceModel from "../../model/resource/resourceModel";
 import Toolbar from "../../model/toolbar";
 import {TabController as tabsController} from "../../controller/tabsController";
-import GetLegacyAccountService from "../account/getLegacyAccountService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
+import GetActiveAccountService from "../account/getActiveAccountService";
+import CheckAuthStatusService from "../auth/checkAuthStatusService";
+import Log from "../../model/log";
 
 class ToolbarService {
-  initialise() {
+  constructor() {
     this.bindCallbacks();
     this.addEventListeners();
-    this.account = null; // The user account
     this.tabUrl = null; // The tab url the toolbar is displaying the count of suggested resources for.
   }
 
@@ -33,9 +34,9 @@ class ToolbarService {
     this.handleShortcutPressed = this.handleShortcutPressed.bind(this);
     this.handleUserLoggedOut = this.handleUserLoggedOut.bind(this);
     this.handleUserLoggedIn = this.handleUserLoggedIn.bind(this);
-    this.handleSuggestedResourcesOnUpdatedTabBound = this.handleSuggestedResourcesOnUpdatedTab.bind(this);
-    this.handleSuggestedResourcesOnActivatedTabBound = this.handleSuggestedResourcesOnActivatedTab.bind(this);
-    this.handleSuggestedResourcesOnFocusedWindowBound = this.handleSuggestedResourcesOnFocusedWindow.bind(this);
+    this.handleSuggestedResourcesOnUpdatedTab = this.handleSuggestedResourcesOnUpdatedTab.bind(this);
+    this.handleSuggestedResourcesOnActivatedTab = this.handleSuggestedResourcesOnActivatedTab.bind(this);
+    this.handleSuggestedResourcesOnFocusedWindow = this.handleSuggestedResourcesOnFocusedWindow.bind(this);
   }
 
   /**
@@ -60,16 +61,8 @@ class ToolbarService {
    * @returns {Promise<void>}
    */
   async handleUserLoggedIn() {
-    this.account = await GetLegacyAccountService.get();
-    const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(this.account);
-    this.resourceModel = new ResourceModel(apiClientOptions, this.account);
-
     BrowserExtensionIconService.activate();
     await this.updateSuggestedResourcesBadge();
-
-    browser.tabs.onUpdated.addListener(this.handleSuggestedResourcesOnUpdatedTabBound);
-    browser.tabs.onActivated.addListener(this.handleSuggestedResourcesOnActivatedTabBound);
-    browser.windows.onFocusChanged.addListener(this.handleSuggestedResourcesOnFocusedWindowBound);
   }
 
   /**
@@ -80,9 +73,9 @@ class ToolbarService {
     this.tabUrl = null;
     BrowserExtensionIconService.deactivate();
 
-    browser.tabs.onUpdated.removeListener(this.handleSuggestedResourcesOnUpdatedTabBound);
-    browser.tabs.onActivated.removeListener(this.handleSuggestedResourcesOnActivatedTabBound);
-    browser.windows.onFocusChanged.removeListener(this.handleSuggestedResourcesOnFocusedWindowBound);
+    browser.tabs.onUpdated.removeListener(this.handleSuggestedResourcesOnUpdatedTab);
+    browser.tabs.onActivated.removeListener(this.handleSuggestedResourcesOnActivatedTab);
+    browser.windows.onFocusChanged.removeListener(this.handleSuggestedResourcesOnFocusedWindow);
   }
 
   /**
@@ -113,7 +106,7 @@ class ToolbarService {
   async handleSuggestedResourcesOnFocusedWindow(windowId) {
     if (windowId === browser.windows.WINDOW_ID_NONE) {
       // If no window selected, reset the suggested resources badge.
-      this.resetSuggestedResourcesBadge();
+      await this.resetSuggestedResourcesBadge();
     } else {
       await this.updateSuggestedResourcesBadge();
     }
@@ -133,6 +126,10 @@ class ToolbarService {
    */
   async resetSuggestedResourcesBadge() {
     this.tabUrl = null;
+    // Should do nothing if the user is not authenticated
+    if (!await this.isUserAuthenticated()) {
+      return;
+    }
     BrowserExtensionIconService.setSuggestedResourcesCount(0);
   }
 
@@ -141,32 +138,65 @@ class ToolbarService {
    * @private
    */
   async updateSuggestedResourcesBadge() {
-    const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
-    const currentTab = tabs?.[0];
+    try {
+      const account = await GetActiveAccountService.get();
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+      // Should do nothing if the user is not authenticated
+      if (!await this.isUserAuthenticated()) {
+        return;
+      }
 
-    const tabUrl = currentTab?.url;
-    let suggestedResourcesCount = 0;
+      this.resourceModel = new ResourceModel(apiClientOptions, account);
 
-    // The toolbar is already displaying the count of suggested resources for the current url.
-    if (this.tabUrl === tabUrl) {
-      return;
+      const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
+      const currentTab = tabs?.[0];
+
+      const tabUrl = currentTab?.url;
+      let suggestedResourcesCount = 0;
+
+      // The toolbar is already displaying the count of suggested resources for the current url.
+      if (this.tabUrl === tabUrl) {
+        return;
+      }
+
+      this.tabUrl = tabUrl;
+      if (!this.isUrlPassboltDomain(this.tabUrl, account) && !this.isUrlPassboltExtension(this.tabUrl)) {
+        suggestedResourcesCount = await this.resourceModel.countSuggestedResources(this.tabUrl);
+      }
+
+      BrowserExtensionIconService.setSuggestedResourcesCount(suggestedResourcesCount);
+    } catch (error) {
+      // Error happens only if no account is associate
+      console.error(error);
     }
+  }
 
-    this.tabUrl = tabUrl;
-    if (this.account && !this.isUrlPassboltDomain(this.tabUrl) && !this.isUrlPassboltExtension(this.tabUrl)) {
-      suggestedResourcesCount = await this.resourceModel.countSuggestedResources(this.tabUrl);
+  /**
+   * Is the user authenticated
+   * @returns {Promise<{boolean}|boolean>}
+   */
+  async isUserAuthenticated() {
+    try {
+      const checkAuthStatusService = new CheckAuthStatusService();
+      // use the cached data as the worker could wake up every 30 secondes.
+      const authStatus = await checkAuthStatusService.checkAuthStatus(false);
+      return authStatus.isAuthenticated;
+    } catch (error) {
+      // Service is unavailable, do nothing...
+      Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
+      // The user is not authenticated
+      return false;
     }
-
-    BrowserExtensionIconService.setSuggestedResourcesCount(suggestedResourcesCount);
   }
 
   /**
    * Check if the url has the user account trusted domain.
    * @param {string} tabUrl The url to check.
+   * @param {AccountEntity} account The account
    * @returns {boolean}
    */
-  isUrlPassboltDomain(tabUrl) {
-    const passboltDomain = new URL(this.account.domain);
+  isUrlPassboltDomain(tabUrl, account) {
+    const passboltDomain = new URL(account.domain);
     const url = tabUrl && new URL(tabUrl);
     return passboltDomain.hostname === url.hostname;
   }

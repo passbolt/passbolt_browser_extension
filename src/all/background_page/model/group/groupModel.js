@@ -75,15 +75,12 @@ class GroupModel {
    * @param {Object} [contains] optional
    * @param {Object} [filters] optional
    * @param {Object} [orders] optional
-   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<GroupsCollection>}
    */
-  async findAll(contains, filters, orders, preSanitize) {
-    let groupsDto = await this.groupService.findAll(contains, filters, orders);
-    if (preSanitize) {
-      groupsDto = GroupsCollection.sanitizeDto(groupsDto);
-    }
-    return new GroupsCollection(groupsDto, {clone: false});
+  async findAll(contains, filters, orders, ignoreInvalidEntity) {
+    const groupsDto = await this.groupService.findAll(contains, filters, orders);
+    return new GroupsCollection(groupsDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
   }
 
   /**
@@ -118,17 +115,14 @@ class GroupModel {
    * Update a group using Passbolt API and add result to local storage
    *
    * @param {GroupUpdateEntity} groupUpdateEntity
-   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<GroupEntity>}
    * @public
    */
-  async update(groupUpdateEntity, preSanitize) {
+  async update(groupUpdateEntity, ignoreInvalidEntity) {
     const data = groupUpdateEntity.toDto();
-    let groupDto = await this.groupService.update(groupUpdateEntity.id, data);
-    if (preSanitize) {
-      groupDto = GroupEntity.sanitizeDto(groupDto);
-    }
-    const updatedGroupEntity = new GroupEntity(groupDto);
+    const groupDto = await this.groupService.update(groupUpdateEntity.id, data);
+    const updatedGroupEntity = new GroupEntity(groupDto, {ignoreInvalidEntity: ignoreInvalidEntity});
     await GroupLocalStorage.updateGroup(updatedGroupEntity);
     return updatedGroupEntity;
   }

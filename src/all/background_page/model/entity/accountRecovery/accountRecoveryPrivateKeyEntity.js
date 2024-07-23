@@ -36,7 +36,7 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
     // Associations
     if (this._props.account_recovery_private_key_passwords) {
       const sanitizedCollection = AccountRecoveryPrivateKeyPasswordsCollection.sanitizeDto(this._props.account_recovery_private_key_passwords);
-      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(sanitizedCollection, {clone: false});
+      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(sanitizedCollection, {...options, clone: false});
       delete this._props.account_recovery_private_key_passwords;
     }
   }

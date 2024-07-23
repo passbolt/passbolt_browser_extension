@@ -79,12 +79,9 @@ class AbstractAccountEntity extends Entity {
         "first_name": profileEntitySchema.properties.first_name,
         "last_name": profileEntitySchema.properties.last_name,
         "locale": {
-          "anyOf": [{
-            "type": "string",
-            "pattern": /^[a-z]{2}-[A-Z]{2}$/,
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "pattern": /^[a-z]{2}-[A-Z]{2}$/,
+          "nullable": true,
         },
         "security_token": SecurityTokenEntity.getSchema(),
       }

@@ -14,9 +14,9 @@
 
 import {v4 as uuidv4} from "uuid";
 import DecryptPrivateKeyPasswordDataService from "./decryptPrivateKeyPasswordDataService";
-import {defaultAccountRecoveryPrivateKeyPasswordDto} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
+import {defaultAccountRecoveryPrivateKeyPasswordDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
 import AccountRecoveryPrivateKeyPasswordEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import {defaultAccountRecoveryPrivateKeyPasswordDecryptedDataDto} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity.test.data";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";

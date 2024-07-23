@@ -21,13 +21,13 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import RecoverAccountController from "./recoverAccountController";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {
   approvedAccountRecoveryRequestDto,
   approvedAccountRecoveryRequestWithoutPrivateKeyDto,
   approvedAccountRecoveryRequestWithoutResponsesDto
-} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";

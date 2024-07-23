@@ -86,8 +86,8 @@ class ExternalGpgKeyEntity extends Entity {
             "type": "string",
             "pattern": "^Infinity$"
           }, {
-            "type": "null"
-          }]
+          }],
+          "nullable": true,
         },
         "created": {
           "type": "string",
@@ -101,11 +101,8 @@ class ExternalGpgKeyEntity extends Entity {
           "minimum": 1,
         },
         "curve": {
-          "anyOf": [{
-            "type": "string"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "nullable": true,
         },
         "private": {
           "type": "boolean"

@@ -14,11 +14,117 @@
 import ExternalGpgKeyEntity from "./externalGpgKeyEntity";
 import {ExternalGpgKeyEntityFixtures} from "./externalGpgKeyEntity.test.fixtures";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("ExternalGpgKey entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(ExternalGpgKeyEntity.ENTITY_NAME, ExternalGpgKeyEntity.getSchema());
+  describe("ExternalGpgKeyEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(ExternalGpgKeyEntity.ENTITY_NAME, ExternalGpgKeyEntity.getSchema());
+    });
+
+    it("validates armored_key property", () => {
+      assertEntityProperty.string(ExternalGpgKeyEntity, "armored_key");
+      assertEntityProperty.minLength(ExternalGpgKeyEntity, "armored_key", 1);
+      assertEntityProperty.required(ExternalGpgKeyEntity, "armored_key");
+    });
+
+    it("validates key_id property", () => {
+      assertEntityProperty.string(ExternalGpgKeyEntity, "key_id");
+      assertEntityProperty.minLength(ExternalGpgKeyEntity, "key_id", 8);
+      assertEntityProperty.maxLength(ExternalGpgKeyEntity, "key_id", 16);
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "key_id");
+    });
+
+    it("validates user_ids property", () => {
+      const correctUserIds = [
+        {email: "test@test.com", name: "user's name"},
+        {email: "test2@test.com", name: "second user's name"},
+      ];
+      const successScenarios = [
+        assertEntityProperty.SCENARIO_ARRAY,
+        {scenario: "with valid user_ids", value: correctUserIds}
+      ];
+
+      const failingScenarios = [
+        assertEntityProperty.SCENARIO_NULL,
+        assertEntityProperty.SCENARIO_INTEGER,
+        assertEntityProperty.SCENARIO_STRING,
+        assertEntityProperty.SCENARIO_OBJECT,
+        assertEntityProperty.SCENARIO_FALSE,
+        /*
+         * @todo add scenario when nested object will be checked
+         * {scenario: "with invalid user_ids", value: [{email: "test", name: 2}]}
+         */
+      ];
+
+      assertEntityProperty.assert(ExternalGpgKeyEntity, "user_ids", successScenarios, failingScenarios, "type");
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "user_ids");
+    });
+
+    it("validates fingerprint property", () => {
+      //@todo: refactor fingerprint check in assertEntityProperty
+      assertEntityProperty.string(ExternalGpgKeyEntity, "fingerprint");
+      assertEntityProperty.minLength(ExternalGpgKeyEntity, "fingerprint", 40);
+      assertEntityProperty.maxLength(ExternalGpgKeyEntity, "fingerprint", 40);
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "fingerprint");
+    });
+
+    it("validates expires property", () => {
+      const successScenarios = [
+        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO,
+        {scenario: "date 'infinity'", value: "Infinity"},
+        {scenario: "date 'Never'", value: "Never"},
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+
+      //no failing tests are used as the value is enforced in the constructor
+      assertEntityProperty.assert(ExternalGpgKeyEntity, "expires", successScenarios, [], "type");
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "expires");
+    });
+
+    it("validates created property", () => {
+      //assertEntityProperty.string: without failing tests as the value is enforced in the constructor
+      assertEntityProperty.assert(ExternalGpgKeyEntity, "created", assertEntityProperty.SUCCESS_STRING_SCENARIOS, [], "type");
+
+      //assertEntityProperty.dateTime: without failing tests as the value is enforced in the constructor
+      assertEntityProperty.assert(ExternalGpgKeyEntity, "created", assertEntityProperty.SUCCESS_DATETIME_SCENARIO, [], "format");
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "created");
+    });
+
+    it("validates algorithm property", () => {
+      assertEntityProperty.string(ExternalGpgKeyEntity, "algorithm");
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "algorithm");
+    });
+
+    it("validates length property", () => {
+      assertEntityProperty.integer(ExternalGpgKeyEntity, "length");
+      /*
+       * @todo: put back the "min" check when the schema is updated to what's compatible with this rule (using `gte` instead of `min`)
+       * assertEntityProperty.min(ExternalGpgKeyEntity, "length", 1);
+       */
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "length");
+    });
+
+    it("validates curve property", () => {
+      const successScenarios = [
+        ...assertEntityProperty.SUCCESS_STRING_SCENARIOS,
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+      const failingScenarios = assertEntityProperty.FAIL_STRING_SCENARIOS;
+
+      assertEntityProperty.assert(ExternalGpgKeyEntity, "curve", successScenarios, failingScenarios, "type");
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "curve");
+    });
+
+    it("validates private property", () => {
+      assertEntityProperty.boolean(ExternalGpgKeyEntity, "private");
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "private");
+    });
+
+    it("validates revoked property", () => {
+      assertEntityProperty.boolean(ExternalGpgKeyEntity, "revoked");
+      assertEntityProperty.notRequired(ExternalGpgKeyEntity, "revoked");
+    });
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -55,35 +161,6 @@ describe("ExternalGpgKey entity", () => {
     delete sanitizedDto.userIds;
     expect(entity.toDto()).toEqual(sanitizedDto);
   });
-
-  it("constructor throws an exception if DTO is missing required field", () => {
-    try {
-      const dto = ExternalGpgKeyEntityFixtures.missing_required_field_dto;
-      new ExternalGpgKeyEntity(dto);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('armored_key', 'required')).toBe(true);
-    }
-  });
-
-  it("constructor throws an exception if DTO contains invalid field", () => {
-    try {
-      const dto = ExternalGpgKeyEntityFixtures.broken_fields_dto;
-      new ExternalGpgKeyEntity(dto);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('key_id', 'minLength')).toBe(true);
-      //expect(error.hasError('user_ids', 'format')).toBe(true); //checks in array are apparently not done
-      expect(error.hasError('fingerprint', 'maxLength')).toBe(true);
-      expect(error.hasError('created', 'type')).toBe(true);
-      expect(error.hasError('length', 'type')).toBe(true);
-      expect(error.hasError('curve', 'type')).toBe(true);
-      expect(error.hasError('private', 'type')).toBe(true);
-      expect(error.hasError('revoked', 'type')).toBe(true);
-    }
-  });
-
-  it.todo("constructor returns validation error if the user id email is not standard.");
 
   it.todo("constructor works if the user id email is not standard and the application settings defined a custom validation.");
 });

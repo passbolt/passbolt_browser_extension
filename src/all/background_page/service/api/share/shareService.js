@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import {assertString} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
 const SHARE_SERVICE_RESOURCE_NAME = 'share';
@@ -23,6 +24,30 @@ class ShareService extends AbstractService {
    */
   constructor(apiClientOptions) {
     super(apiClientOptions, ShareService.RESOURCE_NAME);
+  }
+
+  /**
+   * Return the list of supported filters for the search operation on the  API
+   *
+   * @returns {Array<string>} list of supported option
+   */
+  static getSupportedSearchArosFiltersOptions() {
+    return [
+      'search',
+    ];
+  }
+
+  /**
+   * Return the list of supported contains for the search operation on the  API
+   *
+   * @returns {Array<string>} list of supported option
+   */
+  static getSupportedSearchArosContainOptions() {
+    return [
+      "profile",
+      "user_count",
+      "role"
+    ];
   }
 
   /**
@@ -81,6 +106,21 @@ class ShareService extends AbstractService {
     this.assertNonEmptyData(data);
     const url = `resource/${resourceId}`;
     const response = await this.apiClient.update(url, data);
+    return response.body;
+  }
+
+  /**
+   * Call the API to run a search on the users and groups given a keyword.
+   * @param {string} keyword
+   * @returns {Promise<Array>}
+   */
+  async searchUsersAndGroups(keyword, contains) {
+    assertString(keyword, "keyword is not a valid string");
+    const filter = this.formatFilterOptions({search: keyword}, ShareService.getSupportedSearchArosFiltersOptions());
+    contains = this.formatContainOptions(contains, ShareService.getSupportedSearchArosContainOptions());
+    const options = {...filter, ...contains};
+    const url = "search-aros";
+    const response = await this.apiClient.get(url, options);
     return response.body;
   }
 }

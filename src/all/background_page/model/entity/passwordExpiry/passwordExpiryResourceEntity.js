@@ -45,12 +45,9 @@ class PasswordExpiryResourceEntity extends Entity {
           "format": "uuid"
         },
         "expired": {
-          "anyOf": [{
-            "type": "string",
-            "format": "date-time"
-          }, {
-            "type": "null",
-          }]
+          "type": "string",
+          "format": "date-time",
+          "nullable": true,
         },
         "created": {
           "type": "string",

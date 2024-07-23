@@ -23,6 +23,7 @@ import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypeLocalStorage from "../local_storage/resourceTypeLocalStorage";
+import CheckAuthStatusService from "../auth/checkAuthStatusService";
 
 jest.useFakeTimers();
 
@@ -39,6 +40,7 @@ describe("ToolbarService", () => {
   const browserExtensionIconServiceSetCountMock = jest.fn();
 
   beforeEach(() => {
+    toolbarService.tabUrl = null;
     jest.spyOn(BrowserExtensionIconService, "activate").mockImplementation(browserExtensionIconServiceActivateMock);
     jest.spyOn(BrowserExtensionIconService, "deactivate").mockImplementation(browserExtensionIconServiceDeactivateMock);
     jest.spyOn(BrowserExtensionIconService, "setSuggestedResourcesCount").mockImplementation(browserExtensionIconServiceSetCountMock);
@@ -48,13 +50,13 @@ describe("ToolbarService", () => {
     it("Given the user is on a tab which has no suggested resource for, it should activate the passbolt icon and display no suggested resource.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      toolbarService.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementation(() => [{url: 'https://www.wherever.com'}]);
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest.spyOn(ResourceLocalStorage, "get").mockImplementation(() => defaultResourceDtosCollection());
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementation(() => resourceTypesCollectionDto());
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: true}));
 
       await toolbarService.handleUserLoggedIn();
 
@@ -65,13 +67,13 @@ describe("ToolbarService", () => {
     it("Given the user is on a tab which has suggested resource for, it should activate the passbolt icon and display the number of suggested resources.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      toolbarService.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementation(() => [{url: 'https://www.passbolt.com'}]);
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest.spyOn(ResourceLocalStorage, "get").mockImplementation(() => defaultResourceDtosCollection());
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementation(() => resourceTypesCollectionDto());
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: true}));
 
       await toolbarService.handleUserLoggedIn();
 
@@ -84,13 +86,13 @@ describe("ToolbarService", () => {
     it("Given the user signs out, it should deactivate the passbolt icon.", async() => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
-      toolbarService.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementation(() => [{url: 'https://www.wherever.com'}]);
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest.spyOn(ResourceLocalStorage, "get").mockImplementation(() => defaultResourceDtosCollection());
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementation(() => resourceTypesCollectionDto());
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: true}));
 
       await toolbarService.handleUserLoggedIn();
       await toolbarService.handleUserLoggedOut();
@@ -103,13 +105,13 @@ describe("ToolbarService", () => {
     it("Given the user navigates to a url having suggested resources, it should change the passbolt icon suggested resources count.", async() => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
-      toolbarService.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [{url: 'https://www.wherever.com'}]);
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest.spyOn(ResourceLocalStorage, "get").mockImplementation(() => defaultResourceDtosCollection());
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementation(() => resourceTypesCollectionDto());
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: true}));
 
       await toolbarService.handleUserLoggedIn();
 
@@ -124,13 +126,13 @@ describe("ToolbarService", () => {
     it("Given the user activates a tab having suggested resources, it should change the passbolt icon suggested resources count.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      toolbarService.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [{url: 'https://www.wherever.com'}]);
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest.spyOn(ResourceLocalStorage, "get").mockImplementation(() => defaultResourceDtosCollection());
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementation(() => resourceTypesCollectionDto());
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: true}));
 
       await toolbarService.handleUserLoggedIn();
       expect(browserExtensionIconServiceSetCountMock).toHaveBeenLastCalledWith(0);
@@ -144,13 +146,13 @@ describe("ToolbarService", () => {
     it("Given the user switches to a window with a tab having suggested resources, it should change the passbolt icon suggested resources count.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      toolbarService.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [{url: 'https://www.wherever.com'}]);
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest.spyOn(ResourceLocalStorage, "get").mockImplementation(() => defaultResourceDtosCollection());
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementation(() => resourceTypesCollectionDto());
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: true}));
 
       await toolbarService.handleUserLoggedIn();
       expect(browserExtensionIconServiceSetCountMock).toHaveBeenLastCalledWith(0);
@@ -162,18 +164,38 @@ describe("ToolbarService", () => {
     it("Given the user switches to another application, it should reset the passbolt icon suggested resources count.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      toolbarService.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [{url: 'https://www.passbolt.com'}]);
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest.spyOn(ResourceLocalStorage, "get").mockImplementation(() => defaultResourceDtosCollection());
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementation(() => resourceTypesCollectionDto());
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: true}));
 
       await toolbarService.handleUserLoggedIn();
       expect(browserExtensionIconServiceSetCountMock).toHaveBeenLastCalledWith(4);
       await toolbarService.handleSuggestedResourcesOnFocusedWindow(browser.windows.WINDOW_ID_NONE);
       expect(browserExtensionIconServiceSetCountMock).toHaveBeenLastCalledWith(0);
+    });
+
+    it("Given the user switches to another application, it should not change the passbolt icon if user is not authenticated.", async() => {
+      expect.assertions(1);
+      const account = new AccountEntity(defaultAccountDto());
+
+      jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: false}));
+
+      await toolbarService.handleSuggestedResourcesOnFocusedWindow(42);
+      expect(browserExtensionIconServiceSetCountMock).toHaveBeenCalledTimes(0);
+    });
+
+    it("Given an anonymous user switches to another application, it should not change the passbolt icon.", async() => {
+      expect.assertions(1);
+
+      jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => { throw Error("The user is not set"); });
+
+      await toolbarService.handleSuggestedResourcesOnActivatedTab();
+      expect(browserExtensionIconServiceSetCountMock).toHaveBeenCalledTimes(0);
     });
   });
 });

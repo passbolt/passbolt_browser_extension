@@ -16,7 +16,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import MoveResourcesController from "./moveResourcesController";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultResourceDtosCollection} from "../../model/entity/resource/resourcesCollection.test.data";
 import FolderModel from "../../model/folder/folderModel";
 import ResourceModel from "../../model/resource/resourceModel";

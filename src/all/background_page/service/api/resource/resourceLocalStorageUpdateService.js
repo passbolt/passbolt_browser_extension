@@ -15,7 +15,6 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import ResourceService from "./resourceService";
 
-
 const TIMER = 5000;
 const lastTimeCalledPerAccount = {};
 const RESOURCE_UPDATE_LOCK = 'resourceUpdateLock';
@@ -54,10 +53,17 @@ class ResourceLocalStorageUpdateService {
       return this.updateLocalStorage();
     }
 
+    const resourcesCollectionOptions = {clone: true};
+    if (ResourceLocalStorage.hasCachedData()) {
+      // Only data coming from the local storage require validation, data in runtime cache has already been validated.
+      resourcesCollectionOptions.validate = false;
+    }
+
     const resources = await ResourceLocalStorage.get();
     if (resources) {
-      return new ResourcesCollection(resources, {clone: false});
+      return new ResourcesCollection(resources, resourcesCollectionOptions);
     }
+
     return this.updateLocalStorage();
   }
 
@@ -80,9 +86,11 @@ class ResourceLocalStorageUpdateService {
   async updateLocalStorage() {
     let resourcesDto = await this.resourceService.findAll(ResourceLocalStorageUpdateService.DEFAULT_CONTAIN);
     resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
+
     const resourcesCollection = new ResourcesCollection(resourcesDto, {clone: false});
     await ResourceLocalStorage.set(resourcesCollection);
     lastTimeCalledPerAccount[this.account.id] = Date.now();
+
     return resourcesCollection;
   }
 

@@ -69,8 +69,20 @@ class AuthVerifyServerKeyController {
    * Whenever the verify fail
    * @param {Error} error The error
    * @returns {Promise<void>}
+   * @throws {ServerKeyChangedError} If the key cannot be parsed
+   * @throws {ServerKeyChangedError} If the server key has changed
+   * @throws {serverKeyIsExpired} If the server key has expired
+   * @throws {Error} If an unexpected error occurred
    */
   async onVerifyError(error) {
+    if (error.data?.code === 500) {
+      /*
+       * If something wrong happens on the server, we do an early exit.
+       * The other errors (no user associated, server key changed etc ) don't produce an error 500.
+       */
+      throw error;
+    }
+
     if (error.message && error.message.indexOf('no user associated') !== -1) {
       /*
        * If the user has been deleted from the API, remove the authentication iframe served by the

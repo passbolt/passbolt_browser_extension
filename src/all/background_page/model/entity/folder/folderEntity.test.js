@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {v4 as uuidv4} from 'uuid';
 import FolderEntity from "./folderEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
@@ -22,245 +21,121 @@ import {
   folderWithUpdatePermissionDto,
   minimalFolderDto
 } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
-import each from "jest-each";
 import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import PermissionsCollection from "../permission/permissionsCollection";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("FolderEntity", () => {
-  describe("FolderEntity:constructor", () => {
+  describe("FolderEntity::getSchema", () => {
     it("schema must validate", () => {
       EntitySchema.validateSchema(FolderEntity.ENTITY_NAME, FolderEntity.getSchema());
     });
 
-    it("constructor works if valid minimal DTO is provided", () => {
-      const dto = minimalFolderDto();
-      const entity = new FolderEntity(dto);
-      expect(entity.id).toBeNull();
-      expect(entity.name).toEqual('Folder name');
-      expect(entity.folderParentId).toBeNull();
-      expect(entity.created).toBeNull();
-      expect(entity.modified).toBeNull();
-      expect(entity.permission).toBeNull();
-      expect(entity.permissions).toBeNull();
-      expect(entity.isReadOnly()).toBe(false);
-      expect(entity.canUpdate()).toBe(false);
-      expect(entity.isOwner()).toBe(false);
-      expect(entity.isPersonal()).toBe(null);
-      expect(entity.isShared()).toBe(null);
+    it("validates id property", () => {
+      assertEntityProperty.uuid(FolderEntity, "id");
+      assertEntityProperty.notRequired(FolderEntity, "id");
     });
 
-    it("constructor works if valid DTO is provided with optional properties", () => {
-      const dto = defaultFolderDto();
-      const entity = new FolderEntity(dto);
-      expect(entity.id).toEqual(dto.id);
-      expect(entity.name).toEqual('Accounting');
-      expect(entity.folderParentId).toBeNull();
-      expect(entity.created).toEqual("2020-02-01T00:00:00+00:00");
-      expect(entity.modified).toEqual("2020-02-01T00:00:00+00:00");
-      expect(entity.permission).toBeInstanceOf(PermissionEntity);
-      expect(entity.permission.toDto()).toEqual(expect.objectContaining({type: 15}));
-      expect(entity.permissions).toBeInstanceOf(PermissionsCollection);
-      expect(entity.permissions.length).toEqual(1);
-      expect(entity.isReadOnly()).toBe(false);
-      expect(entity.canUpdate()).toBe(true);
-      expect(entity.isOwner()).toBe(true);
-      expect(entity.isPersonal()).toBe(false);
-      expect(entity.isShared()).toBe(true);
+    it("validates name property", () => {
+      assertEntityProperty.string(FolderEntity, "name");
+      assertEntityProperty.required(FolderEntity, "name");
+      assertEntityProperty.minLength(FolderEntity, "name", 1);
+      assertEntityProperty.maxLength(FolderEntity, "name", 256);
     });
 
-    // Validate id
-    each([
-      {scenario: 'is not required but null', rule: 'type', value: null},
-      {scenario: 'valid uuid', rule: 'format', value: 'invalid-id'},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the id", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultFolderDto({
-          id: test.value
-        });
-        try {
-          new FolderEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('id', test.rule)).toBeTruthy();
-        }
-      });
+    it("validates folder_parent_id property", () => {
+      assertEntityProperty.uuid(FolderEntity, "folder_parent_id");
+      assertEntityProperty.nullable(FolderEntity, "folder_parent_id");
+      assertEntityProperty.notRequired(FolderEntity, "folder_parent_id");
     });
 
-    // Validate folder_parent_id
-    each([
-      {scenario: 'valid uuid', rule: 'type', value: 'invalid-id'},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the folder_parent_id", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultFolderDto({
-          folder_parent_id: test.value
-        });
-        try {
-          new FolderEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('folder_parent_id', test.rule)).toBeTruthy();
-        }
-      });
+    it("validates created property", () => {
+      assertEntityProperty.string(FolderEntity, "created");
+      assertEntityProperty.dateTime(FolderEntity, "created");
+      assertEntityProperty.notRequired(FolderEntity, "created");
     });
 
-    each([
-      {scenario: 'can be null', rule: 'type', value: null},
-      {scenario: 'valid uuid', rule: 'format', value: uuidv4()},
-    ]).describe("Should validate the folder_parent_id", test => {
-      it(`Should accept: ${test.scenario}`, async() => {
-        expect.assertions(1);
-        const dto = defaultFolderDto({
-          folder_parent_id: test.value
-        });
-        const folder = new FolderEntity(dto);
-        expect(folder).toBeInstanceOf(FolderEntity);
-      });
+    it("validates modified property", () => {
+      assertEntityProperty.string(FolderEntity, "modified");
+      assertEntityProperty.dateTime(FolderEntity, "modified");
+      assertEntityProperty.notRequired(FolderEntity, "modified");
     });
 
-    // Validate name
-    each([
-      {scenario: 'required', rule: 'type'},
-      {scenario: 'not null', rule: 'type', value: null},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the name", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultFolderDto({
-          name: test.value
-        });
-        try {
-          new FolderEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('name', test.rule)).toBeTruthy();
-        }
-      });
+    it("validates created_by property", () => {
+      assertEntityProperty.uuid(FolderEntity, "created_by");
+      assertEntityProperty.notRequired(FolderEntity, "created_by");
     });
 
-    // Validate created_by
-    each([
-      {scenario: 'is not required but null', rule: 'type', value: null},
-      {scenario: 'valid uuid', rule: 'format', value: 'invalid-id'},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the created_by", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultFolderDto({
-          created_by: test.value
-        });
-        try {
-          new FolderEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('created_by', test.rule)).toBeTruthy();
-        }
-      });
+    it("validates modified_by property", () => {
+      assertEntityProperty.uuid(FolderEntity, "modified_by");
+      assertEntityProperty.notRequired(FolderEntity, "modified_by");
     });
 
-    // Validate modified_by
-    each([
-      {scenario: 'is not required but null', rule: 'type', value: null},
-      {scenario: 'valid uuid', rule: 'format', value: 'invalid-id'},
-      {scenario: 'valid format', rule: 'type', value: 42},
-    ]).describe("Should validate the modified_by", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultFolderDto({
-          modified_by: test.value
-        });
-        try {
-          new FolderEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('modified_by', test.rule)).toBeTruthy();
-        }
-      });
+    it("validates personal property", () => {
+      assertEntityProperty.boolean(FolderEntity, "personal");
+      assertEntityProperty.notRequired(FolderEntity, "personal");
     });
+  });
 
-    each([
-      {scenario: 'is not required but cannot be null', rule: null},
-      {scenario: 'valid url object', rule: 'type', value: 42},
-    ]).describe("Should validate the created", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultFolderDto({
-          created: test.value
-        });
-        try {
-          new FolderEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('created', test.rule)).toBeTruthy();
-        }
-      });
-    });
+  it("constructor works if valid minimal DTO is provided", () => {
+    const dto = minimalFolderDto();
+    const entity = new FolderEntity(dto);
+    expect(entity.id).toBeNull();
+    expect(entity.name).toEqual('Folder name');
+    expect(entity.folderParentId).toBeNull();
+    expect(entity.created).toBeNull();
+    expect(entity.modified).toBeNull();
+    expect(entity.permission).toBeNull();
+    expect(entity.permissions).toBeNull();
+    expect(entity.isReadOnly()).toBe(false);
+    expect(entity.canUpdate()).toBe(false);
+    expect(entity.isOwner()).toBe(false);
+    expect(entity.isPersonal()).toBe(null);
+    expect(entity.isShared()).toBe(null);
+  });
 
-    each([
-      {scenario: 'is not required but cannot be null', rule: null},
-      {scenario: 'valid url object', rule: 'type', value: 42},
-    ]).describe("Should validate the modified", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultFolderDto({
-          modified: test.value
-        });
-        try {
-          new FolderEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('modified', test.rule)).toBeTruthy();
-        }
-      });
-    });
+  it("constructor works if valid DTO is provided with optional properties", () => {
+    const dto = defaultFolderDto();
+    const entity = new FolderEntity(dto);
+    expect(entity.id).toEqual(dto.id);
+    expect(entity.name).toEqual('Accounting');
+    expect(entity.folderParentId).toBeNull();
+    expect(entity.created).toEqual("2020-02-01T00:00:00+00:00");
+    expect(entity.modified).toEqual("2020-02-01T00:00:00+00:00");
+    expect(entity.permission).toBeInstanceOf(PermissionEntity);
+    expect(entity.permission.toDto()).toEqual(expect.objectContaining({type: 15}));
+    expect(entity.permissions).toBeInstanceOf(PermissionsCollection);
+    expect(entity.permissions.length).toEqual(1);
+    expect(entity.isReadOnly()).toBe(false);
+    expect(entity.canUpdate()).toBe(true);
+    expect(entity.isOwner()).toBe(true);
+    expect(entity.isPersonal()).toBe(false);
+    expect(entity.isShared()).toBe(true);
+  });
 
-    each([
-      {scenario: 'is not required but cannot be null', rule: null},
-      {scenario: 'valid url object', rule: 'type', value: 42},
-      {scenario: 'valid url object', rule: 'type', value: 1},
-    ]).describe("Should validate the personal", test => {
-      it(`Should not accept: ${test.scenario}`, async() => {
-        expect.assertions(2);
-        const dto = defaultFolderDto({
-          personal: test.value
-        });
-        try {
-          new FolderEntity(dto);
-        } catch (error) {
-          expect(error).toBeInstanceOf(EntityValidationError);
-          expect(error.hasError('personal', test.rule)).toBeTruthy();
-        }
-      });
+  it('Should not accept invalid associated permission', async() => {
+    expect.assertions(2);
+    const dto = defaultFolderDto({
+      permission: ownerPermissionDto({id: "invalid-id"})
     });
+    try {
+      new FolderEntity(dto);
+    } catch (error) {
+      expect(error).toBeInstanceOf(EntityValidationError);
+      expect(error.hasError('id', 'format')).toBeTruthy();
+    }
+  });
 
-    it('Should not accept invalid associated permission', async() => {
-      expect.assertions(2);
-      const dto = defaultFolderDto({
-        permission: ownerPermissionDto({id: "invalid-id"})
-      });
-      try {
-        new FolderEntity(dto);
-      } catch (error) {
-        expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('id', 'format')).toBeTruthy();
-      }
+  it('Should not accept invalid associated permissions', async() => {
+    expect.assertions(2);
+    const dto = defaultFolderDto({
+      permissions: [ownerPermissionDto({id: "invalid-id"})]
     });
-
-    it('Should not accept invalid associated permissions', async() => {
-      expect.assertions(2);
-      const dto = defaultFolderDto({
-        permissions: [ownerPermissionDto({id: "invalid-id"})]
-      });
-      try {
-        new FolderEntity(dto);
-      } catch (error) {
-        expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('id', 'format')).toBeTruthy();
-      }
-    });
+    // The error is still incomplete, it should return an EntityValidationError with details on the permissions property.
+    expect(() => new FolderEntity(dto))
+      .not.toThrowCollectionValidationError("permissions.0.id.format");
+    expect(() => new FolderEntity(dto))
+      .toThrowCollectionValidationError("0.id.format");
   });
 
   describe("FolderEntity:toDto", () => {

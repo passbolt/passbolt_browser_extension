@@ -34,7 +34,7 @@
   "Initialize": "Rozpocznij",
   "Initializing": "Rozpoczynanie",
   "Initializing ...": "Rozpoczynanie ...",
-  "Mark as expired ...": "Mark as expired ...",
+  "Mark as expired ...": "Oznacz jako wygasły...",
   "MFA authentication is required.": "Uwierzytelnienie MFA jest wymagane.",
   "Moving {{name}}": "Przenoszenie {{name}}",
   "Moving {{total}} resources": "Przenoszenie {{total}} zasobów",
@@ -68,7 +68,7 @@
   "The keys should be an array of valid openpgp private keys.": "Klucze powinny być szeregiem prawidłowych kluczy prywatnych openpgp.",
   "The keys should be an array of valid openpgp public keys.": "Klucze powinny być szeregiem prawidłowych kluczy publicznych openpgp.",
   "The keys should be an array.": "Klucze powinny być szeregiem.",
-  "The message should be a valid openpgp clear text message.": "The message should be a valid openpgp clear text message.",
+  "The message should be a valid openpgp clear text message.": "Wiadomość powinna być prawidłową wiadomością tekstową openpgp.",
   "The message should be a valid openpgp message.": "Wiadomość powinna być prawidłową wiadomością openpgp.",
   "The message should be of type string.": "Wiadomość powinna być ciągiem.",
   "The private key should be a valid openpgp key.": "Klucz prywatny powinien być prawidłowym kluczem openpgp.",
@@ -91,5 +91,5 @@
   "Updating password": "Aktualizowanie hasła",
   "Updating resource": "Aktualizowanie zasobu",
   "Updating users' key...": "Aktualizowanie klucza użytkowników...",
-  "You have already started the process on another tab.": "You have already started the process on another tab."
+  "You have already started the process on another tab.": "Ten proces już został przez Ciebie rozpoczęty w innej karcie."
 }

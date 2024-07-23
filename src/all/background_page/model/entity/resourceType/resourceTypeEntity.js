@@ -67,12 +67,9 @@ class ResourceTypeEntity extends Entity {
           "type": "object"
         },
         "description": {
-          "anyOf": [{
-            "type": "string",
-            "maxLength": RESOURCE_TYPE_DESCRIPTION_MAX_LENGTH
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "maxLength": RESOURCE_TYPE_DESCRIPTION_MAX_LENGTH,
+          "nullable": true,
         },
         "created": {
           "type": "string",

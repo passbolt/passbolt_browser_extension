@@ -15,6 +15,7 @@ import GroupModel from "../model/group/groupModel";
 import GroupsUpdateController from "../controller/group/groupUpdateController";
 import GroupEntity from "../model/entity/group/groupEntity";
 import GroupDeleteTransferEntity from "../model/entity/group/transfer/groupDeleteTransfer";
+import FindGroupsCurrentUserIsMemberOfController from "../controller/group/findGroupsCurrentUserIsMemberOfController";
 
 /**
  * Listens to the groups events
@@ -56,6 +57,18 @@ const listen = function(worker, apiClientOptions, account) {
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  /*
+   * Find all the groups
+   *
+   * @listens passbolt.groups.find-my-groups
+   * @param requestId {uuid} The request identifier
+   * @param options {object} The options to apply to the find
+   */
+  worker.port.on('passbolt.groups.find-my-groups', async requestId => {
+    const controller = new FindGroupsCurrentUserIsMemberOfController(worker, requestId, apiClientOptions);
+    controller._exec();
   });
 
   /*

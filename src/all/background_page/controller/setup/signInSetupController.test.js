@@ -19,7 +19,7 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SignInSetupController from "./signInSetupController";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";

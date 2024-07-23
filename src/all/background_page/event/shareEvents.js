@@ -12,6 +12,7 @@ import ShareResourcesController from "../controller/share/shareResourcesControll
 import ShareFoldersController from "../controller/share/shareFoldersController";
 import FoldersCollection from "../model/entity/folder/foldersCollection";
 import PermissionChangesCollection from "../model/entity/permission/change/permissionChangesCollection";
+import SearchUsersAndGroupsController from "../controller/share/searchUsersAndGroupsController";
 
 /**
  * Listens the share events
@@ -84,6 +85,18 @@ const listen = function(worker, apiClientOptions, account) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  /**
+   * Search for any Groups or Users that match the given keyword
+   *
+   * @listens passbolt.share.search-aros
+   * @param {string} requestId uuid, the request identifier
+   * @param {string} keyword the keyword with which to run the search
+   */
+  worker.port.on('passbolt.share.search-aros', async(requestId, keyword) => {
+    const controller = new SearchUsersAndGroupsController(worker, requestId, apiClientOptions);
+    await controller._exec(keyword);
   });
 };
 export const ShareEvents = {listen};

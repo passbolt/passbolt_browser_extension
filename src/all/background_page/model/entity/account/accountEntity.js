@@ -79,14 +79,11 @@ class AccountEntity extends AbstractAccountEntity {
         ... abstractAccountEntitySchema.properties,
         "type": {
           "type": "string",
-          "pattern": `^${AccountEntity.TYPE_ACCOUNT}$`,
+          "enum": [AccountEntity.TYPE_ACCOUNT],
         },
         "role_name": {
-          "anyOf": [
-            RoleEntity.getSchema().properties.name,
-            {
-              "type": "null"
-            }]
+          ...RoleEntity.getSchema().properties.name,
+          "nullable": true,
         },
       }
     };

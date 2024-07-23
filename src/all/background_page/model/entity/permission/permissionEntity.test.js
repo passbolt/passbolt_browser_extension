@@ -11,191 +11,237 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import PermissionEntity from "./permissionEntity";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {
+  defaultPermissionDto,
+  minimumPermissionDto
+} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import UserEntity from "../user/userEntity";
+import GroupEntity from "../group/groupEntity";
 
-/**
- * getTestDto
- * @returns {object}
- */
-function getTestDto() {
-  return {
-    'aro': PermissionEntity.ARO_USER,
-    'aco': PermissionEntity.ACO_RESOURCE,
-    'aro_foreign_key': '7f077753-0835-4054-92ee-556660ea04f1',
-    'aco_foreign_key': '7f077753-0835-4054-92ee-556660ea04f2',
-    'type': PermissionEntity.PERMISSION_OWNER,
-  };
-}
+describe("PermissionEntity", () => {
+  describe("GroupEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(PermissionEntity.ENTITY_NAME, PermissionEntity.getSchema());
+    });
 
-describe("Entity permission", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(PermissionEntity.ENTITY_NAME, PermissionEntity.getSchema());
+    it("validates id property", () => {
+      assertEntityProperty.string(PermissionEntity, "id");
+      assertEntityProperty.uuid(PermissionEntity, "id");
+      assertEntityProperty.notRequired(PermissionEntity, "id");
+    });
+
+    it("validates aco property", () => {
+      assertEntityProperty.string(PermissionEntity, "aco");
+      assertEntityProperty.enumeration(PermissionEntity, "aco", [PermissionEntity.ACO_FOLDER, PermissionEntity.ACO_RESOURCE]);
+      assertEntityProperty.required(PermissionEntity, "aco");
+    });
+
+    it("validates aco_foreign_key property", () => {
+      assertEntityProperty.string(PermissionEntity, "aco_foreign_key");
+      assertEntityProperty.uuid(PermissionEntity, "aco_foreign_key");
+      assertEntityProperty.required(PermissionEntity, "aco_foreign_key");
+    });
+
+    it("validates aro property", () => {
+      assertEntityProperty.string(PermissionEntity, "aro");
+      assertEntityProperty.enumeration(PermissionEntity, "aro", [PermissionEntity.ARO_GROUP, PermissionEntity.ARO_USER], ['not-valid-aro', '']);
+      assertEntityProperty.required(PermissionEntity, "aro");
+    });
+
+    it("validates aro_foreign_key property", () => {
+      assertEntityProperty.string(PermissionEntity, "aro_foreign_key");
+      assertEntityProperty.uuid(PermissionEntity, "aro_foreign_key");
+      assertEntityProperty.required(PermissionEntity, "aro_foreign_key");
+    });
+
+    it("validates type property", () => {
+      assertEntityProperty.integer(PermissionEntity, "type");
+      assertEntityProperty.enumeration(PermissionEntity, "type", PermissionEntity.PERMISSION_TYPES, [-1, 0, 42]);
+      assertEntityProperty.required(PermissionEntity, "type");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(PermissionEntity, "created");
+      assertEntityProperty.dateTime(PermissionEntity, "created");
+      assertEntityProperty.notRequired(PermissionEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(PermissionEntity, "modified");
+      assertEntityProperty.dateTime(PermissionEntity, "modified");
+      assertEntityProperty.notRequired(PermissionEntity, "modified");
+    });
   });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const aroForeignKey = '7f077753-0835-4054-92ee-556660ea04f1';
-    const acoForeignKey = '466dc5ea-27ce-4281-8db1-8b130469b9b2';
-    const dto = {
-      'aro': PermissionEntity.ARO_USER,
-      'aco': PermissionEntity.ACO_RESOURCE,
-      'aro_foreign_key': aroForeignKey,
-      'aco_foreign_key': acoForeignKey,
-      'type': PermissionEntity.PERMISSION_OWNER,
-    };
+  describe("PermissionEntity::constructor", () => {
+    it("works if valid minimal DTO is provided", () => {
+      expect.assertions(11);
+      const dto = minimumPermissionDto();
+      const entity = new PermissionEntity(dto);
+      expect(entity.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
+      expect(entity.id).toBeNull();
+      expect(entity.aco).toEqual(dto.aco);
+      expect(entity.aro).toEqual(dto.aro);
+      expect(entity.acoForeignKey).toEqual(dto.aco_foreign_key);
+      expect(entity.aroForeignKey).toEqual(dto.aro_foreign_key);
+      expect(entity.type).toEqual(dto.type);
+      expect(entity._props.created).toBeUndefined();
+      expect(entity._props.modified).toBeUndefined();
+      expect(entity.user).toBeNull();
+      expect(entity.group).toBeNull();
+    });
 
-    // Entity props is equal to original dto
-    const entity = new PermissionEntity(dto);
-    expect(entity.toDto()).toEqual(dto);
-
-    // optional id is not set
-    expect(entity.id).toBe(null);
-    expect(entity._hasProp('id')).toBe(false);
-
-    // Other fields are set properly
-    expect(entity.aro).toBe(PermissionEntity.ARO_USER);
-    expect(entity.aco).toBe(PermissionEntity.ACO_RESOURCE);
-    expect(entity.type).toBe(PermissionEntity.PERMISSION_OWNER);
-    expect(entity.aroForeignKey).toBe(aroForeignKey);
-    expect(entity.acoForeignKey).toBe(acoForeignKey);
-    expect(entity._hasProp('acoForeignKey')).toBe(true);
+    it("constructor works if valid DTO is provided with optional and non supported fields", () => {
+      expect.assertions(11);
+      const dto = defaultPermissionDto({}, {withGroup: true, withUser: true});
+      const entity = new PermissionEntity(dto);
+      expect(entity.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
+      expect(entity.id).toEqual(dto.id);
+      expect(entity.aco).toEqual(dto.aco);
+      expect(entity.aro).toEqual(dto.aro);
+      expect(entity.acoForeignKey).toEqual(dto.aco_foreign_key);
+      expect(entity.aroForeignKey).toEqual(dto.aro_foreign_key);
+      expect(entity.type).toEqual(dto.type);
+      expect(entity._props.created).toEqual(dto.created);
+      expect(entity._props.modified).toEqual(dto.modified);
+      expect(entity.user).toBeInstanceOf(UserEntity);
+      expect(entity.group).toBeInstanceOf(GroupEntity);
+    });
   });
 
-  it("constructor works if valid DTO is provided with optional and non supported fields", () => {
-    const aroForeignKey = '7f077753-0835-4054-92ee-556660ea04f1';
-    const acoForeignKey = '466dc5ea-27ce-4281-8db1-8b130469b9b2';
-    const id = '466dc5ea-27ce-4281-8db1-8b130469b9b3';
-    const dto = {
-      'id': id,
-      'aro': PermissionEntity.ARO_USER,
-      'aco': PermissionEntity.ACO_RESOURCE,
-      'aro_foreign_key': aroForeignKey,
-      'aco_foreign_key': acoForeignKey,
-      'type': PermissionEntity.PERMISSION_OWNER,
-      'modified': '2022-04-23 17:34:00',
-      '_custom': 'not needed'
-    };
-    const filtered = {
-      'id': id,
-      'aro': PermissionEntity.ARO_USER,
-      'aco': PermissionEntity.ACO_RESOURCE,
-      'aro_foreign_key': aroForeignKey,
-      'aco_foreign_key': acoForeignKey,
-      'type': PermissionEntity.PERMISSION_OWNER,
-      'modified': '2022-04-23 17:34:00',
-    };
-
-    // Entity props is filtered
-    const entity = new PermissionEntity(dto);
-    expect(entity.toDto()).toEqual(filtered);
-
-    expect(entity._hasProp('_custom')).toBe(false);
-    expect(entity._hasProp('id')).toBe(true);
-    expect(entity._hasProp('modified')).toBe(true);
-    expect(entity.id).toBe(id);
+  describe("PermissionEntity::isIdMatching", () => {
+    it("should match matching id", () => {
+      expect.assertions(2);
+      const dto1 = defaultPermissionDto();
+      const entity1 = new PermissionEntity(dto1);
+      const entity2 = new PermissionEntity(dto1);
+      const entity3 = new PermissionEntity(defaultPermissionDto({id: crypto.randomUUID()}));
+      expect(PermissionEntity.isIdMatching(entity1, entity2)).toBeTruthy();
+      expect(PermissionEntity.isIdMatching(entity1, entity3)).toBeFalsy();
+    });
   });
 
-  it("constructor returns validation error if dto required fields are missing", () => {
-    try {
-      new PermissionEntity({
-        'id': 'nope',
-        'modified': 123
+  describe("PermissionEntity::isAroMatching", () => {
+    it("should match matching aro", () => {
+      expect.assertions(2);
+      const dto1 = defaultPermissionDto();
+      const entity1 = new PermissionEntity(dto1);
+      const entity2 = new PermissionEntity(dto1);
+      const entity3 = new PermissionEntity(defaultPermissionDto({aro: PermissionEntity.ARO_GROUP}));
+      expect(PermissionEntity.isAroMatching(entity1, entity2)).toBeTruthy();
+      expect(PermissionEntity.isAroMatching(entity1, entity3)).toBeFalsy();
+    });
+  });
+
+  describe("PermissionEntity::isAcoMatching", () => {
+    it("should match matching aco", () => {
+      expect.assertions(2);
+      const dto1 = defaultPermissionDto();
+      const entity1 = new PermissionEntity(dto1);
+      const entity2 = new PermissionEntity(dto1);
+      const entity3 = new PermissionEntity(defaultPermissionDto({aco: PermissionEntity.ACO_FOLDER}));
+      expect(PermissionEntity.isAcoMatching(entity1, entity2)).toBeTruthy();
+      expect(PermissionEntity.isAcoMatching(entity1, entity3)).toBeFalsy();
+    });
+  });
+
+  describe("PermissionEntity::isAcoAndAroMatching", () => {
+    it("should match matching aco & aro", () => {
+      expect.assertions(2);
+      const dto1 = defaultPermissionDto();
+      const entity1 = new PermissionEntity(dto1);
+      const entity2 = new PermissionEntity(dto1);
+      const entity3 = new PermissionEntity(defaultPermissionDto({aro: PermissionEntity.ARO_GROUP, aco: PermissionEntity.ACO_FOLDER}));
+      expect(PermissionEntity.isAcoAndAroMatching(entity1, entity2)).toBeTruthy();
+      expect(PermissionEntity.isAcoAndAroMatching(entity1, entity3)).toBeFalsy();
+    });
+  });
+
+  describe("PermissionEntity::isTypeMatching", () => {
+    it("should match matching type", () => {
+      expect.assertions(2);
+      const dto1 = defaultPermissionDto();
+      const entity1 = new PermissionEntity(dto1);
+      const entity2 = new PermissionEntity(dto1);
+      const entity3 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_READ}));
+      expect(PermissionEntity.isTypeMatching(entity1, entity2)).toBeTruthy();
+      expect(PermissionEntity.isTypeMatching(entity1, entity3)).toBeFalsy();
+    });
+  });
+
+  describe("PermissionEntity::isMatchingAroAcoType", () => {
+    it("should match matching aco & aro & type", () => {
+      expect.assertions(2);
+      const dto1 = defaultPermissionDto();
+      const entity1 = new PermissionEntity(dto1);
+      const entity2 = new PermissionEntity(dto1);
+      const entity3 = new PermissionEntity(defaultPermissionDto({aro: PermissionEntity.ARO_GROUP, aco: PermissionEntity.ACO_FOLDER, type: PermissionEntity.PERMISSION_READ}));
+      expect(PermissionEntity.isMatchingAroAcoType(entity1, entity2)).toBeTruthy();
+      expect(PermissionEntity.isMatchingAroAcoType(entity1, entity3)).toBeFalsy();
+    });
+  });
+
+  describe("PermissionEntity::getHighestPermissionType", () => {
+    it("should get the highest permission type", () => {
+      expect.assertions(4);
+      const entity1 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_OWNER}));
+      const entity2 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_UPDATE}));
+      const entity3 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_READ}));
+      expect(PermissionEntity.getHighestPermissionType(entity1, entity2)).toBe(PermissionEntity.PERMISSION_OWNER);
+      expect(PermissionEntity.getHighestPermissionType(entity2, entity3)).toBe(PermissionEntity.PERMISSION_UPDATE);
+      expect(PermissionEntity.getHighestPermissionType(entity3, entity1)).toBe(PermissionEntity.PERMISSION_OWNER);
+      expect(PermissionEntity.getHighestPermissionType(entity3, entity3)).toBe(PermissionEntity.PERMISSION_READ);
+    });
+  });
+
+  describe("PermissionEntity::getHighestPermission", () => {
+    it("should get the highest permission", () => {
+      expect.assertions(4);
+      const entity1 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_OWNER}));
+      const entity2 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_UPDATE}));
+      const entity3 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_READ}));
+      expect(PermissionEntity.getHighestPermission(entity1, entity2)).toBe(entity1);
+      expect(PermissionEntity.getHighestPermission(entity2, entity3)).toBe(entity2);
+      expect(PermissionEntity.getHighestPermission(entity3, entity1)).toBe(entity1);
+      expect(PermissionEntity.getHighestPermission(entity3, entity3)).toBe(entity3);
+    });
+  });
+
+  describe("PermissionEntity::assertIsPermission", () => {
+    it("should throw if null given", () => {
+      expect.assertions(1);
+      expect(() => PermissionEntity.assertIsPermission(null)).toThrow(TypeError);
+    });
+
+    it("should throw if array given", () => {
+      expect.assertions(1);
+      const dto = defaultPermissionDto();
+      expect(() => PermissionEntity.assertIsPermission(dto)).toThrow(TypeError);
+    });
+
+    it("should accept permission entity", () => {
+      expect.assertions(1);
+      const entity = new PermissionEntity(defaultPermissionDto());
+      expect(() => PermissionEntity.assertIsPermission(entity)).not.toThrow();
+    });
+  });
+
+  describe("PermissionEntity::copyForAnotherAco", () => {
+    it("should copy an entity for another aco", () => {
+      expect.assertions(1);
+      const p = new PermissionEntity(defaultPermissionDto());
+      const uuid0 = crypto.randomUUID();
+      const p2 = p.copyForAnotherAco(PermissionEntity.ACO_FOLDER, uuid0);
+      expect(p2.toDto()).toEqual({
+        'aro': PermissionEntity.ARO_USER,
+        'aro_foreign_key': p.aroForeignKey,
+        'aco': PermissionEntity.ACO_FOLDER,
+        'aco_foreign_key': uuid0,
+        'type': PermissionEntity.PERMISSION_OWNER,
       });
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)). toBe(true);
-      expect(error.hasError('id')).toBe(true);
-      expect(error.hasError('modified')).toBe(true);
-      expect(error.hasError('aro')).toBe(true);
-      expect(error.hasError('aco')).toBe(true);
-      expect(error.hasError('aro_foreign_key')).toBe(true);
-      expect(error.hasError('aco_foreign_key')).toBe(true);
-      expect(error.hasError('type')).toBe(true);
-    }
-  });
-
-  it("assertion checks work", () => {
-    const uuid0 = '7f077753-0835-4054-92ee-556660ea04f0';
-    const uuid1 = '7f077753-0835-4054-92ee-556660ea04f1';
-    const uuid2 = '7f077753-0835-4054-92ee-556660ea04f2';
-    const uuid3 = '7f077753-0835-4054-92ee-556660ea04f3';
-    const uuid4 = '7f077753-0835-4054-92ee-556660ea04f4';
-    const uuid5 = '7f077753-0835-4054-92ee-556660ea04f5';
-
-    const dto1 = {
-      'id': uuid0,
-      'aro': PermissionEntity.ARO_USER,
-      'aco': PermissionEntity.ACO_RESOURCE,
-      'aro_foreign_key': uuid1,
-      'aco_foreign_key': uuid2,
-      'type': PermissionEntity.PERMISSION_OWNER,
-    };
-    const dto2 = {
-      'id': uuid3,
-      'aro': PermissionEntity.ARO_GROUP,
-      'aco': PermissionEntity.ACO_FOLDER,
-      'aro_foreign_key': uuid4,
-      'aco_foreign_key': uuid5,
-      'type': PermissionEntity.PERMISSION_UPDATE,
-    };
-    const same = new PermissionEntity(dto1);
-    const samesame = new PermissionEntity(dto1);
-    const butdifferent = new PermissionEntity(dto2);
-
-    expect(PermissionEntity.isIdMatching(same, samesame)).toBe(true);
-    expect(PermissionEntity.isIdMatching(samesame, butdifferent)).toBe(false);
-
-    expect(PermissionEntity.isAroMatching(same, samesame)).toBe(true);
-    expect(PermissionEntity.isAroMatching(samesame, butdifferent)).toBe(false);
-
-    expect(PermissionEntity.isAcoMatching(same, samesame)).toBe(true);
-    expect(PermissionEntity.isAcoMatching(samesame, butdifferent)).toBe(false);
-
-    expect(PermissionEntity.isAcoAndAroMatching(same, samesame)).toBe(true);
-    expect(PermissionEntity.isAcoAndAroMatching(samesame, butdifferent)).toBe(false);
-
-    expect(PermissionEntity.isTypeMatching(same, samesame)).toBe(true);
-    expect(PermissionEntity.isTypeMatching(samesame, butdifferent)).toBe(false);
-
-    expect(PermissionEntity.isMatchingAroAcoType(same, samesame)).toBe(true);
-    expect(PermissionEntity.isMatchingAroAcoType(samesame, butdifferent)).toBe(false);
-
-    expect(PermissionEntity.getHighestPermissionType(same, samesame)).toBe(PermissionEntity.PERMISSION_OWNER);
-    expect(PermissionEntity.getHighestPermissionType(same, butdifferent)).toBe(PermissionEntity.PERMISSION_OWNER);
-    expect(PermissionEntity.getHighestPermissionType(butdifferent, samesame)).toBe(PermissionEntity.PERMISSION_OWNER);
-
-    expect(PermissionEntity.getHighestPermission(same, samesame)).toEqual(same);
-    expect(PermissionEntity.getHighestPermission(same, butdifferent)).toEqual(same);
-    expect(PermissionEntity.getHighestPermission(butdifferent, samesame)).toEqual(samesame);
-  });
-
-  it("assert permission fails if not an entity", () => {
-    try {
-      PermissionEntity.assertIsPermission(null);
-      expect(false).toBe(true);
-    } catch (error) {
-      expect(error instanceof TypeError).toBe(true);
-    }
-    try {
-      PermissionEntity.assertIsPermission(getTestDto());
-      expect(false).toBe(true);
-    } catch (error) {
-      expect(error instanceof TypeError).toBe(true);
-    }
-    PermissionEntity.assertIsPermission(new PermissionEntity(getTestDto()));
-  });
-
-  it("assert permission fails if not an entity", () => {
-    const p = new PermissionEntity(getTestDto());
-    const uuid0 = '7f077753-0835-4054-92ee-556660ea04f0';
-    const p2 = p.copyForAnotherAco(PermissionEntity.ACO_FOLDER, uuid0);
-    expect(p2.toDto()).toEqual({
-      'aro': PermissionEntity.ARO_USER,
-      'aro_foreign_key': '7f077753-0835-4054-92ee-556660ea04f1',
-      'aco': PermissionEntity.ACO_FOLDER,
-      'aco_foreign_key': '7f077753-0835-4054-92ee-556660ea04f0',
-      'type': PermissionEntity.PERMISSION_OWNER,
     });
   });
 });

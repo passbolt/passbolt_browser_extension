@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 
 const ENTITY_NAME = 'gpgkey';
@@ -22,18 +21,7 @@ const FINGERPRINT_MAX_LENGTH = 40;
 const KEY_ID_MIN_LENGTH = 8;
 const KEY_ID_MAX_LENGTH = 16;
 
-class GpgkeyEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(gpgkeyDto, options = {}) {
-    super(EntitySchema.validate(
-      GpgkeyEntity.ENTITY_NAME,
-      gpgkeyDto,
-      GpgkeyEntity.getSchema()
-    ), options);
-  }
-
+class GpgkeyEntity extends EntityV2 {
   /**
    * Get gpgkey entity schema
    * @returns {Object} schema
@@ -54,6 +42,7 @@ class GpgkeyEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
+        //@todo: enforce fingerprint checks with regexp like the other fingerprint schema
         "fingerprint": {
           "type": "string",
           "minLength": FINGERPRINT_MIN_LENGTH,
@@ -66,21 +55,15 @@ class GpgkeyEntity extends Entity {
           "type": "boolean"
         },
         "type": {
-          "anyOf": [{
-            "type": "string"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "nullable": true,
         },
         "uid": {
           "type": "string"
         },
         "bits": {
-          "anyOf": [{
-            "type": "integer",
-          }, {
-            "type": "null"
-          }]
+          "type": "integer",
+          "nullable": true,
         },
         "key_id": {
           "type": "string",
@@ -92,12 +75,9 @@ class GpgkeyEntity extends Entity {
           "format": "date-time"
         },
         "expires": {
-          "anyOf": [{
-            "type": "string",
-            "format": "date-time"
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "format": "date-time",
+          "nullable": true,
         },
         "created": {
           "type": "string",

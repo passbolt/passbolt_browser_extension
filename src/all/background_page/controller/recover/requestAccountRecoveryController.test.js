@@ -17,7 +17,7 @@ import RequestAccountRecoveryController from "./requestAccountRecoveryController
 import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {pendingAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import {pendingAccountRecoveryRequestDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";

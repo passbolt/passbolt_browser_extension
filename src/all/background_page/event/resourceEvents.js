@@ -13,6 +13,7 @@ import GetResourceGridUserSettingController
 import SetResourceGridUserSettingController
   from "../controller/resourceGridSetting/setResourceGridUserSettingController";
 import SetResourcesExpiryDateController from "../controller/resource/setResourcesExpiryDateController";
+import FindResourceDetailsController from "../controller/resource/findResourceDetailsController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -30,6 +31,18 @@ const listen = function(worker, apiClientOptions, account) {
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  /**
+   * Find a resource with its details given an id
+   *
+   * @listens passbolt.resources.find-details
+   * @param requestId {uuid} The request identifier
+   * @param options {object} The options to apply to the find
+   */
+  worker.port.on('passbolt.resources.find-details', async(requestId, resourceId) => {
+    const controller = new FindResourceDetailsController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourceId);
   });
 
   /*

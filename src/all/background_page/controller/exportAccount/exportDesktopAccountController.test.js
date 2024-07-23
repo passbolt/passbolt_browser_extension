@@ -18,7 +18,7 @@ import {requestId, worker} from "./exportDesktopAccountController.test.data";
 import FileService from "../../service/file/fileService";
 import GetLegacyAccountService from "../../service/account/getLegacyAccountService";
 import {Buffer} from 'buffer';
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import SignMessageService from "../../service/crypto/signMessageService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";

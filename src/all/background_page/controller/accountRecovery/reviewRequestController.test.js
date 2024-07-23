@@ -23,7 +23,7 @@ import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {
   pendingAccountRecoveryRequestDto,
   pendingAccountRecoveryRequestWithInvalidAccountRecoveryPrivateKeyPasswordDto,
@@ -31,7 +31,7 @@ import {
   pendingAccountRecoveryRequestWithoutPrivateKeyPasswordDto,
   pendingAccountRecoveryRequestWithWrongPrivateKeyIdDto,
   pendingAccountRecoveryRequestWithWrongPrivateKeyUserIdDto,
-} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import Keyring from "../../model/keyring";

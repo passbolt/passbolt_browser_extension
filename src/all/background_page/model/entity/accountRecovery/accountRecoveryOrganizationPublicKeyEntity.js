@@ -51,12 +51,9 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
           "type": "string",
         },
         "fingerprint": {
-          "anyOf": [{
-            "type": "string",
-            "length": FINGERPRINT_LENGTH
-          }, {
-            "type": "null"
-          }]
+          "type": "string",
+          "length": FINGERPRINT_LENGTH,
+          "nullable": true,
         },
         "created": {
           "type": "string",

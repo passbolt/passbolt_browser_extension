@@ -15,14 +15,138 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountEntity from "./accountEntity";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {defaultAccountDto} from "./accountEntity.test.data";
 
 describe("AccountEntity", () => {
-  describe("AccountEntity:constructor", () => {
+  describe("AccountEntity::getSchema", () => {
     it("schema must validate", () => {
       EntitySchema.validateSchema(AccountEntity.ENTITY_NAME, AccountEntity.getSchema());
     });
 
+    it("validates domain property", () => {
+      assertEntityProperty.string(AccountEntity, "domain");
+      assertEntityProperty.required(AccountEntity, "domain");
+    });
+
+    it("validates user_id property", () => {
+      assertEntityProperty.string(AccountEntity, "user_id");
+      assertEntityProperty.uuid(AccountEntity, "user_id");
+      assertEntityProperty.required(AccountEntity, "user_id");
+    });
+
+    it("validates user_key_fingerprint property", () => {
+      const successScenario = [
+        {scenario: "a valid fingerprint", value: "ABCD".repeat(10)},
+      ];
+
+      const failingScenario = [
+        {scenario: "non hexadecimal fingerprint character set", value: "GHIJ".repeat(10)},
+        {scenario: "wrong fingerprint character case set", value: "abcd".repeat(10)},
+      ];
+
+      assertEntityProperty.string(AccountEntity, "user_key_fingerprint");
+      assertEntityProperty.minLength(AccountEntity, "user_key_fingerprint", 40);
+      assertEntityProperty.maxLength(AccountEntity, "user_key_fingerprint", 40);
+      assertEntityProperty.assert(AccountEntity, "user_key_fingerprint", successScenario, failingScenario, "pattern");
+      assertEntityProperty.notRequired(AccountEntity, "user_key_fingerprint");
+    });
+
+    it("validates user_public_armored_key property", () => {
+      assertEntityProperty.string(AccountEntity, "user_public_armored_key");
+      assertEntityProperty.required(AccountEntity, "user_public_armored_key");
+    });
+
+    it("validates user_private_armored_key property", () => {
+      assertEntityProperty.string(AccountEntity, "user_private_armored_key");
+      assertEntityProperty.required(AccountEntity, "user_private_armored_key");
+    });
+
+    it("validates server_public_armored_key property", () => {
+      assertEntityProperty.string(AccountEntity, "server_public_armored_key");
+      assertEntityProperty.required(AccountEntity, "server_public_armored_key");
+    });
+
+    it("validates username property", () => {
+      assertEntityProperty.string(AccountEntity, "username");
+      assertEntityProperty.email(AccountEntity, "username");
+      //@todo: add custom email validation
+      assertEntityProperty.required(AccountEntity, "username");
+    });
+
+    it("validates first_name property", () => {
+      assertEntityProperty.string(AccountEntity, "first_name");
+      assertEntityProperty.minLength(AccountEntity, "first_name", 1);
+      assertEntityProperty.maxLength(AccountEntity, "first_name", 255);
+      assertEntityProperty.required(AccountEntity, "first_name");
+    });
+
+    it("validates last_name property", () => {
+      assertEntityProperty.string(AccountEntity, "last_name");
+      assertEntityProperty.minLength(AccountEntity, "last_name", 1);
+      assertEntityProperty.maxLength(AccountEntity, "last_name", 255);
+      assertEntityProperty.required(AccountEntity, "first_name");
+    });
+
+    it("validates locale property", () => {
+      assertEntityProperty.nullable(AccountEntity, "locale");
+      assertEntityProperty.locale(AccountEntity, "locale");
+      assertEntityProperty.notRequired(AccountEntity, "locale");
+    });
+
+    it("validates security_token property", () => {
+      //@todo: refactor security_token scenarios to put it on assertEntityProperty
+      const securityTokenGenerator = ({code = "Abc", color = "#abcdef", textcolor = "#abcdef"} = {}) => ({code, color, textcolor});
+
+      const successScenarios = [
+        {scenario: "a valid security token", value: securityTokenGenerator()},
+      ];
+
+      const failingScenarios = [
+        assertEntityProperty.SCENARIO_STRING,
+        assertEntityProperty.SCENARIO_INTEGER,
+        assertEntityProperty.SCENARIO_OBJECT,
+        assertEntityProperty.SCENARIO_ARRAY,
+        assertEntityProperty.SCENARIO_TRUE,
+        {scenario: "an invalid security token code", value: securityTokenGenerator({code: ";;;"})},
+        {scenario: "an invalid security token color", value: securityTokenGenerator({color: "redish"})},
+        {scenario: "an invalid security token textcolor", value: securityTokenGenerator({textcolor: "greenish"})},
+      ];
+
+      successScenarios.forEach(test => {
+        const dto = defaultAccountDto();
+        dto.security_token = test.value;
+        expect(() => new AccountEntity(dto)).not.toThrow();
+      });
+
+      failingScenarios.forEach(test => {
+        const dto = defaultAccountDto();
+        dto.security_token = test.value;
+        expect(() => new AccountEntity(dto)).toThrow(EntityValidationError);
+      });
+    });
+
+    it("validates role_name property", () => {
+      const successScenarios = [
+        {scenario: "valid role 'user'", value: 'user'},
+        {scenario: "valid role 'admin'", value: 'admin'},
+      ];
+
+      const failingScenarios = [
+        assertEntityProperty.SCENARIO_STRING,
+        assertEntityProperty.SCENARIO_INTEGER,
+        assertEntityProperty.SCENARIO_OBJECT,
+        assertEntityProperty.SCENARIO_ARRAY,
+        assertEntityProperty.SCENARIO_TRUE,
+      ];
+
+      assertEntityProperty.nullable(AccountEntity, "role_name");
+      assertEntityProperty.assert(AccountEntity, "role_name", successScenarios, failingScenarios);
+      assertEntityProperty.notRequired(AccountEntity, "role_name");
+    });
+  });
+
+  describe("AccountEntity:constructor", () => {
     it("it should instantiate the entity with a minimal dto", () => {
       expect.assertions(2);
       const dto = defaultAccountDto();

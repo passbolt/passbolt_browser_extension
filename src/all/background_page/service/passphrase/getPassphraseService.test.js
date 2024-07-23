@@ -22,7 +22,7 @@ import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import PortManager from "../../sdk/port/portManager";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";

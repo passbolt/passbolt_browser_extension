@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.9.1] - 2024-07-23
+### Fixed
+- PB-34134 As a signed-in user I should search resources even if the data integrity is corrupted
+
 ## [4.9.0] - 2024-07-22
 ### Added
 - PB-33439 As a user I want to hide entropy on passphrases passwords
@@ -1715,7 +1719,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.9.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.9.1...HEAD
+[4.9.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.9.0...4.9.1
 [4.9.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.2...4.9.0
 [4.8.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.1...4.8.2
 [4.8.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.8.0...4.8.1

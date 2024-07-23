@@ -104,7 +104,9 @@ describe("Resource entity", () => {
     it("validates personal property", () => {
       assertEntityProperty.boolean(ResourceEntity, "personal");
       assertEntityProperty.notRequired(ResourceEntity, "personal");
+      assertEntityProperty.nullable(ResourceEntity, "personal");
     });
+    
   });
 
   it("constructor works if valid DTO is provided", () => {

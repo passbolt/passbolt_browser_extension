@@ -28,6 +28,7 @@ const RESOURCE_NAME_MAX_LENGTH = 255;
 const RESOURCE_USERNAME_MAX_LENGTH = 255;
 const RESOURCE_URI_MAX_LENGTH = 1024;
 const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
+const METADATA_OBJECT_TYPE = "PASSBOLT_METADATA_V5";
 
 class ResourceEntity extends EntityV2 {
   /**
@@ -425,6 +426,23 @@ class ResourceEntity extends EntityV2 {
    */
   isSuggestion(url) {
     return canSuggestUrl(url, this.uri);
+  }
+
+  /**
+   * Transform DTO from V4 to V5
+   * @param {Object} resourceDTO dto v4
+   * @returns {Object} resourceDTO dto v5
+   */
+  static transformDtoFromV4toV5(resourceDTO) {
+    resourceDTO.metadata = {
+      object_type: METADATA_OBJECT_TYPE,
+      resource_type_id: resourceDTO.resourceTypeId,
+      name: resourceDTO.name,
+      username: resourceDTO.username,
+      uris: resourceDTO.uri ? [resourceDTO.uri] : [],
+      description: resourceDTO.description
+    }
+    return resourceDTO;
   }
 
   /*

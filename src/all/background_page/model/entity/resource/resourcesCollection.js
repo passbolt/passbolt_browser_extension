@@ -340,6 +340,21 @@ class ResourcesCollection extends EntityV2Collection {
   static get RULE_UNIQUE_ID() {
     return RULE_UNIQUE_ID;
   }
+
+  /*
+   * ==================================================
+   * Meta data relative
+   * ==================================================
+   */
+
+  /**
+   * Transform collection DTO from V4 to V5
+   * @param {Array} resourcesCollectionDTO dto v4
+   * @returns {Array} resourcesCollectionDTO dto v5
+   */
+  static transformDtoFromV4toV5(resourcesCollectionDTO) {
+    return resourcesCollectionDTO.map((item) => ResourceEntity.transformDtoFromV4toV5(item));
+  }
 }
 
 export default ResourcesCollection;

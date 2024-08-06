@@ -50,7 +50,7 @@ describe("ResourcesCollection", () => {
       const dto2 = {"name": "resource2"};
       const dtos = [dto1, dto2];
       const collection = new ResourcesCollection(dtos);
-      expect(collection.toDto()).toEqual(dtos);
+      expect(collection.toDto()).toEqual(ResourcesCollection.transformDtoFromV4toV5(dtos));
       expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
       expect(collection).toHaveLength(2);
       expect(collection.items[0].name).toEqual('resource1');
@@ -64,7 +64,7 @@ describe("ResourcesCollection", () => {
       const dtos = [dto1, dto2];
       const collection = new ResourcesCollection(dtos);
       expect(collection).toHaveLength(2);
-      expect(collection.toDto()).toEqual(dtos);
+      expect(collection.toDto()).toEqual(ResourcesCollection.transformDtoFromV4toV5(dtos));
       expect(collection.items[0].id).toEqual(dto1.id);
       expect(collection.items[1].id).toEqual(dto2.id);
     });
@@ -385,7 +385,7 @@ describe("ResourcesCollection", () => {
 
   describe("ResourcesCollection::transformDtoFromV4toV5", () => {
     it("Should transform collection DTO by including V5 format", () => {
-      expect.assertions(7)
+      expect.assertions(7);
 
       const resource1 = defaultResourceDto({uri: "https://passbolt.com"});
       const resourcesCollection = new ResourcesCollection([
@@ -395,20 +395,20 @@ describe("ResourcesCollection", () => {
 
       expect(entityCollectionV5).toHaveLength(1);
       // V4 root format
-      expect(entityCollectionV5[0].name).toEqual(resource1.name)
-      expect(entityCollectionV5[0].description).toEqual(resource1.description)
-      expect(entityCollectionV5[0].username).toEqual(resource1.username)
-      expect(entityCollectionV5[0].uri).toEqual(resource1.uri)
-      expect(entityCollectionV5[0].resourceTypeId).toEqual(resource1.resourceTypeId)
+      expect(entityCollectionV5[0].name).toEqual(resource1.name);
+      expect(entityCollectionV5[0].description).toEqual(resource1.description);
+      expect(entityCollectionV5[0].username).toEqual(resource1.username);
+      expect(entityCollectionV5[0].uri).toEqual(resource1.uri);
+      expect(entityCollectionV5[0].resource_type_id).toEqual(resource1.resource_type_id);
       // V5 metata data object
       expect(entityCollectionV5[0].metadata).toEqual({
         object_type: "PASSBOLT_METADATA_V5",
-        resource_type_id: resource1.resourceTypeId,
+        resource_type_id: resource1.resource_type_id,
         name: resource1.name,
         username: resource1.username,
         uris: [resource1.uri],
         description: resource1.description
-      })
-    })
-  })
+      });
+    });
+  });
 });

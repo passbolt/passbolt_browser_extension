@@ -22,13 +22,13 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import UserEntity from "../user/userEntity";
+import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
 const RESOURCE_USERNAME_MAX_LENGTH = 255;
 const RESOURCE_URI_MAX_LENGTH = 1024;
 const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
-const METADATA_OBJECT_TYPE = "PASSBOLT_METADATA_V5";
 
 class ResourceEntity extends EntityV2 {
   /**
@@ -79,6 +79,17 @@ class ResourceEntity extends EntityV2 {
       this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
       delete this._props._modifier;
     }
+    if (this._props.metadata) {
+      this._metadata = new ResourceMetadataEntity(this._props.metadata, {...options, clone: false});
+      delete this._props.metadata;
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  marshall() {
+    ResourceEntity.transformDtoFromV4toV5(this._props);
   }
 
   /**
@@ -154,6 +165,7 @@ class ResourceEntity extends EntityV2 {
           "nullable": true,
         },
         // Associated models
+        "metadata": ResourceMetadataEntity.getSchema(),
         "favorite": {
           ...FavoriteEntity.getSchema(),
           "nullable": true,
@@ -182,6 +194,7 @@ class ResourceEntity extends EntityV2 {
    */
   toDto(contain) {
     const result = Object.assign({}, this._props);
+    result.metadata = this._metadata.toDto();
     if (!contain) {
       return result;
     }
@@ -435,13 +448,13 @@ class ResourceEntity extends EntityV2 {
    */
   static transformDtoFromV4toV5(resourceDTO) {
     resourceDTO.metadata = {
-      object_type: METADATA_OBJECT_TYPE,
-      resource_type_id: resourceDTO.resourceTypeId,
+      object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
+      resource_type_id: resourceDTO.resource_type_id ?? null,
       name: resourceDTO.name,
-      username: resourceDTO.username,
+      username: resourceDTO.username ?? null,
       uris: resourceDTO.uri ? [resourceDTO.uri] : [],
-      description: resourceDTO.description
-    }
+      description: resourceDTO.description ?? null
+    };
     return resourceDTO;
   }
 

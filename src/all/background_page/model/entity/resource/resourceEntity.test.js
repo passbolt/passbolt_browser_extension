@@ -16,6 +16,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 
 describe("Resource entity", () => {
   describe("UserEntity::getSchema", () => {
@@ -223,5 +224,30 @@ describe("Resource entity", () => {
       });
     }
   });
+
+  describe("ResourceEntity::transformDtoFromV4toV5", () => {
+    it("Should transform DTO by including V5 format", () => {
+      expect.assertions(6)
+
+      const entity = new ResourceEntity(defaultResourceDto()).toDto()
+      const entityV5 = ResourceEntity.transformDtoFromV4toV5(entity);
+
+      // V4 root format
+      expect(entityV5.name).toEqual(entity.name)
+      expect(entityV5.description).toEqual(entity.description)
+      expect(entityV5.username).toEqual(entity.username)
+      expect(entityV5.uri).toEqual(entity.uri)
+      expect(entityV5.resource_type_id).toEqual(entity.resource_type_id)
+      // V5 metata data object
+      expect(entityV5.metadata).toEqual({
+        object_type: "PASSBOLT_METADATA_V5",
+        resource_type_id: entity.resourceTypeId,
+        name: entity.name,
+        username: entity.username,
+        uris: [entity.uri],
+        description: entity.description
+      })
+    })
+  })
 });
 

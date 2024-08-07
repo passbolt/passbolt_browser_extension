@@ -353,7 +353,7 @@ class ResourcesCollection extends EntityV2Collection {
    * @returns {Array} resourcesCollectionDTO dto v5
    */
   static transformDtoFromV4toV5(resourcesCollectionDTO) {
-    return resourcesCollectionDTO.map((item) => ResourceEntity.transformDtoFromV4toV5(item));
+    return resourcesCollectionDTO.map(item => ResourceEntity.transformDtoFromV4toV5(item));
   }
 }
 

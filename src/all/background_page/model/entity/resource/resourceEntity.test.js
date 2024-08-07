@@ -17,9 +17,11 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
+import {v4 as uuidv4} from "uuid";
 
 describe("Resource entity", () => {
-  describe("UserEntity::getSchema", () => {
+  describe("ResourceEntity::getSchema", () => {
     it("schema must validate", () => {
       EntitySchema.validateSchema(ResourceEntity.ENTITY_NAME, ResourceEntity.getSchema());
     });
@@ -107,7 +109,6 @@ describe("Resource entity", () => {
       assertEntityProperty.notRequired(ResourceEntity, "personal");
       assertEntityProperty.nullable(ResourceEntity, "personal");
     });
-    
   });
 
   it("constructor works if valid DTO is provided", () => {
@@ -115,6 +116,7 @@ describe("Resource entity", () => {
     const modifier = defaultUserDto();
     const dto = {
       "id": "10801423-4151-42a4-99d1-86e66145a08c",
+      "resource_type_id": uuidv4(),
       "name": "test",
       "username": "test@passbolt.com",
       "uri": "https://www.passbolt.com",
@@ -156,32 +158,42 @@ describe("Resource entity", () => {
     };
     const entity = new ResourceEntity(dto);
     expect(entity.toDto()).toEqual({
-      "id": "10801423-4151-42a4-99d1-86e66145a08c",
-      "name": "test",
-      "username": "test@passbolt.com",
-      "uri": "https://www.passbolt.com",
-      "description": "Check check one two",
+      "id": dto.id,
+      "resource_type_id": dto.resource_type_id,
+      "name": dto.name,
+      "username": dto.username,
+      "uri": dto.uri,
+      "description": dto.description,
       "deleted": false,
-      "created": "2020-05-04T20:31:45+00:00",
-      "modified": "2020-05-04T20:31:45+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "created": dto.created,
+      "modified": dto.modified,
+      "created_by": dto.created_by,
+      "modified_by": dto.modified_by,
+      "folder_parent_id": dto.folder_parent_id,
       "creator": creator,
       "modifier": modifier,
+      "metadata": {
+        "object_type": ResourceMetadataEntity.METADATA_OBJECT_TYPE,
+        "resource_type_id": dto.resource_type_id,
+        "name": dto.name,
+        "username": dto.username,
+        "uris": [dto.uri],
+        "description": dto.description
+      }
     });
     const contain = {secrets: true, permissions: true, permission: true, tags: true, favorite: true, creator: true, modifier: true};
     expect(entity.toDto(contain)).toEqual({
-      "id": "10801423-4151-42a4-99d1-86e66145a08c",
-      "name": "test",
-      "username": "test@passbolt.com",
-      "uri": "https://www.passbolt.com",
-      "description": "Check check one two",
+      "id": dto.id,
+      "resource_type_id": dto.resource_type_id,
+      "name": dto.name,
+      "username": dto.username,
+      "uri": dto.uri,
+      "description": dto.description,
       "deleted": false,
-      "created": "2020-05-04T20:31:45+00:00",
-      "modified": "2020-05-04T20:31:45+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+      "created": dto.created,
+      "modified": dto.modified,
+      "created_by": dto.created_by,
+      "modified_by": dto.modified_by,
       "favorite": {
         "id": "45ce85c9-e301-4de2-8b41-298507002861",
         "user_id": "d57c10f5-633d-5160-9c81-8a0c6c4ec856",
@@ -211,6 +223,14 @@ describe("Resource entity", () => {
       "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff",
       "creator": creator,
       "modifier": modifier,
+      "metadata": {
+        "object_type": ResourceMetadataEntity.METADATA_OBJECT_TYPE,
+        "resource_type_id": dto.resource_type_id,
+        "name": dto.name,
+        "username": dto.username,
+        "uris": [dto.uri],
+        "description": dto.description
+      }
     });
   });
 
@@ -227,27 +247,26 @@ describe("Resource entity", () => {
 
   describe("ResourceEntity::transformDtoFromV4toV5", () => {
     it("Should transform DTO by including V5 format", () => {
-      expect.assertions(6)
+      expect.assertions(6);
 
-      const entity = new ResourceEntity(defaultResourceDto()).toDto()
+      const entity = new ResourceEntity(defaultResourceDto()).toDto();
       const entityV5 = ResourceEntity.transformDtoFromV4toV5(entity);
 
       // V4 root format
-      expect(entityV5.name).toEqual(entity.name)
-      expect(entityV5.description).toEqual(entity.description)
-      expect(entityV5.username).toEqual(entity.username)
-      expect(entityV5.uri).toEqual(entity.uri)
-      expect(entityV5.resource_type_id).toEqual(entity.resource_type_id)
+      expect(entityV5.name).toEqual(entity.name);
+      expect(entityV5.description).toEqual(entity.description);
+      expect(entityV5.username).toEqual(entity.username);
+      expect(entityV5.uri).toEqual(entity.uri);
+      expect(entityV5.resource_type_id).toEqual(entity.resource_type_id);
       // V5 metata data object
       expect(entityV5.metadata).toEqual({
-        object_type: "PASSBOLT_METADATA_V5",
-        resource_type_id: entity.resourceTypeId,
+        object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
+        resource_type_id: entity.resource_type_id,
         name: entity.name,
         username: entity.username,
         uris: [entity.uri],
         description: entity.description
-      })
-    })
-  })
+      });
+    });
+  });
 });
-

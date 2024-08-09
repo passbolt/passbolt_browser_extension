@@ -366,6 +366,14 @@ class ResourceEntity extends EntityV2 {
   }
 
   /**
+   * Get resource metadata
+   * @returns {(ResourceMetadataEntity|null)}
+   */
+  get metadata() {
+    return this._metadata || null;
+  }
+
+  /**
    * Get resource permission for the current user
    * @returns {(PermissionEntity|null)}
    */
@@ -438,7 +446,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {boolean}
    */
   isSuggestion(url) {
-    return canSuggestUrl(url, this.uri);
+    return canSuggestUrl(url, this.metadata.uris?.[0]);
   }
 
   /**

@@ -139,12 +139,12 @@ class ExternalResourceEntity extends Entity {
       name: resourceEntityDto.metadata.name,
       username: resourceEntityDto.metadata.username,
       uri: resourceEntityDto.metadata.uris?.[0] || "",
-      description: resourceEntityDto.metadata.description,
-      secrets: resourceEntityDto.secrets,
+      description: resourceEntityDto.metadata.description || null,
+      secrets: resourceEntityDto.secrets || [],
       folder_parent_id: externalFolderParent?.id || null,
       resource_type_id: resourceEntityDto.metadata.resource_type_id,
       folder_parent_path: externalFolderParent?.path || "",
-      expired: resourceEntityDto.expired,
+      expired: resourceEntityDto.expired || null,
     };
   }
 

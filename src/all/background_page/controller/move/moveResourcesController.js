@@ -144,7 +144,7 @@ class MoveResourcesController {
         parent = this.resourcesParentFolders.getById(resource.folderParentId);
       }
       if (!ResourceEntity.canResourceMove(resource, parent, this.destinationFolder)) {
-        console.warn(`Resource ${resource.name} can not be moved, skipping.`);
+        console.warn(`Resource ${resource.metadata.name} can not be moved, skipping.`);
         resourceIdsToRemove.push(resource.id);
       }
     }
@@ -166,7 +166,7 @@ class MoveResourcesController {
   async calculateChanges() {
     this.changes = new PermissionChangesCollection([]);
     for (const resource of this.resources) {
-      await this.progressService.finishStep(i18n.t('Calculating changes for {{name}}', {name: resource.name}));
+      await this.progressService.finishStep(i18n.t('Calculating changes for {{name}}', {name: resource.metadata.name}));
       /*
        * A user who can update a resource can move it
        * But to change the rights they need to be owner
@@ -201,10 +201,10 @@ class MoveResourcesController {
     const resourceIdsToRemove = [];
     for (const resource of this.resources) {
       if (resource.folderParentId !== this.destinationFolderId) {
-        await this.progressService.finishStep(i18n.t('Moving {{name}}', {name: resource.name}));
+        await this.progressService.finishStep(i18n.t('Moving {{name}}', {name: resource.metadata.name}));
         await this.resourceModel.move(resource, this.destinationFolderId);
       } else {
-        Log.write({level: 'debug', message: `Resource ${resource.name} is already in the folder, skipping.`});
+        Log.write({level: 'debug', message: `Resource ${resource.metadata.name} is already in the folder, skipping.`});
         resourceIdsToRemove.push(resource.id);
       }
     }

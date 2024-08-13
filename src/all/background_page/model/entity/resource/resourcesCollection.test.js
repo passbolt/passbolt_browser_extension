@@ -46,8 +46,8 @@ describe("ResourcesCollection", () => {
 
     it("works if valid minimal DTO is provided", () => {
       expect.assertions(5);
-      const dto1 = {"name": "resource1"};
-      const dto2 = {"name": "resource2"};
+      const dto1 = {"name": "resource1", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION};
+      const dto2 = {"name": "resource2", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION};
       const dtos = [dto1, dto2];
       const collection = new ResourcesCollection(dtos);
       expect(collection.toDto()).toEqual(ResourcesCollection.transformDtoFromV4toV5(dtos));
@@ -288,26 +288,12 @@ describe("ResourcesCollection", () => {
       const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
       const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
       resources.filterByResourceTypes(resourcesTypes);
-      expect.assertions(6);
+      expect.assertions(5);
       expect(resources).toHaveLength(4);
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeTruthy();
-      expect(resources.items[1].metadata.name === "Resource password string legacy").toBeFalsy();
-    });
-
-    it("with the option to keep resource with undefined resource type, it should filter the collection by all supported and not defined resources types.", () => {
-      const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
-      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
-      resources.filterByResourceTypes(resourcesTypes, false);
-      expect.assertions(6);
-      expect(resources).toHaveLength(5);
-      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
-      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
-      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
-      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeTruthy();
-      expect(resources.items[1].metadata.name === "Resource password string legacy").toBeTruthy();
     });
 
     it("should filter the collection by a subset of resource types and excludes resources without resource type.", () => {
@@ -315,27 +301,12 @@ describe("ResourcesCollection", () => {
       const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
       resourcesTypes.filterByPasswordResourceTypes();
       resources.filterByResourceTypes(resourcesTypes);
-      expect.assertions(6);
+      expect.assertions(5);
       expect(resources).toHaveLength(3);
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
-      expect(resources.items[1].metadata.name === "Resource password string legacy").toBeFalsy();
-    });
-
-    it("should filter the collection by a subset of resource types and includes resources without resource type.", () => {
-      const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
-      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
-      resourcesTypes.filterByPasswordResourceTypes();
-      resources.filterByResourceTypes(resourcesTypes, false);
-      expect.assertions(6);
-      expect(resources).toHaveLength(4);
-      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
-      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
-      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
-      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
-      expect(resources.items[1].metadata.name === "Resource password string legacy").toBeTruthy();
     });
 
     it("should throw an exception if the resource types parameter is not a ResourceTypesCollection.", () => {

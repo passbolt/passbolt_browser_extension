@@ -131,17 +131,16 @@ class ResourcesCollection extends EntityV2Collection {
   /**
    * Filter by resource types.
    * @param {ResourceTypesCollection} resourceTypes The resource types to filter by
-   * @param {boolean} [excludeUndefined=true] Filter out resources not having a defined resource type.
    * @return {void} The function alters the collection itself.
    * @throws TypeError if parameters are invalid
    */
-  filterByResourceTypes(resourceTypes, excludeUndefined = true) {
+  filterByResourceTypes(resourceTypes) {
     if (!(resourceTypes instanceof ResourceTypesCollection)) {
       throw new TypeError('ResourcesCollection filterByResourceTypes expects resourceTypes to be a ResourceTypesCollection.');
     }
 
     const resourceTypesIds = resourceTypes.extract("id");
-    this.filterByPropertyValueIn("resource_type_id", resourceTypesIds, excludeUndefined);
+    this.filterByPropertyValueIn("resource_type_id", resourceTypesIds);
   }
 
   /**

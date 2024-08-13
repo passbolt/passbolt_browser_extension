@@ -15,6 +15,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import ResourceMetadataEntity from "./resourceMetadataEntity";
 import {defaultResourceMetadataDto, minimalResourceMetadataDto} from "./resourceMetadataEntity.test.data";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("Resource Metadata entity", () => {
   describe("ResourceMetadataEntity::getSchema", () => {
@@ -31,7 +32,7 @@ describe("Resource Metadata entity", () => {
     it("validates resource_type_id property", () => {
       assertEntityProperty.string(ResourceMetadataEntity, "resource_type_id");
       assertEntityProperty.uuid(ResourceMetadataEntity, "resource_type_id");
-      assertEntityProperty.notRequired(ResourceMetadataEntity, "resource_type_id");
+      assertEntityProperty.required(ResourceMetadataEntity, "resource_type_id");
     });
 
     it("validates name property", () => {
@@ -62,6 +63,18 @@ describe("Resource Metadata entity", () => {
   });
 
   describe("ResourceEntity::constructor", () => {
+    it("constructor returns validation error if dto required fields are missing", () => {
+      try {
+        new ResourceMetadataEntity({});
+      } catch (error) {
+        expect(error instanceof EntityValidationError).toBe(true);
+        expect(error.details).toEqual({
+          name: {required: "The name is required."},
+          resource_type_id: {required: "The resource_type_id is required."},
+        });
+      }
+    });
+
     it("works if minimal DTO is provided", () => {
       const metadataDto = minimalResourceMetadataDto();
       const metadataEntity = new ResourceMetadataEntity(metadataDto);

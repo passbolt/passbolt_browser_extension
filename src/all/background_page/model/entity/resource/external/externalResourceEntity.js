@@ -130,6 +130,27 @@ class ExternalResourceEntity extends Entity {
     return this.toDto();
   }
 
+  /**
+   * Builds from a resource entity DTO an external resource entity DTO.
+   * @param {object} resourceEntityDto
+   * @param {ExternalFolderEntity} [externalFolderParent]
+   * @returns {object}
+   */
+  static buildDtoFromResourceEntityDto(resourceEntityDto, externalFolderParent) {
+    return {
+      id: resourceEntityDto.id,
+      name: resourceEntityDto.metadata.name,
+      username: resourceEntityDto.metadata.username,
+      uri: resourceEntityDto.metadata.uris?.[0] || "",
+      description: resourceEntityDto.metadata.description || null,
+      secrets: resourceEntityDto.secrets || [],
+      folder_parent_id: externalFolderParent?.id || null,
+      resource_type_id: resourceEntityDto.metadata.resource_type_id,
+      folder_parent_path: externalFolderParent?.path || "",
+      expired: resourceEntityDto.expired || null,
+    };
+  }
+
   /*
    * ==================================================
    * Dynamic properties getters

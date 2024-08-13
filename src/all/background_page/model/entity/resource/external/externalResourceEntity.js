@@ -151,6 +151,28 @@ class ExternalResourceEntity extends Entity {
     };
   }
 
+  /**
+   * Returns a Resource DTO in v5 format.
+   * @returns {object}
+   */
+  toResourceEntityDto() {
+    return {
+      id: this.id,
+      metadata: {
+        object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
+        name: this.name,
+        username: this.username,
+        uris: [this.uri],
+        description: this.description,
+        resource_type_id: this.resourceTypeId,
+      },
+      secrets: this._secrets.toDto(),
+      folder_parent_id: this.folderParentId,
+      resource_type_id: this.resourceTypeId,
+      expired: this.expired,
+    };
+  }
+
   /*
    * ==================================================
    * Dynamic properties getters

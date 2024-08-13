@@ -25,10 +25,7 @@ import UserEntity from "../user/userEntity";
 import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'Resource';
-const RESOURCE_NAME_MAX_LENGTH = 255;
-const RESOURCE_USERNAME_MAX_LENGTH = 255;
 const RESOURCE_URI_MAX_LENGTH = 1024;
-const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
 
 class ResourceEntity extends EntityV2 {
   /**
@@ -101,7 +98,7 @@ class ResourceEntity extends EntityV2 {
     return {
       "type": "object",
       "required": [
-        "name"
+        "metadata"
       ],
       "properties": {
         "id": {
@@ -114,21 +111,20 @@ class ResourceEntity extends EntityV2 {
         },
         "name": {
           "type": "string",
-          "maxLength": RESOURCE_NAME_MAX_LENGTH
+          "nullable": true,
         },
         "username": {
           "type": "string",
-          "maxLength": RESOURCE_USERNAME_MAX_LENGTH,
           "nullable": true,
         },
+        //@TODO E2EE remove later with uris from metadata
         "uri": {
           "type": "string",
-          "maxLength": RESOURCE_URI_MAX_LENGTH,
           "nullable": true,
+          "maxLength": RESOURCE_URI_MAX_LENGTH
         },
         "description": {
           "type": "string",
-          "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH,
           "nullable": true,
         },
         "expired": {
@@ -455,14 +451,32 @@ class ResourceEntity extends EntityV2 {
    * @returns {Object} resourceDTO dto v5
    */
   static transformDtoFromV4toV5(resourceDTO) {
-    resourceDTO.metadata = {
-      object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
-      resource_type_id: resourceDTO.resource_type_id ?? null,
-      name: resourceDTO.name,
-      username: resourceDTO.username ?? null,
-      uris: resourceDTO.uri ? [resourceDTO.uri] : [],
-      description: resourceDTO.description ?? null
-    };
+    if (!resourceDTO.metadata) {
+      resourceDTO.metadata = {
+        object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
+        resource_type_id: resourceDTO.resource_type_id ?? null,
+        name: resourceDTO.name,
+        username: resourceDTO.username ?? null,
+        uris: resourceDTO.uri ? [resourceDTO.uri] : [],
+        description: resourceDTO.description ?? null
+      };
+    }
+    return resourceDTO;
+  }
+
+  /**
+   * Transform v5 format to v4 format
+   * @used for to communicate with API
+   * @param {object} [contain] optional
+   * @returns {Object} resourceDTO dto v5
+   */
+  toV4Dto(contain) {
+    const resourceDTO = this.toDto(contain);
+    resourceDTO.name = resourceDTO.metadata.name;
+    resourceDTO.username = resourceDTO.metadata.username;
+    resourceDTO.uri = resourceDTO.metadata.uris[0]; //Uris is always an array send by UI
+    resourceDTO.description = resourceDTO.metadata.description;
+    delete resourceDTO.metadata;
     return resourceDTO;
   }
 

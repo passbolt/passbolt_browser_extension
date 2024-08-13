@@ -19,6 +19,7 @@ import {defaultTotpDto} from "../../totp/totpDto.test.data";
 import ResourceEntity from "../resourceEntity";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
+import {defaultExternalResourceDto} from "./externalResourceEntity.test.data";
 
 describe("ExternalResourceEntity", () => {
   it("schema must validate", () => {
@@ -162,6 +163,40 @@ describe("ExternalResourceEntity", () => {
 
       const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(entity.toDto({secrets: true, metadata: true}));
       expect(() => new ExternalResourceEntity(resultDto)).not.toThrow();
+    });
+  });
+
+  describe("::toResourceEntityDto", () => {
+    it("should export a DTO in the expected format", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+
+      const resourceEntityDto = entity.toResourceEntityDto();
+      expect(resourceEntityDto).toStrictEqual({
+        id: dto.id,
+        resource_type_id: dto.resource_type_id,
+        expired: dto.expired,
+        folder_parent_id: dto.folder_parent_id,
+        metadata: {
+          object_type: "PASSBOLT_METADATA_V5",
+          name: dto.name,
+          username: dto.username,
+          uris: [dto.uri],
+          description: dto.description,
+          resource_type_id: dto.resource_type_id,
+        },
+        secrets: dto.secrets,
+      });
+    });
+
+    it("should generate a DTO that could be used to instantiate a ResourceEntity", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+
+      const resourceEntityDto = entity.toResourceEntityDto();
+      expect(() => new ResourceEntity(resourceEntityDto)).not.toThrow();
     });
   });
 });

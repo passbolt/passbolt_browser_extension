@@ -96,6 +96,20 @@ class ExternalResourcesCollection extends EntityCollection {
 
   /*
    * ==================================================
+   * Serialization
+   * ==================================================
+   */
+  /**
+   * Return a DTO ready to be sent to the API
+   *
+   * @returns {Array<ResourceEntityDto>}
+   */
+  toResourceCollectionDto() {
+    return this._items.map(item => item.toResourceEntityDto());
+  }
+
+  /*
+   * ==================================================
    * Finders / Filters
    * ==================================================
    */

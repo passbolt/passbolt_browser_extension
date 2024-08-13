@@ -17,6 +17,7 @@ import ResourceSecretsCollection from "../../secret/resource/resourceSecretsColl
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import TotpEntity from "../../totp/totpEntity";
+import ResourceMetadataEntity from "../metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'ExternalResource';
 const DEFAULT_RESOURCE_NAME = '(no name)';
@@ -73,6 +74,8 @@ class ExternalResourceEntity extends Entity {
    */
   static getSchema() {
     const resourceEntitySchema = ResourceEntity.getSchema();
+    const metadataEntitySchema = ResourceMetadataEntity.getSchema();
+
     return {
       "type": "object",
       "required": [
@@ -81,10 +84,10 @@ class ExternalResourceEntity extends Entity {
       ],
       "properties": {
         "id": resourceEntitySchema.properties.id,
-        "name": resourceEntitySchema.properties.name,
-        "username": resourceEntitySchema.properties.username,
+        "name": metadataEntitySchema.properties.name,
+        "username": metadataEntitySchema.properties.username,
         "uri": resourceEntitySchema.properties.uri,
-        "description": resourceEntitySchema.properties.description,
+        "description": metadataEntitySchema.properties.description,
         "secrets": resourceEntitySchema.properties.secrets,
         "folder_parent_id": resourceEntitySchema.properties.folder_parent_id,
         "resource_type_id": resourceEntitySchema.properties.resource_type_id,

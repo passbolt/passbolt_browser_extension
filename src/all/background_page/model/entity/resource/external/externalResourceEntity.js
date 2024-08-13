@@ -86,7 +86,10 @@ class ExternalResourceEntity extends Entity {
         "id": resourceEntitySchema.properties.id,
         "name": metadataEntitySchema.properties.name,
         "username": metadataEntitySchema.properties.username,
-        "uri": resourceEntitySchema.properties.uri,
+        "uri": {
+          "type": "string",
+          "maxLength": ResourceMetadataEntity.URI_MAX_LENGTH,
+        },
         "description": metadataEntitySchema.properties.description,
         "secrets": resourceEntitySchema.properties.secrets,
         "folder_parent_id": resourceEntitySchema.properties.folder_parent_id,

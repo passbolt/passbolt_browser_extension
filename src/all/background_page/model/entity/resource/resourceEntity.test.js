@@ -16,7 +16,6 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {defaultResourceDto, defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 
 describe("Resource entity", () => {
   describe("ResourceEntity::getSchema", () => {
@@ -89,7 +88,7 @@ describe("Resource entity", () => {
     const dto = defaultResourceDto({}, contain);
     const entity = new ResourceEntity(dto);
 
-    expect(entity.toDto(contain)).toEqual(dto);
+    expect(entity.toDto(contain)).toEqual(ResourceEntity.transformDtoFromV4toV5(dto));
   });
 
   it("constructor returns validation error if dto required fields are missing", () => {
@@ -105,26 +104,15 @@ describe("Resource entity", () => {
 
   describe("ResourceEntity::transformDtoFromV4toV5", () => {
     it("Should transform DTO by including V5 format", () => {
-      expect.assertions(6);
+      expect.assertions(2);
 
       const resourceDTO = defaultResourceV4Dto();
       const entityV5 = ResourceEntity.transformDtoFromV4toV5(resourceDTO);
 
       // V4 root format
-      expect(entityV5.name).toEqual(resourceDTO.name);
-      expect(entityV5.description).toEqual(resourceDTO.description);
-      expect(entityV5.username).toEqual(resourceDTO.username);
-      expect(entityV5.uri).toEqual(resourceDTO.uri);
       expect(entityV5.resource_type_id).toEqual(resourceDTO.resource_type_id);
       // V5 metata data object
-      expect(entityV5.metadata).toEqual({
-        object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
-        resource_type_id: resourceDTO.resource_type_id,
-        name: resourceDTO.name,
-        username: resourceDTO.username,
-        uris: [resourceDTO.uri],
-        description: resourceDTO.description
-      });
+      expect(entityV5.metadata).toEqual(resourceDTO.metadata);
     });
     it("Should not create metadata if exist", () => {
       expect.assertions(1);

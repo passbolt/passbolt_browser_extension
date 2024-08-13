@@ -53,8 +53,8 @@ describe("ResourcesCollection", () => {
       expect(collection.toDto()).toEqual(ResourcesCollection.transformDtoFromV4toV5(dtos));
       expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
       expect(collection).toHaveLength(2);
-      expect(collection.items[0].name).toEqual('resource1');
-      expect(collection.items[1].name).toEqual('resource2');
+      expect(collection.items[0].metadata.name).toEqual('resource1');
+      expect(collection.items[1].metadata.name).toEqual('resource2');
     });
 
     it("works if valid complete DTOs are provided", () => {
@@ -294,7 +294,7 @@ describe("ResourcesCollection", () => {
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeTruthy();
-      expect(resources.getFirst("name", "Resource password string legacy")).toBeFalsy();
+      expect(resources.items[1].metadata.name === "Resource password string legacy").toBeFalsy();
     });
 
     it("with the option to keep resource with undefined resource type, it should filter the collection by all supported and not defined resources types.", () => {
@@ -307,7 +307,7 @@ describe("ResourcesCollection", () => {
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeTruthy();
-      expect(resources.getFirst("name", "Resource password string legacy")).toBeTruthy();
+      expect(resources.items[1].metadata.name === "Resource password string legacy").toBeTruthy();
     });
 
     it("should filter the collection by a subset of resource types and excludes resources without resource type.", () => {
@@ -321,7 +321,7 @@ describe("ResourcesCollection", () => {
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
-      expect(resources.getFirst("name", "Resource password string legacy")).toBeFalsy();
+      expect(resources.items[1].metadata.name === "Resource password string legacy").toBeFalsy();
     });
 
     it("should filter the collection by a subset of resource types and includes resources without resource type.", () => {
@@ -335,7 +335,7 @@ describe("ResourcesCollection", () => {
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
-      expect(resources.getFirst("name", "Resource password string legacy")).toBeTruthy();
+      expect(resources.items[1].metadata.name === "Resource password string legacy").toBeTruthy();
     });
 
     it("should throw an exception if the resource types parameter is not a ResourceTypesCollection.", () => {
@@ -385,7 +385,7 @@ describe("ResourcesCollection", () => {
 
   describe("ResourcesCollection::transformDtoFromV4toV5", () => {
     it("Should transform collection DTO by including V5 format", () => {
-      expect.assertions(7);
+      expect.assertions(3);
 
       const resource1 = defaultResourceDto({uri: "https://passbolt.com"});
       const resourcesCollection = new ResourcesCollection([
@@ -395,10 +395,6 @@ describe("ResourcesCollection", () => {
 
       expect(entityCollectionV5).toHaveLength(1);
       // V4 root format
-      expect(entityCollectionV5[0].name).toEqual(resource1.name);
-      expect(entityCollectionV5[0].description).toEqual(resource1.description);
-      expect(entityCollectionV5[0].username).toEqual(resource1.username);
-      expect(entityCollectionV5[0].uri).toEqual(resource1.uri);
       expect(entityCollectionV5[0].resource_type_id).toEqual(resource1.resource_type_id);
       // V5 metata data object
       expect(entityCollectionV5[0].metadata).toEqual({

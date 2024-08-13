@@ -128,11 +128,19 @@ class ResourceMetadataEntity extends EntityV2 {
   }
 
   /**
-   * ResourceMetadataEntity.ENTITY_NAME
+   * ResourceMetadataEntity.METADATA_OBJECT_TYPE
    * @returns {string}
    */
   static get METADATA_OBJECT_TYPE() {
     return METADATA_OBJECT_TYPE;
+  }
+
+  /**
+   * ResourceMetadataEntity.URI_MAX_LENGTH
+   * @returns {number}
+   */
+  static get URI_MAX_LENGTH() {
+    return RESOURCE_URI_MAX_LENGTH;
   }
 }
 

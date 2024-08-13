@@ -25,7 +25,6 @@ import UserEntity from "../user/userEntity";
 import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'Resource';
-const RESOURCE_URI_MAX_LENGTH = 1024;
 
 class ResourceEntity extends EntityV2 {
   /**
@@ -108,24 +107,6 @@ class ResourceEntity extends EntityV2 {
         "resource_type_id": {
           "type": "string",
           "format": "uuid"
-        },
-        "name": {
-          "type": "string",
-          "nullable": true,
-        },
-        "username": {
-          "type": "string",
-          "nullable": true,
-        },
-        //@TODO E2EE remove later with uris from metadata
-        "uri": {
-          "type": "string",
-          "nullable": true,
-          "maxLength": RESOURCE_URI_MAX_LENGTH
-        },
-        "description": {
-          "type": "string",
-          "nullable": true,
         },
         "expired": {
           "type": "string",
@@ -242,30 +223,6 @@ class ResourceEntity extends EntityV2 {
   }
 
   /**
-   * Get resource name
-   * @returns {string} admin or user
-   */
-  get name() {
-    return this._props.name;
-  }
-
-  /**
-   * Get resource username
-   * @returns {string} username
-   */
-  get username() {
-    return this._props.username;
-  }
-
-  /**
-   * Get resource description
-   * @returns {(string|null)} description
-   */
-  get description() {
-    return this._props.description || null;
-  }
-
-  /**
    * Get deleted flag info
    * @returns {(boolean|null)} true if deleted
    */
@@ -322,13 +279,6 @@ class ResourceEntity extends EntityV2 {
    */
   get resourceTypeId() {
     return this._props.resource_type_id || null;
-  }
-
-  /**
-   * Returns the resource uri
-   */
-  get uri() {
-    return this._props.uri || null;
   }
 
   /*
@@ -461,6 +411,11 @@ class ResourceEntity extends EntityV2 {
         description: resourceDTO.description ?? null
       };
     }
+    // Remove all legacy metadata at the root object
+    delete resourceDTO.name;
+    delete resourceDTO.username;
+    delete resourceDTO.uri;
+    delete resourceDTO.description;
     return resourceDTO;
   }
 
@@ -682,10 +637,6 @@ class ResourceEntity extends EntityV2 {
    */
   static get ALL_CONTAIN_OPTIONS() {
     return {permission: true, permissions: true, secrets: true, favorite: true, tag: true, creator: true, modifier: true};
-  }
-
-  static get URI_MAX_LENGTH() {
-    return RESOURCE_URI_MAX_LENGTH;
   }
 }
 

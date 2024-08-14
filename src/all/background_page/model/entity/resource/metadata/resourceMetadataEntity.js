@@ -29,7 +29,8 @@ class ResourceMetadataEntity extends EntityV2 {
     return {
       "type": "object",
       "required": [
-        "name"
+        "name",
+        "resource_type_id"
       ],
       "properties": {
         "object_type": {
@@ -38,8 +39,7 @@ class ResourceMetadataEntity extends EntityV2 {
         },
         "resource_type_id": {
           "type": "string",
-          "format": "uuid",
-          "nullable": true, // Nullable is allowed to have compatibility if resource id is undefined @TODO Remove after migration
+          "format": "uuid"
         },
         "name": {
           "type": "string",

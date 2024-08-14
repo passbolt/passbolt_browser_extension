@@ -97,7 +97,8 @@ class ResourceEntity extends EntityV2 {
     return {
       "type": "object",
       "required": [
-        "metadata"
+        "metadata",
+        "resource_type_id"
       ],
       "properties": {
         "id": {

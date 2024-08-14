@@ -16,6 +16,9 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {defaultResourceDto, defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {
+  TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 
 describe("Resource entity", () => {
   describe("ResourceEntity::getSchema", () => {
@@ -71,7 +74,7 @@ describe("Resource entity", () => {
     it("validates resource_type_id property", () => {
       assertEntityProperty.string(ResourceEntity, "resource_type_id");
       assertEntityProperty.uuid(ResourceEntity, "resource_type_id");
-      assertEntityProperty.notRequired(ResourceEntity, "resource_type_id");
+      assertEntityProperty.required(ResourceEntity, "resource_type_id");
     });
 
     it("validates personal property", () => {
@@ -97,6 +100,17 @@ describe("Resource entity", () => {
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
+        resource_type_id: {required: "The resource_type_id is required."},
+      });
+    }
+  });
+
+  it("constructor returns validation error if dto required metadata fields are missing", () => {
+    try {
+      new ResourceEntity({resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION});
+    } catch (error) {
+      expect(error instanceof EntityValidationError).toBe(true);
+      expect(error.details).toEqual({
         name: {type: "The name is not a valid string."},
       });
     }
@@ -111,7 +125,7 @@ describe("Resource entity", () => {
 
       // V4 root format
       expect(entityV5.resource_type_id).toEqual(resourceDTO.resource_type_id);
-      // V5 metata data object
+      // V5 metadata data object
       expect(entityV5.metadata).toEqual(resourceDTO.metadata);
     });
     it("Should not create metadata if exist", () => {

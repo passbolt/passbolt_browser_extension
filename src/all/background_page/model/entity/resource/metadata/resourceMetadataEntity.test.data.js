@@ -11,7 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import {v4 as uuidv4} from "uuid";
+import {
+  TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 
 /**
  * Build minimal resource metadata dto.
@@ -21,6 +23,7 @@ import {v4 as uuidv4} from "uuid";
 export const minimalResourceMetadataDto = (data = {}) => {
   const metadataDto = {
     name: "Passbolt",
+    resource_type_id: data?.resource_type_id || TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
     ...data
   };
   return metadataDto;
@@ -33,7 +36,7 @@ export const minimalResourceMetadataDto = (data = {}) => {
  */
 export const defaultResourceMetadataDto = (data = {}) => {
   const metadataDto = {
-    resource_type_id: data?.resource_type_id || uuidv4(),
+    resource_type_id: data?.resource_type_id || TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
     name: "Passbolt",
     username: "admin@passbolt.com",
     uris: ["https://passbolt.com", "https://m.passbolt.com", "https://secure.passbolt.com"],

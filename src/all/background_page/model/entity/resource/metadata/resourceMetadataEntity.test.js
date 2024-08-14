@@ -49,9 +49,9 @@ describe("Resource Metadata entity", () => {
     });
 
     it("validates uris property", () => {
-      const FAIL_ARRAY_SCENARIOS = [assertEntityProperty.SCENARIO_INTEGER, assertEntityProperty.SCENARIO_TRUE, assertEntityProperty.SCENARIO_FALSE, assertEntityProperty.SCENARIO_OBJECT];
-      assertEntityProperty.assert(ResourceMetadataEntity, "uris", [assertEntityProperty.SCENARIO_ARRAY], FAIL_ARRAY_SCENARIOS, "type");
-      // @todo Uris cannot be tested for now due to entity validation framework limitation.
+      assertEntityProperty.array(ResourceMetadataEntity, "uris");
+      assertEntityProperty.assertArrayItemString(ResourceMetadataEntity, "uris");
+      assertEntityProperty.arrayStringMaxLength(ResourceMetadataEntity, "uris", ResourceMetadataEntity.URI_MAX_LENGTH);
     });
 
     it("validates description property", () => {

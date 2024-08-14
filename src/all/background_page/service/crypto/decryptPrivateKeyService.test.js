@@ -38,4 +38,9 @@ describe("DecryptPrivateKey service", () => {
       expect(e).toStrictEqual(new Error("The private key should be encrypted."));
     }
   }, 10 * 1000);
+
+  it('should validate a private key armored and decrypt it', async() => {
+    expect.assertions(1);
+    await expect(DecryptPrivateKeyService.decryptArmoredKey(pgpKeys.ada.private, "ada@passbolt.com")).resolves.not.toBeNull();
+  }, 10 * 1000);
 });

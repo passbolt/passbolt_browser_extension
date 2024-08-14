@@ -330,7 +330,7 @@ class ResourceModel {
    * @returns {Promise<ResourceEntity>}
    */
   async update(resourceEntity) {
-    const data = resourceEntity.toDto({secrets: true});
+    const data = resourceEntity.toV4Dto({secrets: true});
     const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
     const updatedResourceEntity = new ResourceEntity(resourceDto);
     await ResourceLocalStorage.updateResource(updatedResourceEntity);

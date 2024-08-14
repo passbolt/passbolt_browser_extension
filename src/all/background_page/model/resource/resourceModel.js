@@ -322,20 +322,6 @@ class ResourceModel {
    *  CRUD
    * ==============================================================
    */
-  /**
-   * Create a resource using Passbolt API and add result to local storage
-   *
-   * @param {ResourceEntity} resourceEntity
-   * @returns {Promise<ResourceEntity>}
-   */
-  async create(resourceEntity) {
-    const data = resourceEntity.toDto({secrets: true});
-    const contain = {permission: true, favorite: true, tags: true, folder: true};
-    const resourceDto = await this.resourceService.create(data, contain);
-    const newResourceEntity = new ResourceEntity(resourceDto);
-    await ResourceLocalStorage.addResource(newResourceEntity);
-    return newResourceEntity;
-  }
 
   /**
    * Update a resource using Passbolt API and add result to local storage

@@ -143,10 +143,10 @@ describe("ResourceCreateService", () => {
 
       const result = await resourceCreateService.create(entity);
 
-      expect(result.metadata.name).toEqual(entity.name);
-      expect(result.metadata.username).toEqual(entity.username);
-      expect(result.metadata.uris[0]).toEqual(entity.uri);
-      expect(result.metadata.description).toEqual(entity.description);
+      expect(result.metadata.name).toEqual(entity.metadata.name);
+      expect(result.metadata.username).toEqual(entity.metadata.username);
+      expect(result.metadata.uris).toEqual(entity.metadata.uris);
+      expect(result.metadata.description).toEqual(entity.metadata.description);
     });
   });
 

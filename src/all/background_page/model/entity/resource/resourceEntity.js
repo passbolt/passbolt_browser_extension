@@ -405,11 +405,11 @@ class ResourceEntity extends EntityV2 {
     if (!resourceDTO.metadata) {
       resourceDTO.metadata = {
         object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
-        resource_type_id: resourceDTO.resource_type_id ?? null,
+        resource_type_id: resourceDTO.resource_type_id,
         name: resourceDTO.name,
-        username: resourceDTO.username ?? null,
+        username: resourceDTO.username || null,
         uris: resourceDTO.uri ? [resourceDTO.uri] : [],
-        description: resourceDTO.description ?? null
+        description: resourceDTO.description || null
       };
     }
     // Remove all legacy metadata at the root object

@@ -146,10 +146,10 @@ describe("Resource entity", () => {
       const entityV5 =  new ResourceEntity(resourceDTO);
       const dtoV4 = entityV5.toV4Dto();
 
-      expect(dtoV4.name).toEqual(resourceDTO.name);
-      expect(dtoV4.username).toEqual(resourceDTO.username);
-      expect(dtoV4.description).toEqual(resourceDTO.description);
-      expect(dtoV4.uri).toEqual(resourceDTO.uri);
+      expect(dtoV4.name).toEqual(entityV5.metadata.name);
+      expect(dtoV4.username).toEqual(entityV5.metadata.username);
+      expect(dtoV4.description).toEqual(entityV5.metadata.description);
+      expect(dtoV4.uri).toEqual(entityV5.metadata.uris?.[0]);
       expect(dtoV4.metadata).toBeUndefined();
     });
   });

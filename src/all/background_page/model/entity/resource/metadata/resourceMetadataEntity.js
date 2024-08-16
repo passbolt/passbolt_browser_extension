@@ -54,8 +54,7 @@ class ResourceMetadataEntity extends EntityV2 {
           "type": "array", // Validating array of data is not yet supported by the validator @TODO Add validation
           "items": {
             "type": "string",
-            "maxLength": RESOURCE_URI_MAX_LENGTH,
-            "notEmpty": true
+            "maxLength": RESOURCE_URI_MAX_LENGTH
           }
         },
         "description": {
@@ -101,10 +100,10 @@ class ResourceMetadataEntity extends EntityV2 {
 
   /**
    * Get the resource type if any
-   * @returns {(string|null)} uuid
+   * @returns {(string)} uuid
    */
   get resourceTypeId() {
-    return this._props.resource_type_id || null;
+    return this._props.resource_type_id;
   }
 
   /**

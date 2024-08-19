@@ -35,3 +35,22 @@ export const defaultExternalResourceDto = (data = {}) => {
     ...data,
   };
 };
+
+export const defaultExternalResourceImportDto = (data = {}) => {
+  const secretCollection = defaultResourcesSecretsDtos(1);
+  delete secretCollection[0].resource_id;
+
+  return {
+    name: "external resource dto",
+    username: "ada@passbolt.com",
+    uri: "https://passbolt.local",
+    description: "This is the description of the resource",
+    secrets: secretCollection,
+    folder_parent_id: uuidv4(),
+    resource_type_id: uuidv4(),
+    totp: defaultTotpDto(),
+    folder_parent_path: "private/data",
+    expired: null,
+    ...data,
+  };
+};

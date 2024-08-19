@@ -19,7 +19,7 @@ import {defaultTotpDto} from "../../totp/totpDto.test.data";
 import ResourceEntity from "../resourceEntity";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
-import {defaultExternalResourceDto} from "./externalResourceEntity.test.data";
+import {defaultExternalResourceDto, defaultExternalResourceImportDto} from "./externalResourceEntity.test.data";
 
 describe("ExternalResourceEntity", () => {
   it("schema must validate", () => {
@@ -166,15 +166,14 @@ describe("ExternalResourceEntity", () => {
     });
   });
 
-  describe("::toResourceEntityDto", () => {
+  describe("::toResourceEntityImportDto", () => {
     it("should export a DTO in the expected format", () => {
       expect.assertions(1);
       const dto = defaultExternalResourceDto();
       const entity = new ExternalResourceEntity(dto);
 
-      const resourceEntityDto = entity.toResourceEntityDto();
+      const resourceEntityDto = entity.toResourceEntityImportDto();
       expect(resourceEntityDto).toStrictEqual({
-        id: dto.id,
         resource_type_id: dto.resource_type_id,
         expired: dto.expired,
         folder_parent_id: dto.folder_parent_id,
@@ -192,10 +191,10 @@ describe("ExternalResourceEntity", () => {
 
     it("should generate a DTO that could be used to instantiate a ResourceEntity", () => {
       expect.assertions(1);
-      const dto = defaultExternalResourceDto();
+      const dto = defaultExternalResourceImportDto();
       const entity = new ExternalResourceEntity(dto);
 
-      const resourceEntityDto = entity.toResourceEntityDto();
+      const resourceEntityDto = entity.toResourceEntityImportDto();
       expect(() => new ResourceEntity(resourceEntityDto)).not.toThrow();
     });
   });

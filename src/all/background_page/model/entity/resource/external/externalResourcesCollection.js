@@ -104,8 +104,8 @@ class ExternalResourcesCollection extends EntityCollection {
    *
    * @returns {Array<ResourceEntityDto>}
    */
-  toResourceCollectionDto() {
-    return this._items.map(item => item.toResourceEntityDto());
+  toResourceCollectionImportDto() {
+    return this._items.map(item => item.toResourceEntityImportDto());
   }
 
   /*

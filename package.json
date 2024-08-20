@@ -44,7 +44,6 @@
     "eslint-plugin-no-unsanitized": "^4.0.1",
     "eslint-plugin-react": "^7.33.1",
     "grunt": "^1.0.3",
-    "grunt-browserify": "^6.0.0",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-shell": "^4.0.0",
@@ -70,9 +69,6 @@
       "glob-parent": "5.1.2"
     },
     "firefox-profile": "4.3.2",
-    "crypto-browserify": {
-      "browserify-sign": "4.2.2"
-    },
     "ws": "8.17.1"
   },
   "scripts": {

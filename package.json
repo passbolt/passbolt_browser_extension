@@ -55,7 +55,7 @@
     "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^16.0.0",
     "jest-webextension-mock": "^3.8.9",
-    "lockfile-lint": "^4.12.1",
+    "lockfile-lint": "^4.14.0",
     "text-encoding-utf-8": "^1.0.2",
     "uuid": "^8.3.2",
     "web-ext": "^8.0.0",

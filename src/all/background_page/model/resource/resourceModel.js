@@ -633,7 +633,7 @@ class ResourceModel {
    */
   async keepResourcesSupported(resourcesDto) {
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
+    return resourcesDto.filter(resource => resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
   }
 }
 

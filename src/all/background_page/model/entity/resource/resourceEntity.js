@@ -430,7 +430,7 @@ class ResourceEntity extends EntityV2 {
     const resourceDTO = this.toDto(contain);
     resourceDTO.name = resourceDTO.metadata.name;
     resourceDTO.username = resourceDTO.metadata.username;
-    resourceDTO.uri = resourceDTO.metadata.uris[0]; //Uris is always an array send by UI
+    resourceDTO.uri = resourceDTO.metadata.uris?.[0] || "";
     resourceDTO.description = resourceDTO.metadata.description;
     delete resourceDTO.metadata;
     return resourceDTO;

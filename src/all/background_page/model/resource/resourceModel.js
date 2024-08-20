@@ -424,7 +424,7 @@ class ResourceModel {
        * but we don't add the resource entity in the local storage just yet,
        * we wait until all resources are created in order to speed things up
        */
-      const data = resourceEntity.toDto({secrets: true});
+      const data = resourceEntity.toV4Dto({secrets: true});
       const contain = {permission: true, favorite: true, tags: true, folder: true};
       const resourceDto = await this.resourceService.create(data, contain);
       const createdResourceEntity = new ResourceEntity(resourceDto);

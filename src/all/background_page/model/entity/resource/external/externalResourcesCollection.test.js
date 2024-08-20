@@ -98,13 +98,13 @@ describe("ExternalResourcesCollection", () => {
     }
   });
 
-  describe("::toResourceCollectionDto", () => {
+  describe("::toResourceCollectionImportDto", () => {
     it("should create a resource entity collection", () => {
       const collectionDto = defaultExternalResourceCollectionDto();
       const externalResourceCollection = new ExternalResourcesCollection(collectionDto);
-      const resourceEntityCollection = externalResourceCollection.toResourceCollectionDto();
+      const resourceEntityCollection = externalResourceCollection.toResourceCollectionImportDto();
 
-      const expectedCollectionDto = collectionDto.map(dto => new ExternalResourceEntity(dto).toResourceEntityDto());
+      const expectedCollectionDto = collectionDto.map(dto => new ExternalResourceEntity(dto).toResourceEntityImportDto());
 
       expect(resourceEntityCollection).toStrictEqual(expectedCollectionDto);
     });
@@ -114,7 +114,7 @@ describe("ExternalResourcesCollection", () => {
       const dto = defaultExternalResourceCollectionDto();
       const externalResourceCollection = new ExternalResourcesCollection(dto);
 
-      const resourceEntityCollectionDto = externalResourceCollection.toResourceCollectionDto();
+      const resourceEntityCollectionDto = externalResourceCollection.toResourceCollectionImportDto();
       expect(() => new ResourcesCollection(resourceEntityCollectionDto)).not.toThrow();
     });
   });

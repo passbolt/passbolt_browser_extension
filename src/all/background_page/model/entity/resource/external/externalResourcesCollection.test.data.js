@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import {defaultExternalResourceDto} from "./externalResourceEntity.test.data";
+import {defaultExternalResourceImportDto} from "./externalResourceEntity.test.data";
 
 export const defaultExternalResourceCollectionDto = (data = {}) => ([
-  defaultExternalResourceDto(data),
-  defaultExternalResourceDto(data),
-  defaultExternalResourceDto(data),
-  defaultExternalResourceDto(data),
+  defaultExternalResourceImportDto(data),
+  defaultExternalResourceImportDto(data),
+  defaultExternalResourceImportDto(data),
+  defaultExternalResourceImportDto(data),
 ]);

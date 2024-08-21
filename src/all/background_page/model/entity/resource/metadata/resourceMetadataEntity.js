@@ -51,7 +51,7 @@ class ResourceMetadataEntity extends EntityV2 {
           "nullable": true,
         },
         "uris": {
-          "type": "array", // Validating array of data is not yet supported by the validator @TODO Add validation
+          "type": "array",
           "items": {
             "type": "string",
             "maxLength": RESOURCE_URI_MAX_LENGTH

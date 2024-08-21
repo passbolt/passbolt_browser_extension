@@ -122,7 +122,7 @@ describe("FolderEntity", () => {
     const entity = new FolderEntity(dto);
     expect(entity.isPersonal()).toBe(null);
   });
-  
+
   it('Should not accept invalid associated permission', async() => {
     expect.assertions(2);
     const dto = defaultFolderDto({

@@ -232,8 +232,8 @@ class PermissionsCollection extends EntityV2Collection {
     permission = this.buildOrCloneEntity(permission);
 
     const permissionToReplaceIndex = this.items.findIndex(item =>
-      (!item.id || item.id === permission._props.id)
-      && (PermissionEntity.isAcoAndAroMatching(item, permission))
+      (!item.id || !permission._props.id || item.id === permission._props.id)
+        && (PermissionEntity.isAcoAndAroMatching(item, permission))
     );
 
     // No matching item, add the permission to the collection.

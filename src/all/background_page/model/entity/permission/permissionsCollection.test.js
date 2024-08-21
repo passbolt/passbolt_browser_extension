@@ -267,7 +267,7 @@ describe("PermissionsCollection", () => {
       expect(collection.permissions[0].type).toEqual(dto1.type);
     });
 
-    it("replaces permission matching the same aro if new permission has higher access right", () => {
+    it("replaces permission matching the same aro/aco if new permission has higher access right", () => {
       expect.assertions(2);
       const dto1 = updateMinimalFolderPermissionDto();
       const dto2 = ownerMinimalFolderPermissionDto({aco_foreign_key: dto1.aco_foreign_key, aro_foreign_key: dto1.aro_foreign_key});
@@ -277,7 +277,7 @@ describe("PermissionsCollection", () => {
       expect(collection.permissions[0].type).toEqual(dto2.type);
     });
 
-    it("does not replace permission matching the same aro if new permission does not have higher access right", () => {
+    it("does not replace permission matching the same aro/aco if new permission does not have higher access right", () => {
       expect.assertions(2);
       const dto1 = ownerMinimalFolderPermissionDto();
       const dto2 = updateMinimalFolderPermissionDto({aco_foreign_key: dto1.aco_foreign_key, aro_foreign_key: dto1.aro_foreign_key});
@@ -285,6 +285,28 @@ describe("PermissionsCollection", () => {
       collection.addOrReplace(new PermissionEntity(dto2));
       expect(collection.permissions.length).toBe(1);
       expect(collection.permissions[0].type).toEqual(dto1.type);
+    });
+
+    it("identifies new permission as replacement if same aco/aro but new permission has no id and existing one has one", () => {
+      expect.assertions(3);
+      const dto1 = updateFolderPermissionDto();
+      const dto2 = ownerMinimalFolderPermissionDto({aco_foreign_key: dto1.aco_foreign_key, aro_foreign_key: dto1.aro_foreign_key});
+      const collection = new PermissionsCollection([dto1], {assertAtLeastOneOwner: false});
+      collection.addOrReplace(new PermissionEntity(dto2));
+      expect(collection.permissions.length).toBe(1);
+      expect(collection.permissions[0].type).toEqual(dto2.type);
+      expect(collection.permissions[0].id).toBeNull();
+    });
+
+    it("identifies new permission as replacement if same aco/aro but new permission has id and existing one has none", () => {
+      expect.assertions(3);
+      const dto1 = updateMinimalFolderPermissionDto();
+      const dto2 = ownerFolderPermissionDto({aco_foreign_key: dto1.aco_foreign_key, aro_foreign_key: dto1.aro_foreign_key});
+      const collection = new PermissionsCollection([dto1], {assertAtLeastOneOwner: false});
+      collection.addOrReplace(new PermissionEntity(dto2));
+      expect(collection.permissions.length).toBe(1);
+      expect(collection.permissions[0].type).toEqual(dto2.type);
+      expect(collection.permissions[0].id).toEqual(dto2.id);
     });
 
     it("addOrReplace allow updating permissions to higher ones muliple manipulations", () => {

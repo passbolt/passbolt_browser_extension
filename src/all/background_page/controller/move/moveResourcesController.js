@@ -76,6 +76,7 @@ class MoveResourcesController {
       await this.progressService.close();
       this.cleanup();
     } catch (error) {
+      console.error(error);
       await this.progressService.close();
       this.cleanup();
       throw error;

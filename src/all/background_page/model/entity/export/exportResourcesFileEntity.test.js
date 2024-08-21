@@ -59,6 +59,8 @@ describe("ExportResourcesFileEntity", () => {
       assertEntityProperty.assert(ExportResourcesFileEntity, "resources_ids", successScenarios, failingScenarios, "type");
       assertEntityProperty.nullable(ExportResourcesFileEntity, "resources_ids");
       assertEntityProperty.notRequired(ExportResourcesFileEntity, "resources_ids");
+      assertEntityProperty.assertArrayItemString(ExportResourcesFileEntity, "resources_ids");
+      assertEntityProperty.assertArrayItemUuid(ExportResourcesFileEntity, "resources_ids");
     });
 
     it("validates folders_ids property", () => {
@@ -72,6 +74,8 @@ describe("ExportResourcesFileEntity", () => {
       assertEntityProperty.assert(ExportResourcesFileEntity, "folders_ids", successScenarios, failingScenarios, "type");
       assertEntityProperty.nullable(ExportResourcesFileEntity, "folders_ids");
       assertEntityProperty.notRequired(ExportResourcesFileEntity, "folders_ids");
+      assertEntityProperty.assertArrayItemString(ExportResourcesFileEntity, "folders_ids");
+      assertEntityProperty.assertArrayItemUuid(ExportResourcesFileEntity, "folders_ids");
     });
 
     it("validates export_resources property", () => {

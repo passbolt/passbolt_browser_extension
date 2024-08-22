@@ -11,19 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.9.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import Keyring from "../../model/keyring";
-import EncryptMessageService from "../../service/crypto/encryptMessageService";
-import User from "../../model/user";
-import ResourceModel from "../../model/resource/resourceModel";
-import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
-import FolderModel from "../../model/folder/folderModel";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
+
 import i18n from "../../sdk/i18n";
-import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import ProgressService from "../../service/progress/progressService";
-import ShareModel from "../../model/share/shareModel";
+import ResourceCreateService from "../../service/resource/create/resourceCreateService";
 
 class ResourceCreateController {
   /**
@@ -37,102 +29,42 @@ class ResourceCreateController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.resourceModel = new ResourceModel(apiClientOptions, account);
-    this.folderModel = new FolderModel(apiClientOptions);
-    this.shareModel = new ShareModel(apiClientOptions);
-    this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker, i18n.t('Creating password'));
+    this.resourceCreateService = new ResourceCreateService(account, apiClientOptions, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
-   * Create a resource.
-   *
+   * Controller executor.
    * @param {object} resourceDto The resource data
    * @param {string|object} plaintextDto The secret to encrypt
-   * @return {Promise<ResourceEntity>} resourceEntity
+   * @returns {Promise<void>}
    */
-  async main(resourceDto, plaintextDto) {
-    let privateKey;
-
-    /*
-     * set default goals, we give arbitrarily "more" goals if a parent permission folder is set
-     * as we don't know how many 'share' operations are needed yet
-     */
-    let resource = new ResourceEntity(resourceDto);
-    const goals = resource.folderParentId ? 10 : 2;
-
-    // Get the passphrase if needed and decrypt secret key
+  async _exec(resourceDto, plaintextDto) {
     try {
-      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-      privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
+      const resource = await this.exec(resourceDto, plaintextDto);
+      this.worker.port.emit(this.requestId, 'SUCCESS', resource);
     } catch (error) {
       console.error(error);
-      throw error;
+      this.worker.port.emit(this.requestId, 'ERROR', error);
     }
-
-    try {
-      this.progressService.start(goals, i18n.t('Initializing'));
-      const plaintext = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, plaintextDto);
-
-      // Encrypt and sign
-      await this.progressService.finishStep(i18n.t('Encrypting secret'), true);
-      const userId = User.getInstance().get().id;
-      const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
-      const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
-      const secret = await EncryptMessageService.encrypt(plaintext, userPublicKey, [privateKey]);
-      resource.secrets = new ResourceSecretsCollection([{data: secret}]);
-
-      // Save
-      await this.progressService.finishStep(i18n.t('Creating password'), true);
-      resource = await this.resourceModel.create(resource);
-
-      // Share if needed
-      if (resource.folderParentId) {
-        await this.handleCreateInFolder(resource, privateKey);
-      }
-    } catch (error) {
-      console.error(error);
-      await this.progressService.close();
-      throw error;
-    }
-
-    await this.progressService.finishStep(i18n.t('Done!'), true);
-    await this.progressService.close();
-
-    return resource;
   }
 
   /**
-   * Handle post create operations if resource is created in folder
-   * This includes sharing the resource to match the parent folder permissions
-   *
-   * @param {ResourceEntity} resourceEntity
-   * @param {openpgp.PrivateKey} privateKey The user decrypted private key
+   * @param {object} resourceDto The resource data
+   * @param {string|object} plaintextDto The secret to encrypt
    * @returns {Promise<void>}
    */
-  async handleCreateInFolder(resourceEntity, privateKey) {
-    // Calculate changes if any
-    await this.progressService.finishStep(i18n.t('Calculate permissions'), true);
-    const destinationFolder = await this.folderModel.findForShare(resourceEntity.folderParentId);
-    const changes = await this.resourceModel.calculatePermissionsChangesForCreate(resourceEntity, destinationFolder);
-
-    // Apply changes
-    if (changes.length) {
-      const goals = (changes.length * 3) + 2 + this.progressService.progress; // closer to reality...
-      this.progressService.updateGoals(goals);
-
-      // Sync keyring
-      await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
-      await this.keyring.sync();
-
-      // Share
-      await this.progressService.finishStep(i18n.t('Start sharing'), true);
-      const resourcesToShare = [resourceEntity.toDto({secrets: true})];
-      await this.shareModel.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message =>
-        await this.progressService.finishStep(message)
-      );
-      await this.resourceModel.updateLocalStorage();
+  async exec(resourceDto, plaintextDto) {
+    try {
+      const goals = resourceDto.folder_parent_id ? 10 : 2;
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+      this.progressService.start(goals, i18n.t('Initializing'));
+      const resourceCreated =  await this.resourceCreateService.exec(resourceDto, plaintextDto, passphrase);
+      await this.progressService.finishStep(i18n.t('Done!'), true);
+      return resourceCreated;
+    } finally {
+      await this.progressService.close();
     }
   }
 }

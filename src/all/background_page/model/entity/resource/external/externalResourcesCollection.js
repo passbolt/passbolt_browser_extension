@@ -88,11 +88,24 @@ class ExternalResourcesCollection extends EntityCollection {
     }
     const externalResourcesDto = resourcesCollection.resources.map(resourceEntity => {
       const externalFolderParent = externalFoldersCollection.getById(resourceEntity.folderParentId);
-      const folderParentId = externalFolderParent ? externalFolderParent.id : null;
-      const folderParentPath = externalFolderParent ? externalFolderParent.path : "";
-      return Object.assign(resourceEntity.toDto({secrets: true}), {folder_parent_id: folderParentId, folder_parent_path: folderParentPath});
+      const resourceDto = resourceEntity.toDto({secrets: true, metadata: true});
+      return ExternalResourceEntity.buildDtoFromResourceEntityDto(resourceDto, externalFolderParent);
     });
     return new ExternalResourcesCollection(externalResourcesDto);
+  }
+
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
+  /**
+   * Return a DTO ready to be sent to the API
+   *
+   * @returns {Array<ResourceEntityDto>}
+   */
+  toResourceCollectionImportDto() {
+    return this._items.map(item => item.toResourceEntityImportDto());
   }
 
   /*

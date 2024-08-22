@@ -16,6 +16,10 @@ import ExternalResourceEntity from "./externalResourceEntity";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
 import {v4 as uuidv4} from "uuid";
 import {defaultTotpDto} from "../../totp/totpDto.test.data";
+import ResourceEntity from "../resourceEntity";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
+import {defaultExternalResourceDto, defaultExternalResourceImportDto} from "./externalResourceEntity.test.data";
 
 describe("ExternalResourceEntity", () => {
   it("schema must validate", () => {
@@ -123,5 +127,75 @@ describe("ExternalResourceEntity", () => {
     expect(resource.folderParentPath).toEqual("root");
     resource.changeRootPath(rootFolder);
     expect(resource.folderParentPath).toEqual("root/root");
+  });
+
+  describe("::buildDtoFromResourceEntityDto", () => {
+    it("should build a dto from the DTO of a resource entity", () => {
+      const secrets = defaultResourcesSecretsDtos(1);
+      const resourceDto = defaultResourceDto({
+        id: secrets[0].resource_id,
+        secrets: secrets,
+      });
+      const entity = new ResourceEntity(resourceDto);
+
+      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(entity.toDto({secrets: true, metadata: true}));
+      expect(resultDto).toStrictEqual({
+        id: entity.id,
+        name: entity.metadata.name,
+        username: entity.metadata.username,
+        uri: entity.metadata.uris[0],
+        description: entity.metadata.description,
+        secrets: secrets,
+        folder_parent_id: entity.folderParentId,
+        resource_type_id: entity.metadata.resourceTypeId,
+        folder_parent_path: "",
+        expired: null,
+      });
+    });
+
+    it("should build a dto from the DTO of a resource entity and that can use to instantiate an ExternalResourceEntity", () => {
+      const secrets = defaultResourcesSecretsDtos(1);
+      const resourceDto = defaultResourceDto({
+        id: secrets[0].resource_id,
+        secrets: secrets,
+      });
+      const entity = new ResourceEntity(resourceDto);
+
+      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(entity.toDto({secrets: true, metadata: true}));
+      expect(() => new ExternalResourceEntity(resultDto)).not.toThrow();
+    });
+  });
+
+  describe("::toResourceEntityImportDto", () => {
+    it("should export a DTO in the expected format", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+
+      const resourceEntityDto = entity.toResourceEntityImportDto();
+      expect(resourceEntityDto).toStrictEqual({
+        resource_type_id: dto.resource_type_id,
+        expired: dto.expired,
+        folder_parent_id: dto.folder_parent_id,
+        metadata: {
+          object_type: "PASSBOLT_METADATA_V5",
+          name: dto.name,
+          username: dto.username,
+          uris: [dto.uri],
+          description: dto.description,
+          resource_type_id: dto.resource_type_id,
+        },
+        secrets: dto.secrets,
+      });
+    });
+
+    it("should generate a DTO that could be used to instantiate a ResourceEntity", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceImportDto();
+      const entity = new ExternalResourceEntity(dto);
+
+      const resourceEntityDto = entity.toResourceEntityImportDto();
+      expect(() => new ResourceEntity(resourceEntityDto)).not.toThrow();
+    });
   });
 });

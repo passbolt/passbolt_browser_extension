@@ -18,6 +18,7 @@ import {
   TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
   TEST_RESOURCE_TYPE_PASSWORD_STRING, TEST_RESOURCE_TYPE_TOTP
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {v4 as uuidv4} from "uuid";
 
 export const defaultResourceDtosCollection = () => {
   const resource1 = defaultResourceDto({name: "Resource1"});
@@ -44,21 +45,19 @@ export const resourceAllTypesDtosCollection = () => {
   resource1.secrets = [readSecret({resource_id: resource1.id})];
   resource1.permission = ownerPermissionDto({aco_foreign_key: resource1.id});
   resource1.permissions = [resource1.permission];
-  // Legacy resource type < v3, it should be deprecated since v3 but it still supported in the code.
-  const resource2 = defaultResourceDto({name: "Resource password string legacy"});
-  delete resource2.resource_type_id;
+  const resource2 = defaultResourceDto({name: "Resource password with encrypted description", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION});
   resource2.secrets = [readSecret({resource_id: resource2.id})];
   resource2.permission = ownerPermissionDto({aco_foreign_key: resource2.id});
   resource2.permissions = [resource2.permission];
-  const resource3 = defaultResourceDto({name: "Resource password with encrypted description", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION});
+  const resource3 = defaultResourceDto({name: "Resource password with encrypted description and totp", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP});
   resource3.secrets = [readSecret({resource_id: resource3.id})];
   resource3.permission = ownerPermissionDto({aco_foreign_key: resource3.id});
   resource3.permissions = [resource3.permission];
-  const resource4 = defaultResourceDto({name: "Resource password with encrypted description and totp", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP});
+  const resource4 = defaultResourceDto({name: "Resource totp", resource_type_id: TEST_RESOURCE_TYPE_TOTP});
   resource4.secrets = [readSecret({resource_id: resource4.id})];
   resource4.permission = ownerPermissionDto({aco_foreign_key: resource4.id});
   resource4.permissions = [resource4.permission];
-  const resource5 = defaultResourceDto({name: "Resource totp", resource_type_id: TEST_RESOURCE_TYPE_TOTP});
+  const resource5 = defaultResourceDto({name: "Resource type unknown", resource_type_id: uuidv4()});
   resource5.secrets = [readSecret({resource_id: resource5.id})];
   resource5.permission = ownerPermissionDto({aco_foreign_key: resource5.id});
   resource5.permissions = [resource5.permission];

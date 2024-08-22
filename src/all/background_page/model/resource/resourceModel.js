@@ -322,20 +322,6 @@ class ResourceModel {
    *  CRUD
    * ==============================================================
    */
-  /**
-   * Create a resource using Passbolt API and add result to local storage
-   *
-   * @param {ResourceEntity} resourceEntity
-   * @returns {Promise<ResourceEntity>}
-   */
-  async create(resourceEntity) {
-    const data = resourceEntity.toDto({secrets: true});
-    const contain = {permission: true, favorite: true, tags: true, folder: true};
-    const resourceDto = await this.resourceService.create(data, contain);
-    const newResourceEntity = new ResourceEntity(resourceDto);
-    await ResourceLocalStorage.addResource(newResourceEntity);
-    return newResourceEntity;
-  }
 
   /**
    * Update a resource using Passbolt API and add result to local storage
@@ -344,7 +330,7 @@ class ResourceModel {
    * @returns {Promise<ResourceEntity>}
    */
   async update(resourceEntity) {
-    const data = resourceEntity.toDto({secrets: true});
+    const data = resourceEntity.toV4Dto({secrets: true});
     const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
     const updatedResourceEntity = new ResourceEntity(resourceDto);
     await ResourceLocalStorage.updateResource(updatedResourceEntity);
@@ -438,7 +424,7 @@ class ResourceModel {
        * but we don't add the resource entity in the local storage just yet,
        * we wait until all resources are created in order to speed things up
        */
-      const data = resourceEntity.toDto({secrets: true});
+      const data = resourceEntity.toV4Dto({secrets: true});
       const contain = {permission: true, favorite: true, tags: true, folder: true};
       const resourceDto = await this.resourceService.create(data, contain);
       const createdResourceEntity = new ResourceEntity(resourceDto);
@@ -647,7 +633,7 @@ class ResourceModel {
    */
   async keepResourcesSupported(resourcesDto) {
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
+    return resourcesDto.filter(resource => resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
   }
 }
 

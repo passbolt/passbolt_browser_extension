@@ -13,6 +13,9 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ExternalResourcesCollection from "./externalResourcesCollection";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
+import {defaultExternalResourceCollectionDto} from "./externalResourcesCollection.test.data";
+import ResourcesCollection from "../resourcesCollection";
+import ExternalResourceEntity from "./externalResourceEntity";
 
 describe("ExternalResourcesCollection", () => {
   it("schema must validate", () => {
@@ -93,5 +96,26 @@ describe("ExternalResourcesCollection", () => {
     for (const externalResourceEntity of collection) {
       expect(externalResourceEntity.folderParentPath).toMatch(/^New\/Root/);
     }
+  });
+
+  describe("::toResourceCollectionImportDto", () => {
+    it("should create a resource entity collection", () => {
+      const collectionDto = defaultExternalResourceCollectionDto();
+      const externalResourceCollection = new ExternalResourcesCollection(collectionDto);
+      const resourceEntityCollection = externalResourceCollection.toResourceCollectionImportDto();
+
+      const expectedCollectionDto = collectionDto.map(dto => new ExternalResourceEntity(dto).toResourceEntityImportDto());
+
+      expect(resourceEntityCollection).toStrictEqual(expectedCollectionDto);
+    });
+
+    it("should generate a DTO that could be used to instantiate a ResourceEntityCollection", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceCollectionDto();
+      const externalResourceCollection = new ExternalResourcesCollection(dto);
+
+      const resourceEntityCollectionDto = externalResourceCollection.toResourceCollectionImportDto();
+      expect(() => new ResourcesCollection(resourceEntityCollectionDto)).not.toThrow();
+    });
   });
 });

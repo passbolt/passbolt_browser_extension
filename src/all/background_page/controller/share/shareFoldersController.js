@@ -204,7 +204,7 @@ class ShareFoldersController {
 
     // Share resources
     if (this.resourcesChanges.length) {
-      const resourcesDto = this.resources.toDto({secrets: true});
+      const resourcesDto = this.resources.toDto({secrets: true, metadata: true});
       const changesDto = this.resourcesChanges.toDto();
       await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
       await this.keyring.sync();

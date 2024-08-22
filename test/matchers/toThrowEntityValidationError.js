@@ -11,8 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.8.0
  */
+const getPropertyValueByPath = (obj, path) => path
+  .split('.')
+  .reduce((accumulator, key) => accumulator?.[key], obj);
 
-exports.toThrowEntityValidationError = function(received, propertyName, validationRule, dto) {
+exports.toThrowEntityValidationError = function(received, propertyPath, validationRule, dto) {
   const {printExpected, printReceived, matcherHint} = this.utils;
   let errorDetails;
 
@@ -22,7 +25,7 @@ exports.toThrowEntityValidationError = function(received, propertyName, validati
     errorDetails = error.details;
   }
 
-  let expectedPropertyMessage = propertyName;
+  let expectedPropertyMessage = propertyPath;
   if (validationRule) {
     expectedPropertyMessage += `:${validationRule}`;
   }
@@ -51,8 +54,8 @@ exports.toThrowEntityValidationError = function(received, propertyName, validati
   }
 
   const pass = Boolean(errorDetails)
-    && propertyName in errorDetails
-    && (!validationRule || validationRule in errorDetails[propertyName]);
+    && Boolean(getPropertyValueByPath(errorDetails, propertyPath))
+    && (!validationRule || validationRule in getPropertyValueByPath(errorDetails, propertyPath));
 
   return {pass: pass, message: () => (pass ? passMessage : failMessage)};
 };

@@ -74,6 +74,7 @@ describe("FolderEntity", () => {
     it("validates personal property", () => {
       assertEntityProperty.boolean(FolderEntity, "personal");
       assertEntityProperty.notRequired(FolderEntity, "personal");
+      assertEntityProperty.nullable(FolderEntity, "personal");
     });
   });
 
@@ -111,6 +112,15 @@ describe("FolderEntity", () => {
     expect(entity.isOwner()).toBe(true);
     expect(entity.isPersonal()).toBe(false);
     expect(entity.isShared()).toBe(true);
+  });
+
+  it('Should allow personal with null value', async() => {
+    expect.assertions(1);
+    const dto = defaultFolderDto({
+      personal: null
+    });
+    const entity = new FolderEntity(dto);
+    expect(entity.isPersonal()).toBe(null);
   });
 
   it('Should not accept invalid associated permission', async() => {
@@ -209,10 +219,18 @@ describe("FolderEntity", () => {
 
   describe("FolderEntity:canFolderMove", () => {
     it("folder can move test", () => {
+      expect.assertions(22);
+
       const personalFolderDto = defaultFolderDto({
         "personal": true,
       });
       const personal = new FolderEntity(personalFolderDto);
+
+      // Should not crash when value is null
+      const personalNullFolderDto = defaultFolderDto({
+        "personal": null,
+      });
+      const personalNullFolder = new FolderEntity(personalNullFolderDto);
 
       const sharedOwnerDto = defaultFolderDto({
         "personal": false,
@@ -246,6 +264,7 @@ describe("FolderEntity", () => {
       expect(FolderEntity.canFolderMove(sharedRead, sharedUpdate, sharedUpdate)).toBe(false);
       expect(FolderEntity.canFolderMove(sharedRead, sharedOwner, sharedUpdate)).toBe(false);
       expect(FolderEntity.canFolderMove(sharedRead, personal, sharedUpdate)).toBe(false);
+      expect(FolderEntity.canFolderMove(sharedRead, personalNullFolder, sharedUpdate)).toBe(null);
 
       /*
        * CAN MOVE

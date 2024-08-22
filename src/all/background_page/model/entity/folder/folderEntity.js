@@ -100,6 +100,7 @@ class FolderEntity extends EntityV2 {
         },
         "personal": {
           "type": "boolean",
+          "nullable": true,
         },
         "permission": PermissionEntity.getSchema(), // current user permission
         "permissions": PermissionsCollection.getSchema() // all users permissions

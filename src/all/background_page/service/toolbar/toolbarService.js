@@ -72,10 +72,6 @@ class ToolbarService {
   handleUserLoggedOut() {
     this.tabUrl = null;
     BrowserExtensionIconService.deactivate();
-
-    browser.tabs.onUpdated.removeListener(this.handleSuggestedResourcesOnUpdatedTab);
-    browser.tabs.onActivated.removeListener(this.handleSuggestedResourcesOnActivatedTab);
-    browser.windows.onFocusChanged.removeListener(this.handleSuggestedResourcesOnFocusedWindow);
   }
 
   /**
@@ -198,7 +194,7 @@ class ToolbarService {
   isUrlPassboltDomain(tabUrl, account) {
     const passboltDomain = new URL(account.domain);
     const url = tabUrl && new URL(tabUrl);
-    return passboltDomain.hostname === url.hostname;
+    return passboltDomain.hostname === url?.hostname;
   }
 
   /**
@@ -207,7 +203,7 @@ class ToolbarService {
    * @returns {boolean}
    */
   isUrlPassboltExtension(tabUrl) {
-    return tabUrl.startsWith(browser.runtime.getURL("/"));
+    return Boolean(tabUrl?.startsWith(browser.runtime.getURL("/")));
   }
 }
 

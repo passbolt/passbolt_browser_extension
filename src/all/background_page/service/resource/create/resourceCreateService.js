@@ -115,7 +115,7 @@ class ResourceCreateService {
 
       // Share
       await this.progressService?.finishStep(i18n.t('Start sharing'), true);
-      const resourcesToShare = [resourceEntity.toV4Dto({secrets: true})];
+      const resourcesToShare = [resourceEntity.toDto({secrets: true})];
       await this.shareModel.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message =>
         await this.progressService?.finishStep(message)
       );

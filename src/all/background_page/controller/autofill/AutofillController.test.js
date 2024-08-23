@@ -105,6 +105,7 @@ describe("AutofillController", () => {
       expect(portWrapper.request).toHaveBeenCalledWith('passbolt.quickaccess.fill-form', resource.username, secret.password, tab.url);
       expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.in-form-menu.close');
     });
+    
 
     it("Should not autofill from a worker that is not inform menu or quickaccess.", async() => {
       expect.assertions(10);
@@ -142,6 +143,47 @@ describe("AutofillController", () => {
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledWith(resource.resourceTypeId);
       expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.web-integration.fill-credentials', {username: resource.username, password: secret.password});
       expect(portWrapper.request).not.toHaveBeenCalledWith('passbolt.quickaccess.fill-form', resource.username, secret.password, tab.url);
+      expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.in-form-menu.close');
+    });
+
+    it("Should map username with empty string if not exist.", async() => {
+      expect.assertions(10);
+
+      // initialisation
+      const requestId = uuidv4();
+      const worker = readWorker();
+      const controller = new AutofillController(worker, requestId, defaultApiClientOptions(), account);
+      const resource = defaultResourceDto({
+        username: null
+      });
+      const secret = {password: "secret"};
+      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const portWrapper = new Port(port);
+      const tab = {url: "https://url.com"};
+      // mocked function
+      jest.spyOn(WorkerService, "get").mockImplementationOnce(() => ({port: portWrapper, tab: tab}));
+      jest.spyOn(controller.getPassphraseService, "requestPassphraseFromQuickAccess");
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementationOnce(() => pgpKeys.ada.passphrase);
+      jest.spyOn(controller.resourceModel, "findForDecrypt").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.resourceTypeModel, "getSecretSchemaById").mockImplementationOnce(jest.fn());
+      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(() => pgpKeys.ada.private_decrypted);
+      jest.spyOn(DecryptAndParseResourceSecretService, "decryptAndParse").mockImplementationOnce(() => secret);
+      jest.spyOn(portWrapper, "emit");
+      jest.spyOn(portWrapper, "request");
+
+      // process
+      await controller.exec(resource.id, worker.tabId);
+
+      // expectations
+      expect(controller.getPassphraseService.requestPassphraseFromQuickAccess).not.toHaveBeenCalled();
+      expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
+      expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledWith(worker);
+      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledTimes(1);
+      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledWith(resource.id);
+      expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledTimes(1);
+      expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledWith(resource.resourceTypeId);
+      expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.web-integration.fill-credentials', {username: "", password: secret.password});
+      expect(portWrapper.request).not.toHaveBeenCalledWith('passbolt.quickaccess.fill-form', "", secret.password, tab.url);
       expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.in-form-menu.close');
     });
   });

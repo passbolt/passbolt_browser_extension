@@ -20,8 +20,8 @@
   "Encrypting": "Chiffrement",
   "Encrypting {{counter}}/{{total}}": "Chiffrement {{counter}}/{{total}}",
   "Encrypting secret": "Chiffrement du secret",
-  "Expiry date will be updated on {{count}} resource._one": "Expiry date will be updated on {{count}} resource.",
-  "Expiry date will be updated on {{count}} resource._other": "Expiry date will be updated on {{count}} resources.",
+  "Expiry date will be updated on {{count}} resource._one": "La date d'expiration sera mise à jour sur {{count}} ressource.",
+  "Expiry date will be updated on {{count}} resource._other": "La date d'expiration sera mise à jour sur {{count}} ressources.",
   "Exporting ...": "Exportation ...",
   "Fetching parent permissions": "Récupération des permissions parentes",
   "Folder {{name}} can not be moved.": "Le dossier {{name}} ne peut pas être déplacé.",
@@ -34,7 +34,7 @@
   "Initialize": "Initialisation",
   "Initializing": "Initialisation en cours",
   "Initializing ...": "Initialisation en cours ...",
-  "Mark as expired ...": "Mark as expired ...",
+  "Mark as expired ...": "Marquer comme expiré ...",
   "MFA authentication is required.": "L'authentification MFA est requise.",
   "Moving {{name}}": "Déplace {{name}}",
   "Moving {{total}} resources": "Déplacement de {{total}} ressources",
@@ -68,7 +68,7 @@
   "The keys should be an array of valid openpgp private keys.": "Les clés doivent être un tableau de clés privées OpenPGP valides.",
   "The keys should be an array of valid openpgp public keys.": "Les clés doivent être un tableau de clés publiques OpenPGP valides.",
   "The keys should be an array.": "Les clés doivent être un tableau.",
-  "The message should be a valid openpgp clear text message.": "The message should be a valid openpgp clear text message.",
+  "The message should be a valid openpgp clear text message.": "Le message doit être un message OpenPGP en clair valide.",
   "The message should be a valid openpgp message.": "Le message doit être un message OpenPGP valide.",
   "The message should be of type string.": "Le message doit être de type string.",
   "The private key should be a valid openpgp key.": "La clé privée doit être une clé OpenPGP valide.",
@@ -91,5 +91,5 @@
   "Updating password": "Mise à jour du mot de passe",
   "Updating resource": "Mise à jour de la ressource",
   "Updating users' key...": "Mise à jour de la clé d'utilisateurs...",
-  "You have already started the process on another tab.": "You have already started the process on another tab."
+  "You have already started the process on another tab.": "Vous avez déjà commencé le processus dans un autre onglet."
 }

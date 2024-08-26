@@ -75,24 +75,6 @@ class RolesLocalStorage {
     return roles.find(item => item.id === id);
   }
 
-  /**
-   * Add a role in the local storage
-   * @param {RoleEntity} roleEntity
-   */
-  static async addResourceType(roleEntity) {
-    await lock.acquire();
-    try {
-      RolesLocalStorage.assertEntityBeforeSave(roleEntity);
-      const roles = await RolesLocalStorage.get();
-      roles.push(roleEntity.toDto());
-      await browser.storage.local.set({roles: roles});
-      lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
-    }
-  }
-
   /*
    * =================================================
    * Static methods

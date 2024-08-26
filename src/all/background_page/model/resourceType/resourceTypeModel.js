@@ -68,7 +68,7 @@ class ResourceTypeModel {
    * Return the secret section of the schema definition for a given resource type id
    *
    * @param {string} resourceTypeId uuid
-   * @returns {Promise<Object>}
+   * @returns {Promise<Object|undefined>}
    */
   async getSecretSchemaById(resourceTypeId) {
     if (!Validator.isUUID(resourceTypeId)) {
@@ -76,10 +76,7 @@ class ResourceTypeModel {
     }
     const types = await this.getOrFindAll();
     const type = types.getFirst('id', resourceTypeId);
-    if (!type || !type.definition || !type.definition.secret) {
-      return undefined;
-    }
-    return type.definition.secret;
+    return type?.definition?.secret;
   }
 }
 

@@ -11,10 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'ResourceType';
 const RESOURCE_TYPE_NAME_MAX_LENGTH = 255;
 const RESOURCE_TYPE_SLUG_MAX_LENGTH = 64;
 const RESOURCE_TYPE_DESCRIPTION_MAX_LENGTH = 255;
@@ -24,18 +22,7 @@ export const RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG = "password-and-descrip
 export const RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG = "password-description-totp";
 export const RESOURCE_TYPE_TOTP_SLUG = "totp";
 
-class ResourceTypeEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(resourceTypeDto, options = {}) {
-    super(EntitySchema.validate(
-      ResourceTypeEntity.ENTITY_NAME,
-      resourceTypeDto,
-      ResourceTypeEntity.getSchema()
-    ), options);
-  }
-
+class ResourceTypeEntity extends EntityV2 {
   /**
    * Get resource type entity schema
    * @returns {Object} schema
@@ -97,14 +84,6 @@ class ResourceTypeEntity extends Entity {
   }
 
   /**
-   * Get resource type name
-   * @returns {string} name
-   */
-  get name() {
-    return this._props.name;
-  }
-
-  /**
    * Get resource type slug
    * @returns {string} slug
    */
@@ -114,47 +93,10 @@ class ResourceTypeEntity extends Entity {
 
   /**
    * Get resource type definition (JSON compatible schema)
-   * @returns {string} definition
+   * @returns {object|null} definition
    */
   get definition() {
-    return this._props.definition;
-  }
-
-  /**
-   * Get resource type description
-   * @returns {(string|null)} description
-   */
-  get description() {
-    return this._props.description || null;
-  }
-
-  /**
-   * Get created date
-   * @returns {(string|null)} date
-   */
-  get created() {
-    return this._props.created || null;
-  }
-
-  /**
-   * Get modified date
-   * @returns {(string|null)} date
-   */
-  get modified() {
-    return this._props.modified || null;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * ResourceTypeEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
+    return this._props.definition || null;
   }
 }
 

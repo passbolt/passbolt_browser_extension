@@ -38,34 +38,6 @@ class GroupsUsersCollection extends EntityV2Collection {
 
   /*
    * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-  /**
-   * Sanitize groups users dto:
-   * - Remove group user which do not validate
-   *
-   * @param {array} dto The dto to sanitize.
-   * @return {array}
-   */
-  static sanitizeDto(dto) {
-    if (!Array.isArray(dto)) {
-      return [];
-    }
-
-    const filterValidGroupUser = dto => {
-      try {
-        new GroupUserEntity(dto);
-        return true;
-      } catch (error) {
-        return false;
-      }
-    };
-    return dto.filter(filterValidGroupUser);
-  }
-
-  /*
-   * ==================================================
    * Static and dynamic properties getters
    * ==================================================
    */

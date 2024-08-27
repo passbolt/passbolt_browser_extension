@@ -14,11 +14,12 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ResourceTypeEntity from "./resourceTypeEntity";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import {resourceTypePasswordDescriptionTotpDto, resourceTypePasswordStringDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 
-describe("Resource Type entity", () => {
-  describe("ResourceTypeEntity::getSchema", () => {
+describe("ResourceTypeEntity", () => {
+  describe("::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(ResourceTypeEntity.ENTITY_NAME, ResourceTypeEntity.getSchema());
+      EntitySchema.validateSchema(ResourceTypeEntity.name, ResourceTypeEntity.getSchema());
     });
 
     it("validates id property", () => {
@@ -63,37 +64,31 @@ describe("Resource Type entity", () => {
       assertEntityProperty.assert(ResourceTypeEntity, "description", successScenarios, failingScenarios, "type");
       assertEntityProperty.notRequired(ResourceTypeEntity, "description");
     });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(ResourceTypeEntity, "created");
+      assertEntityProperty.dateTime(ResourceTypeEntity, "created");
+      assertEntityProperty.notRequired(ResourceTypeEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(ResourceTypeEntity, "modified");
+      assertEntityProperty.dateTime(ResourceTypeEntity, "modified");
+      assertEntityProperty.notRequired(ResourceTypeEntity, "modified");
+    });
   });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "test-resource-type"
-    };
-    const entity = new ResourceTypeEntity(dto);
-    expect(entity.toDto()).toEqual(dto);
-  });
+  describe("::constructor", () => {
+    it("constructor works if valid minimal DTO is provided", () => {
+      const dto = resourceTypePasswordStringDto();
+      const entity = new ResourceTypeEntity(dto);
+      expect(entity.toDto()).toEqual(dto);
+    });
 
-  it("constructor works if valid minimal DTO is provided with optional and non supported fields", () => {
-    const dto = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "test-resource-type",
-      "description": "A test resource type",
-      "created": "2012-07-04T13:39:25+00:00",
-      "modified": "2012-07-04T13:39:25+00:00",
-      "_nope": 'nope'
-    };
-    const filtered = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "test-resource-type",
-      "description": "A test resource type",
-      "created": "2012-07-04T13:39:25+00:00",
-      "modified": "2012-07-04T13:39:25+00:00",
-    };
-    const resourceTypeEntity = new ResourceTypeEntity(dto);
-    expect(resourceTypeEntity.toDto()).toEqual(filtered);
+    it("constructor works if full DTO is provided", () => {
+      const dto = resourceTypePasswordDescriptionTotpDto();
+      const resourceTypeEntity = new ResourceTypeEntity(dto);
+      expect(resourceTypeEntity.toDto()).toEqual(dto);
+    });
   });
 });

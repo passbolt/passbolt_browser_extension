@@ -58,7 +58,6 @@ describe("ResourceTypesCollection", () => {
       const resourceTypeDto1 = resourceTypePasswordStringDto();
       const resourceTypeDto2 = resourceTypePasswordStringDto();
       const resourceTypesDto = [resourceTypeDto1, resourceTypeDto2];
-      console.log(resourceTypesDto);
       expect(() => new ResourceTypesCollection(resourceTypesDto)).toThrow(CollectionValidationError);
     });
 
@@ -68,6 +67,30 @@ describe("ResourceTypesCollection", () => {
       const dto2 = resourceTypePasswordStringDto({slug: 'unsupported-slug-2'});
       const resourceTypesCollection = new ResourceTypesCollection([dto1, dto2]);
       expect(resourceTypesCollection.length).toStrictEqual(0);
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate the build rules: must have unique slug", () => {
+      expect.assertions(2);
+      const resourceTypeDto1 = resourceTypePasswordStringDto();
+      const resourceTypeDto2 = resourceTypePasswordStringDto();
+      const resourceTypesDto = [resourceTypeDto1, resourceTypeDto2];
+      const options = {ignoreInvalidEntity: true};
+      const collection = new ResourceTypesCollection(resourceTypesDto, options);
+      expect(collection).toHaveLength(1);
+      expect(collection._items[0].toDto()).toStrictEqual(resourceTypeDto1);
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate", () => {
+      expect.assertions(2);
+      const resourceTypeDto1 = resourceTypePasswordStringDto();
+      const resourceTypeDto2 = resourceTypePasswordStringDto({
+        id: "wrong-id"
+      });
+      const resourceTypesDto = [resourceTypeDto1, resourceTypeDto2];
+      const options = {ignoreInvalidEntity: true};
+      const collection = new ResourceTypesCollection(resourceTypesDto, options);
+      expect(collection).toHaveLength(1);
+      expect(collection._items[0].toDto()).toStrictEqual(resourceTypeDto1);
     });
 
     it("Check if resource type id is present or not in the collection", () => {

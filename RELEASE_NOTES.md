@@ -1,6 +1,6 @@
 Song: https://www.youtube.com/watch?v=VmtU-bLyReU
 
-This release candidate addresses several bugs reported by the community. Additionally, it includes numerous maintenance updates as part of our ongoing efforts to ensure a smooth transition and support for the upcoming v5.
+This release addresses several bugs reported by the community. Additionally, it includes numerous maintenance updates as part of our ongoing efforts to ensure a smooth transition and support for the upcoming v5.
 
 Thank you to the community for reporting these issues.
 

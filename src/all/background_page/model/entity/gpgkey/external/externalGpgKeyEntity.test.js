@@ -98,10 +98,7 @@ describe("ExternalGpgKey entity", () => {
 
     it("validates length property", () => {
       assertEntityProperty.integer(ExternalGpgKeyEntity, "length");
-      /*
-       * @todo: put back the "min" check when the schema is updated to what's compatible with this rule (using `gte` instead of `min`)
-       * assertEntityProperty.min(ExternalGpgKeyEntity, "length", 1);
-       */
+      assertEntityProperty.minimum(ExternalGpgKeyEntity, "length", 1);
       assertEntityProperty.notRequired(ExternalGpgKeyEntity, "length");
     });
 

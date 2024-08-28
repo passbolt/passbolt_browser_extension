@@ -40,7 +40,7 @@ const mockedWorker = {
   }
 };
 describe("CreateCommentController", () => {
-  const validationError = new EntityValidationError("Could not validate entity Comment.");
+  const validationError = new EntityValidationError("Could not validate entity CommentEntity.");
   const expectInvalidField = (controller, mockCreation) => expect(controller.exec(mockCreation)).rejects.toThrowError(validationError);
 
   describe("CreateCommentController::constructor", () => {

@@ -11,32 +11,24 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import ResourceEntity from "../resource/resourceEntity";
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import UserEntity from "../user/userEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'Comment';
-const COMMENT_CONTENT_MIN_LENGTH = 1;
 const COMMENT_CONTENT_MAX_LENGTH = 255;
-
+const FOREIGN_MODEL_RESOURCE = "Resource";
 /**
  * List of allowed foreign models on which Comments can be plugged.
  */
 const ALLOWED_FOREIGN_MODELS = [
-  ResourceEntity.ENTITY_NAME,
+  FOREIGN_MODEL_RESOURCE,
 ];
 
-class CommentEntity extends Entity {
+class CommentEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
   constructor(commentDto, options = {}) {
-    super(EntitySchema.validate(
-      CommentEntity.ENTITY_NAME,
-      commentDto,
-      CommentEntity.getSchema()
-    ), options);
+    super(commentDto, options);
 
     // Associations
     if (this._props.creator) {
@@ -213,22 +205,6 @@ class CommentEntity extends Entity {
     return this._props.modified || null;
   }
 
-  /**
-   * Get created by user id
-   * @returns {(string|null)} uuid
-   */
-  get createdBy() {
-    return this._props.created_by || null;
-  }
-
-  /**
-   * Get modified by user id
-   * @returns {(string|null)} date
-   */
-  get modifiedBy() {
-    return this._props.modified_by || null;
-  }
-
   /*
    * ==================================================
    * Associated properties getters
@@ -255,21 +231,6 @@ class CommentEntity extends Entity {
    * Static properties getters
    * ==================================================
    */
-  /**
-   * CommentEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
-  }
-
-  /**
-   * CommentEntity.COMMENT_CONTENT_MIN_LENGTH
-   * @returns {int}
-   */
-  static get COMMENT_CONTENT_MIN_LENGTH() {
-    return COMMENT_CONTENT_MIN_LENGTH;
-  }
 
   /**
    * CommentEntity.COMMENT_CONTENT_MAX_LENGTH

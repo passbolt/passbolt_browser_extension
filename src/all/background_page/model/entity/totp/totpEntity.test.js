@@ -61,6 +61,21 @@ describe("Totp entity", () => {
       expect(entity.toDto()).toStrictEqual(dto);
     });
 
+    each([
+      {scenario: 'empty dto', dto: {}},
+      {scenario: 'secret key not base32', dto: defaultTotpDto({secret_key: " 871H KBKB "})},
+      {scenario: 'digits is not valid', dto: defaultTotpDto({digits: 10})},
+      {scenario: 'period is not valid', dto: defaultTotpDto({period: 0})},
+      {scenario: 'algorithm is not valid', dto: defaultTotpDto({algorithm: "AAA"})},
+    ]).describe("constructor returns validation error if dto is not valid", test => {
+      it(`Should not validate: ${test.scenario}`, async() => {
+        expect.assertions(1);
+        expect(() => new TotpEntity(test.dto)).toThrow(EntityValidationError);
+      });
+    });
+  });
+
+  describe("::createTotpFromKdbxWindows", () => {
     it("constructor works if valid kdbx windows is provided", () => {
       expect.assertions(1);
       const fields = new Map();
@@ -77,39 +92,26 @@ describe("Totp entity", () => {
       };
       expect(entity.toDto()).toStrictEqual(dto);
     });
+  });
 
-    describe("::marshal", () => {
-      it("should sanitize the secret_key", () => {
-        expect.assertions(1);
-        const entity = new TotpEntity(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
-        expect(entity.secretKey).toStrictEqual("572HKBKB");
-      });
-
-      it("Sanitising twice should give the same result", () => {
-        expect.assertions(1);
-        const entity = new TotpEntity(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
-        const entity2 = new TotpEntity(entity.toDto());
-        expect(entity2.secretKey).toStrictEqual("572HKBKB");
-      });
-
-      it("Sanitize valid DTO should remain the same", () => {
-        expect.assertions(1);
-        const entity = new TotpEntity(defaultTotpDto());
-        expect(entity.secretKey).toStrictEqual(defaultTotpDto().secret_key);
-      });
+  describe("::marshal", () => {
+    it("should sanitize the secret_key", () => {
+      expect.assertions(1);
+      const entity = new TotpEntity(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
+      expect(entity.secretKey).toStrictEqual("572HKBKB");
     });
 
-    each([
-      {scenario: 'empty dto', dto: {}},
-      {scenario: 'secret key not base32', dto: defaultTotpDto({secret_key: " 871H KBKB "})},
-      {scenario: 'digits is not valid', dto: defaultTotpDto({digits: 10})},
-      {scenario: 'period is not valid', dto: defaultTotpDto({period: 0})},
-      {scenario: 'algorithm is not valid', dto: defaultTotpDto({algorithm: "AAA"})},
-    ]).describe("constructor returns validation error if dto is not valid", test => {
-      it(`Should not validate: ${test.scenario}`, async() => {
-        expect.assertions(1);
-        expect(() => new TotpEntity(test.dto)).toThrow(EntityValidationError);
-      });
+    it("Sanitising twice should give the same result", () => {
+      expect.assertions(1);
+      const entity = new TotpEntity(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
+      const entity2 = new TotpEntity(entity.toDto());
+      expect(entity2.secretKey).toStrictEqual("572HKBKB");
+    });
+
+    it("Sanitize valid DTO should remain the same", () => {
+      expect.assertions(1);
+      const entity = new TotpEntity(defaultTotpDto());
+      expect(entity.secretKey).toStrictEqual(defaultTotpDto().secret_key);
     });
   });
 

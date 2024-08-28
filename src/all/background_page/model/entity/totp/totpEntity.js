@@ -63,14 +63,18 @@ class TotpEntity extends EntityV2 {
   marshall() {
     /*
      * Sanitize secret_key:
-     * - Replace white spaces in secret_key.
-     * - Capitalize characters in secret_key.
-     * - Remove all special characters
+     * - Replace white spaces.
+     * - Capitalize characters.
+     * - Remove all special characters.
      */
     if (typeof this._props.secret_key === "string") {
       this._props.secret_key = this._props.secret_key?.replace(/(\W|_|\s)/g, '').toUpperCase();
     }
 
+    /*
+     * Sanitize algorithm
+     * - Capitalize characters.
+     */
     if (typeof this._props.algorithm === "string") {
       this._props.algorithm = this._props.algorithm?.toUpperCase();
     }

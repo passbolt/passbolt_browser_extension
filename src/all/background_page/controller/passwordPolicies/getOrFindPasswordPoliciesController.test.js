@@ -158,7 +158,7 @@ describe("GetOrFindPasswordPoliciesController::exec", () => {
     const weakPasswordPolicies = defaultPasswordPolicies({
       default_generator: "passphrase",
       password_generator_settings: defaultPasswordGeneratorSettings({
-        length: 4
+        length: 8
       }),
     });
 

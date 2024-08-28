@@ -82,7 +82,7 @@ describe("ExternalResourceEntity", () => {
     expect(entity.secretClear).toEqual(result.secret_clear);
     expect(entity.folderParentId).toEqual(null);
     expect(entity.folderParentPath).toEqual("");
-    expect(entity.totp).toEqual(result.totp);
+    expect(entity.totp.toDto()).toEqual(result.totp);
     expect(entity.secrets).toBeUndefined();
     entity.totp = defaultTotpDto({secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"});
     expect(entity.totp.secret_key !== result.totp.secret_key).toBeTruthy();

@@ -70,7 +70,7 @@ class AutofillController {
       const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
       const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(resource.secret, secretSchema, privateKey);
-      const {username} = resource;
+      const username = resource.metadata?.username || "";
       const password = plaintextSecret?.password;
       this.fillCredential(webIntegrationWorker, {username, password});
     } finally {

@@ -22,12 +22,9 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import UserEntity from "../user/userEntity";
+import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'Resource';
-const RESOURCE_NAME_MAX_LENGTH = 255;
-const RESOURCE_USERNAME_MAX_LENGTH = 255;
-const RESOURCE_URI_MAX_LENGTH = 1024;
-const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
 
 class ResourceEntity extends EntityV2 {
   /**
@@ -78,6 +75,17 @@ class ResourceEntity extends EntityV2 {
       this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
       delete this._props._modifier;
     }
+    if (this._props.metadata) {
+      this._metadata = new ResourceMetadataEntity(this._props.metadata, {...options, clone: false});
+      delete this._props.metadata;
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  marshall() {
+    ResourceEntity.transformDtoFromV4toV5(this._props);
   }
 
   /**
@@ -89,7 +97,8 @@ class ResourceEntity extends EntityV2 {
     return {
       "type": "object",
       "required": [
-        "name"
+        "metadata",
+        "resource_type_id"
       ],
       "properties": {
         "id": {
@@ -99,25 +108,6 @@ class ResourceEntity extends EntityV2 {
         "resource_type_id": {
           "type": "string",
           "format": "uuid"
-        },
-        "name": {
-          "type": "string",
-          "maxLength": RESOURCE_NAME_MAX_LENGTH
-        },
-        "username": {
-          "type": "string",
-          "maxLength": RESOURCE_USERNAME_MAX_LENGTH,
-          "nullable": true,
-        },
-        "uri": {
-          "type": "string",
-          "maxLength": RESOURCE_URI_MAX_LENGTH,
-          "nullable": true,
-        },
-        "description": {
-          "type": "string",
-          "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH,
-          "nullable": true,
         },
         "expired": {
           "type": "string",
@@ -149,9 +139,11 @@ class ResourceEntity extends EntityV2 {
           "nullable": true,
         },
         "personal": {
-          "type": "boolean"
+          "type": "boolean",
+          "nullable": true,
         },
         // Associated models
+        "metadata": ResourceMetadataEntity.getSchema(),
         "favorite": {
           ...FavoriteEntity.getSchema(),
           "nullable": true,
@@ -180,6 +172,7 @@ class ResourceEntity extends EntityV2 {
    */
   toDto(contain) {
     const result = Object.assign({}, this._props);
+    result.metadata = this._metadata.toDto();
     if (!contain) {
       return result;
     }
@@ -228,30 +221,6 @@ class ResourceEntity extends EntityV2 {
    */
   get id() {
     return this._props.id || null;
-  }
-
-  /**
-   * Get resource name
-   * @returns {string} admin or user
-   */
-  get name() {
-    return this._props.name;
-  }
-
-  /**
-   * Get resource username
-   * @returns {string} username
-   */
-  get username() {
-    return this._props.username;
-  }
-
-  /**
-   * Get resource description
-   * @returns {(string|null)} description
-   */
-  get description() {
-    return this._props.description || null;
   }
 
   /**
@@ -313,13 +282,6 @@ class ResourceEntity extends EntityV2 {
     return this._props.resource_type_id || null;
   }
 
-  /**
-   * Returns the resource uri
-   */
-  get uri() {
-    return this._props.uri || null;
-  }
-
   /*
    * ==================================================
    * Permissions methods
@@ -348,6 +310,14 @@ class ResourceEntity extends EntityV2 {
       return null;
     }
     return !this.isPersonal();
+  }
+
+  /**
+   * Get resource metadata
+   * @returns {(ResourceMetadataEntity|null)}
+   */
+  get metadata() {
+    return this._metadata || null;
   }
 
   /**
@@ -423,7 +393,47 @@ class ResourceEntity extends EntityV2 {
    * @returns {boolean}
    */
   isSuggestion(url) {
-    return canSuggestUrl(url, this.uri);
+    return canSuggestUrl(url, this.metadata.uris?.[0]);
+  }
+
+  /**
+   * Transform DTO from V4 to V5
+   * @param {Object} resourceDTO dto v4
+   * @returns {Object} resourceDTO dto v5
+   */
+  static transformDtoFromV4toV5(resourceDTO) {
+    if (!resourceDTO.metadata) {
+      resourceDTO.metadata = {
+        object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
+        resource_type_id: resourceDTO.resource_type_id,
+        name: resourceDTO.name,
+        username: resourceDTO.username || null,
+        uris: resourceDTO.uri ? [resourceDTO.uri] : [],
+        description: resourceDTO.description || null
+      };
+    }
+    // Remove all legacy metadata at the root object
+    delete resourceDTO.name;
+    delete resourceDTO.username;
+    delete resourceDTO.uri;
+    delete resourceDTO.description;
+    return resourceDTO;
+  }
+
+  /**
+   * Transform v5 format to v4 format
+   * @used for to communicate with API
+   * @param {object} [contain] optional
+   * @returns {Object} resourceDTO dto v5
+   */
+  toV4Dto(contain) {
+    const resourceDTO = this.toDto(contain);
+    resourceDTO.name = resourceDTO.metadata.name;
+    resourceDTO.username = resourceDTO.metadata.username;
+    resourceDTO.uri = resourceDTO.metadata.uris?.[0] || "";
+    resourceDTO.description = resourceDTO.metadata.description;
+    delete resourceDTO.metadata;
+    return resourceDTO;
   }
 
   /*
@@ -628,10 +638,6 @@ class ResourceEntity extends EntityV2 {
    */
   static get ALL_CONTAIN_OPTIONS() {
     return {permission: true, permissions: true, secrets: true, favorite: true, tag: true, creator: true, modifier: true};
-  }
-
-  static get URI_MAX_LENGTH() {
-    return RESOURCE_URI_MAX_LENGTH;
   }
 }
 

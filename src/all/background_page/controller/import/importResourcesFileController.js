@@ -248,7 +248,7 @@ class ImportResourcesFileController {
    */
   async bulkImportResources(importEntity) {
     let importedCount = 0;
-    const resourcesCollection = new ResourcesCollection(importEntity.importResources.toJSON());
+    const resourcesCollection = new ResourcesCollection(importEntity.importResources.toResourceCollectionImportDto());
     const successCallback = (resourceEntity, index) => this.handleImportResourceSuccess(importEntity, ++importedCount, resourceEntity, importEntity.importResources.items[index]);
     const errorCallback = (error, index) => this.handleImportResourceError(importEntity, ++importedCount, error, importEntity.importResources.items[index]);
     await this.resourceModel.bulkCreate(resourcesCollection, {successCallback: successCallback, errorCallback: errorCallback});

@@ -86,7 +86,7 @@ describe("ResourceLocalStorage", () => {
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(2);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(resourcesDto);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(ResourcesCollection.transformDtoFromV4toV5(resourcesDto));
     });
 
     it("Should set the cache when setting the local storage", async() => {
@@ -98,7 +98,7 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(2);
-      expect(ResourceLocalStorage._cachedData).toEqual(resourcesDto);
+      expect(ResourceLocalStorage._cachedData).toEqual(ResourcesCollection.transformDtoFromV4toV5(resourcesDto));
     });
   });
 
@@ -157,7 +157,7 @@ describe("ResourceLocalStorage", () => {
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resourceDto);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto));
     });
 
     it("Should update the cache with the added resource", async() => {
@@ -169,7 +169,7 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(1);
-      expect(ResourceLocalStorage._cachedData[0]).toEqual(resourceDto);
+      expect(ResourceLocalStorage._cachedData[0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto));
     });
   });
 
@@ -208,8 +208,8 @@ describe("ResourceLocalStorage", () => {
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(2);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resourceDto1);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(resourceDto2);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto2));
     });
 
     it("Should update the cache with the added resources", async() => {
@@ -224,8 +224,8 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(2);
-      expect(ResourceLocalStorage._cachedData[0]).toEqual(resourceDto1);
-      expect(ResourceLocalStorage._cachedData[1]).toEqual(resourceDto2);
+      expect(ResourceLocalStorage._cachedData[0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
+      expect(ResourceLocalStorage._cachedData[1]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto2));
     });
   });
 
@@ -338,10 +338,10 @@ describe("ResourceLocalStorage", () => {
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(4);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resourceDto1);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual({...resourceDto2, name: "Resource 2 name update"});
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][2]).toEqual(resourceDto3);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][3]).toEqual({...resourceDto4, name: "Resource 4 name update"});
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
     });
 
     it("Should update cache when updating resources", async() => {
@@ -363,10 +363,10 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(4);
-      expect(ResourceLocalStorage._cachedData[0]).toEqual(resourceDto1);
-      expect(ResourceLocalStorage._cachedData[1]).toEqual({...resourceDto2, name: "Resource 2 name update"});
-      expect(ResourceLocalStorage._cachedData[2]).toEqual(resourceDto3);
-      expect(ResourceLocalStorage._cachedData[3]).toEqual({...resourceDto4, name: "Resource 4 name update"});
+      expect(ResourceLocalStorage._cachedData[0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
+      expect(ResourceLocalStorage._cachedData[1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
+      expect(ResourceLocalStorage._cachedData[2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
+      expect(ResourceLocalStorage._cachedData[3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
     });
   });
 

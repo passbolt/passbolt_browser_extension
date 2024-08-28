@@ -40,6 +40,20 @@ class DecryptPrivateKeyService {
       throw new InvalidMasterPasswordError();
     }
   }
+
+  /**
+   * Decrypt an armored private key with the given passphrase.
+   *
+   * @param {string} armoredPrivateKey the armored private key to decrypt
+   * @param {string} passphrase the passphrase with which to do the decryption operation
+   * @returns {Promise<openpgp.PrivateKey>} the private key decrypted
+   * @throws {InvalidMasterPasswordError} if the key cannot be decrypted with the passphrase
+   * @throws {Error} If the private key is already decrypted.
+   */
+  static async decryptArmoredKey(armoredPrivateKey, passphrase) {
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredPrivateKey);
+    return (await DecryptPrivateKeyService.decrypt(privateKey, passphrase));
+  }
 }
 
 export default DecryptPrivateKeyService;

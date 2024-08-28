@@ -87,10 +87,18 @@ class ExportResourcesFileEntity extends Entity {
         "resources_ids": {
           "type": "array",
           "nullable": true,
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
         },
         "folders_ids": {
           "type": "array",
           "nullable": true,
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
         },
         "export_resources": ExternalResourcesCollection.getSchema(),
         "export_folders": ExternalFoldersCollection.getSchema(),

@@ -17,6 +17,7 @@ import ResourceSecretsCollection from "../../secret/resource/resourceSecretsColl
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import TotpEntity from "../../totp/totpEntity";
+import ResourceMetadataEntity from "../metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'ExternalResource';
 const DEFAULT_RESOURCE_NAME = '(no name)';
@@ -73,6 +74,8 @@ class ExternalResourceEntity extends Entity {
    */
   static getSchema() {
     const resourceEntitySchema = ResourceEntity.getSchema();
+    const metadataEntitySchema = ResourceMetadataEntity.getSchema();
+
     return {
       "type": "object",
       "required": [
@@ -81,10 +84,13 @@ class ExternalResourceEntity extends Entity {
       ],
       "properties": {
         "id": resourceEntitySchema.properties.id,
-        "name": resourceEntitySchema.properties.name,
-        "username": resourceEntitySchema.properties.username,
-        "uri": resourceEntitySchema.properties.uri,
-        "description": resourceEntitySchema.properties.description,
+        "name": metadataEntitySchema.properties.name,
+        "username": metadataEntitySchema.properties.username,
+        "uri": {
+          "type": "string",
+          "maxLength": ResourceMetadataEntity.URI_MAX_LENGTH,
+        },
+        "description": metadataEntitySchema.properties.description,
         "secrets": resourceEntitySchema.properties.secrets,
         "folder_parent_id": resourceEntitySchema.properties.folder_parent_id,
         "resource_type_id": resourceEntitySchema.properties.resource_type_id,
@@ -125,6 +131,48 @@ class ExternalResourceEntity extends Entity {
    */
   toJSON() {
     return this.toDto();
+  }
+
+  /**
+   * Builds from a resource entity DTO an external resource entity DTO.
+   * @param {object} resourceEntityDto
+   * @param {ExternalFolderEntity} [externalFolderParent]
+   * @returns {object}
+   */
+  static buildDtoFromResourceEntityDto(resourceEntityDto, externalFolderParent) {
+    return {
+      id: resourceEntityDto.id,
+      name: resourceEntityDto.metadata.name,
+      username: resourceEntityDto.metadata.username,
+      uri: resourceEntityDto.metadata.uris?.[0] || "",
+      description: resourceEntityDto.metadata.description || null,
+      secrets: resourceEntityDto.secrets || [],
+      folder_parent_id: externalFolderParent?.id || null,
+      resource_type_id: resourceEntityDto.metadata.resource_type_id,
+      folder_parent_path: externalFolderParent?.path || "",
+      expired: resourceEntityDto.expired || null,
+    };
+  }
+
+  /**
+   * Returns a Resource DTO in v5 format.
+   * @returns {object}
+   */
+  toResourceEntityImportDto() {
+    return {
+      metadata: {
+        object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
+        name: this.name,
+        username: this.username,
+        uris: [this.uri || ""],
+        description: this.description,
+        resource_type_id: this.resourceTypeId,
+      },
+      secrets: this._secrets.toDto(),
+      folder_parent_id: this.folderParentId,
+      resource_type_id: this.resourceTypeId,
+      expired: this.expired,
+    };
   }
 
   /*

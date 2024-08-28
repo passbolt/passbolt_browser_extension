@@ -45,7 +45,7 @@ class ShareModel {
         const resource = resources.find(resource => resource.id === resourceId);
         const permissions = resourcesChanges[resourceId];
         const secrets = resourcesSecrets[resourceId] || [];
-        progressCallback(`Sharing password ${resource.name}`);
+        progressCallback(`Sharing password ${resource.metadata.name}`);
         await this.shareService.shareResource(resourceId, {permissions: permissions, secrets: secrets});
       }
     }
@@ -104,7 +104,7 @@ class ShareModel {
 
     for (const resourceId in resourcesChanges) {
       const resource = resources.find(resource => resource.id === resourceId);
-      progressCallback(`Validating share operation for ${resource.name}`);
+      progressCallback(`Validating share operation for ${resource.metadata.name}`);
       const simulateResult = await this.shareService.simulateShareResource(resourceId, resourcesChanges[resourceId]);
       const simulateAddedUsers = simulateResult.changes.added;
       if (simulateAddedUsers.length) {
@@ -138,7 +138,7 @@ class ShareModel {
       const resource = resources.find(resource => resource.id === resourceId);
       const originalMessage = await OpenpgpAssertion.readMessageOrFail(resource.secrets[0].data);
       const users = resourcesNewUsers[resourceId];
-      progressCallback(`Encrypting for ${resource.name}`);
+      progressCallback(`Encrypting for ${resource.metadata.name}`);
       if (users && users.length) {
         const message = await DecryptMessageService.decrypt(originalMessage, privateKey);
         const encryptAllData = users.reduce((carry, userId) => [...carry, {userId: userId, message: message}], []);

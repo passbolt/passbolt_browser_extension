@@ -16,11 +16,11 @@ import ResourceModel from "../../model/resource/resourceModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import BrowserTabService from "../../service/ui/browserTab.service";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
 import WorkerService from "../../service/worker/workerService";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import ResourceMetadataEntity from "../../model/entity/resource/metadata/resourceMetadataEntity";
 
 /**
  * Controller related to the in-form call-to-action
@@ -89,7 +89,7 @@ class InformMenuController {
     // Retrieve resource name and uri from tab.
     const tab = await BrowserTabService.getCurrent();
     const name = tab.title;
-    const uri = tab.url.substr(0, ResourceEntity.URI_MAX_LENGTH);
+    const uri = tab.url.substr(0, ResourceMetadataEntity.URI_MAX_LENGTH);
 
     // Store the resource to save in cache.
     const resourceDto = {name: name, username: username, uri: uri, secret_clear: secret_clear};

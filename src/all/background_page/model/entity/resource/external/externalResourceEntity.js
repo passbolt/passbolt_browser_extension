@@ -54,6 +54,10 @@ class ExternalResourceEntity extends Entity {
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
+    if (this._props.totp) {
+      //@todo: update when refactoring ExternalResourceEntity
+      this._props.totp = new TotpEntity(this._props.totp, {clone: false});
+    }
   }
 
   /**
@@ -121,6 +125,10 @@ class ExternalResourceEntity extends Entity {
     const result = Object.assign({}, this._props);
     if (this._secrets) {
       result.secrets = this._secrets.toDto();
+    }
+    if (this._props.totp) {
+      //@todo: update when refactoring ExternalResourceEntity
+      result.totp = this._props.totp.toDto();
     }
     return result;
   }

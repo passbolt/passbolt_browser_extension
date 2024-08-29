@@ -11,79 +11,71 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import CommentsCollection from "./commentsCollection";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {defaultCommentDto, minimumCommentDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
+import {defaultCommentCollectionDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntityCollection.test.data";
+import {v4 as uuidv4} from "uuid";
 
-describe("Comment entity", () => {
+describe("CommentsCollection entity", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(CommentsCollection.ENTITY_NAME, CommentsCollection.getSchema());
   });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const comment1 = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac82",
-      "user_id": "b58de6d3-f52c-5080-b79b-a601a647ac82",
-      "foreign_key": "7f077753-0835-4054-92ee-556660ea04f1",
-      "foreign_model": "Resource",
-      "content": "comment1"
-    };
-    const comment2 = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac83",
-      "user_id": "b58de6d3-f52c-5080-b79b-a601a647ac83",
-      "foreign_key": "7f077753-0835-4054-92ee-556660ea04f1",
-      "foreign_model": "Resource",
-      "content": "comment2"
-    };
-    const dto = [comment1, comment2];
-    const entity = new CommentsCollection(dto);
-    const expected = [comment1, comment2];
-    expect(expected).toEqual(entity.toDto());
-    expect(expected).toEqual(entity.toJSON());
-    expect(JSON.stringify(entity)).toEqual(JSON.stringify(expected));
-    expect(entity.items[0].content).toEqual('comment1');
-    expect(entity.items[1].content).toEqual('comment2');
-    expect(entity.ids).toEqual(['a58de6d3-f52c-5080-b79b-a601a647ac82', 'a58de6d3-f52c-5080-b79b-a601a647ac83']);
-    expect(entity.userIds).toEqual(['b58de6d3-f52c-5080-b79b-a601a647ac82', 'b58de6d3-f52c-5080-b79b-a601a647ac83']);
-  });
+  describe("::constructor", () => {
+    it("works with empty data", () => {
+      expect.assertions(1);
+      const collection = new CommentsCollection([]);
+      expect(collection).toHaveLength(0);
+    });
+    it("works if valid minimal DTOs are provided", () => {
+      expect.assertions(4);
 
-  it("constructor fails if reusing same comment", () => {
-    const comment1 =  {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac82",
-      "user_id": "b58de6d3-f52c-5080-b79b-a601a647ac82",
-      "foreign_key": "7f077753-0835-4054-92ee-556660ea04f1",
-      "foreign_model": "Resource",
-      "content": "comment1"
-    };
-    const dto = [comment1, comment1];
+      const dto = [minimumCommentDto()];
+      const collection = new CommentsCollection(dto);
 
-    const t = () => { new CommentsCollection(dto); };
-    expect(t).toThrow(EntityCollectionError);
-  });
+      expect(dto).toEqual(collection.toDto());
+      expect(dto).toEqual(collection.toJSON());
+      expect(collection.items[0].content).toEqual('minimum content');
+      expect(collection.userIds).toEqual([dto[0].user_id]);
+    });
 
-  it("constructor fails if not the same foreign id", () => {
-    const comment1 = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac81",
-      "user_id": "b58de6d3-f52c-5080-b79b-a601a647ac81",
-      "foreign_key": "7f077753-0835-4054-92ee-556660ea04f1",
-      "foreign_model": "Resource",
-      "content": "comment1"
-    };
-    const comment2 = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac82",
-      "user_id": "b58de6d3-f52c-5080-b79b-a601a647ac82",
-      "foreign_key": "7f077753-0835-4054-92ee-556660ea04f2",
-      "foreign_model": "Resource",
-      "content": "comment2"
-    };
-    const dto = [comment1, comment2];
+    it("works if valid complete entities are provided", () => {
+      expect.assertions(6);
 
-    const t = () => { new CommentsCollection(dto); };
-    expect(t).toThrow(EntityCollectionError);
-  });
+      const dto = defaultCommentCollectionDto();
+      const collection = new CommentsCollection(dto);
 
-  it("constructor works with empty collection", () => {
-    const collection = new CommentsCollection([]);
-    expect(collection.ids).toEqual([]);
+      expect(dto).toEqual(collection.toDto());
+      expect(dto).toEqual(collection.toJSON());
+      expect(collection.items[0].content).toEqual('comment2');
+      expect(collection.items[1].content).toEqual('comment2');
+      expect(collection.ids).toEqual([dto[0].id, dto[1].id, dto[2].id, dto[3].id]);
+      expect(collection.userIds).toEqual([dto[0].user_id, dto[1].user_id, dto[2].user_id, dto[3].user_id]);
+    });
+    it("should throw if the collection schema does not validate", () => {
+      expect.assertions(1);
+      expect(() => new CommentsCollection({}))
+        .toThrowEntityValidationError("items");
+    });
+    it("should throw if the collection schema does not validate the unique content", () => {
+      const comment1 =  defaultCommentDto();
+      const dto = [comment1, comment1];
+
+      const t = () => { new CommentsCollection(dto); };
+      expect(t).toThrow(CollectionValidationError);
+    });
+
+    it("should throw if the collection schema does not validate the same foreign id", () => {
+      const comment1 = defaultCommentDto();
+      const comment2 = defaultCommentDto({
+        foreign_key: uuidv4()
+      });
+      const dto = [comment1, comment2];
+
+      const t = () => { new CommentsCollection(dto); };
+      expect(t).toThrow(CollectionValidationError);
+    });
   });
 });

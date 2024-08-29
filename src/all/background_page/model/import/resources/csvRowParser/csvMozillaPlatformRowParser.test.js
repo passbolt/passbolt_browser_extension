@@ -44,7 +44,7 @@ describe("CsvMozillaPlatformRowParser", () => {
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.uri).toEqual(data.url);
     expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.username).toBeUndefined();
+    expect(externalResourceEntity.username).toBeNull();
   });
 
   it("parses legacy resource from csv row with all available properties", () => {

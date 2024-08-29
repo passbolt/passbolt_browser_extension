@@ -12,7 +12,6 @@
  */
 import CsvKdbxRowParser from "../../../import/resources/csvRowParser/csvKdbxRowParser";
 import AbstractRowComposer from "./abstractRowComposer";
-import TotpEntity from "../../../entity/totp/totpEntity";
 
 const FORMAT = "csv-kdbx";
 
@@ -45,7 +44,7 @@ class CsvKdbxRowComposer extends AbstractRowComposer {
     const externalResourceDto = externalResourceEntity.toDto();
     for (const propertyName in this.mapping) {
       if (propertyName === "totp" && externalResourceEntity.totp) {
-        const totp = new TotpEntity(externalResourceEntity.totp);
+        const totp = externalResourceEntity.totp;
         const totpUrl = totp.createUrlFromExternalResource(externalResourceEntity);
         row[this.mapping[propertyName]] = totpUrl.toString();
       } else {

@@ -19,7 +19,7 @@ import ExternalResourceEntity from "./externalResourceEntity";
 
 describe("ExternalResourcesCollection", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(ExternalResourcesCollection.ENTITY_NAME, ExternalResourcesCollection.getSchema());
+    EntitySchema.validateSchema(ExternalResourcesCollection.name, ExternalResourcesCollection.getSchema());
   });
 
   it("constructor works if valid minimal DTO is provided", () => {

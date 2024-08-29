@@ -24,6 +24,7 @@ import ExportResourcesFileEntity from "../../model/entity/export/exportResources
 import i18n from "../../sdk/i18n";
 import FileService from "../../service/file/fileService";
 import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
+import TotpEntity from "../../model/entity/totp/totpEntity";
 
 const INITIAL_PROGRESS_GOAL = 100;
 class ExportResourcesFileController {
@@ -109,9 +110,11 @@ class ExportResourcesFileController {
 
       const secretSchema = await this.resourceTypeModel.getSecretSchemaById(exportResourceEntity.resourceTypeId);
       const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(exportResourceEntity.secrets.items[0], secretSchema, privateKey);
-      exportResourceEntity.secretClear = plaintextSecret.password;
+      exportResourceEntity.secretClear = plaintextSecret.password || "";
       exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description;
-      exportResourceEntity.totp = plaintextSecret?.totp;
+      if (plaintextSecret.totp) {
+        exportResourceEntity.totp = new TotpEntity(plaintextSecret.totp);
+      }
     }
   }
 

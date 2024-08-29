@@ -178,7 +178,7 @@ class ImportResourcesFileController {
       // @todo sloppy. We remove the clear secret fields here, but it should be done at a parsing level.
       importResourceEntity.secretClear = "";
       importResourceEntity.description = "";
-      importResourceEntity.totp = "";
+      importResourceEntity.totp = null;
       return dto;
     }
     return importResourceEntity.secretClear;

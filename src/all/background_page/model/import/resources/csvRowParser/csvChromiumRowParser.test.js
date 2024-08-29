@@ -43,8 +43,8 @@ describe("CsvChromiumRowParser", () => {
     const externalResourceEntity = CsvChromiumRowParser.parse(data);
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.name).toEqual(data.name);
-    expect(externalResourceEntity.username).toBeUndefined();
-    expect(externalResourceEntity.uri).toBeUndefined();
+    expect(externalResourceEntity.username).toBeNull();
+    expect(externalResourceEntity.uri).toBeNull();
     expect(externalResourceEntity.secretClear).toEqual("");
   });
 

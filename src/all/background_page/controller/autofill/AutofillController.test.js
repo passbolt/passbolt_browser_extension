@@ -105,7 +105,6 @@ describe("AutofillController", () => {
       expect(portWrapper.request).toHaveBeenCalledWith('passbolt.quickaccess.fill-form', resource.username, secret.password, tab.url);
       expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.in-form-menu.close');
     });
-    
 
     it("Should not autofill from a worker that is not inform menu or quickaccess.", async() => {
       expect.assertions(10);

@@ -16,6 +16,12 @@ import {v4 as uuidv4} from "uuid";
 import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
 import {defaultTotpDto} from "../../totp/totpDto.test.data";
 
+export const minimalExternalResourceDto = (data = {}) => ({
+  name: "Minimal External Resource",
+  secret_clear: "this is a secret",
+  ...data,
+});
+
 export const defaultExternalResourceDto = (data = {}) => {
   const secretCollection = defaultResourcesSecretsDtos();
   const resourceid = secretCollection[0].resource_id;

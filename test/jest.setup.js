@@ -23,6 +23,9 @@ import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
 import ResourceLocalStorage from "../src/all/background_page/service/local_storage/resourceLocalStorage";
 
+// hides all the messages from Log
+jest.mock("../src/all/background_page/model/log.js");
+
 global.console = {
   ...console,
   debug: jest.fn(),

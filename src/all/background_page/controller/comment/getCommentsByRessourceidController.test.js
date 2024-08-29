@@ -13,12 +13,12 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {commentsMockDto} from "../../model/entity/comment/comments.test.data";
 import GetCommentsByRessourceController from "./getCommentsByRessourceIdController";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {v4 as uuidv4} from "uuid";
 import MockExtension from "../../../../../test/mocks/mockExtension";
+import {defaultCommentCollectionDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntityCollection.test.data";
 
 beforeEach(async() =>  {
   enableFetchMocks();
@@ -26,7 +26,7 @@ beforeEach(async() =>  {
   await MockExtension.withConfiguredAccount();
 });
 
-const mockApiResult = commentsMockDto();
+const mockApiResult = defaultCommentCollectionDto();
 const fetchCommentsMock = () => {
   fetch.doMock(() => mockApiResponse(mockApiResult));
 };
@@ -53,17 +53,20 @@ describe("GetCommentsByRessourceController", () => {
   });
   describe("GetCommentsByRessourceController::exec", () => {
     it("Should retrieve the comments being used by the worker.", async() => {
+      expect.assertions(7);
+
       fetchCommentsMock();
       const resourceId = uuidv4();
       const controller = new GetCommentsByRessourceController(null, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller.commentModel, "findAllByResourceId");
       const commentsCollectionDto = await controller.exec(resourceId);
 
-      expect.assertions(5);
+      expect(commentsCollectionDto.items.length).toBe(4);
 
-      expect(commentsCollectionDto.items.length).toBe(2);
-      expect(commentsCollectionDto.items[0]._props).toEqual(expect.objectContaining(mockApiResult[0]));
-      expect(commentsCollectionDto.items[1]._props).toEqual(expect.objectContaining(mockApiResult[1]));
+      expect(mockApiResult[0]).toEqual(expect.objectContaining(commentsCollectionDto.items[0]._props));
+      expect(mockApiResult[1]).toEqual(expect.objectContaining(commentsCollectionDto.items[1]._props));
+      expect(mockApiResult[2]).toEqual(expect.objectContaining(commentsCollectionDto.items[2]._props));
+      expect(mockApiResult[3]).toEqual(expect.objectContaining(commentsCollectionDto.items[3]._props));
       //We expect the function findAllByResourceId to be called with resourceId
       expect(spy).toHaveBeenCalled();
       expect(spy).toHaveBeenCalledWith(resourceId);

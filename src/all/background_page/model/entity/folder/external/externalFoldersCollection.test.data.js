@@ -14,8 +14,8 @@
 import {defaultExternalFolderDto} from "./externalFolderEntity.test.data";
 
 export const defaultExternalFoldersCollectionDto = (data = {}) => ([
-  defaultExternalFolderDto(data),
-  defaultExternalFolderDto(data),
-  defaultExternalFolderDto(data),
-  defaultExternalFolderDto(data),
+  defaultExternalFolderDto({name: "folder 1", ...data}),
+  defaultExternalFolderDto({name: "folder 2", ...data}),
+  defaultExternalFolderDto({name: "folder 3", ...data}),
+  defaultExternalFolderDto({name: "folder 4", ...data}),
 ]);

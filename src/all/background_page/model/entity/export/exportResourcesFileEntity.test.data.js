@@ -12,15 +12,15 @@
  * @since         4.8.0
  */
 
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import {defaultExternalResourceDto} from "../resource/external/externalResourceEntity.test.data";
+import {defaultExternalFolderDto} from "../folder/external/externalFolderEntity.test.data";
 
 export const defaultKdbxExportResourceFileDto = (data = {}) => ({
   format: "kdbx",
   resources_ids: [],
   folders_ids: [],
-  export_resources: [defaultResourceDto()],
-  export_folders: [defaultFolderDto()],
+  export_resources: [defaultExternalResourceDto()],
+  export_folders: [defaultExternalFolderDto()],
   options: defaultPasswordCredentialOptions(),
   ...data,
 });
@@ -29,8 +29,8 @@ export const kdbxWithKeyExportResourceFileDto = (data = {}) => ({
   format: "kdbx",
   resources_ids: [],
   folders_ids: [],
-  export_resources: [defaultResourceDto()],
-  export_folders: [defaultFolderDto()],
+  export_resources: [defaultExternalResourceDto()],
+  export_folders: [defaultExternalFolderDto()],
   options: defaultKeyFileCredentialOptions(),
   ...data,
 });
@@ -39,8 +39,8 @@ export const csvExportResourceFileDto = (data = {}) => ({
   format: "kdbx-csv",
   resources_ids: [],
   folders_ids: [],
-  export_resources: [defaultResourceDto()],
-  export_folders: [defaultFolderDto()],
+  export_resources: [defaultExternalResourceDto()],
+  export_folders: [defaultExternalFolderDto()],
   ...data,
 });
 

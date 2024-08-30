@@ -18,14 +18,19 @@ import {
   defaultEmptyOptions,
   defaultKdbxExportResourceFileDto,
   defaultKeyFileCredentialOptions,
-  defaultPasswordCredentialOptions
+  defaultPasswordCredentialOptions,
+  kdbxWithKeyExportResourceFileDto
 } from "./exportResourcesFileEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
+import ExternalFoldersCollection from "../folder/external/externalFoldersCollection";
+import {defaultExternalResourceCollectionDto} from "../resource/external/externalResourcesCollection.test.data";
+import {defaultExternalFoldersCollectionDto} from "../folder/external/externalFoldersCollection.test.data";
 
 describe("ExportResourcesFileEntity", () => {
-  describe("ExportResourcesFileEntity::getSchema", () => {
+  describe("::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(ExportResourcesFileEntity.ENTITY_NAME, ExportResourcesFileEntity.getSchema());
+      EntitySchema.validateSchema(ExportResourcesFileEntity.name, ExportResourcesFileEntity.getSchema());
     });
 
     it("validates format property", () => {
@@ -132,6 +137,122 @@ describe("ExportResourcesFileEntity", () => {
       });
 
       assertEntityProperty.notRequired(ExportResourcesFileEntity, "options");
+    });
+  });
+
+  describe("::constructor", () => {
+    it("constructor works if valid minimal DTO is provided", () => {
+      expect.assertions(6);
+
+      const dto = defaultEmptyOptions({format: "kdbx"});
+      const entity = new ExportResourcesFileEntity(dto);
+
+      expect(entity._props.format).toStrictEqual(dto.format);
+      expect(entity._props.resources_ids).toBeUndefined();
+      expect(entity._props.folders_ids).toBeUndefined();
+      expect(entity.exportResources).toStrictEqual(new ExternalResourcesCollection([]));
+      expect(entity.exportFolders).toStrictEqual(new ExternalFoldersCollection([]));
+      expect(entity._props.options).toBeUndefined();
+    });
+
+    it("constructor works if valid fields DTO is provided", () => {
+      expect.assertions(6);
+
+      const dto = defaultKdbxExportResourceFileDto();
+      const entity = new ExportResourcesFileEntity(dto);
+
+      expect(entity._props.format).toStrictEqual(dto.format);
+      expect(entity._props.resources_ids).toStrictEqual([]);
+      expect(entity._props.folders_ids).toStrictEqual([]);
+      expect(entity.exportResources.toDto()).toStrictEqual(dto.export_resources);
+      expect(entity.exportFolders.toDto()).toStrictEqual(dto.export_folders);
+      expect(entity._props.options).toStrictEqual(dto.options);
+    });
+  });
+
+  describe("::getters", () => {
+    it("should provide the right values when everything is set", () => {
+      expect.assertions(12);
+
+      const dto = defaultKdbxExportResourceFileDto();
+      const entity = new ExportResourcesFileEntity(dto);
+
+      expect(entity.format).toStrictEqual(dto.format);
+      expect(entity.foldersIds).toStrictEqual(dto.folders_ids);
+      expect(entity.resourcesIds).toStrictEqual(dto.resources_ids);
+      expect(entity.password).toStrictEqual(dto.options.credentials.password);
+      expect(entity.keyfile).toStrictEqual(dto.options.credentials.keyfile);
+      expect(entity.fileType).toStrictEqual(dto.format);
+
+      expect(entity.exportResources).toBeInstanceOf(ExternalResourcesCollection);
+      expect(entity.exportResources).toHaveLength(dto.export_resources.length);
+      expect(entity.exportResources.toDto()).toStrictEqual(dto.export_resources);
+
+      expect(entity.exportFolders).toBeInstanceOf(ExternalFoldersCollection);
+      expect(entity.exportFolders).toHaveLength(dto.export_folders.length);
+      expect(entity.exportFolders.toDto()).toStrictEqual(dto.export_folders);
+    });
+
+    it("should provide the right values for exporting to KDBX with keyfile", () => {
+      expect.assertions(2);
+
+      const dto = kdbxWithKeyExportResourceFileDto();
+      const entity = new ExportResourcesFileEntity(dto);
+
+      expect(entity.password).toStrictEqual(dto.options.credentials.password);
+      expect(entity.keyfile).toStrictEqual(dto.options.credentials.keyfile);
+    });
+
+    it("should provide the default values with minimal dto", () => {
+      expect.assertions(8);
+
+      const dto = defaultEmptyOptions({format: "kdbx"});
+      const entity = new ExportResourcesFileEntity(dto);
+
+      expect(entity.format).toStrictEqual("kdbx");
+      expect(entity.foldersIds).toBeNull();
+      expect(entity.resourcesIds).toBeNull();
+      expect(entity.password).toBeNull();
+      expect(entity.keyfile).toBeNull();
+      expect(entity.fileType).toStrictEqual("kdbx");
+      expect(entity.exportResources).toStrictEqual(new ExternalResourcesCollection([]));
+      expect(entity.exportFolders).toStrictEqual(new ExternalFoldersCollection([]));
+    });
+  });
+
+  describe("::setters", () => {
+    it("should set the property as expected", () => {
+      expect.assertions(2);
+
+      const dto = defaultEmptyOptions({format: "kdbx"});
+      const entity = new ExportResourcesFileEntity(dto);
+
+      const externalResourcesCollection = new ExternalResourcesCollection(defaultExternalResourceCollectionDto());
+      const externalFoldersCollection = new ExternalFoldersCollection(defaultExternalFoldersCollectionDto());
+
+      entity.exportResources = externalResourcesCollection;
+      entity.exportFolders = externalFoldersCollection;
+
+      expect(entity.exportResources).toStrictEqual(externalResourcesCollection);
+      expect(entity.exportFolders).toStrictEqual(externalFoldersCollection);
+    });
+
+    it("should assert exportResources as ExternalResourcesCollection", () => {
+      expect.assertions(1);
+
+      const dto = defaultEmptyOptions({format: "kdbx"});
+      const entity = new ExportResourcesFileEntity(dto);
+
+      expect(() => entity.exportResources = "test").toThrow(TypeError);
+    });
+
+    it("should assert exportFolder as ExternalFoldersCollection", () => {
+      expect.assertions(1);
+
+      const dto = defaultEmptyOptions({format: "kdbx"});
+      const entity = new ExportResourcesFileEntity(dto);
+
+      expect(() => entity.exportFolders = "test").toThrow(TypeError);
     });
   });
 });

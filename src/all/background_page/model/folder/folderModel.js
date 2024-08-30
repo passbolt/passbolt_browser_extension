@@ -70,7 +70,7 @@ class FolderModel {
    *
    * @param {array} folderIds The folder ids
    * @param {boolean} [withChildren] optional default false
-   * @return {FoldersCollection}
+   * @return {Promise<FoldersCollection>}
    */
   async getAllByIds(folderIds, withChildren) {
     const outputCollection = new FoldersCollection([]);

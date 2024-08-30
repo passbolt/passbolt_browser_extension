@@ -19,3 +19,11 @@ export const defaultExternalResourceCollectionDto = (data = {}) => ([
   defaultExternalResourceImportDto(data),
   defaultExternalResourceImportDto(data),
 ]);
+
+export const externalResourceCollectionWithoutIdsDto = (data = {}) => {
+  const externalResourceCollectionDto = defaultExternalResourceCollectionDto(data);
+  for (let i = 0; i < externalResourceCollectionDto.length; i++) {
+    delete externalResourceCollectionDto[i].id;
+  }
+  return externalResourceCollectionDto;
+};

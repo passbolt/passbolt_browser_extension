@@ -57,6 +57,7 @@ export const defaultExternalResourceImportDto = (data = {}) => {
     totp: defaultTotpDto(),
     folder_parent_path: "private/data",
     expired: null,
+    secret_clear: "",
     ...data,
   };
 };

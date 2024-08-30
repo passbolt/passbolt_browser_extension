@@ -152,7 +152,7 @@ describe("ExternalResourcesCollection", () => {
   });
 
   describe("::removeByPath", () => {
-    it("should remove the targetted elements base on their path", () => {
+    it("should remove the targetted elements based on their path", () => {
       expect.assertions(1);
       const dto = defaultExternalResourceCollectionDto();
       const collection = new ExternalResourcesCollection(dto);

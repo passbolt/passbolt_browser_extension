@@ -21,6 +21,7 @@ import ExternalFoldersCollection from "../../folder/external/externalFoldersColl
 import {defaultExternalFoldersCollectionDto} from "../../folder/external/externalFoldersCollection.test.data";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
+import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
 
 describe("ExternalResourcesCollection", () => {
   describe("::getSchema", () => {
@@ -107,6 +108,29 @@ describe("ExternalResourcesCollection", () => {
       expect(collection.getAll("name", "Password 2")[0].folderParentId).toEqual(folderParentId);
       expect(collection.getAll("name", "Password 3")[0].folderParentId).toEqual(folderParentId);
       expect(collection.getAll("name", "Password 4")[0].folderParentId).toBeNull();
+    });
+  });
+
+  describe("::changeRootPath", () => {
+    it("changeRootPath change the root path of the resources of the collection", () => {
+      const dto = defaultExternalResourceCollectionDto({name: "Password ", folder_parent_path: "Fodler 1"});
+
+      expect.assertions(dto.length);
+
+      dto[0].folder_parent_path = "";
+      dto[3].folder_parent_path += "/Folder 2";
+
+      dto[0].name += "1";
+      dto[0].name += "2";
+      dto[0].name += "3";
+      dto[0].name += "4";
+
+      const collection = new ExternalResourcesCollection(dto);
+      const rootFolder = new ExternalFolderEntity({"name": "Root", "folder_parent_path": "New"});
+      collection.changeRootPath(rootFolder);
+      for (const externalResourceEntity of collection) {
+        expect(externalResourceEntity.folderParentPath).toMatch(/^New\/Root/);
+      }
     });
   });
 

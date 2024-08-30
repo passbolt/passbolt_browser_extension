@@ -48,23 +48,7 @@ class ExternalResourcesCollection extends EntityV2Collection {
    * @inheritdoc
    */
   validateBuildRules(item, options = {}) {
-    this.assertValidId(item, options);
-  }
-
-  /**
-   * Asserts that the given id is valid.
-   * It is valid if it is unique in the set or
-   * if it is not set.
-   * @param {ExternalResourceEntity} item
-   * @param {Object} options
-   * @private
-   */
-  assertValidId(item, options) {
-    if (!item._props.id) {
-      return;
-    }
-
-    super.assertNotExist("id", item._props.id, options);
+    this.assertNotExist("id", item._props.id, options);
   }
 
   /**

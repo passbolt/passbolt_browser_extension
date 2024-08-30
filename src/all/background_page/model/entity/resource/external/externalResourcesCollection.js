@@ -13,32 +13,23 @@
 import ResourcesCollection from "../resourcesCollection";
 import ExternalFoldersCollection from "../../folder/external/externalFoldersCollection";
 import ExternalResourceEntity from "./externalResourceEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
+import {assertType} from "../../../../utils/assertions";
 
-const ENTITY_NAME = 'ExternalResources';
-
-class ExternalResourcesCollection extends EntityCollection {
+class ExternalResourcesCollection extends EntityV2Collection {
   /**
    * @inheritDoc
    */
-  constructor(ExternalResourcesCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      ExternalResourcesCollection.ENTITY_NAME,
-      ExternalResourcesCollectionDto,
-      ExternalResourcesCollection.getSchema()
-    ), options);
+  get entityClass() {
+    return ExternalResourceEntity;
+  }
 
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(externalResourceDto => {
-      this.push(new ExternalResourceEntity(externalResourceDto, {clone: false}));
-    });
-
-    // We do not keep original props
-    this._props = null;
+  /**
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items with an ID in the collection has a unique ID.
+   */
+  constructor(dtos = [], options = {}) {
+    super(dtos, options);
   }
 
   /**
@@ -54,19 +45,26 @@ class ExternalResourcesCollection extends EntityCollection {
   }
 
   /**
-   * Get external resources
-   * @returns {Array<ExternalResourceEntity>}
+   * @inheritdoc
    */
-  get externalResources() {
-    return this._items;
+  validateBuildRules(item, options = {}) {
+    this.assertValidId(item, options);
   }
 
   /**
-   * Get all the ids of the resources in the collection
-   * @returns {Array<string>}
+   * Asserts that the given id is valid.
+   * It is valid if it is unique in the set or
+   * if it is not set.
+   * @param {ExternalResourceEntity} item
+   * @param {Object} options
+   * @private
    */
-  get ids() {
-    return this._items.map(r => r.id);
+  assertValidId(item, options) {
+    if (!item._props.id) {
+      return;
+    }
+
+    super.assertNotExist("id", item._props.id, options);
   }
 
   /**
@@ -78,14 +76,13 @@ class ExternalResourcesCollection extends EntityCollection {
    * @param {ExternalFoldersCollection} externalFoldersCollection The collection of folders to organize the resources.
    * If none given, the resources will be considered at the root of the collection
    * @return {ExternalResourcesCollection}
+   * @throws {TypeError} if resourcesCollection argument is not a ResourcesCollection
+   * @throws {TypeError} if externalFoldersCollection argument is not a ExternalFoldersCollection
    */
   static constructFromResourcesCollection(resourcesCollection, externalFoldersCollection) {
-    if (!(resourcesCollection instanceof ResourcesCollection)) {
-      throw new TypeError(`ExternalResourcesCollection constructFromResourcesCollection parameter 1 should be an instance of ResourcesCollection.`);
-    }
-    if (!(externalFoldersCollection instanceof ExternalFoldersCollection)) {
-      throw new TypeError(`ExternalResourcesCollection constructFromResourcesCollection parameter 2 should be an instance of ExternalFoldersCollection.`);
-    }
+    assertType(resourcesCollection, ResourcesCollection);
+    assertType(externalFoldersCollection, ExternalFoldersCollection);
+
     const externalResourcesDto = resourcesCollection.resources.map(resourceEntity => {
       const externalFolderParent = externalFoldersCollection.getById(resourceEntity.folderParentId);
       const resourceDto = resourceEntity.toDto({secrets: true, metadata: true});
@@ -120,7 +117,7 @@ class ExternalResourcesCollection extends EntityCollection {
    * @return {array}
    */
   getByDepth(depth) {
-    return this.externalResources.filter(externalResource => externalResource.depth === depth);
+    return this._items.filter(externalResource => externalResource.depth === depth);
   }
 
   /**
@@ -132,7 +129,7 @@ class ExternalResourcesCollection extends EntityCollection {
     if (!folderParentId) {
       return [];
     }
-    return this.externalResources.filter(externalResource => externalResource.folderParentId === folderParentId);
+    return this._items.filter(externalResource => externalResource.folderParentId === folderParentId);
   }
 
   /*
@@ -140,20 +137,20 @@ class ExternalResourcesCollection extends EntityCollection {
    * Setters
    * ==================================================
    */
-  /**
-   * Push a copy of the external resource to the list
-   * @param {object|ExternalResourceEntity} externalResource DTO or ExternalResourceEntity
-   */
-  push(externalResource) {
-    if (!externalResource || typeof externalResource !== 'object') {
-      throw new TypeError(`ExternalResourcesCollection push parameter should be an object.`);
-    }
-    if (externalResource instanceof ExternalResourceEntity) {
-      externalResource = externalResource.toDto(); // deep clone
-    }
-    const externalResourceEntity = new ExternalResourceEntity(externalResource); // validate
+  pushMany(data, entityOptions = {}, options = {}) {
+    const uniqueIdsOrNullSetCache = new Set(this.extract("id"));
 
-    return super.push(externalResourceEntity);
+    // Build rules
+    const onItemPushed = item => {
+      uniqueIdsOrNullSetCache.add(item.id);
+    };
+
+    options = {
+      onItemPushed: onItemPushed,
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsOrNullSetCache},
+      ...options
+    };
+    super.pushMany(data, entityOptions, options);
   }
 
   /**
@@ -162,7 +159,7 @@ class ExternalResourcesCollection extends EntityCollection {
    * @param {string} folderParentId The corresponding folder parent id
    */
   setFolderParentIdsByPath(folderParentPath, folderParentId) {
-    for (const externalResource of this.externalResources) {
+    for (const externalResource of this._items) {
       if (externalResource.folderParentPath === folderParentPath) {
         externalResource.folderParentId = folderParentId;
       }
@@ -174,7 +171,7 @@ class ExternalResourcesCollection extends EntityCollection {
    * @param {ExternalFolderEntity} rootFolder The folder to use as root
    */
   changeRootPath(rootFolder) {
-    this.externalResources.forEach(resource => resource.changeRootPath(rootFolder));
+    this._items.forEach(resource => resource.changeRootPath(rootFolder));
   }
 
   /**
@@ -182,27 +179,14 @@ class ExternalResourcesCollection extends EntityCollection {
    * @param {string} path the path to remove
    */
   removeByPath(path) {
-    for (let i = this.externalResources.length - 1; i >= 0; i--) {
-      const externalResourceEntity = this.externalResources[i];
+    for (let i = this._items.length - 1; i >= 0; i--) {
+      const externalResourceEntity = this._items[i];
       const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, '\\$&');
       const regex = new RegExp(`^${escapedPath}\/`);
       if (regex.exec(externalResourceEntity.path)) {
-        this.externalResources.splice(i, 1);
+        this._items.splice(i, 1);
       }
     }
-  }
-
-  /*
-   * ==================================================
-   * Static getters
-   * ==================================================
-   */
-  /**
-   * ExternalResourcesCollection.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

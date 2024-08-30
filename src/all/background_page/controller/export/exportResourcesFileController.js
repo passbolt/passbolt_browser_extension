@@ -111,7 +111,7 @@ class ExportResourcesFileController {
       const secretSchema = await this.resourceTypeModel.getSecretSchemaById(exportResourceEntity.resourceTypeId);
       const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(exportResourceEntity.secrets.items[0], secretSchema, privateKey);
       exportResourceEntity.secretClear = plaintextSecret.password || "";
-      exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description;
+      exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description || "";
       if (plaintextSecret.totp) {
         exportResourceEntity.totp = new TotpEntity(plaintextSecret.totp);
       }

@@ -14,8 +14,6 @@
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'Secret';
-
 class SecretEntity extends EntityV2 {
   /**
    * @inheritDoc
@@ -68,8 +66,7 @@ class SecretEntity extends EntityV2 {
    * @throw {EntityValidationError} If the data is not formatted as a valid pgp message.
    *
    */
-  // eslint-disable-next-line no-unused-vars
-  validateBuildRules(options = {}) {
+  validateBuildRules() {
     SecretEntity.assertValidMessage(this._props.data);
   }
 
@@ -80,7 +77,7 @@ class SecretEntity extends EntityV2 {
    */
   /**
    * Get secret id
-   * @returns {(string|null)} uuid
+   * @returns {string|null} uuid
    */
   get id() {
     return this._props.id || null;
@@ -96,7 +93,7 @@ class SecretEntity extends EntityV2 {
 
   /**
    * Get secret user id
-   * @returns {(string|null)} uuid
+   * @returns {string|null} uuid
    */
   get userId() {
     return this._props.user_id || null;
@@ -104,39 +101,10 @@ class SecretEntity extends EntityV2 {
 
   /**
    * Get secret resource id
-   * @returns {(string|null)} uuid
+   * @returns {string|null} uuid
    */
   get resourceId() {
     return this._props.resource_id || null;
-  }
-
-  /**
-   * Get created date
-   * @returns {(string|null)} date
-   */
-  get created() {
-    return this._props.created || null;
-  }
-
-  /**
-   * Get modified date
-   * @returns {(string|null)} date
-   */
-  get modified() {
-    return this._props.modified || null;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * SecretEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 
   /**

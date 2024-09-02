@@ -14,7 +14,7 @@
 import GroupUserTransferEntity from "./groupUserTransferEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultUserTransferDto} from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data"
+import {defaultUserTransferDto} from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
 
 describe("GroupUser transfer entity", () => {
   describe("::getSchema", () => {
@@ -24,22 +24,24 @@ describe("GroupUser transfer entity", () => {
     it("validates id property", () => {
       assertEntityProperty.string(GroupUserTransferEntity, "id");
       assertEntityProperty.uuid(GroupUserTransferEntity, "id");
-      assertEntityProperty.required(GroupUserTransferEntity, "id");  
+      assertEntityProperty.required(GroupUserTransferEntity, "id");
     });
+
     it("validates group_id property", () => {
       assertEntityProperty.string(GroupUserTransferEntity, "group_id");
       assertEntityProperty.uuid(GroupUserTransferEntity, "group_id");
-      assertEntityProperty.required(GroupUserTransferEntity, "group_id");  
+      assertEntityProperty.required(GroupUserTransferEntity, "group_id");
     });
-  })
+  });
+
   describe("::constructor", () => {
     it("works if valid minimal DTO is provided", () => {
       expect.assertions(1);
 
       const dto = defaultUserTransferDto();
       const userDeleteTransfer = new GroupUserTransferEntity(dto);
-      
+
       expect(userDeleteTransfer.toDto()).toEqual(dto);
-    })
-  })
+    });
+  });
 });

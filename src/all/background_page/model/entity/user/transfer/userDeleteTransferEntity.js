@@ -13,19 +13,16 @@
  */
 import GroupUserTransfersCollection from "../../groupUser/transfer/groupUserTransfersCollection";
 import PermissionTransfersCollection from "../../permission/transfer/permissionTransfersCollection";
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 
-const ENTITY_NAME = 'UserDeleteTransfer';
-
-class UserDeleteTransferEntity extends Entity {
+class UserDeleteTransferEntity extends EntityV2 {
   /**
    * @inheritDoc
-   * @throws {EntityValidationError} Build rule checking if at least a list of owners or a list of managers is provided.
    */
-  constructor(transferDto, options = {}) {
-    super(UserDeleteTransferEntity.validate(transferDto), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Association
     if (this._props.owners) {
@@ -39,20 +36,13 @@ class UserDeleteTransferEntity extends Entity {
   }
 
   /**
-   * Validate the props
+   * @inheritDoc
    */
-  static validate(transferDto) {
-    const props = {};
-    if (!transferDto || (!transferDto.owners && !transferDto.managers)) {
+  // eslint-disable-next-line no-unused-vars
+  validateBuildRules(_) {
+    if (!this._props.owners && !this._props.managers) {
       throw new EntityValidationError(`The user delete transfer data cannot be empty.`);
     }
-    if (transferDto.owners && Array.isArray(transferDto.owners)) {
-      props.owners = transferDto.owners;
-    }
-    if (transferDto.managers && Array.isArray(transferDto.managers)) {
-      props.managers = transferDto.managers;
-    }
-    return props;
   }
 
   /**
@@ -62,6 +52,7 @@ class UserDeleteTransferEntity extends Entity {
   static getSchema() {
     return {
       "type": "object",
+      "required": [],
       "properties": {
         "owners": PermissionTransfersCollection.getSchema(),
         "managers": GroupUserTransfersCollection.getSchema()
@@ -80,49 +71,13 @@ class UserDeleteTransferEntity extends Entity {
    */
   toDto() {
     const result = {};
-    if (this.owners) {
-      result.owners = this.owners.toDto();
+    if (this._owners) {
+      result.owners = this._owners.toDto();
     }
-    if (this.managers) {
-      result.managers = this.managers.toDto();
+    if (this._managers) {
+      result.managers = this._managers.toDto();
     }
     return result;
-  }
-
-  /*
-   * ==================================================
-   * Dynamic properties getters
-   * ==================================================
-   */
-  /**
-   * Get the collection of resource/folder permission transfers if any
-   * @returns {PermissionTransfersCollection}
-   * @public
-   */
-  get owners() {
-    return this._owners || null;
-  }
-
-  /**
-   * Get the collection of group user transfers if any
-   * @returns {GroupUserTransfersCollection}
-   * @public
-   */
-  get managers() {
-    return this._managers || null;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * UserDeleteTransferEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

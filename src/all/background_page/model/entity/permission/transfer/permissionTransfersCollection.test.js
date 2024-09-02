@@ -13,44 +13,34 @@
  */
 import PermissionTransfersCollection from "./permissionTransfersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import {defaultPermissionTransferDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransferEntity.test.data";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("Permission transfer entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(PermissionTransfersCollection.ENTITY_NAME, PermissionTransfersCollection.getSchema());
-  });
+  describe("::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(PermissionTransfersCollection.constructor.name, PermissionTransfersCollection.getSchema());
+    });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = [{
-      aco_foreign_key: '8e3874ae-4b40-590b-968a-418f704b9d9a',
-      id: '898ce1d0-601f-5194-976b-147a680dd472'
-    }];
-    const userDeleteTransfer = new PermissionTransfersCollection(dto);
-    expect(userDeleteTransfer.toDto()).toEqual(dto);
-    expect(userDeleteTransfer.items[0].acoForeignKey).toEqual('8e3874ae-4b40-590b-968a-418f704b9d9a');
-    expect(userDeleteTransfer.items[0].id).toEqual('898ce1d0-601f-5194-976b-147a680dd472');
-  });
+    it("validates collection is an array", () => {
+      assertEntityProperty.collection(PermissionTransfersCollection);
+    });
 
-  it("constructor fails if dto is empty", () => {
-    const dto = [];
-    try {
-      new PermissionTransfersCollection(dto);
-      expect(true).toBe(false);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-    }
+    it("validates minItems property", () => {
+      assertEntityProperty.collectionMinItems(PermissionTransfersCollection, 1);
+    });
   });
+  describe("::constructor", () => {
+    it("works if valid minimal DTO is provided", () => {
+      expect.assertions(3);
 
-  it("constructor fails if dto is invalid", () => {
-    const dto = [{
-      id: 'not uuid',
-      aco_foreign_key: 'not uuid',
-    }];
-    try {
-      new PermissionTransfersCollection(dto);
-      expect(true).toBe(false);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-    }
+      const dtos = [defaultPermissionTransferDto()];
+      console.log(dtos);
+      const collection = new PermissionTransfersCollection(dtos);
+
+      expect(collection.toDto()).toEqual(dtos);
+      expect(collection.items[0].acoForeignKey).toEqual(dtos[0].aco_foreign_key);
+      expect(collection.items[0].id).toEqual(dtos[0].id);
+    });
   });
 });

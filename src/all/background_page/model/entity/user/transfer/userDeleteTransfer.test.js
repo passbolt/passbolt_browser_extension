@@ -35,13 +35,11 @@ describe("User delete transfer entity", () => {
 
     expect(userDeleteTransfer.owners).toBeDefined();
     expect(userDeleteTransfer.owners.length).toBe(1);
-    expect(userDeleteTransfer.owners.items[0].id).toBe('898ce1d0-601f-5194-976b-147a680dd472');
-    expect(userDeleteTransfer.owners.items[0].acoForeignKey).toBe('8e3874ae-4b40-590b-968a-418f704b9d9a');
+    expect(userDeleteTransfer.owners.toDto()).toEqual(dto.owners);
 
     expect(userDeleteTransfer.managers).toBeDefined();
     expect(userDeleteTransfer.managers.length).toBe(2);
-    expect(userDeleteTransfer.managers.items[0].id).toBe('0c17f5e3-2f28-4697-9e7b-4e4943ec546a');
-    expect(userDeleteTransfer.managers.items[0].groupId).toBe('47787831-f9c2-4edc-a27f-06978ac18406');
+    expect(userDeleteTransfer.managers.toDto()).toEqual(dto.managers);
   });
 
   it("constructor works if valid minimal DTO is provided", () => {

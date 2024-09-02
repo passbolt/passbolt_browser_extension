@@ -71,8 +71,8 @@ describe("User delete transfer entity", () => {
     t = () => { new UserDeleteTransferEntity({owners: [{id: '898ce1d0-601f-5194-976b-147a680dd472'}]}); };
     expect(t).toThrow(CollectionValidationError);
     t = () => { new UserDeleteTransferEntity({managers: []}); };
-    expect(t).toThrow(EntityValidationError);
+    expect(t).toThrow(CollectionValidationError);
     t = () => { new UserDeleteTransferEntity({managers: [{id: '898ce1d0-601f-5194-976b-147a680dd472'}]}); };
-    expect(t).toThrow(EntityValidationError);
+    expect(t).toThrow(CollectionValidationError);
   });
 });

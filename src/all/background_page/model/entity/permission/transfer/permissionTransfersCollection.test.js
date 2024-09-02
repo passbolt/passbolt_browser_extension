@@ -35,7 +35,6 @@ describe("Permission transfer entity", () => {
       expect.assertions(3);
 
       const dtos = [defaultPermissionTransferDto()];
-      console.log(dtos);
       const collection = new PermissionTransfersCollection(dtos);
 
       expect(collection.toDto()).toEqual(dtos);

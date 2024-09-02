@@ -33,7 +33,6 @@ describe("GroupUser transfer entity", () => {
       assertEntityProperty.required(GroupUserTransferEntity, "group_id");
     });
   });
-
   describe("::constructor", () => {
     it("works if valid minimal DTO is provided", () => {
       expect.assertions(1);

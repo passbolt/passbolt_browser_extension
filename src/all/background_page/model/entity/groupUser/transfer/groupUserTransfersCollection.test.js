@@ -13,42 +13,31 @@
  */
 import GroupUserTransfersCollection from "./groupUserTransfersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import {defaultUserTransferDto} from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("GroupUser transfer entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(GroupUserTransfersCollection.ENTITY_NAME, GroupUserTransfersCollection.getSchema());
-  });
+  describe("::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(GroupUserTransfersCollection.constructor.name, GroupUserTransfersCollection.getSchema());
+    });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = [{
-      group_id: '8e3874ae-4b40-590b-968a-418f704b9d9a',
-      id: '898ce1d0-601f-5194-976b-147a680dd472'
-    }];
-    const userDeleteTransfer = new GroupUserTransfersCollection(dto);
-    expect(userDeleteTransfer.toDto()).toEqual(dto);
-  });
+    it("validates collection is an array", () => {
+      assertEntityProperty.collection(GroupUserTransfersCollection);
+    });
 
-  it("constructor fails if dto is empty", () => {
-    const dto = [];
-    try {
-      new GroupUserTransfersCollection(dto);
-      expect(true).toBe(false);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-    }
+    it("validates minItems property", () => {
+      assertEntityProperty.collectionMinItems(GroupUserTransfersCollection, 1);
+    });
   });
+  describe("::constructor", () => {
+    it("works if valid minimal DTO is provided", () => {
+      expect.assertions(1);
 
-  it("constructor fails if dto is invalid", () => {
-    const dto = [{
-      id: 'not uuid',
-      group_id: 'not uuid',
-    }];
-    try {
-      new GroupUserTransfersCollection(dto);
-      expect(true).toBe(false);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-    }
+      const dtos = [defaultUserTransferDto()];
+      const collection = new GroupUserTransfersCollection(dtos);
+
+      expect(collection.toDto()).toEqual(dtos);
+    });
   });
 });

@@ -26,7 +26,6 @@ describe("Group delete transfer entity", () => {
       assertEntityProperty.required(GroupDeleteTransferEntity, "owners");
     });
   });
-
   describe("::constructor", () => {
     it("works if valid minimal DTO is provided", () => {
       expect.assertions(4);

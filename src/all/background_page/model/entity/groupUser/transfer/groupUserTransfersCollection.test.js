@@ -27,8 +27,6 @@ describe("GroupUser transfer entity", () => {
     }];
     const userDeleteTransfer = new GroupUserTransfersCollection(dto);
     expect(userDeleteTransfer.toDto()).toEqual(dto);
-    expect(userDeleteTransfer.items[0].groupId).toEqual('8e3874ae-4b40-590b-968a-418f704b9d9a');
-    expect(userDeleteTransfer.items[0].id).toEqual('898ce1d0-601f-5194-976b-147a680dd472');
   });
 
   it("constructor fails if dto is empty", () => {

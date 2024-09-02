@@ -27,7 +27,7 @@ class GroupDeleteTransferEntity extends EntityV2 {
       delete this._props.owners;
     }
   }
-  
+
   /*
    * ==================================================
    * Validation

@@ -10,40 +10,35 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import ExternalFoldersCollection from "../folder/external/externalFoldersCollection";
 import FolderEntity from "../folder/folderEntity";
 import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
 import TagEntity from "../tag/tagEntity";
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {assertType} from "../../../utils/assertions";
 
-const ENTITY_NAME = "ImportResourcesFile";
 const FILE_TYPE_KDBX = "kdbx";
 const FILE_TYPE_CSV = "csv";
 
-class ImportResourcesFileEntity extends Entity {
+const SUPPORTED_FILE_TYPES = [
+  FILE_TYPE_CSV,
+  FILE_TYPE_KDBX,
+];
+
+class ImportResourcesFileEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(importResourcesFileDto, options = {}) {
-    super(EntitySchema.validate(
-      ImportResourcesFileEntity.ENTITY_NAME,
-      importResourcesFileDto,
-      ImportResourcesFileEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
+
     // @todo Refactor when a schema deep testing strategy is implemented.
-    if (importResourcesFileDto.options) {
-      EntitySchema.validate(
-        ImportResourcesFileEntity.ENTITY_NAME,
-        importResourcesFileDto.options,
-        ImportResourcesFileEntity.getSchema().properties.options
-      );
-      if (importResourcesFileDto.options.credentials) {
-        EntitySchema.validate(
-          ImportResourcesFileEntity.ENTITY_NAME,
-          importResourcesFileDto.options.credentials,
-          ImportResourcesFileEntity.getSchema().properties.options.properties.credentials
-        );
+    if (this._props.options) {
+      const optionsSchema = this.cachedSchema.properties.options;
+      this._props.options = EntitySchema.validate(this.constructor.name, this._props.options, optionsSchema);
+      if (dto.options.credentials) {
+        this._props.options.credentials = EntitySchema.validate(this.constructor.name, this._props.options.credentials, optionsSchema.properties.credentials);
       }
     }
     this._import_resources = new ExternalResourcesCollection([]);
@@ -76,7 +71,7 @@ class ImportResourcesFileEntity extends Entity {
         },
         "file_type": {
           "type": "string",
-          "enum": ImportResourcesFileEntity.SUPPORTED_FILE_TYPES
+          "enum": SUPPORTED_FILE_TYPES
         },
         "options": {
           "type": "object",
@@ -142,7 +137,7 @@ class ImportResourcesFileEntity extends Entity {
 
   /**
    * Customizes JSON stringification behavior
-   * @returns {*}
+   * @returns {{references: {folder: (object|null), tag: (object|null)}, created: {resourcesCount: int, foldersCount: int}, options: {folders: boolean, tags: boolean}, errors: {folders: array, resources: array}}}
    */
   toJSON() {
     return this.toDto();
@@ -179,19 +174,11 @@ class ImportResourcesFileEntity extends Entity {
   }
 
   /**
-   * Get import options
-   * @returns {string} the file encrypted in base64
-   */
-  get options() {
-    return this._props.options || {};
-  }
-
-  /**
    * Must import folders
    * @returns {boolean}
    */
   get mustImportFolders() {
-    return this.options.folders || false;
+    return Boolean(this._props.options?.folders);
   }
 
   /**
@@ -199,31 +186,23 @@ class ImportResourcesFileEntity extends Entity {
    * @returns {boolean}
    */
   get mustTag() {
-    return this.options.tags || false;
-  }
-
-  /**
-   * get credentials if any
-   * @returns {boolean}
-   */
-  get credentials() {
-    return this.options.credentials || {};
+    return Boolean(this._props.options?.tags);
   }
 
   /**
    * Get the password protecting the file
-   * @returns {boolean}
+   * @returns {string|null}
    */
   get password() {
-    return this.credentials.password;
+    return this._props.options?.credentials?.password ?? null;
   }
 
   /**
    * Get the keyfile protecting the file
-   * @returns {boolean}
+   * @returns {string|null}
    */
   get keyfile() {
-    return this.credentials.keyfile;
+    return this._props.options?.credentials?.keyfile ?? null;
   }
 
   /*
@@ -245,9 +224,7 @@ class ImportResourcesFileEntity extends Entity {
    * @param {FolderEntity} folder The folder entity
    */
   set referenceFolder(folder) {
-    if (folder !== null && !(folder instanceof FolderEntity)) {
-      throw new TypeError('The reference folder should be a valid FolderEntity');
-    }
+    assertType(folder, FolderEntity);
     this._referenceFolder = folder;
   }
 
@@ -264,9 +241,7 @@ class ImportResourcesFileEntity extends Entity {
    * @param {TagEntity} tag The tag entity
    */
   set referenceTag(tag) {
-    if (tag !== null && !(tag instanceof TagEntity)) {
-      throw new TypeError('The reference tag should be a valid TagEntity');
-    }
+    assertType(tag, TagEntity);
     this._referenceTag = tag;
   }
 
@@ -289,9 +264,7 @@ class ImportResourcesFileEntity extends Entity {
    * @param {ExternalResourcesCollection} externalResourcesCollection The collection of resources to import
    */
   set importResources(externalResourcesCollection) {
-    if (!(externalResourcesCollection instanceof ExternalResourcesCollection)) {
-      throw new TypeError("importResources must be a valid ImportResourcesCollection instance");
-    }
+    assertType(externalResourcesCollection, ExternalResourcesCollection);
     this._import_resources = externalResourcesCollection;
   }
 
@@ -308,48 +281,24 @@ class ImportResourcesFileEntity extends Entity {
    * @param {ExternalFoldersCollection} importFoldersCollection The collection of folders to import
    */
   set importFolders(importFoldersCollection) {
-    if (!(importFoldersCollection instanceof ExternalFoldersCollection)) {
-      throw new TypeError("importFolders must be a valid ExternalFoldersCollection instance");
-    }
+    assertType(importFoldersCollection, ExternalFoldersCollection);
     this._import_folders = importFoldersCollection;
   }
 
   /**
    * Get the list of resources errors
-   * @returns {array}
+   * @returns {array<ImportError>}
    */
   get importResourcesErrors() {
     return this._import_resources_errors;
   }
 
   /**
-   * Set the list of resources errors
-   * @param {array} collection The collection of errors
-   */
-  set importResourcesErrors(errors) {
-    if (Array.isArray(errors)) {
-      throw new TypeError("importResourcesErrors must be a valid array");
-    }
-    this._import_resources_errors = errors;
-  }
-
-  /**
    * Get the list of folders errors
-   * @returns {array}
+   * @returns {array<ImportError>}
    */
   get importFoldersErrors() {
     return this._import_folders_errors;
-  }
-
-  /**
-   * Set the list of folders errors
-   * @param {array} collection The list of errors
-   */
-  set importFoldersErrors(errors) {
-    if (Array.isArray(errors)) {
-      throw new TypeError("importFoldersErrors must be a valid array");
-    }
-    this._import_folders_errors = errors;
   }
 
   /*
@@ -357,25 +306,6 @@ class ImportResourcesFileEntity extends Entity {
    * Static properties getters
    * ==================================================
    */
-
-  /**
-   * ImportResourcesFileEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
-  }
-
-  /**
-   * ImportResourcesFileEntity.SUPPORTED_FILE_TYPES
-   * @returns {array<string>}
-   */
-  static get SUPPORTED_FILE_TYPES() {
-    return [
-      ImportResourcesFileEntity.FILE_TYPE_CSV,
-      ImportResourcesFileEntity.FILE_TYPE_KDBX,
-    ];
-  }
 
   /**
    * ImportResourcesFileEntity.FILE_TYPE_CSV
@@ -386,7 +316,7 @@ class ImportResourcesFileEntity extends Entity {
   }
 
   /**
-   * ImportResourcesFileEntity.FILE_TYPE_CSV
+   * ImportResourcesFileEntity.FILE_TYPE_KDBX
    * @returns {string}
    */
   static get FILE_TYPE_KDBX() {

@@ -12,7 +12,7 @@
  */
 import GroupEntity from "../groupEntity";
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import SecretsCollection from "../../secret/secretsCollection";
+import GroupUpdateSecretsCollection from "../../secret/groupUpdate/groupUpdateSecretsCollection";
 import GroupUserChangesCollection from "../../groupUser/change/groupUserChangesCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
@@ -35,7 +35,7 @@ class GroupUpdateEntity extends Entity {
       delete this._props.groups_users;
     }
     if (this._props.secrets) {
-      this._secrets = new SecretsCollection(this._props.secrets, {clone: false});
+      this._secrets = new GroupUpdateSecretsCollection(this._props.secrets, {clone: false});
       delete this._props.secrets;
     }
   }
@@ -57,7 +57,7 @@ class GroupUpdateEntity extends Entity {
         "name": groupEntitySchema.properties.name,
         // Associations
         "groups_users": GroupUserChangesCollection.getSchema(),
-        "secrets": SecretsCollection.getSchema()
+        "secrets": GroupUpdateSecretsCollection.getSchema()
       }
     };
   }
@@ -137,7 +137,7 @@ class GroupUpdateEntity extends Entity {
 
   /**
    * Return secrets
-   * @returns {(SecretsCollection|null)}
+   * @returns {GroupUpdateSecretsCollection|null}
    */
   get secrets() {
     return this._secrets || null;
@@ -145,7 +145,7 @@ class GroupUpdateEntity extends Entity {
 
   /**
    * Set secrets
-   * @param {SecretsCollection} secrets
+   * @param {GroupUpdateSecretsCollection} secrets
    */
   set secrets(secrets) {
     this._secrets = secrets;

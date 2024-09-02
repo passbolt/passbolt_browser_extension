@@ -21,7 +21,7 @@ import GroupEntity from "../../model/entity/group/groupEntity";
 import GroupUpdateEntity from "../../model/entity/group/update/groupUpdateEntity";
 import i18n from "../../sdk/i18n";
 import SecretEntity from "../../model/entity/secret/secretEntity";
-import SecretsCollection from "../../model/entity/secret/secretsCollection";
+import GroupUpdateSecretsCollection from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection";
 import ProgressService from "../../service/progress/progressService";
 
 const INITIAL_PROGRESS_GOAL = 10;
@@ -55,7 +55,7 @@ class GroupsUpdateController {
     const groupUpdateEntity = GroupUpdateEntity.createFromGroupsDiff(originalGroupEntity, updatedGroupEntity);
 
     this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t('Initialize'));
-    await this.progressService.finishStep(null, true);
+    this.progressService.finishStep(null, true);
 
     try {
       const privateKey = await this.getPrivateKey();
@@ -66,11 +66,9 @@ class GroupsUpdateController {
         groupUpdateEntity.secrets = await this.encryptNeededSecrets(privateKey, groupUpdateDryRunResultEntity);
       }
       await this.updateGroup(groupUpdateEntity);
-      await this.progressService.finishStep(null, true);
-      await this.progressService.close();
-    } catch (error) {
-      await this.progressService.close();
-      throw error;
+      this.progressService.finishStep(null, true);
+    } finally {
+      this.progressService.close();
     }
     return updatedGroupDto;
   }
@@ -84,7 +82,7 @@ class GroupsUpdateController {
     const groupUpdateDryRunResultEntity = await this.groupModel.updateDryRun(groupUpdateEntity);
     const progressGoal = INITIAL_PROGRESS_GOAL + groupUpdateDryRunResultEntity.neededSecrets.length + groupUpdateDryRunResultEntity.secrets.length;
     this.progressService.updateGoals(progressGoal);
-    await this.progressService.finishStep(null, true);
+    this.progressService.finishStep(null, true);
     return groupUpdateDryRunResultEntity;
   }
 
@@ -102,7 +100,7 @@ class GroupsUpdateController {
    * @returns {Promise<int>}
    */
   async synchronizeKeys() {
-    await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
+    this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
     return this.keyring.sync();
   }
 
@@ -110,7 +108,7 @@ class GroupsUpdateController {
    * Encrypt the needed secrets to complete the group update operation.
    * @param {openpgp.PrivateKey} privateKey The logged in user private key
    * @param {GroupUpdateEntity} groupUpdateDryRunResultEntity The result of the group update simulation
-   * @returns {Promise<SecretsCollection>}
+   * @returns {Promise<GroupUpdateSecretsCollection>}
    */
   async encryptNeededSecrets(privateKey, groupUpdateDryRunResultEntity) {
     const decryptedSecrets = await this.decryptSecrets(privateKey, groupUpdateDryRunResultEntity.secrets);
@@ -122,10 +120,10 @@ class GroupsUpdateController {
    * @param {openpgp.PrivateKey} privateKey The logged in user private key
    * @param {NeededSecretsCollection} neededSecretsCollection A collection of needed secret
    * @param {Array} decryptedSecrets A collection of decrypted secret [{resourceId: secretDecrypted}, ...]
-   * @returns {Promise<SecretsCollection>}
+   * @returns {Promise<GroupUpdateSecretsCollection>}
    */
   async encryptSecrets(privateKey, neededSecretsCollection, decryptedSecrets) {
-    const secrets = new SecretsCollection([]);
+    const groupUpdateSecrets = new GroupUpdateSecretsCollection([]);
     const items = neededSecretsCollection.items;
     let userId, userPublicArmoredKey, userPublicKey;
     for (const i in items) {
@@ -144,15 +142,15 @@ class GroupsUpdateController {
         data: await EncryptMessageService.encrypt(decryptedSecrets[resourceId], userPublicKey, [privateKey])
       };
       const secret = new SecretEntity(secretDto);
-      secrets.push(secret);
+      groupUpdateSecrets.push(secret);
     }
-    return secrets;
+    return groupUpdateSecrets;
   }
 
   /**
    * Decrypt a collection of secrets
    * @param {openpgp.PrivateKey} privateKey The logged in user private key
-   * @param {SecretsCollection} secretsCollection The collection of secrets to decrypt
+   * @param {GroupUpdateSecretsCollection} secretsCollection The collection of secrets to decrypt
    * @returns {Promise<[]>} [{resourceId: secretDecrypted}, ...]
    */
   async decryptSecrets(privateKey, secretsCollection) {
@@ -161,7 +159,7 @@ class GroupsUpdateController {
     for (const i in items) {
       const secret = items[i];
       const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
-      await this.progressService.finishStep(i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
+      this.progressService.finishStep(i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
       result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
     }
     return result;
@@ -173,7 +171,7 @@ class GroupsUpdateController {
    * @returns {Promise<void>}
    */
   async updateGroup(groupUpdateEntity) {
-    await this.progressService.finishStep(i18n.t("Updating group"), true);
+    this.progressService.finishStep(i18n.t("Updating group"), true);
     await this.groupModel.update(groupUpdateEntity, true);
   }
 }

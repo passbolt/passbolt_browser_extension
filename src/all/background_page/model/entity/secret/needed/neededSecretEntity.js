@@ -11,26 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-
-const ENTITY_NAME = 'NeededSecret';
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 /**
  * Needed secret entity is used to request secret that need to be encrypted.
  */
-class NeededSecretEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(neededSecretDto, options = {}) {
-    super(EntitySchema.validate(
-      NeededSecretEntity.ENTITY_NAME,
-      neededSecretDto,
-      NeededSecretEntity.getSchema()
-    ), options);
-  }
-
+class NeededSecretEntity extends EntityV2 {
   /**
    * Get entity schema
    * @returns {Object} schema
@@ -75,20 +61,6 @@ class NeededSecretEntity extends Entity {
    */
   get resourceId() {
     return this._props.resource_id;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-
-  /**
-   * NeededSecretEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

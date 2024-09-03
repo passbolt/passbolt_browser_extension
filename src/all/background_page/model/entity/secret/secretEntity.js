@@ -110,7 +110,7 @@ class SecretEntity extends EntityV2 {
   /**
    * Assert a given OpenPGP armored message block is valid
    * @param {string} message
-   * @return {EntityValidationError} if the message is not a valid armored block
+   * @throws {EntityValidationError} if the message is not a valid armored block
    * TODO a-fA-F0-9\=... before readArmored
    * TODO this format validation should be part of the json schema.
    */

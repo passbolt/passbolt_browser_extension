@@ -12,7 +12,7 @@
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import NeededSecretsCollection from "../../secret/needed/neededSecretsCollection";
-import SecretsCollection from "../../secret/secretsCollection";
+import GroupUpdateSecretsCollection from "../../secret/groupUpdate/groupUpdateSecretsCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'GroupUpdateDryRunResult';
@@ -30,7 +30,7 @@ class GroupUpdateDryRunResultEntity extends Entity {
 
     // Association
     if (this._props.secrets) {
-      this._secrets = new SecretsCollection(this._props.secrets, {clone: false});
+      this._secrets = new GroupUpdateSecretsCollection(this._props.secrets, {clone: false});
       delete this._props.secrets;
     }
     if (this._props.needed_secrets) {
@@ -49,7 +49,7 @@ class GroupUpdateDryRunResultEntity extends Entity {
       "required": [],
       "properties": {
         // Associations
-        "secrets": SecretsCollection.getSchema(),
+        "secrets": GroupUpdateSecretsCollection.getSchema(),
         "needed_secrets": NeededSecretsCollection.getSchema()
       }
     };
@@ -92,7 +92,7 @@ class GroupUpdateDryRunResultEntity extends Entity {
 
   /**
    * Return secrets
-   * @returns {(SecretsCollection|null)}
+   * @returns {GroupUpdateSecretsCollection|null}
    */
   get secrets() {
     return this._secrets || null;
@@ -100,7 +100,7 @@ class GroupUpdateDryRunResultEntity extends Entity {
 
   /**
    * Return needed secrets
-   * @returns {(SecretsCollection|null)}
+   * @returns {NeededSecretsCollection|null}
    */
   get neededSecrets() {
     return this._needed_secrets || null;

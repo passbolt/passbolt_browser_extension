@@ -1,25 +1,28 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "__MSG_appName__",
   "short_name": "passbolt",
   "version": "4.9.2",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
-  "externally_connectable": {},
+  "minimum_chrome_version": "116",
+  "externally_connectable": {
+    "ids": []
+  },
   "icons": {
     "16": "webAccessibleResources/img/icons/icon-16.png",
     "48": "webAccessibleResources/img/icons/icon-48.png",
     "128": "webAccessibleResources/img/icons/icon-128.png"
   },
   "background": {
-    "page": "index.html"
+    "service_worker": "serviceWorker/serviceWorker.js"
   },
-  "browser_action": {
+  "action": {
     "default_icon": "webAccessibleResources/img/icons/icon-32.png",
     "theme_icons": [{
-        "light": "webAccessibleResources/img/icons/icon-32.png",
-        "dark": "webAccessibleResources/img/icons/icon-32.png",
-        "size": 32
+      "light": "webAccessibleResources/img/icons/icon-32.png",
+      "dark": "webAccessibleResources/img/icons/icon-32.png",
+      "size": 32
     }],
     "default_title": "Passbolt Quickaccess",
     "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
@@ -35,18 +38,25 @@
   },
   "permissions": [
     "activeTab",
-    "tabs",
     "unlimitedStorage",
     "storage",
-    "background",
-    "clipboardWrite",
-    "downloads",
-    "*://*/*",
+    "tabs",
+    "scripting",
     "alarms",
-    "cookies"
+    "downloads",
+    "cookies",
+    "clipboardWrite",
+    "background",
+    "offscreen"
   ],
-  "web_accessible_resources": [
-    "webAccessibleResources/*"
+  "host_permissions": [
+    "*://*/*"
   ],
-  "content_security_policy": "script-src 'self'; object-src 'none';"
+  "web_accessible_resources": [{
+    "resources": ["webAccessibleResources/*"],
+    "matches": ["*://*/*"]
+  }],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'"
+  }
 }

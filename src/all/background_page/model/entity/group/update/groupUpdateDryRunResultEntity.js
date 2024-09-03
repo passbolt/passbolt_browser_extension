@@ -10,23 +10,16 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import NeededSecretsCollection from "../../secret/needed/neededSecretsCollection";
 import GroupUpdateSecretsCollection from "../../secret/groupUpdate/groupUpdateSecretsCollection";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'GroupUpdateDryRunResult';
-
-class GroupUpdateDryRunResultEntity extends Entity {
+class GroupUpdateDryRunResultEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(groupUpdateDryRunResultDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupUpdateDryRunResultEntity.ENTITY_NAME,
-      groupUpdateDryRunResultDto,
-      GroupUpdateDryRunResultEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Association
     if (this._props.secrets) {
@@ -104,20 +97,6 @@ class GroupUpdateDryRunResultEntity extends Entity {
    */
   get neededSecrets() {
     return this._needed_secrets || null;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-
-  /**
-   * GroupEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

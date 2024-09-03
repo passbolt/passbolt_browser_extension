@@ -489,7 +489,7 @@ class ResourceModel {
     if (!schema) {
       throw new TypeError('Could not find the schema definition for the requested resource type.');
     }
-    const plaintextEntity = new PlaintextEntity(plaintextDto, schema);
+    const plaintextEntity = new PlaintextEntity(plaintextDto, {schema});
     return JSON.stringify(plaintextEntity);
   }
 

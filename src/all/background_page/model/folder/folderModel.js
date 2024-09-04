@@ -150,19 +150,6 @@ class FolderModel {
     return new FolderEntity(foldersDtos[0]);
   }
 
-  /**
-   * Get folder permission
-   *
-   * @param {string} folderId folderId
-   * @returns {Promise<PermissionsCollection>}
-   */
-  async findFolderPermissions(folderId) {
-    const contain = {'permissions.user.profile': true, 'permissions.group': true};
-    const folderDto = await this.folderService.get(folderId, contain);
-    const folderEntity = new FolderEntity(folderDto);
-    return folderEntity.permissions;
-  }
-
   /*
    * ==============================================================
    *  Permission changes

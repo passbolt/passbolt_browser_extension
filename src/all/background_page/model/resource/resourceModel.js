@@ -257,30 +257,6 @@ class ResourceModel {
   }
 
   /**
-   * Find permissions for a resource
-   *
-   * @param {string} resourcesId resource uuid
-   * @returns {Promise<PermissionsCollection>}
-   */
-  async findResourcePermissions(resourcesId) {
-    const contain = {'permissions.user.profile': true, 'permissions.group': true};
-
-    /*
-     *  TODO deprecate findAll with has-id filter and use what's in comment
-     *  TODO not possible for backward compatibility issues, because permissions filter not present < v3
-     * const resourcesDto = await this.resourceService.get(resourcesId, contain);
-     * const resourceEntity = new ResourceEntity(resourcesDto);
-     * return resourceEntity.permissions;
-     */
-
-    // @deprecated
-    const filter = {'has-id': [resourcesId]};
-    const resourceDtos = await this.resourceService.findAll(contain, filter);
-    const resourceEntity = new ResourceEntity(resourceDtos[0]); // will fail if not found but not clean 404
-    return resourceEntity.permissions;
-  }
-
-  /**
    * Returns the count of possible resources to suggest given an url
    * @param {string} url An url
    * @return {Promise<number>}

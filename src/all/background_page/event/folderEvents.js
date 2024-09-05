@@ -18,24 +18,6 @@ import FolderEntity from "../model/entity/folder/folderEntity";
  */
 const listen = function(worker, apiClientOptions, account) {
   /*
-   * Find a folder with complete permissions
-   *
-   * @listens passbolt.resources.find-for-permissions
-   * @param requestId {uuid} The request identifier
-   * @param folderId {uuid} the folder uuid
-   */
-  worker.port.on('passbolt.folders.find-permissions', async(requestId, folderId) => {
-    try {
-      const folderModel = new FolderModel(apiClientOptions);
-      const permissions = await folderModel.findFolderPermissions(folderId);
-      worker.port.emit(requestId, 'SUCCESS', permissions);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-  /*
    * Create a new folder
    *
    * @listens passbolt.folders.create

@@ -46,6 +46,7 @@ import {RememberMeEvents} from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import {userLoggedInAuthStatus} from "../controller/auth/authCheckStatus.test.data";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import {PermissionEvents} from "../event/permissionEvents";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -75,6 +76,7 @@ jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PermissionEvents, "listen").mockImplementation(jest.fn());
 
 describe("App", () => {
   beforeEach(async() => {
@@ -85,7 +87,7 @@ describe("App", () => {
 
   describe("App::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(32);
+      expect.assertions(33);
       // data mocked
       const port = {
         _port: {
@@ -135,6 +137,7 @@ describe("App", () => {
       expect(MfaEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ClipboardEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(PermissionEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(App.events).toStrictEqual([
         ConfigEvents,
         AppEvents,
@@ -163,7 +166,8 @@ describe("App", () => {
         PownedPasswordEvents,
         MfaEvents,
         ClipboardEvents,
-        RememberMeEvents
+        RememberMeEvents,
+        PermissionEvents
       ]);
       expect(App.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(App.appName).toBe('App');

@@ -15,7 +15,7 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import SecretDecryptController from "./secretDecryptController";
+import FindSecretByResourceIdController from "./findSecretByResourceIdController";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {readSecret} from "../../model/entity/secret/secretEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
@@ -38,6 +38,7 @@ import {
 import PlaintextEntity from "../../model/entity/plaintext/plaintextEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {adminAccountDto, defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -46,7 +47,7 @@ beforeEach(() => {
 jest.mock("../../service/passphrase/getPassphraseService");
 
 describe("SecretDecryptController", () => {
-  describe("SecretDecryptController::exec", () => {
+  describe("FindSecretByResourceIdController::exec", () => {
     it("Decrypt successfully a resource with encrypted description.", async() => {
       const account = new AccountEntity(defaultAccountDto());
       const user = await MockExtension.withConfiguredAccount();
@@ -61,15 +62,16 @@ describe("SecretDecryptController", () => {
       const resourceDto = defaultResourceDto({
         id: resourceId,
         resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
-        secrets: [secretDto]
       });
-      fetch.doMockOnceIf(new RegExp(`/resources/${resourceDto.id}.json`), () => mockApiResponse(resourceDto));
+      const resourceEntity = new ResourceEntity(resourceDto);
+      fetch.doMockOnceIf(new RegExp(`secrets/resource/${resourceDto.id}.json`), () => mockApiResponse(secretDto));
       const resourceTypesCollection = resourceTypesCollectionDto();
       fetch.doMockOnceIf(new RegExp(`/resource-types.json`), () => mockApiResponse(resourceTypesCollection));
 
       expect.assertions(2);
 
-      const controller = new SecretDecryptController(null, null, defaultApiClientOptions(), account);
+      const controller = new FindSecretByResourceIdController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.resourceModel, "getById").mockImplementationOnce(() => resourceEntity);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
       const plaintextSecret = await controller.exec(resourceDto.id);
@@ -91,15 +93,16 @@ describe("SecretDecryptController", () => {
       const resourceDto = defaultResourceDto({
         id: resourceId,
         resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_STRING,
-        secrets: [secretDto]
       });
-      fetch.doMockOnceIf(new RegExp(`/resources/${resourceDto.id}.json`), () => mockApiResponse(resourceDto));
+      const resourceEntity = new ResourceEntity(resourceDto);
+      fetch.doMockOnceIf(new RegExp(`secrets/resource/${resourceDto.id}.json`), () => mockApiResponse(secretDto));
       const resourceTypesCollection = resourceTypesCollectionDto();
       fetch.doMockOnceIf(new RegExp(`/resource-types.json`), () => mockApiResponse(resourceTypesCollection));
 
       expect.assertions(2);
 
-      const controller = new SecretDecryptController(null, null, defaultApiClientOptions(), account);
+      const controller = new FindSecretByResourceIdController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.resourceModel, "getById").mockImplementationOnce(() => resourceEntity);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
       const plaintextSecret = await controller.exec(resourceDto.id);
@@ -121,15 +124,16 @@ describe("SecretDecryptController", () => {
       const resourceDto = defaultResourceDto({
         id: resourceId,
         resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
-        secrets: [secretDto]
       });
-      fetch.doMockOnceIf(new RegExp(`/resources/${resourceDto.id}.json`), () => mockApiResponse(resourceDto));
+      const resourceEntity = new ResourceEntity(resourceDto);
+      fetch.doMockOnceIf(new RegExp(`secrets/resource/${resourceDto.id}.json`), () => mockApiResponse(secretDto));
       const resourceTypesCollection = resourceTypesCollectionDto();
       fetch.doMockOnceIf(new RegExp(`/resource-types.json`), () => mockApiResponse(resourceTypesCollection));
 
       expect.assertions(7);
 
-      const controller = new SecretDecryptController(null, null, defaultApiClientOptions(), account);
+      const controller = new FindSecretByResourceIdController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.resourceModel, "getById").mockImplementationOnce(() => resourceEntity);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
 
       const plaintextSecret = await controller.exec(resourceDto.id);
@@ -156,15 +160,16 @@ describe("SecretDecryptController", () => {
       const resourceDto = defaultResourceDto({
         id: resourceId,
         resource_type_id: TEST_RESOURCE_TYPE_TOTP,
-        secrets: [secretDto]
       });
-      fetch.doMockOnceIf(new RegExp(`/resources/${resourceDto.id}.json`), () => mockApiResponse(resourceDto));
+      const resourceEntity = new ResourceEntity(resourceDto);
+      fetch.doMockOnceIf(new RegExp(`secrets/resource/${resourceDto.id}.json`), () => mockApiResponse(secretDto));
       const resourceTypesCollection = resourceTypesCollectionDto();
       fetch.doMockOnceIf(new RegExp(`/resource-types.json`), () => mockApiResponse(resourceTypesCollection));
 
       expect.assertions(7);
 
-      const controller = new SecretDecryptController(null, null, defaultApiClientOptions(), account);
+      const controller = new FindSecretByResourceIdController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.resourceModel, "getById").mockImplementationOnce(() => resourceEntity);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
 
       const plaintextSecret = await controller.exec(resourceDto.id);

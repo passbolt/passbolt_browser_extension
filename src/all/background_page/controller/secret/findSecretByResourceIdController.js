@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.8.0
+ * @since         4.9.4
  */
 import i18n from "../../sdk/i18n";
 import {assertUuid} from "../../utils/assertions";
@@ -19,8 +19,9 @@ import GetPassphraseService from "../../service/passphrase/getPassphraseService"
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import ProgressService from "../../service/progress/progressService";
 import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
+import FindSecretService from "../../service/secret/findSecretService";
 
-class SecretDecryptController {
+class FindSecretByResourceIdController {
   /**
    * Secret decrypt controller constructor
    *
@@ -33,6 +34,7 @@ class SecretDecryptController {
     this.worker = worker;
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.findSecretService = new FindSecretService(account, apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker, i18n.t('Decrypting ...'));
     this.getPassphraseService = new GetPassphraseService(account);
@@ -42,9 +44,9 @@ class SecretDecryptController {
    * Wrapper of exec function to run it with worker.
    *
    */
-  async _exec() {
+  async _exec(resourceId) {
     try {
-      const result = await this.exec.apply(this, arguments);
+      const result = await this.exec(resourceId);
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
@@ -61,13 +63,14 @@ class SecretDecryptController {
     assertUuid(resourceId);
 
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-    const resourcePromise = this.resourceModel.findForDecrypt(resourceId);
+    const resourcePromise = this.resourceModel.getById(resourceId);
+    const secret = await this.findSecretService.findByResourceId(resourceId);
     const decryptedPrivateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
     const resource = await resourcePromise;
     const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);
 
-    return DecryptAndParseResourceSecretService.decryptAndParse(resource.secret, secretSchema, decryptedPrivateKey);
+    return DecryptAndParseResourceSecretService.decryptAndParse(secret, secretSchema, decryptedPrivateKey);
   }
 }
 
-export default SecretDecryptController;
+export default FindSecretByResourceIdController;

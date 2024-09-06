@@ -25,7 +25,7 @@
   "Exporting ...": "Esportazione...",
   "Fetching parent permissions": "Recupero dei permessi genitore",
   "Folder {{name}} can not be moved.": "La cartella {{name}} non può essere spostata.",
-  "Folder {{name}} is already in folder {{destination}}.": "La cartella {{name}} è già presente nella cartella di destinazione {{destination}}.",
+  "Folder {{name}} is already in folder {{destination}}.": "La cartella {{name}} è già presente nella cartella di destinazione {{destination}}\\.",
   "Generate file": "Genera il file",
   "Importing ...": "Importazione...",
   "Importing folders {{importedCount}}/{{total}}": "Importazione delle cartelle {{importedCount}}/{{total}}",

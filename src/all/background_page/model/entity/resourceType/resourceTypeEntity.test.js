@@ -14,7 +14,14 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ResourceTypeEntity from "./resourceTypeEntity";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {resourceTypePasswordDescriptionTotpDto, resourceTypePasswordStringDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {
+  resourceTypePasswordAndDescriptionDto,
+  resourceTypePasswordDescriptionTotpDto,
+  resourceTypePasswordStringDto,
+  resourceTypeTotpDto,
+  resourceTypeWithoutSecretDefinitionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("ResourceTypeEntity", () => {
   describe("::getSchema", () => {
@@ -49,7 +56,7 @@ describe("ResourceTypeEntity", () => {
       const failingScenarios = [];
 
       assertEntityProperty.assert(ResourceTypeEntity, "definition", successScenarios, failingScenarios, "type");
-      assertEntityProperty.notRequired(ResourceTypeEntity, "definition");
+      assertEntityProperty.required(ResourceTypeEntity, "definition");
     });
 
     it("validates description property", () => {
@@ -79,16 +86,99 @@ describe("ResourceTypeEntity", () => {
   });
 
   describe("::constructor", () => {
-    it("constructor works if valid minimal DTO is provided", () => {
+    it("works if valid minimal DTO is provided", () => {
+      expect.assertions(1);
       const dto = resourceTypePasswordStringDto();
       const entity = new ResourceTypeEntity(dto);
       expect(entity.toDto()).toEqual(dto);
     });
 
-    it("constructor works if full DTO is provided", () => {
+    it("works if full DTO is provided", () => {
+      expect.assertions(1);
       const dto = resourceTypePasswordDescriptionTotpDto();
       const resourceTypeEntity = new ResourceTypeEntity(dto);
       expect(resourceTypeEntity.toDto()).toEqual(dto);
+    });
+
+    it("should throw an error if slug is unknown", () => {
+      expect.assertions(1);
+      const dto = resourceTypePasswordAndDescriptionDto({
+        slug: "wrong-slug",
+      });
+      expect(() => new ResourceTypeEntity(dto)).toThrow(new EntityValidationError("Could not validate entity ResourceTypeEntity."));
+    });
+
+    it("should throw an error if slug is invalid", () => {
+      expect.assertions(1);
+      const dto = resourceTypePasswordAndDescriptionDto({
+        slug: 42,
+      });
+      expect(() => new ResourceTypeEntity(dto)).toThrow(new EntityValidationError("Could not validate entity ResourceTypeEntity."));
+    });
+  });
+
+  describe("::marshall", () => {
+    it("should set the right plaintext secret definition for: password-string", () => {
+      expect.assertions(2);
+
+      const dto = resourceTypeWithoutSecretDefinitionDto({slug: "password-string"});
+      const expectedSecretDefinition = resourceTypePasswordStringDto().definition.secret;
+
+      const resourceTypeEntity = new ResourceTypeEntity(dto);
+
+      expect(resourceTypeEntity.definition.secret).toBeTruthy();
+      expect(resourceTypeEntity.definition.secret).toStrictEqual(expectedSecretDefinition);
+    });
+
+    it("should set the right plaintext secret definition for: password-and-description", () => {
+      expect.assertions(2);
+
+      const dto = resourceTypeWithoutSecretDefinitionDto({slug: "password-and-description"});
+      const expectedSecretDefinition = resourceTypePasswordAndDescriptionDto().definition.secret;
+
+      const resourceTypeEntity = new ResourceTypeEntity(dto);
+
+      expect(resourceTypeEntity.definition.secret).toBeTruthy();
+      expect(resourceTypeEntity.definition.secret).toStrictEqual(expectedSecretDefinition);
+    });
+
+    it("should set the right plaintext secret definition for: password-description-totp", () => {
+      expect.assertions(2);
+
+      const dto = resourceTypeWithoutSecretDefinitionDto({slug: "password-description-totp"});
+      const expectedSecretDefinition = resourceTypePasswordDescriptionTotpDto().definition.secret;
+
+      const resourceTypeEntity = new ResourceTypeEntity(dto);
+
+      expect(resourceTypeEntity.definition.secret).toBeTruthy();
+      expect(resourceTypeEntity.definition.secret).toStrictEqual(expectedSecretDefinition);
+    });
+
+    it("should set the right plaintext secret definition for: totp", () => {
+      expect.assertions(2);
+
+      const dto = resourceTypeWithoutSecretDefinitionDto({slug: "totp"});
+      const expectedSecretDefinition = resourceTypeTotpDto().definition.secret;
+
+      const resourceTypeEntity = new ResourceTypeEntity(dto);
+
+      expect(resourceTypeEntity.definition.secret).toBeTruthy();
+      expect(resourceTypeEntity.definition.secret).toStrictEqual(expectedSecretDefinition);
+    });
+  });
+
+  describe("::getters", () => {
+    it("should provide the right values when everything is set", () => {
+      expect.assertions(3);
+
+      const dto = resourceTypeWithoutSecretDefinitionDto({slug: "password-description-totp"});
+      const entity = new ResourceTypeEntity(dto);
+
+      const expectedDefinition = resourceTypePasswordDescriptionTotpDto().definition;
+
+      expect(entity.id).toStrictEqual(dto.id);
+      expect(entity.definition).toStrictEqual(expectedDefinition);
+      expect(entity.slug).toStrictEqual(dto.slug);
     });
   });
 });

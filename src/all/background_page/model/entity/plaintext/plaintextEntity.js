@@ -11,29 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
+const LEGACY_PLAINTEXT_SECRET_SCHEMA = {
+  "type": "object",
+  "required": [
+    "password"
+  ],
+  "properties": {
+    "password": {
+      "type": "string",
+      "maxLength": 4096
+    },
+  },
+};
 
-const ENTITY_NAME = 'Plaintext';
-
-class PlaintextEntity extends Entity {
-  /**
-   * Plaintext entity constructor
-   * Use to store unencrypted secrets
-   *
-   * @param {Object} secretDto secret DTO
-   * @param {Object} schema from ResourceType
-   * @throws EntityValidationError if the dto cannot be converted into an entity
-   */
-  constructor(secretDto, schema) {
-    super(EntitySchema.validate(
-      PlaintextEntity.ENTITY_NAME,
-      secretDto,
-      schema
-    ));
-  }
-
+class PlaintextEntity extends EntityV2 {
   /**
    * Create plaintext secret entity from legacy plaintext secret.
    * @param {string} password The password
@@ -41,9 +34,7 @@ class PlaintextEntity extends Entity {
    */
   static createFromLegacyPlaintextSecret(password) {
     const plaintextSecretDto = {password};
-    const schema = this.getLegacyPlaintextSecretSchema();
-
-    return new PlaintextEntity(plaintextSecretDto, schema);
+    return new PlaintextEntity(plaintextSecretDto, {schema: LEGACY_PLAINTEXT_SECRET_SCHEMA});
   }
 
   /**
@@ -55,37 +46,9 @@ class PlaintextEntity extends Entity {
   }
 
   /**
-   * Get legacy plaintext secret entity schema
-   * @return {object}
-   */
-  static getLegacyPlaintextSecretSchema() {
-    return {
-      "type": "object",
-      "required": [
-        "password"
-      ],
-      "properties": {
-        "password": {
-          "type": "string",
-          "maxLength": 4096
-        },
-      },
-    };
-  }
-
-  /**
-   * Return props
-   *
-   * @returns {any}
-   */
-  get props() {
-    return this._props;
-  }
-
-  /**
    * Return password prop if any
    *
-   * @returns {(string|null)} password
+   * @returns {string|null} password
    */
   get password() {
     return this._props.password || null;
@@ -94,7 +57,7 @@ class PlaintextEntity extends Entity {
   /**
    * Return description prop if any
    *
-   * @returns {(string|null)} description
+   * @returns {string|null} description
    */
   get description() {
     return this._props.description || null;
@@ -103,23 +66,10 @@ class PlaintextEntity extends Entity {
   /**
    * Return totp prop if any
    *
-   * @returns {(object|null)} totp
+   * @returns {object|null} totp
    */
   get totp() {
     return this._props.totp || null;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * Plaintext.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

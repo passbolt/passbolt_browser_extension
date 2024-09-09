@@ -53,7 +53,7 @@ class DecryptAndParseResourceSecretService {
       throw new Error('Unable to parse the secret.');
     }
 
-    return new PlaintextEntity(secretDto, schema);
+    return new PlaintextEntity(secretDto, {schema});
   }
 }
 

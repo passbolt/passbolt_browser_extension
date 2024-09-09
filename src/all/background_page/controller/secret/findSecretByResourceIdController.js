@@ -57,7 +57,7 @@ class FindSecretByResourceIdController {
   /**
    * Execute the controller
    * @param {string} resourceId The resource uuid
-   * @return {Promise<PlaintextEntity>}
+   * @returns {Promise<PlaintextEntity>}
    */
   async exec(resourceId) {
     assertUuid(resourceId);

@@ -27,26 +27,30 @@ import WorkerService from "../../service/worker/workerService";
 import {mockPort} from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
 import QuickAccessPagemod from "../../pagemod/quickAccessPagemod";
+import {minimalDto} from "../../model/entity/secret/secretEntity.test.data";
+import SecretEntity from "../../model/entity/secret/secretEntity";
 
 describe("AutofillController", () => {
   const account = new AccountEntity(defaultAccountDto());
 
   describe("AutofillController::exec", () => {
     it("Should autofill from inform menu.", async() => {
-      expect.assertions(8);
+      expect.assertions(10);
 
       // initialisation
       const requestId = uuidv4();
       const worker = readWorker({name: InformMenuPagemod.appName});
       const controller = new AutofillController(worker, requestId, defaultApiClientOptions(), account);
       const resource = defaultResourceDto();
+      const secretDto = minimalDto();
       const secret = {password: "secret"};
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
       const portWrapper = new Port(port);
       // mocked function
       jest.spyOn(WorkerService, "get").mockImplementationOnce(() => ({port: portWrapper}));
       jest.spyOn(controller.getPassphraseService, "requestPassphraseFromQuickAccess").mockImplementationOnce(() => pgpKeys.ada.passphrase);
-      jest.spyOn(controller.resourceModel, "findForDecrypt").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.resourceModel, "getById").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.findSecretService, "findByResourceId").mockImplementationOnce(() => new SecretEntity(secretDto));
       jest.spyOn(controller.resourceTypeModel, "getSecretSchemaById").mockImplementationOnce(jest.fn());
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(() => pgpKeys.ada.private_decrypted);
       jest.spyOn(DecryptAndParseResourceSecretService, "decryptAndParse").mockImplementationOnce(() => secret);
@@ -57,8 +61,10 @@ describe("AutofillController", () => {
 
       // expectations
       expect(controller.getPassphraseService.requestPassphraseFromQuickAccess).toHaveBeenCalledTimes(1);
-      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledTimes(1);
-      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledWith(resource.id);
+      expect(controller.resourceModel.getById).toHaveBeenCalledTimes(1);
+      expect(controller.resourceModel.getById).toHaveBeenCalledWith(resource.id);
+      expect(controller.findSecretService.findByResourceId).toHaveBeenCalledTimes(1);
+      expect(controller.findSecretService.findByResourceId).toHaveBeenCalledWith(resource.id);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledTimes(1);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledWith(resource.resourceTypeId);
       expect(portWrapper.emit).toHaveBeenCalledTimes(2);
@@ -67,13 +73,14 @@ describe("AutofillController", () => {
     });
 
     it("Should autofill from quickaccess.", async() => {
-      expect.assertions(11);
+      expect.assertions(13);
 
       // initialisation
       const requestId = uuidv4();
       const worker = readWorker({name: QuickAccessPagemod.appName});
       const controller = new AutofillController(worker, requestId, defaultApiClientOptions(), account);
       const resource = defaultResourceDto();
+      const secretDto = minimalDto();
       const secret = {password: "secret"};
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: "https://url.com"});
       const portWrapper = new Port(port);
@@ -82,7 +89,8 @@ describe("AutofillController", () => {
       jest.spyOn(WorkerService, "get").mockImplementationOnce(() => ({port: portWrapper, tab: tab}));
       jest.spyOn(controller.getPassphraseService, "requestPassphraseFromQuickAccess");
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementationOnce(() => pgpKeys.ada.passphrase);
-      jest.spyOn(controller.resourceModel, "findForDecrypt").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.resourceModel, "getById").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.findSecretService, "findByResourceId").mockImplementationOnce(() => new SecretEntity(secretDto));
       jest.spyOn(controller.resourceTypeModel, "getSecretSchemaById").mockImplementationOnce(jest.fn());
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(() => pgpKeys.ada.private_decrypted);
       jest.spyOn(DecryptAndParseResourceSecretService, "decryptAndParse").mockImplementationOnce(() => secret);
@@ -96,8 +104,10 @@ describe("AutofillController", () => {
       expect(controller.getPassphraseService.requestPassphraseFromQuickAccess).not.toHaveBeenCalled();
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledWith(worker);
-      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledTimes(1);
-      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledWith(resource.id);
+      expect(controller.resourceModel.getById).toHaveBeenCalledTimes(1);
+      expect(controller.resourceModel.getById).toHaveBeenCalledWith(resource.id);
+      expect(controller.findSecretService.findByResourceId).toHaveBeenCalledTimes(1);
+      expect(controller.findSecretService.findByResourceId).toHaveBeenCalledWith(resource.id);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledTimes(1);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledWith(resource.resourceTypeId);
       expect(portWrapper.emit).toHaveBeenCalledTimes(1);
@@ -107,13 +117,14 @@ describe("AutofillController", () => {
     });
 
     it("Should not autofill from a worker that is not inform menu or quickaccess.", async() => {
-      expect.assertions(10);
+      expect.assertions(12);
 
       // initialisation
       const requestId = uuidv4();
       const worker = readWorker();
       const controller = new AutofillController(worker, requestId, defaultApiClientOptions(), account);
       const resource = defaultResourceDto();
+      const secretDto = minimalDto();
       const secret = {password: "secret"};
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
       const portWrapper = new Port(port);
@@ -122,7 +133,8 @@ describe("AutofillController", () => {
       jest.spyOn(WorkerService, "get").mockImplementationOnce(() => ({port: portWrapper, tab: tab}));
       jest.spyOn(controller.getPassphraseService, "requestPassphraseFromQuickAccess");
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementationOnce(() => pgpKeys.ada.passphrase);
-      jest.spyOn(controller.resourceModel, "findForDecrypt").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.resourceModel, "getById").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.findSecretService, "findByResourceId").mockImplementationOnce(() => new SecretEntity(secretDto));
       jest.spyOn(controller.resourceTypeModel, "getSecretSchemaById").mockImplementationOnce(jest.fn());
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(() => pgpKeys.ada.private_decrypted);
       jest.spyOn(DecryptAndParseResourceSecretService, "decryptAndParse").mockImplementationOnce(() => secret);
@@ -136,8 +148,10 @@ describe("AutofillController", () => {
       expect(controller.getPassphraseService.requestPassphraseFromQuickAccess).not.toHaveBeenCalled();
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledWith(worker);
-      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledTimes(1);
-      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledWith(resource.id);
+      expect(controller.resourceModel.getById).toHaveBeenCalledTimes(1);
+      expect(controller.resourceModel.getById).toHaveBeenCalledWith(resource.id);
+      expect(controller.findSecretService.findByResourceId).toHaveBeenCalledTimes(1);
+      expect(controller.findSecretService.findByResourceId).toHaveBeenCalledWith(resource.id);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledTimes(1);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledWith(resource.resourceTypeId);
       expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.web-integration.fill-credentials', {username: resource.username, password: secret.password});
@@ -146,7 +160,7 @@ describe("AutofillController", () => {
     });
 
     it("Should map username with empty string if not exist.", async() => {
-      expect.assertions(10);
+      expect.assertions(12);
 
       // initialisation
       const requestId = uuidv4();
@@ -155,6 +169,7 @@ describe("AutofillController", () => {
       const resource = defaultResourceDto({
         username: null
       });
+      const secretDto = minimalDto();
       const secret = {password: "secret"};
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
       const portWrapper = new Port(port);
@@ -163,7 +178,8 @@ describe("AutofillController", () => {
       jest.spyOn(WorkerService, "get").mockImplementationOnce(() => ({port: portWrapper, tab: tab}));
       jest.spyOn(controller.getPassphraseService, "requestPassphraseFromQuickAccess");
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementationOnce(() => pgpKeys.ada.passphrase);
-      jest.spyOn(controller.resourceModel, "findForDecrypt").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.resourceModel, "getById").mockImplementationOnce(() => resource);
+      jest.spyOn(controller.findSecretService, "findByResourceId").mockImplementationOnce(() => new SecretEntity(secretDto));
       jest.spyOn(controller.resourceTypeModel, "getSecretSchemaById").mockImplementationOnce(jest.fn());
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(() => pgpKeys.ada.private_decrypted);
       jest.spyOn(DecryptAndParseResourceSecretService, "decryptAndParse").mockImplementationOnce(() => secret);
@@ -177,8 +193,10 @@ describe("AutofillController", () => {
       expect(controller.getPassphraseService.requestPassphraseFromQuickAccess).not.toHaveBeenCalled();
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledWith(worker);
-      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledTimes(1);
-      expect(controller.resourceModel.findForDecrypt).toHaveBeenCalledWith(resource.id);
+      expect(controller.resourceModel.getById).toHaveBeenCalledTimes(1);
+      expect(controller.resourceModel.getById).toHaveBeenCalledWith(resource.id);
+      expect(controller.findSecretService.findByResourceId).toHaveBeenCalledTimes(1);
+      expect(controller.findSecretService.findByResourceId).toHaveBeenCalledWith(resource.id);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledTimes(1);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledWith(resource.resourceTypeId);
       expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.web-integration.fill-credentials', {username: "", password: secret.password});

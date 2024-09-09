@@ -20,6 +20,7 @@ import GetDecryptedUserPrivateKeyService from "../../service/account/getDecrypte
 import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
 import InformMenuPagemod from "../../pagemod/informMenuPagemod";
 import QuickAccessPagemod from "../../pagemod/quickAccessPagemod";
+import FindSecretService from "../../service/secret/findSecretService";
 
 class AutofillController {
   /**
@@ -33,6 +34,7 @@ class AutofillController {
     this.worker = worker;
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.findSecretService = new FindSecretService(account, apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.getPassphraseService = new GetPassphraseService(account);
   }
@@ -66,10 +68,11 @@ class AutofillController {
     try {
       const passphrase = await this.getPassphrase();
       // Get the resource, decrypt the resources password and requests to fill the credentials
-      const resource = await this.resourceModel.findForDecrypt(resourceId);
+      const resource = await this.resourceModel.getById(resourceId);
+      const secret = await this.findSecretService.findByResourceId(resourceId);
       const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(resource.secret, secretSchema, privateKey);
+      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(secret, secretSchema, privateKey);
       const username = resource.metadata?.username || "";
       const password = plaintextSecret?.password;
       this.fillCredential(webIntegrationWorker, {username, password});

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.6
  */
-import ResourceTypeModel from "../model/resourceType/resourceTypeModel";
+import GetResourceTypesController from "../controller/resourceType/getResourceTypesController";
 
 /**
  * Listens the resource type events
@@ -25,14 +25,9 @@ const listen = function(worker, apiClientOptions) {
    * @listens passbolt.resource-type.get-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.resource-type.get-all', async requestId => {
-    try {
-      const resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-      const resourceTypes = await resourceTypeModel.getOrFindAll();
-      worker.port.emit(requestId, 'SUCCESS', resourceTypes);
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.resource-type.get-or-find-all', async requestId => {
+    const controller = new GetResourceTypesController(worker, requestId, apiClientOptions);
+    await controller._exec();
   });
 };
 

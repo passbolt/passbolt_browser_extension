@@ -14,7 +14,6 @@
 import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import ResourceTypesCollection from "../entity/resourceType/resourceTypesCollection";
-import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import Validator from "validator";
 
 class ResourceTypeModel {
@@ -34,17 +33,7 @@ class ResourceTypeModel {
    * @return {Promise<ResourceTypesCollection>}
    */
   async updateLocalStorage() {
-    let resourceTypeDtos = [];
-    try {
-      resourceTypeDtos = await this.resourceTypeService.findAll();
-    } catch (error) {
-      // @deprecated to remove with v4. Expect 404 if API < V3, ResourcesTypes has been introduced with v3.
-      if (error instanceof PassboltApiFetchError && error.data && error.data.code === 404) {
-        console.error(error);
-      } else {
-        throw error;
-      }
-    }
+    const resourceTypeDtos = await this.resourceTypeService.findAll();
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypeDtos);
     await ResourceTypeLocalStorage.set(resourceTypesCollection);
     return resourceTypesCollection;

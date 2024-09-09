@@ -246,17 +246,6 @@ class ResourceModel {
   }
 
   /**
-   * Find a resource to share
-   *
-   * @param {string} resourcesId resource uuid
-   * @returns {Promise<ResourceEntity>}
-   */
-  async findForDecrypt(resourcesId) {
-    const resourcesDto = await this.resourceService.get(resourcesId, {'secret': true, 'resource-type': true});
-    return new ResourceEntity(resourcesDto);
-  }
-
-  /**
    * Returns the count of possible resources to suggest given an url
    * @param {string} url An url
    * @return {Promise<number>}
@@ -298,21 +287,6 @@ class ResourceModel {
    *  CRUD
    * ==============================================================
    */
-
-  /**
-   * Update a resource using Passbolt API and add result to local storage
-   *
-   * @param {ResourceEntity} resourceEntity
-   * @returns {Promise<ResourceEntity>}
-   */
-  async update(resourceEntity) {
-    const data = resourceEntity.toV4Dto({secrets: true});
-    const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
-    const updatedResourceEntity = new ResourceEntity(resourceDto);
-    await ResourceLocalStorage.updateResource(updatedResourceEntity);
-    return updatedResourceEntity;
-  }
-
   /**
    * Update resources in the local storage
    *

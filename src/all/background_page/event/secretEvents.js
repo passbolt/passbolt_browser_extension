@@ -5,7 +5,7 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import SecretDecryptController from "../controller/secret/secretDecryptController";
+import FindSecretByResourceIdController from "../controller/secret/findSecretByResourceIdController";
 
 /**
  * Listens the secret events
@@ -17,11 +17,11 @@ const listen = function(worker, apiClientOptions, account) {
   /*
    * Decrypt a given armored string.
    *
-   * @listens passbolt.secret.decrypt
+   * @listens passbolt.secret.find-by-resource-id
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.secret.decrypt', async(requestId, resourceId) => {
-    const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
+  worker.port.on('passbolt.secret.find-by-resource-id', async(requestId, resourceId) => {
+    const controller = new FindSecretByResourceIdController(worker, requestId, apiClientOptions, account);
     await controller._exec(resourceId);
   });
 };

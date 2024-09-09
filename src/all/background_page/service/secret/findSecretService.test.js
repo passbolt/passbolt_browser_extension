@@ -13,43 +13,43 @@
  */
 
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import FindPermissionsService from "./findPermissionsService";
 import {v4 as uuidv4} from "uuid";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
+import FindSecretService from "./findSecretService";
+import {minimalDto} from "../../model/entity/secret/secretEntity.test.data";
 
-describe("FindPermissionService", () => {
-  describe("FindPermissionService::exec", () => {
-    it("Should call permission service to find all permission from a resource id", async() => {
+describe("FindSecretService", () => {
+  describe("FindSecretService::exec", () => {
+    it("Should call Secret service to find all Secret from a resource id", async() => {
       expect.assertions(3);
       // initialisation
       const account = new AccountEntity(defaultAccountDto());
-      const service = new FindPermissionsService(account, defaultApiClientOptions());
+      const service = new FindSecretService(account, defaultApiClientOptions());
       const resourceId = uuidv4();
-      const expectedDto = [ownerPermissionDto()];
+      const expectedDto = minimalDto();
       // mocked function
-      jest.spyOn(service.permissionService, "findAllByAcoForeignKey").mockImplementationOnce(() => expectedDto);
+      jest.spyOn(service.secretService, "findByResourceId").mockImplementationOnce(() => expectedDto);
       // process
-      const permissionsCollection = await service.findAllByAcoForeignKeyForDisplay(resourceId);
+      const secretEntity = await service.findByResourceId(resourceId);
       // expectations
-      expect(service.permissionService.findAllByAcoForeignKey).toHaveBeenCalledTimes(1);
-      expect(service.permissionService.findAllByAcoForeignKey).toHaveBeenCalledWith(resourceId, FindPermissionsService.DEFAULT_CONTAIN);
-      expect(permissionsCollection.toDto()).toStrictEqual(expectedDto);
+      expect(service.secretService.findByResourceId).toHaveBeenCalledTimes(1);
+      expect(service.secretService.findByResourceId).toHaveBeenCalledWith(resourceId);
+      expect(secretEntity.toDto()).toStrictEqual(expectedDto);
     });
 
     it("Should fail if the resource id is not a uuid", async() => {
       expect.assertions(1);
       // initialisation
       const account = new AccountEntity(defaultAccountDto());
-      const service = new FindPermissionsService(account, defaultApiClientOptions());
+      const service = new FindSecretService(account, defaultApiClientOptions());
       const resourceId = "not a uuid";
       try {
         // process
-        await service.findAllByAcoForeignKeyForDisplay(resourceId);
+        await service.findByResourceId(resourceId);
       } catch (error) {
         // expectations
-        expect(error.message).toBe(`Service error. The id '${resourceId}' is not a valid uuid.`);
+        expect(error.message).toBe("The given parameter is not a valid UUID");
       }
     });
   });

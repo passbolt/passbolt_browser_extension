@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import PermissionService from "../api/permission/permissionService";
 import {assertUuid} from "../../utils/assertions";
-import PermissionsCollection from "../../model/entity/permission/permissionsCollection";
+import SecretService from "../api/secret/secretService";
+import SecretEntity from "../../model/entity/secret/secretEntity";
 
 
-class FindPermissionsService {
+class FindSecretService {
   /**
    *
    * @param {AccountEntity} account The user account
@@ -24,7 +24,7 @@ class FindPermissionsService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
-    this.permissionService = new PermissionService(apiClientOptions);
+    this.secretService = new SecretService(apiClientOptions);
   }
 
   /**
@@ -33,22 +33,13 @@ class FindPermissionsService {
    * @param {string} resourceId The resource id
    * @throws {Error} if API call fails, service unreachable, etc.
    * @throws {TypeError} if resource id is not an uuid
-   * @return {Promise<PermissionsCollection>} permissionsCollection
+   * @return {Promise<SecretEntity>} permissionsCollection
    */
-  async findAllByAcoForeignKeyForDisplay(resourceId) {
-    assertUuid(resourceId, `Service error. The id '${resourceId}' is not a valid uuid.`);
-    const permissionsCollectionDto = await this.permissionService.findAllByAcoForeignKey(resourceId, FindPermissionsService.DEFAULT_CONTAIN);
-    return new PermissionsCollection(permissionsCollectionDto);
-  }
-
-  /**
-   * FindPermissionsService.DEFAULT_CONTAIN
-   * @private
-   * @returns {Object}
-   */
-  static get DEFAULT_CONTAIN() {
-    return {"user": true, "user.profile": true, "group": true};
+  async findByResourceId(resourceId) {
+    assertUuid(resourceId);
+    const secretDto = await this.secretService.findByResourceId(resourceId);
+    return new SecretEntity(secretDto);
   }
 }
 
-export default FindPermissionsService;
+export default FindSecretService;

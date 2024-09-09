@@ -105,14 +105,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param editedPassword {} The resource
    */
   worker.port.on('passbolt.resources.update', async(requestId, resourceDto, plaintextDto) => {
-    try {
-      const controller = new ResourceUpdateController(worker, requestId, apiClientOptions, account);
-      const updatedResource = await controller.main(resourceDto, plaintextDto);
-      worker.port.emit(requestId, 'SUCCESS', updatedResource);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new ResourceUpdateController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourceDto, plaintextDto);
   });
 
   /*

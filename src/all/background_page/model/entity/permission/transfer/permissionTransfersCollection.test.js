@@ -15,6 +15,7 @@ import PermissionTransfersCollection from "./permissionTransfersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {defaultPermissionTransferDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransferEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import {defaultPermissionTransfersCollectionDtos} from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransfersCollection.test.data";
 
 describe("Permission transfer entity", () => {
   describe("::getSchema", () => {
@@ -40,6 +41,19 @@ describe("Permission transfer entity", () => {
       expect(collection.toDto()).toEqual(dtos);
       expect(collection.items[0].acoForeignKey).toEqual(dtos[0].aco_foreign_key);
       expect(collection.items[0].id).toEqual(dtos[0].id);
+    });
+  });
+
+  describe("PermissionTransfersCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const permissionTransfersCount = 10_000;
+      const dtos = defaultPermissionTransfersCollectionDtos(permissionTransfersCount);
+
+      const start = performance.now();
+      const collection = new PermissionTransfersCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(permissionTransfersCount);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

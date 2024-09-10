@@ -34,3 +34,18 @@ export const externalResourceCollectionWithoutIdsDto = (data = {}) => {
   }
   return externalResourceCollectionDto;
 };
+
+/**
+ * Build external resources collection dtos.
+ * @param {number} [resourcesCount=10] The number of resources.
+ * @param {Object} [data] override data properties
+ * @returns {object}
+ */
+export const buildDefineNumberOfExternalResourcesCollectionDto = (resourcesCount = 10, data = {}) => {
+  const dtos = [];
+  for (let i = 0; i < resourcesCount; i++) {
+    const dto = defaultExternalResourceDto(data);
+    dtos.push(dto);
+  }
+  return dtos;
+};

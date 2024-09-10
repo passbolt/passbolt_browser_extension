@@ -15,7 +15,7 @@ import CollectionValidationError from "passbolt-styleguide/src/shared/models/ent
 import CommentsCollection from "./commentsCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {defaultCommentDto, minimumCommentDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
-import {defaultCommentCollectionDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntityCollection.test.data";
+import {defaultCommentCollectionDto, buildDefineNumberOfCommentsDtos} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntityCollection.test.data";
 import {v4 as uuidv4} from "uuid";
 
 describe("CommentsCollection entity", () => {
@@ -76,6 +76,23 @@ describe("CommentsCollection entity", () => {
 
       const t = () => { new CommentsCollection(dto); };
       expect(t).toThrow(CollectionValidationError);
+    });
+  });
+
+  describe("CommentsCollection:pushMany", () => {
+    // TODO need optimization
+    it.skip("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const commentsCount = 10_000;
+      const dtos = buildDefineNumberOfCommentsDtos(commentsCount, {
+        withCreator: true,
+        withModifier: true,
+      });
+
+      const start = performance.now();
+      const collection = new CommentsCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(commentsCount);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

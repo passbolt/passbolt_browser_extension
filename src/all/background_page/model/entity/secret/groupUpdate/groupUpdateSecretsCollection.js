@@ -50,7 +50,7 @@ class GroupUpdateSecretsCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same resource and user.
    */
   validateBuildRules(item, options = {}) {
-    this.assertNotExist("id", item._props.id, options);
+    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
     this.assertUniqueResourceIdUserId(item, {haystackSet: options?.uniqueResourceIdsUserIdsOrNullSetCache});
   }
 
@@ -108,16 +108,19 @@ class GroupUpdateSecretsCollection extends EntityV2Collection {
    * ==================================================
    */
   pushMany(data, entityOptions = {}, options = {}) {
+    const uniqueIdsSetCache = new Set(this.extract("id"));
+
     const uniqueResourceIdsUserIdsOrNullSetCache = new Set(this.extractUserIdResourceId());
 
     // Build rules
     const onItemPushed = item => {
+      uniqueIdsSetCache.add(item.id);
       uniqueResourceIdsUserIdsOrNullSetCache.add(GroupUpdateSecretsCollection.getResourceIdUserIdKey(item));
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueResourceIdsUserIdsOrNullSetCache},
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueResourceIdsUserIdsOrNullSetCache},
       ...options
     };
     super.pushMany(data, entityOptions, options);

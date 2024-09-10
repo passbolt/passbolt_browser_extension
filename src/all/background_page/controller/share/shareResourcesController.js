@@ -12,7 +12,6 @@
  * @since         2.8.0
  */
 import Keyring from "../../model/keyring";
-import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import i18n from "../../sdk/i18n";
@@ -32,7 +31,6 @@ class ShareResourcesController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker);

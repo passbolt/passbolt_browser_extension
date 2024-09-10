@@ -19,24 +19,32 @@ import ServerKeyChangedError from "../../error/serverKeyChangedError";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
+import {mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import {enableFetchMocks} from "jest-fetch-mock";
 
 jest.mock('../../model/gpgAuthToken', () => function() {
   return {token: "gpgauthv1.3.0|36|A89F6AB1-5BEE-32D8-a18B-461B810902E2|gpgauthv1.3.0", validate: () => true};
 });
 
 beforeEach(() => {
+  enableFetchMocks();
   jest.resetModules();
   jest.clearAllMocks();
 });
 
 describe("AuthVerifyServerKeyController", () => {
-  describe("AuthVerifyServerKeyController::exec", () => {
+  describe("::exec", () => {
+    let account, controller;
+
+    beforeEach(() => {
+      account = new AccountEntity(defaultAccountDto());
+      controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
+    });
+
     it("Should verify the server successfully.", async() => {
       expect.assertions(1);
-      // Mock account.
-      const account = new AccountEntity(defaultAccountDto());
 
-      const controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(jest.fn());
 
       const promise = controller.exec();
@@ -45,10 +53,10 @@ describe("AuthVerifyServerKeyController", () => {
 
     it("Should throw a server key has changed error", async() => {
       expect.assertions(1);
-      // Mock account.
-      const account = new AccountEntity(defaultAccountDto({server_public_armored_key: pgpKeys.expired.public}));
 
-      const controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
+      account = new AccountEntity(defaultAccountDto({server_public_armored_key: pgpKeys.expired.public}));
+      controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
+
       jest.spyOn(controller.authVerifyServerKeyService, "getServerKey").mockImplementationOnce(() => ({armored_key: pgpKeys.server.public}));
 
       const promise = controller.exec();
@@ -57,10 +65,10 @@ describe("AuthVerifyServerKeyController", () => {
 
     it("Should throw a server key expired error", async() => {
       expect.assertions(1);
-      // Mock account.
-      const account = new AccountEntity(defaultAccountDto({server_public_armored_key: pgpKeys.expired.public}));
 
-      const controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
+      account = new AccountEntity(defaultAccountDto({server_public_armored_key: pgpKeys.expired.public}));
+      controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
+
       jest.spyOn(controller.authVerifyServerKeyService, "getServerKey").mockImplementationOnce(() => ({armored_key: pgpKeys.expired.public}));
 
       const promise = controller.exec();
@@ -101,14 +109,38 @@ describe("AuthVerifyServerKeyController", () => {
     it("Should throw a server error if the server cannot be verified", async() => {
       expect.assertions(1);
       // Mock account.
-      const account = new AccountEntity(defaultAccountDto({server_public_armored_key: pgpKeys.server.public}));
+      account = new AccountEntity(defaultAccountDto({server_public_armored_key: pgpKeys.server.public}));
+      controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
 
-      const controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
-      jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(() => { throw Error('Unknown error'); });
       jest.spyOn(controller.authVerifyServerKeyService, "getServerKey").mockImplementationOnce(() =>  { throw Error('Unknown error'); });
 
       const promise = controller.exec();
       await expect(promise).rejects.toThrowError(new ServerKeyChangedError("Could not verify the server key. Server internal error. Check with your administrator."));
+    });
+
+    it("Should throw a the server message error in case of internal server error", async() => {
+      expect.assertions(1);
+
+      const expectedError = "Something wrong happened!";
+
+      fetch.doMockOnceIf(/auth\/verify\.json\?api-version=v2/, async() => mockApiResponseError(500, expectedError));
+
+      const promise = controller.exec();
+      await expect(promise).rejects.toThrowError(expectedError);
+    });
+
+    it("Should throw a the message error in case of no content status", async() => {
+      expect.assertions(1);
+      const expectedError = "Cannot reach the server API";
+      jest.spyOn(controller.authVerifyServerChallengeService.authVerifyServerKeyService.apiClient, "parseResponseJson").mockImplementation(async() => {
+        throw new PassboltApiFetchError(expectedError, {
+          code: 0,
+          body: {}
+        });
+      });
+
+      const promise = controller.exec();
+      await expect(promise).rejects.toThrowError(expectedError);
     });
   });
 });

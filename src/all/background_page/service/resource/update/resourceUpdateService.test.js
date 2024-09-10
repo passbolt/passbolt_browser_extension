@@ -16,10 +16,9 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import ResourceUpdateService from "./resourceUpdateService";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
-import {defaultResourceDto, defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../../test/mocks/mockApiResponse";
 import {v4 as uuidv4} from "uuid";
 import ResourceEntity from "../../../model/entity/resource/resourceEntity";
 import EncryptMessageService from "../../crypto/encryptMessageService";

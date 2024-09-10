@@ -36,7 +36,7 @@ beforeEach(() => {
 });
 
 describe("ResourceCreateService", () => {
-  let resourceCreateService, resource, worker, apiClientOptions;
+  let resourceCreateService, resourceDto, worker, apiClientOptions;
   const plaintextDto = "secret";
   const account = new AccountEntity(defaultAccountDto());
 
@@ -47,7 +47,7 @@ describe("ResourceCreateService", () => {
       }
     };
     apiClientOptions = defaultApiClientOptions();
-    resource = defaultResourceDto();
+    resourceDto = defaultResourceDto();
     jest.spyOn(Keyring.prototype, "sync").mockImplementation(() => jest.fn());
     resourceCreateService = new ResourceCreateService(account, apiClientOptions, new ProgressService(worker, ""));
     fetch.doMockOnce(() => mockApiResponse(defaultResourceV4Dto()));
@@ -57,7 +57,7 @@ describe("ResourceCreateService", () => {
     it("Should call progress service during the differents steps of creation", async() => {
       expect.assertions(3);
 
-      await resourceCreateService.exec(resource, plaintextDto, pgpKeys.ada.passphrase);
+      await resourceCreateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
 
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledTimes(2);
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith('Creating password', true);
@@ -71,9 +71,9 @@ describe("ResourceCreateService", () => {
       jest.spyOn(resourceCreateService.resourceModel, "serializePlaintextDto");
       jest.spyOn(resourceCreateService, "create");
 
-      const entity = new ResourceEntity(resource);
+      const entity = new ResourceEntity(resourceDto);
 
-      await resourceCreateService.exec(resource, plaintextDto, pgpKeys.ada.passphrase);
+      await resourceCreateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
       expect(resourceCreateService.create).toHaveBeenCalledTimes(1);
       expect(resourceCreateService.create).toHaveBeenCalledWith(expect.objectContaining(entity));
       expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(1);
@@ -90,7 +90,7 @@ describe("ResourceCreateService", () => {
         folderParentId: uuidv4()
       }));
 
-      await resourceCreateService.exec(resource, plaintextDto, pgpKeys.ada.passphrase);
+      await resourceCreateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
 
       expect(resourceCreateService.handleCreateInFolder).toHaveBeenCalledTimes(1);
     });
@@ -99,7 +99,7 @@ describe("ResourceCreateService", () => {
     let entity;
 
     beforeEach(async() => {
-      entity = new ResourceEntity(resource);
+      entity = new ResourceEntity(resourceDto);
     });
 
     it("Should convert data to v4 format when calling API", async() => {
@@ -146,7 +146,7 @@ describe("ResourceCreateService", () => {
       expect(result.metadata.name).toEqual(entity.metadata.name);
       expect(result.metadata.username).toEqual(entity.metadata.username);
       expect(result.metadata.uris).toEqual(entity.metadata.uris);
-      expect(result.metadata.description).toEqual(entity.metadata.description);
+      expect(result.metadata.description).toBeNull();
     });
   });
 
@@ -154,7 +154,7 @@ describe("ResourceCreateService", () => {
     let entity;
 
     beforeEach(async() => {
-      entity = new ResourceEntity(resource);
+      entity = new ResourceEntity(resourceDto);
       //Mock models
       resourceCreateService.resourceModel = resourceModelMock();
       resourceCreateService.folderModel = folderModelMock();

@@ -17,7 +17,7 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import FindSecretByResourceIdController from "./findSecretByResourceIdController";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {readSecret} from "../../model/entity/secret/secretEntity.test.data";
+import {readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";

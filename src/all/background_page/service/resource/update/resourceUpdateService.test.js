@@ -16,10 +16,9 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import ResourceUpdateService from "./resourceUpdateService";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
-import {defaultResourceDto, defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../../test/mocks/mockApiResponse";
 import {v4 as uuidv4} from "uuid";
 import ResourceEntity from "../../../model/entity/resource/resourceEntity";
 import EncryptMessageService from "../../crypto/encryptMessageService";
@@ -27,15 +26,17 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import Keyring from "../../../model/keyring";
 import ProgressService from "../../progress/progressService";
 import UserModel from "../../../model/user/userModel";
+import ResourceService from "../../api/resource/resourceService";
 
 jest.mock("../../../service/progress/progressService");
 
 beforeEach(() => {
   enableFetchMocks();
+  jest.clearAllMocks();
 });
 
 describe("ResourceUpdateService", () => {
-  let resourceUpdateService, resource, worker, apiClientOptions;
+  let resourceUpdateService, resourceDto, worker, apiClientOptions;
   const plaintextDto = "secret";
   const account = new AccountEntity(defaultAccountDto());
 
@@ -46,20 +47,21 @@ describe("ResourceUpdateService", () => {
       }
     };
     apiClientOptions = defaultApiClientOptions();
-    resource = defaultResourceDto();
+    resourceDto = defaultResourceDto();
     jest.spyOn(ResourceLocalStorage, "updateResource").mockImplementation(() => jest.fn());
     jest.spyOn(Keyring.prototype, "sync").mockImplementation(() => jest.fn());
     jest.spyOn(Keyring.prototype, "findPublic").mockImplementation(() => ({armoredKey: pgpKeys.ada.public}));
     jest.spyOn(UserModel.prototype, "findAllIdsForResourceUpdate").mockImplementation(() => [uuidv4()]);
     resourceUpdateService = new ResourceUpdateService(account, apiClientOptions, new ProgressService(worker, ""));
-    fetch.doMockOnce(() => mockApiResponse(defaultResourceV4Dto()));
+    jest.spyOn(ResourceService.prototype, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) =>
+      (new ResourceEntity(resourceDtoToUpdate)).toV4Dto(ResourceEntity.ALL_CONTAIN_OPTIONS));
   });
 
   describe("ResourceUpdateService::exec", () => {
     it("Should call progress service during the different steps of creation", async() => {
       expect.assertions(7);
 
-      await resourceUpdateService.exec(resource, plaintextDto, pgpKeys.ada.passphrase);
+      await resourceUpdateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
 
       expect(resourceUpdateService.progressService.updateGoals).toHaveBeenCalledTimes(1);
       expect(resourceUpdateService.progressService.updateGoals).toHaveBeenCalledWith(4);
@@ -77,9 +79,9 @@ describe("ResourceUpdateService", () => {
       jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
       jest.spyOn(resourceUpdateService, "update");
 
-      const entity = new ResourceEntity(resource);
+      const entity = new ResourceEntity(resourceDto);
 
-      await resourceUpdateService.exec(resource, plaintextDto, pgpKeys.ada.passphrase);
+      await resourceUpdateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
       expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
       expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity));
       expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(1);
@@ -90,10 +92,10 @@ describe("ResourceUpdateService", () => {
     it("Should Update the resource without secret", async() => {
       expect.assertions(1);
 
-      const entity = new ResourceEntity(resource);
+      const entity = new ResourceEntity(resourceDto);
       jest.spyOn(resourceUpdateService, "update");
 
-      await resourceUpdateService.exec(resource, null, pgpKeys.ada.passphrase);
+      await resourceUpdateService.exec(resourceDto, null, pgpKeys.ada.passphrase);
 
       expect(resourceUpdateService.update).toHaveBeenCalledWith(entity);
     });
@@ -103,7 +105,7 @@ describe("ResourceUpdateService", () => {
     let entity;
 
     beforeEach(async() => {
-      entity = new ResourceEntity(resource);
+      entity = new ResourceEntity(resourceDto);
     });
 
     it("Should convert data to v4 format when calling API", async() => {
@@ -133,6 +135,7 @@ describe("ResourceUpdateService", () => {
         ResourceLocalStorage.DEFAULT_CONTAIN
       );
     });
+
     it("Should update ResourceLocalStorage with the newest resource", async() => {
       expect.assertions(1);
       jest.spyOn(ResourceLocalStorage, "updateResource").mockImplementation(() => jest.fn());
@@ -140,6 +143,7 @@ describe("ResourceUpdateService", () => {
 
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(result);
     });
+
     it("Should return the entity updated", async() => {
       expect.assertions(4);
       jest.spyOn(entity, 'toV4Dto');

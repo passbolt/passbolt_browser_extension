@@ -93,12 +93,14 @@ class ResourceUpdateService {
    *
    * @param {ResourceEntity} resourceEntity
    * @returns {Promise<ResourceEntity>}
+   * @private
    */
   async update(resourceEntity) {
     const data = resourceEntity.toV4Dto({secrets: true});
     const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
     const updatedResourceEntity = new ResourceEntity(resourceDto);
     await ResourceLocalStorage.updateResource(updatedResourceEntity);
+
     return updatedResourceEntity;
   }
 

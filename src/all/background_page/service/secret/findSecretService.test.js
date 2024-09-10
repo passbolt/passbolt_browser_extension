@@ -17,7 +17,7 @@ import {v4 as uuidv4} from "uuid";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import FindSecretService from "./findSecretService";
-import {minimalDto} from "../../model/entity/secret/secretEntity.test.data";
+import {minimalDto} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 
 describe("FindSecretService", () => {
   describe("FindSecretService::exec", () => {

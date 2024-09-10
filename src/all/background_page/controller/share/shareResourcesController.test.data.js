@@ -14,7 +14,7 @@
 import {v4 as uuidv4} from "uuid";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
-import {readSecret} from "../../model/entity/secret/secretEntity.test.data";
+import {readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";

@@ -20,7 +20,7 @@ import AccountEntity from "../../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
 import {v4 as uuidv4} from "uuid";
-import {minimalDto} from "../../../model/entity/secret/secretEntity.test.data";
+import {minimalDto} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import SecretService from "./secretService";
 
 describe("Secret service", () => {

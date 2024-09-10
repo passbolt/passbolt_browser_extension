@@ -75,7 +75,7 @@ class AuthVerifyServerKeyController {
    * @throws {Error} If an unexpected error occurred
    */
   async onVerifyError(error) {
-    if (error.data?.code === 500) {
+    if (error.data?.code === 500 || error.data?.code === 0) {
       /*
        * If something wrong happens on the server, we do an early exit.
        * The other errors (no user associated, server key changed etc ) don't produce an error 500.

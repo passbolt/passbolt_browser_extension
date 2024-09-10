@@ -11,35 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import NeededSecretEntity from "./neededSecretEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'NeededSecrets';
-
-class NeededSecretsCollection extends EntityCollection {
+class NeededSecretsCollection extends EntityV2Collection {
   /**
    * @inheritDoc
    */
-  constructor(NeededSecretsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      NeededSecretsCollection.ENTITY_NAME,
-      NeededSecretsCollectionDto,
-      NeededSecretsCollection.getSchema()
-    ), options);
-
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(neededSecret => {
-      this.push(new NeededSecretEntity(neededSecret, {clone: false}));
-    });
-
-    // We do not keep original props
-    this._props = null;
+  get entityClass() {
+    return NeededSecretEntity;
   }
-
   /**
    * Get entity schema
    *
@@ -48,52 +29,8 @@ class NeededSecretsCollection extends EntityCollection {
   static getSchema() {
     return {
       "type": "array",
-      "items": NeededSecretEntity.getSchema(),
+      "items": NeededSecretEntity.getSchema()
     };
-  }
-
-  /**
-   * Get needed secrets
-   * @returns {Array<NeededSecretEntity>}
-   */
-  get neededSecrets() {
-    return this._items;
-  }
-
-  /*
-   * ==================================================
-   * Setters
-   * ==================================================
-   */
-
-  /**
-   * Push a copy of the needed secret to the list
-   * @param {object} neededSecret DTO or NeededSecretEntity
-   */
-  push(neededSecret) {
-    if (!neededSecret || typeof neededSecret !== 'object') {
-      throw new TypeError(`NeededSecretsCollection push parameter should be an object.`);
-    }
-    if (neededSecret instanceof NeededSecretEntity) {
-      neededSecret = neededSecret.toDto(); // clone
-    }
-    const neededSecretEntity = new NeededSecretEntity(neededSecret); // validate
-
-    super.push(neededSecretEntity);
-  }
-
-  /*
-   * ==================================================
-   * Static getters
-   * ==================================================
-   */
-
-  /**
-   * NeededSecretsCollection.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

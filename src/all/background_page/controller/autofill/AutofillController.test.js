@@ -27,7 +27,7 @@ import WorkerService from "../../service/worker/workerService";
 import {mockPort} from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
 import QuickAccessPagemod from "../../pagemod/quickAccessPagemod";
-import {minimalDto} from "../../model/entity/secret/secretEntity.test.data";
+import {minimalDto} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import SecretEntity from "../../model/entity/secret/secretEntity";
 
 describe("AutofillController", () => {
@@ -68,7 +68,7 @@ describe("AutofillController", () => {
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledTimes(1);
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledWith(resource.resourceTypeId);
       expect(portWrapper.emit).toHaveBeenCalledTimes(2);
-      expect(portWrapper.emit).toHaveBeenCalledWith('passbolt.web-integration.fill-credentials', {username: resource.username, password: secret.password});
+      expect(portWrapper.emit).toHaveBeenCalledWith('passbolt.web-integration.fill-credentials', {username: resource.metadata.username, password: secret.password});
       expect(portWrapper.emit).toHaveBeenCalledWith('passbolt.in-form-menu.close');
     });
 
@@ -112,7 +112,7 @@ describe("AutofillController", () => {
       expect(controller.resourceTypeModel.getSecretSchemaById).toHaveBeenCalledWith(resource.resourceTypeId);
       expect(portWrapper.emit).toHaveBeenCalledTimes(1);
       expect(portWrapper.request).toHaveBeenCalledTimes(1);
-      expect(portWrapper.request).toHaveBeenCalledWith('passbolt.quickaccess.fill-form', resource.username, secret.password, tab.url);
+      expect(portWrapper.request).toHaveBeenCalledWith('passbolt.quickaccess.fill-form', resource.metadata.username, secret.password, tab.url);
       expect(portWrapper.emit).not.toHaveBeenCalledWith('passbolt.in-form-menu.close');
     });
 

@@ -14,7 +14,7 @@
 import SecretEntity from "./secretEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {minimalDto, readSecret} from "./secretEntity.test.data";
+import {minimalDto, readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import {SCENARIO_EMPTY} from "passbolt-styleguide/test/assert/assertEntityProperty";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 

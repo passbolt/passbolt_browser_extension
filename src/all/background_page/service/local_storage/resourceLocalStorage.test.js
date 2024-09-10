@@ -84,9 +84,9 @@ describe("ResourceLocalStorage", () => {
       const resources = new ResourcesCollection(resourcesDto);
       await ResourceLocalStorage.set(resources);
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toBeInstanceOf(Array);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(2);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(ResourcesCollection.transformDtoFromV4toV5(resourcesDto));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
     });
 
     it("Should set the cache when setting the local storage", async() => {
@@ -98,7 +98,7 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(2);
-      expect(ResourceLocalStorage._cachedData).toEqual(ResourcesCollection.transformDtoFromV4toV5(resourcesDto));
+      expect(ResourceLocalStorage._cachedData).toEqual(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
     });
   });
 
@@ -269,8 +269,8 @@ describe("ResourceLocalStorage", () => {
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resource.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS));
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0].name).not.toEqual(resourceDto.name);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resource.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0].name).not.toEqual(resourceDto.metadata.name);
     });
 
     it("Should update the cache with the updated resource", async() => {
@@ -284,8 +284,8 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(1);
-      expect(ResourceLocalStorage._cachedData[0]).toEqual(resource.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS));
-      expect(ResourceLocalStorage._cachedData[0].name).not.toEqual(resourceDto.name);
+      expect(ResourceLocalStorage._cachedData[0]).toEqual(resource.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+      expect(ResourceLocalStorage._cachedData[0].name).not.toEqual(resourceDto.metadata.name);
     });
   });
 

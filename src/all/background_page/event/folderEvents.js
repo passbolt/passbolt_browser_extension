@@ -4,11 +4,11 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import ResourceModel from "../model/resource/resourceModel";
 import FolderModel from "../model/folder/folderModel";
 import FolderCreateController from "../controller/folder/folderCreateController";
 import MoveController from "../controller/move/moveController";
 import FolderEntity from "../model/entity/folder/folderEntity";
+import UpdateResourcesLocalStorageService from "../service/resource/updateResourcesLocalStorageService";
 
 /**
  * Listens to the folder events
@@ -61,10 +61,10 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.folders.delete', async(requestId, folderId, cascade) => {
     try {
       const folderModel = new FolderModel(apiClientOptions);
-      const resourceModel = new ResourceModel(apiClientOptions, account);
+      const updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
 
       await folderModel.delete(folderId, cascade);
-      await resourceModel.updateLocalStorage();
+      await updateResourcesLocalStorage.updateAll();
 
       worker.port.emit(requestId, 'SUCCESS', folderId);
     } catch (error) {

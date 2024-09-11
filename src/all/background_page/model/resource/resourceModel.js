@@ -21,7 +21,8 @@ import MoveService from "../../service/api/move/moveService";
 import ResourceService from "../../service/api/resource/resourceService";
 import PlaintextEntity from "../entity/plaintext/plaintextEntity";
 import splitBySize from "../../utils/array/splitBySize";
-import ResourceLocalStorageUpdateService from "../../service/api/resource/resourceLocalStorageUpdateService";
+import UpdateResourcesLocalStorageService from "../../service/resource/updateResourcesLocalStorageService";
+import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 
 const BULK_OPERATION_SIZE = 5;
 const MAX_LENGTH_PLAINTEXT = 4096;
@@ -34,19 +35,11 @@ class ResourceModel {
    * @public
    */
   constructor(apiClientOptions, account) {
+    this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
     this.resourceService = new ResourceService(apiClientOptions);
     this.moveService = new MoveService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.resourceLocalStorageUpdateService = new ResourceLocalStorageUpdateService(account, apiClientOptions);
-  }
-
-  /**
-   * Update the resources local storage with the latest API resources the user has access.
-   * @param {boolean} forceUpdate
-   * @return {ResourcesCollection}
-   */
-  async updateLocalStorage(forceUpdate = true) {
-    return await this.resourceLocalStorageUpdateService.exec(forceUpdate);
+    this.resourceLocalStorageUpdateService = new UpdateResourcesLocalStorageService(account, apiClientOptions);
   }
 
   /*
@@ -269,7 +262,7 @@ class ResourceModel {
       return new ResourcesCollection([]);
     }
 
-    const resourcesCollection = await this.getOrFindAll();
+    const resourcesCollection = await this.getOrFindResourcesService.getOrFindAll();
 
     // Filter by resource types behaving as a password.
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();

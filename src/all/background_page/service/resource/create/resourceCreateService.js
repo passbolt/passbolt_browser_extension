@@ -78,6 +78,7 @@ class ResourceCreateService {
    *
    * @param {ResourceEntity} resourceEntity
    * @returns {Promise<ResourceEntity>}
+   * @private
    */
   async create(resourceEntity) {
     const data = resourceEntity.toV4Dto({secrets: true});
@@ -95,6 +96,7 @@ class ResourceCreateService {
    * @param {ResourceEntity} resourceEntity
    * @param {openpgp.PrivateKey} privateKey The user decrypted private key
    * @returns {Promise<void>}
+   * @private
    */
   async handleCreateInFolder(resourceEntity, privateKey) {
     // Calculate changes if any

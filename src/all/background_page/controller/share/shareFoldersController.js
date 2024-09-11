@@ -21,6 +21,7 @@ import PermissionChangesCollection from "../../model/entity/permission/change/pe
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ShareModel from "../../model/share/shareModel";
+import UpdateResourcesLocalStorageService from "../../service/resource/updateResourcesLocalStorageService";
 
 class ShareFoldersController {
   /**
@@ -36,6 +37,7 @@ class ShareFoldersController {
     this.requestId = requestId;
     this.folderModel = new FolderModel(apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     // Work variables
@@ -211,7 +213,7 @@ class ShareFoldersController {
       await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await this.progressService.finishStep(message);
       });
-      await this.resourceModel.updateLocalStorage();
+      await this.updateResourcesLocalStorage.updateAll();
     }
   }
 

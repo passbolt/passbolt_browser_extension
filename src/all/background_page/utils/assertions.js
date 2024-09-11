@@ -171,3 +171,16 @@ export const assertArray = (data, errorMessage = "The given parameter is not a v
     throw new TypeError(errorMessage);
   }
 };
+
+/**
+ * Assert that the given parameter is a valid number.
+ * Note: The value has to be defined to be assessed, undefined is considered valid.
+ * @param {*} value the parameter to validate
+ * @param {string} [errorMessage] the message to throw within the error if any
+ * @throws {TypeError} if the parameter is not valid
+ */
+export const assertNumber = (value, errorMessage = "The given parameter is not a valid number") => {
+  if (typeof value !== 'undefined' && typeof value !== 'number') {
+    throw new TypeError(errorMessage);
+  }
+};

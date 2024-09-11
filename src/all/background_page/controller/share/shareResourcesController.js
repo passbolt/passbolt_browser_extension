@@ -18,6 +18,7 @@ import GetDecryptedUserPrivateKeyService from "../../service/account/getDecrypte
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ShareModel from "../../model/share/shareModel";
+import UpdateResourcesLocalStorageService from "../../service/resource/updateResourcesLocalStorageService";
 
 class ShareResourcesController {
   /**
@@ -32,6 +33,7 @@ class ShareResourcesController {
     this.worker = worker;
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker);
     this.getPassphraseService = new GetPassphraseService(account);
@@ -72,7 +74,7 @@ class ShareResourcesController {
       await this.shareModel.bulkShareResources(resources, changes, privateKey, async message => {
         await this.progressService.finishStep(message);
       });
-      await this.resourceModel.updateLocalStorage();
+      await this.updateResourcesLocalStorage.updateAll();
       const results = resources.map(resource => resource.id);
       await this.progressService.finishStep(i18n.t('Done!'), true);
       await this.progressService.close();

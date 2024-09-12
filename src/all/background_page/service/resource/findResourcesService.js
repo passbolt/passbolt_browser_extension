@@ -37,11 +37,9 @@ export default class FindResourcesService {
    */
   async findAllForLocalStorage() {
     // @todo E2EE should use findAll provided by this service.
-    let resourcesDto = await this.resourceService.findAll(ResourceLocalStorage.DEFAULT_CONTAIN);
+    const resourcesDto = await this.resourceService.findAll(ResourceLocalStorage.DEFAULT_CONTAIN);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
-    // @todo E2EE sanitize should be done with ignore options when creating the collection.
-    resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
-    const resources = new ResourcesCollection(resourcesDto, {clone: false});
+    const resources = new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: true});
     resources.filterByResourceTypes(resourceTypes);
     return resources;
   }

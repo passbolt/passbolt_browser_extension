@@ -31,3 +31,57 @@ export const adaExternalPrivateGpgKeyEntityDto = (data = {}) => {
 
   return Object.assign(defaultData, data);
 };
+
+export const adaExternalPublicGpgKeyEntityDto = (data = {}) => {
+  const defaultData = {
+    "armored_key": pgpKeys.ada.public,
+    "key_id": pgpKeys.ada.key_id,
+    "user_ids": pgpKeys.ada.user_ids,
+    "fingerprint": pgpKeys.ada.fingerprint,
+    "expires": pgpKeys.ada.expires,
+    "created": pgpKeys.ada.created,
+    "algorithm": pgpKeys.ada.algorithm.toLowerCase(),
+    "length": pgpKeys.ada.length,
+    "curve": pgpKeys.ada.curve,
+    "private": true,
+    "revoked": pgpKeys.ada.revoked
+  };
+
+  return Object.assign(defaultData, data);
+};
+
+export const adminExternalPublicGpgKeyEntityDto = (data = {}) => {
+  const defaultData = {
+    "armored_key": pgpKeys.admin.public,
+    "key_id": pgpKeys.admin.key_id,
+    "user_ids": pgpKeys.admin.user_ids,
+    "fingerprint": pgpKeys.admin.fingerprint,
+    "expires": pgpKeys.admin.expires,
+    "created": pgpKeys.admin.created,
+    "algorithm": pgpKeys.admin.algorithm?.toLowerCase(),
+    "length": pgpKeys.admin.length,
+    "curve": pgpKeys.admin.curve,
+    "private": true,
+    "revoked": pgpKeys.admin.revoked
+  };
+
+  return Object.assign(defaultData, data);
+};
+
+export const bettyExternalPublicGpgKeyEntityDto = (data = {}) => {
+  const defaultData = {
+    "armored_key": pgpKeys.betty.public,
+    "key_id": pgpKeys.betty.key_id,
+    "user_ids": pgpKeys.betty.user_ids,
+    "fingerprint": pgpKeys.betty.fingerprint,
+    "expires": pgpKeys.betty.expires,
+    "created": pgpKeys.betty.created,
+    "algorithm": pgpKeys.betty.algorithm?.toLowerCase(),
+    "length": pgpKeys.betty.length,
+    "curve": pgpKeys.betty.curve,
+    "private": true,
+    "revoked": pgpKeys.betty.revoked
+  };
+
+  return Object.assign(defaultData, data);
+};

@@ -27,6 +27,7 @@ import {
   multipleResourceDtos,
   multipleResourceIncludingUnsupportedResourceTypesDtos
 } from "./findResourcesService.test.data";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 
 jest.useFakeTimers();
 
@@ -63,6 +64,24 @@ describe("FindResourcesService", () => {
       const resources = await service.findAllForLocalStorage();
 
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(resourcesDto);
+    });
+
+
+    it("should not throw an error if required field is missing with ignore strategy", async() => {
+      expect.assertions(2);
+      const multipleResources = multipleResourceIncludingUnsupportedResourceTypesDtos();
+      const resourcesCollectionDto = multipleResources.concat([defaultResourceDto({
+        resource_type_id: null
+      })]);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+      const expectedRetainedResource = [multipleResources[0], multipleResources[1], multipleResources[3], multipleResources[4]];
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const collection = await service.findAllForLocalStorage();
+
+      expect(collection).toHaveLength(4);
+      expect(collection.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(expectedRetainedResource);
     });
 
     it("ignores resources having an unknown resource type.", async() => {

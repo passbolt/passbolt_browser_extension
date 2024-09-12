@@ -262,28 +262,6 @@ describe("ResourcesCollection", () => {
     });
   });
 
-  describe("::sanitizeDto", () => {
-    it("sanitizeDto should remove duplicated resource ids", () => {
-      const resourceDto1 = defaultResourceDto();
-      const resourceDto2 = defaultResourceDto({id: resourceDto1.id});
-
-      const santitizedDto = ResourcesCollection.sanitizeDto([resourceDto1, resourceDto2]);
-      expect(santitizedDto).toHaveLength(1);
-      expect(santitizedDto).toEqual(expect.arrayContaining([resourceDto1]));
-
-      const collection = new ResourcesCollection(santitizedDto);
-      expect(collection).toHaveLength(1);
-    });
-
-    it("sanitizeDto should return an empty array if an unsupported type of data is given in parameter", () => {
-      const santitizedDtos = ResourcesCollection.sanitizeDto("not-an-array");
-      expect(santitizedDtos).toHaveLength(0);
-
-      const collection = new ResourcesCollection(santitizedDtos);
-      expect(collection).toHaveLength(0);
-    });
-  });
-
   describe("::filterByResourceTypes", () => {
     it("should filter the collection by all supported resources types and keep all resources having a defined resource type.", () => {
       const resources = new ResourcesCollection(resourceAllTypesDtosCollection());

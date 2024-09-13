@@ -17,6 +17,7 @@ import GroupUpdateSecretsCollection from "./groupUpdateSecretsCollection";
 import {minimalDto, readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import SecretEntity from "../secretEntity";
 import {v4 as uuid} from "uuid";
+import {defaultResourcesSecretsDtos} from "./groupUpdateSecretsCollection.test.data";
 
 describe("GroupUpdateSecretsCollection", () => {
   describe("::getSchema", () => {
@@ -117,6 +118,19 @@ describe("GroupUpdateSecretsCollection", () => {
 
       const entity = new SecretEntity(readSecret());
       expect(GroupUpdateSecretsCollection.getResourceIdUserIdKey(entity)).toStrictEqual(`${entity.resourceId}:${entity.userId}`);
+    });
+  });
+
+  describe("GroupUpdateSecretsCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const groupUpdateSecretsCount = 10_000;
+      const dtos = defaultResourcesSecretsDtos(groupUpdateSecretsCount);
+
+      const start = performance.now();
+      const collection = new GroupUpdateSecretsCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(groupUpdateSecretsCount);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

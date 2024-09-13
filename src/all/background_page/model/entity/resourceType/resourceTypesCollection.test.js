@@ -14,7 +14,8 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ResourceTypesCollection from "./resourceTypesCollection";
 import {
-  resourceTypesCollectionDto
+  resourceTypesCollectionDto,
+  buildDefineNumberOfResourceTypesDtos
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
   TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
@@ -23,6 +24,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import {v4 as uuid} from "uuid";
+import expect from "expect";
 
 describe("ResourceTypesCollection", () => {
   describe("::getSchema", () => {
@@ -114,6 +116,19 @@ describe("ResourceTypesCollection", () => {
       expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
       expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
+    });
+  });
+
+  describe(":pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const count = 10_000;
+      const dtos = buildDefineNumberOfResourceTypesDtos(count);
+
+      const start = performance.now();
+      const collection = new ResourceTypesCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(4);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

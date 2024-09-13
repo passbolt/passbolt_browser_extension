@@ -12,7 +12,11 @@
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ExternalResourcesCollection from "./externalResourcesCollection";
-import {defaultExternalResourceCollectionDto, externalResourceCollectionWithoutIdsDto} from "./externalResourcesCollection.test.data";
+import {
+  buildDefineNumberOfExternalResourcesCollectionDto,
+  defaultExternalResourceCollectionDto,
+  externalResourceCollectionWithoutIdsDto
+} from "./externalResourcesCollection.test.data";
 import ResourcesCollection from "../resourcesCollection";
 import ExternalResourceEntity from "./externalResourceEntity";
 import {v4 as uuid} from "uuid";
@@ -268,6 +272,19 @@ describe("ExternalResourcesCollection", () => {
       expect.assertions(1);
       const resourcesCollection = new ResourcesCollection([defaultResourceDto()]);
       expect(() => ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, null)).toThrow(TypeError);
+    });
+  });
+
+  describe("ExternalResourcesCollection:pushMany", () => {
+    it.skip("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const externalResourcesCount = 10_000;
+      const dtos = buildDefineNumberOfExternalResourcesCollectionDto(externalResourcesCount);
+
+      const start = performance.now();
+      const collection = new ExternalResourcesCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(externalResourcesCount);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

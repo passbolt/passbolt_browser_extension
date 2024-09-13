@@ -16,6 +16,8 @@ import NeededSecretsCollection from "./neededSecretsCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {defaultNeededSecretDto} from "passbolt-styleguide/src/shared/models/entity/secret/neededSecretEntity.test.data";
+import {defaultNeededSecretsDtos} from "passbolt-styleguide/src/shared/models/entity/secret/neededSecretCollection.test.data";
+import expect from "expect";
 
 describe("Needed secrets collection entity", () => {
   describe("::getSchema", () => {
@@ -35,6 +37,19 @@ describe("Needed secrets collection entity", () => {
       const dtos = [defaultNeededSecretDto()];
       const collection = new NeededSecretsCollection(dtos);
       expect(collection.toDto()).toEqual(dtos);
+    });
+  });
+
+  describe(":pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const count = 10_000;
+      const dtos = defaultNeededSecretsDtos(count);
+
+      const start = performance.now();
+      const collection = new NeededSecretsCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(count);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

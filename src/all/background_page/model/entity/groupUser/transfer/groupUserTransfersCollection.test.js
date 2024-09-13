@@ -15,6 +15,7 @@ import GroupUserTransfersCollection from "./groupUserTransfersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {defaultUserTransferDto} from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import {defaultUserTransfersCollectionDto} from "passbolt-styleguide/src/shared/models/entity/group/groupUserTransfersCollection.test.data";
 
 describe("GroupUser transfer entity", () => {
   describe("::getSchema", () => {
@@ -38,6 +39,18 @@ describe("GroupUser transfer entity", () => {
       const collection = new GroupUserTransfersCollection(dtos);
 
       expect(collection.toDto()).toEqual(dtos);
+    });
+  });
+  describe("GroupUserTransfersCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const groupUserTransfersCount = 10_000;
+      const dtos = defaultUserTransfersCollectionDto(groupUserTransfersCount);
+
+      const start = performance.now();
+      const collection = new GroupUserTransfersCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(groupUserTransfersCount);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

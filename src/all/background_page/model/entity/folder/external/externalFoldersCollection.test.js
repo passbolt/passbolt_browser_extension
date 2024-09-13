@@ -475,7 +475,7 @@ describe("ExternalFoldersCollection", () => {
   describe("::getByFolderParentId", () => {
     it("should return an array of ExternalFolderEntity if the id is matching the folder parent", () => {
       const folderParentId = uuid();
-      const externalFoldersCollectionDto = defaultExternalFoldersCollectionDto({
+      const externalFoldersCollectionDto = defaultExternalFoldersCollectionDto(4, {
         folder_parent_id: folderParentId,
       });
       expect.assertions(3 + externalFoldersCollectionDto.length);
@@ -506,6 +506,19 @@ describe("ExternalFoldersCollection", () => {
       const collection = new ExternalFoldersCollection(defaultExternalFoldersCollectionDto());
       const result = collection.getByFolderParentId(null);
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe("ExternalFoldersCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const externalFoldersCount = 10_000;
+      const dtos = defaultExternalFoldersCollectionDto(externalFoldersCount);
+
+      const start = performance.now();
+      const collection = new ExternalFoldersCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(externalFoldersCount);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

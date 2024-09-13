@@ -12,17 +12,21 @@
  * @since         3.0.0
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import {RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA} from "../resourceType/resourceTypeEntity";
 
-const LEGACY_PLAINTEXT_SECRET_SCHEMA = {
-  "type": "object",
-  "required": [
-    "password"
-  ],
-  "properties": {
-    "password": {
-      "type": "string",
-      "maxLength": 4096
-    },
+/**
+ * This is a schema specificaly made up for 'password-string' resource type plaintext secret data validation.
+ * Currently our validation system cannot take the RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA structure as-is.
+ * So, this, is a wrapper schema that put the legacy schema into a compatible schema structure.
+ * It's not meant to be used elsewhere than here.
+ * @type {object}
+ * @private
+ */
+const PLAINTEXT_SECRET_SCHEMA_PASSWORD_STRING = {
+  type: "object",
+  required: ["password"],
+  properties: {
+    password: RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA.secret,
   },
 };
 
@@ -34,7 +38,7 @@ class PlaintextEntity extends EntityV2 {
    */
   static createFromLegacyPlaintextSecret(password) {
     const plaintextSecretDto = {password};
-    return new PlaintextEntity(plaintextSecretDto, {schema: LEGACY_PLAINTEXT_SECRET_SCHEMA});
+    return new PlaintextEntity(plaintextSecretDto, {schema: PLAINTEXT_SECRET_SCHEMA_PASSWORD_STRING});
   }
 
   /**

@@ -14,7 +14,7 @@
 import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import ResourceTypesCollection from "../entity/resourceType/resourceTypesCollection";
-import Validator from "validator";
+import {assertUuid} from "../../utils/assertions";
 
 class ResourceTypeModel {
   /**
@@ -30,7 +30,8 @@ class ResourceTypeModel {
   /**
    * Update the resourceTypes local storage with the latest API resourceTypes the user has access.
    *
-   * @return {Promise<ResourceTypesCollection>}
+   * @returns {Promise<ResourceTypesCollection>}
+   * @private
    */
   async updateLocalStorage() {
     const resourceTypeDtos = await this.resourceTypeService.findAll();
@@ -60,9 +61,8 @@ class ResourceTypeModel {
    * @returns {Promise<Object|undefined>}
    */
   async getSecretSchemaById(resourceTypeId) {
-    if (!Validator.isUUID(resourceTypeId)) {
-      throw new TypeError('The resource type id should be a valid UUID');
-    }
+    assertUuid(resourceTypeId, 'The resource type id should be a valid UUID');
+
     const types = await this.getOrFindAll();
     const type = types.getFirst('id', resourceTypeId);
     return type?.definition?.secret;

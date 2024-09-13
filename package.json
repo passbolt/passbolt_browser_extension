@@ -102,7 +102,7 @@
     "dev:watch:build:web-accessible-resources:browser-integration": "npm run dev:build:web-accessible-resources:browser-integration -- -w",
     "lint": "npm run lint:lockfile && npm run lint:eslint",
     "lint:lockfile": "lockfile-lint --path package-lock.json --allowed-hosts npm github.com --allowed-schemes \"https:\" \"git+ssh:\" --empty-hostname false --allowed-urls \"secrets-passbolt@2.0.1-ccce02543c135b0d92f69a70e960d634e7d64609@\"",
-    "lint:eslint": "eslint -c .eslintrc.json --ext js --ext jsx src",
+    "lint:eslint": "eslint -c .eslintrc.json --ext js --ext jsx src --max-warnings 0",
     "lint:eslint-fix": "eslint -c .eslintrc.json --ext js --ext jsx --fix src",
     "i18n:externalize": "i18next -c ./i18next-parser.config.js",
     "test": "npm run test:unit",

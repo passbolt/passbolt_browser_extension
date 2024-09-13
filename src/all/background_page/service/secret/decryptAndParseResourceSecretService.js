@@ -23,7 +23,7 @@ class DecryptAndParseResourceSecretService {
    * @param {Object} schema The resource secret schema.
    * @param {openpgp.PrivateKey} decryptedPrivateKey the private key.
    * @returns {Promise<PlaintextEntity>}
-   * @throw {Error} If the secret is not a valid secretEntity
+   * @throws {Error} If the secret is not a valid secretEntity
    */
   static async decryptAndParse(secret, schema, decryptedPrivateKey) {
     const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
@@ -39,6 +39,7 @@ class DecryptAndParseResourceSecretService {
    * @param {object} schema
    * @returns {Promise<string|PlaintextEntity>}
    * @throws {Error} if the secret message cannot be parsed.
+   * @private
    */
   static async parse(decryptedSecretMessage, schema) {
     if (schema.type === 'string') {

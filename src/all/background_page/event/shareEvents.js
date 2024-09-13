@@ -44,7 +44,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.share.get-folders', async(requestId, foldersIds) => {
     try {
-      const folderModel = new FolderModel(apiClientOptions);
+      const folderModel = new FolderModel(apiClientOptions, account);
       const foldersCollection = await folderModel.findAllForShare(foldersIds);
       worker.port.emit(requestId, 'SUCCESS', foldersCollection);
     } catch (error) {

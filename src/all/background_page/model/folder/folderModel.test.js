@@ -14,6 +14,8 @@
 import FolderLocalStorage from '../../service/local_storage/folderLocalStorage';
 import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import FolderModel from "./folderModel";
+import AccountEntity from "../entity/account/accountEntity";
+import {defaultAccountDto} from "../entity/account/accountEntity.test.data";
 
 // Mock storage
 jest.mock('../../service/local_storage/folderLocalStorage');
@@ -39,9 +41,10 @@ describe("FolderModel",  () => {
   //const folderB = "34719980-89d3-4791-9c5a-63ff91967fd5";
 
   it("getAllByIds works", async() => {
+    const account = new AccountEntity(defaultAccountDto());
     FolderLocalStorage.get.mockResolvedValue(getReturnValue());
     const apiClientOptions = new ApiClientOptions().setBaseUrl('https://www.passbolt.test');
-    const folderModel = new FolderModel(apiClientOptions);
+    const folderModel = new FolderModel(apiClientOptions, account);
 
     // Not found
     let result = await folderModel.getAllByIds(['5f1da286-37ae-4f1c-aaf1-e0342a5d4d00']);

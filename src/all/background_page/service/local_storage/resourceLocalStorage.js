@@ -222,7 +222,7 @@ class ResourceLocalStorage {
     await lock.acquire();
     try {
       const resources = await ResourceLocalStorage.get() || [];
-      if (resources) {
+      if (resources.length > 0) {
         const resourceIndex = resources.findIndex(item => item.id === resourceId);
         if (resourceIndex !== -1) {
           resources.splice(resourceIndex, 1);

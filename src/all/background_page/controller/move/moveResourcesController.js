@@ -37,7 +37,7 @@ class MoveResourcesController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = new FolderModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions, account);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);

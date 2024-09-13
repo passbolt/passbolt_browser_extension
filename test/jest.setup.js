@@ -22,6 +22,7 @@ import OrganizationSettingsModel from "../src/all/background_page/model/organiza
 import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
 import ResourceLocalStorage from "../src/all/background_page/service/local_storage/resourceLocalStorage";
+import FolderLocalStorage from "../src/all/background_page/service/local_storage/folderLocalStorage";
 
 // hides all the messages from Log
 jest.mock("../src/all/background_page/model/log.js");
@@ -59,6 +60,7 @@ beforeEach(async() => {
   // Flush caches
   OrganizationSettingsModel.flushCache();
   ResourceLocalStorage.flush();
+  FolderLocalStorage.flush();
   Config.flush();
   const keyring = new Keyring();
   keyring.flush(Keyring.PUBLIC);

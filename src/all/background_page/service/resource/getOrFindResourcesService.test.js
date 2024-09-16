@@ -25,6 +25,9 @@ import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import GetOrFindResourcesService from "./getOrFindResourcesService";
 import UpdateResourcesLocalStorageService from "./updateResourcesLocalStorageService";
 import {multipleResourceDtos} from "./getOrFindResourcesService.test.data";
+import {resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
 
 jest.useFakeTimers();
 
@@ -117,6 +120,63 @@ describe("GetOrFindResourcesService", () => {
       expect(ResourceService.prototype.findAll).not.toHaveBeenCalled();
       // Validation should be called twice, once when building the collection mock, and once by the getOrFindAll.
       expect(ResourcesCollection.prototype.validateSchema).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("::getOrFindSuggested", () => {
+    let service;
+
+    beforeEach(() => {
+      service = new GetOrFindResourcesService(account, apiClientOptions);
+    });
+    it("should return an empty resource collection without URL", async() => {
+      expect.assertions(2);
+
+      const resources = await service.getOrFindSuggested();
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(resources).toHaveLength(0);
+    });
+
+    it("should filter the collection by supported resource types and filter by suggested url", async() => {
+      expect.assertions(4);
+
+      const suggestedResource1 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["https://passbolt.com"]})});
+      const suggestedResource2 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["passbolt.com"]})});
+      const notSuggestedResource1 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["nost-passbolt.com"]})});
+      const notSuggestedResource2 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: [""]})});
+
+      const resourcesCollectionDto = [
+        suggestedResource1,
+        suggestedResource2,
+        notSuggestedResource1,
+        notSuggestedResource2
+      ];
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+
+      const resources = await service.getOrFindSuggested("https://www.passbolt.com");
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(resources).toHaveLength(2);
+      expect(resources.getFirstById(suggestedResource1.id)).toBeTruthy();
+      expect(resources.getFirstById(suggestedResource2.id)).toBeTruthy();
+    });
+
+
+    it("should not return any resources if no suggestions are found.", async() => {
+      expect.assertions(2);
+
+      const resourcesCollectionDto = resourceAllTypesDtosCollection();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+
+      const resources = await service.getOrFindSuggested("https://www.not-passbolt.com");
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(resources).toHaveLength(0);
     });
   });
 });

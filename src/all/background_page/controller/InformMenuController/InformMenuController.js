@@ -21,6 +21,7 @@ import ResourceInProgressCacheService from "../../service/cache/resourceInProgre
 import WorkerService from "../../service/worker/workerService";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceMetadataEntity from "../../model/entity/resource/metadata/resourceMetadataEntity";
+import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 
 /**
  * Controller related to the in-form call-to-action
@@ -37,6 +38,7 @@ class InformMenuController {
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.getPassphraseService = new GetPassphraseService(account);
+    this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
   }
 
   /**
@@ -48,7 +50,7 @@ class InformMenuController {
       // Find user input type and value, resources to suggest and secret generator configuration
       const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
       const callToActionInput = await webIntegrationWorker.port.request('passbolt.web-integration.last-performed-call-to-action-input');
-      const suggestedResources = await this.resourceModel.findSuggestedResources(this.worker.tab.url);
+      const suggestedResources = await this.getOrFindResourcesService.getOrFindSuggested(this.worker.tab.url);
       const configuration = {
         inputType: callToActionInput.type,
         inputValue: callToActionInput.value,

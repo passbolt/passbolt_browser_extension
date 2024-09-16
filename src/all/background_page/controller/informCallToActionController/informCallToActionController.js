@@ -16,6 +16,7 @@ import ResourceModel from "../../model/resource/resourceModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import WorkerService from "../../service/worker/workerService";
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
+import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 
 /**
  * Controller related to the in-form call-to-action
@@ -24,13 +25,14 @@ class InformCallToActionController {
   /**
    * InformCallToActionController constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions
    * @param {AccountEntity} account the user account
    */
-  constructor(worker, clientOptions, account) {
+  constructor(worker, apiClientOptions, account) {
     this.worker = worker;
-    this.resourceModel = new ResourceModel(clientOptions, account);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.checkAuthStatusService = new CheckAuthStatusService();
+    this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
   }
 
   /**
@@ -39,8 +41,8 @@ class InformCallToActionController {
    */
   async countSuggestedResourcesCount(requestId) {
     try {
-      const suggestedResourcesCount = await this.resourceModel.countSuggestedResources(this.worker.tab.url);
-      this.worker.port.emit(requestId, "SUCCESS", suggestedResourcesCount);
+      const suggestedResourcesCount = await this.getOrFindResourcesService.getOrFindSuggested(this.worker.tab.url);
+      this.worker.port.emit(requestId, "SUCCESS", suggestedResourcesCount.length);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(requestId, 'ERROR', error);

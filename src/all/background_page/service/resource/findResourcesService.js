@@ -32,14 +32,37 @@ export default class FindResourcesService {
   }
 
   /**
+   * Find all
+   *
+   * @param {Object} [contains] optional example: {permissions: true}
+   * @param {Object} [filters] optional
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAll(contains, filters, ignoreInvalidEntity) {
+    //Assert contains
+    const supportedOptions = ResourceService.getSupportedContainOptions();
+    const supportedFilter = ResourceService.getSupportedFiltersOptions();
+
+    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
+      throw new Error("Unsupported contains parameter used, please check supported contains");
+    }
+
+    if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
+      throw new Error("Unsupported filter parameter used, please check supported filters");
+    }
+
+    const resourcesDto = await this.resourceService.findAll(contains, filters);
+    return new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
+  }
+
+  /**
    * Retrieve all resources for the local storage.
    * @returns {Promise<ResourcesCollection>}
    */
   async findAllForLocalStorage() {
-    // @todo E2EE should use findAll provided by this service.
-    const resourcesDto = await this.resourceService.findAll(ResourceLocalStorage.DEFAULT_CONTAIN);
+    const resources = await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, null, true);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
-    const resources = new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: true});
     resources.filterByResourceTypes(resourceTypes);
     return resources;
   }

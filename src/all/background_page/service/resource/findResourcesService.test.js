@@ -13,7 +13,6 @@
  */
 
 import ResourceService from "../api/resource/resourceService";
-import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
@@ -25,32 +24,135 @@ import {
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import {
   multipleResourceDtos,
-  multipleResourceIncludingUnsupportedResourceTypesDtos
-} from "./findResourcesService.test.data";
+  multipleResourceIncludingUnsupportedResourceTypesDtos} from "./findResourcesService.test.data";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 
-jest.useFakeTimers();
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.clearAllTimers();
 });
 
 describe("FindResourcesService", () => {
-  // mock data
+  let findResourcesService, apiClientOptions;
   const account = new AccountEntity(defaultAccountDto());
-  const apiClientOptions = new ApiClientOptions().setBaseUrl('https://localhost');
 
+  beforeEach(async() => {
+    apiClientOptions = defaultApiClientOptions();
+    findResourcesService = new FindResourcesService(account, apiClientOptions);
+  });
+
+  describe("::findAll", () => {
+    it("should return all items with any params.", async() => {
+      expect.assertions(2);
+
+      const collection = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+
+      const resources = await findResourcesService.findAll();
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(resources.toDto()).toEqual(collection);
+    });
+
+    it("should filter collection when param is defined.", async() => {
+      expect.assertions(3);
+
+      const collection = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+
+      const resources = await findResourcesService.findAll(null, {
+        "has-tag": false,
+        "is-favorite": true
+      });
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith(null, {
+        "has-tag": false,
+        "is-favorite": true
+      });
+      expect(resources.toDto()).toEqual(collection);
+    });
+
+    it("should add field to collection when contains param is defined.", async() => {
+      expect.assertions(3);
+
+      const collection = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+
+      const resources = await findResourcesService.findAll({favorite: true, permission: true, tag: true}, null);
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith({favorite: true, permission: true, tag: true}, null);
+      expect(resources.toDto()).toEqual(collection);
+    });
+
+    it("should skip invalid entity with ignore strategy.", async() => {
+      expect.assertions(2);
+
+      const multipleResources = multipleResourceIncludingUnsupportedResourceTypesDtos();
+      const resourcesCollectionDto = multipleResources.concat([defaultResourceDto({
+        resource_type_id: null
+      })]);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
+      const resources = await findResourcesService.findAll(null, null, true);
+
+      expect(resources).toHaveLength(6);
+      expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(multipleResources);
+    });
+
+    it("should not skip invalid entity without ignore strategy.", async() => {
+      expect.assertions(1);
+
+      const multipleResources = multipleResourceIncludingUnsupportedResourceTypesDtos();
+      const resourcesCollectionDto = multipleResources.concat([defaultResourceDto({
+        resource_type_id: null
+      })]);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
+      const promise = findResourcesService.findAll(null, null, false);
+
+      await expect(promise).rejects.toThrow(CollectionValidationError);
+    });
+
+    it("should not allow invalid contains params.", async() => {
+      expect.assertions(1);
+
+      const collection = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+
+      const promise = findResourcesService.findAll({
+        invalid: true
+      });
+
+      expect(promise).rejects.toThrow(Error("Unsupported contains parameter used, please check supported contains"));
+    });
+
+    it("should not allow invalid filters params.", async() => {
+      expect.assertions(1);
+
+      const collection = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+
+      const promise = findResourcesService.findAll(null, {
+        "is-not-supported": true
+      });
+
+      expect(promise).rejects.toThrow(Error("Unsupported filter parameter used, please check supported filters"));
+    });
+  });
   describe("::findAllForLocalStorage", () => {
     it("uses the contains required by the local storage.", async() => {
       expect.assertions(2);
+      jest.spyOn(findResourcesService, "findAll");
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
 
-      const service = new FindResourcesService(account, apiClientOptions);
-      const resources = await service.findAllForLocalStorage();
+      const resources = await findResourcesService.findAllForLocalStorage();
 
-      expect(service.resourceService.findAll).toHaveBeenCalledWith({favorite: true, permission: true, tag: true});
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith({favorite: true, permission: true, tag: true}, null);
       expect(resources).toBeInstanceOf(ResourcesCollection);
     });
 
@@ -60,8 +162,7 @@ describe("FindResourcesService", () => {
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
 
-      const service = new FindResourcesService(account, apiClientOptions);
-      const resources = await service.findAllForLocalStorage();
+      const resources = await findResourcesService.findAllForLocalStorage();
 
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(resourcesDto);
     });
@@ -77,8 +178,7 @@ describe("FindResourcesService", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
       const expectedRetainedResource = [multipleResources[0], multipleResources[1], multipleResources[3], multipleResources[4]];
 
-      const service = new FindResourcesService(account, apiClientOptions);
-      const collection = await service.findAllForLocalStorage();
+      const collection = await findResourcesService.findAllForLocalStorage();
 
       expect(collection).toHaveLength(4);
       expect(collection.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(expectedRetainedResource);
@@ -92,8 +192,7 @@ describe("FindResourcesService", () => {
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
 
-      const service = new FindResourcesService(account, apiClientOptions);
-      const resources = await service.findAllForLocalStorage();
+      const resources = await findResourcesService.findAllForLocalStorage();
 
       expect(resources).toHaveLength(4);
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(expectedRetainedResource);

@@ -564,17 +564,6 @@ class ResourceModel {
     }
     return true;
   }
-
-
-  /**
-   * Keep only resources supported with no or known resource type
-   * @param resourcesDto
-   * @return {Promise<*[]>}
-   */
-  async keepResourcesSupported(resourcesDto) {
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    return resourcesDto.filter(resource => resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
-  }
 }
 
 export default ResourceModel;

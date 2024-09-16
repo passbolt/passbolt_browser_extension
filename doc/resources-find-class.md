@@ -11,12 +11,20 @@ classDiagram
         class UpdateAllResourcesLocalStorageController{
             +exec() Promise
         }
+        class InformCallToActionController{
+            +countSuggestedResourcesCount() Promise
+        }
+        class InformMenuController {
+            +getInitialConfiguration() Promise
+        }
     }
+
 
     namespace ResourcesService{
         class GetOrFindResourcesService{
             <<Service>>
             +getOrFindAll() Promise~ResourcesCollection~
+            +getOrFindSuggested() Promise~ResourcesCollection~
         }
 
         class UpdateResourcesLocalStorageService{
@@ -33,6 +41,10 @@ classDiagram
             <<Service>>
             +findAll(object contains, object filters) Promise~ResourcesCollection~
             +findAllForLocalStorage() Promise~ResourcesCollection~
+        }
+        
+        class ToolbarService{
+            +updateSuggestedResourcesBadge() Promise
         }
     }
 
@@ -72,6 +84,9 @@ classDiagram
     UpdateAllResourcesLocalStorageController*--UpdateResourcesLocalStorageService
     UpdateResourcesLocalStorageService*--ResourcesLocalStorageService
     UpdateResourcesLocalStorageService-->UpdateLocalStorageOptions
+    InformCallToActionController*--GetOrFindResourcesService
+    InformMenuController*--GetOrFindResourcesService
+    ToolbarService*--GetOrFindResourcesService
     GetOrFindResourcesService*--ResourcesLocalStorageService
     GetOrFindResourcesService*--UpdateResourcesLocalStorageService
     UpdateResourcesLocalStorageService*--FindResourcesService

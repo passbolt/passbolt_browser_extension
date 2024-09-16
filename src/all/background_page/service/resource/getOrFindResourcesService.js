@@ -14,6 +14,7 @@
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import UpdateResourcesLocalStorageService from "./updateResourcesLocalStorageService";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 
 /**
  * The service aims to get resources from the local storage if it is set, or retrieve them from the API and
@@ -27,6 +28,7 @@ export default class GetOrFindResourcesService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.updateResourcesLocalStorageService = new UpdateResourcesLocalStorageService(account, apiClientOptions);
   }
 
@@ -37,7 +39,6 @@ export default class GetOrFindResourcesService {
   async getOrFindAll() {
     const hasRuntimeCache = ResourceLocalStorage.hasCachedData();
     let resourcesDto = await ResourceLocalStorage.get();
-
     // Return local storage data if the storage was initialized.
     if (resourcesDto) {
       // No validation if data were in runtime cache, they were validate by the one which set it.
@@ -50,5 +51,28 @@ export default class GetOrFindResourcesService {
 
     // Validation is not necessary has the data have been refreshed in the runtime cache and validated by the update all.
     return new ResourcesCollection(resourcesDto, {validate: false});
+  }
+
+  /**
+   * Returns the possible resources to suggest given an url.
+   * @param {string} url The url to suggest for.
+   * @return {Promise<ResourcesCollection>}
+   */
+  async getOrFindSuggested(url) {
+    if (!url) {
+      return new ResourcesCollection([]);
+    }
+
+    const resourcesCollection = await this.getOrFindAll();
+
+    // Filter by resource types behaving as a password.
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    resourceTypesCollection.filterByPasswordResourceTypes();
+    resourcesCollection.filterByResourceTypes(resourceTypesCollection);
+
+    // Filter by suggested resources.
+    resourcesCollection.filterBySuggestResources(url);
+
+    return resourcesCollection;
   }
 }

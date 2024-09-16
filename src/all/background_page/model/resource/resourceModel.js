@@ -22,7 +22,6 @@ import ResourceService from "../../service/api/resource/resourceService";
 import PlaintextEntity from "../entity/plaintext/plaintextEntity";
 import splitBySize from "../../utils/array/splitBySize";
 import UpdateResourcesLocalStorageService from "../../service/resource/updateResourcesLocalStorageService";
-import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 
 const BULK_OPERATION_SIZE = 5;
 const MAX_LENGTH_PLAINTEXT = 4096;
@@ -35,7 +34,6 @@ class ResourceModel {
    * @public
    */
   constructor(apiClientOptions, account) {
-    this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
     this.resourceService = new ResourceService(apiClientOptions);
     this.moveService = new MoveService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
@@ -233,43 +231,6 @@ class ResourceModel {
       resourcesDto = [...resourcesDto, ...partialResourcesDto];
     }
     return new ResourcesCollection(resourcesDto);
-  }
-
-  /**
-   * Returns the count of possible resources to suggest given an url
-   * @param {string} url An url
-   * @return {Promise<number>}
-   */
-  async countSuggestedResources(url) {
-    if (!url) {
-      return 0;
-    }
-
-    const resourcesCollection = await this.findSuggestedResources(url);
-    return resourcesCollection.length;
-  }
-
-  /**
-   * Returns the possible resources to suggest given an url.
-   * @param {string} url The url to suggest for.
-   * @return {Promise<ResourcesCollection>}
-   */
-  async findSuggestedResources(url) {
-    if (!url) {
-      return new ResourcesCollection([]);
-    }
-
-    const resourcesCollection = await this.getOrFindResourcesService.getOrFindAll();
-
-    // Filter by resource types behaving as a password.
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    resourceTypesCollection.filterByPasswordResourceTypes();
-    resourcesCollection.filterByResourceTypes(resourceTypesCollection, false);
-
-    // Filter by suggested resources.
-    resourcesCollection.filterBySuggestResources(url);
-
-    return resourcesCollection;
   }
 
   /*

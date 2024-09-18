@@ -18,12 +18,12 @@ import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/fol
 import FolderLocalStorage from "../../local_storage/folderLocalStorage";
 import FolderService from "../../api/folder/folderService";
 import FoldersCollection from "../../../model/entity/folder/foldersCollection";
-
-jest.useFakeTimers();
+import {defaultPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
+import {v4 as uuidv4} from "uuid";
+import FolderEntity from "../../../model/entity/folder/folderEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.clearAllTimers();
 });
 
 describe("FindFoldersService", () => {
@@ -104,6 +104,71 @@ describe("FindFoldersService", () => {
 
       expect(collection).toHaveLength(2);
       expect(collection.toDto(FolderLocalStorage.DEFAULT_CONTAIN)).toEqual(expectedRetainedFolder);
+    });
+  });
+
+  describe("::findByID", () => {
+    it("retrieves folder by id.", async() => {
+      expect.assertions(1);
+      const folderId = uuidv4();
+      const folderDto = defaultFolderDto({id: folderId});
+      jest.spyOn(FolderService.prototype, "get").mockImplementation(() => folderDto);
+
+      const service = new FindFoldersService(apiClientOptions);
+      const folder = await service.findById(folderDto.id);
+
+      expect(folder.toDto(FolderEntity.ALL_CONTAIN_OPTIONS)).toEqual(folderDto);
+    });
+
+    it("should throw an error if id is not a uuid", async() => {
+      expect.assertions(1);
+
+      const service = new FindFoldersService(apiClientOptions);
+      try {
+        await service.findById();
+      } catch (error) {
+        expect(error.message).toEqual("The given parameter is not a valid UUID");
+      }
+    });
+
+    it("should throw error if contains is not supported.", async() => {
+      expect.assertions(1);
+      const service = new FindFoldersService(apiClientOptions);
+      try {
+        await service.findById(uuidv4(), {unknown: true});
+      } catch (error) {
+        expect(error.message).toEqual("Unsupported contains parameter used, please check supported contains");
+      }
+    });
+  });
+
+  describe("::findByIdWithPermission", () => {
+    it("retrieves folder with permissions contains.", async() => {
+      expect.assertions(2);
+      const folderId = uuidv4();
+      const folderDto = defaultFolderDto({id: folderId, permissions: [
+        defaultPermissionDto({aco: "Folder", aco_foreign_key: folderId}, {withUser: true}),
+        defaultPermissionDto({aco: "Folder", aco_foreign_key: folderId}, {withGroup: true})
+      ]});
+      jest.spyOn(FolderService.prototype, "get").mockImplementation(() => folderDto);
+      jest.spyOn(FindFoldersService.prototype, "findById");
+
+      const service = new FindFoldersService(apiClientOptions);
+      const folder = await service.findByIdWithPermissions(folderDto.id);
+
+      expect(service.findById).toHaveBeenCalledWith(folderDto.id, {'permissions.user.profile': true, 'permissions.group': true});
+      expect(folder.toDto(FolderEntity.ALL_CONTAIN_OPTIONS)).toEqual(folderDto);
+    });
+
+    it("should throw an error if id is not a uuid", async() => {
+      expect.assertions(1);
+
+      const service = new FindFoldersService(apiClientOptions);
+      try {
+        await service.findByIdWithPermissions();
+      } catch (error) {
+        expect(error.message).toEqual("The given parameter is not a valid UUID");
+      }
     });
   });
 });

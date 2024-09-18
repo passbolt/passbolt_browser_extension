@@ -25,12 +25,12 @@ const listen = function(worker, apiClientOptions, account) {
    * Find a resource with complete permissions
    *
    * @listens passbolt.resources.find-for-permissions
-   * @param requestId {uuid} The request identifier
-   * @param options {object} The options to apply to the find
+   * @param acoId {uuid} The aco id
+   * @param acoType {string} The aco type (Resource or Folder)
    */
-  worker.port.on('passbolt.permissions.find-aco-permissions-for-display', async(requestId, resourceId) => {
+  worker.port.on('passbolt.permissions.find-aco-permissions-for-display', async(requestId, acoId, acoType) => {
     const controller = new FindAcoPermissionsForDisplayController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourceId);
+    await controller._exec(acoId, acoType);
   });
 };
 

@@ -21,6 +21,8 @@ import FolderService from "../../service/api/folder/folderService";
 import ShareService from "../../service/api/share/shareService";
 import splitBySize from "../../utils/array/splitBySize";
 import Validator from "validator";
+import FindAndUpdateFoldersLocalStorageService
+  from "../../service/folder/update/findAndUpdateFoldersLocalStorageService";
 
 const BULK_OPERATION_SIZE = 5;
 
@@ -29,23 +31,14 @@ class FolderModel {
    * Constructor
    *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} account the user account
    * @public
    */
-  constructor(apiClientOptions) {
+  constructor(apiClientOptions, account) {
     this.folderService = new FolderService(apiClientOptions);
     this.moveService = new MoveService(apiClientOptions);
     this.shareService = new ShareService(apiClientOptions);
-  }
-
-  /**
-   * Update the folders local storage with the latest API folders the user has access.
-   *
-   * @return {FoldersCollection}
-   */
-  async updateLocalStorage() {
-    const foldersCollection = await this.findAll();
-    await FolderLocalStorage.set(foldersCollection);
-    return foldersCollection;
+    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(account, apiClientOptions);
   }
 
   /*
@@ -116,17 +109,6 @@ class FolderModel {
    * Finders
    * ============================================
    */
-  /**
-   * Get all folders from API and map API result to folder Entity
-   *
-   * @throws {Error} if API call fails, service unreachable, etc.
-   * @return {FoldersCollection}
-   */
-  async findAll() {
-    const foldersDtos = await this.folderService.findAll({permission: true});
-    return new FoldersCollection(foldersDtos, {clone: false});
-  }
-
   /**
    * Get all folders from API and map API result to folder collection
    *
@@ -293,7 +275,7 @@ class FolderModel {
        * update storage in case the folder becomes non visible to current user
        * TODO: optimize update only the given folder when user lost access
        */
-      await this.updateLocalStorage();
+      await this.findAndUpdateFoldersLocalStorageService.findAndUpdateAll();
     }
     return folderEntity;
   }
@@ -313,7 +295,7 @@ class FolderModel {
        * update storage and get updated sub folders list in case some are deleted
        * TODO: optimize update only if folder contains subfolders
        */
-      await this.updateLocalStorage();
+      await this.findAndUpdateFoldersLocalStorageService.findAndUpdateAll();
     }
   }
 

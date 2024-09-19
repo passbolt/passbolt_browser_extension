@@ -40,7 +40,7 @@ class ExportResourcesFileController {
     // Models
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
-    this.folderModel = new FolderModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions, account);
 
     this.progressService = new ProgressService(this.worker, i18n.t("Exporting ..."));
     this.getPassphraseService = new GetPassphraseService(account);

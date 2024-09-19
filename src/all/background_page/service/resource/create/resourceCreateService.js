@@ -35,7 +35,7 @@ class ResourceCreateService {
   constructor(account, apiClientOptions, progressService) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
-    this.folderModel = new FolderModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions, account);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = progressService;

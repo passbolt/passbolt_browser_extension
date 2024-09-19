@@ -96,7 +96,7 @@ describe("FolderEntity", () => {
   });
 
   it("constructor works if valid DTO is provided with optional properties", () => {
-    const dto = defaultFolderDto();
+    const dto = defaultFolderDto({}, {withPermissions: true});
     const entity = new FolderEntity(dto);
     expect(entity.id).toEqual(dto.id);
     expect(entity.name).toEqual('Accounting');
@@ -207,7 +207,7 @@ describe("FolderEntity", () => {
         "permissions"
       ];
 
-      const dto = defaultFolderDto();
+      const dto = defaultFolderDto({}, {withPermissions: true});
       const entity = new FolderEntity(dto);
       const resultDto = entity.toDto({permissions: true});
       const keys = Object.keys(resultDto);

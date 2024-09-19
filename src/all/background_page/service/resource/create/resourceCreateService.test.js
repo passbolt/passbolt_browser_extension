@@ -206,7 +206,7 @@ describe("ResourceCreateService", () => {
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [defaultResourceDto({folder_parent_id: folderId})]);
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => defaultResourceDto({folder_parent_id: folderId}));
-      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [defaultFolderDto({id: folderId})]);
+      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [defaultFolderDto({id: folderId}, {withPermissions: true})]);
       jest.spyOn(ShareService.prototype, "simulateShareResource").mockImplementation(() => shareResourceChanges);
       jest.spyOn(ShareService.prototype, "shareFolder").mockImplementation(() => shareResourceChanges);
       jest.spyOn(ShareService.prototype, "shareResource").mockImplementation(() => jest.fn());
@@ -286,7 +286,7 @@ describe("ResourceCreateService", () => {
 
     beforeEach(async() => {
       entity = new ResourceEntity(resourceDto);
-      folder = defaultFolderDto({id: folderId});
+      folder = defaultFolderDto({id: folderId}, {withPermissions: true});
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [defaultResourceDto({folder_parent_id: folderId})]);
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => defaultResourceDto({folder_parent_id: folderId}));
       jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [folder]);

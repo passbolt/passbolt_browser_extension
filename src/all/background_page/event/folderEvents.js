@@ -9,11 +9,14 @@ import FolderCreateController from "../controller/folder/folderCreateController"
 import MoveController from "../controller/move/moveController";
 import FolderEntity from "../model/entity/folder/folderEntity";
 import UpdateResourcesLocalStorageService from "../service/resource/updateResourcesLocalStorageService";
+import UpdateAllFolderLocalStorageController
+  from "../controller/folderLocalStorage/updateAllFoldersLocalStorageController";
 
 /**
  * Listens to the folder events
  * @param {Worker} worker The worker
- * @param {ApiClientOptions} apiClientOptions The api client options
+ * @param {ApiClientOptions} apiClientOptions The
+ * api client options
  * @param {AccountEntity} account The account
  */
 const listen = function(worker, apiClientOptions, account) {
@@ -26,7 +29,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.folders.create', async(requestId, folderDto) => {
     try {
-      const folderCreateController = new FolderCreateController(worker, requestId, apiClientOptions);
+      const folderCreateController = new FolderCreateController(worker, requestId, apiClientOptions, account);
       const folderEntity = await folderCreateController.main(new FolderEntity(folderDto));
       worker.port.emit(requestId, 'SUCCESS', folderEntity);
     } catch (error) {
@@ -43,7 +46,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.folders.update', async(requestId, folderDto) => {
     try {
-      const folderModel = new FolderModel(apiClientOptions);
+      const folderModel = new FolderModel(apiClientOptions, account);
       const folderEntity = await folderModel.update(new FolderEntity(folderDto));
       worker.port.emit(requestId, 'SUCCESS', folderEntity);
     } catch (error) {
@@ -60,7 +63,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.folders.delete', async(requestId, folderId, cascade) => {
     try {
-      const folderModel = new FolderModel(apiClientOptions);
+      const folderModel = new FolderModel(apiClientOptions, account);
       const updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
 
       await folderModel.delete(folderId, cascade);
@@ -79,14 +82,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param {uuid} requestId The request identifier
    */
   worker.port.on('passbolt.folders.update-local-storage', async requestId => {
-    try {
-      const folderModel = new FolderModel(apiClientOptions);
-      await folderModel.updateLocalStorage();
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new UpdateAllFolderLocalStorageController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
   });
 
   /*

@@ -22,6 +22,8 @@ import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ShareModel from "../../model/share/shareModel";
 import UpdateResourcesLocalStorageService from "../../service/resource/updateResourcesLocalStorageService";
+import FindAndUpdateFoldersLocalStorageService
+  from "../../service/folder/update/findAndUpdateFoldersLocalStorageService";
 
 class ShareFoldersController {
   /**
@@ -35,7 +37,8 @@ class ShareFoldersController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = new FolderModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions, account);
+    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(account, apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
@@ -201,7 +204,7 @@ class ShareFoldersController {
       await this.shareModel.bulkShareFolders(folders, this.foldersChanges,  async message => {
         await this.progressService.finishStep(message);
       });
-      await this.folderModel.updateLocalStorage();
+      await this.findAndUpdateFoldersLocalStorageService.findAndUpdateAll();
     }
 
     // Share resources

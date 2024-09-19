@@ -46,31 +46,22 @@ describe("FindFoldersService", () => {
     it("should throw error if contains is not supported.", async() => {
       expect.assertions(1);
       const service = new FindFoldersService(apiClientOptions);
-      try {
-        await service.findAll({unknown: true});
-      } catch (error) {
-        expect(error.message).toEqual("Unsupported contains parameter used, please check supported contains");
-      }
+      const promise = service.findAll({unknown: true});
+      await expect(promise).rejects.toThrowError("Unsupported contains parameter used, please check supported contains");
     });
 
     it("should throw error if filter is not supported.", async() => {
       expect.assertions(1);
       const service = new FindFoldersService(apiClientOptions);
-      try {
-        await service.findAll({}, {unknown: true});
-      } catch (error) {
-        expect(error.message).toEqual("Unsupported filters parameter used, please check supported filters");
-      }
+      const promise = service.findAll({}, {unknown: true});
+      await expect(promise).rejects.toThrowError("Unsupported filters parameter used, please check supported filters");
     });
 
     it("should throw error if ignoreInvalidEntity option is not a boolean.", async() => {
       expect.assertions(1);
       const service = new FindFoldersService(apiClientOptions);
-      try {
-        await service.findAll({}, {}, {ignoreInvalidEntity: 42});
-      } catch (error) {
-        expect(error.message).toEqual("The given parameter is not a valid boolean");
-      }
+      const promise = service.findAll({}, {}, {ignoreInvalidEntity: 42});
+      await expect(promise).rejects.toThrowError("The given parameter is not a valid boolean");
     });
   });
 
@@ -124,21 +115,15 @@ describe("FindFoldersService", () => {
       expect.assertions(1);
 
       const service = new FindFoldersService(apiClientOptions);
-      try {
-        await service.findById();
-      } catch (error) {
-        expect(error.message).toEqual("The given parameter is not a valid UUID");
-      }
+      const promise = service.findById();
+      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
     });
 
     it("should throw error if contains is not supported.", async() => {
       expect.assertions(1);
       const service = new FindFoldersService(apiClientOptions);
-      try {
-        await service.findById(uuidv4(), {unknown: true});
-      } catch (error) {
-        expect(error.message).toEqual("Unsupported contains parameter used, please check supported contains");
-      }
+      const promise = service.findById(uuidv4(), {unknown: true});
+      await expect(promise).rejects.toThrowError("Unsupported contains parameter used, please check supported contains");
     });
   });
 
@@ -164,11 +149,31 @@ describe("FindFoldersService", () => {
       expect.assertions(1);
 
       const service = new FindFoldersService(apiClientOptions);
-      try {
-        await service.findByIdWithPermissions();
-      } catch (error) {
-        expect(error.message).toEqual("The given parameter is not a valid UUID");
-      }
+      const promise = service.findByIdWithPermissions();
+      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+    });
+  });
+
+  describe("::findByIdWithCreatorAndModifier", () => {
+    it("retrieves folder with permissions contains.", async() => {
+      expect.assertions(2);
+      const folderDto = defaultFolderDto({}, {withCreator: true, withModifier: true});
+      jest.spyOn(FolderService.prototype, "get").mockImplementation(() => folderDto);
+      jest.spyOn(FindFoldersService.prototype, "findById");
+
+      const service = new FindFoldersService(apiClientOptions);
+      const folder = await service.findByIdWithCreatorAndModifier(folderDto.id);
+
+      expect(service.findById).toHaveBeenCalledWith(folderDto.id, {creator: true, modifier: true});
+      expect(folder.toDto(FolderEntity.ALL_CONTAIN_OPTIONS)).toEqual(folderDto);
+    });
+
+    it("should throw an error if id is not a uuid", async() => {
+      expect.assertions(1);
+
+      const service = new FindFoldersService(apiClientOptions);
+      const promise = service.findByIdWithCreatorAndModifier();
+      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
     });
   });
 });

@@ -11,6 +11,7 @@ import FolderEntity from "../model/entity/folder/folderEntity";
 import UpdateResourcesLocalStorageService from "../service/resource/updateResourcesLocalStorageService";
 import UpdateAllFolderLocalStorageController
   from "../controller/folderLocalStorage/updateAllFoldersLocalStorageController";
+import FindFolderDetailsController from "../controller/folder/findFolderDetailsController";
 
 /**
  * Listens to the folder events
@@ -84,6 +85,18 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.folders.update-local-storage', async requestId => {
     const controller = new UpdateAllFolderLocalStorageController(worker, requestId, apiClientOptions, account);
     await controller._exec();
+  });
+
+  /**
+   * Find a folder with its details given an id
+   *
+   * @listens passbolt.folders.find-details
+   * @param requestId {uuid} The request identifier
+   * @param folderId {uuid} The folder id
+   */
+  worker.port.on('passbolt.folders.find-details', async(requestId, folderId) => {
+    const controller = new FindFolderDetailsController(worker, requestId, apiClientOptions);
+    await controller._exec(folderId);
   });
 
   /*

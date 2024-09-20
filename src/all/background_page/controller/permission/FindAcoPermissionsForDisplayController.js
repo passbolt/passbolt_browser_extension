@@ -12,6 +12,9 @@
  * @since         4.9.4
  */
 import FindPermissionsService from "../../service/permission/findPermissionsService";
+import PermissionEntity from "../../model/entity/permission/permissionEntity";
+import FindFoldersService from "../../service/folder/find/findFoldersService";
+import {assertString, assertUuid} from "../../utils/assertions";
 
 class FindAcoPermissionsForDisplayController {
   /**
@@ -28,17 +31,19 @@ class FindAcoPermissionsForDisplayController {
 
     // Service
     this.findPermissionService = new FindPermissionsService(account, apiClientOptions);
+    this.findFolderService = new FindFoldersService(apiClientOptions);
   }
 
   /**
    * Wrapper of exec function to run it with worker.
    *
-   * @param {string} resourceId The resource id.
+   * @param {string} acoId The aco id.
+   * @param {string} acoType The aco type.
    * @return {Promise<void>}
    */
-  async _exec(resourceId) {
+  async _exec(acoId, acoType) {
     try {
-      const result = await this.exec(resourceId);
+      const result = await this.exec(acoId, acoType);
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
@@ -47,13 +52,24 @@ class FindAcoPermissionsForDisplayController {
   }
 
   /**
-   * Find all permissions from a resource id.
+   * Find all permissions from an aco id (Resource or Folder).
    *
-   * @param {string} resourceId The resource id.
+   * @param {string} acoId The aco id.
+   * @param {string} acoType The aco type.
    * @return {Promise<PermissionsCollection>}
    */
-  async exec(resourceId) {
-    return this.findPermissionService.findAllByAcoForeignKeyForDisplay(resourceId);
+  async exec(acoId, acoType) {
+    // Assert parameters
+    assertUuid(acoId);
+    assertString(acoType);
+
+    if (acoType === PermissionEntity.ACO_RESOURCE) {
+      return this.findPermissionService.findAllByAcoForeignKeyForDisplay(acoId);
+    } else if (acoType === PermissionEntity.ACO_FOLDER) {
+      // TODO: Should be adapted when API V5 can return permissions with folder id to use the same service than resources
+      const folderEntity = await this.findFolderService.findByIdWithPermissions(acoId);
+      return folderEntity.permissions;
+    }
   }
 }
 

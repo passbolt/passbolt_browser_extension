@@ -16,7 +16,8 @@
 import FolderService from "../../api/folder/folderService";
 import FolderLocalStorage from "../../local_storage/folderLocalStorage";
 import FoldersCollection from "../../../model/entity/folder/foldersCollection";
-import {assertBoolean} from "../../../utils/assertions";
+import {assertBoolean, assertUuid} from "../../../utils/assertions";
+import FolderEntity from "../../../model/entity/folder/folderEntity";
 
 /**
  * The service aims to find folders from the API.
@@ -28,6 +29,37 @@ export default class FindFoldersService {
    */
   constructor(apiClientOptions) {
     this.folderService = new FolderService(apiClientOptions);
+  }
+
+  /**
+   * Retrieve a folder.
+   * @param {string} id The id
+   * @param {object} [contains] optional The contain option
+   * @returns {Promise<FolderEntity>}
+   */
+  async findById(id, contains) {
+    //Assert
+    assertUuid(id);
+    const supportedContain = FolderService.getSupportedContainOptions();
+
+    if (contains && !Object.keys(contains).every(option => supportedContain.includes(option))) {
+      throw new Error("Unsupported contains parameter used, please check supported contains");
+    }
+
+    const foldersDto = await this.folderService.get(id, contains);
+    return new FolderEntity(foldersDto);
+  }
+
+  /**
+   * Retrieve a folder with permission.
+   * @param {string} id The id
+   * @returns {Promise<FolderEntity>}
+   */
+  async findByIdWithPermissions(id) {
+    //Assert
+    assertUuid(id);
+    const foldersDto = await this.findById(id, {'permissions.user.profile': true, 'permissions.group': true});
+    return new FolderEntity(foldersDto);
   }
 
   /**

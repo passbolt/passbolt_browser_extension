@@ -63,6 +63,18 @@ export default class FindFoldersService {
   }
 
   /**
+   * Retrieve a folder with creator and modifier.
+   * @param {string} id The id
+   * @returns {Promise<FolderEntity>}
+   */
+  async findByIdWithCreatorAndModifier(id) {
+    //Assert
+    assertUuid(id);
+    const foldersDto = await this.findById(id, {creator: true, modifier: true});
+    return new FolderEntity(foldersDto);
+  }
+
+  /**
    * Retrieve all folders.
    * @param {object} [contains] optional The contain option
    * @param {object} [filters] optional The filters option

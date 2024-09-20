@@ -16,6 +16,7 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import PermissionEntity from "../permission/permissionEntity";
 import PermissionsCollection from "../permission/permissionsCollection";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import UserEntity from "../user/userEntity";
 
 const ENTITY_NAME = 'Folder';
 const FOLDER_NAME_MIN_LENGTH = 1;
@@ -44,6 +45,14 @@ class FolderEntity extends EntityV2 {
       FolderEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
+    if (this._props.creator) {
+      this._creator = new UserEntity(this._props.creator, {...options, clone: false});
+      delete this._props._creator;
+    }
+    if (this._props.modifier) {
+      this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
+      delete this._props._modifier;
+    }
   }
 
   /**
@@ -62,6 +71,7 @@ class FolderEntity extends EntityV2 {
    * @returns {Object} schema
    */
   static getSchema() {
+    const userSchema = UserEntity.getSchema();
     return {
       "type": "object",
       "required": [
@@ -103,7 +113,9 @@ class FolderEntity extends EntityV2 {
           "nullable": true,
         },
         "permission": PermissionEntity.getSchema(), // current user permission
-        "permissions": PermissionsCollection.getSchema() // all users permissions
+        "permissions": PermissionsCollection.getSchema(), // all users permissions
+        "creator": userSchema,
+        "modifier": userSchema
       }
     };
   }
@@ -131,6 +143,12 @@ class FolderEntity extends EntityV2 {
     if (this._permissions && contain.permissions) {
       // TODO More granular permissions.group permissions.user
       result.permissions = this._permissions.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS);
+    }
+    if (this._creator && contain.creator) {
+      result.creator = this._creator.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
+    }
+    if (this._modifier && contain.modifier) {
+      result.modifier = this._modifier.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
     }
     return result;
   }
@@ -357,7 +375,7 @@ class FolderEntity extends EntityV2 {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {permission: true, permissions: true};
+    return {permission: true, permissions: true, creator: true, modifier: true};
   }
 }
 

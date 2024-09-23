@@ -6,6 +6,10 @@ classDiagram
             "passbolt.resources.update-local-storage"
             "passbolt.resources.find-all-ids-by-is-shared-with-group"
         }
+
+        class ShareEvent{
+            "passbolt.share.find-resources-for-share"
+        }
     }
 
     namespace ResourcesController {
@@ -15,6 +19,10 @@ classDiagram
 
         class FindAllIdsByIsSharedWithGroupController{
             +exec(uuid groupId) Promise~array~
+        }
+        
+        class FindResourcesForShareController{
+            +exec(Array~uuid~ resourceIds) Promise~ResourcesCollection~
         }
     }
 
@@ -36,12 +44,17 @@ classDiagram
 
         class FindResourcesService{
             <<Service>>
-            +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAll(object contains, object filters) Promise~ResourcesCollection~
             +findAllForLocalStorage() Promise~ResourcesCollection~
+            +findAllByIdsForShare() Promise~ResourcesCollection~
+            +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
         }
     }
-
+    namespace ConcurrentlyService {
+        class ExecuteConcurrentlyService {
+            +execute(array callbacks, integer concurrency): array~Promise~
+        }
+    }
     namespace ApiService{
         class AbstractService {
             <<Abstract>>
@@ -77,9 +90,11 @@ classDiagram
     %% Event relationships
     ResourcesEvent*--UpdateAllResourcesLocalStorageController
     ResourcesEvent*--FindAllIdsByIsSharedWithGroupController
+    ShareEvent*--FindResourcesForShareController
     %% Controller relationships
     UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
     FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
+    FindResourcesForShareController*--FindResourcesService
     %% Business service relationships
     FindAndUpdateResourcesLocalStorageService*--ResourcesLocalStorageService
     FindAndUpdateResourcesLocalStorageService-->UpdateLocalStorageOptions
@@ -87,6 +102,7 @@ classDiagram
     GetOrFindResourcesService*--FindAndUpdateResourcesLocalStorageService
     FindAndUpdateResourcesLocalStorageService*--FindResourcesService
     FindResourcesService*--ResourceService
+    FindResourcesService*--ExecuteConcurrentlyService
     %% API service relationships
     AbstractService<|--ResourceService
 ```

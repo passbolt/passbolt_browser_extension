@@ -14,13 +14,14 @@
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import {assertNumber} from "../../utils/assertions";
 import FindResourcesService from "./findResourcesService";
+import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 
 const RESOURCES_UPDATE_ALL_LS_LOCK_PREFIX = 'RESOURCES_UPDATE_LS_LOCK_';
 
 /**
- * The service aim to update the resources local storage service.
+ * The service aim to find and update the resources local storage service.
  */
-class UpdateResourcesLocalStorageService {
+class FindAndUpdateResourcesLocalStorage {
   /**
    * The last times the update all operation run, the object key represents the account id.
    * @type {object}
@@ -39,21 +40,23 @@ class UpdateResourcesLocalStorageService {
   }
 
   /**
-   * Update the local storage with all the resources retrieved from the API.
+   * Find and update the local storage with all the resources retrieved from the API.
    * @param {number} [updatePeriodThreshold] Do not update the local storage if the threshold is not overdue.
-   * @return {Promise<void>}
+   * @return {Promise<RessourceCollection>}
    */
-  async updateAll({updatePeriodThreshold} = {}) {
-    assertNumber(updatePeriodThreshold, "Parameter forceUpdatePeriod should be a number.");
+  async findAndUpdateAll({updatePeriodThreshold} = {}) {
+    assertNumber(updatePeriodThreshold, "Parameter updatePeriodThreshold should be a number.");
 
     const lockKey = `${RESOURCES_UPDATE_ALL_LS_LOCK_PREFIX}${this.account.id}`;
-    const lastUpdateTime = UpdateResourcesLocalStorageService.lastUpdateAllTimes[this.account.id] ?? null;
-    const isLocalStorageInitialized = ResourceLocalStorage.hasCachedData() || Boolean(await ResourceLocalStorage.get());
+    const lastUpdateTime = FindAndUpdateResourcesLocalStorage.lastUpdateAllTimes[this.account.id] ?? null;
+
+    const isRuntimeCacheInitialized = ResourceLocalStorage.hasCachedData();
+    const localStorageResourceCollection = await ResourceLocalStorage.get();
 
     // Do not update the storage if the defined period, during which the local storage doesn't need to be refreshed, has not yet passed.
-    if (updatePeriodThreshold && lastUpdateTime && isLocalStorageInitialized) {
+    if (updatePeriodThreshold && lastUpdateTime && Boolean(localStorageResourceCollection)) {
       if (Date.now() - lastUpdateTime < updatePeriodThreshold) {
-        return;
+        return new ResourcesCollection(localStorageResourceCollection, {validate: !isRuntimeCacheInitialized});
       }
     }
 
@@ -61,15 +64,31 @@ class UpdateResourcesLocalStorageService {
     return await navigator.locks.request(lockKey, {ifAvailable: true}, async lock => {
       // Lock not granted, an update is already in progress. Wait for its completion to notify the function consumer.
       if (!lock) {
-        return navigator.locks.request(lockKey, {mode: "shared"}, () => {});
+        return await navigator.locks.request(lockKey, {mode: "shared"}, async() =>
+          // Return the data from local storage while waiting for the update in progress.
+          new ResourcesCollection(localStorageResourceCollection, {validate: !isRuntimeCacheInitialized})
+        );
       }
 
       // Lock is granted, retrieve all resources and update the local storage.
       const resourcesCollection = await this.findResourcesServices.findAllForLocalStorage();
       await ResourceLocalStorage.set(resourcesCollection);
-      UpdateResourcesLocalStorageService.lastUpdateAllTimes[this.account.id] = Date.now();
+      FindAndUpdateResourcesLocalStorage.lastUpdateAllTimes[this.account.id] = Date.now();
+      // Return the updated resources collection from the API
+      return resourcesCollection;
     });
+  }
+
+  /**
+   * Find and update the local storage with all the resources retrieved from the API.
+   * @param {uuid} groupId
+   * @return {Promise<ResourcesCollection>} The resource shared with the group
+   */
+  async findAndUpdateByIsSharedWithGroup(groupId) {
+    const resourcesCollection = await this.findResourcesServices.findAllByIsSharedWithGroupForLocalStorage(groupId);
+    await ResourceLocalStorage.addOrReplaceResourcesCollection(resourcesCollection);
+    return resourcesCollection;
   }
 }
 
-export default UpdateResourcesLocalStorageService;
+export default FindAndUpdateResourcesLocalStorage;

@@ -11,33 +11,34 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.9.4
  */
-import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
 
-class ResourceUpdateLocalStorageController {
+import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
+import {assertUuid} from "../../utils/assertions";
+
+class FindAllIdsByIsSharedWithGroupController {
   /**
-   * ResourceUpdateLocalStorageController constructor
-   *
-   * @param {Worker} worker
-   * @param {string} requestId
-   * @param {ApiClientOptions} apiClientOptions the api client options
-   * @param {AccountEntity} account The account associated to the worker.clientOptions
+   * Constructor.
+   * @param {Worker} worker The associated worker.
+   * @param {string} requestId The associated request id.
+   * @param {ApiClientOptions} apiClientOptions The api client options.
+   * @param {AccountEntity} account The account associated to the worker.
    */
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
+    this.account = account;
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
   }
 
   /**
    * Controller executor.
-   * @param {{updatePeriodThreshold: number}} options The options
-   * @param {number} options.updatePeriodThreshold Do not update the local storage if the threshold is not overdue.
+   * @param {uuid} groupId
    * @returns {Promise<void>}
    */
-  async _exec(options = {}) {
+  async _exec(groupId) {
     try {
-      await this.exec(options);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      const result = await this.exec(groupId);
+      this.worker.port.emit(this.requestId, 'SUCCESS', result);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
@@ -45,14 +46,14 @@ class ResourceUpdateLocalStorageController {
   }
 
   /**
-   * Update the resource local storage.
-   * @param {{updatePeriodThreshold: number}} options The options
-   * @param {number} options.updatePeriodThreshold Do not update the local storage if the threshold is not overdue.
-   * @returns {Promise<Object>} updated resource
+   * Abort current request and initiate a new one.
+   * @param {uuid} groupId
+   * @returns {Promise<Array<uuid>>}
    */
-  async exec(options = {}) {
-    await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll(options);
+  async exec(groupId) {
+    assertUuid(groupId);
+    return (await this.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup(groupId)).extract("id");
   }
 }
 
-export default ResourceUpdateLocalStorageController;
+export default FindAllIdsByIsSharedWithGroupController;

@@ -21,7 +21,6 @@ import MoveService from "../../service/api/move/moveService";
 import ResourceService from "../../service/api/resource/resourceService";
 import PlaintextEntity from "../entity/plaintext/plaintextEntity";
 import splitBySize from "../../utils/array/splitBySize";
-import UpdateResourcesLocalStorageService from "../../service/resource/updateResourcesLocalStorageService";
 
 const BULK_OPERATION_SIZE = 5;
 const MAX_LENGTH_PLAINTEXT = 4096;
@@ -33,11 +32,10 @@ class ResourceModel {
    * @param {AccountEntity} account the user account
    * @public
    */
-  constructor(apiClientOptions, account) {
+  constructor(apiClientOptions) {
     this.resourceService = new ResourceService(apiClientOptions);
     this.moveService = new MoveService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.resourceLocalStorageUpdateService = new UpdateResourcesLocalStorageService(account, apiClientOptions);
   }
 
   /*
@@ -84,14 +82,6 @@ class ResourceModel {
   async getById(resourceId) {
     const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
     return new ResourceEntity(resourceDto);
-  }
-
-  /**
-   * Returns the cached collection of resoures or fetch them otherwise
-   * @return {Promise<ResourcesCollection>}
-   */
-  async getOrFindAll() {
-    return await this.resourceLocalStorageUpdateService.exec();
   }
 
   /*

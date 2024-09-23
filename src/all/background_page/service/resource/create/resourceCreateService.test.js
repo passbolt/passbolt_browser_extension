@@ -343,11 +343,11 @@ describe("ResourceCreateService", () => {
     it("Should update the localstorage from resourceModel", async() => {
       expect.assertions(1);
 
-      jest.spyOn(resourceCreateService.updateResourcesLocalStorage, "updateAll");
+      jest.spyOn(resourceCreateService.findAndUpdateResourcesLocalStorage, "findAndUpdateAll");
 
       await resourceCreateService.handleCreateInFolder(entity);
 
-      expect(resourceCreateService.updateResourcesLocalStorage.updateAll).toHaveBeenCalledTimes(1);
+      expect(resourceCreateService.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
     });
 
     it("Should sync the keyring", async() => {

@@ -34,11 +34,11 @@ describe("ResourceUpdateLocalStorageController", () => {
     it("Should call the resourceLocalStorageUpdateService and emit a success message", async() => {
       expect.assertions(3);
 
-      jest.spyOn(controller.updateResourcesLocalStorageService, "updateAll").mockImplementationOnce(jest.fn());
+      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateAll").mockImplementationOnce(jest.fn());
       await controller._exec({updatePeriodThreshold: 10000});
 
-      expect(controller.updateResourcesLocalStorageService.updateAll).toHaveBeenCalledTimes(1);
-      expect(controller.updateResourcesLocalStorageService.updateAll).toHaveBeenCalledWith({updatePeriodThreshold: 10000});
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledWith({updatePeriodThreshold: 10000});
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'SUCCESS');
     });
 
@@ -46,10 +46,10 @@ describe("ResourceUpdateLocalStorageController", () => {
       expect.assertions(2);
 
       const error = new Error();
-      jest.spyOn(controller.updateResourcesLocalStorageService, "updateAll").mockImplementationOnce(() => { throw error; });
+      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateAll").mockImplementationOnce(() => { throw error; });
       await controller._exec();
 
-      expect(controller.updateResourcesLocalStorageService.updateAll).toHaveBeenCalledWith({});
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledWith({});
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'ERROR', error);
     });
   });

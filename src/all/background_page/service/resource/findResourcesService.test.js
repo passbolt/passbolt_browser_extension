@@ -28,6 +28,7 @@ import {
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
+import {v4 as uuidv4} from "uuid";
 
 
 beforeEach(() => {
@@ -196,6 +197,56 @@ describe("FindResourcesService", () => {
 
       expect(resources).toHaveLength(4);
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(expectedRetainedResource);
+    });
+  });
+
+  describe("::findAllByIsSharedWithGroupForLocalStorage", () => {
+    let service;
+    const groupId = uuidv4();
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+    });
+
+    it("should return resources shared with group id", async() => {
+      expect.assertions(1);
+
+      const collection = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+
+      const resourcesCollection = await service.findAllByIsSharedWithGroupForLocalStorage(groupId);
+
+      expect(resourcesCollection).toEqual(new ResourcesCollection(collection));
+    });
+
+    it("should call the api with is-shared-with-group and the groupId associated ", async() => {
+      expect.assertions(2);
+
+      const collection = multipleResourceDtos();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(service, "findAll");
+
+      await service.findAllByIsSharedWithGroupForLocalStorage(groupId);
+
+      expect(service.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId});
+    });
+
+
+    it("should call the api with is-shared-with-group and the groupId associated ", async() => {
+      expect.assertions(2);
+
+      const collection = multipleResourceDtos();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(service, "findAll");
+
+      await service.findAllByIsSharedWithGroupForLocalStorage(groupId);
+
+      expect(service.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId});
     });
   });
 });

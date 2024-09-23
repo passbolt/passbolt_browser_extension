@@ -23,7 +23,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import GetOrFindResourcesService from "./getOrFindResourcesService";
-import UpdateResourcesLocalStorageService from "./updateResourcesLocalStorageService";
+import FindAndUpdateResourcesLocalStorage from "./findAndUpdateResourcesLocalStorageService";
 import {multipleResourceDtos} from "./getOrFindResourcesService.test.data";
 import {resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
@@ -46,13 +46,13 @@ describe("GetOrFindResourcesService", () => {
       expect.assertions(6);
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
-      jest.spyOn(UpdateResourcesLocalStorageService.prototype, "updateAll");
+      jest.spyOn(FindAndUpdateResourcesLocalStorage.prototype, "findAndUpdateAll");
 
       const service = new GetOrFindResourcesService(account, apiClientOptions);
       const resources = await service.getOrFindAll();
 
-      expect(UpdateResourcesLocalStorageService.prototype.updateAll).toHaveBeenCalledTimes(1);
-      expect(UpdateResourcesLocalStorageService.prototype.updateAll).toHaveBeenCalledWith(); //to be verified as it's the default parameter value, I think it should be this way, but I can be wrong
+      expect(FindAndUpdateResourcesLocalStorage.prototype.findAndUpdateAll).toHaveBeenCalledTimes(1);
+      expect(FindAndUpdateResourcesLocalStorage.prototype.findAndUpdateAll).toHaveBeenCalledWith(); //to be verified as it's the default parameter value, I think it should be this way, but I can be wrong
       expect(resources).toBeInstanceOf(ResourcesCollection);
       expect(resources).toHaveLength(0);
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();

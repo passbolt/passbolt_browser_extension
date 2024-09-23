@@ -24,7 +24,7 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import i18n from "../../../sdk/i18n";
 import ResourceModel from "../../../model/resource/resourceModel";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
-import UpdateResourcesLocalStorageService from "../updateResourcesLocalStorageService";
+import FindAndUpdateResourcesLocalStorage from "../findAndUpdateResourcesLocalStorageService";
 
 class ResourceCreateService {
   /**
@@ -40,7 +40,7 @@ class ResourceCreateService {
     this.keyring = new Keyring();
     this.progressService = progressService;
     this.resourceModel = new ResourceModel(apiClientOptions, this.account);
-    this.updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
   }
 
   /**
@@ -123,7 +123,7 @@ class ResourceCreateService {
       await this.shareModel.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message =>
         await this.progressService?.finishStep(message)
       );
-      await this.updateResourcesLocalStorage.updateAll();
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
     }
   }
 }

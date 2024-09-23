@@ -2,8 +2,9 @@
 %%{init: {'theme':'neutral'}}%%
 classDiagram
     namespace Event {
-        class UpdateResourcesLocalStoragePortMessage{
-            +name: "passbolt.resources.update-local-storage"
+        class ResourcesEvent{
+            "passbolt.resources.update-local-storage"
+            "passbolt.resources.find-all-ids-by-is-shared-with-group"
         }
     }
 
@@ -11,40 +12,33 @@ classDiagram
         class UpdateAllResourcesLocalStorageController{
             +exec() Promise
         }
-        class InformCallToActionController{
-            +countSuggestedResourcesCount() Promise
-        }
-        class InformMenuController {
-            +getInitialConfiguration() Promise
+
+        class FindAllIdsByIsSharedWithGroupController{
+            +exec(uuid groupId) Promise~array~
         }
     }
-
 
     namespace ResourcesService{
         class GetOrFindResourcesService{
             <<Service>>
             +getOrFindAll() Promise~ResourcesCollection~
-            +getOrFindSuggested() Promise~ResourcesCollection~
         }
 
-        class UpdateResourcesLocalStorageService{
+        class FindAndUpdateResourcesLocalStorageService{
             <<Service>>
-            +updateAll(UpdateLocalStorageOptions) Promise
+            +findAndUpdateAll(UpdateLocalStorageOptions) Promise~void~
+            +findAndUpdateByIsSharedWithGroup(uuid groupId) Promise~ResourcesCollection~
         }
 
         class UpdateLocalStorageOptions {
-            forceUpdate: boolean
-            forcePeriod: integer
+            updatePeriodThreshold: integer
         }
 
         class FindResourcesService{
             <<Service>>
+            +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAll(object contains, object filters) Promise~ResourcesCollection~
             +findAllForLocalStorage() Promise~ResourcesCollection~
-        }
-        
-        class ToolbarService{
-            +updateSuggestedResourcesBadge() Promise
         }
     }
 
@@ -80,16 +74,19 @@ classDiagram
         }
     }
 
-    UpdateResourcesLocalStoragePortMessage*--UpdateAllResourcesLocalStorageController
-    UpdateAllResourcesLocalStorageController*--UpdateResourcesLocalStorageService
-    UpdateResourcesLocalStorageService*--ResourcesLocalStorageService
-    UpdateResourcesLocalStorageService-->UpdateLocalStorageOptions
-    InformCallToActionController*--GetOrFindResourcesService
-    InformMenuController*--GetOrFindResourcesService
-    ToolbarService*--GetOrFindResourcesService
+    %% Event relationships
+    ResourcesEvent*--UpdateAllResourcesLocalStorageController
+    ResourcesEvent*--FindAllIdsByIsSharedWithGroupController
+    %% Controller relationships
+    UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
+    FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
+    %% Business service relationships
+    FindAndUpdateResourcesLocalStorageService*--ResourcesLocalStorageService
+    FindAndUpdateResourcesLocalStorageService-->UpdateLocalStorageOptions
     GetOrFindResourcesService*--ResourcesLocalStorageService
-    GetOrFindResourcesService*--UpdateResourcesLocalStorageService
-    UpdateResourcesLocalStorageService*--FindResourcesService
+    GetOrFindResourcesService*--FindAndUpdateResourcesLocalStorageService
+    FindAndUpdateResourcesLocalStorageService*--FindResourcesService
     FindResourcesService*--ResourceService
+    %% API service relationships
     AbstractService<|--ResourceService
 ```

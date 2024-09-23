@@ -13,7 +13,7 @@
  */
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import UpdateResourcesLocalStorageService from "./updateResourcesLocalStorageService";
+import FindAndUpdateResourcesLocalStorage from "./findAndUpdateResourcesLocalStorageService";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 
 /**
@@ -29,7 +29,7 @@ export default class GetOrFindResourcesService {
   constructor(account, apiClientOptions) {
     this.account = account;
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.updateResourcesLocalStorageService = new UpdateResourcesLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
   }
 
   /**
@@ -38,7 +38,7 @@ export default class GetOrFindResourcesService {
    */
   async getOrFindAll() {
     const hasRuntimeCache = ResourceLocalStorage.hasCachedData();
-    let resourcesDto = await ResourceLocalStorage.get();
+    const resourcesDto = await ResourceLocalStorage.get();
     // Return local storage data if the storage was initialized.
     if (resourcesDto) {
       // No validation if data were in runtime cache, they were validate by the one which set it.
@@ -46,11 +46,10 @@ export default class GetOrFindResourcesService {
     }
 
     // Otherwise retrieve the resources and update the local storage.
-    await this.updateResourcesLocalStorageService.updateAll();
-    resourcesDto = await ResourceLocalStorage.get();
+    const resourcesCollection = await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
 
     // Validation is not necessary has the data have been refreshed in the runtime cache and validated by the update all.
-    return new ResourcesCollection(resourcesDto, {validate: false});
+    return resourcesCollection;
   }
 
   /**

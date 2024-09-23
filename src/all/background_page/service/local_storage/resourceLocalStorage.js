@@ -190,6 +190,32 @@ class ResourceLocalStorage {
   }
 
   /**
+   * Add or replace a resource collection in the local storage.
+   * @param {ResourcesCollection} resourcesCollection The resources to update
+   * @throws {Error} if parameter resourcesCollection is not of ResourcesCollection type
+   */
+  static async addOrReplaceResourcesCollection(resourcesCollection) {
+    assertType(resourcesCollection, ResourcesCollection, 'The parameter resourcesEntities should be of ResourcesCollection type.');
+    await lock.acquire();
+    try {
+      const resources = await ResourceLocalStorage.get() || [];
+      for (const resourceEntity of resourcesCollection) {
+        ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
+        const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
+        if (resourceIndex === -1) {
+          resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+        } else {
+          resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        }
+      }
+      await browser.storage.local.set({resources: resources});
+      ResourceLocalStorage._cachedData = resources;
+    } finally {
+      lock.release();
+    }
+  }
+
+  /**
    * Update the expiry date of a resource collection in the local storage.
    * @param {array<PasswordExpiryResourceEntity>} passwordExpiryResourcesCollection The resources to update
    * @throws {Error} if the resource does not exist in the local storage

@@ -289,7 +289,7 @@ describe("ResourceLocalStorage", () => {
     });
   });
 
-  describe("::updateResources", () => {
+  describe("::updateResourcesCollection", () => {
     it("Should throw if no data passed as parameter", async() => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.updateResourcesCollection();
@@ -314,8 +314,10 @@ describe("ResourceLocalStorage", () => {
 
     it("Should throw if one of the resource is not found in the local storage", async() => {
       expect.assertions(1);
+
       const resourceDto = defaultResourceDto();
       const resources = new ResourcesCollection([resourceDto]);
+
       const promise = ResourceLocalStorage.updateResourcesCollection(resources);
       await expect(promise).rejects.toThrow('The resource could not be found in the local storage');
     });
@@ -360,6 +362,91 @@ describe("ResourceLocalStorage", () => {
       ]);
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.updateResourcesCollection(resources);
+      expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
+      expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
+      expect(ResourceLocalStorage._cachedData).toHaveLength(4);
+      expect(ResourceLocalStorage._cachedData[0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
+      expect(ResourceLocalStorage._cachedData[1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
+      expect(ResourceLocalStorage._cachedData[2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
+      expect(ResourceLocalStorage._cachedData[3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
+    });
+  });
+  describe("::addOrReplaceResourcesCollection", () => {
+    it("Should throw if no data passed as parameter", async() => {
+      expect.assertions(1);
+      const promise = ResourceLocalStorage.addOrReplaceResourcesCollection();
+      await expect(promise).rejects.toThrow("The parameter resourcesEntities should be of ResourcesCollection type.");
+    });
+
+    it("Should throw if the resourcesEntities parameter is not an array", async() => {
+      expect.assertions(1);
+      const promise = ResourceLocalStorage.addOrReplaceResourcesCollection(42);
+      await expect(promise).rejects.toThrow("The parameter resourcesEntities should be of ResourcesCollection type.");
+    });
+
+    it("Should throw if one of the resources does not validate", async() => {
+      expect.assertions(1);
+      const resourceDto1 = defaultResourceDto();
+      delete resourceDto1.id;
+      const resourceDto2 = defaultResourceDto();
+      const resources = new ResourcesCollection([resourceDto1, resourceDto2]);
+      const promise = ResourceLocalStorage.addOrReplaceResourcesCollection(resources);
+      await expect(promise).rejects.toThrow("ResourceLocalStorage expects ResourceEntity id to be set");
+    });
+
+    it("Should add the resource if one of the resource is not found in the local storage", async() => {
+      expect.assertions(3);
+
+      const resourceDto = defaultResourceDto();
+      const resources = new ResourcesCollection([resourceDto]);
+      await ResourceLocalStorage.addOrReplaceResourcesCollection(resources);
+      const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
+
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto));
+    });
+
+    it("Should update resources", async() => {
+      expect.assertions(6);
+      const resourceDto1 = defaultResourceDto();
+      const resourceDto2 = defaultResourceDto();
+      const resourceDto3 = defaultResourceDto();
+      const resourceDto4 = defaultResourceDto();
+      const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
+      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      const resources = new ResourcesCollection([
+        resourceDto1,
+        {...resourceDto2, name: "Resource 2 name update"},
+        resourceDto3,
+        {...resourceDto4, name: "Resource 4 name update"},
+      ]);
+      await ResourceLocalStorage.addOrReplaceResourcesCollection(resources);
+      const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(4);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
+    });
+
+    it("Should update cache when updating resources", async() => {
+      expect.assertions(8);
+      const resourceDto1 = defaultResourceDto();
+      const resourceDto2 = defaultResourceDto();
+      const resourceDto3 = defaultResourceDto();
+      const resourceDto4 = defaultResourceDto();
+      const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
+      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      const resources = new ResourcesCollection([
+        resourceDto1,
+        {...resourceDto2, name: "Resource 2 name update"},
+        resourceDto3,
+        {...resourceDto4, name: "Resource 4 name update"},
+      ]);
+      expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
+      await ResourceLocalStorage.addOrReplaceResourcesCollection(resources);
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(4);

@@ -16,6 +16,7 @@ import SetResourcesExpiryDateController from "../controller/resource/setResource
 import FindResourceDetailsController from "../controller/resource/findResourceDetailsController";
 import ResourceUpdateLocalStorageController
   from "../controller/resourceLocalStorage/resourceUpdateLocalStorageController";
+import FindAllIdsByIsSharedWithGroupController from "../controller/resource/findAllIdsByIsSharedWithGroupController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -43,22 +44,15 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   /*
-   * Find all resources
+   * Find all resources shared with group by aro foreign key
    *
-   * @listens passbolt.resources.find-all
+   * @listens passbolt.resources.find-all-ids-by-has-access
    * @param requestId {uuid} The request identifier
-   * @param options {object} The options to apply to the find
+   * @param options {uuid} The group identifier
    */
-  worker.port.on('passbolt.resources.find-all', async(requestId, options) => {
-    try {
-      const resourceModel = new ResourceModel(apiClientOptions, account);
-      const {contains, filters, orders} = options;
-      const resources = await resourceModel.findAll(contains, filters, orders);
-      worker.port.emit(requestId, 'SUCCESS', resources);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.resources.find-all-ids-by-is-shared-with-group', async(requestId, groupId) => {
+    const controller = new FindAllIdsByIsSharedWithGroupController(worker, requestId, apiClientOptions, account);
+    await controller._exec(groupId);
   });
 
   /*

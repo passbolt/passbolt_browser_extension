@@ -22,7 +22,7 @@ import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import Log from "../../model/log";
 import ShareModel from "../../model/share/shareModel";
-import UpdateResourcesLocalStorageService from "../../service/resource/updateResourcesLocalStorageService";
+import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
 
 
 class MoveResourcesController {
@@ -39,7 +39,7 @@ class MoveResourcesController {
     this.requestId = requestId;
     this.folderModel = new FolderModel(apiClientOptions, account);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
-    this.updateResourcesLocalStorage = new UpdateResourcesLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker);
@@ -230,7 +230,7 @@ class MoveResourcesController {
       await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await this.progressService.finishStep(message);
       });
-      await this.updateResourcesLocalStorage.updateAll();
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
     }
   }
 

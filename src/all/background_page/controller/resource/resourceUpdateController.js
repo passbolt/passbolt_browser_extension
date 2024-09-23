@@ -17,7 +17,6 @@ import UserModel from "../../model/user/userModel";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ResourceUpdateService from "../../service/resource/update/resourceUpdateService";
-import progressService from "../../service/progress/progressService";
 
 class ResourceUpdateController {
   /**
@@ -35,7 +34,7 @@ class ResourceUpdateController {
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker, i18n.t("Updating password"));
     this.getPassphraseService = new GetPassphraseService(account);
-    this.resourceUpdateService = new ResourceUpdateService(account, apiClientOptions, progressService);
+    this.resourceUpdateService = new ResourceUpdateService(account, apiClientOptions, this.progressService);
   }
 
   /**

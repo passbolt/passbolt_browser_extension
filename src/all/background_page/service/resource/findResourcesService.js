@@ -51,7 +51,6 @@ export default class FindResourcesService {
     if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
       throw new Error("Unsupported filter parameter used, please check supported filters");
     }
-
     const resourcesDto = await this.resourceService.findAll(contains, filters);
     return new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
   }
@@ -62,6 +61,17 @@ export default class FindResourcesService {
    */
   async findAllForLocalStorage() {
     const resources = await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, null, true);
+    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    resources.filterByResourceTypes(resourceTypes);
+    return resources;
+  }
+  /**
+   * Retrieve all resources shared with group for the local storage.
+   * @param {uuid} groupId
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByIsSharedWithGroupForLocalStorage(groupId) {
+    const resources = await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
     return resources;

@@ -20,7 +20,7 @@ classDiagram
         class FindAllIdsByIsSharedWithGroupController{
             +exec(uuid groupId) Promise~array~
         }
-        
+
         class FindResourcesForShareController{
             +exec(Array~uuid~ resourceIds) Promise~ResourcesCollection~
         }
@@ -52,7 +52,7 @@ classDiagram
     }
     namespace ConcurrentlyService {
         class ExecuteConcurrentlyService {
-            +execute(array callbacks, integer concurrency): array~Promise~
+            +execute(array callbacks, integer concurrency, object options): Promise~array~
         }
     }
     namespace ApiService{

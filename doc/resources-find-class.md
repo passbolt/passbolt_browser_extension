@@ -5,6 +5,7 @@ classDiagram
         class ResourcesEvent{
             "passbolt.resources.update-local-storage"
             "passbolt.resources.find-all-ids-by-is-shared-with-group"
+            "passbolt.export-resources.export-to-file"
         }
 
         class ShareEvent{
@@ -23,6 +24,10 @@ classDiagram
         
         class FindResourcesForShareController{
             +exec(Array~uuid~ resourceIds) Promise~ResourcesCollection~
+        }
+
+        class ExportResourcesFileController {
+            +exec(object exportResourcesFileDto) Promise~ResourcesCollection~
         }
     }
 
@@ -47,6 +52,7 @@ classDiagram
             +findAll(object contains, object filters) Promise~ResourcesCollection~
             +findAllForLocalStorage() Promise~ResourcesCollection~
             +findAllByIdsForShare() Promise~ResourcesCollection~
+            +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
         }
     }
@@ -91,10 +97,12 @@ classDiagram
     ResourcesEvent*--UpdateAllResourcesLocalStorageController
     ResourcesEvent*--FindAllIdsByIsSharedWithGroupController
     ShareEvent*--FindResourcesForShareController
+    ResourcesEvent*--ExportResourcesFileController
     %% Controller relationships
     UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
     FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
     FindResourcesForShareController*--FindResourcesService
+    ExportResourcesFileController*--FindResourcesService
     %% Business service relationships
     FindAndUpdateResourcesLocalStorageService*--ResourcesLocalStorageService
     FindAndUpdateResourcesLocalStorageService-->UpdateLocalStorageOptions

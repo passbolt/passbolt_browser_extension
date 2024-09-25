@@ -6,13 +6,13 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import ResourceModel from "../model/resource/resourceModel";
 import FolderModel from "../model/folder/folderModel";
 import ShareResourcesController from "../controller/share/shareResourcesController";
 import ShareFoldersController from "../controller/share/shareFoldersController";
 import FoldersCollection from "../model/entity/folder/foldersCollection";
 import PermissionChangesCollection from "../model/entity/permission/change/permissionChangesCollection";
 import SearchUsersAndGroupsController from "../controller/share/searchUsersAndGroupsController";
+import FindResourcesForShareController from "../controller/share/findResourcesForShareController";
 
 /**
  * Listens the share events
@@ -23,18 +23,12 @@ import SearchUsersAndGroupsController from "../controller/share/searchUsersAndGr
 const listen = function(worker, apiClientOptions, account) {
   /*
    * Retrieve the resources to share.
-   * @listens passbolt.share.get-resources
+   * @listens passbolt.share.find-resources-for-share
    * @param {array} resourcesIds The ids of the resources to retrieve.
    */
-  worker.port.on('passbolt.share.get-resources', async(requestId, resourcesIds) => {
-    try {
-      const resourceModel = new ResourceModel(apiClientOptions, account);
-      const resourcesCollection = await resourceModel.findAllForShare(resourcesIds);
-      worker.port.emit(requestId, 'SUCCESS', resourcesCollection);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.share.find-resources-for-share', async(requestId, resourcesIds) => {
+    const controller = new FindResourcesForShareController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourcesIds);
   });
 
   /*

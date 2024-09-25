@@ -23,6 +23,7 @@ import ProgressService from "../../service/progress/progressService";
 import Log from "../../model/log";
 import ShareModel from "../../model/share/shareModel";
 import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
+import FindResourcesService from "../../service/resource/findResourcesService";
 
 
 class MoveResourcesController {
@@ -39,6 +40,7 @@ class MoveResourcesController {
     this.requestId = requestId;
     this.folderModel = new FolderModel(apiClientOptions, account);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
@@ -120,7 +122,7 @@ class MoveResourcesController {
    * @returns {Promise<void>}
    */
   async findAllForShare() {
-    this.resources = await this.resourceModel.findAllForShare(this.resourcesIds);
+    this.resources = await this.findResourcesService.findAllByIdsForShare(this.resourcesIds);
     const parentIds = [...new Set(this.resources.folderParentIds)];
 
     if (this.destinationFolderId) {

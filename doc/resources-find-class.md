@@ -79,10 +79,11 @@ classDiagram
             <<Service>>
             +findAll(object contains, object filters) Promise~ResourcesCollection~
             +findAllByHasAccessForLocalStorage(uuid acoForeignKey) Promise~ResourcesCollection~
+            +findAllByIds(Array~uuid~ resourcesIds, object contains) Promise~ResourcesCollection~
+            +findAllForLocalStorage() Promise~ResourcesCollection~
             +findAllByIdsForShare() Promise~ResourcesCollection~
             +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
-            +findAllForLocalStorage() Promise~ResourcesCollection~
         }
 
         class ExecuteConcurrentlyService {

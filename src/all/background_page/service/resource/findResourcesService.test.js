@@ -29,7 +29,7 @@ import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/r
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import {v4 as uuidv4} from "uuid";
-
+import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -247,6 +247,83 @@ describe("FindResourcesService", () => {
 
       expect(service.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId});
+    });
+  });
+
+  describe("::findAllByIds", () => {
+    let service;
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+    });
+
+    it("should call the api only 1 times when the resource ids array length equals 1", async() => {
+      expect.assertions(4);
+
+      const collectionDto = Array.from({length: 79}, () => defaultResourceDto());
+      const collectionIds = collectionDto.map(collection => collection.id);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
+      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
+
+      const result = await service.findAllByIds(collectionIds, ResourceLocalStorage.DEFAULT_CONTAIN);
+
+      expect(result).toEqual(new ResourcesCollection(collectionDto));
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {
+        "has-id": collectionIds
+      });
+      expect(ExecuteConcurrentlyService.prototype.execute).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe("::findAllByIdsForShare", () => {
+    let service, expectedContains;
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+      expectedContains = {
+        "permission": true,
+        "permissions.user.profile": true,
+        "permissions.group": true,
+        "secret": true
+      };
+    });
+
+    it("should call the api only 1 times when the resource is less than 80", async() => {
+      expect.assertions(3);
+
+      const collectionDto = Array.from({length: 80}, () => defaultResourceDto());
+      const collectionIds = collectionDto.map(collection => collection.id);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
+      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
+
+      const result = await service.findAllByIdsForShare(collectionIds);
+
+      expect(result).toEqual(new ResourcesCollection(collectionDto));
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, {
+        "has-id": collectionIds
+      });
+    });
+
+    it("should call the api only 2 times when the resource is more than 80", async() => {
+      expect.assertions(4);
+
+      const collectionDto = Array.from({length: 82}, () => defaultResourceDto());
+      const resultCollectionDto = [...collectionDto];
+      const collectionIds = collectionDto.map(collection => collection.id);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
+        expect(contains).toEqual(expectedContains);
+        return resultCollectionDto.splice(0, filters["has-id"].length);
+      });
+      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
+
+      const result = await service.findAllByIdsForShare(collectionIds);
+
+      expect(result.toDto()).toEqual(collectionDto);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(2);
     });
   });
 });

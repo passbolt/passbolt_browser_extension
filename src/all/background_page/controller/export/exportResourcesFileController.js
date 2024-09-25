@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
-import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
@@ -25,6 +24,7 @@ import i18n from "../../sdk/i18n";
 import FileService from "../../service/file/fileService";
 import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
 import TotpEntity from "../../model/entity/totp/totpEntity";
+import FindResourcesService from "../../service/resource/findResourcesService";
 
 const INITIAL_PROGRESS_GOAL = 100;
 class ExportResourcesFileController {
@@ -39,11 +39,11 @@ class ExportResourcesFileController {
 
     // Models
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.folderModel = new FolderModel(apiClientOptions, account);
 
     this.progressService = new ProgressService(this.worker, i18n.t("Exporting ..."));
     this.getPassphraseService = new GetPassphraseService(account);
+    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
   }
 
   /**
@@ -80,7 +80,7 @@ class ExportResourcesFileController {
 
     const foldersCollection = await this.folderModel.getAllByIds(exportEntity.foldersIds);
     const exportFoldersCollection = ExternalFoldersCollection.constructFromFoldersCollection(foldersCollection);
-    const resourcesCollection = await this.resourceModel.findAllForDecrypt(exportEntity.resourcesIds);
+    const resourcesCollection = await this.findResourcesService.findAllForDecrypt(exportEntity.resourcesIds);
     const exportResourcesCollection = ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, exportFoldersCollection);
     exportEntity.exportFolders = exportFoldersCollection;
     exportEntity.exportResources = exportResourcesCollection;

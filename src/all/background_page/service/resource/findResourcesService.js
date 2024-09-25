@@ -130,4 +130,19 @@ export default class FindResourcesService {
 
     return resourceCollection;
   }
+
+  /**
+   * Find all resources for decrypt
+   *
+   * @param {array} resourcesIds resources uuids
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllForDecrypt(resourcesIds) {
+    assertArrayUUID(resourcesIds);
+
+    const contains = {'secret': true, 'resource-type': true};
+    const resourceCollection =  await this.findAllByIds(resourcesIds, contains);
+
+    return resourceCollection;
+  }
 }

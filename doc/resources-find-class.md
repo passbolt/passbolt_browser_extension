@@ -41,10 +41,15 @@ classDiagram
             "passbolt.resources.find-all-ids-by-is-shared-with-group"
             "passbolt.share.find-resources-for-share"
             "passbolt.export-resources.export-to-file"
+            "passbolt.resources.find-details"
         }
 
         class UpdateAllResourcesLocalStorageController{
             <<Controller>>
+            +exec() Promise
+        }
+
+        class FindResourceDetailsController{
             +exec() Promise
         }
 
@@ -82,9 +87,10 @@ classDiagram
             +findAllByIds(Array~uuid~ resourcesIds, object contains) Promise~ResourcesCollection~
             +findAllForLocalStorage() Promise~ResourcesCollection~
             +findAllByIdsForShare() Promise~ResourcesCollection~
-            +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
+            +findOneById(string uuid, object contains) Promise~ResourceEntity~
+            +findOneByIdForDetails(string uuid) Promise~ResourceEntity~
         }
 
         class ExecuteConcurrentlyService {
@@ -234,11 +240,13 @@ classDiagram
     EventsList*--FindAllIdsByIsSharedWithGroupController
     EventsList*--FindResourcesForShareController
     EventsList*--ExportResourcesFileController
+    EventsList*--FindResourceDetailsController
     UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
     FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
     FindResourcesForShareController*--FindResourcesService
     FindAndUpdateResourcesLocalStorageService*--ResourcesLocalStorageService
     ExportResourcesFileController*--FindResourcesService
+    FindResourceDetailsController*--FindResourcesService
     GetOrFindResourcesService*--ResourcesLocalStorageService
     GetOrFindResourcesService*--FindAndUpdateResourcesLocalStorageService
     FindAndUpdateResourcesLocalStorageService*--FindResourcesService

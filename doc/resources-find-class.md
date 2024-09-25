@@ -82,6 +82,7 @@ classDiagram
             +findAllByIds(Array~uuid~ resourcesIds, object contains) Promise~ResourcesCollection~
             +findAllForLocalStorage() Promise~ResourcesCollection~
             +findAllByIdsForShare() Promise~ResourcesCollection~
+            +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
         }

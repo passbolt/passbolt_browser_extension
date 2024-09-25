@@ -195,23 +195,6 @@ class ResourceModel {
     return new ResourceEntity(resourcesDto);
   }
 
-  /**
-   * Find all resources for decrypt
-   *
-   * @param {array} resourcesIds resources uuids
-   * @returns {Promise<ResourcesCollection>}
-   */
-  async findAllForDecrypt(resourcesIds) {
-    let resourcesDto = [];
-    // We split the requests in chunks in order to avoid any too long url error.
-    const resourcesIdsChunks = splitBySize(resourcesIds, 80);
-    for (const resourcesIdsChunk of resourcesIdsChunks) {
-      const partialResourcesDto = await this.resourceService.findAll({'secret': true, 'resource-type': true}, {'has-id': resourcesIdsChunk});
-      resourcesDto = [...resourcesDto, ...partialResourcesDto];
-    }
-    return new ResourcesCollection(resourcesDto);
-  }
-
   /*
    * ==============================================================
    *  CRUD

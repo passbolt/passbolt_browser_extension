@@ -15,6 +15,9 @@ import ResourceService from "../api/resource/resourceService";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import {assertArrayUUID} from "../../utils/assertions";
+import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
+import splitBySize from "../../utils/array/splitBySize";
 
 /**
  * The service aims to find resources from the API.
@@ -29,6 +32,7 @@ export default class FindResourcesService {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.executeConcurrentlyService = new ExecuteConcurrentlyService();
   }
 
   /**
@@ -51,8 +55,38 @@ export default class FindResourcesService {
     if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
       throw new Error("Unsupported filter parameter used, please check supported filters");
     }
+
     const resourcesDto = await this.resourceService.findAll(contains, filters);
     return new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
+  }
+
+  /**
+   * Find all by ids
+   * @param {Object} contains
+   * @param {Array<uuid>} resourcesIds
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByIds(resourcesIds, contains = {}) {
+    assertArrayUUID(resourcesIds);
+
+    // We split the requests in chunks in order to avoid any too long url error.
+    const resourcesIdsChunks = splitBySize(resourcesIds, 80);
+    const callbacks = resourcesIdsChunks.map(resourceIds => {
+      const filter = {
+        "has-id": resourceIds
+      };
+      return async() => await this.findAll(contains, filter);
+    });
+
+
+    // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
+    const arrayOfCollection = await this.executeConcurrentlyService.execute(callbacks, 5);
+    const resourcesCollection = new ResourcesCollection();
+
+    arrayOfCollection.forEach(collection => {
+      resourcesCollection._items = resourcesCollection._items.concat(collection._items);
+    });
+    return resourcesCollection;
   }
 
   /**
@@ -65,6 +99,7 @@ export default class FindResourcesService {
     resources.filterByResourceTypes(resourceTypes);
     return resources;
   }
+
   /**
    * Retrieve all resources shared with group for the local storage.
    * @param {uuid} groupId
@@ -75,5 +110,24 @@ export default class FindResourcesService {
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
     return resources;
+  }
+
+  /**
+   * Retrieve all resources by ids for sharing.
+   * @param {Array<uuid>} resourceIds
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByIdsForShare(resourcesIds) {
+    assertArrayUUID(resourcesIds);
+
+    const contains = {
+      "permission": true,
+      "permissions.user.profile": true,
+      "permissions.group": true,
+      "secret": true
+    };
+    const resourceCollection =  await this.findAllByIds(resourcesIds, contains);
+
+    return resourceCollection;
   }
 }

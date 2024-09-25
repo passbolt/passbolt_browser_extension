@@ -24,6 +24,7 @@ import ShareModel from "../../model/share/shareModel";
 import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
 import FindAndUpdateFoldersLocalStorageService
   from "../../service/folder/update/findAndUpdateFoldersLocalStorageService";
+import FindResourcesService from "../../service/resource/findResourcesService";
 
 class ShareFoldersController {
   /**
@@ -40,6 +41,7 @@ class ShareFoldersController {
     this.folderModel = new FolderModel(apiClientOptions, account);
     this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(account, apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
@@ -151,7 +153,7 @@ class ShareFoldersController {
 
     // Get more detailed permissions for all of these affected items if any
     if (this.resources.length) {
-      this.resources = await this.resourceModel.findAllForShare(this.resources.ids);
+      this.resources = await this.findResourcesService.findAllByIdsForShare(this.resources.ids);
     }
     if (this.subFolders.length) {
       this.subFolders = await this.folderModel.findAllForShare(this.subFolders.ids);

@@ -196,17 +196,6 @@ class ResourceModel {
   }
 
   /**
-   * Find all for share
-   *
-   * @param {array} resourcesIds resource uuids
-   * @returns {Promise<ResourcesCollection>}
-   */
-  async findAllForShare(resourcesIds) {
-    const resourcesDto = await this.resourceService.findAllForShare(resourcesIds);
-    return new ResourcesCollection(resourcesDto);
-  }
-
-  /**
    * Find all resources for decrypt
    *
    * @param {array} resourcesIds resources uuids
@@ -498,7 +487,7 @@ class ResourceModel {
    * ==============================================================
    */
   /**
-   * Assert that all the folders are in the local storage
+   * Assert that all resources are in the local storage
    *
    * @param {Array} resourceIds array of uuid
    * @throws {Error} if a resource does not exist

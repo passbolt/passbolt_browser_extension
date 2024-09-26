@@ -30,6 +30,7 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import {v4 as uuidv4} from "uuid";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -374,6 +375,119 @@ describe("FindResourcesService", () => {
 
       expect(result.toDto()).toEqual(collectionDto);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(2);
+    });
+  });
+  describe("::findOneById", () => {
+    let service;
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+    });
+
+    it("should retrieve the resource by an id with optional contain parameter", async() => {
+      expect.assertions(3);
+
+      const ressource = defaultResourceDto();
+
+      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => ressource);
+
+      const result = await service.findOneById(ressource.id);
+
+      expect(result).toEqual(new ResourceEntity(ressource));
+      expect(ResourceService.prototype.get).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.get).toHaveBeenCalledWith(ressource.id, {});
+    });
+
+    it("should retrieve the resource by an id with contain parameter", async() => {
+      expect.assertions(3);
+
+      const ressource = defaultResourceDto();
+      const contain = {
+        creator: true,
+        modifier: true,
+      };
+
+      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => ressource);
+
+      const result = await service.findOneById(ressource.id, contain);
+
+      expect(result).toEqual(new ResourceEntity(ressource));
+      expect(ResourceService.prototype.get).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.get).toHaveBeenCalledWith(ressource.id, contain);
+    });
+
+    it("should validate the resource id to be an uuid", async() => {
+      expect.assertions(1);
+
+      const promise = service.findOneById("Not an uuid");
+
+      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+    });
+
+    it("should validate the contains parameter", async() => {
+      expect.assertions(1);
+      const ressource = defaultResourceDto();
+
+      const promise = service.findOneById(ressource.id, {"not-valid": true});
+
+      await expect(promise).rejects.toThrowError("Unsupported contains parameter used, please check supported contains");
+    });
+
+    it("should throw an error in case of api error", async() => {
+      expect.assertions(1);
+
+      const ressource = defaultResourceDto();
+
+      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => { throw new Error("API error"); });
+
+      const promise = service.findOneById(ressource.id);
+
+      await expect(promise).rejects.toThrowError("API error");
+    });
+  });
+  describe("::findOneByIdForDetails", () => {
+    let service, expectedContains;
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+      expectedContains = {
+        "creator": true,
+        "modifier": true
+      };
+    });
+
+    it("should retrieve the resource by id for detail", async() => {
+      expect.assertions(3);
+
+      const ressource = defaultResourceDto();
+
+      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => ressource);
+
+      const result = await service.findOneByIdForDetails(ressource.id);
+
+      expect(result).toEqual(new ResourceEntity(ressource));
+      expect(ResourceService.prototype.get).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.get).toHaveBeenCalledWith(ressource.id, expectedContains);
+    });
+
+    it("should validate the resource id to be an uuid", async() => {
+      expect.assertions(1);
+
+      const promise = service.findOneByIdForDetails("Not an uuid");
+
+      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+    });
+
+    it("should throw an error in case of api error", async() => {
+      expect.assertions(1);
+
+      const ressource = defaultResourceDto();
+
+      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => { throw new Error("API error"); });
+
+      const promise = service.findOneByIdForDetails(ressource.id);
+
+      await expect(promise).rejects.toThrowError("API error");
     });
   });
 });

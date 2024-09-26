@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.9.0
  */
-import ResourceModel from "../../model/resource/resourceModel";
+import FindResourcesService from "../../service/resource/findResourcesService";
 import {assertUuid} from "../../utils/assertions";
 
 class FindResourceDetailsController {
@@ -26,7 +26,7 @@ class FindResourceDetailsController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
   }
 
   /**
@@ -51,11 +51,7 @@ class FindResourceDetailsController {
    */
   async exec(resourceId) {
     assertUuid(resourceId);
-    const contains = {
-      creator: true,
-      modifier: true,
-    };
-    return await this.resourceModel.findById(resourceId, contains);
+    return this.findResourcesService.findOneByIdForDetails(resourceId);
   }
 }
 

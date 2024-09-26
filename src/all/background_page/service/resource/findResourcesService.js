@@ -15,9 +15,10 @@ import ResourceService from "../api/resource/resourceService";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
-import {assertArrayUUID} from "../../utils/assertions";
+import {assertArrayUUID, assertUuid} from "../../utils/assertions";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import splitBySize from "../../utils/array/splitBySize";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
 
 /**
  * The service aims to find resources from the API.
@@ -144,5 +145,43 @@ export default class FindResourcesService {
     const resourceCollection =  await this.findAllByIds(resourcesIds, contains);
 
     return resourceCollection;
+  }
+
+  /**
+   * Find a resource given an id
+   *
+   * @param {array} resourceId resource id
+   * @param {Object} [contains] optional example: {permissions: true}
+   * @returns {Promise<ResourceEntity>}
+   */
+  async findOneById(resourceId, contains = {}) {
+    assertUuid(resourceId);
+    //Assert contains
+    const supportedOptions = ResourceService.getSupportedContainOptions();
+
+    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
+      throw new Error("Unsupported contains parameter used, please check supported contains");
+    }
+    const resourcesDto  = await this.resourceService.get(resourceId, contains);
+
+    return new ResourceEntity(resourcesDto);
+  }
+
+  /**
+   * Find the resource detail given an id
+   *
+   * @param {array} resourceId resource id
+   * @returns {Promise<ResourceEntity>}
+   */
+  async findOneByIdForDetails(resourceId) {
+    assertUuid(resourceId);
+
+    const contains = {
+      creator: true,
+      modifier: true,
+    };
+
+    const resource = this.findOneById(resourceId, contains);
+    return resource;
   }
 }

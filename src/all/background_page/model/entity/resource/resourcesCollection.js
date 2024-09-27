@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 import ResourceEntity from "./resourceEntity";
-import deduplicateObjects from "../../../utils/array/deduplicateObjects";
 import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
@@ -157,12 +156,6 @@ class ResourcesCollection extends EntityV2Collection {
     this.filterByCallback(resource => resource.isSuggestion(url));
   }
 
-  /*
-   * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-
   /**
    * Keep the resources if the tag is not present
    *
@@ -173,26 +166,6 @@ class ResourcesCollection extends EntityV2Collection {
     const tagIsNotPresent = tag => tag.id !== tagId;
     const filterResource = resource => resource.tags.tags.every(tagIsNotPresent);
     return  this._items.filter(filterResource);
-  }
-
-  /*
-   * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-  /**
-   * Sanitize resources dto:
-   * - Deduplicate the resources by id.
-   *
-   * @param {Array} dto The resources dto
-   * @returns {Array}
-   */
-  static sanitizeDto(dto) {
-    if (!Array.isArray(dto)) {
-      return [];
-    }
-
-    return deduplicateObjects(dto, 'id');
   }
 
   /*
@@ -338,21 +311,6 @@ class ResourcesCollection extends EntityV2Collection {
    */
   static get RULE_UNIQUE_ID() {
     return RULE_UNIQUE_ID;
-  }
-
-  /*
-   * ==================================================
-   * Meta data relative
-   * ==================================================
-   */
-
-  /**
-   * Transform collection DTO from V4 to V5
-   * @param {Array} resourcesCollectionDTO dto v4
-   * @returns {Array} resourcesCollectionDTO dto v5
-   */
-  static transformDtoFromV4toV5(resourcesCollectionDTO) {
-    return resourcesCollectionDTO.map(item => ResourceEntity.transformDtoFromV4toV5(item));
   }
 }
 

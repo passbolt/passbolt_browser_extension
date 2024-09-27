@@ -17,7 +17,7 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import {BrowserExtensionIconService} from "../ui/browserExtensionIcon.service";
-import {defaultResourceDtosCollection} from "../../model/entity/resource/resourcesCollection.test.data";
+import {defaultResourceDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import {
   resourceTypesCollectionDto

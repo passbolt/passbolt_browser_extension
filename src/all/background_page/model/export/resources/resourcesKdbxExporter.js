@@ -12,7 +12,6 @@
  */
 import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
 import * as kdbxweb from 'kdbxweb';
-import TotpEntity from "../../entity/totp/totpEntity";
 import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
 
 class ResourcesKdbxExporter {
@@ -113,10 +112,10 @@ class ResourcesKdbxExporter {
    * @param {ExternalResourceEntity} externalResourceEntity
    */
   setTotpField(kdbxEntry, externalResourceEntity) {
-    const totp = new TotpEntity(TotpEntity.sanitizeDto(externalResourceEntity.totp));
+    const totp = externalResourceEntity.totp;
     switch (this.exportEntity.format) {
       case ExportResourcesFileEntity.FORMAT_KDBX: {
-        kdbxEntry.fields.set('TimeOtp-Secret-Base32', kdbxweb.ProtectedValue.fromString(totp.secret_key));
+        kdbxEntry.fields.set('TimeOtp-Secret-Base32', kdbxweb.ProtectedValue.fromString(totp.secretKey));
         // Adapt algorithm to match keepass windows
         const algorithm = `HMAC-${totp.algorithm.substring(0, 3)}-${totp.algorithm.substring(3)}`;
         kdbxEntry.fields.set('TimeOtp-Algorithm', algorithm);
@@ -125,7 +124,7 @@ class ResourcesKdbxExporter {
         break;
       }
       case ExportResourcesFileEntity.FORMAT_KDBX_OTHERS: {
-        const totpUrl = totp.createUrlFromResource(externalResourceEntity);
+        const totpUrl = totp.createUrlFromExternalResource(externalResourceEntity);
         kdbxEntry.fields.set('otp', kdbxweb.ProtectedValue.fromString(totpUrl.toString()));
         break;
       }

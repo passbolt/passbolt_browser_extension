@@ -10,12 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import ExternalFoldersCollection from "../folder/external/externalFoldersCollection";
 import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {assertType} from "../../../utils/assertions";
 
-const ENTITY_NAME = "ExportResourcesFileEntity";
 const FORMAT_KDBX = "kdbx";
 const FORMAT_KDBX_OTHERS = "kdbx-others";
 const FORMAT_CSV_KDBX = "csv-kdbx";
@@ -29,17 +28,27 @@ const FORMAT_CSV_DASHLANE = "csv-dashlane";
 const FORMAT_CSV_NORDPASS = "csv-nordpass";
 const FORMAT_CSV_LOGMEONCE = "csv-logmeonce";
 
-class ExportResourcesFileEntity extends Entity {
+const SUPPORTED_FORMAT = [
+  FORMAT_KDBX,
+  FORMAT_KDBX_OTHERS,
+  FORMAT_CSV_KDBX,
+  FORMAT_CSV_LASTPASS,
+  FORMAT_CSV_1PASSWORD,
+  FORMAT_CSV_CHROMIUM,
+  FORMAT_CSV_BITWARDEN,
+  FORMAT_CSV_MOZILLA,
+  FORMAT_CSV_SAFARI,
+  FORMAT_CSV_DASHLANE,
+  FORMAT_CSV_NORDPASS,
+  FORMAT_CSV_LOGMEONCE
+];
+
+class ExportResourcesFileEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(exportResourcesFileDto, options = {}) {
-    super(EntitySchema.validate(
-      ExportResourcesFileEntity.ENTITY_NAME,
-      exportResourcesFileDto,
-      ExportResourcesFileEntity.getSchema()
-    ), options);
-
+  constructor(dto, options = {}) {
+    super(dto, options);
     /*
      * // @todo Refactor when a schema deep testing strategy is implemented.
      * $ if (exportResourcesFileDto.options) {
@@ -82,7 +91,7 @@ class ExportResourcesFileEntity extends Entity {
       "properties": {
         "format": {
           "type": "string",
-          "enum": ExportResourcesFileEntity.SUPPORTED_FORMAT
+          "enum": SUPPORTED_FORMAT
         },
         "resources_ids": {
           "type": "array",
@@ -158,35 +167,19 @@ class ExportResourcesFileEntity extends Entity {
   }
 
   /**
-   * Get export options
-   * @returns {object} the file encrypted in base64
-   */
-  get options() {
-    return this._props.options || {};
-  }
-
-  /**
-   * get export if any
-   * @returns {object}
-   */
-  get credentials() {
-    return this.options.credentials || {};
-  }
-
-  /**
    * Get export protecting password
-   * @returns {string}
+   * @returns {string|null}
    */
   get password() {
-    return this.credentials.password;
+    return this._props.options?.credentials?.password || null;
   }
 
   /**
    * Get export protecting keyfile
-   * @returns {string}
+   * @returns {string|null}
    */
   get keyfile() {
-    return this.credentials.keyfile;
+    return this._props.options?.credentials?.keyfile || null;
   }
 
   /*
@@ -214,7 +207,7 @@ class ExportResourcesFileEntity extends Entity {
    * @returns {ExternalResourcesCollection}
    */
   get exportResources() {
-    return this._export_resources;
+    return this._export_resources || new ExternalResourcesCollection([]);
   }
 
   /**
@@ -222,9 +215,7 @@ class ExportResourcesFileEntity extends Entity {
    * @param {ExternalResourcesCollection} collection The collection of resources to export
    */
   set exportResources(collection) {
-    if (!(collection instanceof ExternalResourcesCollection)) {
-      throw new TypeError("exportResources must be a valid ImportResourcesCollection instance");
-    }
+    assertType(collection, ExternalResourcesCollection);
     this._export_resources = collection;
   }
 
@@ -241,9 +232,7 @@ class ExportResourcesFileEntity extends Entity {
    * @param {ExternalFoldersCollection} collection The collection of folders to export
    */
   set exportFolders(collection) {
-    if (!(collection instanceof ExternalFoldersCollection)) {
-      throw new TypeError("exportFolders must be a valid ExternalFoldersCollection instance");
-    }
+    assertType(collection, ExternalFoldersCollection);
     this._export_folders = collection;
   }
 
@@ -252,35 +241,6 @@ class ExportResourcesFileEntity extends Entity {
    * Static properties getters
    * ==================================================
    */
-
-  /**
-   * ExportResourcesFileEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
-  }
-
-  /**
-   * ExportResourcesFileEntity.SUPPORTED_FILE_TYPES
-   * @returns {array<string>}
-   */
-  static get SUPPORTED_FORMAT() {
-    return [
-      ExportResourcesFileEntity.FORMAT_KDBX,
-      ExportResourcesFileEntity.FORMAT_KDBX_OTHERS,
-      ExportResourcesFileEntity.FORMAT_CSV_KDBX,
-      ExportResourcesFileEntity.FORMAT_CSV_LASTPASS,
-      ExportResourcesFileEntity.FORMAT_CSV_1PASSWORD,
-      ExportResourcesFileEntity.FORMAT_CSV_CHROMIUM,
-      ExportResourcesFileEntity.FORMAT_CSV_BITWARDEN,
-      ExportResourcesFileEntity.FORMAT_CSV_MOZILLA,
-      ExportResourcesFileEntity.FORMAT_CSV_SAFARI,
-      ExportResourcesFileEntity.FORMAT_CSV_DASHLANE,
-      ExportResourcesFileEntity.FORMAT_CSV_NORDPASS,
-      ExportResourcesFileEntity.FORMAT_CSV_LOGMEONCE
-    ];
-  }
 
   /**
    * ExportResourcesFileEntity.FORMAT_KDBX
@@ -296,86 +256,6 @@ class ExportResourcesFileEntity extends Entity {
    */
   static get FORMAT_KDBX_OTHERS() {
     return FORMAT_KDBX_OTHERS;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_KDBX
-   * @returns {string}
-   */
-  static get FORMAT_CSV_KDBX() {
-    return FORMAT_CSV_KDBX;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_LASTPASS
-   * @returns {string}
-   */
-  static get FORMAT_CSV_LASTPASS() {
-    return FORMAT_CSV_LASTPASS;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_1PASSWORD
-   * @returns {string}
-   */
-  static get FORMAT_CSV_1PASSWORD() {
-    return FORMAT_CSV_1PASSWORD;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_CHROMIUM
-   * @returns {string}
-   */
-  static get FORMAT_CSV_CHROMIUM() {
-    return FORMAT_CSV_CHROMIUM;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_BITWARDEN
-   * @returns {string}
-   */
-  static get FORMAT_CSV_BITWARDEN() {
-    return FORMAT_CSV_BITWARDEN;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_MOZILLA
-   * @returns {string}
-   */
-  static get FORMAT_CSV_MOZILLA() {
-    return FORMAT_CSV_MOZILLA;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_SAFARI
-   * @returns {string}
-   */
-  static get FORMAT_CSV_SAFARI() {
-    return FORMAT_CSV_SAFARI;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_DASHLANE
-   * @returns {string}
-   */
-  static get FORMAT_CSV_DASHLANE() {
-    return FORMAT_CSV_DASHLANE;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_NORDPASS
-   * @returns {string}
-   */
-  static get FORMAT_CSV_NORDPASS() {
-    return FORMAT_CSV_NORDPASS;
-  }
-
-  /**
-   * ExportResourcesFileEntity.FORMAT_CSV_LOGMEONCE
-   * @returns {string}
-   */
-  static get FORMAT_CSV_LOGMEONCE() {
-    return FORMAT_CSV_LOGMEONCE;
   }
 }
 

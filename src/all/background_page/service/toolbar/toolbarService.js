@@ -12,13 +12,13 @@
  * @since         2.0.0
  */
 import {BrowserExtensionIconService} from "../ui/browserExtensionIcon.service";
-import ResourceModel from "../../model/resource/resourceModel";
 import Toolbar from "../../model/toolbar";
 import {TabController as tabsController} from "../../controller/tabsController";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import CheckAuthStatusService from "../auth/checkAuthStatusService";
 import Log from "../../model/log";
+import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
 
 class ToolbarService {
   constructor() {
@@ -142,7 +142,7 @@ class ToolbarService {
         return;
       }
 
-      this.resourceModel = new ResourceModel(apiClientOptions, account);
+      this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
 
       const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
       const currentTab = tabs?.[0];
@@ -156,8 +156,9 @@ class ToolbarService {
       }
 
       this.tabUrl = tabUrl;
+
       if (!this.isUrlPassboltDomain(this.tabUrl, account) && !this.isUrlPassboltExtension(this.tabUrl)) {
-        suggestedResourcesCount = await this.resourceModel.countSuggestedResources(this.tabUrl);
+        suggestedResourcesCount = (await this.getOrFindResourcesService.getOrFindSuggested(this.tabUrl)).length;
       }
 
       BrowserExtensionIconService.setSuggestedResourcesCount(suggestedResourcesCount);

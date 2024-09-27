@@ -12,147 +12,123 @@
  * @since         4.1.0
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import ResourceTypeEntity from "./resourceTypeEntity";
 import ResourceTypesCollection from "./resourceTypesCollection";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import {
-  resourceTypesCollectionDto
+  resourceTypesCollectionDto,
+  buildDefineNumberOfResourceTypesDtos
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
   TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
-  TEST_RESOURCE_TYPE_PASSWORD_STRING, TEST_RESOURCE_TYPE_TOTP
+  TEST_RESOURCE_TYPE_PASSWORD_STRING, TEST_RESOURCE_TYPE_TOTP,
+  resourceTypePasswordStringDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
+import {v4 as uuid} from "uuid";
+import expect from "expect";
 
 describe("ResourceTypesCollection", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(ResourceTypesCollection.ENTITY_NAME, ResourceTypesCollection.getSchema());
+  describe("::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(ResourceTypesCollection.name, ResourceTypesCollection.getSchema());
+    });
   });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "password-string"
-    };
-    const dto2 = {
-      "id": "b58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "password-and-description"
-    };
-    const entity = new ResourceTypeEntity(dto);
-    const entity2 = new ResourceTypeEntity(dto2);
-    const resourceTypesCollection = new ResourceTypesCollection([entity, entity2]);
-    expect(resourceTypesCollection.toDto()).toEqual([dto, dto2]);
+  describe("::constructor", () => {
+    it("constructor works if valid minimal DTO is provided", () => {
+      expect.assertions(1);
+      const resourceTypesDto = resourceTypesCollectionDto();
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesDto);
+      expect(resourceTypesCollection.toDto()).toEqual(resourceTypesDto);
+    });
+
+    it("constructor works if valid DTO is provided with optional and non supported fields", () => {
+      expect.assertions(1);
+      const resourceTypesDto = resourceTypesCollectionDto();
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesDto);
+      expect(resourceTypesCollection.toDto()).toEqual(resourceTypesDto);
+    });
+
+    it("constructor fails if reusing same resource type id", () => {
+      expect.assertions(1);
+      const resourceTypeDto = resourceTypePasswordStringDto();
+      const resourceTypesDto = [resourceTypeDto, resourceTypeDto];
+      expect(() => new ResourceTypesCollection(resourceTypesDto)).toThrow(CollectionValidationError);
+    });
+
+    it("constructor fails if reusing same resource type slug", () => {
+      expect.assertions(1);
+      const resourceTypeDto1 = resourceTypePasswordStringDto();
+      const resourceTypeDto2 = resourceTypePasswordStringDto();
+      const resourceTypesDto = [resourceTypeDto1, resourceTypeDto2];
+      expect(() => new ResourceTypesCollection(resourceTypesDto)).toThrow(CollectionValidationError);
+    });
+
+    it("constructor should be empty if no resource types are supported", () => {
+      expect.assertions(1);
+      const dto1 = resourceTypePasswordStringDto({slug: 'unsupported-slug'});
+      const dto2 = resourceTypePasswordStringDto({slug: 'unsupported-slug-2'});
+      const resourceTypesCollection = new ResourceTypesCollection([dto1, dto2]);
+      expect(resourceTypesCollection.length).toStrictEqual(0);
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate the build rules: must have unique slug", () => {
+      expect.assertions(2);
+      const resourceTypeDto1 = resourceTypePasswordStringDto();
+      const resourceTypeDto2 = resourceTypePasswordStringDto();
+      const resourceTypesDto = [resourceTypeDto1, resourceTypeDto2];
+      const options = {ignoreInvalidEntity: true};
+      const collection = new ResourceTypesCollection(resourceTypesDto, options);
+      expect(collection).toHaveLength(1);
+      expect(collection._items[0].toDto()).toStrictEqual(resourceTypeDto1);
+    });
+
+    it("should, with enabling the ignore invalid option, ignore items which do not validate", () => {
+      expect.assertions(2);
+      const resourceTypeDto1 = resourceTypePasswordStringDto();
+      const resourceTypeDto2 = resourceTypePasswordStringDto({
+        id: "wrong-id"
+      });
+      const resourceTypesDto = [resourceTypeDto1, resourceTypeDto2];
+      const options = {ignoreInvalidEntity: true};
+      const collection = new ResourceTypesCollection(resourceTypesDto, options);
+      expect(collection).toHaveLength(1);
+      expect(collection._items[0].toDto()).toStrictEqual(resourceTypeDto1);
+    });
+
+    it("Check if resource type id is present or not in the collection", () => {
+      const resourceTypesDto = resourceTypesCollectionDto();
+      expect.assertions(resourceTypesDto.length + 1);
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesDto);
+      for (let i = 0; i < resourceTypesDto.length; i++) {
+        expect(resourceTypesCollection.isResourceTypeIdPresent(resourceTypesDto[i].id)).toBeTruthy();
+      }
+      expect(resourceTypesCollection.isResourceTypeIdPresent(uuid())).toBeFalsy();
+    });
   });
 
-  it("constructor works if valid DTO is provided with optional and non supported fields", () => {
-    const dto = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "password-string",
-      "description": "A test resource type",
-      "created": "2012-07-04T13:39:25+00:00",
-      "modified": "2012-07-04T13:39:25+00:00",
-      "_nope": 'nope'
-    };
-    const dto2 = {
-      "id": "b58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type 2",
-      "slug": "password-and-description",
-      "description": "A test resource type 2",
-      "created": "2012-07-04T13:39:25+00:00",
-      "modified": "2012-07-04T13:39:25+00:00",
-      "_nope": 'nope'
-    };
-    const filtered = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "password-string",
-      "description": "A test resource type",
-      "created": "2012-07-04T13:39:25+00:00",
-      "modified": "2012-07-04T13:39:25+00:00",
-    };
-    const filtered2 = {
-      "id": "b58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type 2",
-      "slug": "password-and-description",
-      "description": "A test resource type 2",
-      "created": "2012-07-04T13:39:25+00:00",
-      "modified": "2012-07-04T13:39:25+00:00",
-    };
-    const entity = new ResourceTypeEntity(dto);
-    const entity2 = new ResourceTypeEntity(dto2);
-    const resourceTypesCollection = new ResourceTypesCollection([entity, entity2]);
-    expect(resourceTypesCollection.toDto()).toEqual([filtered, filtered2]);
-  });
-
-  it("constructor fails if reusing same resource", () => {
-    const entity = new ResourceTypeEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'slug': 'password-and-description', 'name': 'test'});
-    const t = () => new ResourceTypesCollection([entity, entity]);
-    expect(t).toThrow(EntityCollectionError);
-  });
-
-  it("constructor should be empty if no resource types are supported", () => {
-    const entity = new ResourceTypeEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'slug': 'test-resource-type', 'name': 'test'});
-    const entity2 = new ResourceTypeEntity({'id': 'af077753-0835-4054-92ee-556660ea04f1', 'slug': 'test-resource-type 2', 'name': 'test2'});
-    const resourceTypesCollection = new ResourceTypesCollection([entity, entity2]);
-    expect(resourceTypesCollection.length).toStrictEqual(0);
-  });
-
-  it("Check if resource type id is present or not in the collection", () => {
-    const dto = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "password string",
-      "slug": "password-string"
-    };
-    const dto2 = {
-      "id": "b58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "password and description",
-      "slug": "password-and-description"
-    };
-    const dto3 = {
-      "id": '7f077753-0835-4054-92ee-556660ea04f1',
-      "name": "test resource type",
-      "slug": 'test-resource-type'
-    };
-    const entity = new ResourceTypeEntity(dto);
-    const entity2 = new ResourceTypeEntity(dto2);
-    const entity3 = new ResourceTypeEntity(dto3);
-    const resourceTypesCollection = new ResourceTypesCollection([entity, entity2, entity3]);
-    expect(resourceTypesCollection.isResourceTypeIdPresent("7f077753-0835-4054-92ee-556660ea04f1")).toBeFalsy();
-    expect(resourceTypesCollection.isResourceTypeIdPresent("af077753-0835-4054-92ee-556660ea04f1")).toBeFalsy();
-    expect(resourceTypesCollection.isResourceTypeIdPresent("a58de6d3-f52c-5080-b79b-a601a647ac85")).toBeTruthy();
-    expect(resourceTypesCollection.isResourceTypeIdPresent("b58de6d3-f52c-5080-b79b-a601a647ac85")).toBeTruthy();
-  });
-
-  it("Resource type id present in the collection", () => {
-    const dto = {
-      "id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "password-string"
-    };
-    const dto2 = {
-      "id": "b58de6d3-f52c-5080-b79b-a601a647ac85",
-      "name": "test resource type",
-      "slug": "password-and-description"
-    };
-    const entity = new ResourceTypeEntity(dto);
-    const entity2 = new ResourceTypeEntity(dto2);
-    const resourceTypesCollection = new ResourceTypesCollection([entity, entity2]);
-    expect(resourceTypesCollection.isResourceTypeIdPresent("a58de6d3-f52c-5080-b79b-a601a647ac85")).toBeTruthy();
-    expect(resourceTypesCollection.isResourceTypeIdPresent("b58de6d3-f52c-5080-b79b-a601a647ac85")).toBeTruthy();
-  });
-
-  describe("ResourceTypesCollection::filterByPasswordResourceTypes", () => {
+  describe("::filterByPasswordResourceTypes", () => {
     it("should filter the collection by resources types behaving like password.", () => {
+      expect.assertions(5);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
       resourceTypes.filterByPasswordResourceTypes();
-      expect.assertions(5);
       expect(resourceTypes).toHaveLength(3);
       expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
       expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
       expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
+    });
+  });
+
+  describe(":pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const count = 10_000;
+      const dtos = buildDefineNumberOfResourceTypesDtos(count);
+
+      const start = performance.now();
+      const collection = new ResourceTypesCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(4);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

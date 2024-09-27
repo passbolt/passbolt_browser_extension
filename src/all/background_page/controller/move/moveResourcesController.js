@@ -22,6 +22,8 @@ import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import Log from "../../model/log";
 import ShareModel from "../../model/share/shareModel";
+import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
+import FindResourcesService from "../../service/resource/findResourcesService";
 
 
 class MoveResourcesController {
@@ -36,8 +38,10 @@ class MoveResourcesController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = new FolderModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions, account);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
+    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker);
@@ -118,7 +122,7 @@ class MoveResourcesController {
    * @returns {Promise<void>}
    */
   async findAllForShare() {
-    this.resources = await this.resourceModel.findAllForShare(this.resourcesIds);
+    this.resources = await this.findResourcesService.findAllByIdsForShare(this.resourcesIds);
     const parentIds = [...new Set(this.resources.folderParentIds)];
 
     if (this.destinationFolderId) {
@@ -228,7 +232,7 @@ class MoveResourcesController {
       await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await this.progressService.finishStep(message);
       });
-      await this.resourceModel.updateLocalStorage();
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
     }
   }
 

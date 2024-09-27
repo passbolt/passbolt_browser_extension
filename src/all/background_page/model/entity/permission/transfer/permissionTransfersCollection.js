@@ -12,39 +12,14 @@
  * @since         2.13.0
  */
 import PermissionTransferEntity from "./permissionTransferEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
-const ENTITY_NAME = 'PermissionTransfers';
-
-class PermissionTransfersCollection extends EntityCollection {
+class PermissionTransfersCollection extends EntityV2Collection {
   /**
    * @inheritDoc
-   * @throws {EntityValidationError} Build Rule: The collection cannot be empty.
    */
-  constructor(permissionTransferDto, options = {}) {
-    super(EntitySchema.validate(
-      PermissionTransfersCollection.ENTITY_NAME,
-      permissionTransferDto,
-      PermissionTransfersCollection.getSchema()
-    ), options);
-
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(permissionTransfer => {
-      this.push(permissionTransfer);
-    });
-
-    // The collection cannot be empty
-    if (!this.length) {
-      throw new EntityValidationError(`The permission transfer collection cannot be empty.`);
-    }
-
-    // We do not keep original props
-    this._props = null;
+  get entityClass() {
+    return PermissionTransferEntity;
   }
 
   /**
@@ -56,35 +31,8 @@ class PermissionTransfersCollection extends EntityCollection {
     return {
       "type": "array",
       "items": PermissionTransferEntity.getSchema(),
+      "minItems": 1
     };
-  }
-
-  /**
-   * PermissionTransfersCollection.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
-  }
-
-  /*
-   * ==================================================
-   * Setters
-   * ==================================================
-   */
-  /**
-   * Push a copy of the permission to the list
-   * @param {PermissionTransferEntity} permissionTransfer DTO or PermissionTransferEntity
-   */
-  push(permissionTransfer) {
-    if (!permissionTransfer || typeof permissionTransfer !== 'object') {
-      throw new TypeError(`PermissionTransfersCollection push parameter should be an object.`);
-    }
-    if (permissionTransfer instanceof PermissionTransferEntity) {
-      permissionTransfer = permissionTransfer.toDto(); // clone
-    }
-    permissionTransfer = new PermissionTransferEntity(permissionTransfer); // validate
-    super.push(permissionTransfer);
   }
 }
 

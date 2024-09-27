@@ -22,6 +22,8 @@ import {
   assertValidInitialisationVector,
   assertBoolean,
   assertType,
+  assertNumber,
+  assertArrayUUID,
 } from "./assertions";
 import {v4 as uuid} from 'uuid';
 import GenerateSsoIvService from "../service/crypto/generateSsoIvService";
@@ -189,7 +191,7 @@ describe("Assertions", () => {
     each([
       {scenario: "True", value: true},
       {scenario: "False", value: false},
-      {scenario: "0", value: undefined},
+      {scenario: "undefined", value: undefined},
     ]).describe(`Should not throw an error if the parameter is valid`, props => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
@@ -233,6 +235,58 @@ describe("Assertions", () => {
         const data = scenarios[i];
         expect(() => assertType(data, AccountRecoveryPrivateKeyEntity, expectedMessage)).toThrow(expectedError);
       }
+    });
+  });
+
+  describe("Assertions::assertNumber", () => {
+    each([
+      {scenario: "Positive number", value: 42},
+      {scenario: "Negative number", value: -42},
+      {scenario: "0", value: 0},
+      {scenario: "Float", value: 42.2},
+      {scenario: "undefined", value: undefined},
+    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertNumber(props.value)).not.toThrow();
+      });
+    });
+
+    each([
+      {scenario: "String number", value: "1"},
+      {scenario: "true", value: true},
+      {scenario: "false", value: false},
+      {scenario: "null", value: null},
+      {scenario: "object", value: {}},
+      {scenario: "array", value: {}}
+    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertNumber(props.value)).toThrow();
+      });
+    });
+  });
+  describe("Assertions::assertArrayUUID", () => {
+    each([
+      {scenario: "Array of uuid", value: [uuid(), uuid()]},
+      {scenario: "Empty array", value: []},
+    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertArrayUUID(props.value)).not.toThrow();
+      });
+    });
+
+    each([
+      {scenario: "object", value: {}},
+      {scenario: "null", value: null},
+      {scenario: "array of number", value: [1, 2]},
+      {scenario: "array of string", value: ["1", "2"]}
+    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertArrayUUID(props.value)).toThrow();
+      });
     });
   });
 });

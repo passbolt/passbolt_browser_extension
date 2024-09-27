@@ -43,10 +43,10 @@ describe("CsvKdbxRowParser", () => {
     const externalResourceEntity = CsvKdbxRowParser.parse(data);
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.name).toEqual(data.Title);
-    expect(externalResourceEntity.username).toBeUndefined();
-    expect(externalResourceEntity.uri).toBeUndefined();
+    expect(externalResourceEntity.username).toBeNull();
+    expect(externalResourceEntity.uri).toBeNull();
     expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.description).toBeUndefined();
+    expect(externalResourceEntity.description).toBeNull();
     expect(externalResourceEntity.folderParentPath).toEqual("");
   });
 
@@ -90,7 +90,7 @@ describe("CsvKdbxRowParser", () => {
     expect(externalResourceEntity.secretClear).toEqual(data.Password);
     expect(externalResourceEntity.description).toEqual(data.Notes);
     expect(externalResourceEntity.folderParentPath).toEqual(data.Group);
-    expect(externalResourceEntity.totp.secret_key).toEqual("TJSNMLGTCYOEMXZG");
+    expect(externalResourceEntity.totp.secretKey).toEqual("TJSNMLGTCYOEMXZG");
     expect(externalResourceEntity.totp.period).toEqual(30);
     expect(externalResourceEntity.totp.digits).toEqual(6);
     expect(externalResourceEntity.totp.algorithm).toEqual("SHA1");
@@ -111,7 +111,7 @@ describe("CsvKdbxRowParser", () => {
     try {
       CsvKdbxRowParser.parse(data, resourceTypesCollection);
     } catch (error) {
-      expect(error.message).toStrictEqual("Could not validate entity Totp.");
+      expect(error.message).toStrictEqual("Could not validate entity TotpEntity.");
     }
   });
 });

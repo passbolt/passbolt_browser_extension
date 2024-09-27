@@ -9,9 +9,11 @@ jobs:
   build:
     name: Create release candidate
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         name: Create Release candidate
         run: gh release create "${GITHUB_REF#refs/*/}" -t "${GITHUB_REF#refs/*/}" -p --notes-file RELEASE_NOTES.md

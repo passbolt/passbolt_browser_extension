@@ -12,41 +12,24 @@
  */
 import ResourceEntity from "../resourceEntity";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import TotpEntity from "../../totp/totpEntity";
 import ResourceMetadataEntity from "../metadata/resourceMetadataEntity";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {assertType} from "../../../../utils/assertions";
 
-const ENTITY_NAME = 'ExternalResource';
 const DEFAULT_RESOURCE_NAME = '(no name)';
 
-class ExternalResourceEntity extends Entity {
+class ExternalResourceEntity extends EntityV2 {
   /**
    * @inheritDoc
-   * Sanitize:
-   * - Override default data using the data provided in the DTO.
-   * - Normalize the folder parent path, see ExternalFolderEntity::sanitizePath
    * @throws {EntityValidationError} Build Rule: The collection of secrets cannot be empty.
    * @throws {EntityValidationError} Build Rule: Verify that the secrets associated resource ID corresponds with the
    * resource ID.
    */
-  constructor(externalResourceDto, options = {}) {
-    // Default properties values
-    const props = Object.assign(ExternalResourceEntity.getDefault(), externalResourceDto);
-
-    // Sanitize
-    if (typeof props.folder_parent_path == "string") {
-      props.folder_parent_path = ExternalFolderEntity.sanitizePath(props.folder_parent_path);
-    }
-
-    // Validate
-    super(EntitySchema.validate(
-      ExternalResourceEntity.ENTITY_NAME,
-      props,
-      ExternalResourceEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Associations
     if (this._props.secrets) {
@@ -54,18 +37,30 @@ class ExternalResourceEntity extends Entity {
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
+
+    if (this._props.totp) {
+      this._totp = new TotpEntity(this._props.totp, {clone: false});
+      delete this._props.totp;
+    }
   }
 
   /**
-   * Get default properties values
-   * @return {object}
+   * @inheritdoc
+   * Sanitize:
+   * - Override default data using the data provided in the DTO.
+   * - Normalize the folder parent path, see ExternalFolderEntity::sanitizePath
    */
-  static getDefault() {
-    return {
-      "name": ExternalResourceEntity.DEFAULT_RESOURCE_NAME,
-      "secret_clear": "",
-      "folder_parent_path": ""
-    };
+  marshall() {
+    this._props.name = this._props.name || ExternalResourceEntity.DEFAULT_RESOURCE_NAME;
+    this._props.secret_clear = this._props.secret_clear || "";
+
+    if (typeof this._props.folder_parent_path === "string") {
+      this._props.folder_parent_path = ExternalFolderEntity.sanitizePath(this._props.folder_parent_path);
+    } else if (!this._props.folder_parent_path) {
+      this._props.folder_parent_path = "";
+    }
+
+    super.marshall();
   }
 
   /**
@@ -97,7 +92,10 @@ class ExternalResourceEntity extends Entity {
         "secret_clear": {
           "type": "string"
         },
-        "totp": TotpEntity.getSchema(),
+        "totp": {
+          ...TotpEntity.getSchema(),
+          "nullable": true,
+        },
         "folder_parent_path": {
           "type": "string"
         },
@@ -122,12 +120,17 @@ class ExternalResourceEntity extends Entity {
     if (this._secrets) {
       result.secrets = this._secrets.toDto();
     }
+
+    if (this._totp) {
+      result.totp = this._totp.toDto();
+    }
+
     return result;
   }
 
   /**
    * Customizes JSON stringification behavior
-   * @returns {*}
+   * @returns {Object}
    */
   toJSON() {
     return this.toDto();
@@ -135,9 +138,9 @@ class ExternalResourceEntity extends Entity {
 
   /**
    * Builds from a resource entity DTO an external resource entity DTO.
-   * @param {object} resourceEntityDto
+   * @param {Object} resourceEntityDto
    * @param {ExternalFolderEntity} [externalFolderParent]
-   * @returns {object}
+   * @returns {Object}
    */
   static buildDtoFromResourceEntityDto(resourceEntityDto, externalFolderParent) {
     return {
@@ -156,7 +159,7 @@ class ExternalResourceEntity extends Entity {
 
   /**
    * Returns a Resource DTO in v5 format.
-   * @returns {object}
+   * @returns {Object}
    */
   toResourceEntityImportDto() {
     return {
@@ -183,18 +186,10 @@ class ExternalResourceEntity extends Entity {
 
   /**
    * Get resource id
-   * @returns {string}
+   * @returns {string|null}
    */
   get id() {
     return this._props.id || null;
-  }
-
-  /**
-   * Set resource id
-   * @param {string} id The resource id
-   */
-  set id(id) {
-    this._props.id = id;
   }
 
   /**
@@ -207,34 +202,26 @@ class ExternalResourceEntity extends Entity {
 
   /**
    * Get resource username
-   * @returns {string}
+   * @returns {string|null}
    */
   get username() {
-    return this._props.username;
+    return this._props.username || null;
   }
 
   /**
    * Get resource uri
-   * @returns {string}
+   * @returns {string|null}
    */
   get uri() {
-    return this._props.uri;
+    return this._props.uri || null;
   }
 
   /**
    * Get resource description
-   * @returns {string}
+   * @returns {string|null}
    */
   get description() {
-    return this._props.description;
-  }
-
-  /**
-   * Set resource description
-   * @params {string} description The description
-   */
-  set description(description) {
-    this._props.description = description;
+    return this._props.description || null;
   }
 
   /**
@@ -244,37 +231,12 @@ class ExternalResourceEntity extends Entity {
   get secretClear() {
     return this._props.secret_clear;
   }
-
-  /**
-   * Set secret in clear
-   * @param {string} secretClear secret in clear
-   */
-  set secretClear(secretClear) {
-    this._props.secret_clear = secretClear;
-  }
-
   /**
    * Get folder parent id
    * @returns {string|null}
    */
   get folderParentId() {
     return this._props.folder_parent_id || null;
-  }
-
-  /**
-   * Set folder parent id
-   * @param {string} folderParentId the folder parent id
-   */
-  set folderParentId(folderParentId) {
-    this._props.folder_parent_id = folderParentId;
-  }
-
-  get totp() {
-    return this._props.totp;
-  }
-
-  set totp(totp) {
-    this._props.totp = totp;
   }
 
   /**
@@ -287,15 +249,15 @@ class ExternalResourceEntity extends Entity {
 
   /**
    * Get the resource type if any
-   * @returns {(string|null)} uuid
+   * @returns {string|null} uuid
    */
   get resourceTypeId() {
     return this._props.resource_type_id || null;
   }
 
   /**
-   * Get the resource type if any
-   * @returns {(string|null)} uuid
+   * Get the resource expiry date if any
+   * @returns {string|null}
    */
   get expired() {
     return this._props.expired || null;
@@ -330,11 +292,48 @@ class ExternalResourceEntity extends Entity {
    */
 
   /**
+   * Set resource id
+   * @param {string} id The resource id
+   */
+  set id(id) {
+    const propSchema = this.cachedSchema.properties.id;
+    this._props.id = EntitySchema.validateProp("id", id, propSchema);
+  }
+
+  /**
+   * Set folder parent id
+   * @param {string} folderParentId the folder parent id
+   */
+  set folderParentId(folderParentId) {
+    const propSchema = this.cachedSchema.properties.folder_parent_id;
+    this._props.folder_parent_id = EntitySchema.validateProp("folder_parent_id", folderParentId, propSchema);
+  }
+
+  /**
+   * Set resource description
+   * @params {string} description The description
+   */
+  set description(description) {
+    const propSchema = this.cachedSchema.properties.description;
+    this._props.description = EntitySchema.validateProp("description", description, propSchema);
+  }
+
+  /**
+   * Set secret in clear
+   * @param {string} secretClear secret in clear
+   */
+  set secretClear(secretClear) {
+    const propSchema = this.cachedSchema.properties.secret_clear;
+    this._props.secret_clear = EntitySchema.validateProp("secret_clear", secretClear, propSchema);
+  }
+
+  /**
    * Set folder parent path
    * @param {string} folderParentPath folder parent path
    */
   set folderParentPath(folderParentPath) {
-    this._props.folder_parent_path = folderParentPath;
+    const propSchema = this.cachedSchema.properties.folder_parent_path;
+    this._props.folder_parent_path = EntitySchema.validateProp("folder_parent_path", folderParentPath, propSchema);
   }
 
   /**
@@ -342,6 +341,8 @@ class ExternalResourceEntity extends Entity {
    * @param {ExternalFolderEntity} rootFolder The folder to use as root
    */
   changeRootPath(rootFolder) {
+    assertType(rootFolder, ExternalFolderEntity);
+
     if (!this.folderParentPath.length) {
       this.folderParentPath = rootFolder.path;
     } else {
@@ -357,10 +358,10 @@ class ExternalResourceEntity extends Entity {
 
   /**
    * Get secrets
-   * @returns {ResourceSecretsCollection} the secrets collection
+   * @returns {ResourceSecretsCollection|null} the secrets collection
    */
   get secrets() {
-    return this._secrets;
+    return this._secrets || null;
   }
 
   /**
@@ -368,10 +369,30 @@ class ExternalResourceEntity extends Entity {
    * @param {ResourceSecretsCollection} secrets the secrets collection
    */
   set secrets(secrets) {
-    if (!(secrets instanceof ResourceSecretsCollection)) {
-      throw new EntityValidationError('ExternalResourceEntity secrets expect a ResourceSecretsCollection.');
-    }
+    assertType(secrets, ResourceSecretsCollection);
     this._secrets = secrets;
+  }
+
+  /**
+   * Get the associated totp if any
+   * @returns {TotpEntity|null}
+   */
+  get totp() {
+    return this._totp || null;
+  }
+
+  /**
+   * Set the associated totp
+   * @param {TotpEntity|null} totp
+   */
+  set totp(totp) {
+    if (totp === null) {
+      this._totp = null;
+      return;
+    }
+
+    assertType(totp, TotpEntity);
+    this._totp = totp;
   }
 
   /*
@@ -379,14 +400,6 @@ class ExternalResourceEntity extends Entity {
    * Static properties getters
    * ==================================================
    */
-  /**
-   * ExternalResourceEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
-  }
-
   /**
    * ExternalResourceEntity.DEFAULT_RESOURCE_NAME
    * @returns {string}

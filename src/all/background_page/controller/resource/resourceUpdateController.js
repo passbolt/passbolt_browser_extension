@@ -12,16 +12,11 @@
  * @since         2.13.0
  */
 import Keyring from "../../model/keyring";
-import EncryptMessageService from "../../service/crypto/encryptMessageService";
-import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import UserModel from "../../model/user/userModel";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import i18n from "../../sdk/i18n";
-import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import ProgressService from "../../service/progress/progressService";
+import ResourceUpdateService from "../../service/resource/update/resourceUpdateService";
 
 class ResourceUpdateController {
   /**
@@ -35,11 +30,27 @@ class ResourceUpdateController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.userModel = new UserModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker, i18n.t("Updating password"));
     this.getPassphraseService = new GetPassphraseService(account);
+    this.resourceUpdateService = new ResourceUpdateService(account, apiClientOptions, this.progressService);
+  }
+
+  /**
+   * Controller executor.
+   * @param {object} resourceDto The resource data
+   * @param {string|object} plaintextDto The secret to encrypt
+   * @returns {Promise<void>}
+   */
+  async _exec(resourceDto, plaintextDto) {
+    try {
+      const resource = await this.exec(resourceDto, plaintextDto);
+      this.worker.port.emit(this.requestId, 'SUCCESS', resource);
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(this.requestId, 'ERROR', error);
+    }
   }
 
   /**
@@ -49,104 +60,16 @@ class ResourceUpdateController {
    * @param {null|string|object} plaintextDto The secret to encrypt
    * @returns {Promise<Object>} updated resource
    */
-  async main(resourceDto, plaintextDto) {
-    const resourceEntity = new ResourceEntity(resourceDto);
-    if (plaintextDto === null) {
-      // Most simple scenario, there is no secret to update
-      return await this.updateResourceMetaOnly(resourceEntity);
-    } else {
-      return await this.updateResourceAndSecret(resourceEntity, plaintextDto);
-    }
-  }
-
-  /**
-   * Update a resource metadata
-   *
-   * @param {ResourceEntity} resourceEntity
-   * @returns {Promise<Object>} updated resource
-   */
-  async updateResourceMetaOnly(resourceEntity) {
-    this.progressService.start(1, i18n.t("Updating password"));
-    const updatedResource = await this.resourceModel.update(resourceEntity);
-    await this.progressService.finishStep(i18n.t("Done!"), true);
-    await this.progressService.close();
-    return updatedResource;
-  }
-
-  /**
-   * Update a resource and associated secret
-   *
-   * @param {ResourceEntity} resourceEntity
-   * @param {string|object} plaintextDto
-   * @returns {Promise<Object>} updated resource
-   */
-  async updateResourceAndSecret(resourceEntity, plaintextDto) {
-    // Get the passphrase if needed and decrypt secret key
-    const privateKey = await this.getPrivateKey();
-
-    // Set the goals
-    try {
-      this.progressService.start(4, i18n.t("Updating password"));
-      const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
-      const goals = usersIds.length + 3; // encrypt * users + keyring sync + save + done
-      this.progressService.updateGoals(goals);
-
-      // Sync keyring
-      await this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
-      await this.keyring.sync();
-
-      // Encrypt
-      const plaintext = await this.resourceModel.serializePlaintextDto(resourceEntity.resourceTypeId, plaintextDto);
-      resourceEntity.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
-
-      // Post data & wrap up
-      await this.progressService.finishStep(i18n.t("Saving resource"), true);
-      const updatedResource = await this.resourceModel.update(resourceEntity);
-      await this.progressService.finishStep(i18n.t("Done!"), true);
-      await this.progressService.close();
-      return updatedResource;
-    } catch (error) {
-      await this.progressService.close();
-      throw error;
-    }
-  }
-
-  /**
-   * getPrivateKey
-   * @returns {Promise<openpgp.PrivateKey>}
-   */
-  async getPrivateKey() {
+  async exec(resourceDto, plaintextDto) {
     try {
       const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-      return GetDecryptedUserPrivateKeyService.getKey(passphrase);
-    } catch (error) {
-      console.error(error);
-      throw error;
+      this.progressService.start(1, i18n.t('Updating resource'));
+      const resourceUpdated =  await this.resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
+      await this.progressService.finishStep(i18n.t('Done!'), true);
+      return resourceUpdated;
+    } finally {
+      await this.progressService.close();
     }
-  }
-
-  /**
-   * Encrypt and sign plaintext data for the given users
-   * TODO Move to service
-   *
-   * @param {string|Object} plaintextDto
-   * @param {array} usersIds
-   * @param {openpgp.PrivateKey} privateKey
-   * @returns {Promise<ResourceSecretsCollection>}
-   */
-  async encryptSecrets(plaintextDto, usersIds, privateKey) {
-    const secrets = [];
-    for (let i = 0; i < usersIds.length; i++) {
-      if (Object.prototype.hasOwnProperty.call(usersIds, i)) {
-        const userId =  usersIds[i];
-        const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
-        const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
-        const data = await EncryptMessageService.encrypt(plaintextDto, userPublicKey, [privateKey]);
-        secrets.push({user_id: userId, data: data});
-        await this.progressService.finishStep(i18n.t("Encrypting"), true);
-      }
-    }
-    return new ResourceSecretsCollection(secrets);
   }
 }
 

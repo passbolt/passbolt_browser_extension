@@ -12,14 +12,20 @@
  * @since         3.0.0
  */
 import Log from "../../model/log";
-import ResourceTypeEntity from "../../model/entity/resourceType/resourceTypeEntity";
 import ResourceTypesCollection from "../../model/entity/resourceType/resourceTypesCollection";
-import Lock from "../../utils/lock";
-const lock = new Lock();
+import {assertType} from "../../utils/assertions";
 
 const RESOURCE_TYPES_LOCAL_STORAGE_KEY = 'resourceTypes';
 
 class ResourceTypeLocalStorage {
+  /**
+   * Get the storage key.
+   * @private
+   */
+  static get storageKey() {
+    return RESOURCE_TYPES_LOCAL_STORAGE_KEY;
+  }
+
   /**
    * Flush the resourceTypes local storage
    *
@@ -28,18 +34,18 @@ class ResourceTypeLocalStorage {
    */
   static async flush() {
     Log.write({level: 'debug', message: 'ResourceTypeLocalStorage flushed'});
-    return await browser.storage.local.remove(RESOURCE_TYPES_LOCAL_STORAGE_KEY);
+    return await browser.storage.local.remove(this.storageKey);
   }
 
   /**
    * Set the resourceTypes local storage.
    *
    * @throws {Error} if operation failed
-   * @return {Promise} results object, containing every object in keys that was found in the storage area.
+   * @return {Promise<ResourceTypesCollectionDto>} results object, containing every object in keys that was found in the storage area.
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    const {resourceTypes} = await browser.storage.local.get([RESOURCE_TYPES_LOCAL_STORAGE_KEY]);
+    const {resourceTypes} = await browser.storage.local.get([this.storageKey]);
     return resourceTypes;
   }
 
@@ -47,74 +53,13 @@ class ResourceTypeLocalStorage {
    * Set the resourceTypes in local storage.
    * @param {ResourceTypesCollection} resourceTypesCollection The folders to insert in the local storage.
    * @return {Promise<void>}
+   * @throws {TypeError} if the given argument is not a ResourceTypesCollection
    */
   static async set(resourceTypesCollection) {
-    await lock.acquire();
-    const resourceTypes = [];
-    if (resourceTypesCollection) {
-      if (!(resourceTypesCollection instanceof ResourceTypesCollection)) {
-        throw new TypeError('ResourceTypeLocalStorage::set expects a ResourceTypesCollection');
-      }
-      for (const resourceTypeEntity of resourceTypesCollection) {
-        ResourceTypeLocalStorage.assertEntityBeforeSave(resourceTypeEntity);
-        resourceTypes.push(resourceTypeEntity.toDto());
-      }
-    }
-    await browser.storage.local.set({resourceTypes: resourceTypes});
-    lock.release();
-  }
-
-  /**
-   * Get a resource from the local storage by id
-   *
-   * @param {string} id The resource id
-   * @return {object} resource object
-   */
-  static async getResourceById(id) {
-    const resourceTypes = await ResourceTypeLocalStorage.get();
-    return resourceTypes.find(item => item.id === id);
-  }
-
-  /**
-   * Add a resourceType in the local storage
-   * @param {ResourceTypeEntity} resourceTypeEntity
-   */
-  static async addResourceType(resourceTypeEntity) {
-    await lock.acquire();
-    try {
-      ResourceTypeLocalStorage.assertEntityBeforeSave(resourceTypeEntity);
-      const resourceTypes = await ResourceTypeLocalStorage.get();
-      resourceTypes.push(resourceTypeEntity.toDto());
-      await browser.storage.local.set({resourceTypes: resourceTypes});
-      lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
-    }
-  }
-
-  /*
-   * =================================================
-   * Static methods
-   * =================================================
-   */
-  /**
-   * Make sure the entity meet some minimal requirements before being stored
-   *
-   * @param {ResourceTypeEntity} resourceTypeEntity
-   * @throw {TypeError} if requirements are not met
-   * @private
-   */
-  static assertEntityBeforeSave(resourceTypeEntity) {
-    if (!resourceTypeEntity) {
-      throw new TypeError('ResourceTypeLocalStorage expects a ResourceTypeEntity to be set');
-    }
-    if (!(resourceTypeEntity instanceof ResourceTypeEntity)) {
-      throw new TypeError('ResourceTypeLocalStorage expects an object of type ResourceTypeEntity');
-    }
-    if (!resourceTypeEntity.id) {
-      throw new TypeError('ResourceTypeLocalStorage expects ResourceTypeEntity id to be set');
-    }
+    assertType(resourceTypesCollection, ResourceTypesCollection, 'ResourceTypeLocalStorage::set expects a ResourceTypesCollection');
+    await navigator.locks.request(this.storageKey, async() => {
+      await browser.storage.local.set({[this.storageKey]: resourceTypesCollection.toDto()});
+    });
   }
 }
 

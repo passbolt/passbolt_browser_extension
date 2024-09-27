@@ -11,10 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'ResourceType';
 const RESOURCE_TYPE_NAME_MAX_LENGTH = 255;
 const RESOURCE_TYPE_SLUG_MAX_LENGTH = 64;
 const RESOURCE_TYPE_DESCRIPTION_MAX_LENGTH = 255;
@@ -24,16 +22,187 @@ export const RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG = "password-and-descrip
 export const RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG = "password-description-totp";
 export const RESOURCE_TYPE_TOTP_SLUG = "totp";
 
-class ResourceTypeEntity extends Entity {
+//Plaintext secret schema for slug: "password-string"
+export const RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA = {
+  resource: {
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: {
+        type: "string",
+        maxLength: 255,
+      },
+      username: {
+        type: "string",
+        maxLength: 255,
+        nullable: true,
+      },
+      description: {
+        maxLength: 10000,
+        nullable: true,
+        type: "string"
+      },
+      uri: {
+        type: "string",
+        maxLength: 1024,
+        nullable: true
+      }
+    }
+  },
+  secret: {
+    type: "string",
+    maxLength: 4096
+  }
+};
+
+//Plaintext secret schema for slug: "password-and-description"
+const RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_DEFINITION_SCHEMA = {
+  resource: {
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: {
+        type: "string",
+        maxLength: 255
+      },
+      username: {
+        type: "string",
+        maxLength: 255,
+        nullable: true
+      },
+      uri: {
+        type: "string",
+        maxLength: 1024,
+        nullable: true
+      },
+    },
+  },
+  secret: {
+    type: "object",
+    required: ["password"],
+    properties: {
+      password: {
+        type: "string",
+        maxLength: 4096
+      },
+      description: {
+        type: "string",
+        maxLength: 10000,
+        nullable: true,
+      },
+    },
+  }
+};
+
+//Plaintext secret schema for slug: "totp"
+const RESOURCE_TYPE_TOTP_DEFINITION_SCHEMA = {
+  resource: {
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: {
+        type: "string",
+        maxLength: 255
+      },
+      uri: {
+        type: "string",
+        maxLength: 1024,
+        nullable: true
+      }
+    }
+  },
+  secret: {
+    type: "object",
+    required: ["totp"],
+    properties: {
+      totp: {
+        type: "object",
+        required: ["secret_key", "digits", "algorithm"],
+        properties: {
+          algorithm: {
+            type: "string",
+            minLength: 4,
+            maxLength: 6,
+          },
+          secret_key: {
+            type: "string",
+            maxLength: 1024
+          },
+          digits: {
+            type: "number",
+            minimum: 6,
+            maximum: 8
+          },
+          period: {
+            type: "number"
+          }
+        }
+      }
+    }
+  }
+};
+
+//Plaintext secret schema for slug: "password-description-totp"
+const RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_DEFINITION_SCHEMA = {
+  resource: {
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: {
+        type: "string",
+        maxLength: 255
+      },
+      username: {
+        type: "string",
+        maxLength: 255,
+        nullable: true
+      },
+      uri: {
+        type: "string",
+        maxLength: 1024,
+        nullable: true
+      },
+    },
+  },
+  secret: {
+    type: "object",
+    required: ["password", "totp"],
+    properties: {
+      password: {
+        type: "string",
+        maxLength: 4096
+      },
+      description: {
+        type: "string",
+        maxLength: 10000,
+        nullable: true,
+      },
+      totp: RESOURCE_TYPE_TOTP_DEFINITION_SCHEMA.secret.properties.totp,
+    },
+  }
+};
+
+const SCHEMAS = {
+  [RESOURCE_TYPE_PASSWORD_STRING_SLUG]: RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA,
+  [RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG]: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_DEFINITION_SCHEMA,
+  [RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG]: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_DEFINITION_SCHEMA,
+  [RESOURCE_TYPE_TOTP_SLUG]: RESOURCE_TYPE_TOTP_DEFINITION_SCHEMA,
+};
+
+class ResourceTypeEntity extends EntityV2 {
   /**
-   * @inheritDoc
+   * @inheritdoc
    */
-  constructor(resourceTypeDto, options = {}) {
-    super(EntitySchema.validate(
-      ResourceTypeEntity.ENTITY_NAME,
-      resourceTypeDto,
-      ResourceTypeEntity.getSchema()
-    ), options);
+  marshall() {
+    if (typeof this._props.slug !== "string" || !(this._props.slug in SCHEMAS)) {
+      //if the slug is not suppported or invalid, we ensure the validation fails on `definition`.
+      delete this._props.definition;
+      return;
+    }
+
+    const resourceTypeDefinitionSchema = SCHEMAS[this._props.slug];
+    const definition = Object.assign({}, resourceTypeDefinitionSchema);
+    this._props.definition = definition;
   }
 
   /**
@@ -47,6 +216,7 @@ class ResourceTypeEntity extends Entity {
         "id",
         "name",
         "slug",
+        "definition",
       ],
       "properties": {
         "id": {
@@ -97,14 +267,6 @@ class ResourceTypeEntity extends Entity {
   }
 
   /**
-   * Get resource type name
-   * @returns {string} name
-   */
-  get name() {
-    return this._props.name;
-  }
-
-  /**
    * Get resource type slug
    * @returns {string} slug
    */
@@ -114,47 +276,10 @@ class ResourceTypeEntity extends Entity {
 
   /**
    * Get resource type definition (JSON compatible schema)
-   * @returns {string} definition
+   * @returns {object} definition
    */
   get definition() {
     return this._props.definition;
-  }
-
-  /**
-   * Get resource type description
-   * @returns {(string|null)} description
-   */
-  get description() {
-    return this._props.description || null;
-  }
-
-  /**
-   * Get created date
-   * @returns {(string|null)} date
-   */
-  get created() {
-    return this._props.created || null;
-  }
-
-  /**
-   * Get modified date
-   * @returns {(string|null)} date
-   */
-  get modified() {
-    return this._props.modified || null;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * ResourceTypeEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

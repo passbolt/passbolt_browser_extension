@@ -10,27 +10,20 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import NeededSecretsCollection from "../../secret/needed/neededSecretsCollection";
-import SecretsCollection from "../../secret/secretsCollection";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import GroupUpdateSecretsCollection from "../../secret/groupUpdate/groupUpdateSecretsCollection";
 
-const ENTITY_NAME = 'GroupUpdateDryRunResult';
-
-class GroupUpdateDryRunResultEntity extends Entity {
+class GroupUpdateDryRunResultEntity extends EntityV2 {
   /**
    * @inheritDoc
    */
-  constructor(groupUpdateDryRunResultDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupUpdateDryRunResultEntity.ENTITY_NAME,
-      groupUpdateDryRunResultDto,
-      GroupUpdateDryRunResultEntity.getSchema()
-    ), options);
+  constructor(dto, options = {}) {
+    super(dto, options);
 
     // Association
     if (this._props.secrets) {
-      this._secrets = new SecretsCollection(this._props.secrets, {clone: false});
+      this._secrets = new GroupUpdateSecretsCollection(this._props.secrets, {clone: false});
       delete this._props.secrets;
     }
     if (this._props.needed_secrets) {
@@ -49,7 +42,7 @@ class GroupUpdateDryRunResultEntity extends Entity {
       "required": [],
       "properties": {
         // Associations
-        "secrets": SecretsCollection.getSchema(),
+        "secrets": GroupUpdateSecretsCollection.getSchema(),
         "needed_secrets": NeededSecretsCollection.getSchema()
       }
     };
@@ -92,7 +85,7 @@ class GroupUpdateDryRunResultEntity extends Entity {
 
   /**
    * Return secrets
-   * @returns {(SecretsCollection|null)}
+   * @returns {GroupUpdateSecretsCollection|null}
    */
   get secrets() {
     return this._secrets || null;
@@ -100,24 +93,10 @@ class GroupUpdateDryRunResultEntity extends Entity {
 
   /**
    * Return needed secrets
-   * @returns {(SecretsCollection|null)}
+   * @returns {NeededSecretsCollection|null}
    */
   get neededSecrets() {
     return this._needed_secrets || null;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-
-  /**
-   * GroupEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

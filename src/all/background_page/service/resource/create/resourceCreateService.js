@@ -24,6 +24,7 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import i18n from "../../../sdk/i18n";
 import ResourceModel from "../../../model/resource/resourceModel";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
+import FindAndUpdateResourcesLocalStorage from "../findAndUpdateResourcesLocalStorageService";
 
 class ResourceCreateService {
   /**
@@ -34,11 +35,12 @@ class ResourceCreateService {
   constructor(account, apiClientOptions, progressService) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
-    this.folderModel = new FolderModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions, account);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = progressService;
     this.resourceModel = new ResourceModel(apiClientOptions, this.account);
+    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
   }
 
   /**
@@ -78,6 +80,7 @@ class ResourceCreateService {
    *
    * @param {ResourceEntity} resourceEntity
    * @returns {Promise<ResourceEntity>}
+   * @private
    */
   async create(resourceEntity) {
     const data = resourceEntity.toV4Dto({secrets: true});
@@ -95,6 +98,7 @@ class ResourceCreateService {
    * @param {ResourceEntity} resourceEntity
    * @param {openpgp.PrivateKey} privateKey The user decrypted private key
    * @returns {Promise<void>}
+   * @private
    */
   async handleCreateInFolder(resourceEntity, privateKey) {
     // Calculate changes if any
@@ -119,7 +123,7 @@ class ResourceCreateService {
       await this.shareModel.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message =>
         await this.progressService?.finishStep(message)
       );
-      await this.resourceModel.updateLocalStorage();
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
     }
   }
 }

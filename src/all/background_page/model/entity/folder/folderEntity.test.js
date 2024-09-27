@@ -24,6 +24,7 @@ import {
 import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import PermissionsCollection from "../permission/permissionsCollection";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import UserEntity from "../user/userEntity";
 
 describe("FolderEntity", () => {
   describe("FolderEntity::getSchema", () => {
@@ -96,7 +97,7 @@ describe("FolderEntity", () => {
   });
 
   it("constructor works if valid DTO is provided with optional properties", () => {
-    const dto = defaultFolderDto();
+    const dto = defaultFolderDto({}, {withPermissions: true, withCreator: true, withModifier: true});
     const entity = new FolderEntity(dto);
     expect(entity.id).toEqual(dto.id);
     expect(entity.name).toEqual('Accounting');
@@ -106,6 +107,11 @@ describe("FolderEntity", () => {
     expect(entity.permission).toBeInstanceOf(PermissionEntity);
     expect(entity.permission.toDto()).toEqual(expect.objectContaining({type: 15}));
     expect(entity.permissions).toBeInstanceOf(PermissionsCollection);
+    expect(entity.permissions.length).toEqual(1);
+    expect(entity._creator).toBeInstanceOf(UserEntity);
+    expect(entity._creator.toDto()).toEqual(expect.objectContaining({username: "ada@passbolt.com"}));
+    expect(entity._modifier).toBeInstanceOf(UserEntity);
+    expect(entity._modifier.toDto()).toEqual(expect.objectContaining({username: "ada@passbolt.com"}));
     expect(entity.permissions.length).toEqual(1);
     expect(entity.isReadOnly()).toBe(false);
     expect(entity.canUpdate()).toBe(true);
@@ -170,8 +176,8 @@ describe("FolderEntity", () => {
       expect(Object.keys(resultDto).length).toBe(expectedKeys.length);
     });
 
-    it("should return the expected properties containing the associated permission.", () => {
-      expect.assertions(3);
+    it("should return the expected properties containing the associated properties.", () => {
+      expect.assertions(6);
       const expectedKeys = [
         "id",
         "folder_parent_id",
@@ -181,39 +187,22 @@ describe("FolderEntity", () => {
         "created",
         "modified",
         "personal",
-        "permission"
+        "creator",
+        "modifier",
+        "permission",
+        "permissions"
       ];
 
-      const dto = defaultFolderDto();
+      const dto = defaultFolderDto({}, {withPermissions: true, withCreator: true, withModifier: true});
       const entity = new FolderEntity(dto);
-      const resultDto = entity.toDto({permission: true});
+      const resultDto = entity.toDto(FolderEntity.ALL_CONTAIN_OPTIONS);
       const keys = Object.keys(resultDto);
       expect(keys).toEqual(expectedKeys);
       expect(Object.keys(resultDto).length).toBe(expectedKeys.length);
       expect(resultDto.permission.type).toEqual(15);
-    });
-
-    it("should return the expected properties containing the associated permissions.", () => {
-      expect.assertions(3);
-      const expectedKeys = [
-        "id",
-        "folder_parent_id",
-        "name",
-        "created_by",
-        "modified_by",
-        "created",
-        "modified",
-        "personal",
-        "permissions"
-      ];
-
-      const dto = defaultFolderDto();
-      const entity = new FolderEntity(dto);
-      const resultDto = entity.toDto({permissions: true});
-      const keys = Object.keys(resultDto);
-      expect(keys).toEqual(expectedKeys);
-      expect(Object.keys(resultDto).length).toBe(expectedKeys.length);
       expect(resultDto.permissions[0].type).toEqual(15);
+      expect(resultDto.creator?.username).toEqual("ada@passbolt.com");
+      expect(resultDto.modifier?.username).toEqual("ada@passbolt.com");
     });
   });
 

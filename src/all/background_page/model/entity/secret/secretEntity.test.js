@@ -14,13 +14,14 @@
 import SecretEntity from "./secretEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {minimalDto, readSecret} from "./secretEntity.test.data";
+import {minimalDto, readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import {SCENARIO_EMPTY} from "passbolt-styleguide/test/assert/assertEntityProperty";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("SecretEntity", () => {
   describe("SecretEntity::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(SecretEntity.ENTITY_NAME, SecretEntity.getSchema());
+      EntitySchema.validateSchema(SecretEntity.name, SecretEntity.getSchema());
     });
 
     it("validates id property", () => {
@@ -67,27 +68,81 @@ describe("SecretEntity", () => {
 
   describe("SecretEntity::constructor", () => {
     it("constructor works if valid minimal DTO is provided", () => {
+      expect.assertions(1);
+
       const dto =  minimalDto();
       const entity = new SecretEntity(dto);
-      expect(entity.toDto()).toEqual(dto);
-      expect(entity.id).toBeNull();
-      expect(entity.data).toEqual(dto.data);
-      expect(entity.userId).toBeNull();
-      expect(entity.resourceId).toBeNull();
-      expect(entity.created).toBeNull();
-      expect(entity.modified).toBeNull();
+      expect(entity.toDto()).toStrictEqual(dto);
     });
 
     it("constructor works if valid complete DTO is provided", () => {
+      expect.assertions(1);
+
       const dto = readSecret();
       const entity = new SecretEntity(dto);
-      expect(entity.toDto()).toEqual(dto);
-      expect(entity.id).toEqual(dto.id);
-      expect(entity.data).toEqual(dto.data);
-      expect(entity.userId).toEqual(dto.user_id);
-      expect(entity.resourceId).toEqual(dto.resource_id);
-      expect(entity.created).toEqual(dto.created);
-      expect(entity.modified).toEqual(dto.modified);
+      expect(entity.toDto()).toStrictEqual(dto);
+    });
+
+    it("constructor should make sure `data` is a valid openpgp message", () => {
+      expect.assertions(1);
+
+      const dto = minimalDto({data: "wrong-format"});
+      expect(() => new SecretEntity(dto)).toThrow(EntityValidationError);
+    });
+  });
+
+  describe("::assertValidMessage", () => {
+    it("should throw an error if the data is not a string", () => {
+      expect.assertions(1);
+
+      const expectedError = new EntityValidationError('This is not a valid OpenPGP armored message');
+      expectedError.addError('data', 'empty', 'The OpenPGP armored message should not be empty.');
+
+      expect(() => SecretEntity.assertValidMessage(42)).toThrow(expectedError);
+    });
+
+    it("should throw an error if the data is not a starting with the expected delimiter", () => {
+      expect.assertions(1);
+
+      const expectedError = new EntityValidationError('This is not a valid OpenPGP armored message');
+      expectedError.addError('data', 'begin', 'The OpenPGP armored message should contain a start delimiter.');
+
+      expect(() => SecretEntity.assertValidMessage("It's a string!")).toThrow(expectedError);
+    });
+
+    it("should throw an error if the data is not a ending with the expected delimiter", () => {
+      expect.assertions(1);
+
+      const expectedError = new EntityValidationError('This is not a valid OpenPGP armored message');
+      expectedError.addError('data', 'begin', 'The OpenPGP armored message should contain a start delimiter.');
+
+      expect(() => SecretEntity.assertValidMessage("-----BEGIN PGP MESSAGE-----")).toThrow(expectedError);
+    });
+  });
+
+  describe("::getters", () => {
+    it("should provide the right values when everything is set", () => {
+      expect.assertions(4);
+
+      const dto = readSecret();
+      const entity = new SecretEntity(dto);
+
+      expect(entity.id).toStrictEqual(dto.id);
+      expect(entity.data).toStrictEqual(dto.data);
+      expect(entity.userId).toStrictEqual(dto.user_id);
+      expect(entity.resourceId).toStrictEqual(dto.resource_id);
+    });
+
+    it("should provide the default values with minimal dto", () => {
+      expect.assertions(4);
+
+      const dto = minimalDto();
+      const entity = new SecretEntity(dto);
+
+      expect(entity.id).toBeNull();
+      expect(entity.data).toStrictEqual(dto.data);
+      expect(entity.userId).toBeNull();
+      expect(entity.resourceId).toBeNull();
     });
   });
 });

@@ -10,57 +10,17 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import FoldersCollection from "../foldersCollection";
 import ExternalFolderEntity from "./externalFolderEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {assertType} from "../../../../utils/assertions";
 
-
-const ENTITY_NAME = 'ExternalFolders';
-
-class ExternalFoldersCollection extends EntityCollection {
+class ExternalFoldersCollection extends EntityV2Collection {
   /**
    * @inheritDoc
    */
-  constructor(externalFoldersCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      ExternalFoldersCollection.ENTITY_NAME,
-      externalFoldersCollectionDto,
-      ExternalFoldersCollection.getSchema()
-    ), options);
-
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(externalFolderDto => {
-      this.push(new ExternalFolderEntity(externalFolderDto, {clone: false}));
-    });
-
-    // We do not keep original props
-    this._props = null;
-  }
-
-  /**
-   * Construct from a folders collection.
-   * All path will be relative to the elements present in the collection.
-   * i.e. A folder which has a parent not present in the collection will be considered at the root of the collection
-   * @param foldersCollection
-   * @returns {ExternalFoldersCollection}
-   */
-  static constructFromFoldersCollection(foldersCollection) {
-    if (!(foldersCollection instanceof FoldersCollection)) {
-      throw new TypeError(`ExternalFoldersCollection constructFromFoldersCollection parameter should be an instance of FoldersCollection.`);
-    }
-    const externalFoldersDto = foldersCollection.folders.map(folderEntity => {
-      const folderParentPath = ExternalFoldersCollection.getEscapedFolderParentPath(foldersCollection, folderEntity);
-      const folderParentId = folderParentPath.length ? folderEntity.folderParentId : null;
-      return Object.assign(folderEntity.toDto(), {
-        name: ExternalFolderEntity.escapeName(folderEntity.name),
-        folder_parent_id: folderParentId,
-        folder_parent_path: folderParentPath});
-    });
-    return new ExternalFoldersCollection(externalFoldersDto);
+  get entityClass() {
+    return ExternalFolderEntity;
   }
 
   /**
@@ -76,11 +36,33 @@ class ExternalFoldersCollection extends EntityCollection {
   }
 
   /**
+   * Construct an ExternalFoldersCollection from a folders collection.
+   * All path will be relative to the elements present in the collection.
+   * i.e. A folder which has a parent not present in the collection will be considered at the root of the collection
+   * @param {FoldersCollection} foldersCollection
+   * @returns {ExternalFoldersCollection}
+   */
+  static constructFromFoldersCollection(foldersCollection) {
+    assertType(foldersCollection, FoldersCollection);
+
+    const externalFoldersDto = foldersCollection.folders.map(folderEntity => {
+      const folderParentPath = ExternalFoldersCollection.getEscapedFolderParentPath(foldersCollection, folderEntity);
+      const folderParentId = folderParentPath.length ? folderEntity.folderParentId : null;
+      return Object.assign(folderEntity.toDto(), {
+        name: ExternalFolderEntity.escapeName(folderEntity.name),
+        folder_parent_id: folderParentId,
+        folder_parent_path: folderParentPath});
+    });
+    return new ExternalFoldersCollection(externalFoldersDto);
+  }
+
+  /**
    * Get the escaped folder parent path for a given FolderEntity.
    *
    * @param {FoldersCollection} foldersCollection
    * @param {FolderEntity} folderEntity
    * @returns {string}
+   * @private
    */
   static getEscapedFolderParentPath(foldersCollection, folderEntity) {
     return foldersCollection.getAllParents(folderEntity).items
@@ -98,30 +80,14 @@ class ExternalFoldersCollection extends EntityCollection {
    * @returns {FoldersCollection}
    */
   static toFoldersCollection(externalFoldersCollection) {
-    const foldersCollection = [];
+    const foldersCollectionDto = [];
     externalFoldersCollection.forEach(externalFolder => {
       const folderDto = Object.assign(externalFolder.toDto(), {
         name: ExternalFolderEntity.resolveEscapedName(externalFolder.name),
       });
-      foldersCollection.push(folderDto);
+      foldersCollectionDto.push(folderDto);
     });
-    return new FoldersCollection(foldersCollection);
-  }
-
-  /**
-   * Get external folders
-   * @returns {Array<ExternalFolderEntity>}
-   */
-  get externalFolders() {
-    return this._items;
-  }
-
-  /**
-   * Get all the ids of the folders in the collection
-   * @returns {Array<string>}
-   */
-  get ids() {
-    return this._items.map(r => r.id);
+    return new FoldersCollection(foldersCollectionDto);
   }
 
   /*
@@ -137,25 +103,25 @@ class ExternalFoldersCollection extends EntityCollection {
    */
   hasPath(path) {
     path = ExternalFolderEntity.sanitizePath(path);
-    return this.externalFolders.some(externalFolderEntity => externalFolderEntity.path === path);
+    return this._items.some(externalFolderEntity => externalFolderEntity.path === path);
   }
 
   /**
    * Get external folder by id
-   * @param {string} id The folder id
+   * @param {string} id The external folder id
    * @return {ExternalFolderEntity|null}
    */
   getById(id) {
-    return this.externalFolders.find(externalFolderEntity => externalFolderEntity.id === id);
+    return this._items.find(externalFolderEntity => externalFolderEntity.id === id) || null;
   }
 
   /**
    * Get external folders by depth
-   * @param {int} depth The depth
-   * @return {array}
+   * @param {number} depth The depth
+   * @return {array<ExternalFolderEntity>}
    */
   getByDepth(depth) {
-    return this.externalFolders.filter(externalFolderEntity => externalFolderEntity.depth === depth);
+    return this._items.filter(externalFolderEntity => externalFolderEntity.depth === depth);
   }
 
   /**
@@ -164,7 +130,7 @@ class ExternalFoldersCollection extends EntityCollection {
    * @return {ExternalFolderEntity|null}
    */
   getByPath(path) {
-    return this.externalFolders.find(externalFolderEntity => externalFolderEntity.path === path);
+    return this._items.find(externalFolderEntity => externalFolderEntity.path === path) || null;
   }
 
   /**
@@ -176,7 +142,7 @@ class ExternalFoldersCollection extends EntityCollection {
     if (!folderParentId) {
       return [];
     }
-    return this.externalFolders.filter(externalFolderEntity => externalFolderEntity.folderParentId === folderParentId);
+    return this._items.filter(externalFolderEntity => externalFolderEntity.folderParentId === folderParentId);
   }
 
   /*
@@ -184,21 +150,6 @@ class ExternalFoldersCollection extends EntityCollection {
    * Setters
    * ==================================================
    */
-  /**
-   * Push a copy of the external folder to the list
-   * @param {object} externalFolder DTO or ExternalFolderEntity
-   */
-  push(externalFolder) {
-    if (!externalFolder || typeof externalFolder !== 'object') {
-      throw new TypeError(`ExternalFoldersCollection push parameter should be an object.`);
-    }
-    if (externalFolder instanceof ExternalFolderEntity) {
-      externalFolder = externalFolder.toDto(); // deep clone
-    }
-    const externalFolderEntity = new ExternalFolderEntity(externalFolder); // validate
-
-    return super.push(externalFolderEntity);
-  }
 
   /**
    * Create and push folders from path.
@@ -208,11 +159,12 @@ class ExternalFoldersCollection extends EntityCollection {
    * @param {string} path The path
    */
   pushFromPath(path) {
-    const externalFoldersEntities = [];
     path = ExternalFolderEntity.sanitizePath(path);
     if (!path.length) {
       return;
     }
+
+    const externalFoldersEntities = [];
     const split = ExternalFolderEntity.splitFolderPath(path);
     let pathCursor = "";
     for (const folderName of split) {
@@ -225,7 +177,7 @@ class ExternalFoldersCollection extends EntityCollection {
     }
 
     // If no error, persist the folders in the collection.
-    externalFoldersEntities.forEach(externalFolderEntity => this.push(externalFolderEntity));
+    this.pushMany(externalFoldersEntities);
   }
 
   /**
@@ -234,7 +186,7 @@ class ExternalFoldersCollection extends EntityCollection {
    * @param {string} folderParentId The corresponding folder parent id
    */
   setFolderParentIdsByPath(folderParentPath, folderParentId) {
-    for (const externalFolderEntity of this.externalFolders) {
+    for (const externalFolderEntity of this._items) {
       if (externalFolderEntity.folderParentPath === folderParentPath) {
         externalFolderEntity.folderParentId = folderParentId;
       }
@@ -246,7 +198,7 @@ class ExternalFoldersCollection extends EntityCollection {
    * @param {ExternalFolderEntity} rootFolder The folder to use as root
    */
   changeRootPath(rootFolder) {
-    this.externalFolders.forEach(folder => folder.changeRootPath(rootFolder));
+    this._items.forEach(folder => folder.changeRootPath(rootFolder));
   }
 
   /**
@@ -254,27 +206,14 @@ class ExternalFoldersCollection extends EntityCollection {
    * @param {string} path the path to remove
    */
   removeByPath(path) {
-    for (let i = this.externalFolders.length - 1; i >= 0; i--) {
-      const externalFolderEntity = this.externalFolders[i];
+    for (let i = this._items.length - 1; i >= 0; i--) {
+      const externalFolderEntity = this._items[i];
       const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, '\\$&');
       const regex = new RegExp(`^${escapedPath}($|\/)`);
       if (regex.exec(externalFolderEntity.path)) {
-        this.externalFolders.splice(i, 1);
+        this._items.splice(i, 1);
       }
     }
-  }
-
-  /*
-   * ==================================================
-   * Static getters
-   * ==================================================
-   */
-  /**
-   * ExternalFoldersCollection.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

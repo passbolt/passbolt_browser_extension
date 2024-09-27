@@ -13,44 +13,44 @@
  */
 import GroupUserTransfersCollection from "./groupUserTransfersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import {defaultUserTransferDto} from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import {defaultUserTransfersCollectionDto} from "passbolt-styleguide/src/shared/models/entity/group/groupUserTransfersCollection.test.data";
 
 describe("GroupUser transfer entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(GroupUserTransfersCollection.ENTITY_NAME, GroupUserTransfersCollection.getSchema());
-  });
+  describe("::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(GroupUserTransfersCollection.constructor.name, GroupUserTransfersCollection.getSchema());
+    });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = [{
-      group_id: '8e3874ae-4b40-590b-968a-418f704b9d9a',
-      id: '898ce1d0-601f-5194-976b-147a680dd472'
-    }];
-    const userDeleteTransfer = new GroupUserTransfersCollection(dto);
-    expect(userDeleteTransfer.toDto()).toEqual(dto);
-    expect(userDeleteTransfer.items[0].groupId).toEqual('8e3874ae-4b40-590b-968a-418f704b9d9a');
-    expect(userDeleteTransfer.items[0].id).toEqual('898ce1d0-601f-5194-976b-147a680dd472');
-  });
+    it("validates collection is an array", () => {
+      assertEntityProperty.collection(GroupUserTransfersCollection);
+    });
 
-  it("constructor fails if dto is empty", () => {
-    const dto = [];
-    try {
-      new GroupUserTransfersCollection(dto);
-      expect(true).toBe(false);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-    }
+    it("validates minItems property", () => {
+      assertEntityProperty.collectionMinItems(GroupUserTransfersCollection, 1);
+    });
   });
+  describe("::constructor", () => {
+    it("works if valid minimal DTO is provided", () => {
+      expect.assertions(1);
 
-  it("constructor fails if dto is invalid", () => {
-    const dto = [{
-      id: 'not uuid',
-      group_id: 'not uuid',
-    }];
-    try {
-      new GroupUserTransfersCollection(dto);
-      expect(true).toBe(false);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-    }
+      const dtos = [defaultUserTransferDto()];
+      const collection = new GroupUserTransfersCollection(dtos);
+
+      expect(collection.toDto()).toEqual(dtos);
+    });
+  });
+  describe("GroupUserTransfersCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const groupUserTransfersCount = 10_000;
+      const dtos = defaultUserTransfersCollectionDto(groupUserTransfersCount);
+
+      const start = performance.now();
+      const collection = new GroupUserTransfersCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(groupUserTransfersCount);
+      expect(time).toBeLessThan(5_000);
+    });
   });
 });

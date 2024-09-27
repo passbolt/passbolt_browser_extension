@@ -10,44 +10,24 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import FolderEntity from "../folderEntity";
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'ExternalFolder';
-
-class ExternalFolderEntity extends Entity {
+class ExternalFolderEntity extends EntityV2 {
   /**
-   * @inheritDoc
-   * Sanitize:
-   * - Override default data using the data provided in the DTO.
-   * - Normalize the folder parent path, see ExternalFolderEntity::sanitizePath
+   * @inheritdoc
    */
-  constructor(externalFolderDto, options = {}) {
-    // Default properties values
-    const props = Object.assign(ExternalFolderEntity.getDefault(), externalFolderDto);
-
-    // Sanitize
-    if (typeof props.folder_parent_path == "string") {
-      props.folder_parent_path = ExternalFolderEntity.sanitizePath(props.folder_parent_path);
+  marshall() {
+    /**
+     * Sanitize:
+     * - Normalize the folder parent path
+     */
+    if (typeof this._props.folder_parent_path === "string") {
+      this._props.folder_parent_path = ExternalFolderEntity.sanitizePath(this._props.folder_parent_path);
+    } else if (typeof this._props.folder_parent_path === "undefined") {
+      this._props.folder_parent_path = "";
     }
-
-    // Validate
-    super(EntitySchema.validate(
-      ExternalFolderEntity.ENTITY_NAME,
-      props,
-      ExternalFolderEntity.getSchema()
-    ), options);
-  }
-
-  /**
-   * Get default properties values
-   * @return {object}
-   */
-  static getDefault() {
-    return {
-      "folder_parent_path": ""
-    };
   }
 
   /**
@@ -187,7 +167,8 @@ class ExternalFolderEntity extends Entity {
    * @param {string} id The folder id
    */
   set id(id) {
-    this._props.id = id;
+    const propSchema = this.cachedSchema.properties.id;
+    this._props.id = EntitySchema.validateProp("id", id, propSchema);
   }
 
   /**
@@ -211,7 +192,8 @@ class ExternalFolderEntity extends Entity {
    * @param {string} folderParentId the folder parent id
    */
   set folderParentId(folderParentId) {
-    this._props.folder_parent_id = folderParentId;
+    const propSchema = this.cachedSchema.properties.folder_parent_id;
+    this._props.folder_parent_id = EntitySchema.validateProp("folder_parent_id", folderParentId, propSchema);
   }
 
   /**
@@ -222,14 +204,6 @@ class ExternalFolderEntity extends Entity {
     return this._props.folder_parent_path || "";
   }
 
-  /**
-   * Set folder parent path
-   * @param {string} folderParentPath folder parent path
-   */
-  set folderParentPath(folderParentPath) {
-    this._props.folder_parent_path = folderParentPath;
-  }
-
   /*
    * ==================================================
    * Calculated properties getters
@@ -238,7 +212,7 @@ class ExternalFolderEntity extends Entity {
 
   /**
    * Get folder path
-   * @returns {(string|null)} folder path
+   * @returns {string|null} folder path
    */
   get path() {
     return this.folderParentPath ? `${this.folderParentPath}/${this.name}` : this.name;
@@ -246,7 +220,7 @@ class ExternalFolderEntity extends Entity {
 
   /**
    * Depth
-   * @returns {int} the depth
+   * @returns {number} the depth
    */
   get depth() {
     return this.folderParentPath ? ExternalFolderEntity.splitFolderPath(this.folderParentPath).length : 0;
@@ -263,25 +237,11 @@ class ExternalFolderEntity extends Entity {
    * @param {ExternalFolderEntity} rootFolder The folder to use as root
    */
   changeRootPath(rootFolder) {
-    if (!this.folderParentPath.length) {
-      this.folderParentPath = rootFolder.path;
+    if (!this._props.folder_parent_path.length) {
+      this._props.folder_parent_path = rootFolder.path;
     } else {
-      this.folderParentPath = `${rootFolder.path}/${this.folderParentPath}`;
+      this._props.folder_parent_path = `${rootFolder.path}/${this._props.folder_parent_path}`;
     }
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-
-  /**
-   * ExternalFolderEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

@@ -235,7 +235,7 @@ describe("ResourcesKdbxExporter", () => {
     const exporter = new ResourcesKdbxExporter(exportEntity);
     await exporter.export();
 
-    expect(exportEntity.password).toEqual(exportDto.options.credentials.password);
+    expect(exportEntity.password).toBeNull();
     expect(exportEntity.file).toBeInstanceOf(ArrayBuffer);
 
     const kdbxCredentials = new kdbxweb.Credentials(null, kdbxweb.ByteUtils.base64ToBytes(exportEntity.keyfile));

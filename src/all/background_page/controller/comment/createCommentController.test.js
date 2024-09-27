@@ -14,13 +14,13 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {commentCreationMock, commentResponseMock} from "../../model/entity/comment/comments.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import CreateCommentController from "./createCommentController";
 import {v4 as uuidv4} from "uuid";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import CommentModel from "../../model/comment/commentModel";
+import {defaultCommentDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
 
 beforeEach(async() =>  {
   enableFetchMocks();
@@ -28,11 +28,10 @@ beforeEach(async() =>  {
   await MockExtension.withConfiguredAccount();
 });
 
-const mockApiCreation = commentCreationMock();
-const mockApiResultCreation = commentResponseMock(mockApiCreation);
+const mockApiCreation = defaultCommentDto();
 
 const fetchCommentsMock = () => {
-  fetch.doMock(() => mockApiResponse(mockApiResultCreation));
+  fetch.doMock(() => mockApiResponse(mockApiCreation));
 };
 const mockedWorker = {
   port: {
@@ -40,7 +39,7 @@ const mockedWorker = {
   }
 };
 describe("CreateCommentController", () => {
-  const validationError = new EntityValidationError("Could not validate entity Comment.");
+  const validationError = new EntityValidationError("Could not validate entity CommentEntity.");
   const expectInvalidField = (controller, mockCreation) => expect(controller.exec(mockCreation)).rejects.toThrowError(validationError);
 
   describe("CreateCommentController::constructor", () => {
@@ -65,7 +64,7 @@ describe("CreateCommentController", () => {
 
       expect.assertions(2);
 
-      expect(createdComment.toDto()).toEqual(expect.objectContaining(mockApiResultCreation));
+      expect(createdComment.toDto()).toEqual(expect.objectContaining(mockApiCreation));
       //We expect the function findAllByResourceId to be called with resourceId
       expect(spy).toHaveBeenCalled();
     });

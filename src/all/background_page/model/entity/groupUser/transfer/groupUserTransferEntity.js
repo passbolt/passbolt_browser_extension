@@ -11,23 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'GroupUserTransfer';
-
-class GroupUserTransferEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(groupUserTransferDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupUserTransferEntity.ENTITY_NAME,
-      groupUserTransferDto,
-      GroupUserTransferEntity.getSchema()
-    ), options);
-  }
-
+class GroupUserTransferEntity extends EntityV2 {
   /**
    * Get managerTransfer entity schema
    *
@@ -52,47 +38,6 @@ class GroupUserTransferEntity extends Entity {
         },
       }
     };
-  }
-
-  /*
-   * ==================================================
-   * Dynamic properties getters
-   * ==================================================
-   */
-  /**
-   * Get the group user ID
-   * This is the membership ID of the user that will be promoted to manager
-   *
-   * @returns {string} uuid
-   * @public
-   */
-  get id() {
-    return this._props.id;
-  }
-
-  /**
-   * Get affected group id
-   *
-   * @returns {string} uuid
-   * @public
-   */
-  get groupId() {
-    return this._props.group_id;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * GroupUserTransferEntity.ENTITY_NAME
-   *
-   * @returns {string}
-   * @public
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

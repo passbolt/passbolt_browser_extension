@@ -14,7 +14,6 @@
 import FolderModel from "../../model/folder/folderModel";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
-import ShareModel from "../../model/share/shareModel";
 
 
 class FolderCreateController {
@@ -24,12 +23,12 @@ class FolderCreateController {
    * @param {Worker} worker
    * @param {string} requestId
    * @param {ApiClientOptions} clientOptions
+   * @param {AccountEntity} account the user account
    */
-  constructor(worker, requestId, clientOptions) {
+  constructor(worker, requestId, clientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = new FolderModel(clientOptions);
-    this.shareModel = new ShareModel(clientOptions);
+    this.folderModel = new FolderModel(clientOptions, account);
     this.progressService = new ProgressService(this.worker, i18n.t('Creating folder...'));
   }
 

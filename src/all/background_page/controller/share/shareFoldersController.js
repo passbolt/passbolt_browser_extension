@@ -21,6 +21,10 @@ import PermissionChangesCollection from "../../model/entity/permission/change/pe
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ShareModel from "../../model/share/shareModel";
+import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
+import FindAndUpdateFoldersLocalStorageService
+  from "../../service/folder/update/findAndUpdateFoldersLocalStorageService";
+import FindResourcesService from "../../service/resource/findResourcesService";
 
 class ShareFoldersController {
   /**
@@ -34,8 +38,11 @@ class ShareFoldersController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = new FolderModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions, account);
+    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(account, apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
+    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     // Work variables
@@ -146,7 +153,7 @@ class ShareFoldersController {
 
     // Get more detailed permissions for all of these affected items if any
     if (this.resources.length) {
-      this.resources = await this.resourceModel.findAllForShare(this.resources.ids);
+      this.resources = await this.findResourcesService.findAllByIdsForShare(this.resources.ids);
     }
     if (this.subFolders.length) {
       this.subFolders = await this.folderModel.findAllForShare(this.subFolders.ids);
@@ -199,7 +206,7 @@ class ShareFoldersController {
       await this.shareModel.bulkShareFolders(folders, this.foldersChanges,  async message => {
         await this.progressService.finishStep(message);
       });
-      await this.folderModel.updateLocalStorage();
+      await this.findAndUpdateFoldersLocalStorageService.findAndUpdateAll();
     }
 
     // Share resources
@@ -211,7 +218,7 @@ class ShareFoldersController {
       await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await this.progressService.finishStep(message);
       });
-      await this.resourceModel.updateLocalStorage();
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
     }
   }
 

@@ -11,23 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'PermissionTransfer';
-
-class PermissionTransferEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(permissionTransferDto, options = {}) {
-    super(EntitySchema.validate(
-      PermissionTransferEntity.ENTITY_NAME,
-      permissionTransferDto,
-      PermissionTransferEntity.getSchema()
-    ), options);
-  }
-
+class PermissionTransferEntity extends EntityV2 {
   /**
    * Get permissionTransfer entity schema
    *
@@ -59,6 +45,7 @@ class PermissionTransferEntity extends Entity {
    * Dynamic properties getters
    * ==================================================
    */
+
   /**
    * Get permission id
    *
@@ -77,21 +64,6 @@ class PermissionTransferEntity extends Entity {
    */
   get acoForeignKey() {
     return this._props.aco_foreign_key;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * PermissionTransferEntity.ENTITY_NAME
-   *
-   * @returns {string}
-   * @public
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

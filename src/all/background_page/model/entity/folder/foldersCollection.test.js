@@ -12,6 +12,7 @@
  * @since         2.13.0
  */
 import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import {defaultFoldersCollectionDto} from "passbolt-styleguide/src/shared/models/entity/folder/foldersCollection.test.data";
 import FoldersCollection from "./foldersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
@@ -323,5 +324,21 @@ describe("Folders collection entity", () => {
     expect(collection.items[1]._permissions).toHaveLength(0);
     expect(collection.items[2].id).toEqual(dto3.id);
     expect(collection.items[2]._permissions).toHaveLength(1);
+  });
+
+  describe("FoldersCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const commentsCount = 10_000;
+      const dtos = defaultFoldersCollectionDto(commentsCount, {
+        withCreator: true,
+        withModifier: true,
+      });
+
+      const start = performance.now();
+      const collection = new FoldersCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(commentsCount);
+      expect(time).toBeLessThan(5_000);
+    });
   });
 });

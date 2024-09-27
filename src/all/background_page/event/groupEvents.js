@@ -14,7 +14,7 @@
 import GroupModel from "../model/group/groupModel";
 import GroupsUpdateController from "../controller/group/groupUpdateController";
 import GroupEntity from "../model/entity/group/groupEntity";
-import GroupDeleteTransferEntity from "../model/entity/group/transfer/groupDeleteTransfer";
+import GroupDeleteTransferEntity from "../model/entity/group/transfer/groupDeleteTransferEntity";
 import FindGroupsCurrentUserIsMemberOfController from "../controller/group/findGroupsCurrentUserIsMemberOfController";
 
 /**

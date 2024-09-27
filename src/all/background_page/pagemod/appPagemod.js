@@ -44,6 +44,7 @@ import BuildApiClientOptionsService from "../service/account/buildApiClientOptio
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import {PermissionEvents} from "../event/permissionEvents";
 
 class App extends Pagemod {
   /**
@@ -86,7 +87,8 @@ class App extends Pagemod {
       PownedPasswordEvents,
       MfaEvents,
       ClipboardEvents,
-      RememberMeEvents
+      RememberMeEvents,
+      PermissionEvents
     ];
   }
 

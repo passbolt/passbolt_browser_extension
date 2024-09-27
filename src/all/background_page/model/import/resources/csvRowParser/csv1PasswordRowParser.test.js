@@ -39,10 +39,10 @@ describe("Csv1PasswordRowParser", () => {
     const externalResourceEntity = Csv1PasswordRowParser.parse(data);
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.name).toEqual(data.Title);
-    expect(externalResourceEntity.username).toBeUndefined();
-    expect(externalResourceEntity.uri).toBeUndefined();
+    expect(externalResourceEntity.username).toBeNull();
+    expect(externalResourceEntity.uri).toBeNull();
     expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.description).toBeUndefined();
+    expect(externalResourceEntity.description).toBeNull();
     expect(externalResourceEntity.folderParentPath).toEqual("");
   });
 

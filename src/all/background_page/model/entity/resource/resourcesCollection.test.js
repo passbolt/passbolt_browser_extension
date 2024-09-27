@@ -21,7 +21,7 @@ import {
   TEST_RESOURCE_TYPE_PASSWORD_STRING,
   TEST_RESOURCE_TYPE_TOTP
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {defaultResourcesDtos, resourceAllTypesDtosCollection} from "./resourcesCollection.test.data";
+import {defaultResourcesDtos, resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
@@ -31,6 +31,9 @@ import ResourceEntity from "./resourceEntity";
 import {defaultTagDto} from "../tag/tagEntity.test.data";
 import expect from "expect";
 import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import {
+  defaultResourceMetadataDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
 
 describe("ResourcesCollection", () => {
   it("schema must validate", () => {
@@ -45,12 +48,11 @@ describe("ResourcesCollection", () => {
     });
 
     it("works if valid minimal DTO is provided", () => {
-      expect.assertions(5);
-      const dto1 = {"name": "resource1", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION};
-      const dto2 = {"name": "resource2", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION};
+      expect.assertions(4);
+      const dto1 = {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, metadata: {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, "name": "resource1"}};
+      const dto2 = {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, metadata: {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, "name": "resource2"}};
       const dtos = [dto1, dto2];
       const collection = new ResourcesCollection(dtos);
-      expect(collection.toDto()).toEqual(ResourcesCollection.transformDtoFromV4toV5(dtos));
       expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
       expect(collection).toHaveLength(2);
       expect(collection.items[0].metadata.name).toEqual('resource1');
@@ -58,13 +60,12 @@ describe("ResourcesCollection", () => {
     });
 
     it("works if valid complete DTOs are provided", () => {
-      expect.assertions(4);
-      const dto1 = defaultResourceDto({"name": "resource1"});
-      const dto2 = defaultResourceDto({"name": "resource2"});
+      expect.assertions(3);
+      const dto1 = defaultResourceDto({metadata: {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, name: "resource1"}});
+      const dto2 = defaultResourceDto({metadata: {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, name: "resource2"}});
       const dtos = [dto1, dto2];
       const collection = new ResourcesCollection(dtos);
       expect(collection).toHaveLength(2);
-      expect(collection.toDto()).toEqual(ResourcesCollection.transformDtoFromV4toV5(dtos));
       expect(collection.items[0].id).toEqual(dto1.id);
       expect(collection.items[1].id).toEqual(dto2.id);
     });
@@ -106,7 +107,7 @@ describe("ResourcesCollection", () => {
 
     it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
       const dto1 = defaultResourceDto();
-      const dto2 = defaultResourceDto({username: 42});
+      const dto2 = defaultResourceDto({metadata: defaultResourceMetadataDto({username: 42})});
 
       expect.assertions(2);
       const collection = new ResourcesCollection([dto1, dto2], {ignoreInvalidEntity: true});
@@ -261,28 +262,6 @@ describe("ResourcesCollection", () => {
     });
   });
 
-  describe("::sanitizeDto", () => {
-    it("sanitizeDto should remove duplicated resource ids", () => {
-      const resourceDto1 = defaultResourceDto();
-      const resourceDto2 = defaultResourceDto({id: resourceDto1.id});
-
-      const santitizedDto = ResourcesCollection.sanitizeDto([resourceDto1, resourceDto2]);
-      expect(santitizedDto).toHaveLength(1);
-      expect(santitizedDto).toEqual(expect.arrayContaining([resourceDto1]));
-
-      const collection = new ResourcesCollection(santitizedDto);
-      expect(collection).toHaveLength(1);
-    });
-
-    it("sanitizeDto should return an empty array if an unsupported type of data is given in parameter", () => {
-      const santitizedDtos = ResourcesCollection.sanitizeDto("not-an-array");
-      expect(santitizedDtos).toHaveLength(0);
-
-      const collection = new ResourcesCollection(santitizedDtos);
-      expect(collection).toHaveLength(0);
-    });
-  });
-
   describe("::filterByResourceTypes", () => {
     it("should filter the collection by all supported resources types and keep all resources having a defined resource type.", () => {
       const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
@@ -318,10 +297,10 @@ describe("ResourcesCollection", () => {
 
   describe("::filterBySuggestedResources", () => {
     it("should filter the collection by resources that could be suggested for a given url.", () => {
-      const suggestedResource1 = defaultResourceDto({uri: "https://passbolt.com"});
-      const suggestedResource2 = defaultResourceDto({uri: "passbolt.com"});
-      const notSuggestedResource1 = defaultResourceDto({uri: "not-passbolt.com"});
-      const notSuggestedResource2 = defaultResourceDto({uri: ""});
+      const suggestedResource1 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["https://passbolt.com"]})});
+      const suggestedResource2 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["passbolt.com"]})});
+      const notSuggestedResource1 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["nost-passbolt.com"]})});
+      const notSuggestedResource2 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: [""]})});
       const resources = new ResourcesCollection([
         suggestedResource1,
         suggestedResource2,
@@ -351,31 +330,6 @@ describe("ResourcesCollection", () => {
       const collection = new ResourcesCollection([]);
       expect.assertions(1);
       expect(() => collection.filterBySuggestResources(42)).toThrow(TypeError);
-    });
-  });
-
-  describe("ResourcesCollection::transformDtoFromV4toV5", () => {
-    it("Should transform collection DTO by including V5 format", () => {
-      expect.assertions(3);
-
-      const resource1 = defaultResourceDto({uri: "https://passbolt.com"});
-      const resourcesCollection = new ResourcesCollection([
-        resource1,
-      ]).toDto();
-      const entityCollectionV5 = ResourcesCollection.transformDtoFromV4toV5(resourcesCollection);
-
-      expect(entityCollectionV5).toHaveLength(1);
-      // V4 root format
-      expect(entityCollectionV5[0].resource_type_id).toEqual(resource1.resource_type_id);
-      // V5 metata data object
-      expect(entityCollectionV5[0].metadata).toEqual({
-        object_type: "PASSBOLT_METADATA_V5",
-        resource_type_id: resource1.resource_type_id,
-        name: resource1.name,
-        username: resource1.username,
-        uris: [resource1.uri],
-        description: resource1.description
-      });
     });
   });
 });

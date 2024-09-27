@@ -11,42 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import GroupUserTransferEntity from "./groupUserTransferEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'GroupUserTransfers';
-
-class GroupUserTransfersCollection extends EntityCollection {
+class GroupUserTransfersCollection extends EntityV2Collection {
   /**
    * @inheritDoc
-   * @throws {EntityValidationError} Build Rule: The collection cannot be empty.
    */
-  constructor(groupUserTransferDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupUserTransfersCollection.ENTITY_NAME,
-      groupUserTransferDto,
-      GroupUserTransfersCollection.getSchema()
-    ), options);
-
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(groupUserTransfer => {
-      this.push(groupUserTransfer);
-    });
-
-    // The collection cannot be empty
-    if (!this.length) {
-      throw new EntityValidationError(`The group user transfer collection cannot be empty.`);
-    }
-
-    // We do not keep original props
-    this._props = null;
+  get entityClass() {
+    return GroupUserTransferEntity;
   }
-
   /**
    * Get groupUsers entity schema
    *
@@ -56,35 +30,8 @@ class GroupUserTransfersCollection extends EntityCollection {
     return {
       "type": "array",
       "items": GroupUserTransferEntity.getSchema(),
+      "minItems": 1
     };
-  }
-
-  /**
-   * GroupUserTransfersCollection.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
-  }
-
-  /*
-   * ==================================================
-   * Setters
-   * ==================================================
-   */
-  /**
-   * Push a copy of the groupUser to the list
-   * @param {GroupUserTransferEntity} groupUserTransfer DTO or GroupUserTransferEntity
-   */
-  push(groupUserTransfer) {
-    if (!groupUserTransfer || typeof groupUserTransfer !== 'object') {
-      throw new TypeError(`GroupUserTransfersCollection push parameter should be an object.`);
-    }
-    if (groupUserTransfer instanceof GroupUserTransferEntity) {
-      groupUserTransfer = groupUserTransfer.toDto(); // clone
-    }
-    groupUserTransfer = new GroupUserTransferEntity(groupUserTransfer); // validate
-    super.push(groupUserTransfer);
   }
 }
 

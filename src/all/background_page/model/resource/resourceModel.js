@@ -21,7 +21,6 @@ import MoveService from "../../service/api/move/moveService";
 import ResourceService from "../../service/api/resource/resourceService";
 import PlaintextEntity from "../entity/plaintext/plaintextEntity";
 import splitBySize from "../../utils/array/splitBySize";
-import ResourceLocalStorageUpdateService from "../../service/api/resource/resourceLocalStorageUpdateService";
 
 const BULK_OPERATION_SIZE = 5;
 const MAX_LENGTH_PLAINTEXT = 4096;
@@ -33,20 +32,10 @@ class ResourceModel {
    * @param {AccountEntity} account the user account
    * @public
    */
-  constructor(apiClientOptions, account) {
+  constructor(apiClientOptions) {
     this.resourceService = new ResourceService(apiClientOptions);
     this.moveService = new MoveService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.resourceLocalStorageUpdateService = new ResourceLocalStorageUpdateService(account, apiClientOptions);
-  }
-
-  /**
-   * Update the resources local storage with the latest API resources the user has access.
-   * @param {boolean} forceUpdate
-   * @return {ResourcesCollection}
-   */
-  async updateLocalStorage(forceUpdate = true) {
-    return await this.resourceLocalStorageUpdateService.exec(forceUpdate);
   }
 
   /*
@@ -93,14 +82,6 @@ class ResourceModel {
   async getById(resourceId) {
     const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
     return new ResourceEntity(resourceDto);
-  }
-
-  /**
-   * Returns the cached collection of resoures or fetch them otherwise
-   * @return {Promise<ResourcesCollection>}
-   */
-  async getOrFindAll() {
-    return await this.resourceLocalStorageUpdateService.exec();
   }
 
   /*
@@ -193,128 +174,13 @@ class ResourceModel {
    * @param {Object} [contains] optional example: {permissions: true}
    * @param {Object} [filters] optional
    * @param {Object} [orders] optional
-   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAll(contains, filters, orders, preSanitize) {
+  async findAll(contains, filters, orders, ignoreInvalidEntity) {
     let resourcesDto = await this.resourceService.findAll(contains, filters, orders);
     resourcesDto = await this.keepResourcesSupported(resourcesDto);
-    if (preSanitize) {
-      resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
-    }
-    return new ResourcesCollection(resourcesDto, {clone: false});
-  }
-
-  /**
-   * Find a resource given an id
-   *
-   * @param {string} resourceId the id of the resource to find
-   * @param {Object} [contains] optional example: {creator: true, modifier: true}
-   * @returns {Promise<ResourcesEntity>}
-   */
-  async findById(resourceId, contains) {
-    const resourcesDto  = await this.resourceService.get(resourceId, contains);
-    return new ResourceEntity(resourcesDto);
-  }
-
-  /**
-   * Find all for share
-   *
-   * @param {array} resourcesIds resource uuids
-   * @returns {Promise<ResourcesCollection>}
-   */
-  async findAllForShare(resourcesIds) {
-    const resourcesDto = await this.resourceService.findAllForShare(resourcesIds);
-    return new ResourcesCollection(resourcesDto);
-  }
-
-  /**
-   * Find all resources for decrypt
-   *
-   * @param {array} resourcesIds resources uuids
-   * @returns {Promise<ResourcesCollection>}
-   */
-  async findAllForDecrypt(resourcesIds) {
-    let resourcesDto = [];
-    // We split the requests in chunks in order to avoid any too long url error.
-    const resourcesIdsChunks = splitBySize(resourcesIds, 80);
-    for (const resourcesIdsChunk of resourcesIdsChunks) {
-      const partialResourcesDto = await this.resourceService.findAll({'secret': true, 'resource-type': true}, {'has-id': resourcesIdsChunk});
-      resourcesDto = [...resourcesDto, ...partialResourcesDto];
-    }
-    return new ResourcesCollection(resourcesDto);
-  }
-
-  /**
-   * Find a resource to share
-   *
-   * @param {string} resourcesId resource uuid
-   * @returns {Promise<ResourceEntity>}
-   */
-  async findForDecrypt(resourcesId) {
-    const resourcesDto = await this.resourceService.get(resourcesId, {'secret': true, 'resource-type': true});
-    return new ResourceEntity(resourcesDto);
-  }
-
-  /**
-   * Find permissions for a resource
-   *
-   * @param {string} resourcesId resource uuid
-   * @returns {Promise<PermissionsCollection>}
-   */
-  async findResourcePermissions(resourcesId) {
-    const contain = {'permissions.user.profile': true, 'permissions.group': true};
-
-    /*
-     *  TODO deprecate findAll with has-id filter and use what's in comment
-     *  TODO not possible for backward compatibility issues, because permissions filter not present < v3
-     * const resourcesDto = await this.resourceService.get(resourcesId, contain);
-     * const resourceEntity = new ResourceEntity(resourcesDto);
-     * return resourceEntity.permissions;
-     */
-
-    // @deprecated
-    const filter = {'has-id': [resourcesId]};
-    const resourceDtos = await this.resourceService.findAll(contain, filter);
-    const resourceEntity = new ResourceEntity(resourceDtos[0]); // will fail if not found but not clean 404
-    return resourceEntity.permissions;
-  }
-
-  /**
-   * Returns the count of possible resources to suggest given an url
-   * @param {string} url An url
-   * @return {Promise<number>}
-   */
-  async countSuggestedResources(url) {
-    if (!url) {
-      return 0;
-    }
-
-    const resourcesCollection = await this.findSuggestedResources(url);
-    return resourcesCollection.length;
-  }
-
-  /**
-   * Returns the possible resources to suggest given an url.
-   * @param {string} url The url to suggest for.
-   * @return {Promise<ResourcesCollection>}
-   */
-  async findSuggestedResources(url) {
-    if (!url) {
-      return new ResourcesCollection([]);
-    }
-
-    const resourcesCollection = await this.getOrFindAll();
-
-    // Filter by resource types behaving as a password.
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    resourceTypesCollection.filterByPasswordResourceTypes();
-    resourcesCollection.filterByResourceTypes(resourceTypesCollection, false);
-
-    // Filter by suggested resources.
-    resourcesCollection.filterBySuggestResources(url);
-
-    return resourcesCollection;
+    return new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
   }
 
   /*
@@ -322,21 +188,6 @@ class ResourceModel {
    *  CRUD
    * ==============================================================
    */
-
-  /**
-   * Update a resource using Passbolt API and add result to local storage
-   *
-   * @param {ResourceEntity} resourceEntity
-   * @returns {Promise<ResourceEntity>}
-   */
-  async update(resourceEntity) {
-    const data = resourceEntity.toV4Dto({secrets: true});
-    const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
-    const updatedResourceEntity = new ResourceEntity(resourceDto);
-    await ResourceLocalStorage.updateResource(updatedResourceEntity);
-    return updatedResourceEntity;
-  }
-
   /**
    * Update resources in the local storage
    *
@@ -513,7 +364,7 @@ class ResourceModel {
     if (!schema) {
       throw new TypeError('Could not find the schema definition for the requested resource type.');
     }
-    const plaintextEntity = new PlaintextEntity(plaintextDto, schema);
+    const plaintextEntity = new PlaintextEntity(plaintextDto, {schema});
     return JSON.stringify(plaintextEntity);
   }
 
@@ -607,7 +458,7 @@ class ResourceModel {
    * ==============================================================
    */
   /**
-   * Assert that all the folders are in the local storage
+   * Assert that all resources are in the local storage
    *
    * @param {Array} resourceIds array of uuid
    * @throws {Error} if a resource does not exist
@@ -623,17 +474,6 @@ class ResourceModel {
       }
     }
     return true;
-  }
-
-
-  /**
-   * Keep only resources supported with no or known resource type
-   * @param resourcesDto
-   * @return {Promise<*[]>}
-   */
-  async keepResourcesSupported(resourcesDto) {
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    return resourcesDto.filter(resource => resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
   }
 }
 

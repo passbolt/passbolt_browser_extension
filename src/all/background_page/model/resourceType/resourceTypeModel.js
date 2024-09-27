@@ -14,8 +14,7 @@
 import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import ResourceTypesCollection from "../entity/resourceType/resourceTypesCollection";
-import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
-import Validator from "validator";
+import {assertUuid} from "../../utils/assertions";
 
 class ResourceTypeModel {
   /**
@@ -31,20 +30,11 @@ class ResourceTypeModel {
   /**
    * Update the resourceTypes local storage with the latest API resourceTypes the user has access.
    *
-   * @return {Promise<ResourceTypesCollection>}
+   * @returns {Promise<ResourceTypesCollection>}
+   * @private
    */
   async updateLocalStorage() {
-    let resourceTypeDtos = [];
-    try {
-      resourceTypeDtos = await this.resourceTypeService.findAll();
-    } catch (error) {
-      // @deprecated to remove with v4. Expect 404 if API < V3, ResourcesTypes has been introduced with v3.
-      if (error instanceof PassboltApiFetchError && error.data && error.data.code === 404) {
-        console.error(error);
-      } else {
-        throw error;
-      }
-    }
+    const resourceTypeDtos = await this.resourceTypeService.findAll();
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypeDtos);
     await ResourceTypeLocalStorage.set(resourceTypesCollection);
     return resourceTypesCollection;
@@ -68,18 +58,14 @@ class ResourceTypeModel {
    * Return the secret section of the schema definition for a given resource type id
    *
    * @param {string} resourceTypeId uuid
-   * @returns {Promise<Object>}
+   * @returns {Promise<Object|undefined>}
    */
   async getSecretSchemaById(resourceTypeId) {
-    if (!Validator.isUUID(resourceTypeId)) {
-      throw new TypeError('The resource type id should be a valid UUID');
-    }
+    assertUuid(resourceTypeId, 'The resource type id should be a valid UUID');
+
     const types = await this.getOrFindAll();
     const type = types.getFirst('id', resourceTypeId);
-    if (!type || !type.definition || !type.definition.secret) {
-      return undefined;
-    }
-    return type.definition.secret;
+    return type?.definition?.secret;
   }
 }
 

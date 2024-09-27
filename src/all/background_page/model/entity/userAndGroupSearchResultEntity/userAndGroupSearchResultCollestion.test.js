@@ -15,6 +15,8 @@ import UserAndGroupSearchResultsCollection from "./userAndGroupSearchResultColle
 import UserAndGroupSearchResultEntity from "./userAndGroupSearchResultEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {defaultGroupSearchResultDto, defaultUserSearchResultDto} from "./userAndGroupSearchResultEntity.test.data";
+import expect from "expect";
+import {defaultUserAndGroupSearchResultsDtos} from "./userAndGroupSearchResultCollection.test.data";
 
 describe("UserAndGroupSearchResultCollection", () => {
   it("schema must validate", () => {
@@ -89,6 +91,19 @@ describe("UserAndGroupSearchResultCollection", () => {
 
       expect.assertions(1);
       expect(collection.toDto()).toStrictEqual(dtos);
+    });
+  });
+
+  describe(":pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const count = 10_000;
+      const dtos = defaultUserAndGroupSearchResultsDtos(count);
+
+      const start = performance.now();
+      const collection = new UserAndGroupSearchResultsCollection(dtos);
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(count);
+      expect(time).toBeLessThan(5_000);
     });
   });
 });

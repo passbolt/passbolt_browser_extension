@@ -16,28 +16,41 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import ResourceCreateService from "./resourceCreateService";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
-import {defaultResourceDto, defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../../test/mocks/mockApiResponse";
 import {v4 as uuidv4} from "uuid";
 import ResourceEntity from "../../../model/entity/resource/resourceEntity";
-import EncryptMessageService from "../../crypto/encryptMessageService";
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
-import {folderDto, folderModelMock, resourceModelMock, shareModelMock} from "./resourceCreateService.test.data";
+import {folderModelMock, resourceModelMock, shareModelMock} from "./resourceCreateService.test.data";
 import Keyring from "../../../model/keyring";
 import FolderEntity from "../../../model/entity/folder/folderEntity";
 import ProgressService from "../../progress/progressService";
+import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import ResourceService from "../../api/resource/resourceService";
+import DecryptMessageService from "../../crypto/decryptMessageService";
+import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import ResourceTypeService from "../../api/resourceType/resourceTypeService";
+import {
+  resourceTypesCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {
+  TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
+  TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
+  TEST_RESOURCE_TYPE_TOTP
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {plaintextSecretPasswordAndDescriptionDto, plaintextSecretPasswordDescriptionTotpDto, plaintextSecretPasswordStringDto, plaintextSecretTotpDto} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
+import FolderService from "../../api/folder/folderService";
+import ShareService from "../../api/share/shareService";
 
 jest.mock("../../../service/progress/progressService");
 
 beforeEach(() => {
-  enableFetchMocks();
+  jest.clearAllMocks();
 });
 
 describe("ResourceCreateService", () => {
-  let resourceCreateService, resource, worker, apiClientOptions;
-  const plaintextDto = "secret";
+  let resourceCreateService, resourceDto, worker, apiClientOptions;
+  const secret = "secret";
   const account = new AccountEntity(defaultAccountDto());
 
   beforeEach(async() => {
@@ -47,59 +60,171 @@ describe("ResourceCreateService", () => {
       }
     };
     apiClientOptions = defaultApiClientOptions();
-    resource = defaultResourceDto();
+    resourceDto = defaultResourceDto();
     jest.spyOn(Keyring.prototype, "sync").mockImplementation(() => jest.fn());
+    jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
     resourceCreateService = new ResourceCreateService(account, apiClientOptions, new ProgressService(worker, ""));
-    fetch.doMockOnce(() => mockApiResponse(defaultResourceV4Dto()));
   });
 
   describe("ResourceCreateService::exec", () => {
     it("Should call progress service during the differents steps of creation", async() => {
       expect.assertions(3);
 
-      await resourceCreateService.exec(resource, plaintextDto, pgpKeys.ada.passphrase);
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => defaultResourceDto());
+      await resourceCreateService.exec(resourceDto, secret, pgpKeys.ada.passphrase);
 
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledTimes(2);
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith('Creating password', true);
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith("Encrypting secret", true);
     });
 
-    it("Should create the resource with encrypted secrets and dto", async() => {
-      expect.assertions(5);
 
-      jest.spyOn(EncryptMessageService, "encrypt");
-      jest.spyOn(resourceCreateService.resourceModel, "serializePlaintextDto");
-      jest.spyOn(resourceCreateService, "create");
+    it("Should create the resource with encrypted secrets <password> and dto", async() => {
+      expect.assertions(3);
+      let resourceToAPI;
+      const plaintextDto = plaintextSecretPasswordStringDto().password;
 
-      const entity = new ResourceEntity(resource);
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(resource => {
+        //Used to check the data sent to API
+        resourceToAPI = resource;
+        return defaultResourceDto(resource);
+      });
 
-      await resourceCreateService.exec(resource, plaintextDto, pgpKeys.ada.passphrase);
-      expect(resourceCreateService.create).toHaveBeenCalledTimes(1);
-      expect(resourceCreateService.create).toHaveBeenCalledWith(expect.objectContaining(entity));
-      expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(1);
-      expect(resourceCreateService.resourceModel.serializePlaintextDto).toHaveBeenCalledTimes(1);
-      expect(resourceCreateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
+      await resourceCreateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
+      //Decrypt secret
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const secretMessage = await OpenpgpAssertion.readMessageOrFail(resourceToAPI.secrets[0].data);
+      const verifyingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const decryptedSecretSent = await DecryptMessageService.decrypt(secretMessage, decryptionKey, [verifyingKey]);
+
+      expect(resourceToAPI.secrets.length).toEqual(1);
+      //Validate secret
+      expect(decryptedSecretSent).toEqual(plaintextDto);
+      //Description should not be encrypted
+      expect(resourceToAPI.description).toEqual(resourceToAPI.description);
     });
 
+    it("Should create the resource with encrypted secrets <password && description> and dto", async() => {
+      expect.assertions(3);
+      let resourceToAPI;
+      const plaintextDto = plaintextSecretPasswordAndDescriptionDto();
+
+      resourceDto.resource_type_id = TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION;
+
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(resource => {
+        //Used to check the data sent to API
+        resourceToAPI = resource;
+        return defaultResourceDto(resource);
+      });
+
+      await resourceCreateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
+      //Decrypt secret
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const secretMessage = await OpenpgpAssertion.readMessageOrFail(resourceToAPI.secrets[0].data);
+      const verifyingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const decryptedSecretSent = await DecryptMessageService.decrypt(secretMessage, decryptionKey, [verifyingKey]);
+
+      expect(resourceToAPI.secrets.length).toEqual(1);
+      //Validate secret
+      expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
+      //Description should be encrypted
+      expect(resourceToAPI.description).not.toEqual(resourceDto.description);
+    });
+
+    it("Should create the resource with encrypted secrets <password && totp> and dto", async() => {
+      expect.assertions(3);
+      let resourceToAPI;
+      const plaintextDto = plaintextSecretTotpDto();
+
+      resourceDto.resource_type_id = TEST_RESOURCE_TYPE_TOTP;
+
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(resource => {
+        //Used to check the data sent to API
+        resourceToAPI = resource;
+        return defaultResourceDto(resource);
+      });
+
+      await resourceCreateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
+      //Decrypt secret
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const secretMessage = await OpenpgpAssertion.readMessageOrFail(resourceToAPI.secrets[0].data);
+      const verifyingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const decryptedSecretSent = await DecryptMessageService.decrypt(secretMessage, decryptionKey, [verifyingKey]);
+
+      expect(resourceToAPI.secrets.length).toEqual(1);
+      //Validate secret
+      expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
+      //Description should be encrypted
+      expect(resourceToAPI.description).not.toEqual(resourceDto.description);
+    });
+
+    it("Should create the resource with encrypted secrets <password && totp && description> and dto", async() => {
+      expect.assertions(3);
+      let resourceToAPI;
+      const plaintextDto = plaintextSecretPasswordDescriptionTotpDto();
+
+      resourceDto.resource_type_id = TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP;
+
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(resource => {
+        //Used to check the data sent to API
+        resourceToAPI = resource;
+        return defaultResourceDto(resource);
+      });
+
+      await resourceCreateService.exec(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
+      //Decrypt secret
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const secretMessage = await OpenpgpAssertion.readMessageOrFail(resourceToAPI.secrets[0].data);
+      const verifyingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const decryptedSecretSent = await DecryptMessageService.decrypt(secretMessage, decryptionKey, [verifyingKey]);
+
+      expect(resourceToAPI.secrets.length).toEqual(1);
+      //Validate secret
+      expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
+      //Description should be encrypted
+      expect(resourceToAPI.description).not.toEqual(resourceDto.description);
+    });
+
+    it("Should not create the resource if the secret is longer than expected", async() => {
+      expect.assertions(1);
+
+      const promise = resourceCreateService.exec(resourceDto, "a".repeat(4097), pgpKeys.ada.passphrase);
+
+      return expect(promise).rejects.toThrow(new TypeError("The secret should be maximum 4096 characters in length."));
+    });
 
     it("Should create the resource into folder parent", async() => {
       expect.assertions(1);
 
-      jest.spyOn(resourceCreateService, "handleCreateInFolder").mockImplementation(() => jest.fn());
-      jest.spyOn(resourceCreateService, "create").mockImplementation(() => defaultResourceDto({
-        folderParentId: uuidv4()
-      }));
+      const folderId = uuidv4();
+      const shareResourceChanges  = {
+        changes: {
+          added: [],
+          removed: []
+        }
+      };
 
-      await resourceCreateService.exec(resource, plaintextDto, pgpKeys.ada.passphrase);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [defaultResourceDto({folder_parent_id: folderId})]);
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => defaultResourceDto({folder_parent_id: folderId}));
+      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [defaultFolderDto({id: folderId}, {withPermissions: true})]);
+      jest.spyOn(ShareService.prototype, "simulateShareResource").mockImplementation(() => shareResourceChanges);
+      jest.spyOn(ShareService.prototype, "shareFolder").mockImplementation(() => shareResourceChanges);
+      jest.spyOn(ShareService.prototype, "shareResource").mockImplementation(() => jest.fn());
+
+      jest.spyOn(resourceCreateService, "handleCreateInFolder");
+
+      await resourceCreateService.exec(resourceDto, plaintextSecretPasswordStringDto().password, pgpKeys.ada.passphrase);
 
       expect(resourceCreateService.handleCreateInFolder).toHaveBeenCalledTimes(1);
     });
   });
+
   describe("ResourceCreateService::create", () => {
     let entity;
 
     beforeEach(async() => {
-      entity = new ResourceEntity(resource);
+      entity = new ResourceEntity(resourceDto);
+      jest.spyOn(resourceCreateService.resourceService, "create").mockImplementation(() => defaultResourceDto());
     });
 
     it("Should convert data to v4 format when calling API", async() => {
@@ -149,24 +274,35 @@ describe("ResourceCreateService", () => {
       expect(result.metadata.description).toEqual(entity.metadata.description);
     });
   });
-
   describe("ResourceCreateService::handleCreateInFolder", () => {
-    let entity;
+    let entity, folder;
+    const folderId = uuidv4();
+    const shareResourceChanges  = {
+      changes: {
+        added: [],
+        removed: []
+      }
+    };
 
     beforeEach(async() => {
-      entity = new ResourceEntity(resource);
-      //Mock models
-      resourceCreateService.resourceModel = resourceModelMock();
-      resourceCreateService.folderModel = folderModelMock();
-      resourceCreateService.shareModel = shareModelMock();
+      entity = new ResourceEntity(resourceDto);
+      folder = defaultFolderDto({id: folderId}, {withPermissions: true});
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [defaultResourceDto({folder_parent_id: folderId})]);
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => defaultResourceDto({folder_parent_id: folderId}));
+      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [folder]);
+      jest.spyOn(ShareService.prototype, "simulateShareResource").mockImplementation(() => shareResourceChanges);
+      jest.spyOn(ShareService.prototype, "shareFolder").mockImplementation(() => shareResourceChanges);
+      jest.spyOn(ShareService.prototype, "shareResource").mockImplementation(() => jest.fn());
     });
 
     it("Should call progressService step to inform about step", async() => {
       expect.assertions(4);
 
+      jest.spyOn(resourceCreateService.progressService, "finishStep");
+
       await resourceCreateService.handleCreateInFolder(entity);
 
-      expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledTimes(3);
+      expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledTimes(5);
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith('Calculate permissions', true);
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith('Synchronizing keys', true);
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith('Start sharing', true);
@@ -180,9 +316,9 @@ describe("ResourceCreateService", () => {
       await resourceCreateService.handleCreateInFolder(entity);
 
       expect(resourceCreateService.resourceModel.calculatePermissionsChangesForCreate).toHaveBeenCalledTimes(1);
-      expect(resourceCreateService.resourceModel.calculatePermissionsChangesForCreate).toHaveBeenCalledWith(entity, new FolderEntity(folderDto()));
+      expect(resourceCreateService.resourceModel.calculatePermissionsChangesForCreate).toHaveBeenCalledWith(entity, new FolderEntity(folder));
       expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledTimes(1);
-      expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledWith(85);
+      expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledWith(88);
     });
 
     it("Should not call progressService step for sharing in case of non permissions changes", async() => {
@@ -207,12 +343,14 @@ describe("ResourceCreateService", () => {
     it("Should update the localstorage from resourceModel", async() => {
       expect.assertions(1);
 
+      jest.spyOn(resourceCreateService.findAndUpdateResourcesLocalStorage, "findAndUpdateAll");
+
       await resourceCreateService.handleCreateInFolder(entity);
 
-      expect(resourceCreateService.resourceModel.updateLocalStorage).toHaveBeenCalledTimes(1);
+      expect(resourceCreateService.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
     });
 
-    it("Should call sync the keyring", async() => {
+    it("Should sync the keyring", async() => {
       expect.assertions(1);
 
       await resourceCreateService.handleCreateInFolder(entity);

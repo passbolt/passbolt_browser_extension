@@ -11,27 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.5.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'Totp';
 const RESOURCE_TOTP_KEY_MAX_LENGTH = 1024;
 const SUPPORTED_ALGORITHMS = ["SHA1", "SHA256", "SHA512"];
+const DEFAULT_ALGORITHM = SUPPORTED_ALGORITHMS[0];
 /**
  * Entity related to the TOTP
  */
-class TotpEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(totpDto, options = {}) {
-    super(EntitySchema.validate(
-      TotpEntity.ENTITY_NAME,
-      totpDto,
-      TotpEntity.getSchema()
-    ), options);
-  }
-
+class TotpEntity extends EntityV2 {
   /**
    * Get current view model schema
    * @returns {Object} schema
@@ -48,26 +36,49 @@ class TotpEntity extends Entity {
       properties: {
         secret_key: {
           type: "string",
-          notEmpty: true,
+          minLength: 1,
           pattern: /^[A-Z2-7]+=*$/, // BASE32
           maxLength: RESOURCE_TOTP_KEY_MAX_LENGTH
         },
         period: {
-          type: "number",
-          gte: 1
+          type: "integer",
+          minimum: 1
         },
         digits: {
-          type: "number",
-          lte: 8,
-          gte: 6
+          type: "integer",
+          minimum: 6,
+          maximum: 8,
         },
         algorithm: {
           type: "string",
-          notEmpty: true,
           enum: SUPPORTED_ALGORITHMS
         }
       }
     };
+  }
+
+  /**
+   * @inheritdoc
+   */
+  marshall() {
+    /*
+     * Sanitize secret_key:
+     * - Replace white spaces.
+     * - Capitalize characters.
+     * - Remove all special characters.
+     */
+    if (typeof this._props.secret_key === "string") {
+      this._props.secret_key = this._props.secret_key?.replace(/(\W|_|\s)/g, '').toUpperCase();
+    }
+
+    /*
+     * Sanitize algorithm
+     * - Capitalize characters.
+     */
+    if (typeof this._props.algorithm === "string") {
+      this._props.algorithm = this._props.algorithm?.toUpperCase();
+    }
+    super.marshall();
   }
 
   /*
@@ -79,13 +90,13 @@ class TotpEntity extends Entity {
    * Get resource id
    * @returns {string} base32 secret key
    */
-  get secret_key() {
+  get secretKey() {
     return this._props.secret_key;
   }
 
   /**
    * Get period
-   * @returns {numbers} period
+   * @returns {number} period
    */
   get period() {
     return this._props.period;
@@ -93,7 +104,7 @@ class TotpEntity extends Entity {
 
   /**
    * Get digits
-   * @returns {numbers} digits
+   * @returns {number} digits
    */
   get digits() {
     return this._props.digits;
@@ -113,17 +124,20 @@ class TotpEntity extends Entity {
    * ==================================================
    */
   /**
-   * Create URL from TOTP
+   * Create TOTP URL from an external resource entity
    * @param {ExternalResourceEntity} resource
    * @return {URL}
    */
-  createUrlFromResource(resource) {
-    const name = resource.username ? `${resource.name}:${resource.username}` : resource.name;
+  createUrlFromExternalResource(externalResourceEntity) {
+    const name = externalResourceEntity.username
+      ? `${externalResourceEntity.name}:${externalResourceEntity.username}`
+      : externalResourceEntity.name;
+
     const url = new URL(`otpauth://totp/${encodeURIComponent(name)}`);
-    url.searchParams.append("secret", this.secret_key.replaceAll(/\s+/g, "").toUpperCase());
+    url.searchParams.append("secret", this.secretKey);
     // Add issuer in the TOTP url if any
-    if (resource.uri.length > 0) {
-      url.searchParams.append("issuer", encodeURIComponent(resource.uri));
+    if (externalResourceEntity.uri?.length > 0) {
+      url.searchParams.append("issuer", encodeURIComponent(externalResourceEntity.uri));
     }
     url.searchParams.append("algorithm", this.algorithm);
     url.searchParams.append("digits", this.digits.toString());
@@ -143,8 +157,8 @@ class TotpEntity extends Entity {
    */
   static createTotpFromUrl(url) {
     const totp = {
-      secret_key: url.searchParams.get('secret').toUpperCase(),
-      algorithm: url.searchParams.get('algorithm')?.toUpperCase() || SUPPORTED_ALGORITHMS[0],
+      secret_key: url.searchParams.get('secret'),
+      algorithm: url.searchParams.get('algorithm') || DEFAULT_ALGORITHM,
       digits: parseInt(url.searchParams.get('digits'), 10) || 6,
       period: parseInt(url.searchParams.get('period'), 10) || 30,
     };
@@ -158,44 +172,12 @@ class TotpEntity extends Entity {
    */
   static createTotpFromKdbxWindows(fields) {
     const totp = {
-      secret_key: fields.get('TimeOtp-Secret-Base32').getText().toUpperCase(),
-      algorithm: fields.get('TimeOtp-Algorithm')?.slice(5).replace('-', '') || SUPPORTED_ALGORITHMS[0],
+      secret_key: fields.get('TimeOtp-Secret-Base32').getText(),
+      algorithm: fields.get('TimeOtp-Algorithm')?.slice(5).replace('-', '') || DEFAULT_ALGORITHM,
       digits:  parseInt(fields.get('TimeOtp-Length'), 10) || 6,
       period: parseInt(fields.get('TimeOtp-Period'), 10) || 30
     };
     return new TotpEntity(totp);
-  }
-
-  /*
-   * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-  /**
-   * Sanitize totp dto:
-   * - Replace space in secret_key.
-   * - Capitalize characters in secret_key.
-   *
-   * @param {Object} dto The totp dto
-   * @returns {Object}
-   */
-  static sanitizeDto(dto) {
-    // Remove all special characters, whitespace (including spaces, tabs and newline characters) and capitalize characters for secret_key
-    dto.secret_key = dto.secret_key.replace(/(\W|_|\s)/g, '').toUpperCase();
-    return dto;
-  }
-
-  /*
-   * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * ResourceEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
   }
 }
 

@@ -15,11 +15,27 @@ import Log from "../../model/log";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import Lock from "../../utils/lock";
+import {assertArray, assertUuid} from "../../utils/assertions";
 const lock = new Lock();
 
-const FOLDER_LOCAL_STORAGE_KEY = 'folders';
+export const FOLDERS_LOCAL_STORAGE_KEY = 'folders';
 
 class FolderLocalStorage {
+  /**
+   * Cached data.
+   * @type {Object}
+   * @private
+   */
+  static _cachedData = null;
+
+  /**
+   * Check if there is cached data.
+   * @returns {boolean}
+   */
+  static hasCachedData() {
+    return FolderLocalStorage._cachedData !== null;
+  }
+
   /**
    * Flush the folders local storage
    *
@@ -28,7 +44,8 @@ class FolderLocalStorage {
    */
   static async flush() {
     Log.write({level: 'debug', message: 'FolderLocalStorage flushed'});
-    return await browser.storage.local.remove(FolderLocalStorage.FOLDER_LOCAL_STORAGE_KEY);
+    await browser.storage.local.remove(FOLDERS_LOCAL_STORAGE_KEY);
+    FolderLocalStorage._cachedData = null;
   }
 
   /**
@@ -39,8 +56,11 @@ class FolderLocalStorage {
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    const {folders} = await browser.storage.local.get([FolderLocalStorage.FOLDER_LOCAL_STORAGE_KEY]);
-    return folders;
+    if (!FolderLocalStorage._cachedData) {
+      const {folders} = await browser.storage.local.get([FOLDERS_LOCAL_STORAGE_KEY]);
+      FolderLocalStorage._cachedData = folders;
+    }
+    return FolderLocalStorage._cachedData;
   }
 
   /**
@@ -51,16 +71,20 @@ class FolderLocalStorage {
    */
   static async set(foldersCollection) {
     await lock.acquire();
-    const folders = [];
-    if (!(foldersCollection instanceof FoldersCollection)) {
-      throw new TypeError('FolderLocalStorage::set expects a FoldersCollection');
+    try {
+      const folders = [];
+      if (!(foldersCollection instanceof FoldersCollection)) {
+        throw new TypeError('FolderLocalStorage::set expects a FoldersCollection');
+      }
+      for (const folderEntity of foldersCollection) {
+        FolderLocalStorage.assertEntityBeforeSave(folderEntity);
+        folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
+      }
+      await browser.storage.local.set({folders: folders});
+      FolderLocalStorage._cachedData = folders;
+    } finally {
+      lock.release();
     }
-    for (const folderEntity of foldersCollection) {
-      FolderLocalStorage.assertEntityBeforeSave(folderEntity);
-      folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
-    }
-    await browser.storage.local.set({folders: folders});
-    lock.release();
   }
 
   /**
@@ -71,18 +95,18 @@ class FolderLocalStorage {
    */
   static async getFolderById(id) {
     const folders = await FolderLocalStorage.get();
-    return folders.find(item => item.id === id);
+    return folders?.find(item => item.id === id);
   }
 
   /**
-   * Get a folder from the local storage by id
+   * Get a folder from the local storage by folder parent id
    *
-   * @param {(string|null)} id The folder id
+   * @param {(string|null)} id The folder parent id
    * @return {object} a folder dto
    */
   static async getFolderByParentId(id) {
     const folders = await FolderLocalStorage.get();
-    return folders.find(item => item.folderParentId === id);
+    return folders?.find(item => item.folder_parent_id === id);
   }
 
   /**
@@ -93,13 +117,12 @@ class FolderLocalStorage {
     await lock.acquire();
     try {
       FolderLocalStorage.assertEntityBeforeSave(folderEntity);
-      const folders = await FolderLocalStorage.get();
+      const folders = await FolderLocalStorage.get() || [];
       folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({folders: folders});
+      FolderLocalStorage._cachedData = folders;
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 
@@ -108,18 +131,18 @@ class FolderLocalStorage {
    * @param {Array<FolderEntity>} folderEntities
    */
   static async addFolders(folderEntities) {
+    assertArray(folderEntities, "The parameter foldersEntities should be an array");
     await lock.acquire();
     try {
-      const folders = await FolderLocalStorage.get();
+      const folders = await FolderLocalStorage.get() || [];
       folderEntities.forEach(folderEntity => {
         FolderLocalStorage.assertEntityBeforeSave(folderEntity);
         folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       });
       await browser.storage.local.set({folders: folders});
+      FolderLocalStorage._cachedData = folders;
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 
@@ -133,17 +156,16 @@ class FolderLocalStorage {
     await lock.acquire();
     try {
       FolderLocalStorage.assertEntityBeforeSave(folderEntity);
-      const folders = await FolderLocalStorage.get();
+      const folders = await FolderLocalStorage.get() || [];
       const folderIndex = folders.findIndex(item => item.id === folderEntity.id);
       if (folderIndex === -1) {
         throw new Error('The folder could not be found in the local storage');
       }
-      folders[folderIndex] = Object.assign(folders[folderIndex], folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
+      folders[folderIndex] = folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN);
       await browser.storage.local.set({folders: folders});
+      FolderLocalStorage._cachedData = folders;
+    } finally {
       lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
     }
   }
 
@@ -152,20 +174,20 @@ class FolderLocalStorage {
    * @param {string} folderId folder uuid
    */
   static async delete(folderId) {
+    assertUuid(folderId, "The parameter folderId should be a UUID.");
     await lock.acquire();
     try {
-      const folders = await FolderLocalStorage.get();
-      if (folders) {
+      const folders = await FolderLocalStorage.get() || [];
+      if (folders.length > 0) {
         const folderIndex = folders.findIndex(item => item.id === folderId);
         if (folderIndex !== -1) {
           folders.splice(folderIndex, 1);
         }
         await browser.storage.local.set({folders: folders});
-        lock.release();
+        FolderLocalStorage._cachedData = folders;
       }
-    } catch (error) {
+    } finally {
       lock.release();
-      throw error;
     }
   }
 
@@ -178,15 +200,6 @@ class FolderLocalStorage {
    */
   static get DEFAULT_CONTAIN() {
     return {permission: true};
-  }
-
-  /**
-   * FolderLocalStorage.FOLDER_LOCAL_STORAGE_KEY
-   * @returns {string}
-   * @constructor
-   */
-  static get FOLDER_LOCAL_STORAGE_KEY() {
-    return FOLDER_LOCAL_STORAGE_KEY;
   }
 
   /**

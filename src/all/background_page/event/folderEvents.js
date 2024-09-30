@@ -64,7 +64,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.folders.delete', async(requestId, folderId, cascade) => {
     try {
-      const folderModel = new FolderModel(apiClientOptions);
+      const folderModel = new FolderModel(apiClientOptions, account);
       const findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
 
       await folderModel.delete(folderId, cascade);

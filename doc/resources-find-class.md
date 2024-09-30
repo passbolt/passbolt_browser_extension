@@ -114,7 +114,16 @@ classDiagram
     namespace MetadataNs {
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% MetadataNs services
+    %% Metadata controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class GetOrFindMetadataTypesSettingsController {
+            event "passbolt.metadata.get-or-find-metadata-type-settings"
+            +exec(): MetdataTypesSettingsEntity
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Metadata services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class DecryptMetadataService {
@@ -147,8 +156,20 @@ classDiagram
             +decryptAllFromMetdataKeysCollection(MetadataKeysCollection collection, ?string passphrase) Promise~MetadataKeysCollection~
         }
 
+        class GetOrFindMetadataSettingsService {
+            +getOrFindTypesSettings() Promise~MetadataTypesSettingsEntity~
+        }
+
+        class FindAndUpdateMetadataSettingsService {
+            +findAndUpdateTypesSettings() Promise~MetadataTypesSettingsEntity~
+        }
+
+        class FindMetadataTypesSettingsService {
+            +findTypesSettings() Promise~MetadataTypesSettingsEntity~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% MetadataNs models
+    %% Metadata models
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class MetadataKeysSessionStorageService {
@@ -156,6 +177,16 @@ classDiagram
 
         class MetadataKeyApiService {
             +findAll(object contains, object filters) Promise~array~
+        }
+
+        class MetadataTypesSettingsLocalStorageService {
+            +get(): Promise~object~
+            +set(MetadataTypesSettingsEntity entity): Promise
+            +flush(): Promise
+        }
+
+        class MetadataTypesSettingsApiService {
+            +findOne() Promise~object~
         }
     }
 
@@ -181,6 +212,7 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% SessionKeys models
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
         class SessionKeysSessionStorageService {
         }
 
@@ -231,6 +263,8 @@ classDiagram
             +getFirstById(uuid id) ResourceTypeEntity
             +getFirstBySlug(string slug) ResourceTypeEntity
             +hasOneWithSlug(string slug) boolean
+            +hasSomePasswordResourceTypes() boolean
+            +hasSomeTotpResourceTypes() boolean
         }
 
         class ResourceTypeEntity {
@@ -245,6 +279,7 @@ classDiagram
             +hasSecretDescription() boolean
             +hasTotp() boolean
             +isStandaloneTotp() boolean
+            +get version() string
         }
 
         class MetadataKeysCollection {
@@ -280,6 +315,21 @@ classDiagram
             +set data(string data) void
             +isDecrypted() boolean
         }
+
+        class MetadataTypesSettingsEntity {
+            -string props.default_resource_types
+            -string props.default_folder_type
+            -string props.default_tag_type
+            -string props.default_comment_type
+            -boolean props.allow_creation_of_v5_resources
+            -boolean props.allow_creation_of_v5_folders
+            -boolean props.allow_creation_of_v5_tags
+            -boolean props.allow_creation_of_v5_comments
+            -boolean props.allow_creation_of_v4_resources
+            -boolean props.allow_creation_of_v4_folders
+            -boolean props.allow_creation_of_v4_tags
+            -boolean props.allow_creation_of_v4_comments
+        }
     }
 
     %% Resource relationships
@@ -302,6 +352,7 @@ classDiagram
     UpdateResourceService*--ResourceService
     UpdateResourceService*--ResourcesLocalStorageService
     %% Metadata key relationships
+    GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
     FindResourcesService*--DecryptMetadataService
     DecryptMetadataService*--GetOrFindSessionKeysService
     DecryptMetadataService*--GetOrFindMetadataKeysService
@@ -316,6 +367,11 @@ classDiagram
     FindMetadataKeysService*--MetadataKeyApiService
     EncryptMetadataService*--PassphraseStorageService
     EncryptMetadataService*--GetOrFindMetadataKeysService
+    GetOrFindMetadataSettingsService*--FindAndUpdateMetadataSettingsService
+    GetOrFindMetadataSettingsService*--MetadataTypesSettingsLocalStorageService
+    FindAndUpdateMetadataSettingsService*--FindMetadataTypesSettingsService
+    FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorageService
+    FindMetadataTypesSettingsService*--MetadataTypesSettingsApiService
     %% Session key relationships
     GetOrFindSessionKeysService*--SessionKeysSessionStorageService
     GetOrFindSessionKeysService*--FindAndUpdateSessionKeysSessionStorageService
@@ -339,6 +395,7 @@ classDiagram
     style FindResourcesForShareController fill:#D2E0FB
     style UpdateAllResourcesLocalStorageController fill:#D2E0FB
     style UpdateResourceController fill:#D2E0FB
+    style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
     style ResourcesLocalStorageService fill:#DEE5D4
     style ResourceService fill:#DEE5D4
     style PassphraseStorageService fill:#DEE5D4

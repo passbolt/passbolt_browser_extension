@@ -21,7 +21,7 @@
     "locutus": "~2.0.9",
     "openpgp": "^5.11.1",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "^4.9.8",
+    "passbolt-styleguide": "^4.9.9",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",

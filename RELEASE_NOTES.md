@@ -4,7 +4,7 @@ Passbolt v4.9.4 is a maintenance update of preparatory work for the incoming v5 
 
 Thank you to the community for reporting this issue.
 
-## [4.9.4] - 2023-09-30
+## [4.9.4] - 2024-09-30
 ### Fixed
 - PB-33927: Update the label for password expiry email notification
 - PB-34743: Fix: folder's sidebar information misses the creator and modifier information

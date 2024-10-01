@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [4.9.4] - 2023-09-30
+## [4.9.4] - 2024-09-30
 ### Fixed
 - PB-33927: Update the label for password expiry email notification
 - PB-34743: Fix: folder's sidebar information misses the creator and modifier information

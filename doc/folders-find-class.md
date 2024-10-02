@@ -16,7 +16,7 @@ classDiagram
     namespace FoldersService{
         class GetOrFindFoldersService{
             <<Service>>
-            +getOrFindAll() Promise~FolderssCollection~
+            +getOrFindAll() Promise~FoldersCollection~
         }
 
         class FindAndUpdateFoldersLocalStorageService{

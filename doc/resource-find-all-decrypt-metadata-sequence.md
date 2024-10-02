@@ -1,5 +1,5 @@
 ```mermaid
-%%{init: {'theme':'neutra'}}%%
+%%{init: {'theme':'neutral'}}%%
 sequenceDiagram
 
 %% Retrieve resources from LS

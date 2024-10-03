@@ -58,6 +58,33 @@ class DecryptMetadataPrivateKeysService {
 
     metadataPrivateKeyEntity.armoredKey = metadataPrivateArmoredKey;
   }
+
+  /**
+   * Decrypts a collection of metadata private key entities and mutate all entities with their decrypted result.
+   *
+   * @param {MetadataPrivateKeysCollection} metadataPrivateKeysCollection the metadata private key collection to decrypt.
+   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @returns {Promise<void>}
+   * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
+   * @throws {Error} if one of the `MetadataPrivateKeyEntity` is already decrypted
+   * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.
+   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
+   */
+  async decryptAll(metadataPrivateKeysCollection, passphrase = null) {
+    assertType(metadataPrivateKeysCollection, MetadataPrivateKeysCollection, "The given collection is not of the type MetadataPrivateKeysCollection");
+
+    passphrase = passphrase || await PassphraseStorageService.get();
+
+    if (!passphrase) {
+      throw new UserPassphraseRequiredError();
+    }
+
+    const items = metadataPrivateKeysCollection.items;
+    for (let i = 0; i < items.length; i++) {
+      const metadataPrivateKeyEntity = items[i];
+      await this.decryptOne(metadataPrivateKeyEntity, passphrase);
+    }
+  }
 }
 
 export default DecryptMetadataPrivateKeysService;

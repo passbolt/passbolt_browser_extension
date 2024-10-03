@@ -142,6 +142,7 @@ classDiagram
 
         class DecryptMetadataPrivateKeyService {
             +decryptOne(MetadataPrivateKeyEntity entity, ?string passphrase) Promise
+            +decryptAll(MetadataPrivateKeyCollection collection, ?string passphrase) Promise
         }
 
         class EncryptMetadataService {

@@ -26,6 +26,14 @@ import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'Resource';
 
+const METADATA_KEY_TYPE_USER_KEY = "user_key";
+const METADATA_KEY_TYPE_METADATA_KEY = "metadata_key";
+
+const SUPPORTED_METADATA_KEY_TYPES = [
+  METADATA_KEY_TYPE_USER_KEY,
+  METADATA_KEY_TYPE_METADATA_KEY,
+];
+
 class ResourceEntity extends EntityV2 {
   /**
    * @inheritDoc
@@ -75,7 +83,7 @@ class ResourceEntity extends EntityV2 {
       this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
       delete this._props._modifier;
     }
-    if (this._props.metadata) {
+    if (this._props.metadata && typeof this._props.metadata !== 'string') {
       this._metadata = new ResourceMetadataEntity(this._props.metadata, {...options, clone: false});
       delete this._props.metadata;
     }
@@ -86,6 +94,18 @@ class ResourceEntity extends EntityV2 {
    */
   marshall() {
     ResourceEntity.transformDtoFromV4toV5(this._props);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  validateBuildRules() {
+    if (Boolean(this._props.metadata) && Boolean(this._metadata)) {
+      const error = new EntityValidationError();
+      const message = "The property metadata and _metadata cannot be set at the same time";
+      error.addError("metadata", "only-one-defined", message);
+      throw error;
+    }
   }
 
   /**
@@ -108,6 +128,16 @@ class ResourceEntity extends EntityV2 {
         "resource_type_id": {
           "type": "string",
           "format": "uuid"
+        },
+        "metadata_key_id": {
+          "type": "string",
+          "format": "uuid",
+          "nullable": true
+        },
+        "metadata_key_type": {
+          "type": "string",
+          "enum": SUPPORTED_METADATA_KEY_TYPES,
+          "nullable": true
         },
         "expired": {
           "type": "string",
@@ -143,7 +173,13 @@ class ResourceEntity extends EntityV2 {
           "nullable": true,
         },
         // Associated models
-        "metadata": ResourceMetadataEntity.getSchema(),
+        "metadata": {"anyOf": [
+          {
+            "type": "string",
+            "pattern": /^-----BEGIN PGP MESSAGE-----\n\n([a-zA-Z0-9/+=]{1,64}\n)*=[a-zA-Z0-9/+=]{4}\n-----END PGP MESSAGE-----$/m
+          },
+          ResourceMetadataEntity.getSchema()
+        ]},
         "favorite": {
           ...FavoriteEntity.getSchema(),
           "nullable": true,
@@ -172,7 +208,7 @@ class ResourceEntity extends EntityV2 {
    */
   toDto(contain) {
     const result = Object.assign({}, this._props);
-    result.metadata = this._metadata.toDto();
+    result.metadata = result.metadata || this._metadata.toDto();
     if (!contain) {
       return result;
     }
@@ -314,10 +350,18 @@ class ResourceEntity extends EntityV2 {
 
   /**
    * Get resource metadata
-   * @returns {(ResourceMetadataEntity|null)}
+   * @returns {(ResourceMetadataEntity|string)}
    */
   get metadata() {
-    return this._metadata || null;
+    return this.isMetadataDecrypted() ? this._metadata : this._props.metadata;
+  }
+
+  /**
+   * Check if the metadata is encrypted.
+   * @returns {boolean}
+   */
+  isMetadataDecrypted() {
+    return Boolean(this._metadata);
   }
 
   /**
@@ -402,7 +446,8 @@ class ResourceEntity extends EntityV2 {
    * @returns {Object} resourceDTO dto v5
    */
   static transformDtoFromV4toV5(resourceDTO) {
-    if (!resourceDTO.metadata) {
+    // Metadata is null or undefined. Prevent metadata having false value to create an empty metadata
+    if (resourceDTO.metadata == null) {
       resourceDTO.metadata = {
         object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
         resource_type_id: resourceDTO.resource_type_id,
@@ -538,6 +583,21 @@ class ResourceEntity extends EntityV2 {
     this._favorite = favorite;
   }
 
+  /**
+   * Set resource metadata
+   * @param {ResourceMetadataEntity|string} metadata
+   */
+  set metadata(metadata) {
+    if (metadata instanceof ResourceMetadataEntity) {
+      this._metadata = new ResourceMetadataEntity(metadata.toDto(), {validate: false});
+      delete this._props.metadata;
+    } else {
+      EntitySchema.validateProp("metadata", metadata, ResourceEntity.getSchema().properties.metadata.anyOf[0]);
+      this._props.metadata = metadata;
+      delete this._metadata;
+    }
+  }
+
   /*
    * ==================================================
    * Build rules
@@ -630,6 +690,22 @@ class ResourceEntity extends EntityV2 {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * ResourceEntity.METADATA_USER_KEY
+   * @returns {string}
+   */
+  static get METADATA_KEY_TYPE_USER_KEY() {
+    return METADATA_KEY_TYPE_USER_KEY;
+  }
+
+  /**
+   * ResourceEntity.METADATA_KEY
+   * @returns {string}
+   */
+  static get METADATA_KEY_TYPE_METADATA_KEY() {
+    return METADATA_KEY_TYPE_METADATA_KEY;
   }
 
   /**

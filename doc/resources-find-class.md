@@ -304,6 +304,8 @@ classDiagram
             -boolean props.allow_creation_of_v4_folders
             -boolean props.allow_creation_of_v4_tags
             -boolean props.allow_creation_of_v4_comments
+            +createFromV4Default(): MetadataTypesSettingsEntity
+            +createFromDefault(?object data): MetadataTypesSettingsEntity
         }
 
         class ResourceEntity {

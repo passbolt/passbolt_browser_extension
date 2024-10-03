@@ -22,7 +22,7 @@ import {
   TEST_RESOURCE_TYPE_TOTP
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import {defaultResourcesDtos, resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
-import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";

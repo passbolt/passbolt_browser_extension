@@ -12,7 +12,7 @@
  */
 import CsvLogMeOnceRowParser from "./csvLogMeOnceRowParser";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
-import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";

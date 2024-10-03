@@ -19,7 +19,7 @@ import ResourcesKdbxImportParser from "./resourcesKdbxImportParser";
 import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import ImportError from "../../../error/importError";
-import ResourceTypesCollection from "../../entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
   TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,

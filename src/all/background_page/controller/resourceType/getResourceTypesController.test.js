@@ -18,7 +18,7 @@ import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import GetResourceTypesController from "./getResourceTypesController";
-import ResourceTypesCollection from "../../model/entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 
 beforeEach(() => {
   enableFetchMocks();

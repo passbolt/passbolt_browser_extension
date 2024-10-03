@@ -66,7 +66,7 @@ classDiagram
         }
 
         class FindAndUpdateResourcesLocalStorageOptions {
-            updatePeriodThreshold: integer
+            updatePeriodThreshold integer
         }
 
         class FindResourcesService {
@@ -90,7 +90,7 @@ classDiagram
         }
 
         class ExecuteConcurrentlyService {
-            +execute(array callbacks, integer concurrency, object options): Promise~array~
+            +execute(array callbacks, integer concurrency, object options) Promise~array~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,7 +128,7 @@ classDiagram
 
         class GetOrFindMetadataTypesSettingsController {
             event "passbolt.metadata.get-or-find-metadata-types-settings"
-            +exec(): MetdataTypesSettingsEntity
+            +exec() MetdataTypesSettingsEntity
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -228,9 +228,9 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class SessionKeysBackupLocalStorageService {
-            +get(): Promise~object~
-            +set(SessionKeysBackupEntity entity): Promise
-            +flush(): Promise
+            +get() Promise~object~
+            +set(SessionKeysBackupEntity entity) Promise
+            +flush() Promise
         }
 
         class SessionKeysSessionStorageService {
@@ -244,9 +244,9 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class GetPassphraseService {
-            +getPassphrase(WorkerEntity worker): Promise~string~
-            +requestPassphraseFromQuickAccess(): Promise~string~
-            +requestPassphrase(WorkerEntity worker): Promise~string~
+            +getPassphrase(WorkerEntity worker) Promise~string~
+            +requestPassphraseFromQuickAccess() Promise~string~
+            +requestPassphrase(WorkerEntity worker) Promise~string~
         }
 
         class PassphraseStorageService {
@@ -268,7 +268,7 @@ classDiagram
         }
 
         class MetadataKeysCollection {
-            +getFirstByIsLatestCreated() MetadataKeyEntity
+            +getFirstByLatestCreated() MetadataKeyEntity
         }
 
         class MetadataPrivateKeyEntity {
@@ -283,6 +283,8 @@ classDiagram
             -string props.modified_by
             +get armoredKey(string armordKey) string
             +get data() string
+            +get metadataKeyId() string
+            +get created() string
             +set armoredKey(string armordKey) void
             +set data(string data) void
             +isDecrypted() boolean
@@ -304,8 +306,8 @@ classDiagram
             -boolean props.allow_creation_of_v4_folders
             -boolean props.allow_creation_of_v4_tags
             -boolean props.allow_creation_of_v4_comments
-            +createFromV4Default(): MetadataTypesSettingsEntity
-            +createFromDefault(?object data): MetadataTypesSettingsEntity
+            +createFromV4Default() MetadataTypesSettingsEntity
+            +createFromDefault(?object data) MetadataTypesSettingsEntity
         }
 
         class ResourceEntity {

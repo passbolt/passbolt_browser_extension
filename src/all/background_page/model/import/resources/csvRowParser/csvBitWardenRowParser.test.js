@@ -15,7 +15,7 @@ import CsvBitWardenRowParser from "./csvBitWardenRowParser";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 
 describe("CsvBitWardenRowParser", () => {
   it("can parse BitWarden csv", () => {

@@ -13,7 +13,7 @@
  */
 import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
-import ResourceTypesCollection from "../entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {assertUuid} from "../../utils/assertions";
 
 class ResourceTypeModel {

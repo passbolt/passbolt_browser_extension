@@ -13,7 +13,7 @@
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import CsvKdbxRowParser from "./csvKdbxRowParser";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 
 describe("CsvKdbxRowParser", () => {
   it("can parse kdbx csv", () => {

@@ -194,7 +194,7 @@ classDiagram
         }
 
         class MetadataTypesSettingsApiService {
-            +findOne() Promise~object~
+            +findSettings() Promise~object~
         }
 
         class MetadataTypesSettingsLocalStorageService {
@@ -458,6 +458,7 @@ classDiagram
     %% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
     style MetadataKeysSessionStorageService fill:#DEE5D4
+    style MetadataTypesSettingsApiService fill:#DEE5D4
 
     %% Session keys service relationships
     DecryptSessionKeysService*--PassphraseStorageService

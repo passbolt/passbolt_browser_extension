@@ -150,16 +150,6 @@ classDiagram
             +encryptAllForForeignModels(Collection collection, ?string passphrase) Promise
         }
 
-        class GetOrFindMetadataKeysService {
-            +getOrFindOneByIsLatest() Promise~MetadataKeyEntity~
-            +getOrFindOneById(uuid foreignKeyId) Promise~MetadataKeyEntity~
-            +getOrFindAllByIds(array~uuid~ foreignKeyIds) Promise~MetadataKeysCollection~
-        }
-
-        class FindAndUpdateMetadataKeysSessionStorageService {
-            +findAndUpdateAll(object contains, object filters) Promise~MetadataKeysCollection~
-        }
-
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata Keys services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,10 +160,24 @@ classDiagram
             +decryptAllFromMetdataKeysCollection(MetadataKeysCollection collection, ?string passphrase) Promise~MetadataKeysCollection~
         }
 
+        class FindAndUpdateMetadataKeysSessionStorageService {
+            +findAndUpdateAll(object contains, object filters) Promise~MetadataKeysCollection~
+        }
+
         class FindMetadataKeysService {
             +findAll(object contains) Promise~MetadataKeysCollection~
             +findAllForSessionStorage() Promise~MetadataKeysCollection~
         }
+
+        class GetOrFindMetadataKeysService {
+            +getOrFindOneByIsLatest() Promise~MetadataKeyEntity~
+            +getOrFindOneById(uuid foreignKeyId) Promise~MetadataKeyEntity~
+            +getOrFindAllByIds(array~uuid~ foreignKeyIds) Promise~MetadataKeysCollection~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Metadata Settings services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class FindAndUpdateMetadataSettingsService {
             +findAndUpdateTypesSettings() Promise~MetadataTypesSettingsEntity~

@@ -30,7 +30,7 @@ class FindAndUpdateResourcesLocalStorage {
   static lastUpdateAllTimes = {};
 
   /**
-   *
+   * @constructor
    * @param {AccountEntity} account The user account
    * @param {ApiClientOptions} apiClientOptions The api client options
    */
@@ -65,7 +65,10 @@ class FindAndUpdateResourcesLocalStorage {
       // Lock not granted, an update is already in progress. Wait for its completion to notify the function consumer.
       if (!lock) {
         return await navigator.locks.request(lockKey, {mode: "shared"}, async() =>
-          // Return the data from local storage while waiting for the update in progress.
+          /*
+           * Return the data from local storage while waiting for the update in progress.
+           * @todo it does not return the latest information but the previous one.
+           */
           new ResourcesCollection(localStorageResourceCollection, {validate: !isRuntimeCacheInitialized})
         );
       }

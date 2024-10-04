@@ -16,14 +16,11 @@ import FindMetadataSettingsService from "./findMetadataSettingsService";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MetadataTypesSettingsApiService from "../api/metadata/metadataTypesSettingsApiService";
 import {
+  defaultMetadataTypesSettingsV4Dto,
   defaultMetadataTypesSettingsV50FreshDto
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import MetadataTypesSettingsEntity
-, {
-  RESOURCE_TYPE_VERSION_4,
-  RESOURCE_TYPE_VERSION_5
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -39,31 +36,25 @@ describe("FindMetadataSettingsService", () => {
 
   describe("::findTypesSettings", () => {
     it("retrieve the metadata types settings.", async() => {
-      expect.assertions(13);
-      jest.spyOn(MetadataTypesSettingsApiService.prototype, "findSettings").mockImplementation(() => defaultMetadataTypesSettingsV50FreshDto());
+      expect.assertions(2);
+      const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
+      jest.spyOn(MetadataTypesSettingsApiService.prototype, "findSettings").mockImplementation(() => metadataTypesSettingsDto);
 
       const entity = await findMetadataTypesSettingsService.findTypesSettings();
 
       expect(entity).toBeInstanceOf(MetadataTypesSettingsEntity);
-      expect(entity._props.default_resource_types).toEqual(RESOURCE_TYPE_VERSION_5);
-      expect(entity._props.default_folder_type).toEqual(RESOURCE_TYPE_VERSION_4);
-      expect(entity._props.default_tag_type).toEqual(RESOURCE_TYPE_VERSION_4);
-      expect(entity._props.default_comment_type).toEqual(RESOURCE_TYPE_VERSION_4);
-      expect(entity._props.allow_creation_of_v5_resources).toBeTruthy();
-      expect(entity._props.allow_creation_of_v5_folders).toBeFalsy();
-      expect(entity._props.allow_creation_of_v5_tags).toBeFalsy();
-      expect(entity._props.allow_creation_of_v5_comments).toBeFalsy();
-      expect(entity._props.allow_creation_of_v4_resources).toBeFalsy();
-      expect(entity._props.allow_creation_of_v4_folders).toBeTruthy();
-      expect(entity._props.allow_creation_of_v4_tags).toBeTruthy();
-      expect(entity._props.allow_creation_of_v4_comments).toBeTruthy();
+      expect(entity.toDto()).toEqual(metadataTypesSettingsDto);
     });
 
-    it("throws an error if the API return invalid data", async() => {
-      expect.assertions(1);
+    it("marshall the API data with local default", async() => {
+      expect.assertions(2);
       jest.spyOn(MetadataTypesSettingsApiService.prototype, "findSettings").mockImplementation(() => {});
 
-      await expect(() => findMetadataTypesSettingsService.findTypesSettings()).rejects.toThrow(EntityValidationError);
+      const entity = await findMetadataTypesSettingsService.findTypesSettings();
+
+      expect(entity).toBeInstanceOf(MetadataTypesSettingsEntity);
+      // The value of the default are expected to evolve with passbolt transitioning to v5 types.
+      expect(entity.toDto()).toEqual(defaultMetadataTypesSettingsV4Dto());
     });
   });
 });

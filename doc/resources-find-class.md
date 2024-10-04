@@ -197,7 +197,8 @@ classDiagram
             +findSettings() Promise~object~
         }
 
-        class MetadataTypesSettingsLocalStorageService {
+        class MetadataTypesSettingsLocalStorage {
+            -$_runtimeCachedData object
             +get() Promise~object~
             +set(MetadataTypesSettingsEntity entity) Promise
             +flush() Promise
@@ -446,7 +447,7 @@ classDiagram
     FindAndUpdateMetadataKeysSessionStorageService*--FindMetadataKeysService
     FindAndUpdateMetadataKeysSessionStorageService*--MetadataKeysSessionStorageService
     FindAndUpdateMetadataSettingsService*--FindMetadataTypesSettingsService
-    FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorageService
+    FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     FindMetadataKeysService*--DecryptMetadataKeyService
     FindMetadataKeysService*--MetadataKeyApiService
     FindMetadataTypesSettingsService*--MetadataTypesSettingsApiService
@@ -454,11 +455,12 @@ classDiagram
     GetOrFindMetadataKeysService*--FindAndUpdateMetadataKeysSessionStorageService
     GetOrFindMetadataKeysService*--MetadataKeysSessionStorageService
     GetOrFindMetadataSettingsService*--FindAndUpdateMetadataSettingsService
-    GetOrFindMetadataSettingsService*--MetadataTypesSettingsLocalStorageService
+    GetOrFindMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     %% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
     style MetadataKeysSessionStorageService fill:#DEE5D4
     style MetadataTypesSettingsApiService fill:#DEE5D4
+    style MetadataTypesSettingsLocalStorage fill:#DEE5D4
 
     %% Session keys service relationships
     DecryptSessionKeysService*--PassphraseStorageService

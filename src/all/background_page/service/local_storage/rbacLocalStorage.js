@@ -50,20 +50,20 @@ class RbacsLocalStorage {
   }
 
   /**
-   * Set the rbacs local storage.
+   * Get the rbacs local storage.
    * @throws {Error} if operation failed
-   * @return {Promise} results object, containing every object in keys that was found in the storage area.
+   * @return {Promise<array|undefined>} results object, containing every object in keys that was found in the storage area.
    * If storage is not set, undefined will be returned.
    */
   async get() {
-    const rbacs = await browser.storage.local.get([this.storageKey]);
-    return rbacs[this.storageKey];
+    const data = await browser.storage.local.get([this.storageKey]);
+    return data[this.storageKey];
   }
 
   /**
    * Set the rbacs in local storage.
    * @param {RbacsCollection} rbacsCollection The rbacs collection to insert in the local storage.
-   * @return {void}
+   * @return {Promise<void>}
    */
   async set(rbacsCollection) {
     await navigator.locks.request(this.storageKey, async() => {

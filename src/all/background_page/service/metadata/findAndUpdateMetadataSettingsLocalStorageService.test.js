@@ -12,7 +12,6 @@
  * @since         4.10.0
  */
 
-
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
@@ -38,6 +37,8 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
     findAndUpdateMetadataTypesSettingsService = new FindAndUpdateMetadataSettingsLocalStorageService(account, apiClientOptions);
+    // flush account related storage before each.
+    findAndUpdateMetadataTypesSettingsService.metadataTypesSettingsLocalStorage.flush();
   });
 
   describe("::findAndUpdateTypesSettings", () => {

@@ -16,7 +16,7 @@ import MetadataTypesSettingsEntity
   from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 /**
- * The service aims to find resources from the API.
+ * The service aims to find metadata settings from the API.
  */
 export default class FindMetadataSettingsService {
   /**
@@ -29,10 +29,11 @@ export default class FindMetadataSettingsService {
 
   /**
    * Retrieve the metadata types settings.
+   * Marshall the information retrieved from the API, and ensure all the local default are present.
    * @returns {Promise<MetadataTypesSettingsEntity>}
    */
   async findTypesSettings() {
     const dto = await this.metadataTypesSettingsApiService.findSettings();
-    return new MetadataTypesSettingsEntity(dto);
+    return MetadataTypesSettingsEntity.createFromDefault(dto);
   }
 }

@@ -82,7 +82,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesDto));
     });
 
-    it("updates local storage with a multiple resource.", async() => {
+    it("updates local storage with multiple resources.", async() => {
       expect.assertions(5);
       const resourcesDto = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
@@ -157,7 +157,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollectionOverdue).toEqual(new ResourcesCollection(resourcesDto));
     });
 
-    it("waits any on-going call to the update.", async() => {
+    it("waits any on-going call to the update and returns the result of the local storage.", async() => {
       expect.assertions(3);
       const resourcesDto = singleResourceDtos();
       let resolve;

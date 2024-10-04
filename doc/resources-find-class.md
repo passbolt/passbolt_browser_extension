@@ -140,6 +140,11 @@ classDiagram
             +decryptAllFromForeignModels(Collection collection, ?string passphrase, ?object options) Promise
         }
 
+        class DecryptMetadataPrivateKeyService {
+            +decryptOne(MetadataPrivateKeyEntity entity, ?string passphrase) Promise
+            +decryptAll(MetadataPrivateKeyCollection collection, ?string passphrase) Promise
+        }
+
         class EncryptMetadataService {
             +encryptOneForForeignModel(Entity entity, ?string passphrase) Promise
             +encryptAllForForeignModels(Collection collection, ?string passphrase) Promise

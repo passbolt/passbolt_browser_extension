@@ -275,6 +275,7 @@ classDiagram
             -string props.modified_by
             -string props.deleted
             +get metadataPrivateKeys() MetadataPrivateKeysCollection
+            +get created() string
         }
 
         class MetadataKeysCollection {
@@ -294,7 +295,6 @@ classDiagram
             +get armoredKey(string armordKey) string
             +get data() string
             +get metadataKeyId() string
-            +get created() string
             +set armoredKey(string armordKey) void
             +set data(string data) void
             +isDecrypted() boolean

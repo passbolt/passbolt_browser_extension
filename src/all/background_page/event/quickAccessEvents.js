@@ -12,6 +12,7 @@ import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedI
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import AutofillController from "../controller/autofill/AutofillController";
 import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
+import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 
 /**
  * Listens to the quickaccess application events
@@ -139,6 +140,23 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.password-expiry.get-or-find', async(requestId, refreshCache = false) => {
     const controller = new GetOrFindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec(refreshCache);
+  });
+
+  /*
+   * ==================================================================================
+   *  Metadata events.
+   * ==================================================================================
+   */
+
+  /*
+   * Get or find metadata types settings.
+   *
+   * @listens passbolt.metadata.get-or-find-metadata-types-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.get-or-find-metadata-types-settings', async requestId => {
+    const controller = new GetOrFindMetadataTypesController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
   });
 };
 

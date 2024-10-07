@@ -128,7 +128,7 @@ classDiagram
 
         class GetOrFindMetadataTypesSettingsController {
             event "passbolt.metadata.get-or-find-metadata-types-settings"
-            +exec() MetdataTypesSettingsEntity
+            +exec() Promise~MetdataTypesSettingsEntity~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

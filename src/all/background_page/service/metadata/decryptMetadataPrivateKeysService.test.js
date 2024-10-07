@@ -23,6 +23,8 @@ import PassphraseStorageService from "../session_storage/passphraseStorageServic
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import MetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeysCollection";
+import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
+import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -238,6 +240,104 @@ describe("DecryptMetadataPrivateKeysService", () => {
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
       await expect(() => service.decryptAll(collection)).rejects.toThrowError(expectedError);
+      expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("::decryptAllFromMetadataKeysCollection", () => {
+    it("should decrypt the private keys from MetadataKeysCollection", async() => {
+      expect.assertions(7);
+
+      const dto1 = defaultMetadataKeyDto();
+      dto1.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
+      dto1.fingerprint = "abcd".repeat(10);
+
+      const dto2 = defaultMetadataKeyDto();
+      dto2.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
+      dto2.fingerprint = "ef01".repeat(10);
+      const collection = new MetadataKeysCollection([dto1, dto2]);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptMetadataPrivateKeysService(account);
+      await service.decryptAllFromMetadataKeysCollection(collection, pgpKeys.ada.passphrase);
+
+      const metadataPrivateKey1 = collection._items[0].metadataPrivateKeys._items[0];
+      const metadataPrivateKey2 = collection._items[1].metadataPrivateKeys._items[0];
+
+      expect(collection).toHaveLength(2);
+      expect(metadataPrivateKey1.data).toBeNull();
+      expect(metadataPrivateKey2.data).toBeNull();
+
+      expect(typeof metadataPrivateKey1.armoredKey).toBe("string");
+      expect(typeof metadataPrivateKey2.armoredKey).toBe("string");
+
+      const openPgpPrivateKey1 = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKey1.armoredKey);
+      const openPgpPrivateKey2 = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKey2.armoredKey);
+      await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey1)).not.toThrow();
+      await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey2)).not.toThrow();
+    }, 10 * 1000);
+
+    it("should retrieve the passphrase from the storage", async() => {
+      expect.assertions(7);
+
+      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
+      spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
+
+      const dto1 = defaultMetadataKeyDto();
+      dto1.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
+      dto1.fingerprint = "abcd".repeat(10);
+
+      const dto2 = defaultMetadataKeyDto();
+      dto2.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
+      dto2.fingerprint = "ef01".repeat(10);
+
+      const collection = new MetadataKeysCollection([dto1, dto2]);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptMetadataPrivateKeysService(account);
+      await service.decryptAllFromMetadataKeysCollection(collection, pgpKeys.ada.passphrase);
+
+      const metadataPrivateKey1 = collection._items[0].metadataPrivateKeys._items[0];
+      const metadataPrivateKey2 = collection._items[1].metadataPrivateKeys._items[0];
+
+      expect(collection).toHaveLength(2);
+      expect(metadataPrivateKey1.data).toBeNull();
+      expect(metadataPrivateKey2.data).toBeNull();
+
+      expect(typeof metadataPrivateKey1.armoredKey).toBe("string");
+      expect(typeof metadataPrivateKey2.armoredKey).toBe("string");
+
+      const openPgpPrivateKey1 = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKey1.armoredKey);
+      const openPgpPrivateKey2 = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKey2.armoredKey);
+      await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey1)).not.toThrow();
+      await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey2)).not.toThrow();
+    }, 10 * 1000);
+
+    it("should ensure metadataKeysCollection is of a valid type", async() => {
+      expect.assertions(1);
+
+      const expectedError = new TypeError("The given collection is not of the type MetadataKeysCollection");
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptMetadataPrivateKeysService(account);
+      await expect(() => service.decryptAllFromMetadataKeysCollection("test")).rejects.toThrowError(expectedError);
+    });
+
+    it("should throw an error if the passphrase is not available", async() => {
+      expect.assertions(2);
+      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
+      spyOnPassphraseStorage.mockImplementation(() => null);
+
+      const dto = defaultMetadataKeyDto();
+      dto.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
+
+      const collection = new MetadataKeysCollection([dto]);
+
+      const expectedError = new UserPassphraseRequiredError();
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptMetadataPrivateKeysService(account);
+      await expect(() => service.decryptAllFromMetadataKeysCollection(collection)).rejects.toThrowError(expectedError);
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
   });

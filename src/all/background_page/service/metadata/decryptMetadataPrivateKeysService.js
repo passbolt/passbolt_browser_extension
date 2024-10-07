@@ -15,6 +15,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import PassphraseStorageService from '../session_storage/passphraseStorageService';
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
 import MetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeysCollection";
+import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import {assertType} from '../../utils/assertions';
 import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
@@ -48,10 +49,7 @@ class DecryptMetadataPrivateKeysService {
 
     const message = await OpenpgpAssertion.readMessageOrFail(metadataPrivateKeyEntity.data);
 
-    passphrase = passphrase || await PassphraseStorageService.get();
-    if (!passphrase) {
-      throw new UserPassphraseRequiredError();
-    }
+    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
 
     const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     const metadataPrivateArmoredKey = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey);
@@ -62,7 +60,7 @@ class DecryptMetadataPrivateKeysService {
   /**
    * Decrypts a collection of metadata private key entities and mutate all entities with their decrypted result.
    *
-   * @param {MetadataPrivateKeysCollection} metadataPrivateKeysCollection the metadata private key collection to decrypt.
+   * @param {MetadataPrivateKeysCollection} metadataPrivateKeysCollection the metadata private keys collection to decrypt.
    * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
@@ -73,17 +71,52 @@ class DecryptMetadataPrivateKeysService {
   async decryptAll(metadataPrivateKeysCollection, passphrase = null) {
     assertType(metadataPrivateKeysCollection, MetadataPrivateKeysCollection, "The given collection is not of the type MetadataPrivateKeysCollection");
 
-    passphrase = passphrase || await PassphraseStorageService.get();
-
-    if (!passphrase) {
-      throw new UserPassphraseRequiredError();
-    }
+    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
 
     const items = metadataPrivateKeysCollection.items;
     for (let i = 0; i < items.length; i++) {
       const metadataPrivateKeyEntity = items[i];
       await this.decryptOne(metadataPrivateKeyEntity, passphrase);
     }
+  }
+
+  /**
+   * Decrypts the metadata private keys from a metadata keys collection
+   * and mutate all metadata private key entities with their decrypted result.
+   *
+   * @param {MetadataKeysCollection} metadataKeysCollection the metadata keys collection to decrypt.
+   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @returns {Promise<void>}
+   * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
+   * @throws {Error} if one of the `MetadataPrivateKeyEntity` is already decrypted
+   * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.
+   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
+   */
+  async decryptAllFromMetadataKeysCollection(metadataKeysCollection, passphrase = null) {
+    assertType(metadataKeysCollection, MetadataKeysCollection, "The given collection is not of the type MetadataKeysCollection");
+
+    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+
+    const items = metadataKeysCollection.items;
+    for (let i = 0; i < items.length; i++) {
+      const metadataKeysCollection = items[i].metadataPrivateKeys;
+      await this.decryptAll(metadataKeysCollection, passphrase);
+    }
+  }
+
+  /**
+   * Retrieve the user passphrase from the local storage or fail.
+   *
+   * @returns {Promise<string>}
+   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
+   * @private
+   */
+  async getPassphraseFromLocalStorageOrFail() {
+    const passphrase = await PassphraseStorageService.get();
+    if (!passphrase) {
+      throw new UserPassphraseRequiredError();
+    }
+    return passphrase;
   }
 }
 

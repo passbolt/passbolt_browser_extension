@@ -42,6 +42,7 @@ import SaveUserPassphrasePoliciesController from "../controller/userPassphrasePo
 import SavePasswordExpirySettingsController from "../controller/passwordExpiry/savePasswordExpirySettingsController";
 import DeletePasswordExpirySettingsController from "../controller/passwordExpiry/deletePasswordExpirySettingsController";
 import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
+import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -264,6 +265,23 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.desktop.export-account', async requestId => {
     const account = await GetLegacyAccountService.get();
     const controller = new ExportDesktopAccountController(worker, requestId, account);
+    await controller._exec();
+  });
+
+  /*
+   * ==================================================================================
+   *  Metadata events.
+   * ==================================================================================
+   */
+
+  /*
+   * Get or find metadata types settings.
+   *
+   * @listens passbolt.metadata.get-or-find-metadata-types-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.get-or-find-metadata-types-settings', async requestId => {
+    const controller = new GetOrFindMetadataTypesController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 };

@@ -106,4 +106,64 @@ describe("FindMetadataKeysApiService", () => {
       await expect(() => service.findAll(fakeContains)).rejects.toThrow(expectedError);
     });
   });
+
+  describe('::findAllForSessionStorage', () => {
+    it("retrieves the settings from API with the right contains", async() => {
+      expect.assertions(5);
+
+      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
+      spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
+
+      const id = uuidv4();
+      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage}, {withData: true})];
+      const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys})];
+
+      const service = new FindMetadataKeysService(apiClientOptions, account);
+      const spyOnFindService = jest.spyOn(service.metadataKeysApiService, "findAll");
+      spyOnFindService.mockImplementation(() => apiMetadataKeysCollection);
+      const resultDto = await service.findAllForSessionStorage();
+
+      expect(resultDto).toBeInstanceOf(MetadataKeysCollection);
+      expect(resultDto).toHaveLength(apiMetadataKeysCollection.length);
+      expect(resultDto.hasDecryptedKeys()).toStrictEqual(true);
+      expect(spyOnFindService).toHaveBeenCalledTimes(1);
+      expect(spyOnFindService).toHaveBeenCalledWith({metadata_private_keys: true});
+    });
+
+    it("throws an error if the keys from the API is already decrypted", async() => {
+      expect.assertions(1);
+
+      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
+      spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
+
+      const id = uuidv4();
+      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id}, {withArmoredKey: true})];
+      const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys})];
+
+      const service = new FindMetadataKeysService(apiClientOptions, account);
+      const spyOnFindService = jest.spyOn(service.metadataKeysApiService, "findAll");
+      spyOnFindService.mockImplementation(() => apiMetadataKeysCollection);
+
+      const expectedError = new Error("The metadata private keys should not be decrypted.");
+      await expect(() => service.findAllForSessionStorage()).rejects.toThrow(expectedError);
+    });
+
+    it("throws API error if the API encountered an issue", async() => {
+      expect.assertions(1);
+      fetch.doMockOnceIf(/metadata\/keys/, () => mockApiResponseError(500, "Something wrong happened!"));
+
+      const service = new FindMetadataKeysService(apiClientOptions);
+
+      await expect(() => service.findAllForSessionStorage()).rejects.toThrow(PassboltApiFetchError);
+    });
+
+    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async() => {
+      expect.assertions(1);
+      fetch.doMockOnceIf(/metadata\/keys/, () => { throw new Error("Service unavailable"); });
+
+      const service = new FindMetadataKeysService(apiClientOptions);
+
+      await expect(() => service.findAllForSessionStorage()).rejects.toThrow(PassboltServiceUnavailableError);
+    });
+  });
 });

@@ -50,6 +50,15 @@ class FindMetadataKeysService {
 
     return collection;
   }
+
+  /**
+   * Retrieve the metadata keys from the API with the contained data necessary for the local storage.
+   * @returns {Promise<MetadataKeysCollection>}
+   * @public
+   */
+  findAllForSessionStorage() {
+    return this.findAll({metadata_private_keys: true});
+  }
 }
 
 export default FindMetadataKeysService;

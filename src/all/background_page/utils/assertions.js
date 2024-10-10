@@ -148,6 +148,22 @@ export const assertType = (object, expectedType, errorMessage = "The given data 
 };
 
 /**
+ * Assert that the given parameter is of the given type.
+ * @param {*} object the parameter to validate
+ * @param {Array<*>} expectedTypes the expected type of `object`
+ * @param {string} [errorMessage] the message to throw withing the Error if any
+ * @throws {TypeError} if the parameter is not valid
+ */
+export const assertAnyTypeOf = (object, expectedTypes, errorMessage = "The given data is not of any of the expected type") => {
+  for (let i = 0; i < expectedTypes.length; i++) {
+    if (object instanceof expectedTypes[i]) {
+      return;
+    }
+  }
+  throw new TypeError(errorMessage);
+};
+
+/**
  * Assert that the given parameter is a valid boolean.
  * Note: The value has to be defined to be assessed, undefined is considered valid.
  * @param {*} value the parameter to validate

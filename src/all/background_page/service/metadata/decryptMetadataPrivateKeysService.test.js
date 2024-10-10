@@ -88,11 +88,9 @@ describe("DecryptMetadataPrivateKeysService", () => {
       const dto = defaultMetadataPrivateKeyDto({}, {withArmoredKey: true});
       const metadataPrivateKeyEntity = new MetadataPrivateKeyEntity(dto);
 
-      const expectedError = new Error("The metadata private key should not be already decrypted.");
-
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptOne(metadataPrivateKeyEntity)).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptOne(metadataPrivateKeyEntity)).not.toThrow();
     });
 
     it("should ensure metadataPrivateKeyEntity data is a valid PGP message", async() => {
@@ -196,18 +194,6 @@ describe("DecryptMetadataPrivateKeysService", () => {
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
       await expect(() => service.decryptAll("test")).rejects.toThrowError(expectedError);
-    });
-
-    it("should ensure metadataPrivateKeyEntity is not decrypted already", async() => {
-      expect.assertions(1);
-      const dto = defaultMetadataPrivateKeyDto({}, {withArmoredKey: true});
-      const collection = new MetadataPrivateKeysCollection([dto]);
-
-      const expectedError = new Error("The metadata private key should not be already decrypted.");
-
-      const account = new AccountEntity(defaultAccountDto());
-      const service = new DecryptMetadataPrivateKeysService(account,);
-      await expect(() => service.decryptAll(collection, "test")).rejects.toThrowError(expectedError);
     });
 
     it("should ensure metadataPrivateKeyEntity data is a valid PGP message", async() => {

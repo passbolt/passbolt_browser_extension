@@ -12,7 +12,8 @@
  * @since         3.0.0
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
-import {RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity";
+import {RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+
 
 /**
  * This is a schema specificaly made up for 'password-string' resource type plaintext secret data validation.

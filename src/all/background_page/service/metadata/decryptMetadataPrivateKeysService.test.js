@@ -234,11 +234,11 @@ describe("DecryptMetadataPrivateKeysService", () => {
     it("should decrypt the private keys from MetadataKeysCollection", async() => {
       expect.assertions(7);
 
-      const dto1 = defaultMetadataKeyDto();
+      const dto1 = defaultMetadataKeyDto({}, {withMetadataPrivateKeys: true});
       dto1.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
       dto1.fingerprint = "abcd".repeat(10);
 
-      const dto2 = defaultMetadataKeyDto();
+      const dto2 = defaultMetadataKeyDto({}, {withMetadataPrivateKeys: true});
       dto2.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
       dto2.fingerprint = "ef01".repeat(10);
       const collection = new MetadataKeysCollection([dto1, dto2]);
@@ -269,11 +269,11 @@ describe("DecryptMetadataPrivateKeysService", () => {
       const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
       spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
 
-      const dto1 = defaultMetadataKeyDto();
+      const dto1 = defaultMetadataKeyDto({}, {withMetadataPrivateKeys: true});
       dto1.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
       dto1.fingerprint = "abcd".repeat(10);
 
-      const dto2 = defaultMetadataKeyDto();
+      const dto2 = defaultMetadataKeyDto({}, {withMetadataPrivateKeys: true});
       dto2.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
       dto2.fingerprint = "ef01".repeat(10);
 
@@ -314,7 +314,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
       const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
       spyOnPassphraseStorage.mockImplementation(() => null);
 
-      const dto = defaultMetadataKeyDto();
+      const dto = defaultMetadataKeyDto({}, {withMetadataPrivateKeys: true});
       dto.metadata_private_keys[0].data = pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage;
 
       const collection = new MetadataKeysCollection([dto]);

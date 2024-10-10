@@ -180,14 +180,17 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class FindAndUpdateMetadataSettingsService {
+            +findAndUpdateKeysSettings() Promise~MetadataKeysSettingsEntity~
             +findAndUpdateTypesSettings() Promise~MetadataTypesSettingsEntity~
         }
 
-        class FindMetadataTypesSettingsService {
+        class FindMetadataSettingsService {
+            +findKeysSettings() Promise~MetadataKeysSettingsEntity~
             +findTypesSettings() Promise~MetadataTypesSettingsEntity~
         }
 
         class GetOrFindMetadataSettingsService {
+            +getOrFindKeysSettings() Promise~MetadataKeysSettingsEntity~
             +getOrFindTypesSettings() Promise~MetadataTypesSettingsEntity~
         }
 
@@ -199,7 +202,18 @@ classDiagram
             +findAll(object contains) Promise~array~
         }
 
+        class MetadataKeysSettingsLocalStorage {
+            -$_runtimeCachedData object
+            +get() Promise~object~
+            +set(MetadataKeysSettingsEntity entity) Promise
+            +flush(AccountEntity account) Promise
+        }
+
         class MetadataKeysSessionStorageService {
+        }
+
+        class MetadataKeysSettingsApiService {
+            +findSettings() Promise~object~
         }
 
         class MetadataTypesSettingsApiService {
@@ -210,7 +224,7 @@ classDiagram
             -$_runtimeCachedData object
             +get() Promise~object~
             +set(MetadataTypesSettingsEntity entity) Promise
-            +flush() Promise
+            +flush(AccountEntity account) Promise
         }
     }
 
@@ -220,30 +234,48 @@ classDiagram
     %% SessionKeys services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        class DecryptSessionKeysService {
-            +decrypt(string data) Promis~SessionKeysCollection~
+        class DecryptSessionKeysBundlesService {
+            +decryptOne(SessionKeysBundleEntity entity, ?string passphrase) Promise
+            +decryptAll(SessionKeysBundlesCollection collection, ?string passphrase) Promise
+        }
+
+        class EncryptSessionKeysBundlesService {
+            +encryptOne(SessionKeysBundleEntity entity, ?string passphrase) Promise
         }
 
         class GetOrFindSessionKeysService {
-            +getOrFindOneByForeignKeyId(uuid foreignKeyId) Promise~SessionKeyEntity~
-            +getOrFindAllByForeignKeyIds(array~uuid~ foreignKeyIds) Promise~SessionKeysCollection~
+            +getOrFindAllBundles() Promise~SessionKeysBundlesCollection~
+            +getOrFindAllByForeignModelAndForeignIds(string foreignModel, array foreignIds): SessionKeysCollection
         }
 
-        class FindAndUpdateSessionKeysSessionStorageService {
-            +findAndUpdateAll(object contains, object filters) Promise~SessionKeysCollection~
+        class FindAndUpdateSessionKeysBundlesSessionStorageService {
+            +findAndUpdateAllBundles() Promise~SessionKeysBundlesCollection~
+        }
+
+        class FindSessionKeysService {
+            +findAllBundles() Promise~SessionKeysBundlesCollection~
+        }
+
+        class SaveSessionKeysService {
+            +save(SessionKeysCollection collection, ?string passphrase, ?boolean retry) Promise
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% SessionKeys models
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        class SessionKeysBackupLocalStorageService {
-            +get() Promise~object~
-            +set(SessionKeysBackupEntity entity) Promise
-            +flush() Promise
+        class SessionKeysBundlesApiService {
+            +create(SessionKeysBundleEntity entity) Promise~object~
+            +delete(string entityId) Promise
+            +findAll() Promise~array~
+            +udpate(string entityId, SessionKeysBundleEntity entity) Promise~object~
         }
 
-        class SessionKeysSessionStorageService {
+        class SessionKeysBundlesSessionStorageService {
+            -$_runtimeCachedData object
+            +get() Promise~array~
+            +set(SessionKeysBundlesCollection collection) Promise
+            +flush(AccountEntity account) Promise
         }
     }
 
@@ -320,6 +352,14 @@ classDiagram
             +createFromDefault(?object data) MetadataTypesSettingsEntity
         }
 
+        class MetadataKeysSettingsEntity {
+            -boolean props.allow_usage_of_personal_keys
+            -boolean props.zero_knowledge_key_share
+            +get allowUsageOfPersonalKeys() boolean
+            +get zeroKnowledgeKeyShare() boolean
+            +createFromDefault(?object data) MetadataKeysSettingsEntity
+        }
+
         class ResourceEntity {
             -uuid props.id
             -uuid props.resource_type_id
@@ -379,6 +419,9 @@ classDiagram
             +get version() string
         }
 
+        class SessionKeysCollection {
+        }
+
         class SessionKeyEntity {
             -string props.foreign_model
             -string foreign_id
@@ -386,7 +429,11 @@ classDiagram
             +get sessionKey() string
         }
 
-        class SessionKeysBackupEntity {
+        class SessionKeysBundlesCollection {
+            +hasDecryptedSessionKeys() boolean
+        }
+
+        class SessionKeysBundleEntity {
             -uuid props.id
             -uuid props.user_id
             -string props.data
@@ -397,9 +444,7 @@ classDiagram
             +set data(string data)
             +get sessionKeys() SessionKeysCollection
             +set sessionKeys(SessionKeysCollection collection)
-        }
-
-        class SessionKeysCollection {
+            +isDecrypted() boolean
         }
     }
 
@@ -451,15 +496,18 @@ classDiagram
     DecryptMetadataService*--GetOrFindSessionKeysService
     DecryptMetadataService*--PassphraseStorageService
     DecryptMetadataService*--ResourcesLocalStorageService
+    DecryptMetadataService*--SaveSessionKeysService
     EncryptMetadataService*--GetOrFindMetadataKeysService
+    EncryptMetadataService*--GetOrFindMetadataSettingsService
     EncryptMetadataService*--PassphraseStorageService
     FindAndUpdateMetadataKeysSessionStorageService*--FindMetadataKeysService
     FindAndUpdateMetadataKeysSessionStorageService*--MetadataKeysSessionStorageService
-    FindAndUpdateMetadataSettingsService*--FindMetadataTypesSettingsService
+    FindAndUpdateMetadataSettingsService*--FindMetadataSettingsService
     FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     FindMetadataKeysService*--DecryptMetadataKeyService
     FindMetadataKeysService*--MetadataKeyApiService
-    FindMetadataTypesSettingsService*--MetadataTypesSettingsApiService
+    FindMetadataSettingsService*--MetadataKeysSettingsApiService
+    FindMetadataSettingsService*--MetadataTypesSettingsApiService
     FindResourcesService*--DecryptMetadataService
     GetOrFindMetadataKeysService*--FindAndUpdateMetadataKeysSessionStorageService
     GetOrFindMetadataKeysService*--MetadataKeysSessionStorageService
@@ -467,20 +515,26 @@ classDiagram
     GetOrFindMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     %% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
+    style MetadataKeysSettingsLocalStorage fill:#DEE5D4
     style MetadataKeysSessionStorageService fill:#DEE5D4
+    style MetadataKeysSettingsApiService fill:#DEE5D4
     style MetadataTypesSettingsApiService fill:#DEE5D4
     style MetadataTypesSettingsLocalStorage fill:#DEE5D4
 
     %% Session keys service relationships
-    DecryptSessionKeysService*--PassphraseStorageService
-    FindAndUpdateSessionKeysSessionStorageService*--DecryptSessionKeysService
-    FindAndUpdateSessionKeysSessionStorageService*--SessionKeysBackupLocalStorageService
-    FindAndUpdateSessionKeysSessionStorageService*--SessionKeysSessionStorageService
-    GetOrFindSessionKeysService*--FindAndUpdateSessionKeysSessionStorageService
-    GetOrFindSessionKeysService*--SessionKeysSessionStorageService
+    DecryptSessionKeysBundlesService*--PassphraseStorageService
+    FindAndUpdateSessionKeysBundlesSessionStorageService*--FindSessionKeysService
+    FindAndUpdateSessionKeysBundlesSessionStorageService*--SessionKeysBundlesSessionStorageService
+    FindSessionKeysService*--DecryptSessionKeysBundlesService
+    FindSessionKeysService*--SessionKeysBundlesApiService
+    GetOrFindSessionKeysService*--FindAndUpdateSessionKeysBundlesSessionStorageService
+    GetOrFindSessionKeysService*--SessionKeysBundlesSessionStorageService
+    SaveSessionKeysService*--EncryptSessionKeysBundlesService
+    SaveSessionKeysService*--SessionKeysBundlesApiService
+    SaveSessionKeysService*--SessionKeysBundlesSessionStorageService
     %% Session keys models relationships.
-    style SessionKeysBackupLocalStorageService fill:#DEE5D4
-    style SessionKeysSessionStorageService fill:#DEE5D4
+    style SessionKeysBundlesApiService fill:#DEE5D4
+    style SessionKeysBundlesSessionStorageService fill:#DEE5D4
 
     %% Entities relationships
     MetadataKeyEntity*--MetadataPrivateKeysCollection
@@ -491,7 +545,8 @@ classDiagram
     ResourceTypesCollection*--ResourceTypeEntity
     ResourcesCollection*--ResourceEntity
     SessionKeysCollection*--SessionKeyEntity
-    SessionKeysBackupEntity*--SessionKeysCollection
+    SessionKeysBundlesCollection*--SessionKeysBundleEntity
+    SessionKeysBundleEntity*--SessionKeysCollection
 
     %% Auth services relationship.
     style PassphraseStorageService fill:#DEE5D4

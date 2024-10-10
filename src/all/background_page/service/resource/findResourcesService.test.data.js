@@ -16,6 +16,7 @@ import {
   defaultResourceDto, resourceLegacyDto, resourceStandaloneTotpDto, resourceUnknownResourceTypeDto,
   resourceWithTotpDto
 } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 
 /**
  * Build an array of resources dto containing resources of different supported types.
@@ -40,4 +41,15 @@ export const multipleResourceIncludingUnsupportedResourceTypesDtos = () => [
   resourceWithTotpDto({name: "Resource2"}, {withTags: true}),
   resourceStandaloneTotpDto({name: "Resource3"}, {withTags: true}),
   resourceUnknownResourceTypeDto({name: "ResourceY"}, {withTags: true}),
+];
+
+export const multipleResourceWithMetadataEncrypted = (sharedMetadataKeyId = null) => [
+  defaultResourceDto({metadata: metadata.withAdaKey.encryptedMetadata[0], metadata_key_id: null, metadata_key_type: "user_key", personal: true}),
+  defaultResourceDto({metadata: metadata.withAdaKey.encryptedMetadata[1], metadata_key_id: null, metadata_key_type: "user_key", personal: true}),
+  defaultResourceDto({metadata: metadata.withAdaKey.encryptedMetadata[2], metadata_key_id: null, metadata_key_type: "user_key", personal: true}),
+  defaultResourceDto({metadata: metadata.withAdaKey.encryptedMetadata[3], metadata_key_id: null, metadata_key_type: "user_key", personal: true}),
+  defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[0], metadata_key_id: sharedMetadataKeyId, metadata_key_type: "metadata_key"}),
+  defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[1], metadata_key_id: sharedMetadataKeyId, metadata_key_type: "metadata_key"}),
+  defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[2], metadata_key_id: sharedMetadataKeyId, metadata_key_type: "metadata_key"}),
+  defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[3], metadata_key_id: sharedMetadataKeyId, metadata_key_type: "metadata_key"}),
 ];

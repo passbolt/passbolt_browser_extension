@@ -168,6 +168,15 @@ class ResourcesCollection extends EntityV2Collection {
     return  this._items.filter(filterResource);
   }
 
+  /**
+   * Keep only the resources which metadata is decrypted.
+   * @returns {Array<ResourceEntity>}
+   */
+  filterOutByMetadataDecrypted() {
+    const filterResource = resource => resource.isMetadataDecrypted();
+    return this._items.filter(filterResource);
+  }
+
   /*
    * ==================================================
    * Setters

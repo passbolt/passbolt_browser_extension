@@ -61,3 +61,27 @@ export const defaultExternalResourceImportDto = (data = {}) => {
     ...data,
   };
 };
+
+
+export const defaultExternalResourceImportMinimalDto = (data = {}) => {
+  const defaultData = minimalExternalResourceDto({
+    id: uuidv4(),
+    name: "",
+    secret_clear: "",
+    username: "",
+    uri: "",
+    description: "",
+    resource_type_id: uuidv4(),
+    folder_parent_path: "private/data",
+    ...data
+  });
+
+  /**
+   * Timestamp during test are unstable we check the path after timestamp
+   */
+  if (data.folder_parent_path_expected) {
+    defaultData.folder_parent_path = `${data.folder_parent_path.split('/')[0]}${data.folder_parent_path_expected}`;
+  }
+
+  return defaultData;
+};

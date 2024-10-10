@@ -12,27 +12,47 @@
  * @since         4.10.0
  */
 
-const defaultCsvData = [
+import BinaryConvert from "../../../utils/format/binaryConvert";
+import fs from "fs";
+
+export const defaultCsvData = [
   "Title,Username,URL,Password,Notes,Group",
-  "Password 1,Username 1,https://url1.com,Password 1,Description 1,",
-  "Password 2,Username 2,https://url1.com,Password 2,Description 2, Folder",
+  "Password 1,Username 1,https://url1.com,Password 1,Description 1",
+  "Password 2,Username 2,https://url1.com,Password 2,Description 2,Folder",
 ].join("\n");
 
-export const defaultImportResourceFileDto = (data = {}) => ({
+export const defaultKDBXCSVData = [
+  "Title,Username,URL,Password,Notes,Group,TOTP",
+  "Password 1,Username 1,https://url1.com,Secret 1,Description 1,Folder 1,otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"
+].join("\n");
+
+
+export const defaultImportResourceFileCSVDto = (data = {}) => ({
   ref: "import-ref",
   file_type: "csv",
-  file: btoa(defaultCsvData),
+  file: btoa(BinaryConvert.toBinary(defaultCsvData)),
   ...data,
 });
 
 export const importResourceFileWithAllOptionsDto = (data = {}) => {
   const options = defaultImportResourceFileOptionsDto(data.options);
   delete(data?.options);
-
-  return defaultImportResourceFileDto({
+  return defaultImportResourceFileCSVDto({
     options,
     ...data,
   });
+};
+
+export const defaultImportResourceFileKDBXDto = (data = {}) => {
+  const defaultPath = "./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx";
+  const file = fs.readFileSync(data.path || defaultPath, {encoding: 'base64'});
+
+  return {
+    ref: "import-ref",
+    file_type: "kdbx",
+    file: file,
+    ...data
+  };
 };
 
 export const defaultImportResourceFileOptionsDto = (data = {}) => ({
@@ -44,3 +64,57 @@ export const defaultImportResourceFileOptionsDto = (data = {}) => ({
   },
   ...data
 });
+
+/**
+ * Without folder fields / totp / description
+ */
+export const chromiumCsvFileImport =  [
+  "name,username,url,password",
+  "Password 1,Username 1,https://url1.com,Password 1",
+].join("\n");
+
+export const mozillaCsvFileImport =  [
+  "url,username,url,password",
+  "Password 1,Username 1,https://url1.com,Password 1",
+].join("\n");
+
+/**
+ * With description fields
+ */
+
+export const dashlaneCsvFileImport =  [
+  "username,username1,username2,username3,title,password,note,url,category, otpSecret",
+  "Username 1,not supported,not supported,not supported,Password 1,Password 1,Description 1,https://url1.com,Password 1,not supported,not supported",
+].join("\n");
+
+export const safariCsvFileImport =  [
+  "Title,Username,URL,Password,Notes,OTPAuth",
+  "Password 1,Username 1,https://url1.com,Password 1,Description 1,not supported",
+].join("\n");
+export const nordPassCsvFileImport =  [
+  "name,username,url,password,note",
+  "Password 1,Username 1,https://url1.com,Password 1,Description 1",
+].join("\n");
+
+/**
+ * With folder and description fields
+ */
+export const onePasswordCsvFileImport =  [
+  "Title,Username,Url,Password,Notes,Type",
+  "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
+].join("\n");
+
+export const bitwardenCsvFileImport =  [
+  "name,login_username,login_uri,login_password,notes,folder",
+  "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
+].join("\n");
+
+export const lastpassCsvFileImport =  [
+  "name,username,url,password,extra,grouping",
+  "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
+].join("\n");
+
+export const logMeOnceCsvFileImport =  [
+  "name,username,url,password,note,group",
+  "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
+].join("\n");

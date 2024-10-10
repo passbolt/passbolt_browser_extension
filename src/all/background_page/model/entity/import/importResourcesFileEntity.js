@@ -32,7 +32,6 @@ class ImportResourcesFileEntity extends EntityV2 {
    */
   constructor(dto, options = {}) {
     super(dto, options);
-
     // @todo Refactor when a schema deep testing strategy is implemented.
     if (this._props.options) {
       const optionsSchema = this.cachedSchema.properties.options;
@@ -41,6 +40,7 @@ class ImportResourcesFileEntity extends EntityV2 {
         this._props.options.credentials = EntitySchema.validate(this.constructor.name, this._props.options.credentials, optionsSchema.properties.credentials);
       }
     }
+
     this._import_resources = new ExternalResourcesCollection([]);
     this._import_folders = new ExternalFoldersCollection([]);
     this._import_resources_errors = [];
@@ -308,6 +308,14 @@ class ImportResourcesFileEntity extends EntityV2 {
    */
 
   /**
+   * ImportResourcesFileEntity.SUPPORTED_FILE_TYPES
+   * @returns {string}
+   */
+  static get SUPPORTED_FILE_TYPES() {
+    return SUPPORTED_FILE_TYPES;
+  }
+
+  /**
    * ImportResourcesFileEntity.FILE_TYPE_CSV
    * @returns {string}
    */
@@ -321,6 +329,28 @@ class ImportResourcesFileEntity extends EntityV2 {
    */
   static get FILE_TYPE_KDBX() {
     return FILE_TYPE_KDBX;
+  }
+
+  /*
+   * ==================================================
+   * Build utils
+   * ==================================================
+   */
+
+  /**
+   * Build the import entity
+   * @param {string} fileType The file to import type
+   * @param {string} file The file to import (Encoded in base64)
+   * @param {object?} options (Optional) The import options
+   * @returns {ImportResourcesFileEntity}
+   * @throws {FileTypeError} If the file type is not supported
+   */
+  static buildImportEntity(fileType, file, options) {
+    const dateRef = (new Date()).toISOString()
+      .split('.')[0]
+      .replace(/\D/g, '');
+    const importResourcesDto = {file_type: fileType, file: file, options: options, ref: `import-${dateRef}`};
+    return new ImportResourcesFileEntity(importResourcesDto);
   }
 }
 

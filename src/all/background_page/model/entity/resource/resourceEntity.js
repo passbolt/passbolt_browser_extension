@@ -318,6 +318,22 @@ class ResourceEntity extends EntityV2 {
     return this._props.resource_type_id || null;
   }
 
+  /**
+   * Get the metadata key id if any
+   * @returns {string|null} uuid
+   */
+  get metadataKeyId() {
+    return this._props.metadata_key_id || null;
+  }
+
+  /**
+   * Get the metadata key type
+   * @returns {string}
+   */
+  get metadataKeyType() {
+    return this._props.metadata_key_type;
+  }
+
   /*
    * ==================================================
    * Permissions methods

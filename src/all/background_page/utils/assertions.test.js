@@ -24,6 +24,7 @@ import {
   assertType,
   assertNumber,
   assertArrayUUID,
+  assertAnyTypeOf,
 } from "./assertions";
 import {v4 as uuid} from 'uuid';
 import GenerateSsoIvService from "../service/crypto/generateSsoIvService";
@@ -31,6 +32,9 @@ import {buildMockedCryptoKey} from "./assertions.test.data";
 import PasswordGeneratorSettingsEntity from "../model/entity/passwordPolicies/passwordGeneratorSettingsEntity";
 import {defaultAccountRecoveryPrivateKeyPasswordDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
 import AccountRecoveryPrivateKeyEntity from "../model/entity/accountRecovery/accountRecoveryPrivateKeyEntity";
+import ResourceEntity from "../model/entity/resource/resourceEntity";
+import FolderEntity from "../model/entity/folder/folderEntity";
+import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 
 describe("Assertions", () => {
   describe("Assertions::assertUuid", () => {
@@ -235,6 +239,20 @@ describe("Assertions", () => {
         const data = scenarios[i];
         expect(() => assertType(data, AccountRecoveryPrivateKeyEntity, expectedMessage)).toThrow(expectedError);
       }
+    });
+  });
+
+  describe("Assertions::assertAnyTypeOf", () => {
+    it("Should not throw an error if the parameter is of one of the expected type", () => {
+      expect.assertions(1);
+      const entity = new FolderEntity(defaultFolderDto());
+      expect(() => assertAnyTypeOf(entity, [ResourceEntity, FolderEntity])).not.toThrow();
+    });
+
+    it("Should throw an error if the parameter is not valid", () => {
+      expect.assertions(1);
+      const entity = new AccountRecoveryPrivateKeyEntity(defaultAccountRecoveryPrivateKeyPasswordDto());
+      expect(() => assertAnyTypeOf(entity, [ResourceEntity, FolderEntity])).toThrow();
     });
   });
 

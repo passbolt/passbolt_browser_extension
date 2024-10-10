@@ -412,12 +412,13 @@ class ResourceModel {
    *
    * @param {Array<string>} resourceIds
    * @param {Array<TagsCollection>} tagsCollections
-   * @returns {Promise<Array<ResourceEntity>>}
+   * @returns {Promise<void>}
    */
   async bulkReplaceResourceTagsLocally(resourceIds, tagsCollections) {
     const resourcesDto = await ResourceLocalStorage.get();
     const resourceCollection = new ResourcesCollection(resourcesDto);
     await resourceCollection.bulkReplaceTagsCollection(resourceIds, tagsCollections);
+
     await ResourceLocalStorage.set(resourceCollection);
   }
 

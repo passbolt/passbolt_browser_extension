@@ -24,14 +24,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @returns {{references: {folder: (object|null), tag: (object|null)}, created: {resourcesCount: int, foldersCount: int}, options: {folders: boolean, tags: boolean}, errors: {folders: array, resources: array}}}
    */
   worker.port.on('passbolt.import-resources.import-file', async(requestId, fileType, file, options) => {
-    const importController = new ImportResourcesFileController(worker, apiClientOptions, account);
-    try {
-      const importEntity = await importController.exec(fileType, file, options);
-      worker.port.emit(requestId, 'SUCCESS', importEntity);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const importController = new ImportResourcesFileController(worker, requestId, apiClientOptions, account);
+    await importController._exec(fileType, file, options);
   });
 };
 

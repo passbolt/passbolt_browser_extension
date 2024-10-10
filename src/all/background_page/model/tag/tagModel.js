@@ -94,7 +94,7 @@ class TagModel {
    * @param {array} resourcesIds the resources ids
    * @param {TagsCollection} tagsCollection the tags to apply
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<array<ResourceEntity>>}
+   * @returns {Promise<void>}
    */
   async bulkTagResources(resourcesIds, tagsCollection, callbacks) {
     let tagCollections = [];
@@ -113,7 +113,7 @@ class TagModel {
       tagCollections = [...tagCollections, ...intermediateResult];
     }
 
-    return await this.resourceModel.bulkReplaceResourceTagsLocally(resourcesIds, tagCollections);
+    await this.resourceModel.bulkReplaceResourceTagsLocally(resourcesIds, tagCollections);
   }
 
   /**
@@ -132,7 +132,7 @@ class TagModel {
 
     try {
       const resourceEntity = await this.resourceModel.getById(resourceId);
-      const updatedTagCollection = new TagsCollection([...tagsCollection.tags, ...resourceEntity.tags]);
+      const updatedTagCollection = new TagsCollection([...tagsCollection.tags, ...resourceEntity.tags || []]);
       const tagsDto = await this.tagService.updateResourceTags(resourceId, updatedTagCollection.toDto());
       const updatedTagsCollection = new TagsCollection(tagsDto);
       successCallback(updatedTagsCollection, collectionIndex);

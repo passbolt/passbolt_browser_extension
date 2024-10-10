@@ -312,6 +312,7 @@ classDiagram
 
         class MetadataKeysCollection {
             +getFirstByLatestCreated() MetadataKeyEntity
+            +hasDecryptedKeys() boolean
         }
 
         class MetadataPrivateKeyEntity {
@@ -333,6 +334,7 @@ classDiagram
         }
 
         class MetadataPrivateKeysCollection {
+            +hasDecryptedPrivateKeys() boolean
         }
 
         class MetadataTypesSettingsEntity {

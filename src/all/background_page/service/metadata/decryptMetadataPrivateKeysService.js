@@ -32,19 +32,19 @@ class DecryptMetadataPrivateKeysService {
 
   /**
    * Decrypts a metadata private key and mutate the metadata private key entity with the decrypted result.
+   * If the private key was already decrypted, nothing happens.
    *
    * @param {MetadataPrivateKeyEntity} metadataPrivateKeyEntity the metadata private key entity to decrypt.
    * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `metadataPrivateKeyEntity` is not of type MetadataPrivateKeyEntity
-   * @throws {Error} if the `metadataPrivateKeyEntity` is already decrypted
    * @throws {Error} if metadata private key entity data is not a valid openPGP message.
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */
   async decryptOne(metadataPrivateKeyEntity, passphrase = null) {
     assertType(metadataPrivateKeyEntity, MetadataPrivateKeyEntity, "The given entity is not a MetadataPrivateKeyEntity");
     if (metadataPrivateKeyEntity.isDecrypted) {
-      throw new Error("The metadata private key should not be already decrypted.");
+      return;
     }
 
     const message = await OpenpgpAssertion.readMessageOrFail(metadataPrivateKeyEntity.data);
@@ -64,7 +64,6 @@ class DecryptMetadataPrivateKeysService {
    * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
-   * @throws {Error} if one of the `MetadataPrivateKeyEntity` is already decrypted
    * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */
@@ -88,7 +87,6 @@ class DecryptMetadataPrivateKeysService {
    * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
-   * @throws {Error} if one of the `MetadataPrivateKeyEntity` is already decrypted
    * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */

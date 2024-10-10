@@ -15,7 +15,7 @@ import AbstractCsvRowParser from "./abstractCsvRowParser";
 import {
   RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
   RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity";
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import TotpEntity from "../../../entity/totp/totpEntity";
 
 class CsvKdbxRowParser extends AbstractCsvRowParser {

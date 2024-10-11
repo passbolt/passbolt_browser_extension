@@ -334,7 +334,7 @@ describe("ResourcesCollection", () => {
     });
   });
 
-  describe("::filterOutByMetadataDecrypted", () => {
+  describe("::filterOutMetadataEncrypted", () => {
     it("should filter out the resource which metadata are encrypted.", () => {
       expect.assertions(3);
 
@@ -353,11 +353,11 @@ describe("ResourcesCollection", () => {
         resourceEncrypted2
       ]);
 
-      const result = resources.filterOutByMetadataDecrypted();
+      resources.filterOutMetadataEncrypted();
 
-      expect(result).toHaveLength(2);
-      expect(result[0].toDto()).toStrictEqual(resourceDecrypted1);
-      expect(result[1].toDto()).toStrictEqual(resourceDecrypted2);
+      expect(resources).toHaveLength(2);
+      expect(resources.items[0].toDto()).toStrictEqual(resourceDecrypted1);
+      expect(resources.items[1].toDto()).toStrictEqual(resourceDecrypted2);
     });
   });
 });

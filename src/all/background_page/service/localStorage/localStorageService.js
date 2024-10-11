@@ -33,6 +33,7 @@ import PasswordPoliciesLocalStorage from "../local_storage/passwordPoliciesLocal
 import PasswordExpirySettingsLocalStorage from "../local_storage/passwordExpirySettingsLocalStorage";
 import KeepSessionAliveService from "../session_storage/keepSessionAliveService";
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
+import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 
 /**
  * Flush storage data when:
@@ -70,6 +71,7 @@ class LocalStorageService {
     (new PasswordPoliciesLocalStorage(account)).flush();
     (new PasswordExpirySettingsLocalStorage(account)).flush();
     (new MetadataTypesSettingsLocalStorage(account)).flush();
+    (new MetadataKeysSessionStorage(account)).flush();
     UserMeSessionStorageService.remove(account);
   }
 }

@@ -27,7 +27,7 @@ import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 const ENTITY_NAME = 'Resource';
 
 const METADATA_KEY_TYPE_USER_KEY = "user_key";
-const METADATA_KEY_TYPE_METADATA_KEY = "metadata_key";
+const METADATA_KEY_TYPE_METADATA_KEY = "shared_key";
 
 const SUPPORTED_METADATA_KEY_TYPES = [
   METADATA_KEY_TYPE_USER_KEY,

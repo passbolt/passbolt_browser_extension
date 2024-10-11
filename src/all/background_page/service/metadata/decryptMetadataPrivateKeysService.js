@@ -14,6 +14,7 @@
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import PassphraseStorageService from '../session_storage/passphraseStorageService';
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
+import DecryptedMetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/decryptedMetadataPrivateKeyEntity";
 import MetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeysCollection";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
@@ -52,9 +53,12 @@ class DecryptMetadataPrivateKeysService {
     passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
 
     const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    const metadataPrivateArmoredKey = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey);
+    const decryptedMessage = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey);
 
-    metadataPrivateKeyEntity.armoredKey = metadataPrivateArmoredKey;
+    const decryptedMetadataPrivateKeyDto = JSON.parse(decryptedMessage);
+    const decryptedMetadataPrivateKeyEntity = new DecryptedMetadataPrivateKeyEntity(decryptedMetadataPrivateKeyDto);
+
+    metadataPrivateKeyEntity.armoredKey = decryptedMetadataPrivateKeyEntity.armoredKey;
   }
 
   /**

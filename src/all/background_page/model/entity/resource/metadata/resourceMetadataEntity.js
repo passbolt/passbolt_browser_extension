@@ -35,7 +35,7 @@ class ResourceMetadataEntity extends EntityV2 {
       "properties": {
         "object_type": {
           "type": "string",
-          "enum": [METADATA_OBJECT_TYPE]
+          "enum": [METADATA_OBJECT_TYPE, "PASSBOLT_RESOURCE_METADATA"]
         },
         "resource_type_id": {
           "type": "string",

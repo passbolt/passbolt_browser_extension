@@ -24,13 +24,20 @@ import {
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import {
   multipleResourceDtos,
-  multipleResourceIncludingUnsupportedResourceTypesDtos} from "./findResourcesService.test.data";
+  multipleResourceIncludingUnsupportedResourceTypesDtos,
+  multipleResourceWithMetadataEncrypted} from "./findResourcesService.test.data";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import {v4 as uuidv4} from "uuid";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
+import {defaultDecryptedSharedMetadataKeysDtos} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -145,6 +152,7 @@ describe("FindResourcesService", () => {
       expect(promise).rejects.toThrow(Error("Unsupported filter parameter used, please check supported filters"));
     });
   });
+
   describe("::findAllForLocalStorage", () => {
     it("uses the contains required by the local storage.", async() => {
       expect.assertions(2);
@@ -168,7 +176,6 @@ describe("FindResourcesService", () => {
 
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(resourcesDto);
     });
-
 
     it("should not throw an error if required field is missing with ignore strategy", async() => {
       expect.assertions(2);
@@ -198,6 +205,62 @@ describe("FindResourcesService", () => {
 
       expect(resources).toHaveLength(4);
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(expectedRetainedResource);
+    });
+
+    it("should return a collection with resources metadata decrypted", async() => {
+      expect.assertions(1);
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+
+      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+      const resourceTypesDto = resourceTypesCollectionDto();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
+      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+      jest.spyOn(findResourcesService.decryptMetadataService.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+
+      const resources = await findResourcesService.findAllForLocalStorage();
+
+      expect(resources).toHaveLength(resourcesDto.length);
+    }, 10 * 1000);
+
+    it("should return a collection with resources metadata decrypted and resources metadata encrypted filtered out (shared key cannot be found)", async() => {
+      expect.assertions(1);
+      const metadata_key_id = uuidv4();
+      const resourcesDto = multipleResourceWithMetadataEncrypted(metadata_key_id);
+      const resourceTypesDto = resourceTypesCollectionDto();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
+      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+      jest.spyOn(findResourcesService.decryptMetadataService.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => new MetadataKeysCollection([]));
+
+      const resources = await findResourcesService.findAllForLocalStorage();
+
+      expect(resources).toHaveLength(4);
+    });
+
+    it("should return a collection with resources metadata decrypted from a mixed source of information (alread decrypted metadata and encrypted metadata)", async() => {
+      expect.assertions(1);
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+
+      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+      const decryptedMetadataResourcesDto = multipleResourceDtos();
+      const resourceTypesDto = resourceTypesCollectionDto();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [...resourcesDto, ...decryptedMetadataResourcesDto]);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
+      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+      jest.spyOn(findResourcesService.decryptMetadataService.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+
+      const resources = await findResourcesService.findAllForLocalStorage();
+
+      expect(resources).toHaveLength(resourcesDto.length + decryptedMetadataResourcesDto.length);
     });
   });
 
@@ -277,6 +340,7 @@ describe("FindResourcesService", () => {
       expect(ExecuteConcurrentlyService.prototype.execute).toHaveBeenCalledTimes(1);
     });
   });
+
   describe("::findAllByIdsForShare", () => {
     let service, expectedContains;
 
@@ -328,7 +392,6 @@ describe("FindResourcesService", () => {
     });
   });
 
-
   describe("::findAllForDecrypt", () => {
     let service, expectedContains;
 
@@ -377,6 +440,7 @@ describe("FindResourcesService", () => {
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(2);
     });
   });
+
   describe("::findOneById", () => {
     let service;
 
@@ -445,6 +509,7 @@ describe("FindResourcesService", () => {
       await expect(promise).rejects.toThrowError("API error");
     });
   });
+
   describe("::findOneByIdForDetails", () => {
     let service, expectedContains;
 

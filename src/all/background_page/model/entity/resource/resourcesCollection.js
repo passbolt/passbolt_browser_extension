@@ -168,6 +168,13 @@ class ResourcesCollection extends EntityV2Collection {
     return  this._items.filter(filterResource);
   }
 
+  /**
+   * Filter out the resources which metadata is encrypted.
+   */
+  filterOutMetadataEncrypted() {
+    this.filterByCallback(resource => resource.isMetadataDecrypted());
+  }
+
   /*
    * ==================================================
    * Setters

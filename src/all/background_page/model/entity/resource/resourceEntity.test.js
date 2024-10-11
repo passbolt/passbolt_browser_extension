@@ -23,6 +23,7 @@ import {
   defaultResourceMetadataDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
 import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
+import {v4 as uuidv4} from "uuid";
 
 describe("Resource entity", () => {
   describe("ResourceEntity::getSchema", () => {
@@ -271,6 +272,82 @@ describe("Resource entity", () => {
         entityV5.metadata = metadata;
       } catch (error) {
         expect(error.getError("metadata", "type")).toEqual("The metadata is not a valid string.");
+      }
+    });
+  });
+
+  describe("ResourceEntity::metadataKeyId", () => {
+    it("Should set metadataKeyId with uuid", () => {
+      expect.assertions(3);
+
+      const resourceDTO = defaultResourceDto();
+      const metadataKeyId = uuidv4();
+      const entityV5 =  new ResourceEntity(resourceDTO);
+
+      expect(entityV5.metadataKeyId).toBeNull();
+
+      entityV5.metadataKeyId = metadataKeyId;
+      const expectedDto = {...resourceDTO, metadata_key_id: metadataKeyId};
+
+      expect(entityV5._props.metadata_key_id).toBeDefined();
+      expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
+    });
+
+    it("Should failed to set metadataKeyId with string", () => {
+      expect.assertions(1);
+
+      const resourceDTO = defaultResourceDto();
+      const metadataKeyId = "string";
+      const entityV5 =  new ResourceEntity(resourceDTO);
+      try {
+        entityV5.metadataKeyId = metadataKeyId;
+      } catch (error) {
+        expect(error.getError("metadata_key_id", "format")).toEqual("The metadata_key_id is not a valid uuid.");
+      }
+    });
+  });
+
+  describe("ResourceEntity::metadataKeyType", () => {
+    it("Should set metadataKeyType with METADATA_KEY_TYPE_USER_KEY", () => {
+      expect.assertions(3);
+
+      const resourceDTO = defaultResourceDto();
+      const entityV5 =  new ResourceEntity(resourceDTO);
+
+      expect(entityV5.metadataKeyType).toBeUndefined();
+
+      entityV5.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
+      const expectedDto = {...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_USER_KEY};
+
+      expect(entityV5._props.metadata_key_type).toBeDefined();
+      expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
+    });
+
+    it("Should set metadataKeyType with METADATA_KEY_TYPE_METADATA_KEY", () => {
+      expect.assertions(3);
+
+      const resourceDTO = defaultResourceDto();
+      const entityV5 =  new ResourceEntity(resourceDTO);
+
+      expect(entityV5.metadataKeyType).toBeUndefined();
+
+      entityV5.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
+      const expectedDto = {...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY};
+
+      expect(entityV5._props.metadata_key_type).toBeDefined();
+      expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
+    });
+
+    it("Should failed to set metadataKeyId with string", () => {
+      expect.assertions(1);
+
+      const resourceDTO = defaultResourceDto();
+      const metadataKeyId = "string";
+      const entityV5 =  new ResourceEntity(resourceDTO);
+      try {
+        entityV5.metadataKeyType = metadataKeyId;
+      } catch (error) {
+        expect(error.getError("metadata_key_type", "enum")).toEqual("The metadata_key_type value is not included in the supported list.");
       }
     });
   });

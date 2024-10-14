@@ -614,6 +614,24 @@ class ResourceEntity extends EntityV2 {
     }
   }
 
+  /**
+   * Set resource metadata key id
+   * @param {string} metadataKeyId
+   */
+  set metadataKeyId(metadataKeyId) {
+    EntitySchema.validateProp("metadata_key_id", metadataKeyId, ResourceEntity.getSchema().properties.metadata_key_id);
+    this._props.metadata_key_id = metadataKeyId;
+  }
+
+  /**
+   * Set resource metadata key type
+   * @param {string} metadataKeyType
+   */
+  set metadataKeyType(metadataKeyType) {
+    EntitySchema.validateProp("metadata_key_type", metadataKeyType, ResourceEntity.getSchema().properties.metadata_key_type);
+    this._props.metadata_key_type = metadataKeyType;
+  }
+
   /*
    * ==================================================
    * Build rules

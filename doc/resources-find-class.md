@@ -325,12 +325,20 @@ classDiagram
             -string props.created_by
             -string props.modified
             -string props.modified_by
-            +get armoredKey(string armordKey) string
-            +get data() string
+            +get data() string|MetadataPrivateKeyDataEntity
             +get metadataKeyId() string
             +set armoredKey(string armordKey) void
             +set data(string data) void
             +isDecrypted() boolean
+        }
+
+        class MetadataPrivateKeyDataEntity {
+            -string props.object_type
+            -string props.domain
+            -string props.fingerprint
+            -string props.armored_key
+            -string props.passphrase
+            +get armoredKey() string
         }
 
         class MetadataPrivateKeysCollection {

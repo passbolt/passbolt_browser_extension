@@ -111,7 +111,7 @@ class DecryptMetadataService {
 
     try {
       const decryptionMetadataKey = metadataKey.metadataPrivateKeys.items[0];
-      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionMetadataKey.armoredKey);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionMetadataKey.data.armoredKey);
 
       await this.decryptMetadata(entity, decryptionKey);
     } catch (e) {

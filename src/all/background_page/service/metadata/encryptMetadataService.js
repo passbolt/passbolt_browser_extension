@@ -86,7 +86,7 @@ class EncryptMetadataKeysService {
       throw new Error("Unable to encrypt the entity metadata, metadata private key is not decrypted.");
     }
     const metadataPublicKey = await OpenpgpAssertion.readKeyOrFail(metadataKeyEntity.armoredKey);
-    const metadataPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.armoredKey);
+    const metadataPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
     const metadataKeyId = metadataKeyEntity.id;
     return {metadataKeyId, metadataPublicKey, metadataPrivateKey};
   }

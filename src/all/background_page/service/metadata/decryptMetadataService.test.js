@@ -25,8 +25,6 @@ import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
-import {v4 as uuidv4} from "uuid";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import DecryptMessageService from "../crypto/decryptMessageService";
 
 beforeEach(() => {
@@ -192,33 +190,14 @@ describe("DecryptMetadataService", () => {
       await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
     });
 
-    it("should throw an error if a resource is encrypted with user key and has a metadata key id", async() => {
-      expect.assertions(1);
-
-      const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos(1);
-      collectionDto[0].metadata_key_id = uuidv4();
-      const collection = new ResourcesCollection(collectionDto);
-
-      const account = new AccountEntity(defaultAccountDto());
-      const apiClientOptions = defaultApiClientOptions();
-
-      const service = new DecryptMetadataService(apiClientOptions, account);
-
-      const expectedError = new Error(`Metadata of the resource (${collectionDto[0].id}) cannot be decrypted.`);
-      const errorCause = new Error("Entitie's metadata should either be encrypted with a shared metadata key or with the current user's private key.");
-      expectedError.cause = errorCause;
-
-      await expect(() => service.decryptAllFromForeignModels(collection, "passphrase")).rejects.toThrow(expectedError);
-    });
-
-    it("should throw error if a resource is encrypted with shared metadata key but is marked as encrypted with private key", async() => {
+    it("should throw error if a resource is encrypted with shared metadata key but no key id is provided", async() => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
 
       const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(1);
-      collectionDto[0].metadata_key_type = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
+      collectionDto[0].metadata_key_id = null;
 
       const collection = new ResourcesCollection(collectionDto);
       const service = new DecryptMetadataService(apiClientOptions, account);
@@ -230,34 +209,42 @@ describe("DecryptMetadataService", () => {
       await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
     });
 
-    it("should ignore error if a resource is encrypted with user key and has a metadata key id", async() => {
-      expect.assertions(1);
-
-      const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos(1);
-      collectionDto[0].metadata_key_id = uuidv4();
-      const collection = new ResourcesCollection(collectionDto);
-
-      const account = new AccountEntity(defaultAccountDto());
-      const apiClientOptions = defaultApiClientOptions();
-
-      const service = new DecryptMetadataService(apiClientOptions, account);
-
-      await expect(() => service.decryptAllFromForeignModels(collection, "passphrase", {ignoreDecryptionError: true})).not.toThrow();
-    });
-
-    it("should ignore error if a resource is encrypted with shared metadata key but is marked as encrypted with private key", async() => {
+    it("should throw error if a resource is encrypted with shared metadata key but no key id is provided", async() => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
 
       const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(1);
-      collectionDto[0].metadata_key_type = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
+      collectionDto[0].metadata_key_id = null;
 
       const collection = new ResourcesCollection(collectionDto);
       const service = new DecryptMetadataService(apiClientOptions, account);
 
-      await expect(() => service.decryptAllFromForeignModels(collection, null, {ignoreDecryptionError: true})).not.toThrow();
+      const expectedError = new Error(`Metadata of the resource (${collectionDto[0].id}) cannot be decrypted.`);
+      const errorCause = new Error("Entitie's metadata should either be encrypted with a shared metadata key or with the current user's private key.");
+      expectedError.cause = errorCause;
+
+      await expect(() => service.decryptAllFromForeignModels(collection, "passphrase", {ignoreDecryptionError: true})).not.toThrow(expectedError);
+    });
+
+    it("should ignore error if a resource is encrypted with shared metadata key but no key id is provided", async() => {
+      expect.assertions(1);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = defaultApiClientOptions();
+
+      const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(1);
+      collectionDto[0].metadata_key_id = null;
+
+      const collection = new ResourcesCollection(collectionDto);
+      const service = new DecryptMetadataService(apiClientOptions, account);
+
+      const expectedError = new Error(`Metadata of the resource (${collectionDto[0].id}) cannot be decrypted.`);
+      const errorCause = new Error("Entitie's metadata should either be encrypted with a shared metadata key or with the current user's private key.");
+      expectedError.cause = errorCause;
+
+      await expect(() => service.decryptAllFromForeignModels(collection, "passphrase", {ignoreDecryptionError: true})).not.toThrow(expectedError);
     });
 
     it("should throw error if an error occurs during decryption with a shared key", async() => {

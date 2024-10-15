@@ -161,8 +161,7 @@ class DecryptMetadataService {
    * @private
    */
   isEncryptedWithUserKey(entity) {
-    return !entity.metadataKeyId
-      && entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
+    return entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
   }
 
   /**

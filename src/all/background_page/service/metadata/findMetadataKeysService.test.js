@@ -24,7 +24,7 @@ import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/
 import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {defaultMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
+import {decryptedMetadataPrivateKeyDto, defaultMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 import {v4 as uuidv4} from "uuid";
 
 describe("FindMetadataKeysApiService", () => {
@@ -44,7 +44,7 @@ describe("FindMetadataKeysApiService", () => {
       spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
 
       const id = uuidv4();
-      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage}, {withData: true})];
+      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
       const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys})];
 
       const service = new FindMetadataKeysService(apiClientOptions, account);
@@ -66,7 +66,7 @@ describe("FindMetadataKeysApiService", () => {
       spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
 
       const id = uuidv4();
-      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id}, {withArmoredKey: true})];
+      const metadata_private_keys = [decryptedMetadataPrivateKeyDto({metadata_key_id: id})];
       const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys})];
 
       const service = new FindMetadataKeysService(apiClientOptions, account);
@@ -115,7 +115,7 @@ describe("FindMetadataKeysApiService", () => {
       spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
 
       const id = uuidv4();
-      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedArmoredPrivateKeyMessage}, {withData: true})];
+      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
       const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys})];
 
       const service = new FindMetadataKeysService(apiClientOptions, account);
@@ -137,7 +137,7 @@ describe("FindMetadataKeysApiService", () => {
       spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
 
       const id = uuidv4();
-      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id}, {withArmoredKey: true})];
+      const metadata_private_keys = [decryptedMetadataPrivateKeyDto({metadata_key_id: id})];
       const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys})];
 
       const service = new FindMetadataKeysService(apiClientOptions, account);

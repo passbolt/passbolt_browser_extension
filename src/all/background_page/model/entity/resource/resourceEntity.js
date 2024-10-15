@@ -632,6 +632,15 @@ class ResourceEntity extends EntityV2 {
     this._props.metadata_key_type = metadataKeyType;
   }
 
+  /**
+   * Set resource personal
+   * @param {boolean} personal
+   */
+  set personal(personal) {
+    EntitySchema.validateProp("personal", personal, ResourceEntity.getSchema().properties.personal);
+    this._props.personal = personal;
+  }
+
   /*
    * ==================================================
    * Build rules

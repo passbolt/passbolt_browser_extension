@@ -170,9 +170,10 @@ classDiagram
         }
 
         class GetOrFindMetadataKeysService {
-            +getOrFindOneByIsLatest() Promise~MetadataKeyEntity~
-            +getOrFindOneById(uuid foreignKeyId) Promise~MetadataKeyEntity~
-            +getOrFindAllByIds(array~uuid~ foreignKeyIds) Promise~MetadataKeysCollection~
+            +getOrFindAll() Promise~MetadataKeysCollection~
+%%            +getOrFindOneByIsLatest() Promise~MetadataKeyEntity~
+%%            +getOrFindOneById(uuid foreignKeyId) Promise~MetadataKeyEntity~
+%%            +getOrFindAllByIds(array~uuid~ foreignKeyIds) Promise~MetadataKeysCollection~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

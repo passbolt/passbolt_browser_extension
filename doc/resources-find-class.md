@@ -313,6 +313,7 @@ classDiagram
         class MetadataKeysCollection {
             +getFirstByLatestCreated() MetadataKeyEntity
             +hasDecryptedKeys() boolean
+            +hasEncryptedKeys() boolean
         }
 
         class MetadataPrivateKeyEntity {
@@ -343,6 +344,7 @@ classDiagram
 
         class MetadataPrivateKeysCollection {
             +hasDecryptedPrivateKeys() boolean
+            +hasEncryptedPrivateKeys() boolean
         }
 
         class MetadataTypesSettingsEntity {
@@ -512,6 +514,7 @@ classDiagram
     EncryptMetadataService*--PassphraseStorageService
     FindAndUpdateMetadataKeysSessionStorageService*--FindMetadataKeysService
     FindAndUpdateMetadataKeysSessionStorageService*--MetadataKeysSessionStorageService
+    FindAndUpdateMetadataSettingsService*--MetadataKeysSettingsLocalStorage
     FindAndUpdateMetadataSettingsService*--FindMetadataSettingsService
     FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     FindMetadataKeysService*--DecryptMetadataKeyService

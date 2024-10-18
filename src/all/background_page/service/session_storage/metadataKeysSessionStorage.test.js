@@ -113,6 +113,13 @@ describe("MetadataKeysSessionStorage", () => {
       await expect(() => storage.set(collection)).rejects.toThrow(new TypeError("The parameter 'metadataKey' should have the association '_metadata_private_keys' set."));
     });
 
+    it("throws if the collection contains encrypted private keys.", async() => {
+      expect.assertions(1);
+      // missing metadata private keys association
+      const collection = new MetadataKeysCollection(defaultMetadataKeysDtos(2, {}, {withMetadataPrivateKeys: true}));
+      await expect(() => storage.set(collection)).rejects.toThrow(new TypeError("The parameter `collection` should contain only decrypted keys."));
+    });
+
     it("waits any on-going call to set to perform another set.", async() => {
       expect.assertions(3);
       const promisesResolvers = [];

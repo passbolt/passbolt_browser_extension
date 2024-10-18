@@ -22,6 +22,10 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {v4 as uuidv4} from "uuid";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
+import {
+  resourceTypesCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 jest.mock("../../service/progress/progressService");
@@ -45,17 +49,18 @@ describe("ResourceCreateController", () => {
     controller = new ResourceCreateController(worker, null, apiClientOptions, account);
     controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
     fetch.doMockOnce(() => mockApiResponse(defaultResourceV4Dto()));
+    jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
   });
   describe("AccountRecoveryLoginController::_exec", () => {
     it("Should call the resourceCreateService and emit a success message", async() => {
       expect.assertions(3);
 
       const resourceDTO = defaultResourceDto();
-      jest.spyOn(controller.resourceCreateService, "exec").mockImplementationOnce(() => resourceDTO);
+      jest.spyOn(controller.resourceCreateService, "create").mockImplementationOnce(() => resourceDTO);
       await controller._exec(resourceDTO, secret);
 
-      expect(controller.resourceCreateService.exec).toHaveBeenCalledTimes(1);
-      expect(controller.resourceCreateService.exec).toHaveBeenCalledWith(resourceDTO, secret, pgpKeys.ada.passphrase);
+      expect(controller.resourceCreateService.create).toHaveBeenCalledTimes(1);
+      expect(controller.resourceCreateService.create).toHaveBeenCalledWith(resourceDTO, secret, pgpKeys.ada.passphrase);
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'SUCCESS', resourceDTO);
     });
 
@@ -63,7 +68,7 @@ describe("ResourceCreateController", () => {
       expect.assertions(1);
 
       const error = new Error();
-      jest.spyOn(controller.resourceCreateService, "exec").mockImplementationOnce(() => { throw error; });
+      jest.spyOn(controller.resourceCreateService, "create").mockImplementationOnce(() => { throw error; });
       await controller._exec(defaultResourceDto(), null);
 
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'ERROR', error);
@@ -75,7 +80,7 @@ describe("ResourceCreateController", () => {
 
       await controller.exec(defaultResourceDto(), secret);
       expect(controller.progressService.start).toHaveBeenCalledTimes(1);
-      expect(controller.progressService.start).toHaveBeenCalledWith(2, 'Initializing');
+      expect(controller.progressService.start).toHaveBeenCalledWith(3, 'Initializing');
     });
 
     it("Should call progress service with folder goals", async() => {
@@ -83,6 +88,7 @@ describe("ResourceCreateController", () => {
       const resource = defaultResourceDto({
         folder_parent_id: uuidv4()
       });
+      jest.spyOn(controller.resourceCreateService, "create").mockImplementationOnce(jest.fn());
       await controller.exec(resource, secret);
       expect(controller.progressService.start).toHaveBeenCalledTimes(1);
       expect(controller.progressService.start).toHaveBeenCalledWith(10, 'Initializing');

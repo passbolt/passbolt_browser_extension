@@ -19,8 +19,12 @@ import {
   defaultMetadataTypesSettingsV4Dto,
   defaultMetadataTypesSettingsV50FreshDto
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import {defaultMetadataKeysSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataTypesSettingsEntity
   from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import MetadataKeysSettingsEntity
+  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import MetadataKeysSettingsApiService from "../api/metadata/metadataKeysSettingsApiService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -55,6 +59,29 @@ describe("FindMetadataSettingsService", () => {
       expect(entity).toBeInstanceOf(MetadataTypesSettingsEntity);
       // The value of the default are expected to evolve with passbolt transitioning to v5 types.
       expect(entity.toDto()).toEqual(defaultMetadataTypesSettingsV4Dto());
+    });
+  });
+
+  describe("::findKeysSettings", () => {
+    it("retrieve the metadata keys settings.", async() => {
+      expect.assertions(2);
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
+      jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => metadataKeysSettingsDto);
+
+      const entity = await findMetadataTypesSettingsService.findKeysSettings();
+
+      expect(entity).toBeInstanceOf(MetadataKeysSettingsEntity);
+      expect(entity.toDto()).toEqual(metadataKeysSettingsDto);
+    });
+
+    it("marshall the API data with local default", async() => {
+      expect.assertions(2);
+      jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => {});
+
+      const entity = await findMetadataTypesSettingsService.findKeysSettings();
+
+      expect(entity).toBeInstanceOf(MetadataKeysSettingsEntity);
+      expect(entity.toDto()).toEqual(defaultMetadataKeysSettingsDto());
     });
   });
 });

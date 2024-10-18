@@ -80,14 +80,16 @@ class MetadataKeysSessionStorage {
    */
   async set(collection) {
     if (!collection || !(collection instanceof MetadataKeysCollection)) {
-      throw new TypeError("Parameter `collection` should be of type MetadataKeysCollection");
+      throw new TypeError("The parameter `collection` should be of type MetadataKeysCollection.");
+    }
+    if (collection.hasEncryptedKeys()) {
+      throw new TypeError("The parameter `collection` should contain only decrypted keys.");
     }
     await navigator.locks.request(this.storageKey, async() => {
-      const dtos = [];
       for (const metadataKey of collection) {
         MetadataKeysSessionStorage.assertEntityBeforeSave(metadataKey);
-        dtos.push(metadataKey.toDto(MetadataKeysSessionStorage.DEFAULT_CONTAIN));
       }
+      const dtos = collection.toDto(MetadataKeysSessionStorage.DEFAULT_CONTAIN);
       await this._setBrowserStorage({[this.storageKey]: dtos});
       MetadataKeysSessionStorage._runtimeCachedData[this.account.id] = dtos;
     });

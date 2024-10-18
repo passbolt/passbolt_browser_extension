@@ -54,7 +54,7 @@ describe("FindMetadataKeysApiService", () => {
 
       expect(resultDto).toBeInstanceOf(MetadataKeysCollection);
       expect(resultDto).toHaveLength(apiMetadataKeysCollection.length);
-      expect(resultDto.hasDecryptedKeys()).toStrictEqual(true);
+      expect(resultDto.hasEncryptedKeys()).toStrictEqual(false);
       expect(spyOnFindService).toHaveBeenCalledTimes(1);
       expect(spyOnFindService).toHaveBeenCalledWith({});
     });
@@ -125,7 +125,7 @@ describe("FindMetadataKeysApiService", () => {
 
       expect(resultDto).toBeInstanceOf(MetadataKeysCollection);
       expect(resultDto).toHaveLength(apiMetadataKeysCollection.length);
-      expect(resultDto.hasDecryptedKeys()).toStrictEqual(true);
+      expect(resultDto.hasEncryptedKeys()).toStrictEqual(false);
       expect(spyOnFindService).toHaveBeenCalledTimes(1);
       expect(spyOnFindService).toHaveBeenCalledWith({metadata_private_keys: true});
     });

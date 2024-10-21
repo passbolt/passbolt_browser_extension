@@ -189,6 +189,18 @@ export const assertArray = (data, errorMessage = "The given parameter is not a v
 };
 
 /**
+ * Assert that the given parameter is a valid array.
+ * @param {Array} data the parameter to validate
+ * @param {string} [errorMessage] the message to throw withing the Error if any
+ * @throws {Error} if the parameter is not valid
+ */
+export const assertNonEmptyArray = (data, errorMessage = "The given parameter is not a valid non empty array") => {
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new TypeError(errorMessage);
+  }
+};
+
+/**
  * Assert that the given parameter is a valid uuid array.
  * @param {Array} data the parameter to validate
  * @throws {Error} if the parameter is not valid

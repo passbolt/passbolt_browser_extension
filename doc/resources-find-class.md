@@ -461,6 +461,22 @@ classDiagram
         }
     }
 
+    namespace ShareServicesNs {
+        class ShareResourcesController {
+            event "passbolt.share.resources.save"
+            +exec(array resources, array changes) Promise
+        }
+
+        class ShareResourcesService {
+            +exec(array resources, array changes, string passphrase) Promise
+        }
+
+        class ShareService {
+            +shareResource(string resourceId, object data) Promise~object~
+            +simulateShareResource(string resourceId, array permissions) Promise~object~
+        }
+    }
+
     %% Resource controllers relationships
     CreateResourceController*--CreateResourceService
     CreateResourceController*--GetPassphraseService
@@ -564,4 +580,10 @@ classDiagram
 
     %% Auth services relationship.
     style PassphraseStorageService fill:#DEE5D4
+
+    %% Share services relationship.
+    style ShareService fill:#DEE5D4
+    style ShareResourcesController fill:#D2E0FB
+    ShareResourcesController*--ShareResourcesService
+    ShareResourcesService*--ShareService
 ```

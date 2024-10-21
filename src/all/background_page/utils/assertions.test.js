@@ -25,6 +25,8 @@ import {
   assertNumber,
   assertArrayUUID,
   assertAnyTypeOf,
+  assertArray,
+  assertNonEmptyArray,
 } from "./assertions";
 import {v4 as uuid} from 'uuid';
 import GenerateSsoIvService from "../service/crypto/generateSsoIvService";
@@ -284,6 +286,7 @@ describe("Assertions", () => {
       });
     });
   });
+
   describe("Assertions::assertArrayUUID", () => {
     each([
       {scenario: "Array of uuid", value: [uuid(), uuid()]},
@@ -304,6 +307,50 @@ describe("Assertions", () => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArrayUUID(props.value)).toThrow();
+      });
+    });
+  });
+
+  describe("Assertions:assertArray", () => {
+    each([
+      {scenario: "Array", value: [false, true, 42, "42", {}, []]},
+      {scenario: "Empty array", value: []},
+    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertArray(props.value)).not.toThrow();
+      });
+    });
+
+    each([
+      {scenario: "object", value: {}},
+      {scenario: "null", value: null},
+    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertArray(props.value)).toThrow();
+      });
+    });
+  });
+
+  describe("Assertions:assertNonEmptyArray", () => {
+    each([
+      {scenario: "Array", value: [false, true, 42, "42", {}, []]},
+    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertNonEmptyArray(props.value)).not.toThrow();
+      });
+    });
+
+    each([
+      {scenario: "object", value: {}},
+      {scenario: "null", value: null},
+      {scenario: "Empty array", value: []},
+    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertNonEmptyArray(props.value)).toThrow();
       });
     });
   });

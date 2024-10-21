@@ -40,7 +40,7 @@ beforeEach(() => {
 });
 
 describe("ShareResourcesController", () => {
-  describe("ShareResourcesController::main", () => {
+  describe("::exec", () => {
     /**
      * This scenario is the following:
      *  - There is 1 user (ada) who wants to share 3 resources with 2 other users (admin and betty)
@@ -194,7 +194,7 @@ describe("ShareResourcesController", () => {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ShareResourcesController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
-      await controller.main(resourcesDto, changesDto);
+      await controller.exec(resourcesDto, changesDto);
     });
 
 
@@ -216,9 +216,9 @@ describe("ShareResourcesController", () => {
       const controller = new ShareResourcesController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       try {
-        await controller.main([], []);
+        await controller.exec([], []);
       } catch (error) {
-        expect(error.message).toStrictEqual("bulkShareAggregateChanges expect an array of ACOs");
+        expect(error.message).toStrictEqual("resources should be a non empty array");
       }
     });
 
@@ -246,9 +246,9 @@ describe("ShareResourcesController", () => {
       const controller = new ShareResourcesController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       try {
-        await controller.main(resourcesDto, []);
+        await controller.exec(resourcesDto, []);
       } catch (error) {
-        expect(error.message).toStrictEqual("bulkShareAggregateChanges expect an array of changes");
+        expect(error.message).toStrictEqual("changes should be a non empty array");
       }
     });
   });

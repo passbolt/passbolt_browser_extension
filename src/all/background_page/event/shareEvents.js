@@ -53,13 +53,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.share.resources.save', async(requestId, resources, changes) => {
-    try {
-      const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions, account);
-      await shareResourcesController.main(resources, changes);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions, account);
+    await shareResourcesController._exec(resources, changes);
   });
 
   /*

@@ -10,15 +10,19 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import CsvChromiumRowParser from "./csvChromiumRowParser";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 
 describe("CsvChromiumRowParser", () => {
   it("can parse Chromium based browsers csv", () => {
+    expect.assertions(5);
+
     // minimum required fields
     let fields = ["name", "password"];
     expect(CsvChromiumRowParser.canParse(fields)).toEqual(2);
@@ -36,19 +40,9 @@ describe("CsvChromiumRowParser", () => {
     expect(CsvChromiumRowParser.canParse(fields)).toEqual(2);
   });
 
-  it("parses legacy resource from csv row with minimum required properties", () => {
-    const data = {
-      "name": "Password 1"
-    };
-    const externalResourceEntity = CsvChromiumRowParser.parse(data);
-    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.name);
-    expect(externalResourceEntity.username).toBeNull();
-    expect(externalResourceEntity.uri).toBeNull();
-    expect(externalResourceEntity.secretClear).toEqual("");
-  });
+  it("parses resource of type resource-with-description with all properties from csv row", () => {
+    expect.assertions(2);
 
-  it("parses legacy resource from csv row with all available properties", () => {
     const data = {
       "name": "Password 1",
       "username": "Username 1",
@@ -56,14 +50,20 @@ describe("CsvChromiumRowParser", () => {
       "password": "Secret 1",
     };
 
-    const resourceTypeCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
-    jest.spyOn(resourceTypeCollection, "getFirst");
-    const externalResourceEntity = CsvChromiumRowParser.parse(data, resourceTypeCollection);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.username,
+      uri: data.url,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.password,
+    });
+
+    const externalResourceEntity = CsvChromiumRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.name);
-    expect(externalResourceEntity.username).toEqual(data.username);
-    expect(externalResourceEntity.uri).toEqual(data.url);
-    expect(externalResourceEntity.secretClear).toEqual(data.password);
-    expect(resourceTypeCollection.getFirst).toHaveBeenCalled();
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
 });

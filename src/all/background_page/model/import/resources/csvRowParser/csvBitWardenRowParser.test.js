@@ -16,9 +16,13 @@ import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 describe("CsvBitWardenRowParser", () => {
   it("can parse BitWarden csv", () => {
+    expect.assertions(5);
+
     // minimum required fields
     let fields = ["name", "login_password"];
     expect(CsvBitWardenRowParser.canParse(fields)).toEqual(2);
@@ -36,21 +40,9 @@ describe("CsvBitWardenRowParser", () => {
     expect(CsvBitWardenRowParser.canParse(fields)).toEqual(2);
   });
 
-  it("parses legacy resource from csv row with minimum required properties", () => {
-    const data = {
-      "name": "Password 1"
-    };
-    const externalResourceEntity = CsvBitWardenRowParser.parse(data);
-    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.name);
-    expect(externalResourceEntity.username).toBeNull();
-    expect(externalResourceEntity.uri).toBeNull();
-    expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.description).toBeNull();
-    expect(externalResourceEntity.folderParentPath).toEqual("");
-  });
+  it("parses legacy resource from csv row with all available properties <V4>", () => {
+    expect.assertions(2);
 
-  it("parses legacy resource from csv row with all available properties", () => {
     const data = {
       "name": "Password 1",
       "login_username": "Username 1",
@@ -59,16 +51,22 @@ describe("CsvBitWardenRowParser", () => {
       "notes": "Description 1",
       "folder": "Folder 1"
     };
-    const resourceTypeCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
-    jest.spyOn(resourceTypeCollection, "getFirst");
-    const externalResourceEntity = CsvBitWardenRowParser.parse(data, resourceTypeCollection);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.login_username,
+      uri: data.login_uri,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.login_password,
+      description: data.notes,
+      folder_parent_path: data.folder,
+    });
+
+    const externalResourceEntity = CsvBitWardenRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.name);
-    expect(externalResourceEntity.username).toEqual(data.login_username);
-    expect(externalResourceEntity.uri).toEqual(data.login_uri);
-    expect(externalResourceEntity.secretClear).toEqual(data.login_password);
-    expect(externalResourceEntity.description).toEqual(data.notes);
-    expect(externalResourceEntity.folderParentPath).toEqual(data.folder);
-    expect(resourceTypeCollection.getFirst).toHaveBeenCalled();
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
 });

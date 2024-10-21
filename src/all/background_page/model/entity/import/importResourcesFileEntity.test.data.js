@@ -118,3 +118,8 @@ export const logMeOnceCsvFileImport =  [
   "name,username,url,password,note,group",
   "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
 ].join("\n");
+
+export const KdbxCsvFileTotpData = [
+  "Title,Username,URL,Password,Notes,Group,TOTP",
+  "Password 1,Username 1,https://url1.com,,,,otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"
+].join("\n");

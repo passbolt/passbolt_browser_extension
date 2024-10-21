@@ -24,7 +24,7 @@ import ProgressService from "../../progress/progressService";
 import ImportResourcesFileEntity from "../../../model/entity/import/importResourcesFileEntity";
 import ResourceTypeService from "../../api/resourceType/resourceTypeService";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import {defaultImportResourceFileCSVDto, defaultKDBXCSVData} from "../../../model/entity/import/importResourcesFileEntity.test.data";
+import {defaultImportResourceFileCSVDto, defaultKDBXCSVData, KdbxCsvFileTotpData} from "../../../model/entity/import/importResourcesFileEntity.test.data";
 import MockExtension from "../../../../../../test/mocks/mockExtension";
 import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
 import ResourceService from "../../api/resource/resourceService";
@@ -43,6 +43,8 @@ import {defaultExternalResourceImportMinimalDto} from "../../../model/entity/res
 import ExternalFolderEntity from "../../../model/entity/folder/external/externalFolderEntity";
 import {minimalExternalFolderDto} from "../../../model/entity/folder/external/externalFolderEntity.test.data";
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -90,85 +92,177 @@ describe("ImportResourcesService", () => {
       jest.spyOn(FolderService.prototype, "create").mockImplementation(() => defaultFolderDto());
       jest.spyOn(TagService.prototype, "updateResourceTags").mockImplementation(() => [defaultTagDto({slug: "import-ref"})]);
     });
-    it("Should parse the file - <password-and-description>", async() => {
-      expect.assertions(7);
-      const expectedResourceType = collection.find(resourceType =>  resourceType.slug === "password-and-description");
+    describe("Content type v4", () => {
+      beforeEach(async() =>  {
+        jest.spyOn(importResourcesService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService, "findTypesSettings")
+          .mockImplementationOnce(() => new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()));
+      });
+      it("Should parse the file - <password-and-description>", async() => {
+        expect.assertions(7);
+        const expectedResourceType = collection.find(resourceType =>  resourceType.slug === "password-and-description");
 
-      expect(importResourceFileCSV.importResources.items.length).toEqual(0);
+        expect(importResourceFileCSV.importResources.items.length).toEqual(0);
 
-      const result = await importResourcesService.importFile(importResourceFileCSV, privateKey);
+        const result = await importResourcesService.importFile(importResourceFileCSV, privateKey);
 
-      expect(result.importResources.items.length).toEqual(2);
-      expect(result.importResourcesErrors.length).toEqual(0);
+        expect(result.importResources.items.length).toEqual(2);
+        expect(result.importResourcesErrors.length).toEqual(0);
 
-      const importedResources = result.importResources.items;
+        const importedResources = result.importResources.items;
 
-      const secret1 =  await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
-      const secret2 =  await decryptSecret(result.importResources.items[1].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
-      expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
-      expect(secret2).toEqual("{\"password\":\"Password 2\",\"description\":\"Description 2\"}");
+        const secret1 =  await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+        const secret2 =  await decryptSecret(result.importResources.items[1].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+        expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+        expect(secret2).toEqual("{\"password\":\"Password 2\",\"description\":\"Description 2\"}");
 
-      //Remove encrypted secrets checked previously
-      delete importedResources[0]._secrets;
-      delete importedResources[1]._secrets;
+        //Remove encrypted secrets checked previously
+        delete importedResources[0]._secrets;
+        delete importedResources[1]._secrets;
 
-      const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
-        id: importedResources[0].id,
-        name: 'Password 1',
-        resource_type_id: expectedResourceType.id,
-        folder_parent_path: "import-ref",
-        uri: "https://url1.com",
-        username: "Username 1",
-      }));
+        const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
+          id: importedResources[0].id,
+          name: 'Password 1',
+          resource_type_id: expectedResourceType.id,
+          folder_parent_path: "import-ref",
+          uri: "https://url1.com",
+          username: "Username 1",
+        }));
 
-      const externalEntity2 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
-        id: importedResources[1].id,
-        name: 'Password 2',
-        resource_type_id: expectedResourceType.id,
-        folder_parent_path: "import-ref",
-        uri: "https://url1.com",
-        username: "Username 2",
-        folder_parent_path_expected: "/Folder",
-      }));
+        const externalEntity2 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
+          id: importedResources[1].id,
+          name: 'Password 2',
+          resource_type_id: expectedResourceType.id,
+          folder_parent_path: "import-ref",
+          uri: "https://url1.com",
+          username: "Username 2",
+          folder_parent_path_expected: "/Folder",
+        }));
 
-      expect(importedResources[0].toDto()).toEqual(externalEntity1.toDto());
-      expect(importedResources[1].toDto()).toEqual(externalEntity2.toDto());
+        expect(importedResources[0].toDto()).toEqual(externalEntity1.toDto());
+        expect(importedResources[1].toDto()).toEqual(externalEntity2.toDto());
+      });
+
+      it("Should parse the file <password-description-totp>", async() => {
+        expect.assertions(4);
+
+        const expectedResourceType = collection.find(resourceType =>  resourceType.slug === "password-description-totp");
+
+        importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
+          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData))
+        }));
+
+        const result = await importResourcesService.importFile(importResourceFileCSV, privateKey);
+        const importedResources = result.importResources.items;
+
+        expect(importResourceFileCSV.importResources.items.length).toEqual(1);
+        expect(result.importResourcesErrors.length).toEqual(0);
+
+        const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+
+        expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+
+        //Remove encrypted secrets checked previously
+        delete importedResources[0]._secrets;
+
+        const externalEntity = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
+          id: importedResources[0].id,
+          name: 'Password 1',
+          resource_type_id: expectedResourceType.id,
+          folder_parent_path: "import-ref",
+          uri: "https://url1.com",
+          username: "Username 1",
+          folder_parent_path_expected: "/Folder 1",
+        }));
+
+        expect(importedResources[0].toDto()).toEqual(externalEntity.toDto());
+      });
+      it("Should parse the file <totp>", async() => {
+        expect.assertions(4);
+
+        const expectedResourceType = collection.find(resourceType =>  resourceType.slug === "totp");
+
+        importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
+          file: btoa(BinaryConvert.toBinary(KdbxCsvFileTotpData))
+        }));
+
+        const result = await importResourcesService.importFile(importResourceFileCSV, privateKey);
+        const importedResources = result.importResources.items;
+
+        expect(importResourceFileCSV.importResources.items.length).toEqual(1);
+        expect(result.importResourcesErrors.length).toEqual(0);
+
+        const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+
+        expect(secret1).toEqual("{\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+
+        //Remove encrypted secrets checked previously
+        delete importedResources[0]._secrets;
+
+        const externalEntity = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
+          id: importedResources[0].id,
+          name: 'Password 1',
+          resource_type_id: expectedResourceType.id,
+          folder_parent_path: "import-ref",
+          uri: "https://url1.com",
+          username: "Username 1",
+          folder_parent_path_expected: "",
+        }));
+
+        expect(importedResources[0].toDto()).toEqual(externalEntity.toDto());
+      });
+      it("Should parse the file <totp and description>", async() => {
+        expect.assertions(4);
+
+        const expectedResourceType = collection.find(resourceType =>  resourceType.slug === "password-description-totp");
+
+        importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
+          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData))
+        }));
+
+        const result = await importResourcesService.importFile(importResourceFileCSV, privateKey);
+        const importedResources = result.importResources.items;
+
+        expect(importResourceFileCSV.importResources.items.length).toEqual(1);
+        expect(result.importResourcesErrors.length).toEqual(0);
+
+        const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+
+        expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+
+        //Remove encrypted secrets checked previously
+        delete importedResources[0]._secrets;
+
+        const externalEntity = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
+          id: importedResources[0].id,
+          name: 'Password 1',
+          resource_type_id: expectedResourceType.id,
+          folder_parent_path: "import-ref/Folder 1",
+          uri: "https://url1.com",
+          username: "Username 1",
+          folder_parent_path_expected: "",
+        }));
+
+        expect(importedResources[0].toDto()).toEqual(externalEntity.toDto());
+      });
+      it("Should throw an error if the resource type cannot be found", async() => {
+        expect.assertions(4);
+
+        jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => []);
+
+        importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
+          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData))
+        }));
+
+        const result = await importResourcesService.importFile(importResourceFileCSV, privateKey);
+        const error = result.importResourcesErrors[0];
+
+        expect(importResourceFileCSV.importResources.items.length).toEqual(0);
+        expect(result.importResourcesErrors.length).toEqual(1);
+        expect(error.sourceError).toBeInstanceOf(Error);
+        expect(error.sourceError.message).toEqual("No resource type associated to this row.");
+      });
     });
 
-    it("Should parse the file <password-description-totp>", async() => {
-      expect.assertions(4);
-
-      const expectedResourceType = collection.find(resourceType =>  resourceType.slug === "password-description-totp");
-
-      importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
-        file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData))
-      }));
-
-      const result = await importResourcesService.importFile(importResourceFileCSV, privateKey);
-      const importedResources = result.importResources.items;
-
-      expect(importResourceFileCSV.importResources.items.length).toEqual(1);
-      expect(result.importResourcesErrors.length).toEqual(0);
-
-      const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
-
-      expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
-
-      //Remove encrypted secrets checked previously
-      delete importedResources[0]._secrets;
-
-      const externalEntity = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
-        id: importedResources[0].id,
-        name: 'Password 1',
-        resource_type_id: expectedResourceType.id,
-        folder_parent_path: "import-ref",
-        uri: "https://url1.com",
-        username: "Username 1",
-        folder_parent_path_expected: "/Folder 1",
-      }));
-
-      expect(importedResources[0].toDto()).toEqual(externalEntity.toDto());
-    });
 
     it("Should inform the user about the progress", async() => {
       expect.assertions(8);
@@ -271,7 +365,7 @@ describe("ImportResourcesService", () => {
       importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
         file: btoa(BinaryConvert.toBinary([
           "Title,Username,URL,Password,Notes,Group",
-          `${"a".repeat(100000)},,,,,\n`,
+          `${"a".repeat(100000)},,,test,,\n`,
           "Password 1,Username 1,https://url1.com,Password 1,Description 1"
         ].join("\n")))
       }));
@@ -289,8 +383,6 @@ describe("ImportResourcesService", () => {
       expect(error.sourceError.details).toHaveProperty("name");
       expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
 
-
-
       expect(result.importResources.items[0].name).toEqual("Password 1");
       expect(result.importResources.items[0].secretClear).toEqual("");
     });
@@ -301,7 +393,7 @@ describe("ImportResourcesService", () => {
       importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
         file: btoa(BinaryConvert.toBinary([
           "Title,Username,URL,Password,Notes,Group",
-          `Folder error,,,,,${"a".repeat(100000)}\n`,
+          `Folder error,,,test,,${"a".repeat(100000)}\n`,
           "Password 1,Username 1,https://url1.com,Password 1,Description 1"
         ].join("\n"))),
         options: {

@@ -32,6 +32,7 @@ import ExecuteConcurrentlyService from "../../execute/executeConcurrentlyService
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import User from "../../../model/user";
 import i18n from "../../../sdk/i18n";
+import GetOrFindMetadataSettingsService from "../../metadata/getOrFindMetadataSettingsService";
 
 /**
  * The service aim to import the resources from a file and save it to the API / localstorage.
@@ -54,6 +55,7 @@ class ImportResourcesService {
     this.resourceService = new ResourceService(apiClientOptions);
     this.executeConcurrentlyService = new ExecuteConcurrentlyService();
     this.progressService = progressService;
+    this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
   }
 
   /**
@@ -81,9 +83,10 @@ class ImportResourcesService {
    * @private
    */
   async parseFile(importResourcesFile) {
+    const metadataTypesSettings = await this.getOrFindMetadataSettingsService.getOrFindTypesSettings();
     const importParser = new ResourcesImportParser();
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    await importParser.parseImport(importResourcesFile, resourceTypesCollection);
+    await importParser.parseImport(importResourcesFile, resourceTypesCollection, metadataTypesSettings);
 
     // Now that we know about the content of the import, update the progress bar goals.
     const progressGoal = 1 // Initialization
@@ -266,7 +269,7 @@ class ImportResourcesService {
       importResourcesFile.importResources.toResourceCollectionImportDto()
     );
     let importedCount = 0;
-
+    console.log(importedCount);
     const callbacks = resourcesCollection.resources.map((resourceEntity, index) => async() => {
       try {
         const data = resourceEntity.toV4Dto({secrets: true});
@@ -283,8 +286,10 @@ class ImportResourcesService {
       }
     });
 
-    const createdResources = await this.executeConcurrentlyService.execute(callbacks, 5);
-    await ResourceLocalStorage.addResources(createdResources);
+    if (callbacks.length > 0) {
+      const createdResources = await this.executeConcurrentlyService.execute(callbacks, 5);
+      await ResourceLocalStorage.addResources(createdResources);
+    }
   }
 
 

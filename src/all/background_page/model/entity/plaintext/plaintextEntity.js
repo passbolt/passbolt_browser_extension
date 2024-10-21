@@ -23,7 +23,7 @@ import {RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA} from "passbolt-s
  * @type {object}
  * @private
  */
-const PLAINTEXT_SECRET_SCHEMA_PASSWORD_STRING = {
+export const PLAINTEXT_SECRET_SCHEMA_PASSWORD_STRING = {
   type: "object",
   required: ["password"],
   properties: {

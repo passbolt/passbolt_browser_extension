@@ -16,9 +16,13 @@ import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entit
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 
 describe("CsvMozillaPlatformRowParser", () => {
   it("can parse Mozilla Platform based browsers csv", () => {
+    expect.assertions(5);
+
     // minimum required fields
     let fields = ["url", "password"];
     expect(CsvMozillaPlatformRowParser.canParse(fields)).toEqual(3);
@@ -36,32 +40,29 @@ describe("CsvMozillaPlatformRowParser", () => {
     expect(CsvMozillaPlatformRowParser.canParse(fields)).toEqual(3);
   });
 
-  it("parses legacy resource from csv row with minimum required properties", () => {
-    const data = {
-      "url": "https://url1.com"
-    };
-    const externalResourceEntity = CsvMozillaPlatformRowParser.parse(data);
-    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.uri).toEqual(data.url);
-    expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.username).toBeNull();
-  });
+  it("parses resource of type resource-with-description with all properties from csv row", () => {
+    expect.assertions(2);
 
-  it("parses legacy resource from csv row with all available properties", () => {
     const data = {
       "name": "https://url1.com",
       "username": "Username 1",
       "url": "https://url1.com",
       "password": "Secret 1",
     };
-    const resourceTypeCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
-    jest.spyOn(resourceTypeCollection, "getFirst");
-    const externalResourceEntity = CsvMozillaPlatformRowParser.parse(data, resourceTypeCollection);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.username,
+      uri: data.url,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.password,
+    });
+
+    const externalResourceEntity = CsvMozillaPlatformRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.name);
-    expect(externalResourceEntity.username).toEqual(data.username);
-    expect(externalResourceEntity.uri).toEqual(data.url);
-    expect(externalResourceEntity.secretClear).toEqual(data.password);
-    expect(resourceTypeCollection.getFirst).toHaveBeenCalled();
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
 });

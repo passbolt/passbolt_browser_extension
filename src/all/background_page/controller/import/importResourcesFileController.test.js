@@ -39,6 +39,8 @@ import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/fol
 import {defaultTagDto} from "../../model/entity/tag/tagEntity.test.data";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 import {defaultExternalResourceImportMinimalDto} from "../../model/entity/resource/external/externalResourceEntity.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 
 beforeEach(async() => {
   await MockExtension.withConfiguredAccount();
@@ -73,7 +75,8 @@ describe("ImportResourcesFileController", () => {
 
       controller = new ImportResourcesFileController(worker, null, apiClientOptions, account);
       collection = resourceTypesCollectionDto();
-
+      jest.spyOn(controller.importResourcesService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService, "findTypesSettings")
+        .mockImplementationOnce(() => new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()));
       //Mock controller
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockResolvedValue(pgpKeys.ada.passphrase);
       //Mock api

@@ -48,6 +48,9 @@ import ResourceSecretsCollection from "../../../model/entity/secret/resource/res
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import expect from "expect";
 import GetDecryptedUserPrivateKeyService from "../../account/getDecryptedUserPrivateKeyService";
+import {
+  defaultMetadataKeysSettingsDto
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -209,8 +212,11 @@ describe("ResourceCreateService", () => {
       let resourceToAPI, resourceLocalStorageExpected;
       const resourceDto = defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT});
       const plaintextDto = plaintextSecretPasswordAndDescriptionDto();
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
       const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
 
+      jest.spyOn(resourceCreateService.encryptMetadataKeysService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+        .mockImplementation(() => metadataKeysSettingsDto);
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(resource => {
         //Used to check the data sent to API
         resourceToAPI = resource;
@@ -247,8 +253,11 @@ describe("ResourceCreateService", () => {
       let resourceToAPI, resourceLocalStorageExpected;
       const resourceDto = defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP});
       const plaintextDto = plaintextSecretPasswordDescriptionTotpDto();
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
       const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
 
+      jest.spyOn(resourceCreateService.encryptMetadataKeysService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+        .mockImplementation(() => metadataKeysSettingsDto);
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(resource => {
         //Used to check the data sent to API
         resourceToAPI = resource;
@@ -285,8 +294,11 @@ describe("ResourceCreateService", () => {
       let resourceToAPI, resourceLocalStorageExpected;
       const resourceDto = resourceStandaloneTotpDto({resource_type_id: TEST_RESOURCE_TYPE_V5_TOTP});
       const plaintextDto = plaintextSecretTotpDto();
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
       const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
 
+      jest.spyOn(resourceCreateService.encryptMetadataKeysService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+        .mockImplementation(() => metadataKeysSettingsDto);
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(resource => {
         //Used to check the data sent to API
         resourceToAPI = resource;

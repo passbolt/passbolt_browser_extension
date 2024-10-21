@@ -19,7 +19,6 @@ import Csv1PasswordRowParser from "./csvRowParser/csv1PasswordRowParser";
 import CsvKdbxRowParser from "./csvRowParser/csvKdbxRowParser";
 import CsvLastPassRowParser from "./csvRowParser/csvLastPassRowParser";
 
-import ExternalResourceEntity from "../../entity/resource/external/externalResourceEntity";
 import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import ImportError from "../../../error/importError";
@@ -31,8 +30,15 @@ import CsvDashlaneRowParser from "./csvRowParser/csvDashlaneRowParser";
 import CsvMozillaPlatformRowParser from "./csvRowParser/csvMozillaPlatformRowParser";
 import CsvNordpassRowParser from "./csvRowParser/csvNordpassRowParser";
 import CsvLogMeOnceRowParser from "./csvRowParser/csvLogMeOnceRowParser";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
+import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 describe("ResourcesCsvImportParser", () => {
+  const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+  const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+
   it("should be aware of the supported row parsers", () => {
     expect(ResourcesCsvImportParser.register).toHaveLength(10);
     const supportedRowParsers = [
@@ -59,7 +65,7 @@ describe("ResourcesCsvImportParser", () => {
       "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const importer = new ResourcesCsvImportParser(importEntity);
+    const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     const {data, fields} = importer.readCsv();
     const csvRow = {
       Title: 'Password 1',
@@ -83,7 +89,7 @@ describe("ResourcesCsvImportParser", () => {
       "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const importer = new ResourcesCsvImportParser(importEntity);
+    const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     const {fields} = importer.readCsv();
     const RowParser = importer.getRowParser(fields);
     expect(RowParser).toEqual(CsvKdbxRowParser);
@@ -97,7 +103,7 @@ describe("ResourcesCsvImportParser", () => {
       "file": file
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const importer = new ResourcesCsvImportParser(importEntity);
+    const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     try {
       await importer.parseImport();
       expect(true).toBeFalsy();
@@ -106,6 +112,27 @@ describe("ResourcesCsvImportParser", () => {
     }
 
     expect(importEntity.importResources.items).toHaveLength(0);
+  });
+
+  it("should not parse empty row and add it to import error", async() => {
+    expect.assertions(4);
+
+    const csv = "Title,Username,URL,Password,Notes,Group\n" +
+      ",,,,,\n";
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(csv))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
+
+    await importer.parseImport();
+
+    expect(importEntity.importResources.items).toHaveLength(0);
+    expect(importEntity.importResourcesErrors).toHaveLength(1);
+    expect(importEntity.importResourcesErrors[0]).toBeInstanceOf(ImportError);
+    expect(importEntity.importResourcesErrors[0].sourceError).toEqual(new Error("No resource type associated to this row."));
   });
 
   function buildExternalResourceDto(num, data) {
@@ -136,14 +163,14 @@ describe("ResourcesCsvImportParser", () => {
       "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const importer = new ResourcesCsvImportParser(importEntity);
+    const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await importer.parseImport();
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
 
     expect(importEntity.importResources.items).toHaveLength(2);
-    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
-    const resource2Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource2Dto]));
+    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref", resource_type_id: expectedResourceType.id});
+    const resource2Dto = buildExternalResourceDto(2, {folder_parent_path: "import-ref", resource_type_id: expectedResourceType.id});
+    expect(importEntity.importResources.toJSON()).toEqual([resource1Dto, resource2Dto]);
   });
 
   it("should parse resources and folders", async() => {
@@ -162,19 +189,17 @@ describe("ResourcesCsvImportParser", () => {
       "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const importer = new ResourcesCsvImportParser(importEntity);
+    const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await importer.parseImport();
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
 
     // Assert resources
     expect(importEntity.importResources.items).toHaveLength(4);
-    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref/Folder 1/Folder 2"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
-    const resource2Dto = buildExternalResourceDto(2, {folder_parent_path: "import-ref/Folder 1"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource2Dto]));
-    const resource3Dto = buildExternalResourceDto(3, {folder_parent_path: "import-ref/Folder 3/Folder 4"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource3Dto]));
-    const resource4Dto = buildExternalResourceDto(4, {folder_parent_path: "import-ref/Folder 2/Folder 1"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource4Dto]));
+    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref/Folder 1/Folder 2", resource_type_id: expectedResourceType.id});
+    const resource2Dto = buildExternalResourceDto(2, {folder_parent_path: "import-ref/Folder 1", resource_type_id: expectedResourceType.id});
+    const resource3Dto = buildExternalResourceDto(3, {folder_parent_path: "import-ref/Folder 3/Folder 4", resource_type_id: expectedResourceType.id});
+    const resource4Dto = buildExternalResourceDto(4, {folder_parent_path: "import-ref/Folder 2/Folder 1", resource_type_id: expectedResourceType.id});
+    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto, resource2Dto, resource3Dto, resource4Dto]));
 
     // Assert folders
     expect(importEntity.importFolders.items).toHaveLength(7);
@@ -194,38 +219,17 @@ describe("ResourcesCsvImportParser", () => {
     expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folder1Dto]));
   });
 
-  it("should be able to parse an empty row", async() => {
-    const csv = "Title,Username,URL,Password,Notes,Group\n" +
-      ",,,,,\n";
-    const importDto = {
-      "ref": "import-ref",
-      "file_type": "csv",
-      "file": btoa(BinaryConvert.toBinary(csv))
-    };
-    const importEntity = new ImportResourcesFileEntity(importDto);
-    const importer = new ResourcesCsvImportParser(importEntity);
-    await importer.parseImport();
-
-    expect(importEntity.importResources.items).toHaveLength(1);
-    const expectedResourceDto = {
-      name: ExternalResourceEntity.DEFAULT_RESOURCE_NAME,
-      secret_clear: "",
-      folder_parent_path: "import-ref"
-    };
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([expectedResourceDto]));
-  });
-
   it("should catch and keep a reference of import resource entity validation error", async() => {
     const name = "too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name";
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
-      `${name},,,,,\n`;
+      `${name},,,Password,,\n`;
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
       "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const importer = new ResourcesCsvImportParser(importEntity);
+    const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await importer.parseImport();
 
     expect(importEntity.importResources.items).toHaveLength(0);
@@ -241,14 +245,14 @@ describe("ResourcesCsvImportParser", () => {
   it("should catch and keep a reference of import folder entity validation error", async() => {
     const path = "too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name";
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
-      `,,,,,${path}\n`;
+      `,,,Password,,${path}\n`;
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
       "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const importer = new ResourcesCsvImportParser(importEntity);
+    const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await importer.parseImport();
 
     expect(importEntity.importResources.items).toHaveLength(1);

@@ -26,8 +26,13 @@ import {
   TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import {defaultTotpDto} from "../../entity/totp/totpDto.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 
 describe("ResourcesKdbxImportParser", () => {
+  const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+  const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+
   it("should read import file", async() => {
     expect.assertions(1);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx", {encoding: 'base64'});
@@ -56,7 +61,7 @@ describe("ResourcesKdbxImportParser", () => {
       }
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     const kdbx = await parser.readKdbxDb();
     expect(kdbx).toBeInstanceOf(kdbxweb.Kdbx);
   });
@@ -70,7 +75,7 @@ describe("ResourcesKdbxImportParser", () => {
       "file": file
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     try {
       await parser.readKdbxDb();
     } catch (error) {
@@ -93,7 +98,7 @@ describe("ResourcesKdbxImportParser", () => {
       }
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     const kdbx = await parser.readKdbxDb();
     expect(kdbx).toBeInstanceOf(kdbxweb.Kdbx);
   });
@@ -107,7 +112,7 @@ describe("ResourcesKdbxImportParser", () => {
       "file": file
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     try {
       await parser.readKdbxDb();
     } catch (error) {
@@ -135,7 +140,7 @@ describe("ResourcesKdbxImportParser", () => {
   }
 
   it("should parse resources and folders", async() => {
-    expect.assertions(15);
+    expect.assertions(12);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -143,19 +148,17 @@ describe("ResourcesKdbxImportParser", () => {
       "file": file
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await parser.parseImport();
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
 
     // Assert resources
     expect(importEntity.importResources.items).toHaveLength(4);
-    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref/Root/Folder 1/Folder 2"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
-    const resource2Dto = buildExternalResourceDto(2, {folder_parent_path: "import-ref/Root/Folder 1"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource2Dto]));
-    const resource3Dto = buildExternalResourceDto(3, {folder_parent_path: "import-ref/Root/Folder 3/Folder 4"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource3Dto]));
-    const resource4Dto = buildExternalResourceDto(4, {folder_parent_path: "import-ref/Root/Folder 2/Folder 1"});
-    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource4Dto]));
+    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref/Root/Folder 1/Folder 2", resource_type_id: expectedResourceType.id});
+    const resource2Dto = buildExternalResourceDto(2, {folder_parent_path: "import-ref/Root/Folder 1", resource_type_id: expectedResourceType.id});
+    const resource3Dto = buildExternalResourceDto(3, {folder_parent_path: "import-ref/Root/Folder 3/Folder 4", resource_type_id: expectedResourceType.id});
+    const resource4Dto = buildExternalResourceDto(4, {folder_parent_path: "import-ref/Root/Folder 2/Folder 1", resource_type_id: expectedResourceType.id});
+    expect(importEntity.importResources.toJSON()).toEqual([resource1Dto, resource2Dto, resource4Dto, resource3Dto]);
 
     // Assert folders
     expect(importEntity.importFolders.items).toHaveLength(9);
@@ -194,7 +197,7 @@ describe("ResourcesKdbxImportParser", () => {
       }
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await parser.parseImport();
 
     // Assert resources
@@ -228,7 +231,7 @@ describe("ResourcesKdbxImportParser", () => {
       }
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await parser.parseImport();
 
     // Assert resources
@@ -259,12 +262,13 @@ describe("ResourcesKdbxImportParser", () => {
       "file": file
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await parser.parseImport();
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
 
     // Assert resources
     expect(importEntity.importResources.items).toHaveLength(2);
-    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref/Root/Folder 1"});
+    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref/Root/Folder 1", resource_type_id: expectedResourceType.id});
     expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
 
     // Assert folders
@@ -308,7 +312,7 @@ describe("ResourcesKdbxImportParser", () => {
       }
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
-    const parser = new ResourcesKdbxImportParser(importEntity);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await parser.parseImport();
 
     // Assert resources

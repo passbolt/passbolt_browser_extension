@@ -12,9 +12,15 @@
  */
 import Csv1PasswordRowParser from "./csv1PasswordRowParser";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
+import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 
 describe("Csv1PasswordRowParser", () => {
   it("can parse 1password csv", () => {
+    expect.assertions(5);
+
     // minimum required fields
     let fields = ["Title", "Password"];
     expect(Csv1PasswordRowParser.canParse(fields)).toEqual(2);
@@ -32,21 +38,9 @@ describe("Csv1PasswordRowParser", () => {
     expect(Csv1PasswordRowParser.canParse(fields)).toEqual(2);
   });
 
-  it("parses legacy resource from csv row with minimum required properties", () => {
-    const data = {
-      "Title": "Password 1"
-    };
-    const externalResourceEntity = Csv1PasswordRowParser.parse(data);
-    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.Title);
-    expect(externalResourceEntity.username).toBeNull();
-    expect(externalResourceEntity.uri).toBeNull();
-    expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.description).toBeNull();
-    expect(externalResourceEntity.folderParentPath).toEqual("");
-  });
+  it("parses resource of type resource-with-description with all properties from csv row", () => {
+    expect.assertions(2);
 
-  it("parses legacy resource from csv row with all available properties", () => {
     const data = {
       "Title": "Password 1",
       "Username": "Username 1",
@@ -55,13 +49,22 @@ describe("Csv1PasswordRowParser", () => {
       "Notes": "Description 1",
       "Type": "Folder 1"
     };
-    const externalResourceEntity = Csv1PasswordRowParser.parse(data);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.Title,
+      username: data.Username,
+      uri: data.Url,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.Password,
+      description: data.Notes,
+      folder_parent_path: data.Type,
+    });
+
+    const externalResourceEntity = Csv1PasswordRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.Title);
-    expect(externalResourceEntity.username).toEqual(data.Username);
-    expect(externalResourceEntity.uri).toEqual(data.Url);
-    expect(externalResourceEntity.secretClear).toEqual(data.Password);
-    expect(externalResourceEntity.description).toEqual(data.Notes);
-    expect(externalResourceEntity.folderParentPath).toEqual(data.Type);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
 });

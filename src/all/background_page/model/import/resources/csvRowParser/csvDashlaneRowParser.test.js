@@ -16,9 +16,13 @@ import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entit
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 
 describe("CsvDashlaneRowParser", () => {
   it("can parse LastPass csv", () => {
+    expect.assertions(5);
+
     // minimum required fields
     let fields = ["title", "password"];
     expect(CsvDashlaneRowParser.canParse(fields)).toEqual(2);
@@ -36,20 +40,9 @@ describe("CsvDashlaneRowParser", () => {
     expect(CsvDashlaneRowParser.canParse(fields)).toEqual(2);
   });
 
-  it("parses legacy resource from csv row with minimum required properties", () => {
-    const data = {
-      "title": "Password 1"
-    };
-    const externalResourceEntity = CsvDashlaneRowParser.parse(data);
-    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.title);
-    expect(externalResourceEntity.username).toBeNull();
-    expect(externalResourceEntity.uri).toBeNull();
-    expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.description).toBeNull();
-  });
+  it("parses legacy resource from csv row with all available properties <V4>", () => {
+    expect.assertions(2);
 
-  it("parses legacy resource from csv row with all available properties", () => {
     const data = {
       "title": "Password 1",
       "username": "Username 1",
@@ -57,15 +50,21 @@ describe("CsvDashlaneRowParser", () => {
       "password": "Secret 1",
       "note": "Description 1",
     };
-    const resourceTypeCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
-    jest.spyOn(resourceTypeCollection, "getFirst");
-    const externalResourceEntity = CsvDashlaneRowParser.parse(data, resourceTypeCollection);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.title,
+      username: data.username,
+      uri: data.url,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.password,
+      description: data.note,
+    });
+
+    const externalResourceEntity = CsvDashlaneRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.title);
-    expect(externalResourceEntity.username).toEqual(data.username);
-    expect(externalResourceEntity.uri).toEqual(data.url);
-    expect(externalResourceEntity.secretClear).toEqual(data.password);
-    expect(externalResourceEntity.description).toEqual(data.note);
-    expect(resourceTypeCollection.getFirst).toHaveBeenCalled();
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
 });

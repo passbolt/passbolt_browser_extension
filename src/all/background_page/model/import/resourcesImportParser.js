@@ -20,11 +20,13 @@ class ResourcesImportParser {
    * Parse import
    * @param {ImportResourcesFileEntity} importEntity The import to parse
    * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
+   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
    * @returns {Promise<void>}
    */
-  parseImport(importResourcesEntity, resourceTypesCollection) {
+  parseImport(importResourcesEntity, resourceTypesCollection, metadataTypesSettings) {
     const Parser = this.getParser(importResourcesEntity);
-    const parser = new Parser(importResourcesEntity, resourceTypesCollection);
+    const parser = new Parser(importResourcesEntity, resourceTypesCollection, metadataTypesSettings);
+
     return parser.parseImport();
   }
 

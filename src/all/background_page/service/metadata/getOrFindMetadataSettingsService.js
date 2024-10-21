@@ -15,6 +15,9 @@ import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSet
 import FindAndUpdateMetadataSettingsLocalStorageService from "./findAndUpdateMetadataSettingsLocalStorageService";
 import MetadataTypesSettingsEntity
   from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSettingsLocalStorage";
+import MetadataKeysSettingsEntity
+  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 
 /**
  * The service aims to get metadata settings from the local storage, or to retrieve them from the API and store them in the local storage.
@@ -28,6 +31,7 @@ export default class GetOrFindMetadataSettingsService {
   constructor(account, apiClientOptions) {
     this.findAndUpdateMetadataSettingsLocalStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(account, apiClientOptions);
     this.metadataTypesSettingsLocalStorage = new MetadataTypesSettingsLocalStorage(account);
+    this.metadataKeysSettingsLocalStorage = new MetadataKeysSettingsLocalStorage(account);
   }
 
   /**
@@ -41,5 +45,18 @@ export default class GetOrFindMetadataSettingsService {
     }
 
     return this.findAndUpdateMetadataSettingsLocalStorageService.findAndUpdateTypesSettings();
+  }
+
+  /**
+   * Get the metadata keys settings from the local storage, or retrieve them from the API and update the local storage.
+   * @returns {Promise<MetadataKeysSettingsEntity>}
+   */
+  async getOrFindKeysSettings() {
+    const metadataKeysSettingsDto = await this.metadataKeysSettingsLocalStorage.get();
+    if (metadataKeysSettingsDto) {
+      return MetadataKeysSettingsEntity.createFromDefault(metadataKeysSettingsDto);
+    }
+
+    return this.findAndUpdateMetadataSettingsLocalStorageService.findAndUpdateKeysSettings();
   }
 }

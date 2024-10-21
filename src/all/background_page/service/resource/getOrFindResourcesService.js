@@ -15,6 +15,7 @@ import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import FindAndUpdateResourcesLocalStorage from "./findAndUpdateResourcesLocalStorageService";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import {assertArrayUUID} from "../../utils/assertions";
 
 /**
  * The service aims to get resources from the local storage if it is set, or retrieve them from the API and
@@ -71,6 +72,20 @@ export default class GetOrFindResourcesService {
 
     // Filter by suggested resources.
     resourcesCollection.filterBySuggestResources(url);
+
+    return resourcesCollection;
+  }
+
+  /**
+   * Returns all the resources matching the given ids.
+   * @param {array<uuid>} resourceIds.
+   * @return {Promise<ResourcesCollection>}
+   */
+  async getOrFindByIds(resourceIds) {
+    assertArrayUUID(resourceIds);
+
+    const resourcesCollection = await this.getOrFindAll();
+    resourcesCollection.filterByPropertyValueIn("id", resourceIds);
 
     return resourcesCollection;
   }

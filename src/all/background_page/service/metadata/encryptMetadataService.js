@@ -21,7 +21,7 @@ import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {assertAnyTypeOf} from "../../utils/assertions";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 
-class EncryptMetadataKeysService {
+class EncryptMetadataService {
   /**
    * @constructor
    * @param {ApiClientOptions} apiClientOptions
@@ -107,4 +107,4 @@ class EncryptMetadataKeysService {
   }
 }
 
-export default EncryptMetadataKeysService;
+export default EncryptMetadataService;

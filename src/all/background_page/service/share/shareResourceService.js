@@ -22,6 +22,13 @@ import FindAndUpdateResourcesLocalStorage from "../resource/findAndUpdateResourc
 import {assertNonEmptyArray} from "../../utils/assertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import DecryptMetadataService from "../metadata/decryptMetadataService";
+import ResourceService from "../api/resource/resourceService";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
+import EncryptMetadataService from "../metadata/encryptMetadataService";
+import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
 
 class ShareResourceService {
   /**
@@ -35,6 +42,11 @@ class ShareResourceService {
     this.progressService = progressService;
     this.shareService = new ShareService(apiClientOptions);
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.resourceService = new ResourceService(apiClientOptions);
+    this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
+    this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
+    this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
   }
 
   /**
@@ -54,22 +66,62 @@ class ShareResourceService {
     this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
     await (new Keyring()).sync();
 
+    await this.updatePersonalMetadataToSharedMetadata(resourcesDto, passphrase);
+
     const permissionChanges = new PermissionChangesCollection(permissionChangesDto);
-    let requiredSecretsDto = await this.simulateShare(resourcesDto, permissionChanges);
+    let requiredSecretsDto = await this.simulateShare(permissionChanges);
     requiredSecretsDto = await this.encryptSecrets(resourcesDto, requiredSecretsDto, privateKey);
-    await this.saveChanges(resourcesDto, permissionChanges, requiredSecretsDto);
+    await this.saveChanges(permissionChanges, requiredSecretsDto);
 
     await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
   }
 
   /**
+   * Returns a collection of V5 resources that needs to have their metadata keys updated to use a shared key.
+   * The collection is set from the given resourcesDto and by keeping all resources that are personal.
+   * @param {ResourcesCollection} resourcesDto
+   */
+  async updatePersonalMetadataToSharedMetadata(resourcesDto, passphrase) {
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+
+    const resourcesCollection = await this.getOrFindResourcesService.getOrFindByIds(resourcesDto.map(r => r.id));
+    resourcesCollection.filterByCallback(resource => {
+      const resourceType = resourceTypesCollection.getFirstById(resource.resourceTypeId);
+      return resource.isPersonal() && resourceType.isV5();
+    });
+
+    const collectionLength = resourcesCollection.length;
+    if (collectionLength === 0) {
+      return;
+    }
+
+    this.progressService.updateGoals(this.progressService.goals + 2);
+    this.progressService.finishStep(i18n.t('Decrypting resources metadata'), true);
+    await this.decryptMetadataService.decryptAllFromForeignModels(resourcesCollection, passphrase);
+
+    for (let i = 0; i < collectionLength; i++) {
+      this.progressService.finishStep(i18n.t('Updating resources metadata {{counter}}/{{total}}', {counter: i + 1, total: collectionLength}));
+      const resource = resourcesCollection.items[i];
+      const decryptedMetadata = resource.metadata;
+
+      resource.personal = false;
+      await this.encryptMetadataService.encryptOneForForeignModel(resource, passphrase);
+
+      const updatedResourceDto = await this.resourceService.update(resource.id, resource.toDto(), ResourceLocalStorage.DEFAULT_CONTAIN);
+      const updatedResourceEntity = new ResourceEntity(updatedResourceDto);
+
+      updatedResourceEntity.metadata = decryptedMetadata;
+      await ResourceLocalStorage.updateResource(updatedResourceEntity);
+    }
+  }
+
+  /**
    * Simulate the changes to apply to the resources
-   * @param {array} resources The resources to share
    * @param {PermissionChangesCollection} permissionChanges The permission changes
-   * @returns {array} required secrets dto
+   * @returns {Promise<array>} required secrets dto
    * @private
    */
-  async simulateShare(resources, permissionChanges) {
+  async simulateShare(permissionChanges) {
     const requiredSecretsDto = [];
     const resourceIds = [...new Set(permissionChanges.extract('aco_foreign_key'))];
     let counter = 0;
@@ -78,9 +130,7 @@ class ShareResourceService {
       this.progressService.finishStep(`Calculating resource permissions ${++counter}/${resourceIds.length}`);
       const resourcePermissionChanges = permissionChanges.items.filter(permissionChange => permissionChange.acoForeignKey === resourceId);
       const simulateResult = await this.shareService.simulateShareResource(resourceId, resourcePermissionChanges);
-      if (simulateResult.changes.added.length) {
-        simulateResult.changes.added.forEach(user => requiredSecretsDto.push({resource_id: resourceId, user_id: user.User.id}));
-      }
+      simulateResult.changes.added?.forEach(user => requiredSecretsDto.push({resource_id: resourceId, user_id: user.User.id}));
     }
 
     return requiredSecretsDto;
@@ -128,7 +178,7 @@ class ShareResourceService {
    * @param {array} requiredSecretsDto The resources secrets
    * @returns {Promise<void>}
    */
-  async saveChanges(resources, permissionChanges, requiredSecretsDto) {
+  async saveChanges(permissionChanges, requiredSecretsDto) {
     const resourceIds = [...new Set(permissionChanges.extract('aco_foreign_key'))];
 
     let counter = 0;

@@ -46,6 +46,14 @@ class ProgressService {
   }
 
   /**
+   * Returns the current goals
+   * @returns {number}
+   */
+  get goals() {
+    return this._goals;
+  }
+
+  /**
    * Start the progression of a task by:
    *  - settings the target goal
    *  - opening a progress dialog
@@ -54,6 +62,7 @@ class ProgressService {
    */
   start(goals, message) {
     this._progress = 0;
+    this._goals = goals;
     this.isClose = false;
     this.worker.port.emit('passbolt.progress.open-progress-dialog', this._title, goals, message);
     this.lastTimeCall = new Date().getTime();
@@ -65,6 +74,7 @@ class ProgressService {
    * @param {string|null} message
    */
   updateGoals(goals) {
+    this._goals = goals;
     this.worker.port.emit('passbolt.progress.update-goals', goals);
   }
 

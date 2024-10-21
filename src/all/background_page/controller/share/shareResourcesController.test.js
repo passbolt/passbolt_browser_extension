@@ -19,6 +19,9 @@ import ShareResourcesController from "./shareResourcesController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
+import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 
 const {enableFetchMocks} = require("jest-fetch-mock");
 const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
@@ -193,6 +196,12 @@ describe("ShareResourcesController", () => {
       // finally we can call the controller with the data as everything is setup.
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ShareResourcesController(null, null, clientOptions, account);
+
+      const spyOnFindResourceType = jest.spyOn(controller.shareResourceService.resourceTypeModel, "getOrFindAll");
+      const spyOnGetOrFindResources = jest.spyOn(controller.shareResourceService.getOrFindResourcesService, "getOrFindAll");
+      spyOnFindResourceType.mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
+      spyOnGetOrFindResources.mockImplementation(() => new ResourcesCollection(resourcesDto));
+
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       await controller.exec(resourcesDto, changesDto);
     });

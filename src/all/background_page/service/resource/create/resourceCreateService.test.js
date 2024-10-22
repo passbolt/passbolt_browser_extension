@@ -17,7 +17,10 @@ import AccountEntity from "../../../model/entity/account/accountEntity";
 import ResourceCreateService from "./resourceCreateService";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import {
-  defaultResourceDto, resourceWithTotpDto, resourceLegacyDto, resourceStandaloneTotpDto
+  defaultResourceDto,
+  resourceLegacyDto,
+  resourceStandaloneTotpDto,
+  resourceWithTotpDto
 } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {v4 as uuidv4} from "uuid";
@@ -34,16 +37,22 @@ import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
-  TEST_RESOURCE_TYPE_V5_DEFAULT, TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP, TEST_RESOURCE_TYPE_V5_TOTP,
+  TEST_RESOURCE_TYPE_V5_DEFAULT,
+  TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP,
+  TEST_RESOURCE_TYPE_V5_TOTP,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {plaintextSecretPasswordAndDescriptionDto, plaintextSecretPasswordDescriptionTotpDto, plaintextSecretPasswordStringDto, plaintextSecretTotpDto} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
+import {
+  plaintextSecretPasswordAndDescriptionDto,
+  plaintextSecretPasswordDescriptionTotpDto,
+  plaintextSecretPasswordStringDto,
+  plaintextSecretTotpDto
+} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 import FolderService from "../../api/folder/folderService";
 import ShareService from "../../api/share/shareService";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import {
   defaultDecryptedSharedMetadataKeysDtos
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
-import FindMetadataKeysService from "../../metadata/findMetadataKeysService";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import expect from "expect";
@@ -397,7 +406,8 @@ describe("ResourceCreateService", () => {
       jest.spyOn(ShareService.prototype, "simulateShareResource").mockImplementation(() => shareResourceChanges);
       jest.spyOn(ShareService.prototype, "shareFolder").mockImplementation(() => shareResourceChanges);
       jest.spyOn(ShareService.prototype, "shareResource").mockImplementation(() => jest.fn());
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(resourceCreateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
 
       jest.spyOn(resourceCreateService, "share");
 

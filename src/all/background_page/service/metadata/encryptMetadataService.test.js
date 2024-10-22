@@ -29,7 +29,6 @@ import EncryptMetadataService from "./encryptMetadataService";
 import {
   TEST_RESOURCE_TYPE_V5_DEFAULT
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import FindMetadataKeysService from "./findMetadataKeysService";
 import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {
@@ -62,7 +61,8 @@ describe("EncryptMetadataService", () => {
       const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
       resourceEntity._props.personal = false;
 
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
 
       expect(resourceEntity.isMetadataDecrypted()).toBeTruthy();
@@ -111,7 +111,8 @@ describe("EncryptMetadataService", () => {
       resourceEntity._props.personal = true;
       const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto({allow_usage_of_personal_keys: false, zero_knowledge_key_share: false});
 
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
         .mockImplementationOnce(() => metadataKeysSettingsDto);
 
@@ -137,7 +138,7 @@ describe("EncryptMetadataService", () => {
       const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
       resourceEntity._props.personal = false;
 
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementationOnce(() => metadataKeys);
+      jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementationOnce(() => metadataKeys);
 
       expect(resourceEntity.isMetadataDecrypted()).toBeTruthy();
 
@@ -159,7 +160,7 @@ describe("EncryptMetadataService", () => {
       const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
       resourceEntity._props.personal = false;
 
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementationOnce(() => new MetadataKeysCollection([]));
+      jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementationOnce(() => new MetadataKeysCollection([]));
 
       const expectedError = new Error("Unable to encrypt the entity metadata, no metadata key found.");
       await expect(() => encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase)).rejects.toThrow(expectedError);
@@ -173,7 +174,7 @@ describe("EncryptMetadataService", () => {
       const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
       resourceEntity._props.personal = false;
 
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementationOnce(() => metadataKeys);
+      jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementationOnce(() => metadataKeys);
 
       const expectedError = new Error("Unable to encrypt the entity metadata, metadata private key is not decrypted.");
       await expect(() => encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase)).rejects.toThrow(expectedError);

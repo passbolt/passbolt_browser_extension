@@ -269,7 +269,6 @@ class ImportResourcesService {
       importResourcesFile.importResources.toResourceCollectionImportDto()
     );
     let importedCount = 0;
-    console.log(importedCount);
     const callbacks = resourcesCollection.resources.map((resourceEntity, index) => async() => {
       try {
         const data = resourceEntity.toV4Dto({secrets: true});

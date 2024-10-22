@@ -13,7 +13,7 @@
  */
 import PassphraseStorageService from '../session_storage/passphraseStorageService';
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
-import FindMetadataKeysService from "./findMetadataKeysService";
+import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
@@ -29,8 +29,8 @@ class EncryptMetadataKeysService {
    * @param {AccountEntity} account the account associated to the worker
    */
   constructor(apiClientOptions, account) {
-    this.findMetadataKeysService = new FindMetadataKeysService(apiClientOptions, account);
     this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
+    this.getOrFindMetadataKeysService = new GetOrFindMetadataKeysService(account, apiClientOptions);
     this.account = account;
   }
 
@@ -78,7 +78,7 @@ class EncryptMetadataKeysService {
    * @private
    */
   async getLatestMetadataKeysAndId() {
-    const metadataKeysCollection = await this.findMetadataKeysService.findAllForSessionStorage();
+    const metadataKeysCollection = await this.getOrFindMetadataKeysService.getOrFindAll();
     const metadataKeyEntity = metadataKeysCollection.getFirstByLatestCreated();
     if (metadataKeyEntity === null) {
       throw new Error("Unable to encrypt the entity metadata, no metadata key found.");

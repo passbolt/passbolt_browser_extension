@@ -48,7 +48,6 @@ import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity
 import {
   defaultDecryptedSharedMetadataKeysDtos
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
-import FindMetadataKeysService from "../../metadata/findMetadataKeysService";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data.js";
 
@@ -344,7 +343,8 @@ describe("ResourceUpdateService", () => {
       jest.spyOn(EncryptMessageService, "encrypt");
       jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
       jest.spyOn(resourceUpdateService, "update");
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(resourceUpdateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       let resourceUpdated, resourceLocalStorageExpected;
       jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
         resourceUpdated = resourceDtoToUpdate;
@@ -406,7 +406,8 @@ describe("ResourceUpdateService", () => {
       jest.spyOn(EncryptMessageService, "encrypt");
       jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
       jest.spyOn(resourceUpdateService, "update");
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(resourceUpdateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       let resourceUpdated, resourceLocalStorageExpected;
       jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
         resourceUpdated = resourceDtoToUpdate;
@@ -468,7 +469,8 @@ describe("ResourceUpdateService", () => {
       jest.spyOn(EncryptMessageService, "encrypt");
       jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
       jest.spyOn(resourceUpdateService, "update");
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(resourceUpdateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       let resourceUpdated, resourceLocalStorageExpected;
       jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
         resourceUpdated = resourceDtoToUpdate;
@@ -530,7 +532,8 @@ describe("ResourceUpdateService", () => {
       jest.spyOn(EncryptMessageService, "encrypt");
       jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
       jest.spyOn(resourceUpdateService, "update");
-      jest.spyOn(FindMetadataKeysService.prototype, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(resourceUpdateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       let resourceUpdated, resourceLocalStorageExpected;
       jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
         resourceUpdated = resourceDtoToUpdate;

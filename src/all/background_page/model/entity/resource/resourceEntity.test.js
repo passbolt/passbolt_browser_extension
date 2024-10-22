@@ -274,6 +274,19 @@ describe("Resource entity", () => {
         expect(error.getError("metadata", "type")).toEqual("The metadata is not a valid string.");
       }
     });
+
+    it("Should not set metadata if given dto does not validate", () => {
+      expect.assertions(1);
+
+      const resourceDTO = defaultResourceDto();
+      const metadata = {};
+      const entityV5 =  new ResourceEntity(resourceDTO);
+      /*
+       * The thrown validation error is not attached to the associated property, to be updated when the validation schema will
+       * support it.
+       */
+      expect(() => entityV5.metadata = metadata).toThrowEntityValidationError("name", "required");
+    });
   });
 
   describe("ResourceEntity::metadataKeyId", () => {

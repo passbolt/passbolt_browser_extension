@@ -15,13 +15,12 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {assertAnyTypeOf} from '../../utils/assertions';
 import DecryptMessageService from '../crypto/decryptMessageService';
 import FindMetadataKeysService from "./findMetadataKeysService";
-import ResourceMetadataEntity from "../../model/entity/resource/metadata/resourceMetadataEntity";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import FoldersCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
-import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
+import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 
 class DecryptMetadataService {
   /**
@@ -46,20 +45,100 @@ class DecryptMetadataService {
   async decryptAllFromForeignModels(collection, passphrase = null, options = {ignoreDecryptionError: false}) {
     assertAnyTypeOf(collection, [ResourcesCollection, FoldersCollection], "The given collection is neither a ResourcesCollection nor a FoldersCollection");
 
-    for (let i = 0; i < collection.length; i++) {
-      const entity = collection.items[i];
-
-      if (entity.isMetadataDecrypted()) {
-        continue;
+    await this.decryptAllFromForeignModelsWithSharedKey(collection, options);
+    await this.decryptAllFromForeignModelsWithUserKey(collection, passphrase, options);
+    collection.items.forEach(entity => {
+      if (!entity.isMetadataDecrypted()) {
+        const error = new Error("Entitie's metadata should either be encrypted with a shared metadata key or with the current user's private key.");
+        this.handleError(entity, options, error);
       }
+    });
+  }
 
-      if (this.isEncryptedWithSharedKey(entity)) {
-        await this.decryptOneWithSharedKey(entity, options);
-      } else if (this.isEncryptedWithUserKey(entity)) {
-        await this.decryptOneWithUserKey(entity, passphrase, options);
-      } else {
-        const errorCause = new Error("Entitie's metadata should either be encrypted with a shared metadata key or with the current user's private key.");
-        this.handleError(entity, options, errorCause);
+  /**
+   * Decrypts the metadata of all entities in the collection that were encrypted with the shared metadata key, and
+   * mutates the entities with the decrypted metadata.
+   *
+   * @param {ResourcesCollection|FoldersCollection} collection the collection to run metadata decryption on.
+   * @param {object} [options]
+   * @param {boolean} [options.ignoreDecryptionError = false] if set to true any decryption errors will be ignored
+   * @returns {Promise<void>}
+   */
+  async decryptAllFromForeignModelsWithSharedKey(collection, options = {ignoreDecryptionError: false}) {
+    const filteredCollection = collection.items.filter(entity => entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
+    if (!filteredCollection.length) {
+      return;
+    }
+
+    const metadataKeys = await this.findMetadataKeysService.findAllForSessionStorage();
+    const metadataOpenPgpPrivateKeys = {}; // Cache already read private keys.
+
+    for (const entity of filteredCollection) {
+      try {
+        const metadataDecryptedPrivateKey = metadataOpenPgpPrivateKeys[entity.metadataKeyId]
+          || (metadataOpenPgpPrivateKeys[entity.metadataKeyId] = await this.getAndReadMetadataPrivateKey(entity, metadataKeys, options));
+
+        await this.decryptMetadata(entity, metadataDecryptedPrivateKey);
+      } catch (error) {
+        this.handleError(entity, options, error);
+      }
+    }
+  }
+
+  /**
+   * Get and read metadata private key in a collection of metadata keys based on an entity metadata key id property.
+   *
+   * @param {ResourceEntity|FolderEntity} entity the entity to retrieve the key for
+   * @param {MetadataKeysCollection} metadataKeysCollection The collection of metadata keys. They must contain their
+   * private keys, and they should be decrypted.
+   * @returns {Promise<openpgp.PrivateKey>}
+   * @throws {Error} If no metadata key was found for entity metadata key id reference
+   * @throws {Error} If no metadata private key was found attached to the metadata key
+   * @throws {Error} If the metadata private key found was encrypted
+   */
+  async getAndReadMetadataPrivateKey(entity, metadataKeysCollection) {
+    const metadataKey = metadataKeysCollection.getFirst("id", entity.metadataKeyId);
+    if (!metadataKey) {
+      throw new Error(`No metadata key found with the id (${entity.metadataKeyId}).`);
+    }
+    const metadataPrivateKey = metadataKey.metadataPrivateKeys?.items[0];
+    if (!metadataPrivateKey) {
+      throw new Error(`No metadata private key found for the metadata key id (${entity.metadataKeyId}).`);
+    }
+    if (!metadataPrivateKey.isDecrypted) {
+      throw new Error(`The metadata private key for the metadata key id (${entity.metadataKeyId}) should be decrypted.`);
+    }
+
+    return OpenpgpAssertion.readKeyOrFail(metadataPrivateKey.data.armoredKey);
+  }
+
+  /**
+   * Decrypts the metadata of all entities in the collection that were encrypted with the user's private key, and
+   * mutates the entities with the decrypted metadata.
+   * @param {ResourcesCollection|FoldersCollection} collection the collection to run metadata decryption on.
+   * @param {string} passphrase The user passphrase
+   * @param {object} [options]
+   * @param {boolean} [options.ignoreDecryptionError = false] if set to true any decryption errors will be ignored
+   * @returns {Promise<void>}
+   * @returns {Promise<void>}
+   */
+  async decryptAllFromForeignModelsWithUserKey(collection, passphrase, options = {ignoreDecryptionError: false}) {
+    const filteredCollection = collection.items.filter(entity => entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_USER_KEY);
+    if (!filteredCollection.length) {
+      return;
+    }
+
+    passphrase = passphrase || await PassphraseStorageService.get();
+    if (!passphrase) {
+      throw new UserPassphraseRequiredError();
+    }
+    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+
+    for (const entity of filteredCollection) {
+      try {
+        await this.decryptMetadata(entity, userDecryptedPrivateKey);
+      } catch (e) {
+        this.handleError(entity, options, e);
       }
     }
   }
@@ -69,99 +148,45 @@ class DecryptMetadataService {
    *
    * @param {Entity} entity the entity to run metadata decryption on.
    * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
-   * @param {object} [options]
-   * @param {boolean} [options.ignoreDecryptionError = false] if set to true any decryption errors will be ignored
-   * @returns {Promise<void>}
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    * @private
    */
-  async decryptOneWithUserKey(entity, passphrase = null, options = {ignoreDecryptionError: false}) {
+  async decryptOneWithUserKey(entity, passphrase = null) {
     passphrase = passphrase || await PassphraseStorageService.get();
     if (!passphrase) {
       throw new UserPassphraseRequiredError();
     }
-
-    try {
-      const decryptionKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-      await this.decryptMetadata(entity, decryptionKey);
-    } catch (e) {
-      this.handleError(entity, options, e);
-    }
+    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+    await this.decryptMetadata(entity, userDecryptedPrivateKey);
   }
 
   /**
    * Decrypts the metadata of the given entity and mutates it with the decrypted result.
    *
    * @param {Entity} entity the entity to run metadata decryption on.
-   * @param {object} [options]
-   * @param {boolean} [options.ignoreDecryptionError = false] if set to true any decryption errors will be ignored
    * @returns {Promise<void>}
-   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    * @private
    */
-  async decryptOneWithSharedKey(entity, options = {ignoreDecryptionError: false}) {
+  async decryptOneWithSharedKey(entity) {
     const metadataKeys = await this.findMetadataKeysService.findAllForSessionStorage();
-    const metadataKey = metadataKeys.getFirst("id", entity.metadataKeyId);
-
-    if (!metadataKey) {
-      const errorCause = new Error(`No metadata key found with the id (${entity.metadataKeyId})`);
-      this.handleError(entity, options, errorCause);
-      return;
-    }
-
-    try {
-      const decryptionMetadataKey = metadataKey.metadataPrivateKeys.items[0];
-      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionMetadataKey.data.armoredKey);
-
-      await this.decryptMetadata(entity, decryptionKey);
-    } catch (e) {
-      this.handleError(entity, options, e);
-    }
+    const metadataDecryptedPrivateKey = await this.getAndReadMetadataPrivateKey(entity, metadataKeys);
+    await this.decryptMetadata(entity, metadataDecryptedPrivateKey);
   }
 
   /**
    * Decrypts the metadata of the given entity and mutates it with the decrypted result.
    *
    * @param {Entity} entity the entity to run metadata decryption on.
-   * @param {OpentPgp.PrivateKey} decryptionKey the GPG private key to use for decryption.
+   * @param {OpenPgp.PrivateKey} decryptionKey the GPG private key to use for decryption.
    * @param {boolean} [options.ignoreDecryptionError = false] if set to true any decryption errors will be ignored
    * @returns {Promise<void>}
    * @private
    */
   async decryptMetadata(entity, decryptionKey) {
-    try {
-      const gpgMessage = await OpenpgpAssertion.readMessageOrFail(entity.metadata);
-      const decryptedData = await DecryptMessageService.decrypt(gpgMessage, decryptionKey);
+    const gpgMessage = await OpenpgpAssertion.readMessageOrFail(entity.metadata);
+    const decryptedData = await DecryptMessageService.decrypt(gpgMessage, decryptionKey);
 
-      const metadataDto = JSON.parse(decryptedData);
-
-      entity.metadata = new ResourceMetadataEntity(metadataDto);
-    } catch (e) {
-      const error = new Error("Could not decrypt metadata");
-      error.cause = e;
-      throw error;
-    }
-  }
-
-  /**
-   * Returns true of the entity metadata is encrypted with a metadata shared key.
-   * @param {ResourceEntity|FolderEntity} entity
-   * @returns {boolean}
-   * @private
-   */
-  isEncryptedWithSharedKey(entity) {
-    return Boolean(entity.metadataKeyId)
-      && entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
-  }
-
-  /**
-   * Returns true of the entity metadata is encrypted with the current user's key.
-   * @param {ResourceEntity|FolderEntity} entity
-   * @returns {boolean}
-   * @private
-   */
-  isEncryptedWithUserKey(entity) {
-    return entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
+    entity.metadata = JSON.parse(decryptedData);
   }
 
   /**

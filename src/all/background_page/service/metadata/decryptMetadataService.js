@@ -14,13 +14,13 @@
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {assertAnyTypeOf} from '../../utils/assertions';
 import DecryptMessageService from '../crypto/decryptMessageService';
-import FindMetadataKeysService from "./findMetadataKeysService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import FoldersCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
+import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 
 class DecryptMetadataService {
   /**
@@ -29,7 +29,7 @@ class DecryptMetadataService {
    */
   constructor(apiClientOptions, account) {
     this.account = account;
-    this.findMetadataKeysService = new FindMetadataKeysService(apiClientOptions, account);
+    this.getOrFindMetadataKeysService = new GetOrFindMetadataKeysService(account, apiClientOptions);
   }
 
   /**
@@ -70,7 +70,7 @@ class DecryptMetadataService {
       return;
     }
 
-    const metadataKeys = await this.findMetadataKeysService.findAllForSessionStorage();
+    const metadataKeys = await this.getOrFindMetadataKeysService.getOrFindAll();
     const metadataOpenPgpPrivateKeys = {}; // Cache already read private keys.
 
     for (const entity of filteredCollection) {
@@ -168,7 +168,7 @@ class DecryptMetadataService {
    * @private
    */
   async decryptOneWithSharedKey(entity) {
-    const metadataKeys = await this.findMetadataKeysService.findAllForSessionStorage();
+    const metadataKeys = await this.getOrFindMetadataKeysService.getOrFindAll();
     const metadataDecryptedPrivateKey = await this.getAndReadMetadataPrivateKey(entity, metadataKeys);
     await this.decryptMetadata(entity, metadataDecryptedPrivateKey);
   }

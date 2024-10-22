@@ -219,7 +219,7 @@ describe("FindResourcesService", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
 
       const resources = await findResourcesService.findAllForLocalStorage();
 
@@ -236,7 +236,7 @@ describe("FindResourcesService", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => new MetadataKeysCollection([]));
+      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => new MetadataKeysCollection([]));
 
       const resources = await findResourcesService.findAllForLocalStorage();
 
@@ -256,7 +256,7 @@ describe("FindResourcesService", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
 
       const resources = await findResourcesService.findAllForLocalStorage();
 

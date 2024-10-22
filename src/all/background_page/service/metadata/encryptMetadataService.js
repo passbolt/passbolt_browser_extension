@@ -20,15 +20,17 @@ import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {assertAnyTypeOf} from "../../utils/assertions";
 import FolderEntity from "../../model/entity/folder/folderEntity";
+import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService";
 
 class EncryptMetadataKeysService {
   /**
    * @constructor
    * @param {ApiClientOptions} apiClientOptions
-   * @param {AbstractAccountEntity} account the account associated to the worker
+   * @param {AccountEntity} account the account associated to the worker
    */
   constructor(apiClientOptions, account) {
     this.findMetadataKeysService = new FindMetadataKeysService(apiClientOptions, account);
+    this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
     this.account = account;
   }
 
@@ -55,7 +57,7 @@ class EncryptMetadataKeysService {
     const serializedMetadata = JSON.stringify(entity.metadata.toDto());
 
     let encryptedMetadata;
-    if (entity.isPersonal()) {
+    if (entity.isPersonal() && await this.allowUsageOfPersonalKeys()) {
       const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
       encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [userPrivateKey]);
       entity._props.metadata_key_id = null;
@@ -104,6 +106,15 @@ class EncryptMetadataKeysService {
       throw new UserPassphraseRequiredError();
     }
     return passphrase;
+  }
+
+  /**
+   * Allow usage of personal keys
+   * @returns {Promise<boolean>}
+   */
+  async allowUsageOfPersonalKeys() {
+    const metadataKeysSettingsEntity = await this.getOrFindMetadataSettingsService.getOrFindKeysSettings();
+    return metadataKeysSettingsEntity.allowUsageOfPersonalKeys;
   }
 }
 

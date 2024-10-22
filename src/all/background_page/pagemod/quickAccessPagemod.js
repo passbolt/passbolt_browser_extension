@@ -28,6 +28,7 @@ import {RememberMeEvents} from "../event/rememberMeEvents";
 import {ResourceTypeEvents} from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import {AccountEvents} from "../event/accountEvents";
 
 class QuickAccess extends Pagemod {
   /**
@@ -56,7 +57,8 @@ class QuickAccess extends Pagemod {
       LocaleEvents,
       PownedPasswordEvents,
       RememberMeEvents,
-      ResourceTypeEvents
+      ResourceTypeEvents,
+      AccountEvents
     ];
   }
 

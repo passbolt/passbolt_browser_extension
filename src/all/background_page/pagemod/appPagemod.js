@@ -45,6 +45,7 @@ import {RememberMeEvents} from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import {PermissionEvents} from "../event/permissionEvents";
+import {AccountEvents} from "../event/accountEvents";
 
 class App extends Pagemod {
   /**
@@ -88,7 +89,8 @@ class App extends Pagemod {
       MfaEvents,
       ClipboardEvents,
       RememberMeEvents,
-      PermissionEvents
+      PermissionEvents,
+      AccountEvents
     ];
   }
 

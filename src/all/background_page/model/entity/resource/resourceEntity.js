@@ -373,7 +373,7 @@ class ResourceEntity extends EntityV2 {
   }
 
   /**
-   * Check if the metadata is encrypted.
+   * Check if the metadata is decrypted.
    * @returns {boolean}
    */
   isMetadataDecrypted() {
@@ -601,11 +601,14 @@ class ResourceEntity extends EntityV2 {
 
   /**
    * Set resource metadata
-   * @param {ResourceMetadataEntity|string} metadata
+   * @param {ResourceMetadataEntity|object|string} metadata
    */
   set metadata(metadata) {
     if (metadata instanceof ResourceMetadataEntity) {
       this._metadata = new ResourceMetadataEntity(metadata.toDto(), {validate: false});
+      delete this._props.metadata;
+    } else if (typeof metadata === "object") {
+      this._metadata = new ResourceMetadataEntity(metadata);
       delete this._props.metadata;
     } else {
       EntitySchema.validateProp("metadata", metadata, ResourceEntity.getSchema().properties.metadata.anyOf[0]);

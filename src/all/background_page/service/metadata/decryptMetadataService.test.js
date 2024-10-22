@@ -16,14 +16,12 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import {defaultSharedResourcesWithEncryptedMetadataDtos, defaultPrivateResourcesWithEncryptedMetadataDtos, defaultResourceDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import {adminAccountDto, defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import DecryptMetadataService from "./decryptMetadataService";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import {defaultDecryptedSharedMetadataKeysDtos} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import DecryptMessageService from "../crypto/decryptMessageService";
 
@@ -62,21 +60,15 @@ describe("DecryptMetadataService", () => {
     }, 10 * 1000);
 
     it("should decrypt the metadata of a ResourcesCollection with private key", async() => {
-      const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos();
-      expect.assertions(2 + collectionDto.length);
-
-      const collection = new ResourcesCollection(collectionDto);
+      expect.assertions(2);
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
-
+      const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos();
+      const collection = new ResourcesCollection(collectionDto);
       const passphrase = pgpKeys.ada.passphrase;
 
       const service = new DecryptMetadataService(apiClientOptions, account);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(async passphrase => {
-        expect(passphrase).toStrictEqual(pgpKeys.ada.passphrase);
-        return await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
-      });
 
       const isAllResourceMetadataEncrypted = collection.resources.reduce((accumulator, resource) => accumulator && !resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataEncrypted).toStrictEqual(true);
@@ -88,34 +80,29 @@ describe("DecryptMetadataService", () => {
     }, 10 * 1000);
 
     it("should decrypt the metadata of a ResourcesCollection using the Passphrase storage to get the user's passphrase", async() => {
-      const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos();
-      expect.assertions(2 + collectionDto.length);
-
-      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
-      spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
-
-      const collection = new ResourcesCollection(collectionDto);
+      expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
+      const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos();
+      const collection = new ResourcesCollection(collectionDto);
 
       const service = new DecryptMetadataService(apiClientOptions, account);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(async passphrase => {
-        expect(passphrase).toStrictEqual(pgpKeys.ada.passphrase);
-        return await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
-      });
+      jest.spyOn(PassphraseStorageService, "get");
+      await PassphraseStorageService.set(pgpKeys.ada.passphrase);
 
       const isAllResourceMetadataEncrypted = collection.resources.reduce((accumulator, resource) => accumulator && !resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataEncrypted).toStrictEqual(true);
 
       await service.decryptAllFromForeignModels(collection);
 
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
       const isAllResourceMetadataDecrypted = collection.resources.reduce((accumulator, resource) => accumulator && resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataDecrypted).toStrictEqual(true);
     }, 10 * 1000);
 
     it("should do nothing if the metadata is already decrypted", async() => {
-      expect.assertions(4);
+      expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
@@ -126,7 +113,6 @@ describe("DecryptMetadataService", () => {
 
       const service = new DecryptMetadataService(apiClientOptions, account);
       const spyOnFindMetadataKeys = jest.spyOn(service.findMetadataKeysService, "findAllForSessionStorage");
-      const spyOnGetDecryptedPrivateKey = jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey");
 
       let isAllResourceMetadataDecrypted = collection.resources.reduce((accumulator, resource) => accumulator && resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataDecrypted).toStrictEqual(true);
@@ -137,7 +123,6 @@ describe("DecryptMetadataService", () => {
       expect(isAllResourceMetadataDecrypted).toStrictEqual(true);
 
       expect(spyOnFindMetadataKeys).not.toHaveBeenCalled();
-      expect(spyOnGetDecryptedPrivateKey).not.toHaveBeenCalled();
     });
 
     it("should throw an error if no matching metadata key is found", async() => {
@@ -153,7 +138,59 @@ describe("DecryptMetadataService", () => {
       jest.spyOn(service.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => new MetadataKeysCollection([]));
 
       const expectedError = new Error(`Metadata of the resource (${collection._items[0]._props.id}) cannot be decrypted.`);
-      expectedError.cause = new Error(`No metadata key found with the id (${collection._items[0]._props.metadata_key_id})`);
+      expectedError.cause = new Error(`No metadata key found with the id (${collection._items[0]._props.metadata_key_id}).`);
+      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
+    });
+
+    it("should throw an error if the matching metadata key does not have a metadata private key", async() => {
+      expect.assertions(1);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = defaultApiClientOptions();
+
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      delete(metadataKeys.items[0]._metadata_private_keys);
+
+      const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(1, {
+        metadata_key_id: metadataKeysDtos[0].id
+      });
+      const collection = new ResourcesCollection(collectionDto);
+
+      const service = new DecryptMetadataService(apiClientOptions, account);
+
+      // delete(metadataKeys.items[0].metadata_private_keys);
+      jest.spyOn(service.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+
+
+      const expectedError = new Error(`Metadata of the resource (${collection._items[0]._props.id}) cannot be decrypted.`);
+      expectedError.cause = new Error(`No metadata private key found for the metadata key id (${collection._items[0]._props.metadata_key_id}).`);
+      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
+    });
+
+    it("should throw an error if the matching metadata key has an encrypted private key", async() => {
+      expect.assertions(1);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = defaultApiClientOptions();
+
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      metadataKeys.items[0]._metadata_private_keys.items[0].data = pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage;
+
+      const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(1, {
+        metadata_key_id: metadataKeysDtos[0].id
+      });
+      const collection = new ResourcesCollection(collectionDto);
+
+      const service = new DecryptMetadataService(apiClientOptions, account);
+
+      // delete(metadataKeys.items[0].metadata_private_keys);
+      jest.spyOn(service.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
+
+
+      const expectedError = new Error(`Metadata of the resource (${collection._items[0]._props.id}) cannot be decrypted.`);
+      expectedError.cause = new Error(`The metadata private key for the metadata key id (${collection._items[0]._props.metadata_key_id}) should be decrypted.`);
       await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
     });
 
@@ -190,63 +227,6 @@ describe("DecryptMetadataService", () => {
       await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
     });
 
-    it("should throw error if a resource is encrypted with shared metadata key but no key id is provided", async() => {
-      expect.assertions(1);
-
-      const account = new AccountEntity(defaultAccountDto());
-      const apiClientOptions = defaultApiClientOptions();
-
-      const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(1);
-      collectionDto[0].metadata_key_id = null;
-
-      const collection = new ResourcesCollection(collectionDto);
-      const service = new DecryptMetadataService(apiClientOptions, account);
-
-      const expectedError = new Error(`Metadata of the resource (${collectionDto[0].id}) cannot be decrypted.`);
-      const errorCause = new Error("Entitie's metadata should either be encrypted with a shared metadata key or with the current user's private key.");
-      expectedError.cause = errorCause;
-
-      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
-    });
-
-    it("should throw error if a resource is encrypted with shared metadata key but no key id is provided", async() => {
-      expect.assertions(1);
-
-      const account = new AccountEntity(defaultAccountDto());
-      const apiClientOptions = defaultApiClientOptions();
-
-      const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(1);
-      collectionDto[0].metadata_key_id = null;
-
-      const collection = new ResourcesCollection(collectionDto);
-      const service = new DecryptMetadataService(apiClientOptions, account);
-
-      const expectedError = new Error(`Metadata of the resource (${collectionDto[0].id}) cannot be decrypted.`);
-      const errorCause = new Error("Entitie's metadata should either be encrypted with a shared metadata key or with the current user's private key.");
-      expectedError.cause = errorCause;
-
-      await expect(() => service.decryptAllFromForeignModels(collection, "passphrase", {ignoreDecryptionError: true})).not.toThrow(expectedError);
-    });
-
-    it("should ignore error if a resource is encrypted with shared metadata key but no key id is provided", async() => {
-      expect.assertions(1);
-
-      const account = new AccountEntity(defaultAccountDto());
-      const apiClientOptions = defaultApiClientOptions();
-
-      const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(1);
-      collectionDto[0].metadata_key_id = null;
-
-      const collection = new ResourcesCollection(collectionDto);
-      const service = new DecryptMetadataService(apiClientOptions, account);
-
-      const expectedError = new Error(`Metadata of the resource (${collectionDto[0].id}) cannot be decrypted.`);
-      const errorCause = new Error("Entitie's metadata should either be encrypted with a shared metadata key or with the current user's private key.");
-      expectedError.cause = errorCause;
-
-      await expect(() => service.decryptAllFromForeignModels(collection, "passphrase", {ignoreDecryptionError: true})).not.toThrow(expectedError);
-    });
-
     it("should throw error if an error occurs during decryption with a shared key", async() => {
       expect.assertions(1);
 
@@ -265,11 +245,9 @@ describe("DecryptMetadataService", () => {
       const service = new DecryptMetadataService(apiClientOptions, account);
       jest.spyOn(service.findMetadataKeysService, "findAllForSessionStorage").mockImplementation(() => metadataKeys);
 
-      const decryptionErrorCause = new Error("An error occurs during decryption process");
-      const decryptionError = new Error("Could not decrypt metadata");
+      const errorCause = new Error("An error occurs during decryption process");
       const expectedError = new Error(`Metadata of the resource (${collectionDto[0].id}) cannot be decrypted.`);
-      decryptionError.cause = decryptionErrorCause;
-      expectedError.cause = decryptionError;
+      expectedError.cause = errorCause;
 
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => { throw new Error("An error occurs during decryption process"); });
 
@@ -317,30 +295,27 @@ describe("DecryptMetadataService", () => {
     it("should throw error if an error occurs during decryption with a private key", async() => {
       expect.assertions(1);
 
-      const account = new AccountEntity(defaultAccountDto());
+      const account = new AccountEntity(adminAccountDto());
       const apiClientOptions = defaultApiClientOptions();
 
       const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos();
 
       const collection = new ResourcesCollection(collectionDto);
       const service = new DecryptMetadataService(apiClientOptions, account);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(async() => await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
 
-      const decryptionErrorCause = new Error("An error occurs during decryption process");
-      const decryptionError = new Error("Could not decrypt metadata");
+      const errorCause = new Error("An error occurs during decryption process");
       const expectedError = new Error(`Metadata of the resource (${collectionDto[0].id}) cannot be decrypted.`);
-      decryptionError.cause = decryptionErrorCause;
-      expectedError.cause = decryptionError;
+      expectedError.cause = errorCause;
 
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => { throw new Error("An error occurs during decryption process"); });
 
-      await expect(() => service.decryptAllFromForeignModels(collection, "passphrase")).rejects.toThrow(expectedError);
+      await expect(() => service.decryptAllFromForeignModels(collection, pgpKeys.admin.passphrase)).rejects.toThrow(expectedError);
     });
 
     it("should ignore error if an error occurs during decryption with a private key", async() => {
       expect.assertions(1);
 
-      const account = new AccountEntity(defaultAccountDto());
+      const account = new AccountEntity(adminAccountDto());
       const apiClientOptions = defaultApiClientOptions();
 
       const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos();
@@ -350,9 +325,7 @@ describe("DecryptMetadataService", () => {
 
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => { throw new Error(); });
 
-      await expect(() => service.decryptAllFromForeignModels(collection, "passphrase", {ignoreDecryptionError: true})).not.toThrow();
+      await expect(() => service.decryptAllFromForeignModels(collection, pgpKeys.admin.passphrase, {ignoreDecryptionError: true})).not.toThrow();
     });
-
-    it.todo("should decrypt the metadata of a FoldersCollection");
   });
 });

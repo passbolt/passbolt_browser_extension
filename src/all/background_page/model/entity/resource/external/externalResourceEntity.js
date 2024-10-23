@@ -151,7 +151,7 @@ class ExternalResourceEntity extends EntityV2 {
       description: resourceEntityDto.metadata.description || null,
       secrets: resourceEntityDto.secrets || [],
       folder_parent_id: externalFolderParent?.id || null,
-      resource_type_id: resourceEntityDto.metadata.resource_type_id,
+      resource_type_id: resourceEntityDto.resource_type_id,
       folder_parent_path: externalFolderParent?.path || "",
       expired: resourceEntityDto.expired || null,
     };

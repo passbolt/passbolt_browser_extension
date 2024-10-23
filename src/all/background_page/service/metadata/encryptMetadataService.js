@@ -24,7 +24,7 @@ import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService
 import FoldersCollection from '../../model/entity/folder/foldersCollection';
 import ResourcesCollection from '../../model/entity/resource/resourcesCollection';
 
-class EncryptMetadataKeysService {
+class EncryptMetadataService {
   /**
    * @constructor
    * @param {ApiClientOptions} apiClientOptions
@@ -199,4 +199,4 @@ class EncryptMetadataKeysService {
   }
 }
 
-export default EncryptMetadataKeysService;
+export default EncryptMetadataService;

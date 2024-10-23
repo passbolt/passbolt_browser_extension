@@ -409,7 +409,7 @@ describe("ShareResourceService", () => {
       }, 10 * 1000);
 
       it(`::${scenario.title}: with personal set to 'true'`, async() => {
-        expect.assertions(22);
+        expect.assertions(21);
 
         const apiClientOptions = defaultApiClientOptions();
         const account = new AccountEntity(defaultAccountDto());
@@ -537,7 +537,6 @@ describe("ShareResourceService", () => {
         expect(mockedProgressService.finishStep).toHaveBeenCalledWith(`Encrypting resource secret 1/2`);
         expect(mockedProgressService.finishStep).toHaveBeenCalledWith(`Encrypting resource secret 2/2`);
         expect(mockedProgressService.finishStep).toHaveBeenCalledWith(`Sharing resource 1/1`);
-        expect(mockedProgressService.finishStep).toHaveBeenCalledWith('Decrypting resources metadata', true);
         expect(mockedProgressService.finishStep).toHaveBeenCalledWith('Updating resources metadata 1/1');
         expect(spyOnKeyringSync).toHaveBeenCalledTimes(1);
         expect(spyOnFindResourceService).toHaveBeenCalledTimes(1);

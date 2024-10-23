@@ -23,6 +23,14 @@ import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
 import ResourceLocalStorage from "../src/all/background_page/service/local_storage/resourceLocalStorage";
 import FolderLocalStorage from "../src/all/background_page/service/local_storage/folderLocalStorage";
+import mockedI18n from "./overrides/i18n";
+import I18n from "../src/all/background_page/sdk/i18n";
+
+//mocking i18n avoids some errors like `Error: connect ECONNREFUSED 127.0.0.1:80` in the console while running tests
+jest.mock('../src/all/background_page/sdk/i18n');
+I18n.init = mockedI18n.init;
+I18n.initWithDefaultLocale = mockedI18n.initWithDefaultLocale;
+I18n.t = mockedI18n.t;
 
 // hides all the messages from Log
 jest.mock("../src/all/background_page/model/log.js");

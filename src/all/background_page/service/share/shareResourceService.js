@@ -95,15 +95,14 @@ class ShareResourceService {
       return;
     }
 
-    this.progressService.updateGoals(this.progressService.goals + 2);
-    this.progressService.finishStep(i18n.t('Decrypting resources metadata'), true);
-    await this.decryptMetadataService.decryptAllFromForeignModels(resourcesCollection, passphrase);
+    this.progressService.updateGoals(this.progressService.goals + collectionLength);
 
     for (let i = 0; i < collectionLength; i++) {
       this.progressService.finishStep(i18n.t('Updating resources metadata {{counter}}/{{total}}', {counter: i + 1, total: collectionLength}));
       const resource = resourcesCollection.items[i];
       const decryptedMetadata = resource.metadata;
 
+      //enforce personal property to `false` for the encrypting service to use the shared metadata key instead of the user's private key.
       resource.personal = false;
       await this.encryptMetadataService.encryptOneForForeignModel(resource, passphrase);
 

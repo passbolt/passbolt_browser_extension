@@ -398,8 +398,7 @@ describe("FindResourcesService", () => {
     beforeEach(() => {
       service = new FindResourcesService(account, apiClientOptions);
       expectedContains = {
-        "secret": true,
-        "resource-type": true
+        "secret": true
       };
     });
 

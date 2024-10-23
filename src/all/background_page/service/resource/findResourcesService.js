@@ -147,7 +147,7 @@ export default class FindResourcesService {
   async findAllForDecrypt(resourcesIds) {
     assertArrayUUID(resourcesIds);
 
-    const contains = {'secret': true, 'resource-type': true};
+    const contains = {'secret': true};
     const resourceCollection =  await this.findAllByIds(resourcesIds, contains);
 
     return resourceCollection;

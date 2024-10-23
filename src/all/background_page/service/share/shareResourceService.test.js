@@ -40,15 +40,26 @@ import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
-import {TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {
+  TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
+  TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
+  TEST_RESOURCE_TYPE_PASSWORD_STRING,
+  TEST_RESOURCE_TYPE_TOTP,
+  TEST_RESOURCE_TYPE_V5_DEFAULT,
+  TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP,
+  TEST_RESOURCE_TYPE_V5_PASSWORD_STRING,
+  TEST_RESOURCE_TYPE_V5_TOTP
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import {defaultMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 import {v4 as uuidv4} from "uuid";
 import MetadataKeysApiService from "../api/metadata/metadataKeysApiService";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
+import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 
 beforeEach(() => {
+  MetadataKeysSessionStorage._runtimeCachedData = {};
   jest.clearAllMocks();
   enableFetchMocks();
 });
@@ -56,10 +67,10 @@ beforeEach(() => {
 describe("ShareResourceService", () => {
   describe("::share", () => {
     each([
-      {title: "with password string", value: plaintextSecretPasswordStringDto()},
-      {title: "with password and description", value: plaintextSecretPasswordAndDescriptionDto()},
-      {title: "with password description and totp", value: plaintextSecretPasswordDescriptionTotpDto()},
-      {title: "with standalon totp", value: plaintextSecretTotpDto()},
+      {title: "with password string", value: plaintextSecretPasswordStringDto(), resourceTypeId: TEST_RESOURCE_TYPE_PASSWORD_STRING},
+      {title: "with password and description", value: plaintextSecretPasswordAndDescriptionDto(), resourceTypeId: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION},
+      {title: "with password description and totp", value: plaintextSecretPasswordDescriptionTotpDto(), resourceTypeId: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP},
+      {title: "with standalon totp", value: plaintextSecretTotpDto(), resourceTypeId: TEST_RESOURCE_TYPE_TOTP},
     ]).describe("should share the given resource v4", scenario => {
       it(`::${scenario.title}: with personal set to 'false'`, async() => {
         expect.assertions(14);
@@ -82,10 +93,12 @@ describe("ShareResourceService", () => {
           [pgpKeys.carol.userId]: {armoredKey: pgpKeys.carol.public},
         };
 
-        const clearSecret = plaintextSecretPasswordDescriptionTotpDto();
+        const clearSecret = scenario.value;
         const encryptedSecret = await EncryptMessageService.encrypt(JSON.stringify(clearSecret), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
 
-        const resource = defaultResourceV4Dto();
+        const resource = defaultResourceV4Dto({
+          resource_type_id: scenario.resourceTypeId
+        });
         resource.secrets = [{
           data: encryptedSecret
         }];
@@ -193,10 +206,12 @@ describe("ShareResourceService", () => {
           [pgpKeys.carol.userId]: {armoredKey: pgpKeys.carol.public},
         };
 
-        const clearSecret = plaintextSecretPasswordDescriptionTotpDto();
+        const clearSecret = scenario.value;
         const encryptedSecret = await EncryptMessageService.encrypt(JSON.stringify(clearSecret), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
 
-        const resource = defaultResourceV4Dto();
+        const resource = defaultResourceV4Dto({
+          resource_type_id: scenario.resourceTypeId
+        });
         resource.secrets = [{
           data: encryptedSecret
         }];
@@ -285,10 +300,10 @@ describe("ShareResourceService", () => {
     });
 
     each([
-      {title: "with password string V5", value: plaintextSecretPasswordStringDto()},
-      {title: "with password and description V5", value: plaintextSecretPasswordAndDescriptionDto()},
-      {title: "with password description and totp V5", value: plaintextSecretPasswordDescriptionTotpDto()},
-      {title: "with standalon totp V5", value: plaintextSecretTotpDto()},
+      {title: "with password string V5", value: plaintextSecretPasswordStringDto(), resourceTypeId: TEST_RESOURCE_TYPE_V5_PASSWORD_STRING},
+      {title: "with password and description V5", value: plaintextSecretPasswordAndDescriptionDto(), resourceTypeId: TEST_RESOURCE_TYPE_V5_DEFAULT},
+      {title: "with password description and totp V5", value: plaintextSecretPasswordDescriptionTotpDto(), resourceTypeId: TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP},
+      {title: "with standalon totp V5", value: plaintextSecretTotpDto(), resourceTypeId: TEST_RESOURCE_TYPE_V5_TOTP},
     ]).describe("should share the given resource", scenario => {
       it(`::${scenario.title}: with personal set to 'false'`, async() => {
         expect.assertions(15);
@@ -324,11 +339,12 @@ describe("ShareResourceService", () => {
         };
         spyOnKeyringFindPublic.mockImplementation(userId => userKeys[userId]);
 
-        const clearSecret = plaintextSecretPasswordDescriptionTotpDto();
+        const clearSecret = scenario.value;
         const encryptedSecret = await EncryptMessageService.encrypt(JSON.stringify(clearSecret), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
 
         const resource = defaultResourceDto({
-          secrets: [{data: encryptedSecret}]
+          secrets: [{data: encryptedSecret}],
+          resource_type_id: scenario.resourceTypeId,
         });
 
         const carolPermissionChange = minimumPermissionDto({
@@ -437,11 +453,11 @@ describe("ShareResourceService", () => {
           [pgpKeys.carol.userId]: {armoredKey: pgpKeys.carol.public},
         };
 
-        const clearSecret = plaintextSecretPasswordDescriptionTotpDto();
+        const clearSecret = scenario.value;
         const encryptedSecret = await EncryptMessageService.encrypt(JSON.stringify(clearSecret), await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public));
 
         const resource = defaultResourceDto({
-          resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP,
+          resource_type_id: scenario.resourceTypeId,
           secrets: [{data: encryptedSecret}],
           personal: true,
         });

@@ -327,7 +327,7 @@ describe("Resource entity", () => {
       const resourceDTO = defaultResourceDto();
       const entityV5 =  new ResourceEntity(resourceDTO);
 
-      expect(entityV5.metadataKeyType).toBeUndefined();
+      expect(entityV5.metadataKeyType).toBeNull();
 
       entityV5.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
       const expectedDto = {...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_USER_KEY};
@@ -342,7 +342,7 @@ describe("Resource entity", () => {
       const resourceDTO = defaultResourceDto();
       const entityV5 =  new ResourceEntity(resourceDTO);
 
-      expect(entityV5.metadataKeyType).toBeUndefined();
+      expect(entityV5.metadataKeyType).toBeNull();
 
       entityV5.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
       const expectedDto = {...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY};

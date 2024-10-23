@@ -23,6 +23,10 @@ import FolderEntity from "../../model/entity/folder/folderEntity";
 import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService";
 import FoldersCollection from '../../model/entity/folder/foldersCollection';
 import ResourcesCollection from '../../model/entity/resource/resourcesCollection';
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import {
+  RESOURCE_TYPE_VERSION_5
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 class EncryptMetadataService {
   /**
@@ -33,6 +37,7 @@ class EncryptMetadataService {
   constructor(apiClientOptions, account) {
     this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
     this.getOrFindMetadataKeysService = new GetOrFindMetadataKeysService(account, apiClientOptions);
+    this.resourceTypesModel = new ResourceTypeModel(apiClientOptions);
     this.account = account;
   }
 
@@ -91,15 +96,22 @@ class EncryptMetadataService {
       throw new Error("Unable to encrypt the collection metadata, a resource metadata is already encrypted.");
     }
 
+    const resourceTypesV5Collection = await this.resourceTypesModel.getOrFindAll();
+    resourceTypesV5Collection.filterByResourceTypeVersion(RESOURCE_TYPE_VERSION_5);
+    // No need to encrypt metadata of resource type v4.
+    if (!collection.items.some(resource => Boolean(resourceTypesV5Collection.getFirstById(resource.resourceTypeId)))) {
+      return;
+    }
+
     const canUsePersonalKeys = await this.allowUsageOfPersonalKeys();
     passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
 
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
 
     if (canUsePersonalKeys) {
-      await this.encryptAllFromForeignModelsWithUserKey(collection, userDecryptedPrivateKey);
+      await this.encryptAllFromForeignModelsWithUserKey(collection, resourceTypesV5Collection, userDecryptedPrivateKey);
     }
-    await this.encryptAllFromForeignModelsWithSharedKey(collection, userDecryptedPrivateKey);
+    await this.encryptAllFromForeignModelsWithSharedKey(collection, resourceTypesV5Collection, userDecryptedPrivateKey);
   }
 
   /**
@@ -107,13 +119,18 @@ class EncryptMetadataService {
    * mutates the entities with the encrypted metadata.
    *
    * @param {ResourcesCollection|FoldersCollection} collection the collection to run metadata encryption on.
+   * @param {ResourceTypesCollection} resourceTypesV5 The resource types to encrypt the metadata for.
    * @param {openpgp.PrivateKey} userDecryptedPrivateKey The user decrypted private key
    * @returns {Promise<void>}
    */
-  async encryptAllFromForeignModelsWithSharedKey(collection, userDecryptedPrivateKey) {
+  async encryptAllFromForeignModelsWithSharedKey(collection, resourceTypesV5, userDecryptedPrivateKey) {
     const {metadataKeyId, metadataPublicKey, metadataPrivateKey} = await this.getLatestMetadataKeysAndId();
 
     for (const entity of collection) {
+      // If resource type v4, nothing to do.
+      if (!resourceTypesV5.getFirstById(entity.resourceTypeId)) {
+        return;
+      }
       // Already encrypted with the user private key, nothing to do.
       if (!entity.isMetadataDecrypted()) {
         continue;
@@ -131,15 +148,20 @@ class EncryptMetadataService {
    * Encrypt the metadata of all entities in the collection with the user's private key, and
    * mutates the entities with the encrypted metadata.
    * @param {ResourcesCollection|FoldersCollection} collection the collection to run metadata decryption on.
+   * @param {ResourceTypesCollection} resourceTypesV5 The resource types to encrypt the metadata for.
    * @param {openpgp.PrivateKey} userDecryptedPrivateKey The user decrypted user private key
    * @returns {Promise<void>}
    */
-  async encryptAllFromForeignModelsWithUserKey(collection, userDecryptedPrivateKey) {
+  async encryptAllFromForeignModelsWithUserKey(collection, resourceTypesV5, userDecryptedPrivateKey) {
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
 
     for (const entity of collection) {
       if (!entity.isPersonal()) {
         continue;
+      }
+      // If resource type v4, nothing to do.
+      if (!resourceTypesV5.getFirstById(entity.resourceTypeId)) {
+        return;
       }
 
       const serializedMetadata = JSON.stringify(entity.metadata.toDto());

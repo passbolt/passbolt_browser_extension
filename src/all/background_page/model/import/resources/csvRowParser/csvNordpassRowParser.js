@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
+import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
 
 class CsvNordpassRowParser extends AbstractCsvRowParser {
@@ -52,7 +53,7 @@ class CsvNordpassRowParser extends AbstractCsvRowParser {
    */
   static parse(data, resourceTypesCollection, metadataTypesSettings) {
     const externalResourceDto = {};
-    const resourceType = this.parseResourceType(data, resourceTypesCollection, metadataTypesSettings);
+    const resourceType = ResourcesTypeImportParser.parseResourceType(data, resourceTypesCollection, metadataTypesSettings);
     if (resourceType) {
       externalResourceDto.resource_type_id = resourceType.id;
     }

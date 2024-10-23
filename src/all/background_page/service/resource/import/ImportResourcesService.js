@@ -33,6 +33,8 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import User from "../../../model/user";
 import i18n from "../../../sdk/i18n";
 import GetOrFindMetadataSettingsService from "../../metadata/getOrFindMetadataSettingsService";
+import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
+import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 
 /**
  * The service aim to import the resources from a file and save it to the API / localstorage.
@@ -56,21 +58,25 @@ class ImportResourcesService {
     this.executeConcurrentlyService = new ExecuteConcurrentlyService();
     this.progressService = progressService;
     this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
+    this.encryptService = new EncryptMetadataKeysService(apiClientOptions, account);
+    this.account = account;
   }
 
   /**
    * Import the resource file and save it into the API and local storage.
    * @param {ImportResourcesFileEntity} importResourcesFile The import resource entity.
-   * @param {openpgp.PrivateKey} privateKey the user private key
+   * @param {String} passphrase the user passphrase
    * @return {Promise<ImportResourcesFileEntity>}
    */
-  async importFile(importResourcesFile, privateKey) {
+  async importFile(importResourcesFile, passphrase) {
     const userId = User.getInstance().get().id;
 
+    const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     await this.parseFile(importResourcesFile);
     await this.encryptSecrets(importResourcesFile, userId, privateKey);
+    const resourcesCollection = new ResourcesCollection(importResourcesFile.importResources.toResourceCollectionImportDto());
     importResourcesFile.mustImportFolders && await this.bulkImportFolders(importResourcesFile);
-    await this.bulkImportResources(importResourcesFile);
+    await this.bulkImportResources(importResourcesFile, resourcesCollection);
     importResourcesFile.mustTag && await this.bulkTagResources(importResourcesFile);
     await this.progressService.finishStep(null, true);
     return importResourcesFile;
@@ -260,17 +266,15 @@ class ImportResourcesService {
 
   /**
    * Import the resources.
-   * @param {ImportResourcesFileEntity} importResourcesFile The import object
+   * @param {ImportResourcesFileEntity} importResourcesFile The import
+   * @param {ResourcesCollection} resourcesCollection The collection to import
    * @returns {Promise<void>}
    * @private
    */
-  async bulkImportResources(importResourcesFile) {
-    const resourcesCollection = new ResourcesCollection(
-      importResourcesFile.importResources.toResourceCollectionImportDto()
-    );
+  async bulkImportResources(importResourcesFile, resourcesCollection) {
     let importedCount = 0;
 
-    const callbacks = resourcesCollection.resources.map((resourceEntity, index) => async() => {
+    const callbacks = resourcesCollection.items.map((resourceEntity, index) => async() => {
       try {
         const data = resourceEntity.toV4Dto({secrets: true});
         const contain = {permission: true, favorite: true, tags: true, folder: true};

@@ -13,6 +13,7 @@
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
 import TotpEntity from "../../../entity/totp/totpEntity";
+import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 
 class CsvKdbxRowParser extends AbstractCsvRowParser {
   /**
@@ -50,7 +51,7 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
         }
       }
     }
-    const resourceType = this.parseResourceType(externalResourceDto, resourceTypesCollection, metadataTypesSettings);
+    const resourceType = ResourcesTypeImportParser.parseResourceType(externalResourceDto, resourceTypesCollection, metadataTypesSettings);
     if (resourceType) {
       externalResourceDto.resource_type_id = resourceType.id;
     }

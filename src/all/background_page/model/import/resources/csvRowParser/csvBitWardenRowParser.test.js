@@ -16,8 +16,9 @@ import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 
 describe("CsvBitWardenRowParser", () => {
   it("can parse BitWarden csv", () => {
@@ -40,7 +41,7 @@ describe("CsvBitWardenRowParser", () => {
     expect(CsvBitWardenRowParser.canParse(fields)).toEqual(2);
   });
 
-  it("parses legacy resource from csv row with all available properties <V4>", () => {
+  it("parses resource of type password-with-description with all properties from csv row", () => {
     expect.assertions(2);
 
     const data = {
@@ -53,7 +54,37 @@ describe("CsvBitWardenRowParser", () => {
     };
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
-    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.login_username,
+      uri: data.login_uri,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.login_password,
+      description: data.notes,
+      folder_parent_path: data.folder,
+    });
+
+    const externalResourceEntity = CsvBitWardenRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type default-v5 with all properties from csv row", () => {
+    expect.assertions(2);
+
+    const data = {
+      "name": "Password 1",
+      "login_username": "Username 1",
+      "login_uri": "https://url1.com",
+      "login_password": "Secret 1",
+      "notes": "Description 1",
+      "folder": "Folder 1"
+    };
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.login_username,

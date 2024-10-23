@@ -15,6 +15,7 @@ import Pagemod from "./pagemod";
 import {InformMenuEvents} from "../event/informMenuEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import {AccountEvents} from "../event/accountEvents";
 
 class InFormMenu extends Pagemod {
   /**
@@ -29,7 +30,7 @@ class InFormMenu extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [InformMenuEvents];
+    return [InformMenuEvents, AccountEvents];
   }
 
   /**

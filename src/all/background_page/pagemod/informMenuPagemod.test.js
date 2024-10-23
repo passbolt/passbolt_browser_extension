@@ -17,8 +17,10 @@ import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import {AccountEvents} from "../event/accountEvents";
 
 jest.spyOn(InformMenuEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
 
 describe("InFormMenu", () => {
   beforeEach(async() => {
@@ -29,7 +31,7 @@ describe("InFormMenu", () => {
 
   describe("InformMenu::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(4);
+      expect.assertions(5);
       // data mocked
       const port = {
         _port: {
@@ -51,7 +53,8 @@ describe("InFormMenu", () => {
       await InformMenu.attachEvents(port);
       // expectations
       expect(InformMenuEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformMenu.appName}, apiClientOptions, mockedAccount);
-      expect(InformMenu.events).toStrictEqual([InformMenuEvents]);
+      expect(AccountEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformMenu.appName}, apiClientOptions, mockedAccount);
+      expect(InformMenu.events).toStrictEqual([InformMenuEvents, AccountEvents]);
       expect(InformMenu.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(InformMenu.appName).toBe('InFormMenu');
     });

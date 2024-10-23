@@ -62,9 +62,16 @@ class ResourceCreateService {
     const resourceType = resourceTypes.getFirstById(resource.resourceTypeId);
     // Keep a copy of the metadata. It will be used after creation on the API, to persist it decrypted into the local storage.
     const resourceMetadata = resource.metadata;
-
+    // Get private key decrypted to encrypt data
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    const permissionChanges = await this.calculatePermissionsChanges(resource);
+    let permissionChanges = new PermissionChangesCollection([]);
+    let destinationFolder;
+    if (resource.folderParentId) {
+      destinationFolder = await this.folderModel.findForShare(resource.folderParentId);
+      if (destinationFolder.permissions.length > 1 || destinationFolder.permissions.items[0].aroForeignKey !== this.account.userId) {
+        permissionChanges = destinationFolder.permissions;
+      }
+    }
     this.updateGoals(resourceType.isV5(), permissionChanges.length);
     await this.encryptMetadata(resource, resourceType, permissionChanges, passphrase);
     await this.buildAndEncryptUserSecret(resource, secretDto, privateKey);
@@ -74,26 +81,11 @@ class ResourceCreateService {
       createdResource.metadata = resourceMetadata;
     }
     await ResourceLocalStorage.addResource(createdResource);
-    await this.share(resource, privateKey, permissionChanges);
+    // Share the resource with the metadata decrypted
+    await this.share(createdResource, privateKey, destinationFolder);
+    return createdResource;
   }
 
-  /**
-   * Calculate resource creation share permission changes.
-   * Whenever a resource is created into a folder, its creation will be followed by a share operation
-   *
-   * @param {ResourceEntity} resource The resource
-   * @returns {Promise<PermissionChangesCollection>}
-   * @private
-   */
-  async calculatePermissionsChanges(resource) {
-    if (!resource.folderParentId) {
-      return new PermissionChangesCollection([]);
-    }
-
-    await this.progressService.finishStep(i18n.t('Calculate permissions'), true);
-    const destinationFolder = await this.folderModel.findForShare(resource.folderParentId);
-    return this.resourceModel.calculatePermissionsChangesForCreate(resource, destinationFolder);
-  }
 
   /**
    * Save the resource on the API.
@@ -136,14 +128,18 @@ class ResourceCreateService {
    *
    * @param {ResourceEntity} resource The resource to share.
    * @param {openpgp.PrivateKey} privateKey The user decrypted private key
-   * @param {PermissionChangesCollection} permissionChanges The permission changes collection
+   * @param {FolderEntity} folder The folder entity
    * @returns {Promise<void>}
    * @private
    */
-  async share(resource, privateKey, permissionChanges) {
-    if (!permissionChanges.length) {
+  async share(resource, privateKey, folder) {
+    if (!folder) {
       return;
     }
+    // Calculate resource creation share permission changes.
+    await this.progressService.finishStep(i18n.t('Calculate permissions'), true);
+    // Whenever a resource is created into a folder, its creation will be followed by a share operation
+    const permissionChanges = await this.resourceModel.calculatePermissionsChangesForCreate(resource, folder);
 
     await this.progressService?.finishStep(i18n.t('Synchronizing keys'), true);
     await this.keyring.sync();

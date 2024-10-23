@@ -44,7 +44,6 @@ class DecryptMetadataService {
    */
   async decryptAllFromForeignModels(collection, passphrase = null, options = {ignoreDecryptionError: false}) {
     assertAnyTypeOf(collection, [ResourcesCollection, FoldersCollection], "The given collection is neither a ResourcesCollection nor a FoldersCollection");
-
     await this.decryptAllFromForeignModelsWithSharedKey(collection, options);
     await this.decryptAllFromForeignModelsWithUserKey(collection, passphrase, options);
     collection.items.forEach(entity => {

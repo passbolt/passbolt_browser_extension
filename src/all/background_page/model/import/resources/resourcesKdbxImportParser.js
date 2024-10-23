@@ -15,6 +15,7 @@ import ExternalResourceEntity from "../../entity/resource/external/externalResou
 import ImportError from "../../../error/importError";
 import * as kdbxweb from 'kdbxweb';
 import TotpEntity from "../../entity/totp/totpEntity";
+import ResourcesTypeImportParser from "./resourcesTypeImportParser";
 
 class ResourcesKdbxImportParser {
   /**
@@ -141,7 +142,7 @@ class ResourcesKdbxImportParser {
       }
 
       // @todo pebble
-      const resourceType = this.parseResourceType(externalResourceDto, this.resourceTypesCollection, this.metadataTypesSettings);
+      const resourceType = ResourcesTypeImportParser.parseResourceType(externalResourceDto, this.resourceTypesCollection, this.metadataTypesSettings);
       if (resourceType) {
         externalResourceDto.resource_type_id = resourceType.id;
       }
@@ -172,30 +173,6 @@ class ResourcesKdbxImportParser {
       return totp.toDto();
     }
   }
-
-  /**
-   * Parse the resource type id
-   * @param {object} externalResourceDto the csv row data
-   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
-   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
-   * @returns {ResourceTypeEntity}
-   */
-  parseResourceType(externalResourceDto, resourceTypesCollection, metadataTypesSettings) {
-    //Filter resource collection based on defaultResourceTypes settings
-    resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
-    const scores = this.getScores(externalResourceDto, resourceTypesCollection);
-
-    const matchedResourceType = scores
-      .filter(score => score.value > 0)              // Supports at least one parsed property
-      .filter(score => score.hasRequiredFields)      // Meets all required properties
-      .sort((a, b) => b.value - a.value)[0];         // Supports the highest number of properties
-
-    if (!matchedResourceType) {
-      throw new Error("No resource type associated to this row.");
-    }
-    return resourceTypesCollection.getFirst('slug', matchedResourceType.slug);
-  }
-
 
   /**
    * Get scores for each resources based on the resourceTypes

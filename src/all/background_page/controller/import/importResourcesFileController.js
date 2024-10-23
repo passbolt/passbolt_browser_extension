@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import ImportResourcesFileEntity from "../../model/entity/import/importResourcesFileEntity";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
@@ -65,14 +64,13 @@ class ImportResourcesFileController {
     }
     //assert file type
     assertBase64String(file);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
 
     this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t('Initialize'));
     await this.progressService.finishStep(null, true);
     try {
-      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-      const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
       const importEntity = ImportResourcesFileEntity.buildImportEntity(fileType, file, options);
-      const importedFile = await this.importResourcesService.importFile(importEntity, privateKey);
+      const importedFile = await this.importResourcesService.importFile(importEntity, passphrase);
       return importedFile;
     } finally {
       await this.progressService.close();

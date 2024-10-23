@@ -46,7 +46,6 @@ class MetadataKeysApiService extends AbstractService {
    */
   async findAll(contains = {}) {
     assertType(contains, Object, 'The given contains is not an Object');
-
     contains = contains ? this.formatContainOptions(contains, MetadataKeysApiService.getSupportedContainOptions()) : null;
 
     const options = {...contains};

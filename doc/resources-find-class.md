@@ -82,7 +82,7 @@ classDiagram
         }
 
         class ImportResourcesService {
-            +importFile(ImportResourcesFileEntity import) Promise~ImportResourcesFileEntity~
+            +importFile(ImportResourcesFileEntity import, string passphrase) Promise~ImportResourcesFileEntity~
         }
 
         class UpdateResourceService {

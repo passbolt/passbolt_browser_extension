@@ -15,7 +15,8 @@ import CsvKdbxRowParser from "./csvKdbxRowParser";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 
 describe("CsvKdbxRowParser", () => {
   it("can parse kdbx csv", () => {
@@ -51,7 +52,38 @@ describe("CsvKdbxRowParser", () => {
 
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
-    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-and-description");
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.Title,
+      username: data.Username,
+      uri: data.URL,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.Password,
+      description: data.Notes,
+      folder_parent_path: data.Group,
+    });
+
+    const externalResourceEntity = CsvKdbxRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type v5-default with all properties from csv row", () => {
+    expect.assertions(2);
+
+    const data = {
+      "Title": "Password 1",
+      "Username": "Username 1",
+      "URL": "https://url1.com",
+      "Password": "Secret 1",
+      "Notes": "Description 1",
+      "Group": "Folder 1"
+    };
+
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
     const expectedEntity = new ExternalResourceEntity({
       name: data.Title,
       username: data.Username,
@@ -82,7 +114,44 @@ describe("CsvKdbxRowParser", () => {
 
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
-    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === "password-description-totp");
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.Title,
+      username: data.Username,
+      uri: data.URL,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.Password,
+      description: data.Notes,
+      folder_parent_path: data.Group,
+      totp: {
+        period: 30,
+        digits: 6,
+        algorithm: "SHA1",
+        secret_key: "TJSNMLGTCYOEMXZG"
+      }
+    });
+
+    const externalResourceEntity = CsvKdbxRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type v5-default-with-totp with all properties from csv row", () => {
+    expect.assertions(2);
+    const data = {
+      "Title": "Password 1",
+      "Username": "Username 1",
+      "URL": "https://url1.com",
+      "Password": "Secret 1",
+      "Notes": "Description 1",
+      "TOTP": "otpauth://totp/test.com%20%3A%20admin%40passbolt.com:admin%40passbolt.com?secret=TJSNMLGTCYOEMXZG&period=30&digits=6&issuer=test.com%20%3A%20admin%40passbolt.com",
+      "Group": "Folder 1"
+    };
+
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
     const expectedEntity = new ExternalResourceEntity({
       name: data.Title,
       username: data.Username,
@@ -108,7 +177,7 @@ describe("CsvKdbxRowParser", () => {
   it("parses resource from csv raise an error if totp entity is not valid", () => {
     expect.assertions(1);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
-    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
     const data = {
       "Title": "Password 1",

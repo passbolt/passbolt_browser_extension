@@ -21,9 +21,10 @@ async function main() {
   const portname = query.get('passbolt');
   const port = new Port(portname);
   await port.connect();
+  const storage = browser.storage;
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
-  ReactDOM.render(React.createElement(ExtInFormMenu, {port: port}), domContainer);
+  ReactDOM.render(React.createElement(ExtInFormMenu, {port: port, storage: storage}), domContainer);
 }
 
 main();

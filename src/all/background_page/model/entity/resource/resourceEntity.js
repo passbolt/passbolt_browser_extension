@@ -328,10 +328,10 @@ class ResourceEntity extends EntityV2 {
 
   /**
    * Get the metadata key type
-   * @returns {string}
+   * @returns {string|null}
    */
   get metadataKeyType() {
-    return this._props.metadata_key_type;
+    return this._props.metadata_key_type || null;
   }
 
   /*

@@ -21,6 +21,8 @@ import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {assertAnyTypeOf} from "../../utils/assertions";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService";
+import FoldersCollection from '../../model/entity/folder/foldersCollection';
+import ResourcesCollection from '../../model/entity/resource/resourcesCollection';
 
 class EncryptMetadataKeysService {
   /**
@@ -72,6 +74,84 @@ class EncryptMetadataKeysService {
   }
 
   /**
+   * Encrypts a collection.
+   *
+   * @param {ResourcesCollection|FoldersCollection} collection the collection to encrypt.
+   * @param {string} [passphrase = null] The passphrase to use to decrypt the user private key.
+   * @returns {Promise<void>}
+   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
+   * @throws {Error} if metadata key cannot be retrieved.
+   * @throws {Error} if metadata is already encrypted.
+   */
+  async encryptAllFromForeignModels(collection, passphrase = null) {
+    assertAnyTypeOf(collection, [ResourcesCollection, FoldersCollection], "The given data type is not a ResourcesCollection or a FoldersCollection");
+
+    // Fail if collection has already some encrypted metadata.
+    if (collection.items.some(resourceEntity => !resourceEntity.isMetadataDecrypted())) {
+      throw new Error("Unable to encrypt the collection metadata, a resource metadata is already encrypted.");
+    }
+
+    const canUsePersonalKeys = await this.allowUsageOfPersonalKeys();
+    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+
+    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+
+    if (canUsePersonalKeys) {
+      await this.encryptAllFromForeignModelsWithUserKey(collection, userDecryptedPrivateKey);
+    }
+    await this.encryptAllFromForeignModelsWithSharedKey(collection, userDecryptedPrivateKey);
+  }
+
+  /**
+   * Encrypt the metadata of all entities in the collection with the shared metadata key, and
+   * mutates the entities with the encrypted metadata.
+   *
+   * @param {ResourcesCollection|FoldersCollection} collection the collection to run metadata encryption on.
+   * @param {openpgp.PrivateKey} userDecryptedPrivateKey The user decrypted private key
+   * @returns {Promise<void>}
+   */
+  async encryptAllFromForeignModelsWithSharedKey(collection, userDecryptedPrivateKey) {
+    const {metadataKeyId, metadataPublicKey, metadataPrivateKey} = await this.getLatestMetadataKeysAndId();
+
+    for (const entity of collection) {
+      // Already encrypted with the user private key, nothing to do.
+      if (!entity.isMetadataDecrypted()) {
+        continue;
+      }
+
+      const serializedMetadata = JSON.stringify(entity.metadata.toDto());
+      const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, metadataPublicKey, [userDecryptedPrivateKey, metadataPrivateKey]);
+      entity.metadataKeyId = metadataKeyId;
+      entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
+      entity.metadata = encryptedMetadata;
+    }
+  }
+
+  /**
+   * Encrypt the metadata of all entities in the collection with the user's private key, and
+   * mutates the entities with the encrypted metadata.
+   * @param {ResourcesCollection|FoldersCollection} collection the collection to run metadata decryption on.
+   * @param {openpgp.PrivateKey} userDecryptedPrivateKey The user decrypted user private key
+   * @returns {Promise<void>}
+   */
+  async encryptAllFromForeignModelsWithUserKey(collection, userDecryptedPrivateKey) {
+    const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
+
+    for (const entity of collection) {
+      if (!entity.isPersonal()) {
+        continue;
+      }
+
+      const serializedMetadata = JSON.stringify(entity.metadata.toDto());
+      const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [userDecryptedPrivateKey]);
+      entity._props.metadata_key_id = null;
+      entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
+      entity.metadata = encryptedMetadata;
+    }
+  }
+
+
+  /**
    * Retrieve the id and keys from latest metadataKeysCollection.
    *
    * @returns {Promise<{id: string, metadataPublicKey: openpgp.PublicKey, metadataPrivateKey: openpgp.PrivateKey>}
@@ -80,6 +160,7 @@ class EncryptMetadataKeysService {
   async getLatestMetadataKeysAndId() {
     const metadataKeysCollection = await this.getOrFindMetadataKeysService.getOrFindAll();
     const metadataKeyEntity = metadataKeysCollection.getFirstByLatestCreated();
+
     if (metadataKeyEntity === null) {
       throw new Error("Unable to encrypt the entity metadata, no metadata key found.");
     }

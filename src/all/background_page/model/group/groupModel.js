@@ -34,7 +34,7 @@ class GroupModel {
   /**
    * Update the groups local storage with the latest API
    *
-   * @return {GroupsCollection}
+   * @return {Promise<GroupsCollection>}
    * @public
    */
   async updateLocalStorage() {
@@ -54,7 +54,7 @@ class GroupModel {
    * Get a group by id
    *
    * @param {string} groupId The group id
-   * @return {GroupEntity}
+   * @return {Promise<GroupEntity>}
    */
   async getById(groupId) {
     const localGroup = await GroupLocalStorage.getGroupById(groupId);

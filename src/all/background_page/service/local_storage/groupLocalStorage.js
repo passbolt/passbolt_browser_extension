@@ -47,7 +47,7 @@ class GroupLocalStorage {
    * Set the groups local storage.
    *
    * @param {GroupsCollection} groupsCollection The groups to insert in the local storage.
-   * @return {void}
+   * @return {Promise<void>}
    */
   static async set(groupsCollection) {
     await lock.acquire();

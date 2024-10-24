@@ -217,7 +217,6 @@ class ShareResourceService {
     return secretsSerialized;
   }
 
-
   /**
    * Retrieve and read the user public keys.
    * @param {NeededSecretsCollection} neededSecrets The needed secrets

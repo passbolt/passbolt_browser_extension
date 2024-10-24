@@ -174,7 +174,7 @@ describe("ImportResourcesService", () => {
         const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
 
         importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
-          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData))
+          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData()))
         }));
 
         const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
@@ -244,7 +244,7 @@ describe("ImportResourcesService", () => {
         const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
 
         importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
-          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData))
+          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData()))
         }));
 
         const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
@@ -278,7 +278,7 @@ describe("ImportResourcesService", () => {
         jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => []);
 
         importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
-          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData))
+          file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData()))
         }));
 
         const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);

@@ -561,13 +561,13 @@ describe("ImportResourcesFileController", () => {
       each([
         {
           scenario: "keypass",
-          file: defaultKDBXCSVData,
+          file: defaultKDBXCSVData(),
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG
         },
         {
           scenario: "keypass",
-          file: defaultKDBXCSVData,
+          file: defaultKDBXCSVData(),
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG
         },
@@ -646,6 +646,18 @@ describe("ImportResourcesFileController", () => {
 
       await controller.exec("csv", file);
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
+    });
+
+    it("[performance] should ensure performance adding large dataset remains effective", async() => {
+      const linesCount = 100;
+      const defaultCsvDataFile = defaultKDBXCSVData(linesCount);
+      const file = btoa(BinaryConvert.toBinary(defaultCsvDataFile));
+
+      const start = performance.now();
+      const result = await controller.exec("csv", file);
+      const time = performance.now() - start;
+      expect(result.importResources.items).toHaveLength(linesCount);
+      expect(time).toBeLessThan(2000);
     });
   });
 });

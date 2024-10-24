@@ -21,11 +21,19 @@ export const defaultCsvData = [
   "Password 2,Username 2,https://url1.com,Password 2,Description 2,Folder",
 ].join("\n");
 
-export const defaultKDBXCSVData = [
-  "Title,Username,URL,Password,Notes,Group,TOTP",
-  "Password 1,Username 1,https://url1.com,Secret 1,Description 1,Folder 1,otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"
-].join("\n");
 
+export const defaultKDBXCSVData = (lineCount = 1) => {
+  const header = "Title,Username,URL,Password,Notes,Group,TOTP";
+
+  const lines = [];
+
+  for (let i = 1; i <= lineCount; i++) {
+    const line = `Password ${i},Username ${i},https://url${i}.com,Secret ${i},Description ${i},Folder ${i},otpauth://totp/Password%20${i}%3AUsername%20${i}?secret=THISISASECRET&issuer=https%253A%252F%252Furl${i}.com&algorithm=SHA1&digits=6&period=30`;
+    lines.push(line);
+  }
+
+  return [header, ...lines].join("\n");
+};
 
 export const defaultImportResourceFileCSVDto = (data = {}) => ({
   ref: "import-ref",

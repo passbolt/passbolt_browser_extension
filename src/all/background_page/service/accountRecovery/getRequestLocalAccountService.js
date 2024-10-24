@@ -21,7 +21,7 @@ class GetRequestLocalAccountService {
   /**
    * Get account recovery temporary account matching continue url.
    * @param {string} continueUrl The account recovery url.
-   * @return {Promise<AccountAccountRecoveryEntity|void>}
+   * @return {Promise<AccountAccountRecoveryEntity>}
    * @throw {Error} if cannot parse the account recovery continue url.
    * @throw {Error} if no account found for the given user in the local storage.
    * @throw {Error} if the account found in the local storage does not match the account recovery request url parameters.

@@ -17,9 +17,10 @@
   "Decrypting {{counter}}/{{total}}": "{{counter}}/{{total}} を復号中",
   "Done": "完了",
   "Done!": "完了!",
-  "Encrypting": "暗号化",
   "Encrypting {{counter}}/{{total}}": "{{counter}}/{{total}} を暗号化中",
+  "Encrypting Metadata": "Encrypting Metadata",
   "Encrypting secret": "秘密の暗号化",
+  "Encrypting Secret": "Encrypting Secret",
   "Expiry date will be updated on {{count}} resource._one": "Expiry date will be updated on {{count}} resource.",
   "Expiry date will be updated on {{count}} resource._other": "Expiry date will be updated on {{count}} resources.",
   "Exporting ...": "エクスポート中...",
@@ -90,6 +91,7 @@
   "Updating group ...": "グループを更新中...",
   "Updating password": "パスワードを更新中",
   "Updating resource": "リソースの更新",
+  "Updating resources metadata {{counter}}/{{total}}": "Updating resources metadata {{counter}}/{{total}}",
   "Updating users' key...": "Updating users' key...",
   "You have already started the process on another tab.": "You have already started the process on another tab."
 }

@@ -17,9 +17,10 @@
   "Decrypting {{counter}}/{{total}}": "복호화 중 {{counter}}/{{total}}",
   "Done": "완료",
   "Done!": "완료!",
-  "Encrypting": "암호화 중",
   "Encrypting {{counter}}/{{total}}": "암호화 중 {{counter}}/{{total}}",
+  "Encrypting Metadata": "Encrypting Metadata",
   "Encrypting secret": "비밀번호 암호화 중",
+  "Encrypting Secret": "Encrypting Secret",
   "Expiry date will be updated on {{count}} resource._one": "만료일이 {{count}} 개의 리소스에 업데이트됩니다.",
   "Expiry date will be updated on {{count}} resource._other": "만료일이 {{count}} 개의 리소스에 업데이트됩니다.",
   "Exporting ...": "내보기 중...",
@@ -90,6 +91,7 @@
   "Updating group ...": "그룹 업데이트 중 ...",
   "Updating password": "암호 업데이트 중",
   "Updating resource": "리소스 업데이트 중",
+  "Updating resources metadata {{counter}}/{{total}}": "Updating resources metadata {{counter}}/{{total}}",
   "Updating users' key...": "사용자 키를 업데이트하는 중...",
   "You have already started the process on another tab.": "이미 다른 탭에서 프로세스를 시작했습니다."
 }

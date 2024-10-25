@@ -17,9 +17,10 @@
   "Decrypting {{counter}}/{{total}}": "Ontsleutelen van {{counter}}/{{total}}",
   "Done": "Klaar",
   "Done!": "Klaar!",
-  "Encrypting": "Versleutelen",
   "Encrypting {{counter}}/{{total}}": "Versleutelen {{counter}}/{{total}}",
+  "Encrypting Metadata": "Encrypting Metadata",
   "Encrypting secret": "Versleutelen van het geheim",
+  "Encrypting Secret": "Encrypting Secret",
   "Expiry date will be updated on {{count}} resource._one": "Expiry date will be updated on {{count}} resource.",
   "Expiry date will be updated on {{count}} resource._other": "Expiry date will be updated on {{count}} resources.",
   "Exporting ...": "Exporteren ...",
@@ -90,6 +91,7 @@
   "Updating group ...": "Groep bijwerken ...",
   "Updating password": "Wachtwoord wordt bijgewerkt",
   "Updating resource": "Middel bijwerken",
+  "Updating resources metadata {{counter}}/{{total}}": "Updating resources metadata {{counter}}/{{total}}",
   "Updating users' key...": "Gebruikerssleutel wordt bijgewerkt...",
   "You have already started the process on another tab.": "You have already started the process on another tab."
 }

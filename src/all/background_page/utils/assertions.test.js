@@ -24,6 +24,9 @@ import {
   assertType,
   assertNumber,
   assertArrayUUID,
+  assertAnyTypeOf,
+  assertArray,
+  assertNonEmptyArray,
 } from "./assertions";
 import {v4 as uuid} from 'uuid';
 import GenerateSsoIvService from "../service/crypto/generateSsoIvService";
@@ -31,6 +34,9 @@ import {buildMockedCryptoKey} from "./assertions.test.data";
 import PasswordGeneratorSettingsEntity from "../model/entity/passwordPolicies/passwordGeneratorSettingsEntity";
 import {defaultAccountRecoveryPrivateKeyPasswordDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
 import AccountRecoveryPrivateKeyEntity from "../model/entity/accountRecovery/accountRecoveryPrivateKeyEntity";
+import ResourceEntity from "../model/entity/resource/resourceEntity";
+import FolderEntity from "../model/entity/folder/folderEntity";
+import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 
 describe("Assertions", () => {
   describe("Assertions::assertUuid", () => {
@@ -238,6 +244,20 @@ describe("Assertions", () => {
     });
   });
 
+  describe("Assertions::assertAnyTypeOf", () => {
+    it("Should not throw an error if the parameter is of one of the expected type", () => {
+      expect.assertions(1);
+      const entity = new FolderEntity(defaultFolderDto());
+      expect(() => assertAnyTypeOf(entity, [ResourceEntity, FolderEntity])).not.toThrow();
+    });
+
+    it("Should throw an error if the parameter is not valid", () => {
+      expect.assertions(1);
+      const entity = new AccountRecoveryPrivateKeyEntity(defaultAccountRecoveryPrivateKeyPasswordDto());
+      expect(() => assertAnyTypeOf(entity, [ResourceEntity, FolderEntity])).toThrow();
+    });
+  });
+
   describe("Assertions::assertNumber", () => {
     each([
       {scenario: "Positive number", value: 42},
@@ -266,6 +286,7 @@ describe("Assertions", () => {
       });
     });
   });
+
   describe("Assertions::assertArrayUUID", () => {
     each([
       {scenario: "Array of uuid", value: [uuid(), uuid()]},
@@ -286,6 +307,50 @@ describe("Assertions", () => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArrayUUID(props.value)).toThrow();
+      });
+    });
+  });
+
+  describe("Assertions:assertArray", () => {
+    each([
+      {scenario: "Array", value: [false, true, 42, "42", {}, []]},
+      {scenario: "Empty array", value: []},
+    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertArray(props.value)).not.toThrow();
+      });
+    });
+
+    each([
+      {scenario: "object", value: {}},
+      {scenario: "null", value: null},
+    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertArray(props.value)).toThrow();
+      });
+    });
+  });
+
+  describe("Assertions:assertNonEmptyArray", () => {
+    each([
+      {scenario: "Array", value: [false, true, 42, "42", {}, []]},
+    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertNonEmptyArray(props.value)).not.toThrow();
+      });
+    });
+
+    each([
+      {scenario: "object", value: {}},
+      {scenario: "null", value: null},
+      {scenario: "Empty array", value: []},
+    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertNonEmptyArray(props.value)).toThrow();
       });
     });
   });

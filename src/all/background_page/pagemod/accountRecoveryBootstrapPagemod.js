@@ -15,6 +15,7 @@ import Pagemod from "./pagemod";
 import {PortEvents} from "../event/portEvents";
 import ParseAccountRecoveryUrlService
   from "../service/accountRecovery/parseAccountRecoveryUrlService";
+import GetRequestLocalAccountService from "../service/accountRecovery/getRequestLocalAccountService";
 
 class AccountRecoveryBootstrap extends Pagemod {
   /**
@@ -54,7 +55,8 @@ class AccountRecoveryBootstrap extends Pagemod {
    */
   async canBeAttachedTo(frameDetails) {
     return this.assertTopFrameAttachConstraint(frameDetails)
-      && this.assertUrlAttachConstraint(frameDetails);
+      && this.assertUrlAttachConstraint(frameDetails)
+      && this.assertAccountInLocalStorage(frameDetails);
   }
 
   /**
@@ -73,6 +75,20 @@ class AccountRecoveryBootstrap extends Pagemod {
    */
   assertUrlAttachConstraint(frameDetails) {
     return ParseAccountRecoveryUrlService.test(frameDetails.url);
+  }
+
+  /**
+   * Assert that the account is in the local storage.
+   * @param {Object} frameDetails
+   * @returns {Promise<boolean>}
+   */
+  async assertAccountInLocalStorage(frameDetails) {
+    try {
+      return Boolean(await GetRequestLocalAccountService.getAccountMatchingContinueUrl(frameDetails.url));
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 }
 

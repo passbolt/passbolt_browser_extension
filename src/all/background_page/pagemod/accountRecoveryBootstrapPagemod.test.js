@@ -18,6 +18,8 @@ import each from "jest-each";
 import Pagemod from "./pagemod";
 import {PortEvents} from "../event/portEvents";
 import AccountRecoveryBootstrap from "./accountRecoveryBootstrapPagemod";
+import AccountLocalStorage from "../service/local_storage/accountLocalStorage";
+import {initialAccountAccountRecoveryDto} from "../model/entity/account/accountAccountRecoveryEntity.test.data";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -73,12 +75,60 @@ describe("AccountRecoveryBootstrap", () => {
   describe("AccountRecoveryBootstrap::canBeAttachedTo", () => {
     it(`Should be able to attach a pagemod to browser frame`, async() => {
       expect.assertions(1);
+      const account = initialAccountAccountRecoveryDto();
+      jest.spyOn(AccountLocalStorage, "getAccountByUserIdAndType").mockImplementationOnce(() => account);
+      const frameDetails = {
+        frameId: Pagemod.TOP_FRAME_ID,
+        url: `${account.domain}/account-recovery/continue/${account.user_id}/${account.authentication_token_token}`
+      };
+      const result = await AccountRecoveryBootstrap.canBeAttachedTo(frameDetails);
+      expect(result).toBeTruthy();
+    });
+
+    it(`Should not be able to attach a pagemod to browser frame if account is not in the local storage`, async() => {
+      expect.assertions(1);
       const frameDetails = {
         frameId: Pagemod.TOP_FRAME_ID,
         url: "https://passbolt.dev/account-recovery/continue/d57c10f5-639d-5160-9c81-8a0c6c4ec856/cb66b7ca-bb85-4088-b0da-c50f6f0c2a13"
       };
       const result = await AccountRecoveryBootstrap.canBeAttachedTo(frameDetails);
-      expect(result).toBeTruthy();
+      expect(result).toBeFalsy();
+    });
+
+    it(`Should not be able to attach a pagemod to browser frame if account domain does not match`, async() => {
+      expect.assertions(1);
+      const account = initialAccountAccountRecoveryDto();
+      jest.spyOn(AccountLocalStorage, "getAccountByUserIdAndType").mockImplementationOnce(() => account);
+      const frameDetails = {
+        frameId: Pagemod.TOP_FRAME_ID,
+        url: `https://passbolt.dev/account-recovery/continue/${account.user_id}/${account.authentication_token_token}`
+      };
+      const result = await AccountRecoveryBootstrap.canBeAttachedTo(frameDetails);
+      expect(result).toBeFalsy();
+    });
+
+    it(`Should not be able to attach a pagemod to browser frame if user id does not match`, async() => {
+      expect.assertions(1);
+      const account = initialAccountAccountRecoveryDto();
+      jest.spyOn(AccountLocalStorage, "getAccountByUserIdAndType").mockImplementationOnce(() => account);
+      const frameDetails = {
+        frameId: Pagemod.TOP_FRAME_ID,
+        url: `${account.domain}/account-recovery/continue/d57c10f5-639d-5160-9c81-8a0c6c4ec856/${account.authentication_token_token}`
+      };
+      const result = await AccountRecoveryBootstrap.canBeAttachedTo(frameDetails);
+      expect(result).toBeFalsy();
+    });
+
+    it(`Should not be able to attach a pagemod to browser frame if token does not match`, async() => {
+      expect.assertions(1);
+      const account = initialAccountAccountRecoveryDto();
+      jest.spyOn(AccountLocalStorage, "getAccountByUserIdAndType").mockImplementationOnce(() => account);
+      const frameDetails = {
+        frameId: Pagemod.TOP_FRAME_ID,
+        url: `${account.domain}/account-recovery/continue/${account.user_id}/cb66b7ca-bb85-4088-b0da-c50f6f0c2a13`
+      };
+      const result = await AccountRecoveryBootstrap.canBeAttachedTo(frameDetails);
+      expect(result).toBeFalsy();
     });
 
     each([

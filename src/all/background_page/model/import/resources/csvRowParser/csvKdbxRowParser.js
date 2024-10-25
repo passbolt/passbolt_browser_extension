@@ -12,11 +12,8 @@
  */
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
-import {
-  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
-  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG
-} from "../../../entity/resourceType/resourceTypeEntity";
 import TotpEntity from "../../../entity/totp/totpEntity";
+import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 
 class CsvKdbxRowParser extends AbstractCsvRowParser {
   /**
@@ -38,40 +35,27 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
   /**
    * Parse a csv row
    * @param {object} data the csv row data
-   * @param {ResourceTypesCollection?} resourceTypesCollection (Optional) The available resource types
+   * @param {ResourceTypesCollection} resourceTypesCollection (Optional) The available resource types
+   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
    * @returns {ExternalResourceEntity}
    */
-  static parse(data, resourceTypesCollection) {
+  static parse(data, resourceTypesCollection, metadataTypesSettings) {
     const externalResourceDto = {};
-    let resourceTypeSlug = RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG;
+
     for (const propertyName in this.mapping) {
       if (data[this.mapping[propertyName]]) {
-        if (propertyName === "totp") {
+        if (propertyName.toLowerCase() === "totp") {
           externalResourceDto.totp = this.parseTotp(data[this.mapping[propertyName]]);
-          resourceTypeSlug = RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG;
         } else {
           externalResourceDto[propertyName] = data[this.mapping[propertyName]];
         }
       }
     }
-    const resourceType = this.parseResourceType(resourceTypeSlug, resourceTypesCollection);
+    const resourceType = ResourcesTypeImportParser.parseResourceType(externalResourceDto, resourceTypesCollection, metadataTypesSettings);
     if (resourceType) {
       externalResourceDto.resource_type_id = resourceType.id;
     }
     return new ExternalResourceEntity(externalResourceDto);
-  }
-
-  /**
-   * Parse the resource type according to the resource type slug
-   * @param {string} resourceTypeSlug
-   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
-   * @returns {ResourceTypeEntity}
-   */
-  static parseResourceType(resourceTypeSlug, resourceTypesCollection) {
-    if (resourceTypesCollection) {
-      return resourceTypesCollection.getFirst('slug', resourceTypeSlug);
-    }
-    return null;
   }
 
   /**

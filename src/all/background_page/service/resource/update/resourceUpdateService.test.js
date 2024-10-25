@@ -31,7 +31,11 @@ import {
   adaExternalPublicGpgKeyEntityDto, adminExternalPublicGpgKeyEntityDto, bettyExternalPublicGpgKeyEntityDto
 } from "../../../model/entity/gpgkey/external/externalGpgKeyEntity.test.data";
 import {
-  TEST_RESOURCE_TYPE_PASSWORD_STRING
+  resourceTypePasswordAndDescriptionDto, resourceTypePasswordDescriptionTotpDto,
+  resourceTypePasswordStringDto, resourceTypeTotpDto, resourceTypeV5DefaultDto,
+  resourceTypeV5DefaultTotpDto, resourceTypeV5TotpDto, resourceTypeV5PasswordStringDto,
+  TEST_RESOURCE_TYPE_PASSWORD_STRING, TEST_RESOURCE_TYPE_V5_DEFAULT, TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP,
+  TEST_RESOURCE_TYPE_V5_TOTP, TEST_RESOURCE_TYPE_V5_PASSWORD_STRING
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import expect from "expect";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
@@ -39,6 +43,13 @@ import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../../crypto/decryptMessageService";
 import {plaintextSecretPasswordAndDescriptionDto, plaintextSecretPasswordDescriptionTotpDto, plaintextSecretPasswordStringDto, plaintextSecretTotpDto} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
+import ResourceTypeEntity from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity";
+import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
+import {
+  defaultDecryptedSharedMetadataKeysDtos
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
+import DecryptMetadataService from "../../metadata/decryptMetadataService";
+import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data.js";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -109,7 +120,7 @@ describe("ResourceUpdateService", () => {
       expect(resourceUpdateService.progressService.updateGoals).toHaveBeenCalledWith(6);
       expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledTimes(5);
       expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledWith('Synchronizing keyring', true);
-      expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledWith('Encrypting', true);
+      expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledWith('Encrypting Secret', true);
       expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledWith("Saving resource", true);
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledTimes(1);
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
@@ -119,9 +130,11 @@ describe("ResourceUpdateService", () => {
       expect.assertions(14);
 
       const resourceDto = defaultResourceDto();
+      const resourceTypeDto = resourceTypePasswordAndDescriptionDto();
       const plaintextDto = plaintextSecretPasswordAndDescriptionDto();
       const passphrase = pgpKeys.ada.passphrase;
       const entity = new ResourceEntity(resourceDto);
+      const resourceTypeEntity = new ResourceTypeEntity(resourceTypeDto);
       await ResourceLocalStorage.addResource(entity);
 
       jest.spyOn(EncryptMessageService, "encrypt");
@@ -158,7 +171,7 @@ describe("ResourceUpdateService", () => {
       expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
       expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(3);
       expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
-      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity));
+      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity), resourceTypeEntity, entity.metadata);
       expect(resourceUpdateService.resourceService.update).toHaveBeenCalledWith(entity.id, resourceUpdated, ResourceLocalStorage.DEFAULT_CONTAIN);
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
     });
@@ -167,9 +180,11 @@ describe("ResourceUpdateService", () => {
       expect.assertions(14);
 
       const resourceDto = defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_STRING});
+      const resourceTypeDto = resourceTypePasswordStringDto();
       const plaintextDto = plaintextSecretPasswordStringDto().password;
       const passphrase = pgpKeys.ada.passphrase;
       const entity = new ResourceEntity(resourceDto);
+      const resourceTypeEntity = new ResourceTypeEntity(resourceTypeDto);
       await ResourceLocalStorage.addResource(entity);
 
       jest.spyOn(EncryptMessageService, "encrypt");
@@ -206,7 +221,7 @@ describe("ResourceUpdateService", () => {
       expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
       expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(3);
       expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
-      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity));
+      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity), resourceTypeEntity, entity.metadata);
       expect(resourceUpdateService.resourceService.update).toHaveBeenCalledWith(entity.id, resourceUpdated, ResourceLocalStorage.DEFAULT_CONTAIN);
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
     });
@@ -215,9 +230,11 @@ describe("ResourceUpdateService", () => {
       expect.assertions(14);
 
       const resourceDto = resourceWithTotpDto();
+      const resourceTypeDto = resourceTypePasswordDescriptionTotpDto();
       const plaintextDto = plaintextSecretPasswordDescriptionTotpDto();
       const passphrase = pgpKeys.ada.passphrase;
       const entity = new ResourceEntity(resourceDto);
+      const resourceTypeEntity = new ResourceTypeEntity(resourceTypeDto);
       await ResourceLocalStorage.addResource(entity);
 
       jest.spyOn(EncryptMessageService, "encrypt");
@@ -254,7 +271,7 @@ describe("ResourceUpdateService", () => {
       expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
       expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(3);
       expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
-      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity));
+      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity), resourceTypeEntity, entity.metadata);
       expect(resourceUpdateService.resourceService.update).toHaveBeenCalledWith(entity.id, resourceUpdated, ResourceLocalStorage.DEFAULT_CONTAIN);
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
     });
@@ -263,9 +280,11 @@ describe("ResourceUpdateService", () => {
       expect.assertions(14);
 
       const resourceDto = resourceStandaloneTotpDto();
+      const resourceTypeDto = resourceTypeTotpDto();
       const plaintextDto = plaintextSecretTotpDto();
       const passphrase = pgpKeys.ada.passphrase;
       const entity = new ResourceEntity(resourceDto);
+      const resourceTypeEntity = new ResourceTypeEntity(resourceTypeDto);
       await ResourceLocalStorage.addResource(entity);
 
       jest.spyOn(EncryptMessageService, "encrypt");
@@ -302,7 +321,259 @@ describe("ResourceUpdateService", () => {
       expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
       expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(3);
       expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
-      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity));
+      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(entity), resourceTypeEntity, entity.metadata);
+      expect(resourceUpdateService.resourceService.update).toHaveBeenCalledWith(entity.id, resourceUpdated, ResourceLocalStorage.DEFAULT_CONTAIN);
+      expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
+    });
+
+    it("Should Update the resource with encrypted secrets (v5 default) and dto", async() => {
+      expect.assertions(16);
+
+      const resourceDto = defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT});
+      const resourceTypeDto = resourceTypeV5DefaultDto();
+      const plaintextDto = plaintextSecretPasswordAndDescriptionDto();
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
+      const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const passphrase = pgpKeys.ada.passphrase;
+      const entity = new ResourceEntity(resourceDto);
+      const resourceTypeEntity = new ResourceTypeEntity(resourceTypeDto);
+      await ResourceLocalStorage.addResource(entity);
+
+      jest.spyOn(EncryptMessageService, "encrypt");
+      jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
+      jest.spyOn(resourceUpdateService, "update");
+      jest.spyOn(resourceUpdateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      let resourceUpdated, resourceLocalStorageExpected;
+      jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
+        resourceUpdated = resourceDtoToUpdate;
+        const resourceEntity = new ResourceEntity(resourceDto);
+        resourceEntity.secrets = new ResourceSecretsCollection([resourceDtoToUpdate.secrets[0]]);
+        resourceEntity.metadataKeyId = resourceDtoToUpdate.metadata_key_id;
+        resourceEntity.metadataKeyType = resourceDtoToUpdate.metadata_key_type;
+        resourceLocalStorageExpected = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        resourceEntity.metadata = resourceDtoToUpdate.metadata;
+        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
+      jest.spyOn(ResourceLocalStorage, "updateResource");
+
+      await resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
+
+      // Get secrets from the resource updated sent to the API
+      const secretAda = resourceUpdated.secrets[0];
+      const secretAdaDecrypted =  await decryptSecret(secretAda.data, account.userPrivateArmoredKey, passphrase, resourceUpdated.resource_type_id);
+      const secretAdmin = resourceUpdated.secrets[1];
+      const secretAdminDecrypted =  await decryptSecret(secretAdmin.data, pgpKeys.admin.private, pgpKeys.admin.passphrase, resourceUpdated.resource_type_id);
+      const secretBetty = resourceUpdated.secrets[2];
+      const secretBettyDecrypted =  await decryptSecret(secretBetty.data, pgpKeys.betty.private, pgpKeys.betty.passphrase, resourceUpdated.resource_type_id);
+      // Decrypt metadata
+      const resourceEntityUpdated = new ResourceEntity(resourceUpdated);
+      expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
+      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(resourceEntityUpdated), resourceTypeEntity, entity.metadata);
+      await decryptMetadataService.decryptOneWithSharedKey(resourceEntityUpdated);
+
+      expect(resourceUpdated.secrets.length).toEqual(3);
+      expect(secretAda.user_id).toEqual(account.userId);
+      expect(JSON.parse(secretAdaDecrypted)).toEqual(plaintextDto);
+      expect(secretAdmin.user_id).toEqual(pgpKeys.admin.userId);
+      expect(JSON.parse(secretAdminDecrypted)).toEqual(plaintextDto);
+      expect(secretBetty.user_id).toEqual(pgpKeys.betty.userId);
+      expect(JSON.parse(secretBettyDecrypted)).toEqual(plaintextDto);
+      expect(resourceEntityUpdated.metadata).toEqual(entity.metadata);
+      expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledTimes(1);
+      expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
+      expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(4);
+      expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
+      expect(resourceUpdateService.resourceService.update).toHaveBeenCalledWith(entity.id, resourceUpdated, ResourceLocalStorage.DEFAULT_CONTAIN);
+      expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
+    });
+
+    it("Should Update the resource with encrypted secrets (v5 default totp) and dto", async() => {
+      expect.assertions(16);
+
+      const resourceDto = resourceWithTotpDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT_TOTP});
+      const resourceTypeDto = resourceTypeV5DefaultTotpDto();
+      const plaintextDto = plaintextSecretPasswordDescriptionTotpDto();
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
+      const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const passphrase = pgpKeys.ada.passphrase;
+      const entity = new ResourceEntity(resourceDto);
+      const resourceTypeEntity = new ResourceTypeEntity(resourceTypeDto);
+      await ResourceLocalStorage.addResource(entity);
+
+      jest.spyOn(EncryptMessageService, "encrypt");
+      jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
+      jest.spyOn(resourceUpdateService, "update");
+      jest.spyOn(resourceUpdateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      let resourceUpdated, resourceLocalStorageExpected;
+      jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
+        resourceUpdated = resourceDtoToUpdate;
+        const resourceEntity = new ResourceEntity(resourceDto);
+        resourceEntity.secrets = new ResourceSecretsCollection([resourceDtoToUpdate.secrets[0]]);
+        resourceEntity.metadataKeyId = resourceDtoToUpdate.metadata_key_id;
+        resourceEntity.metadataKeyType = resourceDtoToUpdate.metadata_key_type;
+        resourceLocalStorageExpected = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        resourceEntity.metadata = resourceDtoToUpdate.metadata;
+        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
+      jest.spyOn(ResourceLocalStorage, "updateResource");
+
+      await resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
+
+      // Get secrets from the resource updated sent to the API
+      const secretAda = resourceUpdated.secrets[0];
+      const secretAdaDecrypted =  await decryptSecret(secretAda.data, account.userPrivateArmoredKey, passphrase, resourceUpdated.resource_type_id);
+      const secretAdmin = resourceUpdated.secrets[1];
+      const secretAdminDecrypted =  await decryptSecret(secretAdmin.data, pgpKeys.admin.private, pgpKeys.admin.passphrase, resourceUpdated.resource_type_id);
+      const secretBetty = resourceUpdated.secrets[2];
+      const secretBettyDecrypted =  await decryptSecret(secretBetty.data, pgpKeys.betty.private, pgpKeys.betty.passphrase, resourceUpdated.resource_type_id);
+      // Decrypt metadata
+      const resourceEntityUpdated = new ResourceEntity(resourceUpdated);
+      expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
+      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(resourceEntityUpdated), resourceTypeEntity, entity.metadata);
+      await decryptMetadataService.decryptOneWithSharedKey(resourceEntityUpdated);
+
+      expect(resourceUpdated.secrets.length).toEqual(3);
+      expect(secretAda.user_id).toEqual(account.userId);
+      expect(JSON.parse(secretAdaDecrypted)).toEqual(plaintextDto);
+      expect(secretAdmin.user_id).toEqual(pgpKeys.admin.userId);
+      expect(JSON.parse(secretAdminDecrypted)).toEqual(plaintextDto);
+      expect(secretBetty.user_id).toEqual(pgpKeys.betty.userId);
+      expect(JSON.parse(secretBettyDecrypted)).toEqual(plaintextDto);
+      expect(resourceEntityUpdated.metadata).toEqual(entity.metadata);
+      expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledTimes(1);
+      expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
+      expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(4);
+      expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
+      expect(resourceUpdateService.resourceService.update).toHaveBeenCalledWith(entity.id, resourceUpdated, ResourceLocalStorage.DEFAULT_CONTAIN);
+      expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
+    });
+
+    it("Should Update the resource with encrypted secrets (v5 standalone totp) and dto", async() => {
+      expect.assertions(16);
+
+      const resourceDto = resourceStandaloneTotpDto({resource_type_id: TEST_RESOURCE_TYPE_V5_TOTP, metadata: defaultResourceMetadataDto({resource_type_id: TEST_RESOURCE_TYPE_V5_TOTP, username: null,}),});
+      const resourceTypeDto = resourceTypeV5TotpDto();
+      const plaintextDto = plaintextSecretTotpDto();
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
+      const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const passphrase = pgpKeys.ada.passphrase;
+      const entity = new ResourceEntity(resourceDto);
+      const resourceTypeEntity = new ResourceTypeEntity(resourceTypeDto);
+      await ResourceLocalStorage.addResource(entity);
+
+      jest.spyOn(EncryptMessageService, "encrypt");
+      jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
+      jest.spyOn(resourceUpdateService, "update");
+      jest.spyOn(resourceUpdateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      let resourceUpdated, resourceLocalStorageExpected;
+      jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
+        resourceUpdated = resourceDtoToUpdate;
+        const resourceEntity = new ResourceEntity(resourceDto);
+        resourceEntity.secrets = new ResourceSecretsCollection([resourceDtoToUpdate.secrets[0]]);
+        resourceEntity.metadataKeyId = resourceDtoToUpdate.metadata_key_id;
+        resourceEntity.metadataKeyType = resourceDtoToUpdate.metadata_key_type;
+        resourceLocalStorageExpected = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        resourceEntity.metadata = resourceDtoToUpdate.metadata;
+        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
+      jest.spyOn(ResourceLocalStorage, "updateResource");
+
+      await resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
+
+      // Get secrets from the resource updated sent to the API
+      const secretAda = resourceUpdated.secrets[0];
+      const secretAdaDecrypted =  await decryptSecret(secretAda.data, account.userPrivateArmoredKey, passphrase, resourceUpdated.resource_type_id);
+      const secretAdmin = resourceUpdated.secrets[1];
+      const secretAdminDecrypted =  await decryptSecret(secretAdmin.data, pgpKeys.admin.private, pgpKeys.admin.passphrase, resourceUpdated.resource_type_id);
+      const secretBetty = resourceUpdated.secrets[2];
+      const secretBettyDecrypted =  await decryptSecret(secretBetty.data, pgpKeys.betty.private, pgpKeys.betty.passphrase, resourceUpdated.resource_type_id);
+      // Decrypt metadata
+      const resourceEntityUpdated = new ResourceEntity(resourceUpdated);
+      expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
+      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(resourceEntityUpdated), resourceTypeEntity, entity.metadata);
+      await decryptMetadataService.decryptOneWithSharedKey(resourceEntityUpdated);
+
+      expect(resourceUpdated.secrets.length).toEqual(3);
+      expect(secretAda.user_id).toEqual(account.userId);
+      expect(JSON.parse(secretAdaDecrypted)).toEqual(plaintextDto);
+      expect(secretAdmin.user_id).toEqual(pgpKeys.admin.userId);
+      expect(JSON.parse(secretAdminDecrypted)).toEqual(plaintextDto);
+      expect(secretBetty.user_id).toEqual(pgpKeys.betty.userId);
+      expect(JSON.parse(secretBettyDecrypted)).toEqual(plaintextDto);
+      expect(resourceEntityUpdated.metadata).toEqual(entity.metadata);
+      expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledTimes(1);
+      expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
+      expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(4);
+      expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
+      expect(resourceUpdateService.resourceService.update).toHaveBeenCalledWith(entity.id, resourceUpdated, ResourceLocalStorage.DEFAULT_CONTAIN);
+      expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
+    });
+
+    it("Should Update the resource with encrypted secrets (v5 password string) and dto", async() => {
+      expect.assertions(16);
+
+      const resourceDto = defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_PASSWORD_STRING});
+      const resourceTypeDto = resourceTypeV5PasswordStringDto();
+      const plaintextDto = plaintextSecretPasswordStringDto().password;
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
+      const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const passphrase = pgpKeys.ada.passphrase;
+      const entity = new ResourceEntity(resourceDto);
+      const resourceTypeEntity = new ResourceTypeEntity(resourceTypeDto);
+      await ResourceLocalStorage.addResource(entity);
+
+      jest.spyOn(EncryptMessageService, "encrypt");
+      jest.spyOn(resourceUpdateService.resourceModel, "serializePlaintextDto");
+      jest.spyOn(resourceUpdateService, "update");
+      jest.spyOn(resourceUpdateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      let resourceUpdated, resourceLocalStorageExpected;
+      jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
+        resourceUpdated = resourceDtoToUpdate;
+        const resourceEntity = new ResourceEntity(resourceDto);
+        resourceEntity.secrets = new ResourceSecretsCollection([resourceDtoToUpdate.secrets[0]]);
+        resourceEntity.metadataKeyId = resourceDtoToUpdate.metadata_key_id;
+        resourceEntity.metadataKeyType = resourceDtoToUpdate.metadata_key_type;
+        resourceLocalStorageExpected = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        resourceEntity.metadata = resourceDtoToUpdate.metadata;
+        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
+      jest.spyOn(ResourceLocalStorage, "updateResource");
+
+      await resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
+
+      // Get secrets from the resource updated sent to the API
+      const secretAda = resourceUpdated.secrets[0];
+      const secretAdaDecrypted =  await decryptSecret(secretAda.data, account.userPrivateArmoredKey, passphrase, resourceUpdated.resource_type_id);
+      const secretAdmin = resourceUpdated.secrets[1];
+      const secretAdminDecrypted =  await decryptSecret(secretAdmin.data, pgpKeys.admin.private, pgpKeys.admin.passphrase, resourceUpdated.resource_type_id);
+      const secretBetty = resourceUpdated.secrets[2];
+      const secretBettyDecrypted =  await decryptSecret(secretBetty.data, pgpKeys.betty.private, pgpKeys.betty.passphrase, resourceUpdated.resource_type_id);
+      // Decrypt metadata
+      const resourceEntityUpdated = new ResourceEntity(resourceUpdated);
+      expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
+      expect(resourceUpdateService.update).toHaveBeenCalledWith(expect.objectContaining(resourceEntityUpdated), resourceTypeEntity, entity.metadata);
+      await decryptMetadataService.decryptOneWithSharedKey(resourceEntityUpdated);
+
+      expect(resourceUpdated.secrets.length).toEqual(3);
+      expect(secretAda.user_id).toEqual(account.userId);
+      expect(secretAdaDecrypted).toEqual(plaintextDto);
+      expect(secretAdmin.user_id).toEqual(pgpKeys.admin.userId);
+      expect(secretAdminDecrypted).toEqual(plaintextDto);
+      expect(secretBetty.user_id).toEqual(pgpKeys.betty.userId);
+      expect(secretBettyDecrypted).toEqual(plaintextDto);
+      expect(resourceEntityUpdated.metadata).toEqual(entity.metadata);
+      expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledTimes(1);
+      expect(resourceUpdateService.resourceModel.serializePlaintextDto).toHaveBeenCalledWith(entity.resourceTypeId, plaintextDto);
+      expect(EncryptMessageService.encrypt).toHaveBeenCalledTimes(4);
+      expect(resourceUpdateService.update).toHaveBeenCalledTimes(1);
       expect(resourceUpdateService.resourceService.update).toHaveBeenCalledWith(entity.id, resourceUpdated, ResourceLocalStorage.DEFAULT_CONTAIN);
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
     });

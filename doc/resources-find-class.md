@@ -1,5 +1,5 @@
 ```mermaid
-%%{init: {'theme':'neutral'}}%%
+%%{init: {'theme':'neutral', 'layout': 'elk', 'elk': {'mergeEdges': true, 'nodePlacementStrategy': 'LINEAR_SEGMENTS'}}}%%
 classDiagram
 
     namespace ResourcesNs {
@@ -8,9 +8,14 @@ classDiagram
     %% Resources controllers
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        class UpdateAllResourcesLocalStorageController{
-            event "passbolt.resources.update-local-storage"
-            +exec() Promise
+        class CreateResourceController{
+            event "passbolt.resources.create"
+            +exec(object resourceDto, object secretDto) Promise~ResourceEntity~
+        }
+
+        class ExportResourcesFileController {
+            event "passbolt.export-resources.export-to-file"
+            +exec(object exportResourcesFileDto) Promise~ResourcesCollection~
         }
 
         class FindAllIdsByIsSharedWithGroupController{
@@ -28,9 +33,9 @@ classDiagram
             +exec(Array~uuid~ resourceIds) Promise~ResourcesCollection~
         }
 
-        class ExportResourcesFileController {
-            event "passbolt.export-resources.export-to-file"
-            +exec(object exportResourcesFileDto) Promise~ResourcesCollection~
+        class ImportResourcesFileController {
+            event "passbolt.import-resources.import-file"
+            +exec(object ImportResourcesFileDto) Promise~ImportResourcesFileEntity~
         }
 
         class UpdateResourceController{
@@ -38,14 +43,18 @@ classDiagram
             +exec(object resourceDto, object secretDto) Promise~ResourceEntity~
         }
 
-        class CreateResourceController{
-            event "passbolt.resources.create"
-            +exec(object resourceDto, object secretDto) Promise~ResourceEntity~
+        class UpdateAllResourcesLocalStorageController{
+            event "passbolt.resources.update-local-storage"
+            +exec() Promise
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Resources services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class CreateResourceService {
+            +create(object resourceDto, object secretDto, string passphrase) Promise~ResourceEntity~
+        }
 
         class GetOrFindResourcesService {
             +getOrFindAll() Promise~ResourcesCollection~
@@ -57,7 +66,7 @@ classDiagram
         }
 
         class FindAndUpdateResourcesLocalStorageOptions {
-            updatePeriodThreshold: integer
+            updatePeriodThreshold integer
         }
 
         class FindResourcesService {
@@ -72,16 +81,16 @@ classDiagram
             +findOneByIdForDetails(string uuid) Promise~ResourceEntity~
         }
 
-        class UpdateResourceService {
-            +create(object resourceDto, object secretDto, string passphrase) Promise~ResourceEntity~
+        class ImportResourcesService {
+            +importFile(ImportResourcesFileEntity import, string passphrase) Promise~ImportResourcesFileEntity~
         }
 
-        class CreateResourceService {
-            +create(object resourceDto, object secretDto, string passphrase) Promise~ResourceEntity~
+        class UpdateResourceService {
+            +update(object resourceDto, object secretDto, string passphrase) Promise~ResourceEntity~
         }
 
         class ExecuteConcurrentlyService {
-            +execute(array callbacks, integer concurrency, object options): Promise~array~
+            +execute(array callbacks, integer concurrency, object options) Promise~array~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,32 +123,36 @@ classDiagram
     namespace MetadataNs {
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% MetadataNs services
+    %% Metadata controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class GetOrFindMetadataTypesSettingsController {
+            event "passbolt.metadata.get-or-find-metadata-types-settings"
+            +exec() Promise~MetdataTypesSettingsEntity~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Metadata services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class DecryptMetadataService {
-            +decryptOneFromForeignModel(Entity entity, ?string passphrase) Promise~Entity~
-            +decryptAllFromForeignModels(Collection collection, ?string passphrase, ?object options) Promise~Collection~
+            +decryptOneFromForeignModel(Entity entity, ?string passphrase) Promise
+            +decryptAllFromForeignModels(Collection collection, ?string passphrase, ?object options) Promise
+        }
+
+        class DecryptMetadataPrivateKeyService {
+            +decryptOne(MetadataPrivateKeyEntity entity, ?string passphrase) Promise
+            +decryptAll(MetadataPrivateKeyCollection collection, ?string passphrase) Promise
         }
 
         class EncryptMetadataService {
-            +encryptOneForForeignModel(Entity entity, ?string passphrase) Promise~Entity~
+            +encryptOneForForeignModel(Entity entity, ?string passphrase) Promise
+            +encryptAllForForeignModels(Collection collection, ?string passphrase) Promise
         }
 
-        class GetOrFindMetadataKeysService {
-            +getOrFindOneByIsLatest() Promise~MetadataKeyEntity~
-            +getOrFindOneById(uuid foreignKeyId) Promise~MetadataKeyEntity~
-            +getOrFindAllByIds(array~uuid~ foreignKeyIds) Promise~MetadataKeysCollection~
-        }
-
-        class FindAndUpdateMetadataKeysSessionStorageService {
-            +findAndUpdateAll(object contains, object filters) Promise~MetadataKeysCollection~
-        }
-
-        class FindMetadataKeysService {
-            +findAll(object contains, object filters) Promise~MetadataKeysCollection~
-            +findAllForSessionStorage() Promise~MetadataKeysCollection~
-        }
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Metadata Keys services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class DecryptMetadataKeyService {
             +decryptOne(MetadataPrivateKeyEntity entity, ?string passphrase) Promise~MetadataPrivateKeyEntity~
@@ -147,15 +160,72 @@ classDiagram
             +decryptAllFromMetdataKeysCollection(MetadataKeysCollection collection, ?string passphrase) Promise~MetadataKeysCollection~
         }
 
+        class FindAndUpdateMetadataKeysSessionStorageService {
+            +findAndUpdateAll(object contains, object filters) Promise~MetadataKeysCollection~
+        }
+
+        class FindMetadataKeysService {
+            +findAll(object contains) Promise~MetadataKeysCollection~
+            +findAllForSessionStorage() Promise~MetadataKeysCollection~
+        }
+
+        class GetOrFindMetadataKeysService {
+            +getOrFindAll() Promise~MetadataKeysCollection~
+%%            +getOrFindOneByIsLatest() Promise~MetadataKeyEntity~
+%%            +getOrFindOneById(uuid foreignKeyId) Promise~MetadataKeyEntity~
+%%            +getOrFindAllByIds(array~uuid~ foreignKeyIds) Promise~MetadataKeysCollection~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% MetadataNs models
+    %% Metadata Settings services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class FindAndUpdateMetadataSettingsService {
+            +findAndUpdateKeysSettings() Promise~MetadataKeysSettingsEntity~
+            +findAndUpdateTypesSettings() Promise~MetadataTypesSettingsEntity~
+        }
+
+        class FindMetadataSettingsService {
+            +findKeysSettings() Promise~MetadataKeysSettingsEntity~
+            +findTypesSettings() Promise~MetadataTypesSettingsEntity~
+        }
+
+        class GetOrFindMetadataSettingsService {
+            +getOrFindKeysSettings() Promise~MetadataKeysSettingsEntity~
+            +getOrFindTypesSettings() Promise~MetadataTypesSettingsEntity~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Metadata models
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class MetadataKeyApiService {
+            +findAll(object contains) Promise~array~
+        }
+
+        class MetadataKeysSettingsLocalStorage {
+            -$_runtimeCachedData object
+            +get() Promise~object~
+            +set(MetadataKeysSettingsEntity entity) Promise
+            +flush(AccountEntity account) Promise
+        }
 
         class MetadataKeysSessionStorageService {
         }
 
-        class MetadataKeyApiService {
-            +findAll(object contains, object filters) Promise~array~
+        class MetadataKeysSettingsApiService {
+            +findSettings() Promise~object~
+        }
+
+        class MetadataTypesSettingsApiService {
+            +findSettings() Promise~object~
+        }
+
+        class MetadataTypesSettingsLocalStorage {
+            -$_runtimeCachedData object
+            +get() Promise~object~
+            +set(MetadataTypesSettingsEntity entity) Promise
+            +flush(AccountEntity account) Promise
         }
     }
 
@@ -165,40 +235,142 @@ classDiagram
     %% SessionKeys services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+        class DecryptSessionKeysBundlesService {
+            +decryptOne(SessionKeysBundleEntity entity, ?string passphrase) Promise
+            +decryptAll(SessionKeysBundlesCollection collection, ?string passphrase) Promise
+        }
+
+        class EncryptSessionKeysBundlesService {
+            +encryptOne(SessionKeysBundleEntity entity, ?string passphrase) Promise
+        }
+
         class GetOrFindSessionKeysService {
-            +getOrFindOneByForeignKeyId(uuid foreignKeyId) Promise~SessionKeyEntity~
-            +getOrFindAllByForeignKeyIds(array~uuid~ foreignKeyIds) Promise~SessionKeysCollection~
+            +getOrFindAllBundles() Promise~SessionKeysBundlesCollection~
+            +getOrFindAllByForeignModelAndForeignIds(string foreignModel, array foreignIds): SessionKeysCollection
         }
 
-        class FindAndUpdateSessionKeysSessionStorageService {
-            +findAndUpdateAll(object contains, object filters) Promise~SessionKeysCollection~
+        class FindAndUpdateSessionKeysBundlesSessionStorageService {
+            +findAndUpdateAllBundles() Promise~SessionKeysBundlesCollection~
         }
 
-        class DecryptSessionKeysService {
-            +decrypt(string data) Promis~SessionsKeysCollection~
+        class FindSessionKeysService {
+            +findAllBundles() Promise~SessionKeysBundlesCollection~
+        }
+
+        class SaveSessionKeysService {
+            +save(SessionKeysCollection collection, ?string passphrase, ?boolean retry) Promise
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% SessionKeys models
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        class SessionKeysSessionStorageService {
+
+        class SessionKeysBundlesApiService {
+            +create(SessionKeysBundleEntity entity) Promise~object~
+            +delete(string entityId) Promise
+            +findAll() Promise~array~
+            +udpate(string entityId, SessionKeysBundleEntity entity) Promise~object~
         }
 
-        class SessionKeysLocalStorageService {
+        class SessionKeysBundlesSessionStorageService {
+            -$_runtimeCachedData object
+            +get() Promise~array~
+            +set(SessionKeysBundlesCollection collection) Promise
+            +flush(AccountEntity account) Promise
         }
     }
 
     namespace Auth-service {
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Auth services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class GetPassphraseService {
+            +getPassphrase(WorkerEntity worker) Promise~string~
+            +requestPassphraseFromQuickAccess() Promise~string~
+            +requestPassphrase(WorkerEntity worker) Promise~string~
+        }
+
         class PassphraseStorageService {
-            get() Promise~string~
+            +get() Promise~string~
         }
     }
 
     namespace EntityCollectionNs {
-        class ResourcesCollection {
-            +filterByDecryptedMetadata() void
-            +filterByResourceTypes(ResourceTypesCollection collection) void
-            +filterBySuggestResources(string url) void
+        class MetadataKeyEntity {
+            -uuid props.id
+            -string props.fingerprint
+            -string props.armored_key
+            -string props.created
+            -string props.created_by
+            -string props.modified
+            -string props.modified_by
+            -string props.deleted
+            +get metadataPrivateKeys() MetadataPrivateKeysCollection
+            +get created() string
+        }
+
+        class MetadataKeysCollection {
+            +getFirstByLatestCreated() MetadataKeyEntity
+            +hasDecryptedKeys() boolean
+            +hasEncryptedKeys() boolean
+        }
+
+        class MetadataPrivateKeyEntity {
+            -uuid props.id
+            -uuid props.metadata_key_id
+            -uuid props.user_id
+            -string props.data
+            -string props.armored_key
+            -string props.created
+            -string props.created_by
+            -string props.modified
+            -string props.modified_by
+            +get data() string|MetadataPrivateKeyDataEntity
+            +get metadataKeyId() string
+            +set armoredKey(string armordKey) void
+            +set data(string data) void
+            +isDecrypted() boolean
+        }
+
+        class MetadataPrivateKeyDataEntity {
+            -string props.object_type
+            -string props.domain
+            -string props.fingerprint
+            -string props.armored_key
+            -string props.passphrase
+            +get armoredKey() string
+        }
+
+        class MetadataPrivateKeysCollection {
+            +hasDecryptedPrivateKeys() boolean
+            +hasEncryptedPrivateKeys() boolean
+        }
+
+        class MetadataTypesSettingsEntity {
+            -string props.default_resource_types
+            -string props.default_folder_type
+            -string props.default_tag_type
+            -string props.default_comment_type
+            -boolean props.allow_creation_of_v5_resources
+            -boolean props.allow_creation_of_v5_folders
+            -boolean props.allow_creation_of_v5_tags
+            -boolean props.allow_creation_of_v5_comments
+            -boolean props.allow_creation_of_v4_resources
+            -boolean props.allow_creation_of_v4_folders
+            -boolean props.allow_creation_of_v4_tags
+            -boolean props.allow_creation_of_v4_comments
+            +createFromV4Default() MetadataTypesSettingsEntity
+            +createFromDefault(?object data) MetadataTypesSettingsEntity
+        }
+
+        class MetadataKeysSettingsEntity {
+            -boolean props.allow_usage_of_personal_keys
+            -boolean props.zero_knowledge_key_share
+            +get allowUsageOfPersonalKeys() boolean
+            +get zeroKnowledgeKeyShare() boolean
+            +createFromDefault(?object data) MetadataKeysSettingsEntity
         }
 
         class ResourceEntity {
@@ -224,13 +396,24 @@ classDiagram
             -TagsCollection _tags
             -UserEntity _creator
             -UserEntity _modifier
+            +get metadata() string|MetadataEntity
+            +set metadata(string|MetadataEntity metadata)
             +isMetadataDecrypted() boolean
+        }
+
+        class ResourcesCollection {
+            +filterByDecryptedMetadata() void
+            +filterOutByMetadataDecrypted() void
+            +filterByResourceTypes(ResourceTypesCollection collection) void
+            +filterBySuggestResources(string url) void
         }
 
         class ResourceTypesCollection {
             +getFirstById(uuid id) ResourceTypeEntity
             +getFirstBySlug(string slug) ResourceTypeEntity
             +hasOneWithSlug(string slug) boolean
+            +hasSomePasswordResourceTypes(?string version) boolean
+            +hasSomeTotpResourceTypes(?string version) boolean
         }
 
         class ResourceTypeEntity {
@@ -242,108 +425,165 @@ classDiagram
             +string props.created
             +string props.modified
             +hasPassword() boolean
+            +hasDescription() boolean
             +hasSecretDescription() boolean
             +hasTotp() boolean
             +isStandaloneTotp() boolean
+            +get version() string
         }
 
-        class MetadataKeysCollection {
+        class SessionKeysCollection {
         }
 
-        class MetadataKeyEntity {
-            +uuid props.id
-            +string props.fingerprint
-            +string props.armored_key
-            +string props.created
-            +string props.created_by
-            +string props.modified
-            +string props.modified_by
+        class SessionKeyEntity {
+            -string props.foreign_model
+            -string foreign_id
+            -string session_key
+            +get sessionKey() string
         }
 
-        class MetadataPrivateKeysCollection {
-            +getFirstByIsLatest() MetadataKeyEntity
+        class SessionKeysBundlesCollection {
+            +hasDecryptedSessionKeys() boolean
         }
 
-        class MetadataPrivateKeyEntity {
-            +uuid props.id
-            +uuid props.metadata_key_id
-            +uuid props.user_id
-            +string props.data
-            +string props.armored_key
-            +string props.created
-            +string props.created_by
-            +string props.modified
-            +string props.modified_by
-            +get armoredKey(string armordKey) string
+        class SessionKeysBundleEntity {
+            -uuid props.id
+            -uuid props.user_id
+            -string props.data
+            -SessionKeysCollection _session_keys
+            -string props.created
+            -string props.modified
             +get data() string
-            +set armoredKey(string armordKey) void
-            +set data(string data) void
+            +set data(string data)
+            +get sessionKeys() SessionKeysCollection
+            +set sessionKeys(SessionKeysCollection collection)
             +isDecrypted() boolean
         }
     }
 
-    %% Resource relationships
-    UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
+    namespace ShareServicesNs {
+        class ShareResourcesController {
+            event "passbolt.share.resources.save"
+            +exec(array resources, array changes) Promise
+        }
+
+        class ShareResourcesService {
+            +exec(array resources, array changes, string passphrase) Promise
+        }
+
+        class ShareService {
+            +shareResource(string resourceId, object data) Promise~object~
+            +simulateShareResource(string resourceId, array permissions) Promise~object~
+        }
+    }
+
+    %% Resource controllers relationships
+    CreateResourceController*--CreateResourceService
+    CreateResourceController*--GetPassphraseService
+    ExportResourcesFileController*--FindResourcesService
     FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
     FindResourcesForShareController*--FindResourcesService
     FindResourceDetailsController*--FindResourcesService
     FindAndUpdateResourcesLocalStorageService*--ResourcesLocalStorageService
-    ExportResourcesFileController*--FindResourcesService
-    CreateResourceController*--CreateResourceService
+    ImportResourcesFileController*--GetPassphraseService
+    ImportResourcesFileController*--ImportResourcesService
+    UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
+    UpdateResourceController*--GetPassphraseService
     UpdateResourceController*--UpdateResourceService
-    GetOrFindResourcesService*--ResourcesLocalStorageService
-    GetOrFindResourcesService*--FindAndUpdateResourcesLocalStorageService
-    FindAndUpdateResourcesLocalStorageService*--FindResourcesService
-    FindResourcesService*--ResourceService
-    CreateResourceService*--EncryptMetadataService
-    CreateResourceService*--ResourceService
-    CreateResourceService*--ResourcesLocalStorageService
-    UpdateResourceService*--EncryptMetadataService
-    UpdateResourceService*--ResourceService
-    UpdateResourceService*--ResourcesLocalStorageService
-    %% Metadata key relationships
-    FindResourcesService*--DecryptMetadataService
-    DecryptMetadataService*--GetOrFindSessionKeysService
-    DecryptMetadataService*--GetOrFindMetadataKeysService
-    DecryptMetadataService*--ResourcesLocalStorageService
-    DecryptMetadataService*--PassphraseStorageService
-    GetOrFindMetadataKeysService*--MetadataKeysSessionStorageService
-    GetOrFindMetadataKeysService*--FindAndUpdateMetadataKeysSessionStorageService
-    FindAndUpdateMetadataKeysSessionStorageService*--FindMetadataKeysService
-    FindAndUpdateMetadataKeysSessionStorageService*--MetadataKeysSessionStorageService
-    FindMetadataKeysService*--DecryptMetadataKeyService
-    DecryptMetadataKeyService*--PassphraseStorageService
-    FindMetadataKeysService*--MetadataKeyApiService
-    EncryptMetadataService*--PassphraseStorageService
-    EncryptMetadataService*--GetOrFindMetadataKeysService
-    %% Session key relationships
-    GetOrFindSessionKeysService*--SessionKeysSessionStorageService
-    GetOrFindSessionKeysService*--FindAndUpdateSessionKeysSessionStorageService
-    FindAndUpdateSessionKeysSessionStorageService*--SessionKeysLocalStorageService
-    FindAndUpdateSessionKeysSessionStorageService*--SessionKeysSessionStorageService
-    FindAndUpdateSessionKeysSessionStorageService*--DecryptSessionKeysService
-    DecryptSessionKeysService*--PassphraseStorageService
-    %% Entities relationships
-    ResourcesCollection*--ResourceEntity
-    ResourceEntity*--MetadataKeyEntity
-    ResourceEntity*--ResourceTypeEntity
-    ResourceTypesCollection*--ResourceTypeEntity
-    MetadataKeysCollection*--MetadataKeyEntity
-    MetadataKeyEntity*--MetadataPrivateKeysCollection
-    MetadataPrivateKeysCollection*--MetadataPrivateKeyEntity
-    %% Styling
     style CreateResourceController fill:#D2E0FB
     style ExportResourcesFileController fill:#D2E0FB
     style FindAllIdsByIsSharedWithGroupController fill:#D2E0FB
     style FindResourceDetailsController fill:#D2E0FB
     style FindResourcesForShareController fill:#D2E0FB
+    style ImportResourcesFileController fill:#D2E0FB
     style UpdateAllResourcesLocalStorageController fill:#D2E0FB
     style UpdateResourceController fill:#D2E0FB
-    style ResourcesLocalStorageService fill:#DEE5D4
+    %% Resource services relationships.
+    CreateResourceService*--EncryptMetadataService
+    CreateResourceService*--ResourceService
+    CreateResourceService*--ResourcesLocalStorageService
+    GetOrFindResourcesService*--FindAndUpdateResourcesLocalStorageService
+    GetOrFindResourcesService*--ResourcesLocalStorageService
+    FindAndUpdateResourcesLocalStorageService*--FindResourcesService
+    FindResourcesService*--ResourceService
+    ImportResourcesService*--EncryptMetadataService
+    ImportResourcesService*--ResourceService
+    ImportResourcesService*--ResourcesLocalStorageService
+    UpdateResourceService*--EncryptMetadataService
+    UpdateResourceService*--ResourceService
+    UpdateResourceService*--ResourcesLocalStorageService
+    %% Resource models relationships.
     style ResourceService fill:#DEE5D4
-    style PassphraseStorageService fill:#DEE5D4
-    style MetadataKeysSessionStorageService fill:#DEE5D4
+    style ResourcesLocalStorageService fill:#DEE5D4
+
+    %% Metadata controllers relationships
+    GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
+    style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
+    %% Metadata services relationships.
+    DecryptMetadataKeyService*--PassphraseStorageService
+    DecryptMetadataService*--GetOrFindMetadataKeysService
+    DecryptMetadataService*--GetOrFindSessionKeysService
+    DecryptMetadataService*--PassphraseStorageService
+    DecryptMetadataService*--ResourcesLocalStorageService
+    DecryptMetadataService*--SaveSessionKeysService
+    EncryptMetadataService*--GetOrFindMetadataKeysService
+    EncryptMetadataService*--GetOrFindMetadataSettingsService
+    EncryptMetadataService*--PassphraseStorageService
+    FindAndUpdateMetadataKeysSessionStorageService*--FindMetadataKeysService
+    FindAndUpdateMetadataKeysSessionStorageService*--MetadataKeysSessionStorageService
+    FindAndUpdateMetadataSettingsService*--MetadataKeysSettingsLocalStorage
+    FindAndUpdateMetadataSettingsService*--FindMetadataSettingsService
+    FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorage
+    FindMetadataKeysService*--DecryptMetadataKeyService
+    FindMetadataKeysService*--MetadataKeyApiService
+    FindMetadataSettingsService*--MetadataKeysSettingsApiService
+    FindMetadataSettingsService*--MetadataTypesSettingsApiService
+    FindResourcesService*--DecryptMetadataService
+    GetOrFindMetadataKeysService*--FindAndUpdateMetadataKeysSessionStorageService
+    GetOrFindMetadataKeysService*--MetadataKeysSessionStorageService
+    GetOrFindMetadataSettingsService*--FindAndUpdateMetadataSettingsService
+    GetOrFindMetadataSettingsService*--MetadataTypesSettingsLocalStorage
+    %% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
-    style SessionKeysLocalStorageService fill:#DEE5D4
-    style SessionKeysSessionStorageService fill:#DEE5D4
+    style MetadataKeysSettingsLocalStorage fill:#DEE5D4
+    style MetadataKeysSessionStorageService fill:#DEE5D4
+    style MetadataKeysSettingsApiService fill:#DEE5D4
+    style MetadataTypesSettingsApiService fill:#DEE5D4
+    style MetadataTypesSettingsLocalStorage fill:#DEE5D4
+
+    %% Session keys service relationships
+    DecryptSessionKeysBundlesService*--PassphraseStorageService
+    FindAndUpdateSessionKeysBundlesSessionStorageService*--FindSessionKeysService
+    FindAndUpdateSessionKeysBundlesSessionStorageService*--SessionKeysBundlesSessionStorageService
+    FindSessionKeysService*--DecryptSessionKeysBundlesService
+    FindSessionKeysService*--SessionKeysBundlesApiService
+    GetOrFindSessionKeysService*--FindAndUpdateSessionKeysBundlesSessionStorageService
+    GetOrFindSessionKeysService*--SessionKeysBundlesSessionStorageService
+    SaveSessionKeysService*--EncryptSessionKeysBundlesService
+    SaveSessionKeysService*--SessionKeysBundlesApiService
+    SaveSessionKeysService*--SessionKeysBundlesSessionStorageService
+    %% Session keys models relationships.
+    style SessionKeysBundlesApiService fill:#DEE5D4
+    style SessionKeysBundlesSessionStorageService fill:#DEE5D4
+
+    %% Entities relationships
+    MetadataKeyEntity*--MetadataPrivateKeysCollection
+    MetadataKeysCollection*--MetadataKeyEntity
+    MetadataPrivateKeysCollection*--MetadataPrivateKeyEntity
+    ResourceEntity*--MetadataKeyEntity
+    ResourceEntity*--ResourceTypeEntity
+    ResourceTypesCollection*--ResourceTypeEntity
+    ResourcesCollection*--ResourceEntity
+    SessionKeysCollection*--SessionKeyEntity
+    SessionKeysBundlesCollection*--SessionKeysBundleEntity
+    SessionKeysBundleEntity*--SessionKeysCollection
+
+    %% Auth services relationship.
+    style PassphraseStorageService fill:#DEE5D4
+
+    %% Share services relationship.
+    style ShareService fill:#DEE5D4
+    style ShareResourcesController fill:#D2E0FB
+    ShareResourcesController*--ShareResourcesService
+    ShareResourcesService*--ShareService
 ```

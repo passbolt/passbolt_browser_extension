@@ -23,6 +23,8 @@ import Keyring from "../../../model/keyring";
 import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
+import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
+import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 
 class ResourceUpdateService {
   /**
@@ -34,8 +36,10 @@ class ResourceUpdateService {
   constructor(account, apiClientOptions, progressService) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.progressService = progressService;
-    this.resourceModel = new ResourceModel(apiClientOptions, this.account);
+    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.encryptMetadataKeysService = new EncryptMetadataKeysService(apiClientOptions, this.account);
     this.userModel = new UserModel(apiClientOptions);
     this.keyring = new Keyring();
   }
@@ -50,30 +54,42 @@ class ResourceUpdateService {
    */
   async exec(resourceDto, plaintextDto, passphrase) {
     const resourceEntity = new ResourceEntity(resourceDto);
-    if (plaintextDto === null) {
-      // Most simple scenario, there is no secret to update
-      return this.update(resourceEntity);
-    } else {
-      return this.updateResourceAndSecret(resourceEntity, plaintextDto, passphrase);
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypeEntity = resourceTypesCollection.getFirstById(resourceEntity.resourceTypeId);
+    // Get users ids of those who have access to the resource
+    const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
+    // Set personal property
+    resourceEntity.personal = usersIds.length === 1;
+    // Set goals
+    const goals = this.calculateGoals(plaintextDto, resourceTypeEntity, usersIds.length);
+    this.progressService.updateGoals(goals);
+    // Keep metadata decrypted to update it in the local storage
+    const metadataDecrypted = resourceEntity.metadata;
+    if (resourceTypeEntity.isV5()) {
+      // Encrypt metadata
+      await this.progressService.finishStep(i18n.t("Encrypting Metadata"), true);
+      await this.encryptMetadataKeysService.encryptOneForForeignModel(resourceEntity, passphrase);
     }
+    if (plaintextDto !== null) {
+      // Update secret
+      await this.updateSecret(resourceEntity, plaintextDto, passphrase, usersIds);
+    }
+    // Update resource
+    return this.update(resourceEntity, resourceTypeEntity, metadataDecrypted);
   }
 
   /**
-   * Update a resource and associated secret
+   * Update associated secret
    *
    * @param {ResourceEntity} resourceEntity
    * @param {string|object} plaintextDto
    * @param {string} passphrase The user passphrase
+   * @param {Array<string>} usersIds The users ids
    * @returns {Promise<Object>} updated resource
    */
-  async updateResourceAndSecret(resourceEntity, plaintextDto, passphrase) {
+  async updateSecret(resourceEntity, plaintextDto, passphrase, usersIds) {
     // Get the passphrase if needed and decrypt secret key
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-
-    // Set the goals
-    const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
-    const goals = usersIds.length + 3; // encrypt * users + keyring sync + save + done
-    this.progressService.updateGoals(goals);
 
     // Sync keyring
     await this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
@@ -82,23 +98,27 @@ class ResourceUpdateService {
     // Encrypt
     const plaintext = await this.resourceModel.serializePlaintextDto(resourceEntity.resourceTypeId, plaintextDto);
     resourceEntity.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
-
-    // Post data & wrap up
-    await this.progressService.finishStep(i18n.t("Saving resource"), true);
-    return this.update(resourceEntity);
   }
 
   /**
    * Update a resource using Passbolt API and add result to local storage
    *
    * @param {ResourceEntity} resourceEntity
+   * @param {ResourceTypeEntity} resourceTypeEntity The resource type
+   * @param {ResourceMetadataEntity} metadataDecrypted The metadata decrypted
    * @returns {Promise<ResourceEntity>}
    * @private
    */
-  async update(resourceEntity) {
-    const data = resourceEntity.toV4Dto({secrets: true});
+  async update(resourceEntity, resourceTypeEntity, metadataDecrypted) {
+    // Post data & wrap up
+    await this.progressService.finishStep(i18n.t("Saving resource"), true);
+    const data = resourceTypeEntity.isV5() ? resourceEntity.toDto({secrets: true}) : resourceEntity.toV4Dto({secrets: true});
     const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
     const updatedResourceEntity = new ResourceEntity(resourceDto);
+    // If resource v5, metadata will be returned encrypted, replace it with the original decrypted copy.
+    if (!updatedResourceEntity.isMetadataDecrypted()) {
+      updatedResourceEntity.metadata = metadataDecrypted;
+    }
     await ResourceLocalStorage.updateResource(updatedResourceEntity);
 
     return updatedResourceEntity;
@@ -121,10 +141,27 @@ class ResourceUpdateService {
         const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
         const data = await EncryptMessageService.encrypt(plaintextDto, userPublicKey, [privateKey]);
         secrets.push({user_id: userId, data: data});
-        await this.progressService.finishStep(i18n.t("Encrypting"), true);
+        await this.progressService.finishStep(i18n.t("Encrypting Secret"), true);
       }
     }
     return new ResourceSecretsCollection(secrets);
+  }
+
+  /**
+   * Calculate goals
+   * @param {string|object} plaintextDto The secret to encrypt
+   * @param {ResourceTypeEntity} resourceType The resource type
+   * @param {number} usersLength The number of users
+   * @returns {number}
+   */
+  calculateGoals(plaintextDto, resourceType, usersLength) {
+    if (resourceType.isV5()) {
+      // encrypt metadata + save + done or encrypt secret * users + encrypt metadata + keyring sync + save + done
+      return plaintextDto === null ? 3 : usersLength + 4;
+    } else if (resourceType.isV4()) {
+      // save + done or encrypt secret * users + keyring sync + save + done
+      return plaintextDto === null ? 2 : usersLength + 3;
+    }
   }
 }
 

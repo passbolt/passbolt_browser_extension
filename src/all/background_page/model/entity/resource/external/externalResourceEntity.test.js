@@ -253,7 +253,7 @@ describe("ExternalResourceEntity", () => {
         expired: dto.expired,
         folder_parent_id: dto.folder_parent_id,
         metadata: {
-          object_type: "PASSBOLT_METADATA_V5",
+          object_type: "PASSBOLT_RESOURCE_METADATA",
           name: dto.name,
           username: dto.username,
           uris: [dto.uri],

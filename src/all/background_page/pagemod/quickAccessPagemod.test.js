@@ -30,6 +30,7 @@ import {RememberMeEvents} from "../event/rememberMeEvents";
 import {ResourceTypeEvents} from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import {AccountEvents} from "../event/accountEvents";
 
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
@@ -45,6 +46,7 @@ jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ResourceTypeEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
 
 describe("QuickAccess", () => {
   beforeEach(async() => {
@@ -55,7 +57,7 @@ describe("QuickAccess", () => {
 
   describe("QuickAccess::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(17);
+      expect.assertions(18);
       // data mocked
       const port = {
         _port: {
@@ -85,7 +87,8 @@ describe("QuickAccess", () => {
       expect(PownedPasswordEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ResourceTypeEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
-      expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PownedPasswordEvents, RememberMeEvents, ResourceTypeEvents]);
+      expect(AccountEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PownedPasswordEvents, RememberMeEvents, ResourceTypeEvents, AccountEvents]);
       expect(QuickAccess.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(QuickAccess.appName).toBe('QuickAccess');
     });

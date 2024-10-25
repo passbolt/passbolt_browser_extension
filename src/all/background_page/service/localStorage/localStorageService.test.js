@@ -22,6 +22,12 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 import PostponeUserSettingInvitationService from "../invitation/postponeUserSettingInvitationService";
 import {PASSWORD_POLICIES_LOCAL_STORAGE_KEY} from "../local_storage/passwordPoliciesLocalStorage";
 import {PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY} from "../local_storage/passwordExpirySettingsLocalStorage";
+import MetadataTypesSettingsLocalStorage, {
+  METADATA_TYPES_SETTINGS_LOCAL_STORAGE_KEY
+} from "../local_storage/metadataTypesSettingsLocalStorage";
+import MetadataKeysSessionStorage, {
+  METADATA_KEYS_SESSION_STORAGE_KEY
+} from "../session_storage/metadataKeysSessionStorage";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -30,7 +36,7 @@ beforeEach(() => {
 describe("LocalStorageService", () => {
   describe("LocalStorageService::flush", () => {
     it("Should flush all storage (with no account set)", async() => {
-      expect.assertions(18);
+      expect.assertions(20);
       // spy on
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
@@ -38,6 +44,8 @@ describe("LocalStorageService", () => {
       jest.spyOn(GetLegacyAccountService, "get");
       jest.spyOn(UserMeSessionStorageService, "remove");
       jest.spyOn(PostponeUserSettingInvitationService, "reset");
+      jest.spyOn(MetadataTypesSettingsLocalStorage.prototype, "flush");
+      jest.spyOn(MetadataKeysSessionStorage.prototype, "flush");
       // process
       await LocalStorageService.flush();
       // expectations
@@ -59,10 +67,12 @@ describe("LocalStorageService", () => {
       expect(browser.storage.session.remove).toHaveBeenCalledWith("temp_server_part_sso_kit");
       expect(GetLegacyAccountService.get).not.toHaveBeenCalled();
       expect(UserMeSessionStorageService.remove).not.toHaveBeenCalled();
+      expect(MetadataTypesSettingsLocalStorage.prototype.flush).not.toHaveBeenCalled();
+      expect(MetadataKeysSessionStorage.prototype.flush).not.toHaveBeenCalled();
     });
 
     it("Should flush all storage (with an account set)", async() => {
-      expect.assertions(21);
+      expect.assertions(23);
       // mock data
       MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -76,8 +86,8 @@ describe("LocalStorageService", () => {
       // process
       await LocalStorageService.flush();
       // expectations
-      expect(browser.storage.local.remove).toHaveBeenCalledTimes(11);
-      expect(browser.storage.session.remove).toHaveBeenCalledTimes(3);
+      expect(browser.storage.local.remove).toHaveBeenCalledTimes(12);
+      expect(browser.storage.session.remove).toHaveBeenCalledTimes(4);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resourceTypes");
@@ -96,6 +106,8 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_POLICIES_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${METADATA_TYPES_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.session.remove).toHaveBeenCalledWith(`${METADATA_KEYS_SESSION_STORAGE_KEY}-${account.id}`);
       expect(UserMeSessionStorageService.remove).toHaveBeenCalledWith(account);
     });
   });

@@ -93,7 +93,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.resources.update
    * @param requestId {uuid} The request identifier
    * @param resource {array} The resource
-   * @param editedPassword {} The resource
+   * @param plaintextDto {} The resource secret
    */
   worker.port.on('passbolt.resources.update', async(requestId, resourceDto, plaintextDto) => {
     const controller = new ResourceUpdateController(worker, requestId, apiClientOptions, account);

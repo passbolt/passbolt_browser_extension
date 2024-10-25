@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
+import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
 
 class CsvNordpassRowParser extends AbstractCsvRowParser {
@@ -46,12 +47,13 @@ class CsvNordpassRowParser extends AbstractCsvRowParser {
   /**
    * Parse a csv row
    * @param {object} data the csv row data
-   * @param {ResourceTypesCollection?} resourceTypesCollection (Optional) The available resource types
+   * @param {ResourceTypesCollection} resourceTypesCollection (Optional) The available resource types
+   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
    * @returns {ExternalResourceEntity}
    */
-  static parse(data, resourceTypesCollection) {
+  static parse(data, resourceTypesCollection, metadataTypesSettings) {
     const externalResourceDto = {};
-    const resourceType = this.parseResourceType(data, resourceTypesCollection);
+    const resourceType = ResourcesTypeImportParser.parseResourceType(data, resourceTypesCollection, metadataTypesSettings);
     if (resourceType) {
       externalResourceDto.resource_type_id = resourceType.id;
     }
@@ -61,18 +63,6 @@ class CsvNordpassRowParser extends AbstractCsvRowParser {
       }
     }
     return new ExternalResourceEntity(externalResourceDto);
-  }
-
-  /**
-   * Parse the resource type id
-   * @param {object} data the csv row data
-   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
-   * @returns {ResourceTypeEntity}
-   */
-  static parseResourceType(data, resourceTypesCollection) {
-    if (resourceTypesCollection) {
-      return resourceTypesCollection.getFirst('slug', 'password-and-description');
-    }
   }
 }
 

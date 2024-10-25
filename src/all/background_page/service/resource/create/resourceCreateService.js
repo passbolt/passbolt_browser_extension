@@ -25,6 +25,9 @@ import i18n from "../../../sdk/i18n";
 import ResourceModel from "../../../model/resource/resourceModel";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import FindAndUpdateResourcesLocalStorage from "../findAndUpdateResourcesLocalStorageService";
+import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
+import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
+import PermissionChangesCollection from "../../../model/entity/permission/change/permissionChangesCollection";
 
 class ResourceCreateService {
   /**
@@ -35,11 +38,13 @@ class ResourceCreateService {
   constructor(account, apiClientOptions, progressService) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.folderModel = new FolderModel(apiClientOptions, account);
     this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = progressService;
     this.resourceModel = new ResourceModel(apiClientOptions, this.account);
+    this.encryptMetadataKeysService = new EncryptMetadataKeysService(apiClientOptions, this.account);
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
   }
 
@@ -47,84 +52,134 @@ class ResourceCreateService {
    * Create a resource.
    *
    * @param {object} resourceDto The resource data
-   * @param {string|object} plaintextDto The secret to encrypt
+   * @param {string|object} secretDto The secret to encrypt
    * @param {string} passphrase The user passphrase
    * @return {Promise<ResourceEntity>} resourceEntity
    */
-  async exec(resourceDto, plaintextDto, passphrase) {
-    let resource = new ResourceEntity(resourceDto);
-
+  async create(resourceDto, secretDto, passphrase) {
+    const resource = new ResourceEntity(resourceDto);
+    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    const resourceType = resourceTypes.getFirstById(resource.resourceTypeId);
+    // Keep a copy of the metadata. It will be used after creation on the API, to persist it decrypted into the local storage.
+    const resourceMetadata = resource.metadata;
+    // Get private key decrypted to encrypt data
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    const plaintext = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, plaintextDto);
-
-    // Encrypt and sign
-    await this.progressService?.finishStep(i18n.t('Encrypting secret'), true);
-    const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
-    const secret = await EncryptMessageService.encrypt(plaintext, userPublicKey, [privateKey]);
-    resource.secrets = new ResourceSecretsCollection([{data: secret}]);
-
-    // Save
-    await this.progressService?.finishStep(i18n.t('Creating password'), true);
-    resource = await this.create(resource);
-
-    // Share if needed
+    let permissionChanges = new PermissionChangesCollection([]);
+    let destinationFolder;
     if (resource.folderParentId) {
-      await this.handleCreateInFolder(resource, privateKey);
+      destinationFolder = await this.folderModel.findForShare(resource.folderParentId);
+      if (destinationFolder.permissions.length > 1 || destinationFolder.permissions.items[0].aroForeignKey !== this.account.userId) {
+        permissionChanges = destinationFolder.permissions;
+      }
     }
-
-    return resource;
+    this.updateGoals(resourceType.isV5(), permissionChanges.length);
+    await this.encryptMetadata(resource, resourceType, permissionChanges, passphrase);
+    await this.buildAndEncryptUserSecret(resource, secretDto, privateKey);
+    const createdResource = await this.save(resource, resourceType);
+    // If resource v5, metadata will be returned encrypted, replace it with the original decrypted copy.
+    if (resourceType.isV5()) {
+      createdResource.metadata = resourceMetadata;
+    }
+    await ResourceLocalStorage.addResource(createdResource);
+    // Share the resource with the metadata decrypted
+    await this.share(createdResource, privateKey, destinationFolder);
+    return createdResource;
   }
 
+
   /**
-   * Create a resource using Passbolt API and add result to local storage
+   * Save the resource on the API.
    *
-   * @param {ResourceEntity} resourceEntity
+   * @param {ResourceEntity} resource The resource
+   * @param {ResourceTypeEntity} resourceType The resource type
    * @returns {Promise<ResourceEntity>}
    * @private
    */
-  async create(resourceEntity) {
-    const data = resourceEntity.toV4Dto({secrets: true});
+  async save(resource, resourceType) {
+    await this.progressService.finishStep(i18n.t('Creating password'), true);
+
+    const resourceDto = resourceType.isV5() ? resource.toDto({secrets: true}) : resource.toV4Dto({secrets: true});
     const contain = {permission: true, favorite: true, tags: true, folder: true};
-    const resourceDto = await this.resourceService.create(data, contain);
-    const newResourceEntity = new ResourceEntity(resourceDto);
-    await ResourceLocalStorage.addResource(newResourceEntity);
-    return newResourceEntity;
+    const newResourceDto = await this.resourceService.create(resourceDto, contain);
+    return new ResourceEntity(newResourceDto);
   }
 
   /**
-   * Handle post create operations if resource is created in folder
-   * This includes sharing the resource to match the parent folder permissions
+   * Build and encrypt user secret.
    *
-   * @param {ResourceEntity} resourceEntity
+   * @param {ResourceEntity} resource
+   * @param {string|object} secretDto
+   * @param {openpgp.PrivateKey} privateKey The user private key
+   * @returns {Promise}
+   * @private
+   */
+  async buildAndEncryptUserSecret(resource, secretDto, privateKey) {
+    const serializedSecret = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, secretDto);
+
+    // Encrypt and sign
+    await this.progressService.finishStep(i18n.t('Encrypting secret'), true);
+    const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
+    const secret = await EncryptMessageService.encrypt(serializedSecret, userPublicKey, [privateKey]);
+    resource.secrets = new ResourceSecretsCollection([{data: secret}]);
+  }
+
+  /**
+   * Share the resource.
+   *
+   * @param {ResourceEntity} resource The resource to share.
    * @param {openpgp.PrivateKey} privateKey The user decrypted private key
+   * @param {FolderEntity} folder The folder entity
    * @returns {Promise<void>}
    * @private
    */
-  async handleCreateInFolder(resourceEntity, privateKey) {
-    // Calculate changes if any
-    await this.progressService?.finishStep(i18n.t('Calculate permissions'), true);
-    const destinationFolder = await this.folderModel.findForShare(resourceEntity.folderParentId);
-    const changes = await this.resourceModel.calculatePermissionsChangesForCreate(resourceEntity, destinationFolder);
-
-    // Apply changes
-    if (changes.length) {
-      if (this.progressService) {
-        const goals = (changes.length * 3) + 2 + this.progressService.progress; // closer to reality...
-        this.progressService.updateGoals(goals);
-      }
-
-      // Sync keyring
-      await this.progressService?.finishStep(i18n.t('Synchronizing keys'), true);
-      await this.keyring.sync();
-
-      // Share
-      await this.progressService?.finishStep(i18n.t('Start sharing'), true);
-      const resourcesToShare = [resourceEntity.toDto({secrets: true})];
-      await this.shareModel.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message =>
-        await this.progressService?.finishStep(message)
-      );
-      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
+  async share(resource, privateKey, folder) {
+    if (!folder) {
+      return;
     }
+    // Calculate resource creation share permission changes.
+    await this.progressService.finishStep(i18n.t('Calculate permissions'), true);
+    // Whenever a resource is created into a folder, its creation will be followed by a share operation
+    const permissionChanges = await this.resourceModel.calculatePermissionsChangesForCreate(resource, folder);
+
+    await this.progressService?.finishStep(i18n.t('Synchronizing keys'), true);
+    await this.keyring.sync();
+
+    await this.progressService?.finishStep(i18n.t('Start sharing'), true);
+    const resourcesToShare = [resource.toDto({secrets: true})];
+    await this.shareModel.bulkShareResources(resourcesToShare, permissionChanges.toDto(), privateKey, async message =>
+      await this.progressService?.finishStep(message)
+    );
+    await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
+  }
+
+  /**
+   * Encrypt resource metadata if v5.
+   * @param {ResourceEntity} resource The resource
+   * @param {ResourceTypeEntity} resourceType The resource type
+   * @param {PermissionChangesCollection} permissionChanges The permission changes
+   * @param {string} passphrase The user passphrase
+   * @private
+   */
+  async encryptMetadata(resource, resourceType, permissionChanges, passphrase) {
+    if (!resourceType.isV5()) {
+      return;
+    }
+    await this.progressService.finishStep(i18n.t("Encrypting Metadata"), true);
+    resource.personal = !permissionChanges.length;
+    await this.encryptMetadataKeysService.encryptOneForForeignModel(resource, passphrase);
+  }
+
+  /**
+   * Update goals
+   * @param {boolean} shouldEncryptMetadata if metadata should be encrypted
+   * @param {number} changesLength number of permissions changes
+   * @private
+   */
+  updateGoals(shouldEncryptMetadata, changesLength = 0) {
+    const stepToCreate = shouldEncryptMetadata ? 4 : 3; // number of step to create a resource;
+    const stepPreparingShare = changesLength > 0 ? 3 : 0; // number of step preparing a share;
+    // Goals = number of share (with 3 steps each time) + number of step to create a resource
+    this.progressService.updateGoals(changesLength * 3 + stepPreparingShare + stepToCreate);
   }
 }
 

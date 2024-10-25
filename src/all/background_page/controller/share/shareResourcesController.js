@@ -11,13 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-import Keyring from "../../model/keyring";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
-import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
-import ShareModel from "../../model/share/shareModel";
-import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
+import {assertNonEmptyArray} from "../../utils/assertions";
+import ShareResourceService from "../../service/share/shareResourceService";
+import i18n from "../../sdk/i18n";
 
 class ShareResourcesController {
   /**
@@ -31,10 +29,24 @@ class ShareResourcesController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
-    this.shareModel = new ShareModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker);
+    this.shareResourceService = new ShareResourceService(apiClientOptions, account, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
+  }
+
+  /**
+   * Wrapper of exec function to run it with worker.
+   *
+   * @return {Promise<void>}
+   */
+  async _exec(resources, changes) {
+    try {
+      await this.exec(resources, changes);
+      this.worker.port.emit(this.requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(this.requestId, 'ERROR', error);
+    }
   }
 
   /**
@@ -44,10 +56,11 @@ class ShareResourcesController {
    * @param {array} changes
    * @return {Promise}
    */
-  async main(resources, changes) {
-    const keyring = new Keyring();
+  async exec(resources, changes) {
+    assertNonEmptyArray(resources, 'resources should be a non empty array');
+    assertNonEmptyArray(changes, 'changes should be a non empty array');
 
-    let privateKey;
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
 
     /*
      * Number of goals is (number of resources * 3) + 1 :
@@ -56,31 +69,14 @@ class ShareResourcesController {
      */
     const progressGoal = resources.length * 3 + 1;
 
-    try {
-      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-      privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
+    this.progressService.title = i18n.t("Share {{count}} password", {count: resources.length});
+    this.progressService.start(progressGoal, i18n.t('Initialize'));
 
     try {
-      this.progressService.title = i18n.t("Share {{count}} password", {count: resources.length});
-      this.progressService.start(progressGoal, i18n.t('Initialize'));
-      await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
-      await keyring.sync();
-      await this.shareModel.bulkShareResources(resources, changes, privateKey, async message => {
-        await this.progressService.finishStep(message);
-      });
-      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
-      const results = resources.map(resource => resource.id);
-      await this.progressService.finishStep(i18n.t('Done!'), true);
-      await this.progressService.close();
-      return results;
-    } catch (error) {
-      console.error(error);
-      await this.progressService.close();
-      throw error;
+      await this.shareResourceService.exec(resources, changes, passphrase);
+      this.progressService.finishStep(i18n.t('Done!'), true);
+    } finally {
+      this.progressService.close();
     }
   }
 }

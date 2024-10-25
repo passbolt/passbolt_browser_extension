@@ -179,4 +179,45 @@ describe("GetOrFindResourcesService", () => {
       expect(resources).toHaveLength(0);
     });
   });
+
+  describe("::getOrFindByIds", () => {
+    let service;
+
+    beforeEach(() => {
+      service = new GetOrFindResourcesService(account, apiClientOptions);
+    });
+    it("should assert the given parameters", async() => {
+      expect.assertions(1);
+
+      await expect(() => service.getOrFindByIds()).rejects.toThrow("The given parameter is not a valid array");
+    });
+
+    it("should filter the collection by the given ids", async() => {
+      expect.assertions(4);
+
+      const matchingIdResource1 = defaultResourceDto();
+      const matchingIdResource2 = defaultResourceDto();
+      const notMatchingIdResource1 = defaultResourceDto();
+      const notMatchingIdResource2 = defaultResourceDto();
+
+      const resourcesCollectionDto = [
+        matchingIdResource1,
+        matchingIdResource2,
+        notMatchingIdResource1,
+        notMatchingIdResource2
+      ];
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+
+      const expectedIds = [matchingIdResource1.id, matchingIdResource2.id];
+
+      const resources = await service.getOrFindByIds(expectedIds);
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(resources).toHaveLength(2);
+      expect(resources.getFirstById(matchingIdResource1.id)).toBeTruthy();
+      expect(resources.getFirstById(matchingIdResource1.id)).toBeTruthy();
+    });
+  });
 });

@@ -19,6 +19,7 @@ import {assertArrayUUID, assertUuid} from "../../utils/assertions";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import splitBySize from "../../utils/array/splitBySize";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import DecryptMetadataService from "../metadata/decryptMetadataService";
 
 /**
  * The service aims to find resources from the API.
@@ -34,6 +35,7 @@ export default class FindResourcesService {
     this.resourceService = new ResourceService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.executeConcurrentlyService = new ExecuteConcurrentlyService();
+    this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
   }
 
   /**
@@ -98,6 +100,10 @@ export default class FindResourcesService {
     const resources = await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, null, true);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
+
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources, undefined, {ignoreDecryptionError: true});
+    resources.filterOutMetadataEncrypted();
+
     return resources;
   }
 
@@ -141,7 +147,7 @@ export default class FindResourcesService {
   async findAllForDecrypt(resourcesIds) {
     assertArrayUUID(resourcesIds);
 
-    const contains = {'secret': true, 'resource-type': true};
+    const contains = {'secret': true};
     const resourceCollection =  await this.findAllByIds(resourcesIds, contains);
 
     return resourceCollection;

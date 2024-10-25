@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
+import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
 
 class CsvSafariRowParser extends AbstractCsvRowParser {
@@ -32,33 +33,21 @@ class CsvSafariRowParser extends AbstractCsvRowParser {
   /**
    * Parse a csv row
    * @param {object} data the csv row data
-   * @param {ResourceTypesCollection?} resourceTypesCollection (Optional) The available resource types
+   * @param {ResourceTypesCollection} resourceTypesCollection (Optional) The available resource types
+   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
    * @returns {ExternalResourceEntity}
    */
-  static parse(data, resourceTypesCollection) {
+  static parse(data, resourceTypesCollection, metadataTypesSettings) {
     const externalResourceDto = {};
-    const resourceType = this.parseResourceType(data, resourceTypesCollection);
-    if (resourceType) {
-      externalResourceDto.resource_type_id = resourceType.id;
-    }
     for (const propertyName in this.mapping) {
       if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }
     }
-    return new ExternalResourceEntity(externalResourceDto);
-  }
+    const resourceType = ResourcesTypeImportParser.parseResourceType(externalResourceDto, resourceTypesCollection, metadataTypesSettings);
+    externalResourceDto.resource_type_id = resourceType.id;
 
-  /**
-   * Parse the resource type id
-   * @param {object} data the csv row data
-   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
-   * @returns {ResourceTypeEntity}
-   */
-  static parseResourceType(data, resourceTypesCollection) {
-    if (resourceTypesCollection) {
-      return resourceTypesCollection.getFirst('slug', 'password-and-description');
-    }
+    return new ExternalResourceEntity(externalResourceDto);
   }
 }
 

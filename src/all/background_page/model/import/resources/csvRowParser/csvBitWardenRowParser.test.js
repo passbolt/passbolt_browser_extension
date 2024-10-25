@@ -15,10 +15,15 @@ import CsvBitWardenRowParser from "./csvBitWardenRowParser";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
+import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 
 describe("CsvBitWardenRowParser", () => {
   it("can parse BitWarden csv", () => {
+    expect.assertions(5);
+
     // minimum required fields
     let fields = ["name", "login_password"];
     expect(CsvBitWardenRowParser.canParse(fields)).toEqual(2);
@@ -36,21 +41,9 @@ describe("CsvBitWardenRowParser", () => {
     expect(CsvBitWardenRowParser.canParse(fields)).toEqual(2);
   });
 
-  it("parses legacy resource from csv row with minimum required properties", () => {
-    const data = {
-      "name": "Password 1"
-    };
-    const externalResourceEntity = CsvBitWardenRowParser.parse(data);
-    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.name);
-    expect(externalResourceEntity.username).toBeNull();
-    expect(externalResourceEntity.uri).toBeNull();
-    expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.description).toBeNull();
-    expect(externalResourceEntity.folderParentPath).toEqual("");
-  });
+  it("parses resource of type password-with-description with all properties from csv row", () => {
+    expect.assertions(2);
 
-  it("parses legacy resource from csv row with all available properties", () => {
     const data = {
       "name": "Password 1",
       "login_username": "Username 1",
@@ -59,16 +52,52 @@ describe("CsvBitWardenRowParser", () => {
       "notes": "Description 1",
       "folder": "Folder 1"
     };
-    const resourceTypeCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
-    jest.spyOn(resourceTypeCollection, "getFirst");
-    const externalResourceEntity = CsvBitWardenRowParser.parse(data, resourceTypeCollection);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.login_username,
+      uri: data.login_uri,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.login_password,
+      description: data.notes,
+      folder_parent_path: data.folder,
+    });
+
+    const externalResourceEntity = CsvBitWardenRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.name);
-    expect(externalResourceEntity.username).toEqual(data.login_username);
-    expect(externalResourceEntity.uri).toEqual(data.login_uri);
-    expect(externalResourceEntity.secretClear).toEqual(data.login_password);
-    expect(externalResourceEntity.description).toEqual(data.notes);
-    expect(externalResourceEntity.folderParentPath).toEqual(data.folder);
-    expect(resourceTypeCollection.getFirst).toHaveBeenCalled();
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type default-v5 with all properties from csv row", () => {
+    expect.assertions(2);
+
+    const data = {
+      "name": "Password 1",
+      "login_username": "Username 1",
+      "login_uri": "https://url1.com",
+      "login_password": "Secret 1",
+      "notes": "Description 1",
+      "folder": "Folder 1"
+    };
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.login_username,
+      uri: data.login_uri,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.login_password,
+      description: data.notes,
+      folder_parent_path: data.folder,
+    });
+
+    const externalResourceEntity = CsvBitWardenRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
 });

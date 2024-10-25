@@ -12,7 +12,7 @@
  * @since         2.13.0
  */
 import ResourceEntity from "./resourceEntity";
-import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
 const ENTITY_NAME = 'Resources';
@@ -166,6 +166,13 @@ class ResourcesCollection extends EntityV2Collection {
     const tagIsNotPresent = tag => tag.id !== tagId;
     const filterResource = resource => resource.tags.tags.every(tagIsNotPresent);
     return  this._items.filter(filterResource);
+  }
+
+  /**
+   * Filter out the resources which metadata is encrypted.
+   */
+  filterOutMetadataEncrypted() {
+    this.filterByCallback(resource => resource.isMetadataDecrypted());
   }
 
   /*

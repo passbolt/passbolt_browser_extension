@@ -22,7 +22,7 @@ import {
   TEST_RESOURCE_TYPE_TOTP
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import {defaultResourcesDtos, resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
-import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
@@ -34,6 +34,7 @@ import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/p
 import {
   defaultResourceMetadataDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
+import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 
 describe("ResourcesCollection", () => {
   it("schema must validate", () => {
@@ -330,6 +331,33 @@ describe("ResourcesCollection", () => {
       const collection = new ResourcesCollection([]);
       expect.assertions(1);
       expect(() => collection.filterBySuggestResources(42)).toThrow(TypeError);
+    });
+  });
+
+  describe("::filterOutMetadataEncrypted", () => {
+    it("should filter out the resource which metadata are encrypted.", () => {
+      expect.assertions(3);
+
+      const resourceDecrypted1 = defaultResourceDto();
+      const resourceDecrypted2 = defaultResourceDto();
+      const resourceEncrypted1 = defaultResourceDto({metadata: metadata.withAdaKey.encryptedMetadata[0]});
+      const resourceEncrypted2 = defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[1]});
+
+      delete resourceDecrypted1.permission;
+      delete resourceDecrypted2.permission;
+
+      const resources = new ResourcesCollection([
+        resourceDecrypted1,
+        resourceEncrypted1,
+        resourceDecrypted2,
+        resourceEncrypted2
+      ]);
+
+      resources.filterOutMetadataEncrypted();
+
+      expect(resources).toHaveLength(2);
+      expect(resources.items[0].toDto()).toStrictEqual(resourceDecrypted1);
+      expect(resources.items[1].toDto()).toStrictEqual(resourceDecrypted2);
     });
   });
 });

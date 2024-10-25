@@ -12,13 +12,18 @@
  */
 import CsvDashlaneRowParser from "./csvDashlaneRowParser";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
-import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 
 describe("CsvDashlaneRowParser", () => {
   it("can parse LastPass csv", () => {
+    expect.assertions(5);
+
     // minimum required fields
     let fields = ["title", "password"];
     expect(CsvDashlaneRowParser.canParse(fields)).toEqual(2);
@@ -36,20 +41,9 @@ describe("CsvDashlaneRowParser", () => {
     expect(CsvDashlaneRowParser.canParse(fields)).toEqual(2);
   });
 
-  it("parses legacy resource from csv row with minimum required properties", () => {
-    const data = {
-      "title": "Password 1"
-    };
-    const externalResourceEntity = CsvDashlaneRowParser.parse(data);
-    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.title);
-    expect(externalResourceEntity.username).toBeNull();
-    expect(externalResourceEntity.uri).toBeNull();
-    expect(externalResourceEntity.secretClear).toEqual("");
-    expect(externalResourceEntity.description).toBeNull();
-  });
+  it("parses resource of type password-with-description with all properties from csv row", () => {
+    expect.assertions(2);
 
-  it("parses legacy resource from csv row with all available properties", () => {
     const data = {
       "title": "Password 1",
       "username": "Username 1",
@@ -57,15 +51,49 @@ describe("CsvDashlaneRowParser", () => {
       "password": "Secret 1",
       "note": "Description 1",
     };
-    const resourceTypeCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
-    jest.spyOn(resourceTypeCollection, "getFirst");
-    const externalResourceEntity = CsvDashlaneRowParser.parse(data, resourceTypeCollection);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.title,
+      username: data.username,
+      uri: data.url,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.password,
+      description: data.note,
+    });
+
+    const externalResourceEntity = CsvDashlaneRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
-    expect(externalResourceEntity.name).toEqual(data.title);
-    expect(externalResourceEntity.username).toEqual(data.username);
-    expect(externalResourceEntity.uri).toEqual(data.url);
-    expect(externalResourceEntity.secretClear).toEqual(data.password);
-    expect(externalResourceEntity.description).toEqual(data.note);
-    expect(resourceTypeCollection.getFirst).toHaveBeenCalled();
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type default-v5 with all properties from csv row", () => {
+    expect.assertions(2);
+
+    const data = {
+      "title": "Password 1",
+      "username": "Username 1",
+      "url": "https://url1.com",
+      "password": "Secret 1",
+      "note": "Description 1",
+    };
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.title,
+      username: data.username,
+      uri: data.url,
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.password,
+      description: data.note,
+    });
+
+    const externalResourceEntity = CsvDashlaneRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
 });

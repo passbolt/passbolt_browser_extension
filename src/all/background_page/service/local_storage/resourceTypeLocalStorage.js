@@ -12,7 +12,7 @@
  * @since         3.0.0
  */
 import Log from "../../model/log";
-import ResourceTypesCollection from "../../model/entity/resourceType/resourceTypesCollection";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {assertType} from "../../utils/assertions";
 
 const RESOURCE_TYPES_LOCAL_STORAGE_KEY = 'resourceTypes';

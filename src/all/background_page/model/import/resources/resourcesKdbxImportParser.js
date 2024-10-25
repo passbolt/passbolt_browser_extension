@@ -14,21 +14,20 @@ import ExternalFolderEntity from "../../entity/folder/external/externalFolderEnt
 import ExternalResourceEntity from "../../entity/resource/external/externalResourceEntity";
 import ImportError from "../../../error/importError";
 import * as kdbxweb from 'kdbxweb';
-import {
-  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
-  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG
-} from "../../entity/resourceType/resourceTypeEntity";
 import TotpEntity from "../../entity/totp/totpEntity";
+import ResourcesTypeImportParser from "./resourcesTypeImportParser";
 
 class ResourcesKdbxImportParser {
   /**
    * Kdbx parser constructor
    * @param {ImportResourcesFileEntity} importEntity The import entity
-   * @param {ResourceTypesCollection?} resourceTypesCollection (Optional) The available resource types
+   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
+   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
    */
-  constructor(importEntity, resourceTypesCollection) {
+  constructor(importEntity, resourceTypesCollection, metadataTypesSettings) {
     this.importEntity = importEntity;
     this.resourceTypesCollection = resourceTypesCollection;
+    this.metadataTypesSettings = metadataTypesSettings;
   }
 
   /**
@@ -124,7 +123,6 @@ class ResourcesKdbxImportParser {
    * @returns {Object}
    */
   parseResource(kdbxEntry) {
-    let resourceTypeSlug = RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG;
     const externalResourceDto = {
       name: kdbxEntry.fields.get('Title') ? kdbxEntry.fields.get('Title').trim() : "",
       uri: kdbxEntry.fields.get('URL') ? kdbxEntry.fields.get('URL').trim() : "",
@@ -141,15 +139,13 @@ class ResourcesKdbxImportParser {
       const totp = this.getTotp(kdbxEntry);
       if (totp) {
         externalResourceDto.totp = totp;
-        resourceTypeSlug = RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG;
       }
 
       // @todo pebble
-      const resourceType = this.parseResourceType(resourceTypeSlug);
+      const resourceType = ResourcesTypeImportParser.parseResourceType(externalResourceDto, this.resourceTypesCollection, this.metadataTypesSettings);
       if (resourceType) {
         externalResourceDto.resource_type_id = resourceType.id;
       }
-
       // Sanitize.
       if (!externalResourceDto.name.length) {
         externalResourceDto.name = ExternalResourceEntity.DEFAULT_RESOURCE_NAME;
@@ -179,15 +175,49 @@ class ResourcesKdbxImportParser {
   }
 
   /**
-   * Parse the resource type according to the resource type slug
-   * @param {string} resourceTypeSlug
+   * Get scores for each resources based on the resourceTypes
+   * @param {object} externalResourceDto the csv row data
+   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
    * @returns {ResourceTypeEntity}
    */
-  parseResourceType(resourceTypeSlug) {
-    if (this.resourceTypesCollection) {
-      return this.resourceTypesCollection.getFirst('slug', resourceTypeSlug);
+  getScores(externalResourceDto, resourceTypesCollection) {
+    const scores = [];
+
+    for (let i = 0; i < resourceTypesCollection.length; i++) {
+      const resourceType = resourceTypesCollection.items[i];
+
+      //Skip legacy resourceType if it exists
+      if (resourceType.slug === "password-string") {
+        continue;
+      }
+
+      const resourceProperties = Object.entries(externalResourceDto)
+        .filter(([, value]) => {
+          if (typeof value === 'string') {
+            return value.length > 0; // Exclude empty strings
+          }
+          return true;
+        })
+        .map(([key]) => key === 'secret_clear' ? 'password' : key);
+      // Exception to be removed with v5: we need to include password inti the resource
+      if (resourceType.slug === "password-description-totp" && resourceProperties.includes("totp") &&  resourceProperties.includes("description")) {
+        externalResourceDto.password = "";
+      }
+
+      const secretsFields = Object.keys(resourceType.definition.secret.properties);
+      const secretsRequiredFields = resourceType.definition.secret.required;
+      const score = resourceProperties.filter(value => secretsFields.includes(value));
+      const matchAllRequiredField = secretsRequiredFields.every(secretsField => score.includes(secretsField));
+
+      scores.push({
+        slug: resourceType.slug,
+        value: score.length,
+        hasRequiredFields: matchAllRequiredField,
+        match: score.length === secretsFields.length,
+      });
     }
-    return null;
+
+    return scores;
   }
 
   /**

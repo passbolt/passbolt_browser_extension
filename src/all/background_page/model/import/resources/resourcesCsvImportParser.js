@@ -49,11 +49,13 @@ class ResourcesCsvImportParser {
   /**
    * Kdbx parser constructor
    * @param {ImportResourcesFileEntity} importEntity The import entity
-   * @param {ResourceTypesCollection?} resourceTypesCollection (Optional) The available resource types
+   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
+   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
    */
-  constructor(importEntity, resourceTypesCollection) {
+  constructor(importEntity, resourceTypesCollection, metadataTypesSettings) {
     this.importEntity = importEntity;
     this.resourceTypesCollection = resourceTypesCollection;
+    this.metadataTypesSettings = metadataTypesSettings;
   }
 
   /**
@@ -70,6 +72,7 @@ class ResourcesCsvImportParser {
    */
   async parseImport() {
     const {data, fields} = this.readCsv();
+
     const RowParser = this.getRowParser(fields);
     if (!RowParser) {
       throw new FileFormatError('This csv format is not supported.');
@@ -121,14 +124,16 @@ class ResourcesCsvImportParser {
    */
   parseResources(RowParser, data) {
     const collection = new ExternalResourcesCollection([]);
+
     data.forEach(row => {
       try {
-        const externalResourceEntity = RowParser.parse(row, this.resourceTypesCollection);
+        const externalResourceEntity = RowParser.parse(row, this.resourceTypesCollection, this.metadataTypesSettings);
         collection.push(externalResourceEntity);
       } catch (error) {
         this.importEntity.importResourcesErrors.push(new ImportError("Cannot parse resource", row, error));
       }
     });
+
     return collection;
   }
 
@@ -146,6 +151,7 @@ class ResourcesCsvImportParser {
         this.handleParseFolderValidationError(error, externalResourceEntity);
       }
     }
+
     return collection;
   }
 

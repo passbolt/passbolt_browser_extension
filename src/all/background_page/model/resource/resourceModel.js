@@ -364,6 +364,7 @@ class ResourceModel {
     if (!schema) {
       throw new TypeError('Could not find the schema definition for the requested resource type.');
     }
+
     const plaintextEntity = new PlaintextEntity(plaintextDto, {schema});
     return JSON.stringify(plaintextEntity);
   }
@@ -412,12 +413,13 @@ class ResourceModel {
    *
    * @param {Array<string>} resourceIds
    * @param {Array<TagsCollection>} tagsCollections
-   * @returns {Promise<Array<ResourceEntity>>}
+   * @returns {Promise<void>}
    */
   async bulkReplaceResourceTagsLocally(resourceIds, tagsCollections) {
     const resourcesDto = await ResourceLocalStorage.get();
     const resourceCollection = new ResourcesCollection(resourcesDto);
     await resourceCollection.bulkReplaceTagsCollection(resourceIds, tagsCollections);
+
     await ResourceLocalStorage.set(resourceCollection);
   }
 

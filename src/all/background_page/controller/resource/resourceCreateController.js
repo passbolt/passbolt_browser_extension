@@ -57,10 +57,10 @@ class ResourceCreateController {
    */
   async exec(resourceDto, plaintextDto) {
     try {
-      const goals = resourceDto.folder_parent_id ? 10 : 2;
+      const goals = resourceDto.folder_parent_id ? 10 : 3;
       const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       this.progressService.start(goals, i18n.t('Initializing'));
-      const resourceCreated =  await this.resourceCreateService.exec(resourceDto, plaintextDto, passphrase);
+      const resourceCreated =  await this.resourceCreateService.create(resourceDto, plaintextDto, passphrase);
       await this.progressService.finishStep(i18n.t('Done!'), true);
       return resourceCreated;
     } finally {

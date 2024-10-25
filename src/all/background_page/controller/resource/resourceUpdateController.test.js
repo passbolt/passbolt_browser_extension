@@ -22,6 +22,10 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
+import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
+import {
+  resourceTypesCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 jest.mock("../../service/progress/progressService");
@@ -45,6 +49,7 @@ describe("ResourceUpdateController", () => {
     controller = new ResourceUpdateController(worker, null, apiClientOptions, account);
     controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
     fetch.doMockOnce(() => mockApiResponse(defaultResourceV4Dto()));
+    jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
   });
   describe("ResourceUpdateController::_exec", () => {
     it("Should call the resourceUpdateService and emit a success message when only metadata have benn updated", async() => {

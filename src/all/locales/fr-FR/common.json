@@ -17,9 +17,10 @@
   "Decrypting {{counter}}/{{total}}": "Déchiffrement {{counter}}/{{total}}",
   "Done": "Terminé",
   "Done!": "Terminé!",
-  "Encrypting": "Chiffrement",
   "Encrypting {{counter}}/{{total}}": "Chiffrement {{counter}}/{{total}}",
+  "Encrypting Metadata": "Encrypting Metadata",
   "Encrypting secret": "Chiffrement du secret",
+  "Encrypting Secret": "Encrypting Secret",
   "Expiry date will be updated on {{count}} resource._one": "La date d'expiration sera mise à jour sur {{count}} ressource.",
   "Expiry date will be updated on {{count}} resource._other": "La date d'expiration sera mise à jour sur {{count}} ressources.",
   "Exporting ...": "Exportation ...",
@@ -90,6 +91,7 @@
   "Updating group ...": "Mise à jour du groupe ...",
   "Updating password": "Mise à jour du mot de passe",
   "Updating resource": "Mise à jour de la ressource",
+  "Updating resources metadata {{counter}}/{{total}}": "Updating resources metadata {{counter}}/{{total}}",
   "Updating users' key...": "Mise à jour de la clé d'utilisateurs...",
   "You have already started the process on another tab.": "Vous avez déjà commencé le processus dans un autre onglet."
 }

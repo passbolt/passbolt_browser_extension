@@ -17,9 +17,10 @@
   "Decrypting {{counter}}/{{total}}": "Decriptare {{counter}}/{{total}}",
   "Done": "Finalizat",
   "Done!": "Finalizat!",
-  "Encrypting": "Se criptează",
   "Encrypting {{counter}}/{{total}}": "Criptare {{counter}}/{{total}}",
+  "Encrypting Metadata": "Encrypting Metadata",
   "Encrypting secret": "Se criptează secretul",
+  "Encrypting Secret": "Encrypting Secret",
   "Expiry date will be updated on {{count}} resource._one": "Expiry date will be updated on {{count}} resource.",
   "Expiry date will be updated on {{count}} resource._other": "Expiry date will be updated on {{count}} resources.",
   "Exporting ...": "Se exportă...",
@@ -90,6 +91,7 @@
   "Updating group ...": "Se actualizează grupul ...",
   "Updating password": "Se actualizează parola",
   "Updating resource": "Se actualizează resursa",
+  "Updating resources metadata {{counter}}/{{total}}": "Updating resources metadata {{counter}}/{{total}}",
   "Updating users' key...": "Se actualizează cheia utilizatorilor...",
   "You have already started the process on another tab.": "You have already started the process on another tab."
 }

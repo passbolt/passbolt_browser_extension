@@ -54,15 +54,18 @@ import PassphraseStorageService from "../../session_storage/passphraseStorageSer
 import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG, RESOURCE_TYPE_V5_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import each from "jest-each";
 import GetOrFindMetadataSettingsService from "../../metadata/getOrFindMetadataSettingsService";
+import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
+import DecryptMetadataService from "../../metadata/decryptMetadataService";
 
 jest.mock("../../../service/progress/progressService");
 
 beforeEach(async() =>  {
   await MockExtension.withConfiguredAccount();
+  jest.clearAllMocks();
 });
 
 describe("ImportResourcesService", () => {
-  let importResourcesService, worker, importResourceFileCSV, passphrase, collection;
+  let importResourcesService, worker, importResourceFileCSV, passphrase, collection, decryptMetadataService, metadataKeys;
 
   const account = new AccountEntity(defaultAccountDto({user_id: pgpKeys.ada.userId}));
   const apiClientOptions = defaultApiClientOptions();
@@ -88,6 +91,7 @@ describe("ImportResourcesService", () => {
         emit: jest.fn()
       }
     };
+    decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
     importResourcesService = new ImportResourcesService(account, apiClientOptions, new ProgressService(worker, ""));
     collection = resourceTypesCollectionDto();
     jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => collection);
@@ -101,7 +105,7 @@ describe("ImportResourcesService", () => {
       jest.spyOn(FolderService.prototype, "create").mockImplementation(() => defaultFolderDto());
       jest.spyOn(TagService.prototype, "updateResourceTags").mockImplementation(() => [defaultTagDto({slug: "import-ref"})]);
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
-      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
       jest.spyOn(GetOrFindMetadataKeysService.prototype, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => defaultMetadataKeysSettingsDto());
@@ -289,6 +293,84 @@ describe("ImportResourcesService", () => {
         expect(error.sourceError).toBeInstanceOf(Error);
         expect(error.sourceError.message).toEqual("No resource type associated to this row.");
       });
+    });
+
+    each([
+      {
+        scenario: RESOURCE_TYPE_V5_DEFAULT_SLUG,
+        importResourcesFile: new ImportResourcesFileEntity(defaultImportResourceFileCSVDto()),
+      },
+      {
+        scenario: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
+        importResourcesFile: new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
+          data: defaultKDBXCSVData
+        })),
+      },
+      {
+        scenario: RESOURCE_TYPE_V5_TOTP_SLUG,
+        importResourcesFile: new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
+          data: KdbxCsvFileTotpData
+        })),
+      },
+    ]).describe("Should encrypt the metadata", test => {
+      it(`Should encrypt the metadata - <${test.scenario}>`, async() => {
+        expect.assertions(10);
+        jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
+          .mockImplementationOnce(() => new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()));
+
+        await importResourcesService.importFile(test.importResourcesFile, passphrase);
+
+        const createCalls = ResourceService.prototype.create.mock.calls;
+
+        expect(createCalls.length).toEqual(2);
+
+        const createdCollection = new ResourcesCollection([
+          createCalls[0][0],
+          createCalls[1][0],
+        ]);
+
+        expect(createdCollection.items[0].isMetadataDecrypted()).toEqual(false);
+        expect(createdCollection.items[1].isMetadataDecrypted()).toEqual(false);
+
+        const expectedCollection = new ResourcesCollection(test.importResourcesFile.importResources.toResourceCollectionImportDto());
+        await decryptMetadataService.decryptAllFromForeignModels(createdCollection, pgpKeys.ada.passphrase);
+        expect(createdCollection.items[0].isMetadataDecrypted()).toEqual(true);
+        expect(createdCollection.items[1].isMetadataDecrypted()).toEqual(true);
+        expect(createdCollection.items[0].metadataKeyType).toEqual("shared_key");
+        expect(createdCollection.items[0].metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
+        expect(createdCollection.items[1].metadataKeyType).toEqual("shared_key");
+        expect(createdCollection.items[1].metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
+        //Checked
+        delete createdCollection.items[0]._props.metadata_key_type;
+        delete createdCollection.items[1]._props.metadata_key_type;
+        delete createdCollection.items[0]._props.metadata_key_id;
+        delete createdCollection.items[1]._props.metadata_key_id;
+
+        expect(createdCollection).toEqual(expectedCollection);
+      });
+    });
+    it(`Should not encrypt the metadata - <v4>`, async() => {
+      expect.assertions(4);
+      jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
+        .mockImplementationOnce(() => new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()));
+      const importResourcesFile = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
+      await importResourcesService.importFile(importResourcesFile, passphrase);
+
+      const createCalls = ResourceService.prototype.create.mock.calls;
+
+      expect(createCalls.length).toEqual(2);
+
+      const createdCollection = new ResourcesCollection([
+        createCalls[0][0],
+        createCalls[1][0],
+      ]);
+
+      expect(createdCollection.items[0].isMetadataDecrypted()).toEqual(true);
+      expect(createdCollection.items[1].isMetadataDecrypted()).toEqual(true);
+
+      const expectedCollection = new ResourcesCollection(importResourcesFile.importResources.toResourceCollectionImportDto());
+
+      expect(createdCollection).toEqual(expectedCollection);
     });
 
     it("Should inform the user about the progress", async() => {

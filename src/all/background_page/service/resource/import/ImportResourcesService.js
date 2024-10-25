@@ -75,6 +75,7 @@ class ImportResourcesService {
     await this.parseFile(importResourcesFile);
     await this.encryptSecrets(importResourcesFile, userId, privateKey);
     const resourcesCollection = new ResourcesCollection(importResourcesFile.importResources.toResourceCollectionImportDto());
+    await this.encryptService.encryptAllFromForeignModels(resourcesCollection, passphrase);
     importResourcesFile.mustImportFolders && await this.bulkImportFolders(importResourcesFile);
     await this.bulkImportResources(importResourcesFile, resourcesCollection);
     importResourcesFile.mustTag && await this.bulkTagResources(importResourcesFile);
@@ -273,10 +274,18 @@ class ImportResourcesService {
    */
   async bulkImportResources(importResourcesFile, resourcesCollection) {
     let importedCount = 0;
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
 
     const callbacks = resourcesCollection.items.map((resourceEntity, index) => async() => {
       try {
-        const data = resourceEntity.toV4Dto({secrets: true});
+        let data;
+        const resourceType = resourceTypesCollection.getFirstById(resourceEntity.resourceTypeId);
+
+        if (resourceType.isV4()) {
+          data = resourceEntity.toV4Dto({secrets: true});
+        } else {
+          data = resourceEntity.toDto({secrets: true});
+        }
         const contain = {permission: true, favorite: true, tags: true, folder: true};
         const resourceDto = await this.resourceService.create(data, contain);
         const createdResourceEntity = new ResourceEntity(resourceDto);

@@ -82,7 +82,7 @@ class ResourceCreateService {
     }
     await ResourceLocalStorage.addResource(createdResource);
     // Share the resource with the metadata decrypted
-    await this.share(createdResource, privateKey, destinationFolder);
+    await this.share(createdResource, privateKey, destinationFolder, permissionChanges);
     return createdResource;
   }
 
@@ -129,11 +129,12 @@ class ResourceCreateService {
    * @param {ResourceEntity} resource The resource to share.
    * @param {openpgp.PrivateKey} privateKey The user decrypted private key
    * @param {FolderEntity} folder The folder entity
+   * @param {PermissionChangesCollection} permissionChangesFromFolder The permission changes
    * @returns {Promise<void>}
    * @private
    */
-  async share(resource, privateKey, folder) {
-    if (!folder) {
+  async share(resource, privateKey, folder, permissionChangesFromFolder) {
+    if (!folder || !permissionChangesFromFolder.length) {
       return;
     }
     // Calculate resource creation share permission changes.

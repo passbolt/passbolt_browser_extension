@@ -60,6 +60,10 @@ import GetDecryptedUserPrivateKeyService from "../../account/getDecryptedUserPri
 import {
   defaultMetadataKeysSettingsDto
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
+import ShareModel from "../../../model/share/shareModel";
+import {
+  ownerFolderPermissionDto,
+} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -347,7 +351,7 @@ describe("ResourceCreateService", () => {
       return expect(promise).rejects.toThrow(new TypeError("The secret should be maximum 4096 characters in length."));
     });
 
-    it("Should create the resource into folder parent", async() => {
+    it("Should create the resource into shared folder parent", async() => {
       expect.assertions(1);
 
       const folderId = uuidv4();
@@ -373,7 +377,7 @@ describe("ResourceCreateService", () => {
       expect(resourceCreateService.share).toHaveBeenCalledTimes(1);
     });
 
-    it("Should create the resource V5 into folder parent", async() => {
+    it("Should create the resource V5 into shared folder parent", async() => {
       expect.assertions(5);
 
       let resourceToAPI, resourceLocalStorageExpected;
@@ -424,6 +428,54 @@ describe("ResourceCreateService", () => {
       // Resource local storage should add the resource
       expect(ResourceLocalStorage.addResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
       expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledWith(13);
+    });
+
+    it("Should create the resource V5 into personal folder parent", async() => {
+      expect.assertions(6);
+
+      let resourceToAPI, resourceLocalStorageExpected;
+      const folderId = uuidv4();
+      const permissionDto = ownerFolderPermissionDto({aco_foreign_key: folderId, aro_foreign_key: account.userId});
+      const folderDto = defaultFolderDto({id: folderId, permission: permissionDto, permissions: [permissionDto]});
+      const resourceDto = defaultResourceDto({folder_parent_id: folderId, resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT});
+      const plaintextDto = plaintextSecretPasswordDescriptionTotpDto();
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
+      const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
+
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(resource => {
+        //Used to check the data sent to API
+        resourceToAPI = resource;
+        const resourceEntity = new ResourceEntity(resourceDto);
+        resourceEntity.secrets = new ResourceSecretsCollection([resourceToAPI.secrets[0]]);
+        resourceEntity.metadataKeyType = resourceToAPI.metadata_key_type;
+        resourceLocalStorageExpected = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        resourceEntity.metadata = resourceToAPI.metadata;
+        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
+      jest.spyOn(resourceCreateService.encryptMetadataKeysService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+        .mockImplementation(() => metadataKeysSettingsDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [resourceDto]);
+      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [folderDto]);
+      jest.spyOn(ShareModel.prototype, "bulkShareResources");
+      jest.spyOn(resourceCreateService, "share");
+      //Decrypt secret
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(async() => decryptionKey);
+
+      await resourceCreateService.create(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
+
+      // Decrypt metadata
+      const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
+      expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
+      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+
+      expect(resourceCreateService.share).toHaveBeenCalledTimes(1);
+      expect(ShareModel.prototype.bulkShareResources).toHaveBeenCalledTimes(0);
+      //Metadata decrypted should be equal
+      expect(resourceEntityUpdated.metadata.toDto()).toEqual(resourceDto.metadata);
+      // Resource local storage should add the resource
+      expect(ResourceLocalStorage.addResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
+      expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledWith(4);
     });
   });
 });

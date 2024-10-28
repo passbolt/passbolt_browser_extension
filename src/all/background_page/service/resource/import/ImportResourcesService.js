@@ -74,9 +74,9 @@ class ImportResourcesService {
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     await this.parseFile(importResourcesFile);
     await this.encryptSecrets(importResourcesFile, userId, privateKey);
+    importResourcesFile.mustImportFolders && await this.bulkImportFolders(importResourcesFile);
     const resourcesCollection = new ResourcesCollection(importResourcesFile.importResources.toResourceCollectionImportDto());
     await this.encryptService.encryptAllFromForeignModels(resourcesCollection, passphrase);
-    importResourcesFile.mustImportFolders && await this.bulkImportFolders(importResourcesFile);
     await this.bulkImportResources(importResourcesFile, resourcesCollection);
     importResourcesFile.mustTag && await this.bulkTagResources(importResourcesFile);
     await this.progressService.finishStep(null, true);

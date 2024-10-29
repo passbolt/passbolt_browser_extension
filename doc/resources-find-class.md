@@ -465,15 +465,27 @@ classDiagram
         }
     }
 
-    namespace ShareServicesNs {
+    namespace ShareNs {
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Share controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
         class ShareResourcesController {
             event "passbolt.share.resources.save"
             +exec(array resources, array changes) Promise
         }
 
-        class ShareResourcesService {
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Share service
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class ShareResourceService {
             +exec(array resources, array changes, string passphrase) Promise
         }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Share models
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class ShareService {
             +shareResource(string resourceId, object data) Promise~object~
@@ -588,9 +600,16 @@ classDiagram
     %% Auth services relationship.
     style PassphraseStorageService fill:#DEE5D4
 
-    %% Share services relationship.
-    style ShareService fill:#DEE5D4
+
+    %% Share controllers relationships
+    ShareResourcesController*--ShareResourceService
     style ShareResourcesController fill:#D2E0FB
-    ShareResourcesController*--ShareResourcesService
-    ShareResourcesService*--ShareService
+    %% Share services relationships.
+    ShareResourceService*--EncryptMetadataService
+    ShareResourceService*--FindAndUpdateResourcesLocalStorageService
+    ShareResourceService*--GetOrFindResourcesService
+    ShareResourceService*--ShareService
+    ShareResourceService*--ResourceService
+    %% Share models relationships.
+    style ShareService fill:#DEE5D4
 ```

@@ -85,6 +85,10 @@ classDiagram
             +importFile(ImportResourcesFileEntity import, string passphrase) Promise~ImportResourcesFileEntity~
         }
 
+        class ExportResourcesService {
+            +exportToFile(ExportResourcesFileEntity import, string passphrase) Promise~ImportResourcesFileEntity~
+        }
+
         class UpdateResourceService {
             +update(object resourceDto, object secretDto, string passphrase) Promise~ResourceEntity~
         }
@@ -481,6 +485,7 @@ classDiagram
     CreateResourceController*--CreateResourceService
     CreateResourceController*--GetPassphraseService
     ExportResourcesFileController*--FindResourcesService
+    ExportResourcesFileController*--ExportResourcesService
     FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
     FindResourcesForShareController*--FindResourcesService
     FindResourceDetailsController*--FindResourcesService
@@ -509,6 +514,8 @@ classDiagram
     ImportResourcesService*--EncryptMetadataService
     ImportResourcesService*--ResourceService
     ImportResourcesService*--ResourcesLocalStorageService
+    ExportResourcesService*--FindResourcesService
+    ExportResourcesService*--DecryptMetadataService
     UpdateResourceService*--EncryptMetadataService
     UpdateResourceService*--ResourceService
     UpdateResourceService*--ResourcesLocalStorageService

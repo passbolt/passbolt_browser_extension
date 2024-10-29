@@ -82,6 +82,7 @@ classDiagram
         }
 
         class ImportResourcesService {
+            +parseFile(ImportResourcesFileEntity import) Promise~void~
             +importFile(ImportResourcesFileEntity import, string passphrase) Promise~ImportResourcesFileEntity~
         }
 

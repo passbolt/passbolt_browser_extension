@@ -23,7 +23,6 @@ import {assertNonEmptyArray} from "../../utils/assertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
-import DecryptMetadataService from "../metadata/decryptMetadataService";
 import ResourceService from "../api/resource/resourceService";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
@@ -44,7 +43,6 @@ class ShareResourceService {
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.resourceService = new ResourceService(apiClientOptions);
-    this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
     this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
     this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
   }

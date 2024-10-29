@@ -132,6 +132,7 @@ describe("ImportResourcesService", () => {
 
         expect(importResourceFileCSV.importResources.items.length).toEqual(0);
 
+        await importResourcesService.parseFile(importResourceFileCSV);
         const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
         expect(result.importResources.items.length).toEqual(2);
@@ -181,6 +182,7 @@ describe("ImportResourcesService", () => {
           file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData()))
         }));
 
+        await importResourcesService.parseFile(importResourceFileCSV);
         const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
         const importedResources = result.importResources.items;
 
@@ -216,6 +218,7 @@ describe("ImportResourcesService", () => {
           file: btoa(BinaryConvert.toBinary(KdbxCsvFileTotpData))
         }));
 
+        await importResourcesService.parseFile(importResourceFileCSV);
         const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
         const importedResources = result.importResources.items;
 
@@ -251,6 +254,7 @@ describe("ImportResourcesService", () => {
           file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData()))
         }));
 
+        await importResourcesService.parseFile(importResourceFileCSV);
         const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
         const importedResources = result.importResources.items;
 
@@ -285,6 +289,7 @@ describe("ImportResourcesService", () => {
           file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData()))
         }));
 
+        await importResourcesService.parseFile(importResourceFileCSV);
         const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
         const error = result.importResourcesErrors[0];
 
@@ -318,6 +323,7 @@ describe("ImportResourcesService", () => {
         jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
           .mockImplementationOnce(() => new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()));
 
+        await importResourcesService.parseFile(test.importResourcesFile);
         await importResourcesService.importFile(test.importResourcesFile, passphrase);
 
         const createCalls = ResourceService.prototype.create.mock.calls;
@@ -354,6 +360,8 @@ describe("ImportResourcesService", () => {
       jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
         .mockImplementationOnce(() => new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()));
       const importResourcesFile = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
+
+      await importResourcesService.parseFile(importResourcesFile);
       await importResourcesService.importFile(importResourcesFile, passphrase);
 
       const createCalls = ResourceService.prototype.create.mock.calls;
@@ -379,7 +387,7 @@ describe("ImportResourcesService", () => {
       jest.spyOn(importResourcesService.progressService, "updateGoals");
       jest.spyOn(importResourcesService.progressService, "finishStep");
 
-
+      await importResourcesService.parseFile(importResourceFileCSV);
       await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
       expect(importResourcesService.progressService.updateGoals).toHaveBeenCalledTimes(1);
@@ -401,6 +409,7 @@ describe("ImportResourcesService", () => {
         }
       }));
 
+      await importResourcesService.parseFile(importResourceFileCSV);
       const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
       const externalFolderEntity1 = new ExternalFolderEntity(minimalExternalFolderDto({
@@ -435,6 +444,7 @@ describe("ImportResourcesService", () => {
         }
       }));
 
+      await importResourcesService.parseFile(importResourceFileCSV);
       await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledTimes(7);
@@ -456,6 +466,7 @@ describe("ImportResourcesService", () => {
         }
       }));
 
+      await importResourcesService.parseFile(importResourceFileCSV);
       const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
       //Reference tag is never return, so we retrieve it from storage
@@ -479,6 +490,7 @@ describe("ImportResourcesService", () => {
         ].join("\n")))
       }));
 
+      await importResourcesService.parseFile(importResourceFileCSV);
       const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
       expect(result.importResources.items.length).toEqual(1);
@@ -510,6 +522,7 @@ describe("ImportResourcesService", () => {
         }
       }));
 
+      await importResourcesService.parseFile(importResourceFileCSV);
       const result = await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
       expect(result.importResources.items.length).toEqual(2);

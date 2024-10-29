@@ -64,12 +64,14 @@ class ImportResourcesFileController {
     }
     //assert file type
     assertBase64String(file);
-    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
 
     this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t('Initialize'));
     await this.progressService.finishStep(null, true);
+
     try {
       const importEntity = ImportResourcesFileEntity.buildImportEntity(fileType, file, options);
+      await this.importResourcesService.parseFile(importEntity);
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       const importedFile = await this.importResourcesService.importFile(importEntity, passphrase);
       return importedFile;
     } finally {

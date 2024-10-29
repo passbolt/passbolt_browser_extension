@@ -72,7 +72,6 @@ class ImportResourcesService {
     const userId = User.getInstance().get().id;
 
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    await this.parseFile(importResourcesFile);
     await this.encryptSecrets(importResourcesFile, userId, privateKey);
     importResourcesFile.mustImportFolders && await this.bulkImportFolders(importResourcesFile);
     const resourcesCollection = new ResourcesCollection(importResourcesFile.importResources.toResourceCollectionImportDto());
@@ -87,7 +86,6 @@ class ImportResourcesService {
    * Parse the file
    * @param {ImportResourcesFileEntity} importResourcesFile The import entity
    * @returns {Promise<void>}
-   * @private
    */
   async parseFile(importResourcesFile) {
     const metadataTypesSettings = await this.getOrFindMetadataSettingsService.getOrFindTypesSettings();
@@ -286,6 +284,7 @@ class ImportResourcesService {
         } else {
           data = resourceEntity.toDto({secrets: true});
         }
+
         const contain = {permission: true, favorite: true, tags: true, folder: true};
         const resourceDto = await this.resourceService.create(data, contain);
         const createdResourceEntity = new ResourceEntity(resourceDto);

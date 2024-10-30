@@ -455,14 +455,18 @@ classDiagram
             -uuid props.id
             -uuid props.user_id
             -string props.data
-            -SessionKeysCollection _session_keys
             -string props.created
             -string props.modified
-            +get data() string
+            +get data() string|SessionKeysBundleDataEntity
             +set data(string data)
+            +isDecrypted() boolean
+        }
+
+        class SessionKeysBundleDataEntity {
+            -string props.object_type
+            -SessionKeysCollection _session_keys
             +get sessionKeys() SessionKeysCollection
             +set sessionKeys(SessionKeysCollection collection)
-            +isDecrypted() boolean
         }
     }
 
@@ -596,7 +600,8 @@ classDiagram
     ResourcesCollection*--ResourceEntity
     SessionKeysCollection*--SessionKeyEntity
     SessionKeysBundlesCollection*--SessionKeysBundleEntity
-    SessionKeysBundleEntity*--SessionKeysCollection
+    SessionKeysBundleEntity*--SessionKeysBundleDataEntity
+    SessionKeysBundleDataEntity*--SessionKeysCollection
 
     %% Auth services relationship.
     style PassphraseStorageService fill:#DEE5D4

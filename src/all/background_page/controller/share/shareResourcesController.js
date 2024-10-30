@@ -13,9 +13,10 @@
  */
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import ProgressService from "../../service/progress/progressService";
-import {assertNonEmptyArray} from "../../utils/assertions";
+import {assertArray, assertArrayUUID, assertNonEmptyArray} from "../../utils/assertions";
 import ShareResourceService from "../../service/share/shareResourceService";
 import i18n from "../../sdk/i18n";
+import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 
 class ShareResourcesController {
   /**
@@ -50,30 +51,39 @@ class ShareResourcesController {
   }
 
   /**
-   * Orchestrate dialogs during the share operation
+   * Share multiple resources.
    *
-   * @param {array} resources
-   * @param {array} changes
+   * @param {array} resourcesIds The resources ids to share
+   * @param {array} permissionChangesDto The permissions changes
    * @return {Promise}
    */
-  async exec(resources, changes) {
-    assertNonEmptyArray(resources, 'resources should be a non empty array');
-    assertNonEmptyArray(changes, 'changes should be a non empty array');
+  async exec(resourcesIds, permissionChangesDto) {
+    assertArray(resourcesIds, 'The parameter "resourcesIds" should be an array');
+    assertNonEmptyArray(resourcesIds, 'The parameter "resourcesIds" should be a non empty array');
+    assertArrayUUID(resourcesIds, 'The parameter "resourcesIds" should contain only uuid');
+    assertArray(permissionChangesDto, 'The parameter "permissionChangesDto" should be an array');
+    assertNonEmptyArray(permissionChangesDto, 'The parameter "permissionChangesDto" should be a non empty array');
 
+    const permissionChanges = new PermissionChangesCollection(permissionChangesDto);
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
 
     /*
-     * Number of goals is (number of resources * 3) + 1 :
-     * why 3: simulate call to the API + encrypting step + share call to the API
-     * why +1: this function initialization step
+     * 7 steps are required to share resources:
+     * - Updating the resources metadata
+     * - Calculating the secrets requirements
+     * - Retrieving the secrets
+     * - Decrypting the secrets
+     * - Encrypting the secrets
+     * - Synchronizing keyring
+     * - Sharing resources
+     * - Updating resources local storage
      */
-    const progressGoal = resources.length * 3 + 1;
-
-    this.progressService.title = i18n.t("Share {{count}} password", {count: resources.length});
-    this.progressService.start(progressGoal, i18n.t('Initialize'));
+    const goals = 8;
+    this.progressService.title = i18n.t("Share {{count}} resource", {count: resourcesIds.length});
+    this.progressService.start(goals, i18n.t('Initialize'));
 
     try {
-      await this.shareResourceService.exec(resources, changes, passphrase);
+      await this.shareResourceService.shareAll(resourcesIds, permissionChanges, passphrase);
       this.progressService.finishStep(i18n.t('Done!'), true);
     } finally {
       this.progressService.close();

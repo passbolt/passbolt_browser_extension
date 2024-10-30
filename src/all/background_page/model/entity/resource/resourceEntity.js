@@ -26,8 +26,8 @@ import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'Resource';
 
-const METADATA_KEY_TYPE_USER_KEY = "user_key";
-const METADATA_KEY_TYPE_METADATA_KEY = "shared_key";
+export const METADATA_KEY_TYPE_USER_KEY = "user_key";
+export const METADATA_KEY_TYPE_METADATA_KEY = "shared_key";
 
 const SUPPORTED_METADATA_KEY_TYPES = [
   METADATA_KEY_TYPE_USER_KEY,
@@ -348,7 +348,7 @@ class ResourceEntity extends EntityV2 {
       return this._props.personal;
     }
     if (this.permissions) {
-      return this.permissions.length === 1;
+      return this.permissions.length === 1; //@todo dangerous, could be a group permission having mulitple members.
     }
     return null;
   }
@@ -378,6 +378,14 @@ class ResourceEntity extends EntityV2 {
    */
   isMetadataDecrypted() {
     return Boolean(this._metadata);
+  }
+
+  /**
+   * Check if the metadata key type is user key.
+   * @returns {boolean}
+   */
+  isMetadataKeyTypeUserKey() {
+    return this._props.metadata_key_type === METADATA_KEY_TYPE_USER_KEY;
   }
 
   /**

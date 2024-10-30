@@ -22,11 +22,11 @@ import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metad
  * Build an array of resources dto containing resources of different supported types.
  * @returns {array}
  */
-export const multipleResourceDtos = () => [
-  resourceLegacyDto({name: "Resource0"}, {withTags: true}),
-  defaultResourceDto({name: "Resource1"}, {withTags: true}),
-  resourceWithTotpDto({name: "Resource2"}, {withTags: true}),
-  resourceStandaloneTotpDto({name: "Resource3"}, {withTags: true}),
+export const multipleResourceDtos = (data = {}, options = {}) => [
+  resourceLegacyDto({name: "Resource0", ...data}, options),
+  defaultResourceDto({name: "Resource1", ...data}, options),
+  resourceWithTotpDto({name: "Resource2, ...data"}, options),
+  resourceStandaloneTotpDto({name: "Resource3", ...data}, options),
 ];
 
 /**
@@ -34,13 +34,13 @@ export const multipleResourceDtos = () => [
  * unsupported resource types.
  * @returns {array}
  */
-export const multipleResourceIncludingUnsupportedResourceTypesDtos = () => [
-  resourceLegacyDto({name: "Resource0"}, {withTags: true}),
-  defaultResourceDto({name: "Resource1"}, {withTags: true}),
-  resourceUnknownResourceTypeDto({name: "ResourceX"}, {withTags: true}),
-  resourceWithTotpDto({name: "Resource2"}, {withTags: true}),
-  resourceStandaloneTotpDto({name: "Resource3"}, {withTags: true}),
-  resourceUnknownResourceTypeDto({name: "ResourceY"}, {withTags: true}),
+export const multipleResourceIncludingUnsupportedResourceTypesDtos = (data = {}, options = {}) => [
+  resourceLegacyDto({name: "Resource0", ...data}, options),
+  defaultResourceDto({name: "Resource1", ...data}, options),
+  resourceUnknownResourceTypeDto({name: "ResourceX", ...data}, options),
+  resourceWithTotpDto({name: "Resource2", ...data}, options),
+  resourceStandaloneTotpDto({name: "Resource3", ...data}, options),
+  resourceUnknownResourceTypeDto({name: "ResourceY", ...data}, options),
 ];
 
 export const multipleResourceWithMetadataEncrypted = (sharedMetadataKeyId = null) => [

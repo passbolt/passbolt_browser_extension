@@ -9,17 +9,18 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.9.4
+ * @since         4.10.1
  */
 import {assertArrayUUID} from "../../utils/assertions";
 import FindResourcesService from "../../service/resource/findResourcesService";
 
-class FindResourcesForShareController {
+class FindAllByIdsForDisplayPermissionsController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
+   * @param {AccountEntity} account The user account
    */
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
@@ -43,15 +44,15 @@ class FindResourcesForShareController {
   }
 
   /**
-   * Find the resource to share.
+   * Find the resource to display the permissions for.
    * @param {Array<uuid>} resourceIds The resources ids
    * @returns {Promise<ResourcesCollection>}
    */
   async exec(resourceIds) {
     assertArrayUUID(resourceIds);
 
-    return this.findResourcesService.findAllByIdsForShare(resourceIds);
+    return this.findResourcesService.findAllByIdsForDisplayPermissions(resourceIds);
   }
 }
 
-export default FindResourcesForShareController;
+export default FindAllByIdsForDisplayPermissionsController;

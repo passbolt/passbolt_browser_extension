@@ -97,7 +97,7 @@ describe("FolderEntity", () => {
   });
 
   it("constructor works if valid DTO is provided with optional properties", () => {
-    const dto = defaultFolderDto({}, {withPermissions: true, withCreator: true, withModifier: true});
+    const dto = defaultFolderDto({}, {withPermissions: {count: 3}, withCreator: true, withModifier: true});
     const entity = new FolderEntity(dto);
     expect(entity.id).toEqual(dto.id);
     expect(entity.name).toEqual('Accounting');
@@ -107,12 +107,11 @@ describe("FolderEntity", () => {
     expect(entity.permission).toBeInstanceOf(PermissionEntity);
     expect(entity.permission.toDto()).toEqual(expect.objectContaining({type: 15}));
     expect(entity.permissions).toBeInstanceOf(PermissionsCollection);
-    expect(entity.permissions.length).toEqual(1);
+    expect(entity.permissions.length).toEqual(3);
     expect(entity._creator).toBeInstanceOf(UserEntity);
     expect(entity._creator.toDto()).toEqual(expect.objectContaining({username: "ada@passbolt.com"}));
     expect(entity._modifier).toBeInstanceOf(UserEntity);
     expect(entity._modifier.toDto()).toEqual(expect.objectContaining({username: "ada@passbolt.com"}));
-    expect(entity.permissions.length).toEqual(1);
     expect(entity.isReadOnly()).toBe(false);
     expect(entity.canUpdate()).toBe(true);
     expect(entity.isOwner()).toBe(true);

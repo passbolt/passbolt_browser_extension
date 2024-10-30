@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import ResourceEntity from "./resourceEntity";
+import ResourceEntity, {METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY} from "./resourceEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
@@ -24,6 +24,8 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
 import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 import {v4 as uuidv4} from "uuid";
+import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import expect from "expect";
 
 describe("Resource entity", () => {
   describe("ResourceEntity::getSchema", () => {
@@ -362,6 +364,36 @@ describe("Resource entity", () => {
       } catch (error) {
         expect(error.getError("metadata_key_type", "enum")).toEqual("The metadata_key_type value is not included in the supported list.");
       }
+    });
+  });
+
+  describe("::isMetadataDecrypted", () => {
+    it("returns true if the metadata is decrypted", () => {
+      expect.assertions(1);
+      const entity =  new ResourceEntity(defaultResourceDto());
+      expect(entity.isMetadataDecrypted()).toBeTruthy();
+    });
+
+    it("returns false if the metadata is encrypted", () => {
+      expect.assertions();
+      const entity =  new ResourceEntity(defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[0]}));
+      expect(entity.isMetadataDecrypted()).toBeFalsy();
+    });
+  });
+
+  describe("::isMetadataKeyTypeUserKey", () => {
+    it("returns true if the metadata key type user_key", () => {
+      expect.assertions(1);
+      const entity =  new ResourceEntity(defaultResourceDto({metadata_key_type: METADATA_KEY_TYPE_USER_KEY}));
+      expect(entity.isMetadataKeyTypeUserKey()).toBeTruthy();
+    });
+
+    it("returns false if the metadata key type is not user_key", () => {
+      expect.assertions();
+      const entityV4 =  new ResourceEntity(defaultResourceV4Dto());
+      expect(entityV4.isMetadataKeyTypeUserKey()).toBeFalsy();
+      const entityV5SharedKey =  new ResourceEntity(defaultResourceDto({metadata_key_type: METADATA_KEY_TYPE_METADATA_KEY}));
+      expect(entityV5SharedKey.isMetadataKeyTypeUserKey()).toBeFalsy();
     });
   });
 });

@@ -347,9 +347,6 @@ describe("FindResourcesService", () => {
     beforeEach(() => {
       service = new FindResourcesService(account, apiClientOptions);
       expectedContains = {
-        "permission": true,
-        "permissions.user.profile": true,
-        "permissions.group": true,
         "secret": true
       };
     });
@@ -386,6 +383,56 @@ describe("FindResourcesService", () => {
       jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
       const result = await service.findAllByIdsForShare(collectionIds);
+
+      expect(result.toDto()).toEqual(collectionDto);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("::findAllByIdsForDisplayPermissions", () => {
+    let service, expectedContains;
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+      expectedContains = {
+        "permission": true,
+        "permissions.user.profile": true,
+        "permissions.group": true,
+      };
+    });
+
+    it("should call the api only 1 times when the resource is less than 80", async() => {
+      expect.assertions(3);
+
+      const collectionDto = Array.from({length: 80}, () => defaultResourceDto());
+      const collectionIds = collectionDto.map(collection => collection.id);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
+      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
+
+      const result = await service.findAllByIdsForDisplayPermissions(collectionIds);
+
+      expect(result).toEqual(new ResourcesCollection(collectionDto));
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, {
+        "has-id": collectionIds
+      });
+    });
+
+    it("should call the api only 2 times when the resource is more than 80", async() => {
+      expect.assertions(4);
+
+      const collectionDto = Array.from({length: 82}, () => defaultResourceDto());
+      const resultCollectionDto = [...collectionDto];
+      const collectionIds = collectionDto.map(collection => collection.id);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
+        expect(contains).toEqual(expectedContains);
+        return resultCollectionDto.splice(0, filters["has-id"].length);
+      });
+      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
+
+      const result = await service.findAllByIdsForDisplayPermissions(collectionIds);
 
       expect(result.toDto()).toEqual(collectionDto);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(2);

@@ -74,6 +74,7 @@ classDiagram
             +findAllByHasAccessForLocalStorage(uuid acoForeignKey) Promise~ResourcesCollection~
             +findAllByIds(Array~uuid~ resourcesIds, object contains) Promise~ResourcesCollection~
             +findAllForLocalStorage() Promise~ResourcesCollection~
+            +findAllByIdsForDisplayPermissions(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findAllByIdsForShare() Promise~ResourcesCollection~
             +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
@@ -404,6 +405,7 @@ classDiagram
             +get metadata() string|MetadataEntity
             +set metadata(string|MetadataEntity metadata)
             +isMetadataDecrypted() boolean
+            +isMetadataKeyTypeUserKey() boolean
         }
 
         class ResourcesCollection {
@@ -411,6 +413,7 @@ classDiagram
             +filterOutByMetadataDecrypted() void
             +filterByResourceTypes(ResourceTypesCollection collection) void
             +filterBySuggestResources(string url) void
+            +filterOutMetadataNotEncryptedWithUserKey() void
         }
 
         class ResourceTypesCollection {
@@ -435,6 +438,17 @@ classDiagram
             +hasTotp() boolean
             +isStandaloneTotp() boolean
             +get version() string
+        }
+
+        class SecretsCollection {
+        }
+
+        class SecretEntity {
+            +uuid props.id
+            +string props.data
+            +string props.created
+            +string props.created_by
+            +string props.modified_by
         }
 
         class SessionKeysCollection {
@@ -473,7 +487,7 @@ classDiagram
 
         class ShareResourcesController {
             event "passbolt.share.resources.save"
-            +exec(array resources, array changes) Promise
+            +exec(array~uuid~ resourcesIds, array~object~ permissionChangesDto) Promise
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -481,7 +495,7 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class ShareResourceService {
-            +exec(array resources, array changes, string passphrase) Promise
+            +exec(array~uuid~ resourcesIds, PermissionChangesCollection permissionChanges, string passphrase) Promise
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -594,6 +608,7 @@ classDiagram
     ResourceEntity*--ResourceTypeEntity
     ResourceTypesCollection*--ResourceTypeEntity
     ResourcesCollection*--ResourceEntity
+    SecretsCollection*--SecretEntity
     SessionKeysCollection*--SessionKeyEntity
     SessionKeysBundlesCollection*--SessionKeysBundleEntity
     SessionKeysBundleEntity*--SessionKeysCollection
@@ -609,8 +624,8 @@ classDiagram
     ShareResourceService*--EncryptMetadataService
     ShareResourceService*--FindAndUpdateResourcesLocalStorageService
     ShareResourceService*--GetOrFindResourcesService
-    ShareResourceService*--ShareService
     ShareResourceService*--ResourceService
+    ShareResourceService*--ShareService
     %% Share models relationships.
     style ShareService fill:#DEE5D4
 ```

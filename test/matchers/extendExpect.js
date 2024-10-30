@@ -20,6 +20,7 @@ import {toBeEqualToOpenpgpKey} from "./toBeEqualToOpenpgpKey";
 import {toBeOpenpgpPrivateKey} from "./toBeOpenpgpPrivateKey";
 import {toThrowCollectionValidationError} from "./toThrowCollectionValidationError";
 import {toThrowEntityValidationError} from "./toThrowEntityValidationError";
+import {toDecryptAndEqualTo} from "./toDecryptAndEqualTo";
 
 const extensions = {
   toBeEqualToOpenpgpKey,
@@ -27,6 +28,7 @@ const extensions = {
   toBeOpenpgpPrivateKey,
   toBeOpenpgpPublicKey,
   toBeOpenpgpRevokedKey,
+  toDecryptAndEqualTo,
   toThrowEntityValidationErrorOnProperties,
   toThrowCollectionValidationError,
   toThrowEntityValidationError

@@ -66,7 +66,7 @@ export default class FindResourcesService {
   /**
    * Find all by ids
    * @param {Object} contains
-   * @param {Array<uuid>} resourcesIds
+   * @param {Array<string>} resourcesIds
    * @returns {Promise<ResourcesCollection>}
    */
   async findAllByIds(resourcesIds, contains = {}) {
@@ -80,7 +80,6 @@ export default class FindResourcesService {
       };
       return async() => await this.findAll(contains, filter);
     });
-
 
     // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
     const arrayOfCollection = await this.executeConcurrentlyService.execute(callbacks, 5);
@@ -121,21 +120,38 @@ export default class FindResourcesService {
 
   /**
    * Retrieve all resources by ids for sharing.
-   * @param {Array<uuid>} resourceIds
+   * @param {Array<string>} resourcesIds The resource ids to retrieve.
    * @returns {Promise<ResourcesCollection>}
    */
   async findAllByIdsForShare(resourcesIds) {
     assertArrayUUID(resourcesIds);
 
     const contains = {
+      "secret": true
+    };
+    const resources =  await this.findAllByIds(resourcesIds, contains);
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources);
+
+    return resources;
+  }
+
+  /**
+   * Retrieve all resources by ids for display permissions.
+   * @param {Array<uuid>} resourcesIds The resource ids to retrieve.
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByIdsForDisplayPermissions(resourcesIds) {
+    assertArrayUUID(resourcesIds);
+
+    const contains = {
       "permission": true,
       "permissions.user.profile": true,
       "permissions.group": true,
-      "secret": true
     };
-    const resourceCollection =  await this.findAllByIds(resourcesIds, contains);
+    const resources = await this.findAllByIds(resourcesIds, contains);
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources);
 
-    return resourceCollection;
+    return resources;
   }
 
   /**

@@ -175,6 +175,13 @@ class ResourcesCollection extends EntityV2Collection {
     this.filterByCallback(resource => resource.isMetadataDecrypted());
   }
 
+  /**
+   * Filter out resources having their metadata not encrypted with a user key.
+   */
+  filterOutMetadataNotEncryptedWithUserKey() {
+    this.filterByCallback(resource => resource.isMetadataKeyTypeUserKey());
+  }
+
   /*
    * ==================================================
    * Setters

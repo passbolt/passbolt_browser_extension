@@ -135,6 +135,19 @@ export const assertString = (str, errorMessage = "The given parameter is not a v
 };
 
 /**
+ * Assert that the given parameter is a non-empty string.
+ * @param {any} data the parameter to validate
+ * @param {string} [errorMessage] the message to throw withing the Error if any
+ * @throws {Error} if the parameter is not valid
+ */
+export const assertNonEmptyString = (data, errorMessage = "The given parameter should be a non empty string") => {
+  assertString(data, errorMessage);
+  if (!data.length) {
+    throw new TypeError(errorMessage);
+  }
+};
+
+/**
  * Assert that the given parameter is of the given type.
  * @param {*} object the parameter to validate
  * @param {*} expectedType the expected type of `object`
@@ -189,7 +202,7 @@ export const assertArray = (data, errorMessage = "The given parameter is not a v
 };
 
 /**
- * Assert that the given parameter is a valid array.
+ * Assert that the given parameter is a non empty array.
  * @param {Array} data the parameter to validate
  * @param {string} [errorMessage] the message to throw withing the Error if any
  * @throws {Error} if the parameter is not valid
@@ -203,11 +216,16 @@ export const assertNonEmptyArray = (data, errorMessage = "The given parameter is
 /**
  * Assert that the given parameter is a valid uuid array.
  * @param {Array} data the parameter to validate
+ * @param {string} [errorMessage] the message to throw withing the Error if any
  * @throws {Error} if the parameter is not valid
  */
-export const assertArrayUUID = data => {
-  assertArray(data);
-  data.forEach(entry => assertUuid(entry));
+export const assertArrayUUID = (data, errorMessage = "The given parameter is not a valid array of uuid") => {
+  try {
+    assertArray(data);
+    data.forEach(entry => assertUuid(entry));
+  } catch (error) {
+    throw new TypeError(errorMessage, {cause: error});
+  }
 };
 
 /**

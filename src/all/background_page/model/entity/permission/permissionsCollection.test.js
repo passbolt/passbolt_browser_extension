@@ -175,7 +175,7 @@ describe("PermissionsCollection", () => {
   describe(":pushMany", () => {
     it("[performance] should ensure performance adding large dataset remains effective.", async() => {
       const count = 10_000;
-      const dtos = defaultPermissionsDtos(count);
+      const dtos = defaultPermissionsDtos({}, {count});
 
       const start = performance.now();
       const collection = new PermissionsCollection(dtos);

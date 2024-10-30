@@ -35,7 +35,7 @@ describe("FindAcoPermissionsForDisplayController", () => {
       // initialisation
       const controller = new FindAcoPermissionsForDisplayController(null, null, defaultApiClientOptions(), account);
       const resourceId = uuidv4();
-      const permissionsDto = defaultPermissionsDtos(10, {}, {withUser: true});
+      const permissionsDto = defaultPermissionsDtos({}, {withUser: true});
       // mocked function
       jest.spyOn(controller.findPermissionService, "findAllByAcoForeignKeyForDisplay").mockImplementationOnce(() => new PermissionsCollection(permissionsDto));
       jest.spyOn(controller.findFolderService, "findById");

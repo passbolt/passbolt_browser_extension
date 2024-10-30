@@ -406,7 +406,7 @@ describe("ResourceCreateService", () => {
         return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       });
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [resourceDto]);
-      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [defaultFolderDto({id: folderId}, {withPermissions: 2})]);
+      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [defaultFolderDto({id: folderId}, {withPermissions: {count: 2}})]);
       jest.spyOn(ShareService.prototype, "simulateShareResource").mockImplementation(() => shareResourceChanges);
       jest.spyOn(ShareService.prototype, "shareFolder").mockImplementation(() => shareResourceChanges);
       jest.spyOn(ShareService.prototype, "shareResource").mockImplementation(() => jest.fn());

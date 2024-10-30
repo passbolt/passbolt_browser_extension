@@ -12,7 +12,6 @@ import ShareFoldersController from "../controller/share/shareFoldersController";
 import FoldersCollection from "../model/entity/folder/foldersCollection";
 import PermissionChangesCollection from "../model/entity/permission/change/permissionChangesCollection";
 import SearchUsersAndGroupsController from "../controller/share/searchUsersAndGroupsController";
-import FindResourcesForShareController from "../controller/share/findResourcesForShareController";
 
 /**
  * Listens the share events
@@ -21,16 +20,6 @@ import FindResourcesForShareController from "../controller/share/findResourcesFo
  * @param {AccountEntity} account the user account
  */
 const listen = function(worker, apiClientOptions, account) {
-  /*
-   * Retrieve the resources to share.
-   * @listens passbolt.share.find-resources-for-share
-   * @param {array} resourcesIds The ids of the resources to retrieve.
-   */
-  worker.port.on('passbolt.share.find-resources-for-share', async(requestId, resourcesIds) => {
-    const controller = new FindResourcesForShareController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourcesIds);
-  });
-
   /*
    * Retrieve the folders to share.
    * @listens passbolt.share.get-folders

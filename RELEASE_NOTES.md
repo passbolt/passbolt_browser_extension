@@ -1,76 +1,85 @@
-Song: https://www.youtube.com/watch?v=tmZ-loZlsyI
+Song: https://www.youtube.com/watch?v=2YdC0GshApE
 
-Passbolt v4.9.4 is a maintenance update of preparatory work for the incoming v5 and addresses reported issues. Specifically, it cleans the codebase to ease the later encryption of the resource metadata. Plus, it fixes the unexpected resource workspace column resizing and some displayed information.
+Passbolt v4.10.0 is a maintenance update that prepares for the upcoming v5 release, introducing beta support for the v5 resource type format within the v4 user interface and addressing reported issues.
 
-Thank you to the community for reporting this issue.
+This release is particularly valuable for maintainers of clients or integrations, offering an early preview of the v5 resource type format to aid in planning for future adaptations. While previous content types will remain supported until version 6, the new content types expand functionality, empowering technical teams to manage a broader range of credentials. Stay tuned—a blog article will be released soon to explain how to enable v5 support and begin testing your integrations.
 
-## [4.9.4] - 2024-09-30
+Thank you to our community for your continued support.
+
+## [4.10.0] - 2024-10-30
+### Added
+PB-16113 As LU I should be able to drag and drop a resource I own on a shared tag
+PB-35412 WP3-2.1 Implement MetadataPrivateKey entity to support metadata private key
+PB-35419 WP3-2.3 Implement MetadataPrivateKeys collection to support collection of metadata private keys
+PB-35420 WP3-2.5 Implement MetadataKey entity to support metadata key
+PB-35421 WP3-2.6 Implement MetadataKeys collection to support collection of metadata keys
+PB-35422 WP3-2.2 Implement decryptOne on DecryptMetadataPrivateKeys service to decrypt a metadata private key
+PB-35424 WP3-2.4 Implement decryptAll on DecryptMetadataPrivateKeys service to decrypt a metadata private keys collection
+PB-35425 WP3-2.7 Implement decryptAllFromMetdataKeysCollection on DecryptMetadataPrivateKeys service to decrypt metadata private keys on MetadataKeys collection
+PB-35426 WP3-2.8 Implement the function findAll on the FindMetadataKeys service to retrieve metadata keys from the API and decrypt any metadata private keys found if any
+PB-35427 WP3-2.9 Implement the function findAllForSessionStorage on the FindMetadataKeys service to retrieve metadata keys for the Session storage
+PB-35428 WP3-2.10 Adapt resource entity to support both encrypted metadata and non encrypted metadata
+PB-35429 WP3-2.11 Implement decryptAllFromForeignModels on DecryptMetadata service to decrypt metadata on a resource collection
+PB-35430 WP3-2.12 Decrypt metadata of v5 resources types when retrieving resources from the API
+PB-35684 WP3-3.4 Implement encryptOneForForeignModel on EncryptMetadata service to encrypt metadata on a resource
+PB-35686 WP3-3.5 Encrypt metadata of v5 resource types when editing new resource types
+PB-35688 WP3-3.1 Add necessary capabilities to resource types collection and entity to support v5 types in the UI
+PB-35692 WP3-4.1 implement metadata types settings entity to support metadata types settings
+PB-35693 WP3-4.2 Implement findSettings on MetadataTypesSettingsApiService to retrieve metadata types settings
+PB-35694 WP3-4.3 Implement findTypesSettings on FindMetadataSettingsService to retrieve metadata types settings entity
+PB-35695 WP3-4.4 IImplement MetadataTypesSettingsLocalStorage to store and retrieve metadata types settings from local storage
+PB-35696 WP3-4.5 Implement findAndUpdateTypesSettings on FindAndUpdateMetadataSettingsService to retrieve metadata types settings from the API and store them in the local storage
+PB-35698 WP3-4.7 Implement GetOrFindMetadataTypesSettingsController to provide capability to retrieve the metadata types settings from the UI
+PB-35700 WP3-4.6 Implement getOrFindMetadataTypesSettings on GetOrFindMetadataSettingsService to retrieve metadata types settings from store or from the API and store them in the local storage
+PB-36225 WP3-4.10 Create resource service should determine personal resource only with permissions of the destination folder
+PB-35701 WP3-4.8 WebApp/QuickApp lazy loads metadata types settings and provide it to components that need them
+PB-35703 WP3-4.10 WebApp CreateResource component creates resources of type v5
+PB-35704 WP3-4.11 Webapp CreateStandaloneTotp component creates resources of type v5
+PB-35705 WP3-3.6 Webapp EditResource component updates resources of type v5
+PB-35707 WP3-4.12 Encrypt metadata of v5 resource types when creating new resources
+PB-35710 WP3-5.1 Migrate import resources controller logic into a dedicated service
+PB-35718 WP3-5.2 Resources import parsers should determine imported resource type based on imported data and configuration
+PB-35721 WP3-5.3 import resources of type v5
+PB-35755 WP3-6.2 Share resources of type v5
+PB-35853 WP3-4.14 Add resource types v5 to the list of supported resource types
+PB-35893 WP3-7.1 Implement MetadataKeysSettingsEntity to support metadata keys settings
+PB-35895 WP3-7.2 Implement findSettings on MetadataKeysSettingsApiService to retrieve metadata keys settings
+PB-35896 WP3-7.3 Implement findKeysSettings on FindMetadataSettingsService to retrieve metadata keys settings as entity
+PB-35897 WP3-7.4 Implement MetadataKeysSettingsLocalStorageService to store and retrieve metadata keys settings from local storage
+PB-35898 WP3-7.5 Implement findAndUpdateKeysSettings on FindAndUpdateMetadataSettingsService to retrieve metadata keys settings from the API and store them in the local storage
+PB-35899 WP3-7.6 Implement getOrFindMetadataKeysSettings on GetOrFindMetadataSettingsService to retrieve metadata keys settings from storage or from the API and store them in the local storage
+PB-35900 WP3-7.7 Enforce metadata encryption using the metadata key as dictated by the metadata key settings
+PB-35901 WP3-5.6 Implement encryptAllFromForeignModels on EncryptMetadata service to encrypt metadata on a collection of resources
+PB-35902 WP3-9.1 Implement MetadataKeysSessionStorageService to store and retrieve metadata keys from session storage
+PB-35903 WP3-9.2 Implement findAndUpdateAll on FindAndUpdateKeysSessionStorageService to retrieve metadata keys from the API and store them in the local storage
+PB-35904 WP3-9.3 Implement getOrFindAll on GetOrFindMetadataKeysService to retrieve metadata keys from storage or from the API and store them in the local storage
+PB-35907 WP3-9.5 decrypt metadata service should retrieve keys from session storage
+PB-35912 WP3-2.16 Implement MetadataPrivateKeyData entity to support decrypted metadata private key data
+PB-35914 WP3-2.19 Update metadata_key_type to be aligned with the API value for the shared_key
+PB-35915 WP3-2.18 update the resource metadata object_type to be aligned with the API
+PB-35947 WP3-2.17 Update MetadataPrivateKey entity to support MetadataPrivateKeyData
+PB-35982 WP3-2.20 allow a metadata_key_id to be set when metadata_key_type is set to 'user_key'
+PB-35989 WP3-4.13 QuickApp components creates resource of type v5 accordingly to metadata settings
+PB-36187 WP3-9.5.1 Refactor decryptMetadataService to welcome keys coming from getOrFindMetadataKeys
+PB-36226 Create an event to get the account of the user
+PB-36230 WP3-5.3.2 Encrypt EncryptMetadataService.encryptAllFromForeignModels should not crash if v4 resource type are sent for encryption
+PB-36231 WP3-5.3.3 ImportResourceService should encrypt a v5 resource type metadata
+
+### Improved
+PB-35702 WP3-4.9 WebApp DisplayResourcesWorkspaceMainMenu should be able to determine the type of content to create
+PB-35718 WP3-5.2 Resources import parsers should determine imported resource type based on imported data and configuration
+PB-35802 WP3-3.2 WebApp lazy loads resource types and replace resourceTypeSettings usage with it
+PB-35803 WP3-3.2 QuickApp lazy loads resource types and replace resourceTypeSettings usage with it
+PB-35987 WP3-4.13 QuickApp components creates resource button should be display only when possible
+PB-35988 WP3-4.13 Inform components creates or save resources should be display only when possible
+
 ### Fixed
-- PB-33927: Update the label for password expiry email notification
-- PB-34743: Fix: folder's sidebar information misses the creator and modifier information
-- PB-35351: Fix: Grid columns resizing unexpectedly
+PB-35709 Fix: theme back to default randomly after refresh or navigation
+PB-35714 Fix: Infinite loading when user try an account recovery process on another profile with an extension installed
+PB-35861 Fix: Wrong resource type is displayed in resource sidebar
+PB-36123 Fix: Filtering resources with a second group should not enter in a filtering loop between the first and second selected groups
+PB-36236 Fix: Resource type requirements when retrieving resources to export resulting in cardinality issue with some environment
 
 ### Maintenance
-- PB-34313: E2EE WP2 documentation permissions finder class
-- PB-34612: As a desktop app I should see the dotnet error message in of http error
-- PB-34632: WP2-1.1 Migrate ResourceTypeEntity to EntityV2
-- PB-34633: WP2-1.2 Migrate ResourceTypesCollection to EntityV2Collection
-- PB-34634: WP2-1.3 Migrate CommentEntity to EntityV2
-- PB-34635: WP2-1.4 Migrate CommentsCollection to EntityV2Collection
-- PB-34636: WP2-1.5 migrate external resource entity to entity v2
-- PB-34637: WP2-1.6 migrate external resources collection to entity v2 collection
-- PB-34638: WP2-1.7 migrate external folder entity to entity v2
-- PB-34639: WP2-1.8 migrate external folders collection to entity v2 collection
-- PB-34640: WP2-1.9 Migrate ExportResourcesFileEntity to EntityV2
-- PB-34641: WP2-1.10 Migrate PermissionTransferEntity to EntityV2
-- PB-34642: WP2-1.11 Migrate PermissionTransfersCollection to EntityV2Collection
-- PB-34643: WP2-1.12 Migrate GroupDeleteTransferEntity to EntityV2
-- PB-34644: WP2-1.14 Migrate GroupUserTransfersCollection to EntityV2Collection
-- PB-34645: WP2-1.15 Migrate UserDeleteTransferEntity to EntityV2
-- PB-34646: WP2-1.13 Migrate GroupUserTransferEntity to EntityV2
-- PB-34647: WP2-1.16 Migrate NeededSecretEntity to EntityV2
-- PB-34648: WP2-1.17 Migrate NeededSecretsCollection to EntityV2Collection
-- PB-34649: WP2-1.18 Migrate SecretEntity to EntityV2
-- PB-34650: WP2-1.19 Migrate SecretsCollection to EntityV2Collection
-- PB-34651: WP2-1.20 Migrate GroupUpdateDryRunResultEntity to EntityV2
-- PB-34656: WP2-1.25 Migrate ImportResourcesFileEntity to EntityV2
-- PB-34657: WP2-1.26 Migrate PlaintextEntity to EntityV2
-- PB-34658: WP2-1.27 Migrate TotpEntity to EntityV2
-- PB-34747: WP2-1.28 Remove not used sanitizeDto from GroupsUsersCollection
-- PB-35124: Migrate 'gte' and 'lte' props of schemas to 'minimum' and 'maximum'
-- PB-35125: WP2-2.6 Find resource permissions by requesting dedicated API permissions entry point
-- PB-35128: WP2-2.1 unnecessary quick a api call when displaying home page
-- PB-35161: WP2-2.2 unnecessary quick a api call for filtering resources: filter by favourite
-- PB-35170: WP2-2.5 unnecessary quick a api call for filtering resources: filter by tags
-- PB-35172: WP2-2.7 Find folder permissions by requesting dedicated API permissions entry point
-- PB-35174: WP2-4.1 Migrate Webapp resource create form in view model
-- PB-35175: WP2-4.2 Migrate Webapp resource edit form in view model
-- PB-35177: WP2-4.3 Migrate Quickaccess resource create form in view model
-- PB-35178: WP2-4.4 Migrate Quickaccess resource auto-save form in view model
-- PB-35179: WP2-4.5 Migrate Webapp edit description from sidebar form in view model ?
-- PB-35180: WP2-2.8 Copy/preview password/totp should find single secret by requesting dedicated API secrets entry point
-- PB-35182: WP2-3.1 Migrate the resource types event 'passbolt.resource-type.get-all' into a controller
-- PB-35233: WP2-5.1 PlainText entity schema should be provided by the browser extension
-- PB-35253: WP2-3.2 Migrate resource update controller logic into service
-- PB-35255: WP2-3.3 Migrate resource “update-local-storage” event logic to a dedicated controller
-- PB-35256: WP2-5.2 Unit test performance of new collection v2 and ensure no regression is introduced
-- PB-35261: WP2-2.10 Shift resources & folders and update local storage debounce...
-- PB-35261: WP2-2.10 Decouple logic of update local storage, find all and get or find all in order to prepare for resource with encrypted metadata
-- PB-35323: Ensure resource test factory does not contain any metadata at the root of the resource
-- PB-35338: WP2-2.11 Folders update local storage should handle threshold period to limit the number of API request
-- PB-35339: Review resource update service test
-- PB-35340: WP2-2.12 drop resources collection sanitise dto
-- PB-35341: WP2-2.13 Migrate findAll from ResourceModel into FindResourceService
-- PB-35342: WP2-2.14 Leverage local storage when filtering resources by group
-- PB-35344: WP2-2.15 Migrate findSuggestedResources from resource model to...
-- PB-35345: WP2-2.16 Migrate findAllForShare from resource api service to FindResources service
-- PB-35346: WP2-2.17 migrate find all for decrypt from resource api service to find resources service
-- PB-35348: WP2-2.18 Migrate findById to the FindResourcesService
-- PB-35359: WP3 Class diagram of resources types local storage HOC
-- PB-35359: WP3 Update resource class diagram to support resource edit with v5
-- PB-35359: Technical specifications: WP3 support v5 resource types with v4 UI
-- PB-35414: WP2-2.16 Create ExecuteConcurrentlyService to perform query in parallel
-
-### Security
-- PB-35129: Upgrade vulnerable library webpack
-- PB-35354: Upgrade vulnerable library path-to-regexp
+PB-35762 WP3-6.1 Migrate share resources model logic into a dedicated service
+PB-35788 WP3-3.2 Handle resource types settings using an HOC

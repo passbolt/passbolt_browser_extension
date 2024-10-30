@@ -1,7 +1,10 @@
 Song: https://www.youtube.com/watch?v=2YdC0GshApE
 
-Passbolt v4.10.0 RC is a maintenance update of preparatory work for the incoming v5 and addresses reported issues. Specifically, it cleans the codebase to ease the later encryption of the resource metadata.
-Thank you to the community for reporting this issue.
+Passbolt v4.10.0 is a maintenance update that prepares for the upcoming v5 release, introducing beta support for the v5 resource type format within the v4 user interface and addressing reported issues.
+
+This release is particularly valuable for maintainers of clients or integrations, offering an early preview of the v5 resource type format to aid in planning for future adaptations. While previous content types will remain supported until version 6, the new content types expand functionality, empowering technical teams to manage a broader range of credentials. Stay tuned—a blog article will be released soon to explain how to enable v5 support and begin testing your integrations.
+
+Thank you to our community for your continued support.
 
 ## [4.10.0] - 2024-10-30
 ### Added

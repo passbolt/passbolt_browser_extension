@@ -12,12 +12,13 @@
  * @since         4.9.4
  */
 
-
-import FolderService from "../../api/folder/folderService";
-import FolderLocalStorage from "../../local_storage/folderLocalStorage";
-import FoldersCollection from "../../../model/entity/folder/foldersCollection";
-import {assertBoolean, assertUuid} from "../../../utils/assertions";
-import FolderEntity from "../../../model/entity/folder/folderEntity";
+import FolderService from "../api/folder/folderService";
+import FolderLocalStorage from "../local_storage/folderLocalStorage";
+import FoldersCollection from "../../model/entity/folder/foldersCollection";
+import {assertArrayUUID, assertBoolean, assertUuid} from "../../utils/assertions";
+import FolderEntity from "../../model/entity/folder/folderEntity";
+import splitBySize from "../../utils/array/splitBySize";
+import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 
 /**
  * The service aims to find folders from the API.
@@ -106,5 +107,35 @@ export default class FindFoldersService {
    */
   async findAllForLocalStorage() {
     return this.findAll(FolderLocalStorage.DEFAULT_CONTAIN, null, {ignoreInvalidEntity: true});
+  }
+
+  /**
+   * Find all by ids
+   * @param {Object} contains
+   * @param {Array<string>} foldersIds
+   * @returns {Promise<FoldersCollection>}
+   */
+  async findAllByIds(foldersIds, contains = {}) {
+    assertArrayUUID(foldersIds);
+
+    // We split the requests in chunks in order to avoid any too long url error.
+    const foldersIdsChunks = splitBySize(foldersIds, 80);
+    const callbacks = foldersIdsChunks.map(foldersIds => {
+      const filter = {
+        "has-id": foldersIds
+      };
+      return async() => await this.findAll(contains, filter);
+    });
+
+    // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
+    const executeConcurrentlyService = new ExecuteConcurrentlyService();
+    const foldersBatches = await executeConcurrentlyService.execute(callbacks, 5);
+    const folders = new FoldersCollection();
+
+    foldersBatches.forEach(foldersBatch => {
+      folders._items = folders._items.concat(foldersBatch._items);
+    });
+
+    return folders;
   }
 }

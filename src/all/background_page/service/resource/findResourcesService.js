@@ -34,7 +34,6 @@ export default class FindResourcesService {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.executeConcurrentlyService = new ExecuteConcurrentlyService();
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
   }
 
@@ -82,7 +81,8 @@ export default class FindResourcesService {
     });
 
     // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
-    const arrayOfCollection = await this.executeConcurrentlyService.execute(callbacks, 5);
+    const executeConcurrentlyService = new ExecuteConcurrentlyService();
+    const arrayOfCollection = await executeConcurrentlyService.execute(callbacks, 5);
     const resourcesCollection = new ResourcesCollection();
 
     arrayOfCollection.forEach(collection => {

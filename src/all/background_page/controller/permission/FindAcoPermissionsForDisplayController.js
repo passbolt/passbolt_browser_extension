@@ -13,7 +13,7 @@
  */
 import FindPermissionsService from "../../service/permission/findPermissionsService";
 import PermissionEntity from "../../model/entity/permission/permissionEntity";
-import FindFoldersService from "../../service/folder/find/findFoldersService";
+import FindFoldersService from "../../service/folder/findFoldersService";
 import {assertString, assertUuid} from "../../utils/assertions";
 
 class FindAcoPermissionsForDisplayController {

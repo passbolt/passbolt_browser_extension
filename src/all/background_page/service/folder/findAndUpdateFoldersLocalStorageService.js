@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.9.4
  */
-import FindFoldersService from "../find/findFoldersService";
-import {assertNumber} from "../../../utils/assertions";
-import FolderLocalStorage from "../../local_storage/folderLocalStorage";
-import FoldersCollection from "../../../model/entity/folder/foldersCollection";
+import FindFoldersService from "./findFoldersService";
+import {assertNumber} from "../../utils/assertions";
+import FolderLocalStorage from "../local_storage/folderLocalStorage";
+import FoldersCollection from "../../model/entity/folder/foldersCollection";
 
 const FOLDERS_UPDATE_ALL_LS_LOCK_PREFIX = 'FOLDERS_UPDATE_LS_LOCK_';
 

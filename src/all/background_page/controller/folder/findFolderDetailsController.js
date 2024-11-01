@@ -12,7 +12,7 @@
  * @since         4.9.4
  */
 import {assertUuid} from "../../utils/assertions";
-import FindFoldersService from "../../service/folder/find/findFoldersService";
+import FindFoldersService from "../../service/folder/findFoldersService";
 
 class FindFolderDetailsController {
   /**

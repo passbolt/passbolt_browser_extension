@@ -23,7 +23,7 @@ import ProgressService from "../../service/progress/progressService";
 import ShareModel from "../../model/share/shareModel";
 import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
 import FindAndUpdateFoldersLocalStorageService
-  from "../../service/folder/update/findAndUpdateFoldersLocalStorageService";
+  from "../../service/folder/findAndUpdateFoldersLocalStorageService";
 import FindResourcesService from "../../service/resource/findResourcesService";
 
 class ShareFoldersController {

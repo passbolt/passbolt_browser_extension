@@ -15,20 +15,27 @@
 import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import FindFoldersService from "./findFoldersService";
 import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
-import FolderLocalStorage from "../../local_storage/folderLocalStorage";
-import FolderService from "../../api/folder/folderService";
-import FoldersCollection from "../../../model/entity/folder/foldersCollection";
-import {defaultPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
+import FolderLocalStorage from "../local_storage/folderLocalStorage";
+import FolderService from "../api/folder/folderService";
+import FoldersCollection from "../../model/entity/folder/foldersCollection";
+import {
+  defaultPermissionDto
+} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
 import {v4 as uuidv4} from "uuid";
-import FolderEntity from "../../../model/entity/folder/folderEntity";
+import FolderEntity from "../../model/entity/folder/folderEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 describe("FindFoldersService", () => {
-  // mock data
-  const apiClientOptions = new ApiClientOptions().setBaseUrl('https://localhost');
+  let service;
+
+  beforeEach(async() => {
+    const apiClientOptions = new ApiClientOptions().setBaseUrl('https://localhost');
+    service = new FindFoldersService(apiClientOptions);
+  });
+
   describe("::findAll", () => {
     it("retrieves folders with no contains.", async() => {
       expect.assertions(1);
@@ -37,7 +44,6 @@ describe("FindFoldersService", () => {
       const foldersDto = [folderDto1, folderDto2];
       jest.spyOn(FolderService.prototype, "findAll").mockImplementation(() => foldersDto);
 
-      const service = new FindFoldersService(apiClientOptions);
       const folders = await service.findAll();
 
       expect(folders.toDto()).toEqual(foldersDto);
@@ -45,21 +51,18 @@ describe("FindFoldersService", () => {
 
     it("should throw error if contains is not supported.", async() => {
       expect.assertions(1);
-      const service = new FindFoldersService(apiClientOptions);
       const promise = service.findAll({unknown: true});
       await expect(promise).rejects.toThrowError("Unsupported contains parameter used, please check supported contains");
     });
 
     it("should throw error if filter is not supported.", async() => {
       expect.assertions(1);
-      const service = new FindFoldersService(apiClientOptions);
       const promise = service.findAll({}, {unknown: true});
       await expect(promise).rejects.toThrowError("Unsupported filters parameter used, please check supported filters");
     });
 
     it("should throw error if ignoreInvalidEntity option is not a boolean.", async() => {
       expect.assertions(1);
-      const service = new FindFoldersService(apiClientOptions);
       const promise = service.findAll({}, {}, {ignoreInvalidEntity: 42});
       await expect(promise).rejects.toThrowError("The given parameter is not a valid boolean");
     });
@@ -71,7 +74,6 @@ describe("FindFoldersService", () => {
       jest.spyOn(FolderService.prototype, "findAll").mockImplementation(() => []);
       jest.spyOn(FindFoldersService.prototype, "findAll");
 
-      const service = new FindFoldersService(apiClientOptions);
       const folders = await service.findAllForLocalStorage();
 
       expect(service.folderService.findAll).toHaveBeenCalledWith(FolderLocalStorage.DEFAULT_CONTAIN, null);
@@ -90,7 +92,6 @@ describe("FindFoldersService", () => {
       jest.spyOn(FolderService.prototype, "findAll").mockImplementation(() => foldersCollectionDto);
       const expectedRetainedFolder = [multipleFolders[0], multipleFolders[1]];
 
-      const service = new FindFoldersService(apiClientOptions);
       const collection = await service.findAllForLocalStorage();
 
       expect(collection).toHaveLength(2);
@@ -105,7 +106,6 @@ describe("FindFoldersService", () => {
       const folderDto = defaultFolderDto({id: folderId});
       jest.spyOn(FolderService.prototype, "get").mockImplementation(() => folderDto);
 
-      const service = new FindFoldersService(apiClientOptions);
       const folder = await service.findById(folderDto.id);
 
       expect(folder.toDto(FolderEntity.ALL_CONTAIN_OPTIONS)).toEqual(folderDto);
@@ -113,15 +113,12 @@ describe("FindFoldersService", () => {
 
     it("should throw an error if id is not a uuid", async() => {
       expect.assertions(1);
-
-      const service = new FindFoldersService(apiClientOptions);
       const promise = service.findById();
       await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
     });
 
     it("should throw error if contains is not supported.", async() => {
       expect.assertions(1);
-      const service = new FindFoldersService(apiClientOptions);
       const promise = service.findById(uuidv4(), {unknown: true});
       await expect(promise).rejects.toThrowError("Unsupported contains parameter used, please check supported contains");
     });
@@ -138,7 +135,6 @@ describe("FindFoldersService", () => {
       jest.spyOn(FolderService.prototype, "get").mockImplementation(() => folderDto);
       jest.spyOn(FindFoldersService.prototype, "findById");
 
-      const service = new FindFoldersService(apiClientOptions);
       const folder = await service.findByIdWithPermissions(folderDto.id);
 
       expect(service.findById).toHaveBeenCalledWith(folderDto.id, {'permissions.user.profile': true, 'permissions.group': true});
@@ -147,8 +143,6 @@ describe("FindFoldersService", () => {
 
     it("should throw an error if id is not a uuid", async() => {
       expect.assertions(1);
-
-      const service = new FindFoldersService(apiClientOptions);
       const promise = service.findByIdWithPermissions();
       await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
     });
@@ -161,7 +155,6 @@ describe("FindFoldersService", () => {
       jest.spyOn(FolderService.prototype, "get").mockImplementation(() => folderDto);
       jest.spyOn(FindFoldersService.prototype, "findById");
 
-      const service = new FindFoldersService(apiClientOptions);
       const folder = await service.findByIdWithCreatorAndModifier(folderDto.id);
 
       expect(service.findById).toHaveBeenCalledWith(folderDto.id, {creator: true, modifier: true});
@@ -170,10 +163,74 @@ describe("FindFoldersService", () => {
 
     it("should throw an error if id is not a uuid", async() => {
       expect.assertions(1);
-
-      const service = new FindFoldersService(apiClientOptions);
       const promise = service.findByIdWithCreatorAndModifier();
       await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+    });
+  });
+
+  describe("::findAllByIds", () => {
+    it("calls the api only 1 times when the ids array length is less than the limit of 80", async() => {
+      expect.assertions(3);
+
+      const dtos = Array.from({length: 79}, () => defaultFolderDto());
+      const ids = dtos.map(dto => dto.id);
+      jest.spyOn(service.folderService, "findAll").mockImplementation(() => dtos);
+
+      const result = await service.findAllByIds(ids);
+
+      expect(result).toEqual(new FoldersCollection(dtos));
+      expect(service.folderService.findAll).toHaveBeenCalledTimes(1);
+      expect(service.folderService.findAll).toHaveBeenCalledWith({}, {
+        "has-id": ids
+      });
+    });
+
+    it("calls the api 2 times when the ids array length is between the limit and 2 times the limit", async() => {
+      expect.assertions(4);
+
+      const dtos = Array.from({length: 82}, () => defaultFolderDto());
+      const ids = dtos.map(collection => collection.id);
+
+      jest.spyOn(service.folderService, "findAll")
+        .mockImplementationOnce(() => dtos.slice(0, 80))
+        .mockImplementationOnce(() => dtos.slice(80, 82));
+
+      const result = await service.findAllByIds(ids);
+
+      expect(service.folderService.findAll).toHaveBeenCalledTimes(2);
+      expect(service.folderService.findAll).toHaveBeenCalledWith({}, {
+        "has-id": dtos.map(dto => dto.id).slice(0, 80)
+      });
+      expect(service.folderService.findAll).toHaveBeenCalledWith({}, {
+        "has-id": dtos.map(dto => dto.id).slice(80, 82)
+      });
+      expect(result.toDto()).toEqual(dtos);
+    });
+
+    it("calls the api 3 times when the ids array length is between the limit and 3 times the limit", async() => {
+      expect.assertions(5);
+
+      const dtos = Array.from({length: 162}, () => defaultFolderDto());
+      const ids = dtos.map(collection => collection.id);
+
+      jest.spyOn(service.folderService, "findAll")
+        .mockImplementationOnce(() => dtos.slice(0, 80))
+        .mockImplementationOnce(() => dtos.slice(80, 160))
+        .mockImplementationOnce(() => dtos.slice(160, 162));
+
+      const result = await service.findAllByIds(ids);
+
+      expect(service.folderService.findAll).toHaveBeenCalledTimes(3);
+      expect(service.folderService.findAll).toHaveBeenCalledWith({}, {
+        "has-id": dtos.map(dto => dto.id).slice(0, 80)
+      });
+      expect(service.folderService.findAll).toHaveBeenCalledWith({}, {
+        "has-id": dtos.map(dto => dto.id).slice(80, 160)
+      });
+      expect(service.folderService.findAll).toHaveBeenCalledWith({}, {
+        "has-id": dtos.map(dto => dto.id).slice(160, 162)
+      });
+      expect(result.toDto()).toEqual(dtos);
     });
   });
 });

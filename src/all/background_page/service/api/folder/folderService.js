@@ -99,7 +99,7 @@ class FolderService extends AbstractService {
    */
   async findAll(contains, filters) {
     contains = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
-    filters = filters ? this.formatFilterOptions(contains, FolderService.getSupportedFiltersOptions()) : null;
+    filters = filters ? this.formatFilterOptions(filters, FolderService.getSupportedFiltersOptions()) : null;
     const options = {...contains, ...filters};
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {

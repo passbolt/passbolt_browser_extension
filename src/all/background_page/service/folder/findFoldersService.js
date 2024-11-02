@@ -138,4 +138,21 @@ export default class FindFoldersService {
 
     return folders;
   }
+
+  /**
+   * Retrieve all folders by ids with permissions.
+   * @param {Array<string>} foldersIds The resource ids to retrieve.
+   * @returns {Promise<FoldersCollection>}
+   * @todo Write unit tests.
+   */
+  async findAllByIdsWithPermissions(foldersIds) {
+    assertArrayUUID(foldersIds);
+
+    const contains = {
+      "permission": true,
+      "permissions": true,
+    };
+
+    return this.findAllByIds(foldersIds, contains);
+  }
 }

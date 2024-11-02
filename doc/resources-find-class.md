@@ -76,6 +76,7 @@ classDiagram
             +findAllForLocalStorage() Promise~ResourcesCollection~
             +findAllByIdsForDisplayPermissions(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findAllByIdsForShare() Promise~ResourcesCollection~
+            +findAllByIdsWithPermissions(array~uuid~ resourcesIds) Promise~ResourcesCollection~
             +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findOneById(string uuid, object contains) Promise~ResourceEntity~

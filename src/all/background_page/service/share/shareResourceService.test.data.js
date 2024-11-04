@@ -12,7 +12,7 @@
  * @since         4.10.0
  */
 
-export const defaultPermissionSimulation = (addedUserIds = [], removedUserIds = []) => {
+export const simulateShareSecretsChangesDto = (addedUserIds = [], removedUserIds = []) => {
   const data = {
     changes: {
       added: [],

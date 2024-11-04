@@ -78,7 +78,7 @@ export default class GetOrFindResourcesService {
 
   /**
    * Returns all the resources matching the given ids.
-   * @param {array<uuid>} resourceIds.
+   * @param {array<string>} resourceIds The resources to find.
    * @return {Promise<ResourcesCollection>}
    */
   async getOrFindByIds(resourceIds) {

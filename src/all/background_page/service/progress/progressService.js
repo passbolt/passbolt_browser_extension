@@ -90,6 +90,15 @@ class ProgressService {
   }
 
   /**
+   * Update step message, conserving the same progress.
+   * @param {string} message The message to display
+   */
+  updateStepMessage(message) {
+    this.message = message;
+    this._debounceAction(this._updateProgressBar);
+  }
+
+  /**
    * Ends the progression of a task by closing the dialog
    */
   close() {

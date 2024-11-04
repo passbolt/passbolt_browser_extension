@@ -13,252 +13,113 @@
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
-import DecryptMessageService from "../../service/crypto/decryptMessageService";
-import User from "../../model/user";
 import ShareResourcesController from "./shareResourcesController";
-import MockExtension from "../../../../../test/mocks/mockExtension";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {
+  resourceTypesCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
+import expect from "expect";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import MockPort from "passbolt-styleguide/test/mocks/mockPort";
+import {v4 as uuidv4} from "uuid";
+import {minimumPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import {defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {
+  defaultSecretDto
+} from "passbolt-styleguide/src/react-extension/components/Resource/CreateResource/CreateResource.test.data";
+import {
+  plaintextSecretPasswordAndDescriptionDto
+} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
+import {simulateShareSecretsChangesDto} from "../../service/share/shareResourceService.test.data";
 
-const {enableFetchMocks} = require("jest-fetch-mock");
-const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
 const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
-const {users} = require("passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data");
-
-const {
-  _3ResourcesSharedWith3UsersResourcesDto,
-  createChangesDto,
-} = require('./shareResourcesController.test.data');
-
-
-jest.mock("../../service/progress/progressService");
-jest.mock("../../service/passphrase/getPassphraseService");
-
-beforeEach(() => {
-  enableFetchMocks();
-  fetch.resetMocks();
-});
 
 describe("ShareResourcesController", () => {
   describe("::exec", () => {
-    /**
-     * This scenario is the following:
-     *  - There is 1 user (ada) who wants to share 3 resources with 2 other users (admin and betty)
-     *  - The configuration is the following:
-     *    - Resource 1 is unknown to admin and betty
-     *    - Resource 2 is unknown to betty
-     *    - Resource 3 is unknown to admin
-     *
-     * So we expect to generate 4 PGP message / resources
-     *  - Resource 1 for betty
-     *  - Resource 1 for admin
-     *  - Resource 2 for betty
-     *  - Resource 3 for admin
-     */
-    it("Ada shares 3 resources with Betty and Admin, 1 resources is unknown to both of them 2 resources are know by one of them", async() => {
-      const resourceShareUpdateCallCount = 3;
-      const isPermissionExpectedCallcount = 4;
-      const decryptedMessageCallCount = 4;
-      expect.assertions(2 * resourceShareUpdateCallCount + isPermissionExpectedCallcount + decryptedMessageCallCount);
+    let account, controller;
+    beforeEach(async() => {
+      const apiClientOptions = defaultApiClientOptions();
+      account = new AccountEntity(adminAccountDto());
+      const mockedWorker = {port: new MockPort()};
+      // await MockExtension.withConfiguredAccount(pgpKeys.admin);
+      controller = new ShareResourcesController(mockedWorker, uuidv4(), apiClientOptions, account);
+    });
 
-      // preparation of the keyring data to set the 3 needed users
-      const account = new AccountEntity(defaultAccountDto());
-      await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
+    it("throws if the parameters are not valid.", async() => {
+      expect.assertions(6);
+      await expect(() => controller.exec("wrong", [])).rejects.toThrow(new TypeError('The parameter "resourcesIds" should be an array'));
+      await expect(() => controller.exec([], [])).rejects.toThrow(new TypeError('The parameter "resourcesIds" should be a non empty array'));
+      await expect(() => controller.exec(["test"], [])).rejects.toThrow(new TypeError('The parameter "resourcesIds" should contain only uuid', {cause: new TypeError("The given parameter is not a valid UUID")}));
+      await expect(() => controller.exec([uuidv4()], "not-valid")).rejects.toThrow(new TypeError('The parameter "permissionChangesDto" should be an array'));
+      await expect(() => controller.exec([uuidv4()], [])).rejects.toThrow(new TypeError('The parameter "permissionChangesDto" should be a non empty array'));
+      const execPromiseEntityValidationError = controller.exec([uuidv4()], [{}]);
+      await expect(execPromiseEntityValidationError).rejects.toThrowEntityValidationErrorOnProperties(["aco", "aro", "aco_foreign_key", "aro_foreign_key", "type"]);
+    });
+
+    it("shares resources.", async() => {
+      expect.assertions(12);
+      const resourceId = uuidv4();
+      const carolPermissionChange = minimumPermissionDto({
+        aro_foreign_key: pgpKeys.carol.userId,
+        aco_foreign_key: resourceId,
+        type: 1,
+      });
+
+      // mock passphrase service
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementation(() => pgpKeys.admin.passphrase);
+      const resourceDto = defaultResourceV4Dto({id: resourceId}, {withTags: true});
+      // mock resource getOrFindAll service
+      jest.spyOn(controller.shareResourceService.getOrFindResourcesService, "getOrFindAll").mockImplementation(() => new ResourcesCollection([resourceDto]));
+      // Mock request retrieving the resource types.
+      jest.spyOn(controller.shareResourceService.resourceTypeModel, "getOrFindAll").mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
+      // Mock request simulating the share.
+      jest.spyOn(controller.shareResourceService.shareService, "simulateShareResource").mockImplementation(() =>
+        simulateShareSecretsChangesDto([pgpKeys.carol.userId], []));
+      // Mock find all for share.
+      const secretDto = plaintextSecretPasswordAndDescriptionDto();
+      const resourceSecretData = await EncryptMessageService.encrypt(JSON.stringify(secretDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
+      const resourceForShareDto = new defaultResourceV4Dto({
+        ...resourceDto,
+        secrets: [defaultSecretDto({resource_id: resourceId, data: resourceSecretData})]
+      });
+      jest.spyOn(controller.shareResourceService.findResourcesService, "findAllByIdsForShare").mockImplementation(() => new ResourcesCollection([resourceForShareDto]));
+      // Mock keyring.
+      jest.spyOn(Keyring.prototype, "sync").mockImplementation(jest.fn);
       const keyring = new Keyring();
-      await keyring.importPublic(pgpKeys.admin.public, users.admin.id);
-      await keyring.importPublic(pgpKeys.betty.public, users.betty.id);
-      await keyring.importPublic(pgpKeys.ada.public, users.ada.id);
+      keyring.importPublic(pgpKeys.carol.public, pgpKeys.carol.userId);
+      // Mock the share request.
+      let shareRequestData;
+      jest.spyOn(controller.shareResourceService.shareService, "shareResource").mockImplementation((resourceId, data) => {
+        shareRequestData = data;
+        return {};
+      });
+      // Mock the local storage refresh
+      jest.spyOn(controller.shareResourceService.findAndUpdateResourcesLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
+      // Mock the local storage refresh
+      jest.spyOn(controller.progressService, "finishStep").mockImplementation(jest.fn);
 
-      // this is a way to find the correct private key with a user id later when we'll try to decrypt messages
-      const decryptedPrivateKeys = {};
-      decryptedPrivateKeys[users.ada.id] = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
-      decryptedPrivateKeys[users.admin.id] = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
-      decryptedPrivateKeys[users.betty.id] = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+      await controller.exec([resourceId], [carolPermissionChange]);
 
-      /*
-       * this is one of the parameter that the controller requires.
-       * some ids are generated randomly so we catch them after as we need it
-       */
-      const resourcesDto = await _3ResourcesSharedWith3UsersResourcesDto();
-      const getResourceId = (resourcesList, index) => resourcesList[index].id;
-      const resource1Id = getResourceId(resourcesDto, 0);
-      const resource2Id = getResourceId(resourcesDto, 1);
-      const resource3Id = getResourceId(resourcesDto, 2);
+      // Assert share API call.
+      expect(carolPermissionChange).toEqual(expect.objectContaining(shareRequestData.permissions[0].toDto()));
+      expect(shareRequestData.secrets?.length).toStrictEqual(1);
+      await expect(shareRequestData.secrets[0].data)
+        .toDecryptAndEqualTo(pgpKeys.carol.private_decrypted, JSON.stringify(secretDto));
 
-      /*
-       * This is the new couple resource/user that we expect to be created for this scenario.
-       * It is used later to check that there is no extra stuff created in the process.
-       */
-      const expectedResourceUserAssiocation = [
-        {resource: resource1Id, user: users.admin.id},
-        {resource: resource1Id, user: users.betty.id},
-        {resource: resource2Id, user: users.betty.id},
-        {resource: resource3Id, user: users.admin.id}
-      ];
-
-      const genereteChangesFromExpectedNewResourceUserCouples = newResourceUserCouples => {
-        const changes = [];
-        newResourceUserCouples.forEach(resourceUser => {
-          const newResourceUserCouple = createChangesDto({
-            aco_foreign_key: resourceUser.resource,
-            aro_foreign_key: resourceUser.user
-          });
-          changes.push(newResourceUserCouple);
-        });
-        return changes;
-      };
-
-      /*
-       * we prepare the data matching the current password share changes.
-       * this is the second parameter that the controller requires.
-       */
-      const changesDto = genereteChangesFromExpectedNewResourceUserCouples(expectedResourceUserAssiocation);
-
-      // used later to verify that the generated permission is one of the expected
-      const isPermissionExpected = permission => {
-        for (let i = 0; i < expectedResourceUserAssiocation.length; i++) {
-          const expected = expectedResourceUserAssiocation[i];
-          if (expected.resource === permission.aco_foreign_key && expected.user === permission.aro_foreign_key) {
-            return true;
-          }
-        }
-        return false;
-      };
-
-      /*
-       * now we mock the response from the server:
-       *  - keyring synchronisation (1 call)
-       *  - resource share simulations (3 calls, 1 per resource)
-       *  - resource update (3 calls for this scenario)
-       *  - find all resource for local storage update (1 call)
-       */
-
-      // 1st API call is for the keyring sync
-      fetch.doMockOnce(() => mockApiResponse([]));
-
-      // 2nd set of API calls; 1 call per resource share simulation
-      const simulationApiCallback = async request => {
-        const {permissions} = JSON.parse(await request.text());
-        const usersList = permissions.map(perm => ({
-          User: {id: perm.aro_foreign_key}
-        }));
-
-        return mockApiResponse({
-          changes: {
-            added: usersList,
-            removed: []
-          }
-        });
-      };
-
-      for (let i = 0; i < resourcesDto.length; i++) {
-        fetch.doMockOnce(simulationApiCallback);
-      }
-
-      // 3rd set of API calls; 1 call per necessary resource sharing
-      const resourceShareUpdate = async request => {
-        const {permissions, secrets} = JSON.parse(await request.text());
-
-        expect(permissions).toBeTruthy();
-        expect(secrets).toBeTruthy();
-
-        permissions.forEach(permission => expect(isPermissionExpected(permission)).toBe(true));
-
-        for (let i = 0; i < secrets.length; i++) {
-          const secret = secrets[i];
-          const decryptedPrivateKey = decryptedPrivateKeys[secret.user_id];
-          const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
-          const decryptedMessage = await DecryptMessageService.decrypt(secretMessage, decryptedPrivateKey);
-          expect(decryptedMessage).toEqual(expect.stringMatching(/^secret[123]$/));
-        }
-        return mockApiResponse({});
-      };
-
-      for (let i = 0; i < 3; i++) {
-        fetch.doMockOnce(resourceShareUpdate);
-      }
-
-      /*
-       * 4th API call is a findAll on Resources to update local storage
-       * This unit test doesn't cover the local storage part so we respond with an empty response to ignore it.
-       */
-      fetch.doMockOnce(() => mockApiResponse([]));
-
-      /*
-       * 5th API call is a findAll on Resources Type to update local storage
-       * This unit test doesn't cover the local storage part so we respond with an empty response to ignore it.
-       */
-      fetch.doMockOnce(() => mockApiResponse([]));
-
-      // finally we can call the controller with the data as everything is setup.
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ShareResourcesController(null, null, clientOptions, account);
-
-      const spyOnFindResourceType = jest.spyOn(controller.shareResourceService.resourceTypeModel, "getOrFindAll");
-      const spyOnGetOrFindResources = jest.spyOn(controller.shareResourceService.getOrFindResourcesService, "getOrFindAll");
-      spyOnFindResourceType.mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
-      spyOnGetOrFindResources.mockImplementation(() => new ResourcesCollection(resourcesDto));
-
-      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
-      await controller.exec(resourcesDto, changesDto);
-    });
-
-
-    /**
-     * This scenario is the following:
-     *  - error: expect an array of ACOs
-     */
-    it("Error expect array of ACOs", async() => {
-      expect.assertions(1);
-
-      // preparation of the keyring data to set the 3 needed users
-      const account = new AccountEntity(defaultAccountDto());
-      await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
-      // 1st API call is for the keyring sync
-      fetch.doMockOnce(() => mockApiResponse([]));
-
-      // finally we can call the controller with the data as everything is setup.
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ShareResourcesController(null, null, clientOptions, account);
-      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
-      try {
-        await controller.exec([], []);
-      } catch (error) {
-        expect(error.message).toStrictEqual("resources should be a non empty array");
-      }
-    });
-
-    /**
-     * This scenario is the following:
-     *  - error: expect an array of changes
-     */
-    it("Error expect array of changes", async() => {
-      expect.assertions(1);
-
-      // preparation of the keyring data to set the 3 needed users
-      const account = new AccountEntity(defaultAccountDto());
-      await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
-      // 1st API call is for the keyring sync
-      fetch.doMockOnce(() => mockApiResponse([]));
-
-      /*
-       * this is one of the parameter that the controller requires.
-       * some ids are generated randomly so we catch them after as we need it
-       */
-      const resourcesDto = await _3ResourcesSharedWith3UsersResourcesDto();
-
-      // finally we can call the controller with the data as everything is setup.
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ShareResourcesController(null, null, clientOptions, account);
-      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
-      try {
-        await controller.exec(resourcesDto, []);
-      } catch (error) {
-        expect(error.message).toStrictEqual("changes should be a non empty array");
-      }
+      // Assert progress dialog
+      expect(controller.progressService.finishStep).toHaveBeenCalledTimes(9);
+      expect(controller.progressService.finishStep).toHaveBeenNthCalledWith(1, "Updating resources metadata", true);
+      expect(controller.progressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
+      expect(controller.progressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
+      expect(controller.progressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
+      expect(controller.progressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
+      expect(controller.progressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
+      expect(controller.progressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
+      expect(controller.progressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
     });
   });
 });

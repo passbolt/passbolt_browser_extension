@@ -26,8 +26,11 @@ import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entit
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import ResourceEntity from "./resourceEntity";
+import {
+  defaultResourceDto,
+  defaultResourceV4Dto
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import ResourceEntity, {METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY} from "./resourceEntity";
 import {defaultTagDto} from "../tag/tagEntity.test.data";
 import expect from "expect";
 import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
@@ -151,7 +154,7 @@ describe("ResourcesCollection", () => {
   describe(":pushMany", () => {
     it("[performance] should ensure performance adding large dataset remains effective.", async() => {
       const count = 10_000;
-      const options = {withCreator: true, withModifier: true, withPermissions: 10, withFavorite: true};
+      const options = {withCreator: true, withModifier: true, withPermissions: {count: 10}, withFavorite: true};
       const dtos = defaultResourcesDtos(count, {}, options);
 
       const start = performance.now();
@@ -358,6 +361,26 @@ describe("ResourcesCollection", () => {
       expect(resources).toHaveLength(2);
       expect(resources.items[0].toDto()).toStrictEqual(resourceDecrypted1);
       expect(resources.items[1].toDto()).toStrictEqual(resourceDecrypted2);
+    });
+  });
+
+  describe("::filterOutMetadataNotEncryptedWithUserKey", () => {
+    it("should filter out the resource which have metadata key type different than user_key.", () => {
+      expect.assertions(2);
+
+      const resourceMetaKeyTypeUserKeyDto = defaultResourceDto({metadata_key_type: METADATA_KEY_TYPE_USER_KEY});
+      const resourceV4Dto = defaultResourceV4Dto();
+      const resourceMetaKeyTypeMetadataKeyDto = defaultResourceDto({metadata_key_type: METADATA_KEY_TYPE_METADATA_KEY});
+      const resources = new ResourcesCollection([
+        resourceMetaKeyTypeUserKeyDto,
+        resourceMetaKeyTypeMetadataKeyDto,
+        resourceV4Dto,
+      ]);
+
+      resources.filterOutMetadataNotEncryptedWithUserKey();
+
+      expect(resources).toHaveLength(1);
+      expect(resources.items[0].id).toStrictEqual(resourceMetaKeyTypeUserKeyDto.id);
     });
   });
 });

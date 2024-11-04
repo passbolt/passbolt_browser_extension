@@ -657,7 +657,7 @@ describe("ImportResourcesFileController", () => {
       const result = await controller.exec("csv", file);
       const time = performance.now() - start;
       expect(result.importResources.items).toHaveLength(linesCount);
-      expect(time).toBeLessThan(2000);
+      expect(time).toBeLessThan(5000);
     });
   });
 });

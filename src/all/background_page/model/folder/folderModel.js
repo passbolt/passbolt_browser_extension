@@ -22,7 +22,7 @@ import ShareService from "../../service/api/share/shareService";
 import splitBySize from "../../utils/array/splitBySize";
 import Validator from "validator";
 import FindAndUpdateFoldersLocalStorageService
-  from "../../service/folder/update/findAndUpdateFoldersLocalStorageService";
+  from "../../service/folder/findAndUpdateFoldersLocalStorageService";
 
 const BULK_OPERATION_SIZE = 5;
 

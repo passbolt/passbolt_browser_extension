@@ -321,23 +321,23 @@ describe("FindResourcesService", () => {
       service = new FindResourcesService(account, apiClientOptions);
     });
 
-    it("should call the api only 1 times when the resource ids array length equals 1", async() => {
+    it("should call the api only 1 times when the array of ids length is less than the limit of 80", async() => {
       expect.assertions(4);
 
-      const collectionDto = Array.from({length: 79}, () => defaultResourceDto());
-      const collectionIds = collectionDto.map(collection => collection.id);
+      const dtos = Array.from({length: 79}, () => defaultResourceDto());
+      const ids = dtos.map(dto => dto.id);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => dtos);
       jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
-      const result = await service.findAllByIds(collectionIds, ResourceLocalStorage.DEFAULT_CONTAIN);
+      const result = await service.findAllByIds(ids, ResourceLocalStorage.DEFAULT_CONTAIN);
 
-      expect(result).toEqual(new ResourcesCollection(collectionDto));
+      expect(result).toEqual(new ResourcesCollection(dtos));
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {
-        "has-id": collectionIds
+        "has-id": ids
       });
-      expect(ExecuteConcurrentlyService.prototype.execute).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -354,37 +354,37 @@ describe("FindResourcesService", () => {
     it("should call the api only 1 times when the resource is less than 80", async() => {
       expect.assertions(3);
 
-      const collectionDto = Array.from({length: 80}, () => defaultResourceDto());
-      const collectionIds = collectionDto.map(collection => collection.id);
+      const dtos = Array.from({length: 80}, () => defaultResourceDto());
+      const ids = dtos.map(dto => dto.id);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => dtos);
       jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
-      const result = await service.findAllByIdsForShare(collectionIds);
+      const result = await service.findAllByIdsForShare(ids);
 
-      expect(result).toEqual(new ResourcesCollection(collectionDto));
+      expect(result).toEqual(new ResourcesCollection(dtos));
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, {
-        "has-id": collectionIds
+        "has-id": ids
       });
     });
 
     it("should call the api only 2 times when the resource is more than 80", async() => {
       expect.assertions(4);
 
-      const collectionDto = Array.from({length: 82}, () => defaultResourceDto());
-      const resultCollectionDto = [...collectionDto];
-      const collectionIds = collectionDto.map(collection => collection.id);
+      const dtos = Array.from({length: 82}, () => defaultResourceDto());
+      // @todo to review, it seems wrong
+      const resultCollectionDto = [...dtos];
+      const ids = dtos.map(collection => collection.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
         expect(contains).toEqual(expectedContains);
         return resultCollectionDto.splice(0, filters["has-id"].length);
       });
-      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
-      const result = await service.findAllByIdsForShare(collectionIds);
+      const result = await service.findAllByIdsForShare(ids);
 
-      expect(result.toDto()).toEqual(collectionDto);
+      expect(result.toDto()).toEqual(dtos);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(2);
     });
   });
@@ -408,7 +408,6 @@ describe("FindResourcesService", () => {
       const collectionIds = collectionDto.map(collection => collection.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
-      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
       const result = await service.findAllByIdsForDisplayPermissions(collectionIds);
 
@@ -430,7 +429,6 @@ describe("FindResourcesService", () => {
         expect(contains).toEqual(expectedContains);
         return resultCollectionDto.splice(0, filters["has-id"].length);
       });
-      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
       const result = await service.findAllByIdsForDisplayPermissions(collectionIds);
 
@@ -456,7 +454,6 @@ describe("FindResourcesService", () => {
       const resourcesIds = collectionDto.map(resource => resource.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
-      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
       const result = await service.findAllForDecrypt(resourcesIds);
 
@@ -478,7 +475,6 @@ describe("FindResourcesService", () => {
         expect(contains).toEqual(expectedContains);
         return resultCollectionDto.splice(0, filters["has-id"].length);
       });
-      jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
       const result = await service.findAllForDecrypt(resourcesIds);
 

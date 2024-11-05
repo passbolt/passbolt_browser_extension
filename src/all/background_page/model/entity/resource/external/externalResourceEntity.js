@@ -390,7 +390,6 @@ class ExternalResourceEntity extends EntityV2 {
       this._totp = null;
       return;
     }
-
     assertType(totp, TotpEntity);
     this._totp = totp;
   }

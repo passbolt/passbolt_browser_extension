@@ -15,7 +15,7 @@ classDiagram
 
         class ExportResourcesFileController {
             event "passbolt.export-resources.export-to-file"
-            +exec(object exportResourcesFileDto) Promise~ResourcesCollection~
+            +exec(object exportResourcesFileDto) Promise~ExportResourcesFileEntity~
         }
 
         class FindAllIdsByIsSharedWithGroupController{
@@ -88,7 +88,8 @@ classDiagram
         }
 
         class ExportResourcesService {
-            +exportToFile(ExportResourcesFileEntity import, string passphrase) Promise~ImportResourcesFileEntity~
+            +prepareExportContent(ExportResourcesFileEntity import) Promise~void~
+            +exportToFile(ExportResourcesFileEntity import, string passphrase) Promise~void~
         }
 
         class UpdateResourceService {

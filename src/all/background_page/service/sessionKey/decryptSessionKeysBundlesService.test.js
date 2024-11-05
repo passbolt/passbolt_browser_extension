@@ -21,7 +21,8 @@ import PassphraseStorageService from "../session_storage/passphraseStorageServic
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultSessionKeysBundleDto} from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity.test.data";
-
+import {defaultSessionKeysBundlesDtos} from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection.test.data";
+import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -109,6 +110,84 @@ describe("DecryptSessionKeysBundlesService", () => {
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptSessionKeysBundlesService(account);
       await expect(() => service.decryptOne(sessionKeysBundleEntity)).rejects.toThrowError(expectedError);
+      expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("::decryptAll", () => {
+    it("should decrypt a SessionKeysBundlesCollection", async() => {
+      expect.assertions(3);
+
+      const dtos = defaultSessionKeysBundlesDtos({}, {count: 2});
+
+      const collection = new SessionKeysBundlesCollection(dtos);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptSessionKeysBundlesService(account);
+      await service.decryptAll(collection, pgpKeys.ada.passphrase);
+
+      expect(collection).toHaveLength(2);
+      expect(collection._items[0].data).toBeInstanceOf(SessionKeysBundleDataEntity);
+      expect(collection._items[1].data).toBeInstanceOf(SessionKeysBundleDataEntity);
+    });
+
+    it("should retrieve the passphrase from the storage", async() => {
+      expect.assertions(3);
+
+      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
+      spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
+
+      const dtos = defaultSessionKeysBundlesDtos({}, {count: 2});
+
+      const collection = new SessionKeysBundlesCollection(dtos);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptSessionKeysBundlesService(account);
+      await service.decryptAll(collection);
+
+      expect(collection).toHaveLength(2);
+      expect(collection._items[0].data).toBeInstanceOf(SessionKeysBundleDataEntity);
+      expect(collection._items[1].data).toBeInstanceOf(SessionKeysBundleDataEntity);
+    });
+
+    it("should ensure sessionKeysBundlesCollection is of a valid type", async() => {
+      expect.assertions(1);
+
+      const expectedError = new TypeError("The given collection is not of the type SessionKeysBundlesCollection");
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptSessionKeysBundlesService(account);
+      await expect(() => service.decryptAll("test")).rejects.toThrowError(expectedError);
+    });
+
+    it("should ensure sessionKeysBundleEntity data is a valid PGP message", async() => {
+      expect.assertions(1);
+      const dto = defaultSessionKeysBundleDto();
+      const collection = new SessionKeysBundlesCollection([dto]);
+
+      //bypassing entity checks for the unit test
+      collection._items[0]._props.data = "Test";
+
+      const expectedError = new Error("The message should be a valid openpgp message.");
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptSessionKeysBundlesService(account);
+      await expect(() => service.decryptAll(collection, "test")).rejects.toThrowError(expectedError);
+    });
+
+    it("should throw an error if the passphrase is not available", async() => {
+      expect.assertions(2);
+      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
+      spyOnPassphraseStorage.mockImplementation(() => null);
+
+      const dtos = defaultSessionKeysBundlesDtos({}, {count: 2});
+      const collection = new SessionKeysBundlesCollection(dtos);
+
+      const expectedError = new UserPassphraseRequiredError();
+
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new DecryptSessionKeysBundlesService(account);
+      await expect(() => service.decryptAll(collection)).rejects.toThrowError(expectedError);
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
   });

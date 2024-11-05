@@ -16,6 +16,7 @@ import PassphraseStorageService from '../session_storage/passphraseStorageServic
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
 import SessionKeysBundleDataEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleDataEntity";
+import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
 import {assertType} from '../../utils/assertions';
 import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
 import DecryptMessageService from '../crypto/decryptMessageService';
@@ -37,7 +38,7 @@ class DecryptSessionKeysBundlesService {
    * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `sessionKeysBundleEntity` is not of type MetadataPrivateKeyEntity
-   * @throws {Error} if session keys bundle entity data is not a valid openPGP message.
+   * @throws {Error} if metadata private key entity data is not a valid openPGP message.
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */
   async decryptOne(sessionKeysBundleEntity, passphrase = null) {
@@ -55,6 +56,28 @@ class DecryptSessionKeysBundlesService {
     const sessionKeysBundleDataEntity = new SessionKeysBundleDataEntity(decryptedMetadataPrivateKeyDto);
 
     sessionKeysBundleEntity.data = sessionKeysBundleDataEntity;
+  }
+
+  /**
+   * Decrypts a collection of session keys bundle entities and mutate all entities with their decrypted result.
+   *
+   * @param {SessionKeysBundlesCollection} sessionKeysBundlesCollection the session keys bundles collection to decrypt.
+   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @returns {Promise<void>}
+   * @throws {TypeError} if the `sessionKeysBundlesCollection` is not of type SessionKeysBundlesCollection
+   * @throws {Error} if one of the session keys bundle entity data is not a valid openPGP message.
+   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
+   */
+  async decryptAll(sessionKeysBundlesCollection, passphrase = null) {
+    assertType(sessionKeysBundlesCollection, SessionKeysBundlesCollection, "The given collection is not of the type SessionKeysBundlesCollection");
+
+    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+
+    const items = sessionKeysBundlesCollection.items;
+    for (let i = 0; i < items.length; i++) {
+      const sessionKeysBundleEntity = items[i];
+      await this.decryptOne(sessionKeysBundleEntity, passphrase);
+    }
   }
 
   /**

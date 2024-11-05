@@ -74,25 +74,27 @@ describe("SessionKeysBundlesSessionStorageService", () => {
 
   describe("::set", () => {
     it("stores content in the session storage.", async() => {
-      expect.assertions(3);
+      expect.assertions(4);
       const sessionKeysBundlesCollection = new SessionKeysBundlesCollection(defaultSessionKeysBundlesDtos({}, {withDecryptedSessionKeysBundle: true}));
       await storage.set(sessionKeysBundlesCollection);
       // Expect the session storage (mocked here) to be set.
       expect(browser.storage.session.store[storage.storageKey]).toEqual(sessionKeysBundlesCollection.toDto());
       // Expect the runtime cache to be set.
       expect(SessionKeysBundlesSessionStorageService._runtimeCachedData[account.id]).toEqual(sessionKeysBundlesCollection.toDto());
+      expect(storage.hasCachedData()).toBeTruthy();
       // Expect the get to retrieve the set data.
       const resultGet = await storage.get();
       expect(resultGet).toEqual(sessionKeysBundlesCollection.toDto());
     });
 
     it("throws if no data is given to store.", async() => {
-      expect.assertions(3);
+      expect.assertions(4);
       await expect(() => storage.set()).rejects.toThrow(TypeError);
       // Expect the session storage (mocked here) to not be set.
       expect(browser.storage.session.store[storage.storageKey]).toBeUndefined();
       // Expect the runtime cache to not be set.
       expect(SessionKeysBundlesSessionStorageService._runtimeCachedData[account.id]).toBeUndefined();
+      expect(storage.hasCachedData()).toBeFalsy();
     });
 
     it("throws if invalid data is given to store.", async() => {

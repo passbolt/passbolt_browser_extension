@@ -38,7 +38,7 @@ class DecryptSessionKeysBundlesService {
    * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `sessionKeysBundleEntity` is not of type MetadataPrivateKeyEntity
-   * @throws {Error} if metadata private key entity data is not a valid openPGP message.
+   * @throws {Error} if session keys bundle entity data is not a valid openPGP message.
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */
   async decryptOne(sessionKeysBundleEntity, passphrase = null) {

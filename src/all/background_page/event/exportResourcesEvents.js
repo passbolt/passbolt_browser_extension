@@ -22,14 +22,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param exportResourcesFileDto {object} The export resources file DTO
    */
   worker.port.on('passbolt.export-resources.export-to-file', async(requestId, exportResourcesFileDto) => {
-    const exportController = new ExportResourcesFileController(worker, apiClientOptions, account);
-    try {
-      await exportController.exec(exportResourcesFileDto);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new ExportResourcesFileController(worker, requestId, apiClientOptions, account);
+    await controller._exec(exportResourcesFileDto);
   });
 };
 

@@ -15,18 +15,18 @@ import ExternalFoldersCollection from "../folder/external/externalFoldersCollect
 import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
 import {assertType} from "../../../utils/assertions";
 
-const FORMAT_KDBX = "kdbx";
-const FORMAT_KDBX_OTHERS = "kdbx-others";
-const FORMAT_CSV_KDBX = "csv-kdbx";
-const FORMAT_CSV_LASTPASS = "csv-lastpass";
-const FORMAT_CSV_1PASSWORD = "csv-1password";
-const FORMAT_CSV_CHROMIUM = "csv-chromium";
-const FORMAT_CSV_BITWARDEN = "csv-bitwarden";
-const FORMAT_CSV_MOZILLA = "csv-mozilla";
-const FORMAT_CSV_SAFARI = "csv-safari";
-const FORMAT_CSV_DASHLANE = "csv-dashlane";
-const FORMAT_CSV_NORDPASS = "csv-nordpass";
-const FORMAT_CSV_LOGMEONCE = "csv-logmeonce";
+export const FORMAT_KDBX = "kdbx";
+export const FORMAT_KDBX_OTHERS = "kdbx-others";
+export const FORMAT_CSV_KDBX = "csv-kdbx";
+export const FORMAT_CSV_LASTPASS = "csv-lastpass";
+export const FORMAT_CSV_1PASSWORD = "csv-1password";
+export const FORMAT_CSV_CHROMIUM = "csv-chromium";
+export const FORMAT_CSV_BITWARDEN = "csv-bitwarden";
+export const FORMAT_CSV_MOZILLA = "csv-mozilla";
+export const FORMAT_CSV_SAFARI = "csv-safari";
+export const FORMAT_CSV_DASHLANE = "csv-dashlane";
+export const FORMAT_CSV_NORDPASS = "csv-nordpass";
+export const FORMAT_CSV_LOGMEONCE = "csv-logmeonce";
 
 const SUPPORTED_FORMAT = [
   FORMAT_KDBX,
@@ -256,6 +256,15 @@ class ExportResourcesFileEntity extends EntityV2 {
    */
   static get FORMAT_KDBX_OTHERS() {
     return FORMAT_KDBX_OTHERS;
+  }
+
+  /**
+   * Convert entity file to blob
+   * @param {mimeType} the mimetype for the file
+   * @returns {Blob} blob file to export
+   */
+  toBlob(mimeType) {
+    return new Blob([this.file], {type: mimeType});
   }
 }
 

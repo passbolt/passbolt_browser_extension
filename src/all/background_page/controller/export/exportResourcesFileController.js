@@ -11,153 +11,67 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
-import FolderModel from "../../model/folder/folderModel";
-import ExternalFoldersCollection from "../../model/entity/folder/external/externalFoldersCollection";
 import ProgressService from "../../service/progress/progressService";
-import ResourcesExporter from "../../model/export/resourcesExporter";
-import ExternalResourcesCollection from "../../model/entity/resource/external/externalResourcesCollection";
 import ExportResourcesFileEntity from "../../model/entity/export/exportResourcesFileEntity";
 import i18n from "../../sdk/i18n";
 import FileService from "../../service/file/fileService";
-import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
-import TotpEntity from "../../model/entity/totp/totpEntity";
-import FindResourcesService from "../../service/resource/findResourcesService";
+import ExportResourcesService from "../../service/resource/export/exportResourcesService";
 
 const INITIAL_PROGRESS_GOAL = 100;
 class ExportResourcesFileController {
   /**
    * ExportResourcesFileController constructor
    * @param {Worker} worker
+   * @param {string} requestId
    * @param {ApiClientOptions} apiClientOptions the api client options
    * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
-
-    // Models
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.folderModel = new FolderModel(apiClientOptions, account);
-
+    this.requestId = requestId;
     this.progressService = new ProgressService(this.worker, i18n.t("Exporting ..."));
     this.getPassphraseService = new GetPassphraseService(account);
-    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
+    this.exportResourcesService = new ExportResourcesService(account, apiClientOptions, this.progressService);
+  }
+
+  /**
+   * Wrapper of exec function to run it with worker.
+   * @param {object} exportResourcesFileDto The export resources file DTO
+   * @return {Promise<void>}
+   */
+  async _exec(exportResourcesFileDto) {
+    try {
+      const result = await this.exec(exportResourcesFileDto);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(this.requestId, 'ERROR', error);
+    }
   }
 
   /**
    * Main execution function.
-   * @return {Promise}
+   * @return {Promise<ExportResourcesFileEntity>}
    */
   async exec(exportResourcesFileDto) {
+    //Assert the param through the entity
+    const exportResourcesFileEntity = new ExportResourcesFileEntity(exportResourcesFileDto);
+    this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t("Generate file"));
     try {
-      this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t("Generate file"));
-      const exportEntity = new ExportResourcesFileEntity(exportResourcesFileDto);
-      await this.prepareExportContent(exportEntity);
-      const privateKey = await this.getPrivateKey();
-      await this.decryptSecrets(exportEntity, privateKey);
-      await this.export(exportEntity);
-      await this.download(exportEntity);
+      await this.exportResourcesService.prepareExportContent(exportResourcesFileEntity);
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+      await this.exportResourcesService.exportToFile(exportResourcesFileEntity, passphrase);
+      const date = new Date().toISOString().slice(0, 10);
+      const filename = `passbolt-export-${date}.${exportResourcesFileEntity.fileType}`;
+      const mimeType = {kdbx: "application/x-keepass", csv: "text/csv"}[exportResourcesFileEntity.fileType] || "text/plain";
+      const blobFile = exportResourcesFileEntity.toBlob(mimeType);
+      await FileService.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
       await this.progressService.finishStep(i18n.t('Done'), true);
+      return exportResourcesFileEntity;
+    } finally {
       await this.progressService.close();
-      return exportEntity;
-    } catch (error) {
-      await this.progressService.close();
-      throw error;
     }
-  }
-
-  /**
-   * Retrieve the content to export.
-   * @param {ExportResourcesFileEntity} exportEntity The export entity
-   * @returns {Promise<void>}
-   */
-  async prepareExportContent(exportEntity) {
-    const progressGoals = exportEntity.resourcesIds.length + 2; // 1 (initialize & find secrets) + #secrets (to encrypt) + 1 (Complete operation)
-    this.progressService.updateGoals(progressGoals);
-    await this.progressService.finishStep(i18n.t('Initialize'), true);
-
-    const foldersCollection = await this.folderModel.getAllByIds(exportEntity.foldersIds);
-    const exportFoldersCollection = ExternalFoldersCollection.constructFromFoldersCollection(foldersCollection);
-    const resourcesCollection = await this.findResourcesService.findAllForDecrypt(exportEntity.resourcesIds);
-    const exportResourcesCollection = ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, exportFoldersCollection);
-    exportEntity.exportFolders = exportFoldersCollection;
-    exportEntity.exportResources = exportResourcesCollection;
-  }
-
-  /**
-   * Get the user private key decrypted
-   * @returns {Promise<openpgp.PrivateKey>}
-   */
-  async getPrivateKey() {
-    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-    return GetDecryptedUserPrivateKeyService.getKey(passphrase);
-  }
-
-  /**
-   * Decrypt the secrets.
-   * @param {ExportResourcesFileEntity} exportEntity The export object
-   * @param {openpgp.PrivateKey} privateKey the encrypted private key for resource decryption
-   * @returns {Promise<void>}
-   * @todo UserId variable does not seem to be used.
-   */
-  async decryptSecrets(exportEntity, privateKey) {
-    let i = 0;
-    for (const exportResourceEntity of exportEntity.exportResources.items) {
-      i++;
-      await this.progressService.finishStep(i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
-
-      const secretSchema = await this.resourceTypeModel.getSecretSchemaById(exportResourceEntity.resourceTypeId);
-      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(exportResourceEntity.secrets.items[0], secretSchema, privateKey);
-      exportResourceEntity.secretClear = plaintextSecret.password || "";
-      exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description || "";
-      if (plaintextSecret.totp) {
-        exportResourceEntity.totp = new TotpEntity(plaintextSecret.totp);
-      }
-    }
-  }
-
-  /**
-   * Export
-   * @param {ExportResourcesFileEntity} exportEntity The export object
-   * @returns {Promise<void>}
-   */
-  async export(exportEntity) {
-    const exporter = new ResourcesExporter();
-    await exporter.export(exportEntity);
-  }
-
-  /**
-   * Get mime type from file extension.
-   * @param {string} extension kdbx or csv or text/plain
-   * @return {string}
-   */
-  getMimeType(extension) {
-    let mimeType = "text/plain";
-    switch (extension) {
-      case "kdbx":
-        mimeType = "application/x-keepass";
-        break;
-      case "csv":
-        mimeType = "text/csv";
-        break;
-    }
-
-    return mimeType;
-  }
-
-  /**
-   * Propose the file to download.
-   * @param {ExportResourcesFileEntity} exportEntity The export entity
-   * @returns {Promise<void>}
-   */
-  async download(exportEntity) {
-    const date = new Date().toISOString().slice(0, 10);
-    const filename = `passbolt-export-${date}.${exportEntity.fileType}`;
-    const mimeType = this.getMimeType(exportEntity.fileType);
-    const blobFile = new Blob([exportEntity.file], {type: mimeType});
-    await FileService.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
   }
 }
 

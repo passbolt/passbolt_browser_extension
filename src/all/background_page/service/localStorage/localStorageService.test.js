@@ -28,6 +28,9 @@ import MetadataTypesSettingsLocalStorage, {
 import MetadataKeysSessionStorage, {
   METADATA_KEYS_SESSION_STORAGE_KEY
 } from "../session_storage/metadataKeysSessionStorage";
+import SessionKeysBundlesSessionStorageService, {
+  SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY
+} from "../sessionStorage/sessionKeysBundlesSessionStorageService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -36,7 +39,7 @@ beforeEach(() => {
 describe("LocalStorageService", () => {
   describe("LocalStorageService::flush", () => {
     it("Should flush all storage (with no account set)", async() => {
-      expect.assertions(20);
+      expect.assertions(21);
       // spy on
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
@@ -46,6 +49,7 @@ describe("LocalStorageService", () => {
       jest.spyOn(PostponeUserSettingInvitationService, "reset");
       jest.spyOn(MetadataTypesSettingsLocalStorage.prototype, "flush");
       jest.spyOn(MetadataKeysSessionStorage.prototype, "flush");
+      jest.spyOn(SessionKeysBundlesSessionStorageService.prototype, "flush");
       // process
       await LocalStorageService.flush();
       // expectations
@@ -69,10 +73,11 @@ describe("LocalStorageService", () => {
       expect(UserMeSessionStorageService.remove).not.toHaveBeenCalled();
       expect(MetadataTypesSettingsLocalStorage.prototype.flush).not.toHaveBeenCalled();
       expect(MetadataKeysSessionStorage.prototype.flush).not.toHaveBeenCalled();
+      expect(SessionKeysBundlesSessionStorageService.prototype.flush).not.toHaveBeenCalled();
     });
 
     it("Should flush all storage (with an account set)", async() => {
-      expect.assertions(23);
+      expect.assertions(24);
       // mock data
       MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -87,7 +92,7 @@ describe("LocalStorageService", () => {
       await LocalStorageService.flush();
       // expectations
       expect(browser.storage.local.remove).toHaveBeenCalledTimes(12);
-      expect(browser.storage.session.remove).toHaveBeenCalledTimes(4);
+      expect(browser.storage.session.remove).toHaveBeenCalledTimes(5);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resourceTypes");
@@ -108,6 +113,7 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${METADATA_TYPES_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.session.remove).toHaveBeenCalledWith(`${METADATA_KEYS_SESSION_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.session.remove).toHaveBeenCalledWith(`${SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY}-${account.id}`);
       expect(UserMeSessionStorageService.remove).toHaveBeenCalledWith(account);
     });
   });

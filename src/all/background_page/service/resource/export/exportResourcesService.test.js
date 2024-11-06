@@ -28,9 +28,9 @@ import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/fol
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ExportResourcesFileEntity, {FORMAT_CSV_1PASSWORD, FORMAT_CSV_BITWARDEN, FORMAT_CSV_CHROMIUM, FORMAT_CSV_DASHLANE, FORMAT_CSV_KDBX, FORMAT_CSV_LASTPASS, FORMAT_CSV_LOGMEONCE, FORMAT_CSV_MOZILLA, FORMAT_CSV_NORDPASS, FORMAT_CSV_SAFARI, FORMAT_KDBX, FORMAT_KDBX_OTHERS} from "../../../model/entity/export/exportResourcesFileEntity";
 import ResourceService from "../../api/resource/resourceService";
-import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import each from "jest-each";
-import {resourceCollectionV4ToExport} from "./exportResourcesService.test.data";
+import {resourceCollectionV4ToExport, resourceCollectionV5ToExport} from "./exportResourcesService.test.data";
 import {KdbxCsvFile, bitwardenCsvFile, chromiumCsvFile, dashlaneCsvFile, lastpassCsvFile, logMeOnceCsvFile, mozillaCsvFile, nordPassCsvFile, onePasswordCsvFile, safariCsvFile} from "../../../model/entity/import/importResourcesFileEntity.test.data";
 import FolderLocalStorage from "../../local_storage/folderLocalStorage";
 import {defaultTotpDto} from "../../../model/entity/totp/totpDto.test.data";
@@ -41,6 +41,9 @@ import ExternalFoldersCollection from "../../../model/entity/folder/external/ext
 import ResourcesKdbxExporter from "../../../model/export/resources/resourcesKdbxExporter";
 import fs from "fs";
 import FoldersCollection from "../../../model/entity/folder/foldersCollection";
+import GetOrFindMetadataKeysService from "../../metadata/getOrFindMetadataKeysService";
+import {defaultDecryptedSharedMetadataKeysDtos} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
+import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -65,9 +68,12 @@ describe("ExportResourcesService", () => {
     })];
 
     resourceTypeCollection = resourceTypesCollectionDto();
+    const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
+    const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
     service = new ExportResourcesService(account, apiClientOptions, new ProgressService(worker, ""));
     jest.spyOn(FolderLocalStorage, "get").mockImplementation(() => foldersDto);
     jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypeCollection);
+    jest.spyOn(GetOrFindMetadataKeysService.prototype, "getOrFindAll").mockImplementation(() => metadataKeys);
   });
 
   describe("::exportToFile", () => {
@@ -83,53 +89,81 @@ describe("ExportResourcesService", () => {
         {format: FORMAT_CSV_NORDPASS, expected: nordPassCsvFile},
         {format: FORMAT_CSV_LOGMEONCE, expected: logMeOnceCsvFile},
       ]).describe("Should export the csv file with password and description.", test => {
-        it(`Should export ${test.format} v4`, async() => {
-          expect.assertions(1);
-          const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
-          const file = {
-            format: test.format,
-            resources_ids: [uuidv4()],
-            folders_ids: [foldersDto[0].id],
-          };
-          const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
+        each([
+          {version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG},
+          {version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG},
+        ]).describe(`Should export ${test.format}`, iteration => {
+          it(`${iteration.version}`, async() => {
+            expect.assertions(1);
+            const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === iteration.resourceType);
+            const file = {
+              format: test.format,
+              resources_ids: [uuidv4()],
+              folders_ids: [foldersDto[0].id],
+            };
+            const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
 
-          const resourceCollectionV4 = await resourceCollectionV4ToExport({
-            resourceType: resourceType,
-            folder_parent_id: foldersDto[0].id
+            let resourceCollection;
+            if (iteration.version === "v4") {
+              resourceCollection = await resourceCollectionV4ToExport({
+                resourceType: resourceType,
+                folder_parent_id: foldersDto[0].id,
+              });
+            } else {
+              resourceCollection = await resourceCollectionV5ToExport({
+                resourceType: resourceType,
+                folder_parent_id: foldersDto[0].id,
+              });
+            }
+
+            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollection);
+
+            await service.prepareExportContent(exportResourcesFileEntity);
+            await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
+
+            expect(exportResourcesFileEntity.file).toEqual(test.expected);
           });
-
-          jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
-
-          await service.prepareExportContent(exportResourcesFileEntity);
-          await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
-
-          expect(exportResourcesFileEntity.file).toEqual(test.expected);
         });
       });
       each([
         {format: FORMAT_CSV_KDBX, expected: KdbxCsvFile},
       ]).describe("Should export the csv file with password, description and totp.", test => {
-        it(`Should export ${test.format} v4`, async() => {
-          expect.assertions(1);
-          const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
-          const file = {
-            format: test.format,
-            resources_ids: [uuidv4()],
-            folders_ids: [foldersDto[0].id],
-          };
-          const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
+        each([
+          {version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG},
+          {version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG},
+        ]).describe(`Should export ${test.format}`, iteration => {
+          it(`${iteration.version}`, async() => {
+            expect.assertions(1);
+            const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === iteration.resourceType);
+            const file = {
+              format: test.format,
+              resources_ids: [uuidv4()],
+              folders_ids: [foldersDto[0].id],
+            };
+            const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
 
-          const resourceCollectionV4 = await resourceCollectionV4ToExport({
-            resourceType: resourceType,
-            folder_parent_id: foldersDto[0].id,
-            totp: defaultTotpDto({secret_key: "THISISASECRET"})
+            let resourceCollection;
+            if (iteration.version === "v4") {
+              resourceCollection = await resourceCollectionV4ToExport({
+                resourceType: resourceType,
+                folder_parent_id: foldersDto[0].id,
+                totp: defaultTotpDto({secret_key: "THISISASECRET"})
+              });
+            } else {
+              resourceCollection = await resourceCollectionV5ToExport({
+                resourceType: resourceType,
+                folder_parent_id: foldersDto[0].id,
+                totp: defaultTotpDto({secret_key: "THISISASECRET"})
+              });
+            }
+
+            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollection);
+
+            await service.prepareExportContent(exportResourcesFileEntity);
+            await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
+
+            expect(exportResourcesFileEntity.file).toEqual(test.expected);
           });
-          jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
-
-          await service.prepareExportContent(exportResourcesFileEntity);
-          await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
-
-          expect(exportResourcesFileEntity.file).toEqual(test.expected);
         });
       });
     });
@@ -156,88 +190,95 @@ describe("ExportResourcesService", () => {
           exportResourcesFileEntity.exportResources.items[0].totp = new TotpEntity(defaultTotpDto({secret_key: "THISISASECRET"}));
           await kdbxExporter.export(exportResourcesFileEntity);
         }
-        it(`Should export KDBX ${test.format} v4 without credentials`, async() => {
-          expect.assertions(1);
-          const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
-          const file = {
-            format: test.format,
-            resources_ids: [uuidv4()],
-            folders_ids: [foldersDto[0].id],
-          };
-          const resourceCollectionV4 = await resourceCollectionV4ToExport({
-            resourceType: resourceType,
-            folder_parent_id: foldersDto[0].id,
-            totp: defaultTotpDto({secret_key: "THISISASECRET"})
+
+        each([
+          {version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG},
+          {version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG},
+        ]).describe(`Should export ${test.format}`, iteration => {
+          it(`Should export KDBX ${test.format} without credentials - <${iteration.version}>`, async() => {
+            expect.assertions(1);
+            const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === iteration.resourceType);
+            const file = {
+              format: test.format,
+              resources_ids: [uuidv4()],
+              folders_ids: [foldersDto[0].id],
+            };
+            const resourceCollectionV4 = await resourceCollectionV4ToExport({
+              resourceType: resourceType,
+              folder_parent_id: foldersDto[0].id,
+              totp: defaultTotpDto({secret_key: "THISISASECRET"})
+            });
+
+            const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
+            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
+            await service.prepareExportContent(exportResourcesFileEntity);
+            await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
+
+            const expectedResourcesFileEntity = new ExportResourcesFileEntity(file);
+            await getKDBXContent(expectedResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
+
+            expect(exportResourcesFileEntity.file).toEqual(expectedResourcesFileEntity.file);
           });
 
-          const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
-          jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
-          await service.prepareExportContent(exportResourcesFileEntity);
-          await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
+          it(`Should export KDBX ${test.format} v4 with credentials - <${iteration.version}>`, async() => {
+            expect.assertions(1);
+            const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === iteration.resourceType);
+            const file = {
+              format: test.format,
+              resources_ids: [uuidv4()],
+              folders_ids: [foldersDto[0].id],
+              option: {credentials: {password: "secret"}}
+            };
+            const resourceCollectionV4 = await resourceCollectionV4ToExport({
+              resourceType: resourceType,
+              folder_parent_id: foldersDto[0].id,
+              totp: defaultTotpDto({secret_key: "THISISASECRET"})
+            });
 
-          const expectedResourcesFileEntity = new ExportResourcesFileEntity(file);
-          await getKDBXContent(expectedResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
+            const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
+            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
+            await service.prepareExportContent(exportResourcesFileEntity);
+            await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
 
-          expect(exportResourcesFileEntity.file).toEqual(expectedResourcesFileEntity.file);
-        });
-        it(`Should export KDBX ${test.format} v4 with credentials`, async() => {
-          expect.assertions(1);
-          const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
-          const file = {
-            format: test.format,
-            resources_ids: [uuidv4()],
-            folders_ids: [foldersDto[0].id],
-            option: {credentials: {password: "secret"}}
-          };
-          const resourceCollectionV4 = await resourceCollectionV4ToExport({
-            resourceType: resourceType,
-            folder_parent_id: foldersDto[0].id,
-            totp: defaultTotpDto({secret_key: "THISISASECRET"})
+            const expectedResourcesFileEntity = new ExportResourcesFileEntity(file);
+            await getKDBXContent(expectedResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
+
+            expect(exportResourcesFileEntity.file).toEqual(expectedResourcesFileEntity.file);
           });
 
-          const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
-          jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
-          await service.prepareExportContent(exportResourcesFileEntity);
-          await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
+          it(`Should export KDBX ${test.format} v4 with keyFile - <${iteration.version}>`, async() => {
+            expect.assertions(1);
+            const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === iteration.resourceType);
+            const file = {
+              format: test.format,
+              resources_ids: [uuidv4()],
+              folders_ids: [foldersDto[0].id],
+              option: {credentials: {
+                keyfile: fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-keyfile.key", {encoding: 'base64'})
+              }}
+            };
+            const resourceCollectionV4 = await resourceCollectionV4ToExport({
+              resourceType: resourceType,
+              folder_parent_id: foldersDto[0].id,
+              totp: defaultTotpDto({secret_key: "THISISASECRET"})
+            });
 
-          const expectedResourcesFileEntity = new ExportResourcesFileEntity(file);
-          await getKDBXContent(expectedResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
+            const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
+            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
+            await getKDBXContent(exportResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
+            await service.prepareExportContent(exportResourcesFileEntity);
+            await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
 
-          expect(exportResourcesFileEntity.file).toEqual(expectedResourcesFileEntity.file);
-        });
+            const expectedResourcesFileEntity = new ExportResourcesFileEntity(file);
+            await getKDBXContent(expectedResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
 
-        it(`Should export KDBX ${test.format} v4 with keyFile`, async() => {
-          expect.assertions(1);
-          const resourceType = resourceTypeCollection.find(resourceType => resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
-          const file = {
-            format: test.format,
-            resources_ids: [uuidv4()],
-            folders_ids: [foldersDto[0].id],
-            option: {credentials: {
-              keyfile: fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-keyfile.key", {encoding: 'base64'})
-            }}
-          };
-          const resourceCollectionV4 = await resourceCollectionV4ToExport({
-            resourceType: resourceType,
-            folder_parent_id: foldersDto[0].id,
-            totp: defaultTotpDto({secret_key: "THISISASECRET"})
+            expect(exportResourcesFileEntity.file).toEqual(expectedResourcesFileEntity.file);
           });
-
-          const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
-          jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
-          await getKDBXContent(exportResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
-          await service.prepareExportContent(exportResourcesFileEntity);
-          await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
-
-          const expectedResourcesFileEntity = new ExportResourcesFileEntity(file);
-          await getKDBXContent(expectedResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
-
-          expect(exportResourcesFileEntity.file).toEqual(expectedResourcesFileEntity.file);
         });
       });
     });
 
-    it("Should inform the user about the progress - v4", async() => {
+    it("Should inform the user about the progress", async() => {
       expect.assertions(4);
 
       jest.spyOn(service.progressService, "updateGoals");
@@ -251,7 +292,7 @@ describe("ExportResourcesService", () => {
       };
       const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
 
-      const resourceCollectionV4 = await resourceCollectionV4ToExport({
+      const resourceCollectionV4 = await resourceCollectionV5ToExport({
         resourceType: resourceType,
         folder_parent_id: foldersDto[0].id
       });

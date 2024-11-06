@@ -24,6 +24,14 @@ import PlaintextEntity from "../../../model/entity/plaintext/plaintextEntity";
 import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
 
 export const resourceCollectionV4ToExport = async(data = {}, options = {}) => {
+  const collection = await resourceCollectionV5ToExport(data, options);
+
+  delete collection[0].metadata;
+
+  return collection;
+};
+
+export const resourceCollectionV5ToExport = async(data = {}, options = {}) => {
   const plaintextDto = {
     password: data.password || "Password 1",
     description: data.description || "Description 1",
@@ -43,6 +51,12 @@ export const resourceCollectionV4ToExport = async(data = {}, options = {}) => {
     resource_id: id,
     data: encryptedSecret
   };
+  const metadata = {
+    name: "Password 1",
+    username: "Username 1",
+    uris: ["https://url1.com"],
+    resource_type_id: resourceType.id,
+  };
   const dto = defaultResourceDto({
     id: id,
     name: "Password 1",
@@ -51,10 +65,9 @@ export const resourceCollectionV4ToExport = async(data = {}, options = {}) => {
     secrets: [secret],
     resource_type_id: resourceType.id,
     folder_parent_id: data.folder_parent_id,
+    metadata: metadata,
     ...data
   }, options);
-
-  delete dto.metadata;
 
   return [dto];
 };

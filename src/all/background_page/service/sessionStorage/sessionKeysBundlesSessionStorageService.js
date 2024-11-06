@@ -16,7 +16,7 @@ import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/
 
 export const SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY = "session_keys_bundles";
 
-class SessionKeysBundlesSessionStorageStorageService {
+class SessionKeysBundlesSessionStorageService {
   /**
    * Runtime cached data.
    * @type {Object} Key: account_id, value: cached data as dto.
@@ -51,7 +51,7 @@ class SessionKeysBundlesSessionStorageStorageService {
    * @returns {boolean}
    */
   hasCachedData() {
-    return Boolean(SessionKeysBundlesSessionStorageStorageService._runtimeCachedData[this.account.id]);
+    return Boolean(SessionKeysBundlesSessionStorageService._runtimeCachedData[this.account.id]);
   }
 
   /**
@@ -60,7 +60,7 @@ class SessionKeysBundlesSessionStorageStorageService {
    */
   async flush() {
     await browser.storage.session.remove(this.storageKey);
-    delete SessionKeysBundlesSessionStorageStorageService._runtimeCachedData[this.account.id];
+    delete SessionKeysBundlesSessionStorageService._runtimeCachedData[this.account.id];
     console.debug(`SessionKeysBundlesSessionStorageStorage flushed for (${this.account.id})`);
   }
 
@@ -69,15 +69,15 @@ class SessionKeysBundlesSessionStorageStorageService {
    * @return {Promise<Array|undefined>}
    */
   async get() {
-    if (!SessionKeysBundlesSessionStorageStorageService._runtimeCachedData[this.account.id]) {
+    if (!SessionKeysBundlesSessionStorageService._runtimeCachedData[this.account.id]) {
       const data = await browser.storage.session.get([this.storageKey]);
       if (!data[this.storageKey]) {
         return;
       }
-      SessionKeysBundlesSessionStorageStorageService._runtimeCachedData[this.account.id] = data[this.storageKey];
+      SessionKeysBundlesSessionStorageService._runtimeCachedData[this.account.id] = data[this.storageKey];
     }
 
-    return SessionKeysBundlesSessionStorageStorageService._runtimeCachedData[this.account.id];
+    return SessionKeysBundlesSessionStorageService._runtimeCachedData[this.account.id];
   }
 
   /**
@@ -96,7 +96,7 @@ class SessionKeysBundlesSessionStorageStorageService {
     await navigator.locks.request(this.storageKey, async() => {
       const sessionKeysBundlesDto = collection.toDto();
       await this._setBrowserStorage({[this.storageKey]: sessionKeysBundlesDto});
-      SessionKeysBundlesSessionStorageStorageService._runtimeCachedData[this.account.id] = sessionKeysBundlesDto;
+      SessionKeysBundlesSessionStorageService._runtimeCachedData[this.account.id] = sessionKeysBundlesDto;
     });
   }
 
@@ -113,4 +113,4 @@ class SessionKeysBundlesSessionStorageStorageService {
   }
 }
 
-export default SessionKeysBundlesSessionStorageStorageService;
+export default SessionKeysBundlesSessionStorageService;

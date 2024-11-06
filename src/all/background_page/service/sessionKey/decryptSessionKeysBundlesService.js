@@ -31,13 +31,13 @@ class DecryptSessionKeysBundlesService {
   }
 
   /**
-   * Decrypts a session keys bundle and mutate the data entity with the decrypted result.
-   * If the private key was already decrypted, nothing happens.
+   * Decrypts a session keys bundle and mutate the entity data property with the decrypted result.
+   * If the bundle was already decrypted, nothing happens.
    *
-   * @param {SessionKeysBundleEntity} sessionKeysBundleEntity the metadata private key entity to decrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {SessionKeysBundleEntity} sessionKeysBundleEntity the session key bundle entity to decrypt.
+   * @param {string} [passphrase = null] The passphrase to use to decrypt the information.
    * @returns {Promise<void>}
-   * @throws {TypeError} if the `sessionKeysBundleEntity` is not of type MetadataPrivateKeyEntity
+   * @throws {TypeError} if the `sessionKeysBundleEntity` is not of the expected type
    * @throws {Error} if session keys bundle entity data is not a valid openPGP message.
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */

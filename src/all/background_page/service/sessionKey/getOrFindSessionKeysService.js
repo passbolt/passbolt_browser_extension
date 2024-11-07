@@ -15,6 +15,7 @@
 import FindAndUpdateSessionKeysSessionStorageService from "./findAndUpdateSessionKeysSessionStorageService";
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
 import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
+import {assertArrayUUID, assertNonEmptyString} from "../../utils/assertions";
 
 /**
  * The service aims to get session keys from the local storage, or to retrieve them from the API and store them in the session storage.
@@ -31,7 +32,7 @@ export default class GetOrFindSessionKeysService {
   }
 
   /**
-   * Get the session keys from the session storage, or retrieve them from the API and update the session storage.
+   * Get the session keys bundles from the session storage, or retrieve them from the API and update the session storage.
    * @returns {Promise<SessionKeysBundlesCollection>}
    */
   async getOrFindAllBundles() {
@@ -42,5 +43,35 @@ export default class GetOrFindSessionKeysService {
     }
 
     return this.findAndUpdateSessionKeysService.findAndUpdateAllBundles();
+  }
+
+  /**
+   * Get the session keys from the session storage, or retrieve them from the API.
+   * @returns {Promise<SessionKeysCollection>}
+   */
+  async getOrFindAll() {
+    const sessionKeysBundlesCollection = await this.getOrFindAllBundles();
+    // Sort to have the recent one in first position
+    sessionKeysBundlesCollection.sortByModified();
+    const recentSessionKeysCollection = sessionKeysBundlesCollection.items[0].data.sessionKeys;
+    // Concatenate all session keys from the most recent one and validate integrity and ignore invalid
+    for (let i = 1; i < sessionKeysBundlesCollection.length; i++) {
+      recentSessionKeysCollection.pushMany(sessionKeysBundlesCollection.items[i].data.sessionKeys.items, {validate: false, ignoreInvalidEntity: true});
+    }
+    return recentSessionKeysCollection;
+  }
+
+  /**
+   * Get the session keys from the session storage, or retrieve them from the API by foreign model and foreign ids.
+   * @param {string} foreignModel The foreign model (ex: Resource, Folder, Tag,...)
+   * @param {Array<string>} foreignIds The foreign ids (ex: 640ebc06-5ec1-5322-a1ae-6120ed2f3a74)
+   * @returns {Promise<SessionKeysCollection>}
+   */
+  async getOrFindAllByForeignModelAndForeignIds(foreignModel, foreignIds) {
+    assertNonEmptyString(foreignModel, 'The parameter "foreignModel" should not be an empty string');
+    assertArrayUUID(foreignIds, 'The parameter "foreignIds" should contain only uuid');
+    const sessionKeysCollection = await this.getOrFindAll();
+    sessionKeysCollection.filterOutSessionKeysNotMatchingForeignModelAndForeignIds(foreignModel, foreignIds);
+    return sessionKeysCollection;
   }
 }

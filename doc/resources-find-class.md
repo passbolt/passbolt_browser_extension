@@ -254,7 +254,8 @@ classDiagram
 
         class GetOrFindSessionKeysService {
             +getOrFindAllBundles() Promise~SessionKeysBundlesCollection~
-            +getOrFindAllByForeignModelAndForeignIds(string foreignModel, array foreignIds): SessionKeysCollection
+            +getOrFindAll(): Promise~SessionKeysCollection~
+            +getOrFindAllByForeignModelAndForeignIds(string foreignModel, array foreignIds): Promise~SessionKeysCollection~
         }
 
         class FindAndUpdateSessionKeysBundlesSessionStorageService {
@@ -282,6 +283,7 @@ classDiagram
 
         class SessionKeysBundlesSessionStorageService {
             -$_runtimeCachedData object
+            +hasCachedData(): boolean
             +get() Promise~array~
             +set(SessionKeysBundlesCollection collection) Promise
             +flush(AccountEntity account) Promise
@@ -465,6 +467,7 @@ classDiagram
 
         class SessionKeysBundlesCollection {
             +hasDecryptedSessionKeys() boolean
+            +sortByModified() void
         }
 
         class SessionKeysBundleEntity {

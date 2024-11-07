@@ -102,25 +102,19 @@ class FoldersCollection extends EntityV2Collection {
     return this._items.map(folder => folder.folderParentIds);
   }
 
+  /*
+   * ==================================================
+   * Filters
+   * ==================================================
+   */
+
   /**
-   * Return a new collection with all resources the current user is owner
+   * Return a new collection with all folders the current user is owner.
    *
    * @returns {FoldersCollection}
    */
-  getAllWhereOwner() {
-    return new FoldersCollection(this._items.filter(f => f.isOwner()));
-  }
-
-  /**
-   * Get an entity folder parent path.
-   * @param {FolderEntity|ResourceEntity} entity
-   * @returns {string}
-   */
-  getFolderParentPath(entity) {
-    return this.getAllParents(entity).items
-      .reverse()
-      .map(folderParentEntity => folderParentEntity.name)
-      .join("/");
+  filterByIsOwner() {
+    return new FoldersCollection(this._items.filter(f => f.isOwner()), {validate: false});
   }
 
   /*

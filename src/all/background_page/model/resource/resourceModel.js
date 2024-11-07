@@ -48,6 +48,7 @@ class ResourceModel {
    *
    * @param {Array} folderIds The folder id
    * @return {ResourcesCollection}
+   * @deprecated should use getOrFindResourcesService and collection filtering. See shareFoldersService usage.
    */
   async getAllByParentIds(folderIds) {
     const localResources = await ResourceLocalStorage.get();
@@ -66,6 +67,7 @@ class ResourceModel {
    *
    * @param {Array} resourceIds The resource ids
    * @return {ResourcesCollection}
+   * @deprecated should use getOrFindResourcesService and collection filtering.
    */
   async getAllByIds(resourceIds) {
     const localResources = await ResourceLocalStorage.get();
@@ -78,6 +80,7 @@ class ResourceModel {
    *
    * @param {string} resourceId uuid
    * @returns {Promise<ResourceEntity>}
+   * @deprecated should use getOrFindResourcesService and collection filtering.
    */
   async getById(resourceId) {
     const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);

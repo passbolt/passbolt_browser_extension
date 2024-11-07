@@ -45,7 +45,6 @@ describe("ShareResourcesController", () => {
       const apiClientOptions = defaultApiClientOptions();
       account = new AccountEntity(adminAccountDto());
       const mockedWorker = {port: new MockPort()};
-      // await MockExtension.withConfiguredAccount(pgpKeys.admin);
       controller = new ShareResourcesController(mockedWorker, uuidv4(), apiClientOptions, account);
     });
 

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+import {v4 as uuidv4} from "uuid";
 import ResourcesCollection from "./resourcesCollection";
 import TagEntity from "../tag/tagEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
@@ -33,7 +34,10 @@ import {
 import ResourceEntity, {METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY} from "./resourceEntity";
 import {defaultTagDto} from "../tag/tagEntity.test.data";
 import expect from "expect";
-import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import {
+  ownerPermissionDto, readPermissionDto,
+  updatePermissionDto
+} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import {
   defaultResourceMetadataDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
@@ -381,6 +385,32 @@ describe("ResourcesCollection", () => {
 
       expect(resources).toHaveLength(1);
       expect(resources.items[0].id).toStrictEqual(resourceMetaKeyTypeUserKeyDto.id);
+    });
+  });
+
+  describe("::filterByIsOwner", () => {
+    it("filters the collection by resources having a owner permission.", () => {
+      expect.assertions(2);
+
+      const resource1Id = uuidv4();
+      const resource1Dto = defaultResourceDto({id: resource1Id, permission: ownerPermissionDto({aco_foreign_key: resource1Id})});
+      const resource2Id = uuidv4();
+      const resource2Dto = defaultResourceDto({id: resource2Id, permission: updatePermissionDto({aco_foreign_key: resource2Id})});
+      const resource3Id = uuidv4();
+      const resource3Dto = defaultResourceDto({id: resource3Id, permission: readPermissionDto({aco_foreign_key: resource3Id})});
+      const resource4Id = uuidv4();
+      const resource4Dto = defaultResourceDto({id: resource4Id, permission: ownerPermissionDto({aco_foreign_key: resource4Id})});
+      const resources = new ResourcesCollection([
+        resource1Dto,
+        resource2Dto,
+        resource3Dto,
+        resource4Dto,
+      ]);
+
+      const filteredResources = resources.filterByIsOwner();
+
+      expect(filteredResources).toHaveLength(2);
+      expect(filteredResources.ids).toEqual([resource1Id, resource4Id]);
     });
   });
 });

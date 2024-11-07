@@ -12,10 +12,19 @@
  * @since         2.13.0
  */
 import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
-import {defaultFoldersCollectionDto} from "passbolt-styleguide/src/shared/models/entity/folder/foldersCollection.test.data";
+import {
+  defaultFoldersCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/folder/foldersCollection.test.data";
 import FoldersCollection from "./foldersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import {
+  ownerPermissionDto,
+  readPermissionDto,
+  updatePermissionDto
+} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import expect from "expect";
+import {v4 as uuidv4} from "uuid";
+import PermissionEntity from "../permission/permissionEntity";
 
 describe("Folders collection entity", () => {
   it("schema must validate", () => {
@@ -339,6 +348,32 @@ describe("Folders collection entity", () => {
       const time = performance.now() - start;
       expect(collection).toHaveLength(commentsCount);
       expect(time).toBeLessThan(5_000);
+    });
+  });
+
+  describe("::filterByIsOwner", () => {
+    it("filters the collection by folders having a owner permission.", () => {
+      expect.assertions(2);
+
+      const folder1Id = uuidv4();
+      const folder1Dto = defaultFolderDto({id: folder1Id, permission: ownerPermissionDto({aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: folder1Id})});
+      const folder2Id = uuidv4();
+      const folder2Dto = defaultFolderDto({id: folder2Id, permission: updatePermissionDto({aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: folder2Id})});
+      const folder3Id = uuidv4();
+      const folder3Dto = defaultFolderDto({id: folder3Id, permission: readPermissionDto({aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: folder3Id})});
+      const folder4Id = uuidv4();
+      const folder4Dto = defaultFolderDto({id: folder4Id, permission: ownerPermissionDto({aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: folder4Id})});
+      const folders = new FoldersCollection([
+        folder1Dto,
+        folder2Dto,
+        folder3Dto,
+        folder4Dto,
+      ]);
+
+      const filteredResources = folders.filterByIsOwner();
+
+      expect(filteredResources).toHaveLength(2);
+      expect(filteredResources.ids).toEqual([folder1Id, folder4Id]);
     });
   });
 });

@@ -51,6 +51,7 @@ class FolderModel {
    *
    * @param {string} folderId uuid
    * @returns {Promise<FolderEntity|null>}
+   * @deprecated should use getOrFindResourcesService and collection filtering.
    */
   async getById(folderId) {
     const folderDto = await FolderLocalStorage.getFolderById(folderId);
@@ -64,6 +65,7 @@ class FolderModel {
    * @param {array} folderIds The folder ids
    * @param {boolean} [withChildren] optional default false
    * @return {Promise<FoldersCollection>}
+   * @deprecated should use getOrFindResourcesService and collection filtering.
    */
   async getAllByIds(folderIds, withChildren) {
     const outputCollection = new FoldersCollection([]);
@@ -91,6 +93,7 @@ class FolderModel {
    *
    * @param {array} folderIds The folder ids
    * @return {FoldersCollection}
+   * @deprecated should use getOrFindFoldersService and collection filtering. See shareFoldersService usage.
    */
   async getAllChildren(folderIds) {
     const foldersDto = await FolderLocalStorage.get();
@@ -113,6 +116,7 @@ class FolderModel {
    * Get all folders from API and map API result to folder collection
    *
    * @return {FoldersCollection}
+   * @deprecated should use findFoldersService.
    */
   async findAllForShare(foldersIds) {
     const foldersDtos = await this.folderService.findAllForShare(foldersIds);
@@ -123,6 +127,7 @@ class FolderModel {
    * Get folder from API and map API result to folder Entity
    *
    * @return {FolderEntity}
+   * @deprecated should use findFoldersService.
    */
   async findForShare(folderId) {
     const foldersDtos = await this.folderService.findAllForShare([folderId]);
@@ -370,6 +375,7 @@ class FolderModel {
    *
    * @param {(string|null)} folderId folderId
    * @throws {Error} if the folder does not exist
+   * @deprecated should use getOrFindFoldersService.
    */
   async assertFolderExists(folderId) {
     if (folderId === null) {
@@ -382,21 +388,6 @@ class FolderModel {
     if (!folderDto) {
       // TODO check remotely?
       throw new Error(`Folder with id ${folderId} does not exist.`);
-    }
-  }
-
-  /**
-   * Assert that all the folders are in the local storage
-   *
-   * @param {Array} folderIds array of uuid
-   * @throws {Error} if a folder does not exist
-   */
-  async assertFoldersExist(folderIds) {
-    if (!Array.isArray(folderIds)) {
-      throw new TypeError(`Folders exist check expect an array of uuid.`);
-    }
-    for (const i in folderIds) {
-      await this.assertFolderExists(folderIds[i]);
     }
   }
 }

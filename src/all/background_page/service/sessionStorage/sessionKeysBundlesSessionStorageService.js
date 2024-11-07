@@ -66,7 +66,7 @@ class SessionKeysBundlesSessionStorageStorageService {
 
   /**
    * Get the session keys bundle from the session storage.
-   * @return {Promise<object|undefined>}
+   * @return {Promise<Array|undefined>}
    */
   async get() {
     if (!SessionKeysBundlesSessionStorageStorageService._runtimeCachedData[this.account.id]) {

@@ -76,7 +76,7 @@ describe("AuthLoginController", () => {
         if (test.rememberMe) {
           expect(PassphraseStorageService.set).toHaveBeenCalledWith(test.passphrase, -1);
         } else {
-          expect(PassphraseStorageService.set).not.toHaveBeenCalled();
+          expect(PassphraseStorageService.set).toHaveBeenCalledWith(test.passphrase, 60);
         }
         if (test.shouldRefreshCurrentTab) {
           expect(browser.tabs.update).toHaveBeenCalledWith(1, {url: account.domain});

@@ -76,6 +76,8 @@ class SignInSetupController {
         PassphraseStorageService.set(temporaryAccount.passphrase, -1),
         KeepSessionAliveService.start(),
       ]);
+    } else {
+      await PassphraseStorageService.set(temporaryAccount.passphrase, 60);
     }
     await PostLoginService.exec();
     await this.redirectToApp(temporaryAccount.account.domain);

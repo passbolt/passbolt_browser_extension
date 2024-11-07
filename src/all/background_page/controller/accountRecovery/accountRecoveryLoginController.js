@@ -106,6 +106,8 @@ class AccountRecoveryLoginController {
           PassphraseStorageService.set(passphrase, -1),
           KeepSessionAliveService.start(),
         ]);
+      } else {
+        await PassphraseStorageService.set(passphrase, 60);
       }
       await PostLoginService.exec();
       await this.registerRememberMeOption(rememberMe);

@@ -38,7 +38,7 @@ beforeEach(() => {
 describe("SignInSetupController", () => {
   describe("SignInSetupController::exec", () => {
     it.todo("Should sign-in the user.");
-    it.todo("Should remember the passphrase.");
+
     it.todo("Should redirect the user to the application.");
 
     it("Should throw an exception if the passphrase is not a valid.", async() => {
@@ -122,6 +122,36 @@ describe("SignInSetupController", () => {
       } catch (error) {
         expect(error.message).toEqual("You have already started the process on another tab.");
       }
+    });
+
+    it("Should remember the passphrase if requested by the user.", async() => {
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+      jest.spyOn(PassphraseStorageService, "set");
+      await MockExtension.withConfiguredAccount();
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new SignInSetupController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account, passphrase: "ada@passbolt.com"}));
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+
+      await controller.exec(true);
+
+      expect(PassphraseStorageService.set).toHaveBeenCalledWith("ada@passbolt.com", -1);
+    });
+
+    it("Should remember the passphrase during 1 minutes if not requested by the user.", async() => {
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+      jest.spyOn(PassphraseStorageService, "set");
+      await MockExtension.withConfiguredAccount();
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new SignInSetupController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account, passphrase: "ada@passbolt.com"}));
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+
+      await controller.exec();
+
+      expect(PassphraseStorageService.set).toHaveBeenCalledWith("ada@passbolt.com", 60);
     });
   });
 });

@@ -136,8 +136,24 @@ export default class FindResourcesService {
   }
 
   /**
+   * Retrieve all resources by ids with permissions.
+   * @param {Array<string>} resourcesIds The resource ids to retrieve.
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByIdsWithPermissions(resourcesIds) {
+    assertArrayUUID(resourcesIds);
+
+    const contains = {
+      "permission": true,
+      "permissions": true,
+    };
+
+    return this.findAllByIds(resourcesIds, contains);
+  }
+
+  /**
    * Retrieve all resources by ids for display permissions.
-   * @param {Array<uuid>} resourcesIds The resource ids to retrieve.
+   * @param {Array<string>} resourcesIds The resource ids to retrieve.
    * @returns {Promise<ResourcesCollection>}
    */
   async findAllByIdsForDisplayPermissions(resourcesIds) {

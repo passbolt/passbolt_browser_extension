@@ -32,6 +32,8 @@ classDiagram
             <<Service>>
             +findAll(object contains, object filters) Promise~FoldersCollection~
             +findAllForLocalStorage() Promise~FoldersCollection~
+            +findAllByIds(array~uuid~ foldersIds, object contains) Promise~FoldersCollection~
+            +findAllByIdsWithPermissions(array~uuid~ foldersIds) Promise~FoldersCollection~
         }
     }
 

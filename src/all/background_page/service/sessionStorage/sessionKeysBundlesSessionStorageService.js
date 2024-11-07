@@ -47,6 +47,14 @@ class SessionKeysBundlesSessionStorageStorageService {
   }
 
   /**
+   * Check if there is cached data.
+   * @returns {boolean}
+   */
+  hasCachedData() {
+    return Boolean(SessionKeysBundlesSessionStorageStorageService._runtimeCachedData[this.account.id]);
+  }
+
+  /**
    * Flush the session keys bundles from session storage and runtime cached data.
    * @return {Promise<void>}
    */
@@ -82,7 +90,7 @@ class SessionKeysBundlesSessionStorageStorageService {
     if (!collection || !(collection instanceof SessionKeysBundlesCollection)) {
       throw new TypeError("Parameter `sessionKeysBundles` should be of type SessionKeysBundlesCollection");
     }
-    if (collection.hasSomeEncryptedSessionKeysBundles()) {
+    if (collection.length > 0 && collection.hasSomeEncryptedSessionKeysBundles()) {
       throw new TypeError("The parameter `collection` should contain only decrypted keys.");
     }
     await navigator.locks.request(this.storageKey, async() => {

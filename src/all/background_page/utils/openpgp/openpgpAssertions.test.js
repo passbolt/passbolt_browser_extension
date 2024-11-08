@@ -14,6 +14,7 @@
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {OpenpgpAssertion} from "./openpgpAssertions";
 import * as openpgp from 'openpgp';
+import Uint8ArrayConvert from "../format/uint8ArrayConvert";
 
 
 describe("OpenPGP Assertions", () => {
@@ -571,6 +572,59 @@ describe("OpenPGP Assertions", () => {
           expect(e).toStrictEqual(expectedError);
         }
       }
+    });
+  });
+
+  describe("OpenPGP Assertions::assertSessionKey", () => {
+    it("Should validate if the session key is valid", async() => {
+      expect.assertions(1);
+      const sessionKeyString = "9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC";
+      const readSessionKey = await OpenpgpAssertion.readSessionKeyOrFail(sessionKeyString);
+
+      expect(() => OpenpgpAssertion.assertSessionKey(readSessionKey)).not.toThrowError();
+    });
+
+    it("Should throw an Error if the session key is not an object", async() => {
+      expect.assertions(1);
+      expect(() => OpenpgpAssertion.assertSessionKey("error")).toThrowError(Error("The session keys should be an object."));
+    });
+
+    it("Should throw an Error if the session key is not valid", async() => {
+      expect.assertions(1);
+      expect(() => OpenpgpAssertion.assertSessionKey({})).toThrowError(Error("The session keys should be a valid openpgp session key aes256."));
+    });
+
+    it("Should throw an Error if the session key has not AES256 algoithm", async() => {
+      expect.assertions(1);
+      expect(() => OpenpgpAssertion.assertSessionKey({data: new Uint8Array(32), algorithm: "aes128"})).toThrowError(Error("The session keys should be a valid openpgp session key aes256."));
+    });
+  });
+
+  describe("OpenPGP Assertions::readSessionKeyOrFail", () => {
+    it("Should return openpgp.SessionKey", async() => {
+      expect.assertions(2);
+      const sessionKey = "9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC";
+      const readSessionKey = await OpenpgpAssertion.readSessionKeyOrFail(sessionKey);
+      const dataExpected = Uint8ArrayConvert.fromHex("901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC");
+      expect(dataExpected).toHaveLength(32);
+      expect(readSessionKey).toEqual({data: dataExpected, algorithm: "aes256"});
+    });
+
+    it("Should throw an Error if the session key is not string", async() => {
+      expect.assertions(1);
+      expect(OpenpgpAssertion.readSessionKeyOrFail({})).rejects.toThrowError(TypeError("The session key should be a string."));
+    });
+
+    it("Should throw an Error if the session key not following the format integer:hexadecimal-string", async() => {
+      expect.assertions(1);
+      const sessionKey = "error";
+      expect(OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).rejects.toThrowError(Error('The parameter session key does not match the expected format "integer:hexadecimal-string".'));
+    });
+
+    it("Should throw an Error if the session key is not valid", async() => {
+      expect.assertions(1);
+      const sessionKey = "11:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC";
+      expect(OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).rejects.toThrowError(new Error("The session key should be a valid openpgp session key.", {cause: new Error("Invalid enum value.")}));
     });
   });
 });

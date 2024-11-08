@@ -13,6 +13,8 @@
  */
 import * as openpgp from 'openpgp';
 import i18n from "../../sdk/i18n";
+import Uint8ArrayConvert from "../format/uint8ArrayConvert";
+import {assertNonEmptyString} from "../assertions";
 
 /*
  * ==================================================
@@ -50,6 +52,30 @@ const readAllKeysOrFail = async armoredKeys => {
     throw new Error(i18n.t("The keys should be an array of valid openpgp armored key strings."));
   }
   return Promise.all(armoredKeys.map(key => readKeyOrFail(key)));
+};
+
+/**
+ * Read open pgp session key strings.
+ * @param {string} sessionKey The session key represented as "integer:hexadecimal-string" (ex: 9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC)
+ * @returns {Promise<{data: Uint8Array, algorithm: enums.symmetricNames}>}
+ * @throw {Error} if the parameter is not a string
+ * @throw {Error} if session key does not validate the expected format "integer:hexadecimal-string"
+ * @throw {Error} if session key cannot be read
+ */
+const readSessionKeyOrFail = async sessionKey => {
+  assertNonEmptyString(sessionKey, "The session key should be a string.");
+  if (!/^\d{1,2}:[0-9A-F]{64}$/i.test(sessionKey)) {
+    throw new TypeError('The parameter session key does not match the expected format "integer:hexadecimal-string".');
+  }
+
+  try {
+    const sessionKeySplit = sessionKey.split(":");
+    const algorithm = openpgp.enums.read(openpgp.enums.symmetric, sessionKeySplit[0]);
+    const data = Uint8ArrayConvert.fromHex(sessionKeySplit[1]);
+    return {data, algorithm};
+  } catch (error) {
+    throw new Error("The session key should be a valid openpgp session key.", {cause: error});
+  }
 };
 
 /**
@@ -281,6 +307,24 @@ const assertMessage = message => {
 };
 
 /**
+ * Assert the given message is an openpgp.SessionKey
+ * @param {openpgp.SessionKey} sessionKey
+ * @returns {void}
+ *  @throws {Error} if the session key is not an object
+ *  @throws {Error} if the session key data is not a valid Uint8Array
+ *  @throws {Error} if the session key algorithm is not aes256
+ */
+const assertSessionKey = sessionKey => {
+  if (!(Object.prototype.toString.call(sessionKey) === '[object Object]')) {
+    throw new Error("The session keys should be an object.");
+  }
+  // Allow only AES256 algorithm for the moment
+  if (!(sessionKey.data instanceof Uint8Array) || sessionKey.algorithm !== 'aes256') {
+    throw new Error("The session keys should be a valid openpgp session key aes256.");
+  }
+};
+
+/**
  * Assert the given message is an openpgp.CleartextMessage
  * @param {openpgp.CleartextMessage} message
  * @returns {void}
@@ -303,6 +347,7 @@ export const OpenpgpAssertion = {
   assertPrivateKey,
   assertPublicKeys,
   assertPublicKey,
+  assertSessionKey,
   assertKeys,
   assertKey,
   readMessageOrFail,
@@ -310,5 +355,6 @@ export const OpenpgpAssertion = {
   createCleartextMessageOrFail,
   createMessageOrFail,
   readAllKeysOrFail,
-  readKeyOrFail
+  readKeyOrFail,
+  readSessionKeyOrFail
 };

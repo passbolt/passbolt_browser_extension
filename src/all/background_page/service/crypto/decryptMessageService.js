@@ -17,10 +17,10 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 class DecryptMessageService {
   /**
-   * Encrypt symmetrically a message
+   * Decrypt symmetrically a message
    *
    * @param {openpgp.Message} message The message to decrypt.
-   * @param {string} password The password to use to encrypt the message.
+   * @param {string} password The password to use to decrypt the message.
    * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys The private key(s) to use to sign the message.
    * @returns {Promise<string>}
    */
@@ -33,6 +33,35 @@ class DecryptMessageService {
     const {data: decryptedMessage, signatures} = await openpgp.decrypt({
       message: message,
       passwords: [password],
+      verificationKeys: verificationKeys,
+      expectSigned: Boolean(verificationKeys)
+    });
+
+    if (verificationKeys) {
+      await this.doSignatureVerification(signatures);
+    }
+
+    return decryptedMessage;
+  }
+
+  /**
+   * Decrypt a message encrypted with one session key.
+   *
+   * @param {openpgp.Message} message The message to decrypt.
+   * @param {openpgp.SessionKey} sessionKey The sessionKey to use to decrypt the message.
+   * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys The private key(s) to use to sign the message.
+   * @returns {Promise<string>}
+   */
+  static async decryptWithSessionKey(message, sessionKey, verificationKeys = null) {
+    if (verificationKeys) {
+      OpenpgpAssertion.assertKeys(verificationKeys);
+    }
+    OpenpgpAssertion.assertMessage(message);
+    OpenpgpAssertion.assertSessionKey(sessionKey);
+
+    const {data: decryptedMessage, signatures} = await openpgp.decrypt({
+      message: message,
+      sessionKeys: sessionKey,
       verificationKeys: verificationKeys,
       expectSigned: Boolean(verificationKeys)
     });

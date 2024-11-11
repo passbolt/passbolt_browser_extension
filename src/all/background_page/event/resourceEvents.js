@@ -30,7 +30,7 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.update-local-storage', async requestId => {
     Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     const controller = new ResourceUpdateLocalStorageController(worker, requestId, apiClientOptions, account);
-    await controller._exec({updatePeriodThreshold: 10000});
+    await controller._exec();
   });
 
   /**

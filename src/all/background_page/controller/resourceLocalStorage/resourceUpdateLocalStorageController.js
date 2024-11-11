@@ -11,7 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.9.4
  */
+import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 
 class ResourceUpdateLocalStorageController {
   /**
@@ -26,6 +29,7 @@ class ResourceUpdateLocalStorageController {
     this.worker = worker;
     this.requestId = requestId;
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -46,12 +50,19 @@ class ResourceUpdateLocalStorageController {
 
   /**
    * Update the resource local storage.
-   * @param {{updatePeriodThreshold: number}} options The options
-   * @param {number} options.updatePeriodThreshold Do not update the local storage if the threshold is not overdue.
    * @returns {Promise<Object>} updated resource
    */
-  async exec(options = {}) {
-    await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll(options);
+  async exec() {
+    try {
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll({updatePeriodThreshold: 10000});
+    } catch (error) {
+      if (!(error instanceof UserPassphraseRequiredError)) {
+        throw error;
+      }
+      const passphrase =  await this.getPassphraseService.getPassphrase(this.worker);
+      await PassphraseStorageService.set(passphrase, 60);
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
+    }
   }
 }
 

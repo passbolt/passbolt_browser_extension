@@ -16,6 +16,16 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import ResourceUpdateLocalStorageController from "./resourceUpdateLocalStorageController";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import ResourceService from "../../service/api/resource/resourceService";
+import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
+import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {TEST_RESOURCE_TYPE_V5_DEFAULT} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {METADATA_KEY_TYPE_USER_KEY} from "../../model/entity/resource/resourceEntity";
+import {v4 as uuidv4} from "uuid";
 
 describe("ResourceUpdateLocalStorageController", () => {
   let controller, worker;
@@ -49,8 +59,28 @@ describe("ResourceUpdateLocalStorageController", () => {
       jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateAll").mockImplementationOnce(() => { throw error; });
       await controller._exec();
 
-      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledWith({});
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledWith({"updatePeriodThreshold": 10000});
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'ERROR', error);
+    });
+
+    it("Should request passphrase if not set for decryption", async() => {
+      expect.assertions(1);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [defaultResourceDto(
+        {
+          resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
+          metadata_key_type: METADATA_KEY_TYPE_USER_KEY,
+          metadata_key_id: uuidv4(),
+        }
+      )
+      ]);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+      jest.spyOn(GetPassphraseService.prototype, "requestPassphrase").mockImplementation(() => pgpKeys.ada.passphrase);
+      jest.spyOn(PassphraseStorageService, "set");
+
+      await controller._exec();
+
+      expect(PassphraseStorageService.set).toHaveBeenCalledWith(pgpKeys.ada.passphrase, 60);
     });
   });
 });

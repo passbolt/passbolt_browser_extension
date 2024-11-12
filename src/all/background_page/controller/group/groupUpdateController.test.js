@@ -14,9 +14,11 @@
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
-import User from "../../model/user";
 import GroupsUpdateController from "./groupUpdateController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 const {enableFetchMocks} = require("jest-fetch-mock");
 const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
@@ -49,7 +51,7 @@ describe("GroupsUpdateController", () => {
 
       browser.storage.local.set({groups: [localGroup]});
 
-      const clientOptions = await User.getInstance().getApiClientOptions();
+      const clientOptions = defaultApiClientOptions();
       const controller = new GroupsUpdateController(null, null, clientOptions);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
@@ -66,7 +68,7 @@ describe("GroupsUpdateController", () => {
         return mockApiResponse({id, name});
       });
 
-      await controller.main(dto);
+      await controller.exec(dto);
     });
 
     /**
@@ -108,8 +110,9 @@ describe("GroupsUpdateController", () => {
 
       browser.storage.local.set({groups: [localGroup]});
 
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new GroupsUpdateController(null, null, clientOptions);
+      const account = new AccountEntity(defaultAccountDto());
+      const clientOptions = defaultApiClientOptions();
+      const controller = new GroupsUpdateController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
       const dryRunResponse = await add2UsersToGroupDryRunResponse();
@@ -163,7 +166,7 @@ describe("GroupsUpdateController", () => {
         return mockApiResponse({id: id, name: name});
       });
 
-      await controller.main(dto);
+      await controller.exec(dto);
     });
   });
 });

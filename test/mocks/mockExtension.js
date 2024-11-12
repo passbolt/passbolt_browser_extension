@@ -22,7 +22,7 @@ import {Uuid} from "../../src/all/background_page/utils/uuid";
 class MockExtension {
   /**
    * Mock the extension with a configured account. Ada by default.
-   * @returns {void}
+   * @returns {Promise<void>}
    */
   static async withConfiguredAccount(keyData = pgpKeys.ada) {
     const user = this.withMissingPrivateKeyAccount(keyData);

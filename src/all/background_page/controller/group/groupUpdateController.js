@@ -35,8 +35,8 @@ class GroupsUpdateController {
 
     this.getPassphraseService = new GetPassphraseService(account);
 
-    const progressService = new ProgressService(this.worker, i18n.t('Updating group ...'));
-    this.groupUpdateService = new GroupUpdateService(apiClientOptions, account, progressService);
+    this.progressService = new ProgressService(this.worker, i18n.t('Updating group ...'));
+    this.groupUpdateService = new GroupUpdateService(apiClientOptions, account, this.progressService);
   }
 
   async _exec(groupDto) {
@@ -58,10 +58,8 @@ class GroupsUpdateController {
     const groupEntity = new GroupEntity(groupDto);
     try {
       await this.groupUpdateService.exec(groupEntity, passphrase);
-    } catch (e) {
-      console.error(e);
+    } finally {
       this.progressService.close();
-      throw e;
     }
   }
 }

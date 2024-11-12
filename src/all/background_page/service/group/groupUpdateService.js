@@ -65,7 +65,6 @@ class GroupUpdateService {
 
     await this.updateGroup(groupUpdateEntity);
     this.progressService.finishStep(null, true);
-    this.progressService.close();
   }
 
   /**

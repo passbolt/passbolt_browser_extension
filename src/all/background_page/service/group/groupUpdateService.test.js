@@ -32,7 +32,7 @@ import GroupUserEntity from "../../model/entity/groupUser/groupUserEntity";
 
 describe("GroupUpdateService", () => {
   it("should update the group without cryptographic operations if only the name changed", async() => {
-    expect.assertions(13);
+    expect.assertions(12);
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
@@ -91,7 +91,6 @@ describe("GroupUpdateService", () => {
     expect(progressService.finishStep).toHaveBeenCalledTimes(4);
     expect(progressService.finishStep).toHaveBeenCalledWith(null, true);
     expect(progressService.finishStep).toHaveBeenCalledWith("Updating group", true);
-    expect(progressService.close).toHaveBeenCalledTimes(1);
   });
 
   it("should update the group without cryptographic operations if only the permission changed", async() => {
@@ -217,7 +216,7 @@ describe("GroupUpdateService", () => {
   });
 
   it("should update the group and encrypt secrets for the new users", async() => {
-    expect.assertions(24);
+    expect.assertions(23);
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
@@ -309,7 +308,6 @@ describe("GroupUpdateService", () => {
     expect(progressService.finishStep).toHaveBeenCalledWith("Updating group", true);
     expect(progressService.finishStep).toHaveBeenCalledWith('Decrypting 1/1');
     expect(progressService.finishStep).toHaveBeenCalledWith('Encrypting 1/1');
-    expect(progressService.close).toHaveBeenCalledTimes(1);
   });
 
   it("should throw an error if the given dto is not valid as a GroupEntity", async() => {

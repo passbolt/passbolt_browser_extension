@@ -26,6 +26,26 @@ class Uint8ArrayConvert {
     }
     return result;
   }
+
+  /**
+   * Convert an array of 8-bit integers to a hex string
+   * @param {Uint8Array} bytes - Array of 8-bit integers to convert
+   * @returns {String} Hexadecimal representation of the array.
+   */
+  static toHex(bytes) {
+    const result = [];
+    const length = bytes.length;
+    let index = 0;
+    let character;
+    while (index < length) {
+      character = bytes[index++].toString(16);
+      while (character.length < 2) {
+        character = `0${character}`;
+      }
+      result.push(`${character}`);
+    }
+    return result.join('').toUpperCase();
+  }
 }
 
 export default Uint8ArrayConvert;

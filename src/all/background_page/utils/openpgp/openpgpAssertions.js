@@ -57,12 +57,12 @@ const readAllKeysOrFail = async armoredKeys => {
 /**
  * Read open pgp session key strings.
  * @param {string} sessionKey The session key represented as "integer:hexadecimal-string" (ex: 9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC)
- * @returns {Promise<{data: Uint8Array, algorithm: enums.symmetricNames}>}
+ * @returns {{data: Uint8Array, algorithm: enums.symmetricNames}}
  * @throw {Error} if the parameter is not a string
  * @throw {Error} if session key does not validate the expected format "integer:hexadecimal-string"
  * @throw {Error} if session key cannot be read
  */
-const readSessionKeyOrFail = async sessionKey => {
+const readSessionKeyOrFail = sessionKey => {
   assertNonEmptyString(sessionKey, "The session key should be a string.");
   if (!/^\d{1,2}:[0-9A-F]{64}$/i.test(sessionKey)) {
     throw new TypeError('The parameter session key does not match the expected format "integer:hexadecimal-string".');
@@ -307,6 +307,23 @@ const assertMessage = message => {
 };
 
 /**
+ * Assert the given message is an openpgp.Message decrypted
+ * @param {openpgp.Message} message
+ * @returns {void}
+ * @throws {Error} if the message is not an openpgp.Message decrypted
+ */
+const assertDecryptedMessage = message => {
+  assertMessage(message);
+  const packetWithSessionKey = message.packets.findPacket(openpgp.enums.packet.publicKeyEncryptedSessionKey);
+  if (!packetWithSessionKey) {
+    throw new Error(i18n.t("The message should contain at least one session key."));
+  }
+  if (packetWithSessionKey.encrypted !== null) {
+    throw new Error(i18n.t("The message should be decrypted."));
+  }
+};
+
+/**
  * Assert the given message is an openpgp.SessionKey
  * @param {openpgp.SessionKey} sessionKey
  * @returns {void}
@@ -339,6 +356,7 @@ const assertClearMessage = message => {
 export const OpenpgpAssertion = {
   assertMessage,
   assertClearMessage,
+  assertDecryptedMessage,
   assertEncryptedPrivateKeys,
   assertEncryptedPrivateKey,
   assertDecryptedPrivateKeys,

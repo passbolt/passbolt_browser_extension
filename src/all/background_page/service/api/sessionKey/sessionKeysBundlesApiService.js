@@ -13,6 +13,8 @@
  */
 
 import AbstractService from "../abstract/abstractService";
+import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
+import {assertType} from "../../../utils/assertions";
 
 const SESSION_KEYS_BUNDLES_API_SERVICE_RESOURCE_NAME = "metadata/session-keys";
 
@@ -28,7 +30,7 @@ class SessionKeysBundlesApiService extends AbstractService {
   }
 
   /**
-   * Retrieve the metadata keys from the API.
+   * Retrieve the session keys from the API.
    * @returns {Promise<Array>}
    * @public
    */
@@ -38,6 +40,17 @@ class SessionKeysBundlesApiService extends AbstractService {
       return [];
     }
 
+    return response.body;
+  }
+
+  /**
+   * Save new session keys bundle entity
+   * @param {SessionKeysBundleEntity} sessionKeysBundleEntity
+   * @returns {Promise<Object>}
+   */
+  async create(sessionKeysBundleEntity) {
+    assertType(sessionKeysBundleEntity, SessionKeysBundleEntity, "The given entity is not a SessionKeysBundleEntity");
+    const response = await this.apiClient.create(sessionKeysBundleEntity.toDto());
     return response.body;
   }
 }

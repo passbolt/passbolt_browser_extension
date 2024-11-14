@@ -24,6 +24,11 @@ import SessionKeysBundlesApiService from "./sessionKeysBundlesApiService";
 import {
   defaultSessionKeysBundlesDtos
 } from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection.test.data";
+import {
+  defaultSessionKeysBundleDto,
+  minimalSessionKeysBundleDto
+} from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity.test.data";
+import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
 
 describe("SessionKeysBundlesApiService", () => {
   let apiClientOptions, account;
@@ -35,13 +40,13 @@ describe("SessionKeysBundlesApiService", () => {
   });
 
   describe('::findAll', () => {
-    it("retrieves the settings from API", async() => {
+    it("retrieves the session keys bundle from the API", async() => {
       expect.assertions(2);
 
-      const apiSessionKeysBundlesCollection = [defaultSessionKeysBundlesDtos()];
+      const apiSessionKeysBundlesCollection = defaultSessionKeysBundlesDtos();
       fetch.doMockOnceIf(/metadata\/session-keys/, () => mockApiResponse(apiSessionKeysBundlesCollection));
 
-      const service = new SessionKeysBundlesApiService(apiClientOptions, account);
+      const service = new SessionKeysBundlesApiService(apiClientOptions);
       const resultDto = await service.findAll();
 
       expect(resultDto).toBeInstanceOf(Array);
@@ -64,6 +69,33 @@ describe("SessionKeysBundlesApiService", () => {
       const service = new SessionKeysBundlesApiService(apiClientOptions);
 
       await expect(() => service.findAll()).rejects.toThrow(PassboltServiceUnavailableError);
+    });
+  });
+
+  describe('::create', () => {
+    it("create a session key bundle on the API.", async() => {
+      expect.assertions(2);
+
+      const sessionKeysBundleDto = minimalSessionKeysBundleDto();
+      const sessionKeysBundle = new SessionKeysBundleEntity(sessionKeysBundleDto);
+      fetch.doMockOnceIf(/metadata\/session-keys/, async req => {
+        expect(req.method).toEqual("POST");
+        const reqPayload = await req.json();
+        return mockApiResponse(defaultSessionKeysBundleDto(reqPayload));
+      });
+
+      const service = new SessionKeysBundlesApiService(apiClientOptions);
+      const resultDto = await service.create(sessionKeysBundle);
+
+      expect(resultDto).toEqual(expect.objectContaining(sessionKeysBundleDto));
+    });
+
+    it("throws an invalid parameter error if the session key bundle parameter is not valid", async() => {
+      expect.assertions(1);
+
+      const service = new SessionKeysBundlesApiService(apiClientOptions);
+
+      await expect(() => service.create(42)).rejects.toThrow(TypeError);
     });
   });
 });

@@ -26,6 +26,12 @@ const config = {
         options: {
           presets: ["@babel/react"],
         }
+      },
+      // Transform SVG as react component
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        use: ['@svgr/webpack'],
       }
     ]
   },

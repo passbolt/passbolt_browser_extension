@@ -14,7 +14,7 @@
 
 import AbstractService from "../abstract/abstractService";
 import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
-import {assertType} from "../../../utils/assertions";
+import {assertType, assertUuid} from "../../../utils/assertions";
 
 const SESSION_KEYS_BUNDLES_API_SERVICE_RESOURCE_NAME = "metadata/session-keys";
 
@@ -45,12 +45,23 @@ class SessionKeysBundlesApiService extends AbstractService {
 
   /**
    * Save new session keys bundle entity
-   * @param {SessionKeysBundleEntity} sessionKeysBundleEntity
+   * @param {SessionKeysBundleEntity} sessionKeysBundleEntity The session key bundle to save
    * @returns {Promise<Object>}
    */
   async create(sessionKeysBundleEntity) {
     assertType(sessionKeysBundleEntity, SessionKeysBundleEntity, "The given entity is not a SessionKeysBundleEntity");
     const response = await this.apiClient.create(sessionKeysBundleEntity.toDto());
+    return response.body;
+  }
+
+  /**
+   * Delete a session keys bundle
+   * @param {string} id The id of the session key bundle to delete.
+   * @returns {Promise}
+   */
+  async delete(id) {
+    assertUuid(id, "The parameter 'id' should be a UUID.");
+    const response = await this.apiClient.delete(id);
     return response.body;
   }
 }

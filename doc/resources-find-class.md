@@ -276,9 +276,9 @@ classDiagram
 
         class SessionKeysBundlesApiService {
             +create(SessionKeysBundleEntity entity) Promise~object~
-            +delete(string entityId) Promise
+            +delete(string id) Promise
             +findAll() Promise~array~
-            +udpate(string entityId, SessionKeysBundleEntity entity) Promise~object~
+            +udpate(string id, SessionKeysBundleEntity entity) Promise~object~
         }
 
         class SessionKeysBundlesSessionStorageService {

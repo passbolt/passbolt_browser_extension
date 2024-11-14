@@ -12,6 +12,7 @@
  * @since         4.10.1
  */
 
+import {v4 as uuidv4} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
 import AccountEntity from "../../../model/entity/account/accountEntity";
@@ -96,6 +97,29 @@ describe("SessionKeysBundlesApiService", () => {
       const service = new SessionKeysBundlesApiService(apiClientOptions);
 
       await expect(() => service.create(42)).rejects.toThrow(TypeError);
+    });
+  });
+
+  describe('::delete', () => {
+    it("delete a session key bundle on the API.", async() => {
+      expect.assertions(1);
+
+      const sessionKeysBundleId = uuidv4();
+      fetch.doMockOnceIf(new RegExp(`/metadata\/session-keys\/${sessionKeysBundleId}\.json`), async req => {
+        expect(req.method).toEqual("DELETE");
+        return mockApiResponse({});
+      });
+
+      const service = new SessionKeysBundlesApiService(apiClientOptions);
+      await service.delete(sessionKeysBundleId);
+    });
+
+    it("throws an invalid parameter error if the id parameter is not valid", async() => {
+      expect.assertions(1);
+
+      const service = new SessionKeysBundlesApiService(apiClientOptions);
+
+      await expect(() => service.delete(42)).rejects.toThrow(Error);
     });
   });
 });

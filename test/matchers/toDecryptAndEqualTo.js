@@ -15,14 +15,15 @@
 import {OpenpgpAssertion} from "../../src/all/background_page/utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../../src/all/background_page/service/crypto/decryptMessageService";
 
-exports.toDecryptAndEqualTo = async function(armoredMessage, armoredPrivateKey, expectedMessage) {
+exports.toDecryptAndEqualTo = async function(armoredMessage, armoredPrivateKey, expectedMessage, verificationArmoredKey = null) {
   const {matcherHint} = this.utils;
 
   let pass, errorCause;
   try {
     const message = await OpenpgpAssertion.readMessageOrFail(armoredMessage);
     const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredPrivateKey);
-    const decryptedMessage = await DecryptMessageService.decrypt(message, privateKey);
+    const verificationKeys = verificationArmoredKey ? [await OpenpgpAssertion.readKeyOrFail(verificationArmoredKey)] : null;
+    const decryptedMessage = await DecryptMessageService.decrypt(message, privateKey, verificationKeys);
     pass = decryptedMessage === expectedMessage;
   } catch (error) {
     errorCause = error;

@@ -49,7 +49,7 @@ class SessionKeysBundlesApiService extends AbstractService {
    * @returns {Promise<Object>}
    */
   async create(sessionKeysBundleEntity) {
-    assertType(sessionKeysBundleEntity, SessionKeysBundleEntity, "The given entity is not a SessionKeysBundleEntity");
+    assertType(sessionKeysBundleEntity, SessionKeysBundleEntity, "The parameter 'sessionKeysBundleEntity' should be a SessionKeysBundleEntity");
     const response = await this.apiClient.create(sessionKeysBundleEntity.toDto());
     return response.body;
   }
@@ -62,6 +62,19 @@ class SessionKeysBundlesApiService extends AbstractService {
   async delete(id) {
     assertUuid(id, "The parameter 'id' should be a UUID.");
     const response = await this.apiClient.delete(id);
+    return response.body;
+  }
+
+  /**
+   * Update a session keys bundle
+   * @param {string} id The id of the session key bundle to delete.
+   * @param {SessionKeysBundleEntity} sessionKeysBundleEntity The session key bundle to update
+   * @returns {Promise}
+   */
+  async update(id, sessionKeysBundleEntity) {
+    assertUuid(id, "The parameter 'id' should be a UUID.");
+    assertType(sessionKeysBundleEntity, SessionKeysBundleEntity, "The parameter 'sessionKeysBundleEntity' should be a SessionKeysBundleEntity");
+    const response = await this.apiClient.update(id, sessionKeysBundleEntity);
     return response.body;
   }
 }

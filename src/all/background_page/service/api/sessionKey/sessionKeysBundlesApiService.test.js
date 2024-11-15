@@ -122,4 +122,32 @@ describe("SessionKeysBundlesApiService", () => {
       await expect(() => service.delete(42)).rejects.toThrow(Error);
     });
   });
+
+  describe('::update', () => {
+    it("update a session key bundle on the API.", async() => {
+      expect.assertions(2);
+
+      const sessionKeysBundleDto = defaultSessionKeysBundleDto();
+      const sessionKeysBundle = new SessionKeysBundleEntity(sessionKeysBundleDto);
+      fetch.doMockOnceIf(new RegExp(`/metadata\/session-keys\/${sessionKeysBundleDto.id}\.json`), async req => {
+        expect(req.method).toEqual("PUT");
+        const reqPayload = await req.json();
+        return mockApiResponse(reqPayload);
+      });
+
+      const service = new SessionKeysBundlesApiService(apiClientOptions);
+      const resultDto = await service.update(sessionKeysBundleDto.id, sessionKeysBundle);
+
+      expect(resultDto).toEqual(expect.objectContaining(sessionKeysBundleDto));
+    });
+
+    it("throws an invalid parameter error if on of the parameters is not valid", async() => {
+      expect.assertions(2);
+
+      const service = new SessionKeysBundlesApiService(apiClientOptions);
+
+      await expect(() => service.update(42)).rejects.toThrow(Error);
+      await expect(() => service.update(uuidv4(), 42)).rejects.toThrow(Error);
+    });
+  });
 });

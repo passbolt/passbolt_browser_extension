@@ -80,6 +80,20 @@ describe("GetOrFindSessionKeysService", () => {
   });
 
   describe("::getOrFindAll", () => {
+    it("returns an empty session keys collection if no bundles is found.", async() => {
+      expect.assertions(1);
+
+      const apiSessionKeysBundlesCollectionDto = [];
+
+      jest.spyOn(getOrFindSessionKeysService.findAndUpdateSessionKeysService.findSessionKeysService.sesionKeysBundlesApiService, "findAll")
+        .mockImplementation(() => apiSessionKeysBundlesCollectionDto);
+      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
+
+      const collection = await getOrFindSessionKeysService.getOrFindAll();
+
+      expect(collection).toHaveLength(0);
+    });
+
     it("with empty storage, retrieves the session keys bundles from the API and concatenate all session keys.", async() => {
       expect.assertions(1);
 

@@ -16,6 +16,7 @@ import FindAndUpdateSessionKeysSessionStorageService from "./findAndUpdateSessio
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
 import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
 import {assertArrayUUID, assertNonEmptyString} from "../../utils/assertions";
+import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection";
 
 /**
  * The service aims to get session keys from the local storage, or to retrieve them from the API and store them in the session storage.
@@ -51,6 +52,9 @@ export default class GetOrFindSessionKeysService {
    */
   async getOrFindAll() {
     const sessionKeysBundlesCollection = await this.getOrFindAllBundles();
+    if (!sessionKeysBundlesCollection.length) {
+      return new SessionKeysCollection([]);
+    }
     // Sort to have the recent one in first position
     sessionKeysBundlesCollection.sortByModified();
     const recentSessionKeysCollection = sessionKeysBundlesCollection.items[0].data.sessionKeys;

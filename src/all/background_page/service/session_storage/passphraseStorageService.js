@@ -12,6 +12,7 @@
  * @since         3.8.0
  */
 import Log from "../../model/log";
+import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 
 const PASSPHRASE_FLUSH_ALARM = "PassphraseStorageFlush";
 const PASSPHRASE_STORAGE_KEY = "passphrase";
@@ -43,6 +44,20 @@ class PassphraseStorageService {
   static async get() {
     const storedData = await browser.storage.session.get(PASSPHRASE_STORAGE_KEY);
     return storedData?.[PASSPHRASE_STORAGE_KEY] || null;
+  }
+
+  /**
+   * Retrieve the passphrase from the session storage or fail=.
+   * @return {Promise<string|null>}
+   * @throws {UserPassphraseRequiredError} If no user passphrase stored.
+   */
+  static async getOrFail() {
+    const passphrase = await this.get();
+    if (!passphrase) {
+      throw new UserPassphraseRequiredError();
+    }
+
+    return passphrase;
   }
 
   /**

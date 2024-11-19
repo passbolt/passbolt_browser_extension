@@ -31,7 +31,7 @@ const config = {
       {
         test: /\.svg$/i,
         issuer: /\.[jt]sx?$/,
-        use: ['@svgr/webpack'],
+        use: [{loader: "@svgr/webpack", options: {icon: "1.6rem"}}],
       }
     ]
   },

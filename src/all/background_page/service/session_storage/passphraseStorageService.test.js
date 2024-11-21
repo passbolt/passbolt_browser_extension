@@ -12,6 +12,7 @@
  * @since         3.8.0
  */
 import PassphraseStorageService from "./passphraseStorageService";
+import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 
 jest.useFakeTimers();
 
@@ -125,6 +126,22 @@ describe("PassphraseStorageService", () => {
 
       const flushedPassphrase = await PassphraseStorageService.get();
       expect(flushedPassphrase).toBeNull();
+    });
+  });
+
+  describe("PassphraseStorageService::getOrFail", () => {
+    it("returns the stored passphrase", async() => {
+      expect.assertions(1);
+      const passphrase = "This is a very strong passphrase";
+      await PassphraseStorageService.set(passphrase);
+      const storedPassphrase = await PassphraseStorageService.getOrFail();
+      expect(storedPassphrase).toBe(passphrase);
+    });
+
+    it("throw an error if no passphrase is stored", async() => {
+      expect.assertions(1);
+      await PassphraseStorageService.flush();
+      await expect(() => PassphraseStorageService.getOrFail()).rejects.toThrow(UserPassphraseRequiredError);
     });
   });
 

@@ -18,12 +18,12 @@ import DecryptMessageService from "../../src/all/background_page/service/crypto/
 exports.toDecryptAndEqualTo = async function(armoredMessage, armoredPrivateKey, expectedMessage, verificationArmoredKey = null) {
   const {matcherHint} = this.utils;
 
-  let pass, errorCause;
+  let pass, errorCause, decryptedMessage;
   try {
     const message = await OpenpgpAssertion.readMessageOrFail(armoredMessage);
     const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredPrivateKey);
     const verificationKeys = verificationArmoredKey ? [await OpenpgpAssertion.readKeyOrFail(verificationArmoredKey)] : null;
-    const decryptedMessage = await DecryptMessageService.decrypt(message, privateKey, verificationKeys);
+    decryptedMessage = await DecryptMessageService.decrypt(message, privateKey, verificationKeys);
     pass = decryptedMessage === expectedMessage;
   } catch (error) {
     errorCause = error;
@@ -33,12 +33,16 @@ exports.toDecryptAndEqualTo = async function(armoredMessage, armoredPrivateKey, 
   const passMessage =
     `${matcherHint('.not.toDecryptedDataEqualTo')
     }\n\n` +
-    `Expected decrypted message not to be equal to`;
+    `Expected decrypted message not to be equal to:\n` +
+    `Decrypted message: ${decryptedMessage}\n` +
+    `Control message: ${expectedMessage}`;
 
   let failMessage =
     `${matcherHint('.toDecryptedDataEqualTo')
     }\n\n` +
-    `Expected decrypted message to be equal to`;
+    `Expected decrypted message to be equal to:\n` +
+    `Decrypted message: ${decryptedMessage}\n` +
+    `Control message: ${expectedMessage}`;
 
   if (errorCause) {
     failMessage += `\n\n${errorCause.message}`;

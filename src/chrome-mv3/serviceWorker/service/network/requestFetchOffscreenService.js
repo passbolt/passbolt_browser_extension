@@ -57,7 +57,7 @@ export class RequestFetchOffscreenService {
    */
   static async isFetchOffscreenPreferred() {
     if (RequestFetchOffscreenService.isFetchOffscreenPreferredCache === null) {
-      const storageData = await browser.storage.session.get([IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]);
+      const storageData = await browser.storage.session.get(IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY);
       RequestFetchOffscreenService.isFetchOffscreenPreferredCache = Boolean(storageData?.[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]);
     }
 

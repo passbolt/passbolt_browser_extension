@@ -70,7 +70,7 @@ class SessionKeysBundlesSessionStorageService {
    */
   async get() {
     if (!SessionKeysBundlesSessionStorageService._runtimeCachedData[this.account.id]) {
-      const data = await browser.storage.session.get([this.storageKey]);
+      const data = await browser.storage.session.get(this.storageKey);
       if (!data[this.storageKey]) {
         return;
       }

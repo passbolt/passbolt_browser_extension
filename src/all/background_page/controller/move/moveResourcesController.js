@@ -93,6 +93,7 @@ class MoveResourcesController {
    */
   async assertValidMoveParameters(resourcesIds, destinationFolderId) {
     if (destinationFolderId !== null) {
+      //@todo: use the getOrFindFolderSerivce instead and remove the deprecated method afterward
       await this.folderModel.assertFolderExists(destinationFolderId);
     }
     if (resourcesIds.length) {

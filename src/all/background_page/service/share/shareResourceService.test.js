@@ -15,7 +15,7 @@ import each from "jest-each";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {adminAccountDto, defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import ShareResourceService from "./shareResourceService";
+import ShareResourceService, {PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL} from "./shareResourceService";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {
@@ -75,14 +75,19 @@ beforeEach(() => {
 });
 
 describe("ShareResourceService", () => {
-  let apiClientOptions, account, mockedProgressService, service;
+  let apiClientOptions, account, worker, progressService, service;
 
   beforeEach(() => {
     apiClientOptions = defaultApiClientOptions();
     account = new AccountEntity(adminAccountDto());
-    mockedProgressService = {finishStep: jest.fn(), updateGoals: jest.fn(), updateStepMessage: jest.fn()};
+    worker = {port: new MockPort()};
+    progressService = new ProgressService(worker);
+    jest.spyOn(progressService, "finishStep");
+    jest.spyOn(progressService, "finishSteps");
+    jest.spyOn(progressService, "updateStepMessage");
+    jest.spyOn(progressService, "_updateProgressBar").mockImplementation(jest.fn);
 
-    service = new ShareResourceService(apiClientOptions, account, mockedProgressService);
+    service = new ShareResourceService(apiClientOptions, account, progressService);
 
     // Mock keyring.
     jest.spyOn(Keyring.prototype, "sync").mockImplementation(jest.fn);
@@ -100,7 +105,7 @@ describe("ShareResourceService", () => {
       {title: "with standalone totp", secretClear: plaintextSecretTotpDto(), resourceTypeId: TEST_RESOURCE_TYPE_TOTP},
     ]).describe("should share a single resource in format v4", scenario => {
       it(`::${scenario.title}`, async() => {
-        expect.assertions(18);
+        expect.assertions(19);
         const resourceIdToShare = uuidv4();
 
         // Permission changes to apply to the share (Modify one, add one and delete one)
@@ -179,20 +184,21 @@ describe("ShareResourceService", () => {
           .toDecryptAndEqualTo(pgpKeys.betty.private_decrypted, JSON.stringify(scenario.secretClear));
 
         // Assert progress
-        expect(mockedProgressService.finishStep).toHaveBeenCalledTimes(8);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenCalledTimes(4);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(1, "Updating resources metadata", true);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(1, "Calculating secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(2, "Decrypting secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(3, "Encrypting secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(4, "Sharing resources 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
+        expect(progressService.finishStep).toHaveBeenCalledTimes(8);
+        expect(progressService.updateStepMessage).toHaveBeenCalledTimes(4);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(1, "Updating resources metadata", true);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(1, "Calculating secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(2, "Decrypting secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(3, "Encrypting secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(4, "Sharing resources 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
+        expect(progressService._progress).toEqual(PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL);
       });
     });
 
@@ -203,7 +209,7 @@ describe("ShareResourceService", () => {
       {title: "with standalone totp V5", secretClear: plaintextSecretTotpDto(), resourceTypeId: TEST_RESOURCE_TYPE_V5_TOTP},
     ]).describe("should share a single resource in format v5", scenario => {
       it(`::${scenario.title}: with metadata already shared`, async() => {
-        expect.assertions(18);
+        expect.assertions(19);
         const resourceIdToShare = uuidv4();
 
         // Permission changes to apply to the share (Modify one, add one and delete one)
@@ -282,24 +288,25 @@ describe("ShareResourceService", () => {
           .toDecryptAndEqualTo(pgpKeys.betty.private_decrypted, JSON.stringify(scenario.secretClear));
 
         // Assert progress dialog
-        expect(mockedProgressService.finishStep).toHaveBeenCalledTimes(8);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenCalledTimes(4);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(1, "Updating resources metadata", true);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(1, "Calculating secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(2, "Decrypting secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(3, "Encrypting secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(4, "Sharing resources 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
+        expect(progressService.finishStep).toHaveBeenCalledTimes(8);
+        expect(progressService.updateStepMessage).toHaveBeenCalledTimes(4);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(1, "Updating resources metadata", true);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(1, "Calculating secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(2, "Decrypting secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(3, "Encrypting secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(4, "Sharing resources 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
+        expect(progressService._progress).toEqual(PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL);
       });
 
       it(`::${scenario.title}: with metadata personal to re-encrypt with shared key`, async() => {
-        expect.assertions(22);
+        expect.assertions(23);
         const resourceIdToShare = uuidv4();
 
         // Permission changes to apply to the share (Modify one, add one and delete one)
@@ -404,26 +411,27 @@ describe("ShareResourceService", () => {
           .toDecryptAndEqualTo(pgpKeys.betty.private_decrypted, JSON.stringify(scenario.secretClear));
 
         // Assert progress
-        expect(mockedProgressService.finishStep).toHaveBeenCalledTimes(8);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenCalledTimes(5);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(1, "Updating resources metadata", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(1, "Updating resources metadata 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(2, "Calculating secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(3, "Decrypting secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(4, "Encrypting secrets 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
-        expect(mockedProgressService.updateStepMessage).toHaveBeenNthCalledWith(5, "Sharing resources 1/1");
-        expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
+        expect(progressService.finishStep).toHaveBeenCalledTimes(8);
+        expect(progressService.updateStepMessage).toHaveBeenCalledTimes(5);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(1, "Updating resources metadata", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(1, "Updating resources metadata 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(2, "Calculating secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(3, "Decrypting secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(4, "Encrypting secrets 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
+        expect(progressService.updateStepMessage).toHaveBeenNthCalledWith(5, "Sharing resources 1/1");
+        expect(progressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
+        expect(progressService._progress).toEqual(PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL);
       });
     });
 
     it(`shares multiple resources in v4 and v5 having different metadata encryption requirements with multiple users `, async() => {
-      expect.assertions(56);
+      expect.assertions(57);
       const resourceId1V4 = uuidv4();
       const resourceId2V4 = uuidv4();
       const resourceId1V5 = uuidv4();
@@ -691,43 +699,44 @@ describe("ShareResourceService", () => {
         .toDecryptAndEqualTo(pgpKeys.carol.private_decrypted, JSON.stringify(resource3V5SecretDataDto));
 
       // Assert progress dialog
-      expect(mockedProgressService.finishStep).toHaveBeenCalledTimes(8);
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledTimes(27);
-      expect(mockedProgressService.finishStep).toHaveBeenCalledWith("Updating resources metadata", true);
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Updating resources metadata 1/2");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Updating resources metadata 2/2");
-      expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 1/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 2/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 3/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 4/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 5/5");
-      expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
-      expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 1/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 2/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 3/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 4/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 5/5");
-      expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
-      expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 1/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 2/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 3/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 4/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 5/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 6/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 7/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 8/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 9/10");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 10/10");
-      expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 1/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 2/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 3/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 4/5");
-      expect(mockedProgressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 5/5");
-      expect(mockedProgressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
+      expect(progressService.finishStep).toHaveBeenCalledTimes(8);
+      expect(progressService.updateStepMessage).toHaveBeenCalledTimes(27);
+      expect(progressService.finishStep).toHaveBeenCalledWith("Updating resources metadata", true);
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Updating resources metadata 1/2");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Updating resources metadata 2/2");
+      expect(progressService.finishStep).toHaveBeenNthCalledWith(2, "Calculating secrets", true);
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 1/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 2/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 3/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 4/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Calculating secrets 5/5");
+      expect(progressService.finishStep).toHaveBeenNthCalledWith(3, "Retrieving secrets", true);
+      expect(progressService.finishStep).toHaveBeenNthCalledWith(4, "Decrypting secrets", true);
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 1/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 2/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 3/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 4/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Decrypting secrets 5/5");
+      expect(progressService.finishStep).toHaveBeenNthCalledWith(5, "Synchronizing keyring", true);
+      expect(progressService.finishStep).toHaveBeenNthCalledWith(6, "Encrypting secrets", true);
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 1/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 2/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 3/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 4/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 5/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 6/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 7/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 8/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 9/10");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Encrypting secrets 10/10");
+      expect(progressService.finishStep).toHaveBeenNthCalledWith(7, "Sharing resources", true);
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 1/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 2/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 3/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 4/5");
+      expect(progressService.updateStepMessage).toHaveBeenCalledWith("Sharing resources 5/5");
+      expect(progressService.finishStep).toHaveBeenNthCalledWith(8, "Updating resources local storage", true);
+      expect(progressService._progress).toEqual(PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL);
     });
 
     it("throws if the parameters are not valid.", async() => {

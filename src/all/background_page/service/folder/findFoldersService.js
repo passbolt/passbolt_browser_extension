@@ -59,7 +59,7 @@ export default class FindFoldersService {
   async findByIdWithPermissions(id) {
     //Assert
     assertUuid(id);
-    const foldersDto = await this.findById(id, {'permissions.user.profile': true, 'permissions.group': true});
+    const foldersDto = await this.findById(id, {'permissions.user.profile': true, 'permissions.group': true, 'permission': true});
     return new FolderEntity(foldersDto);
   }
 

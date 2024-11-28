@@ -90,7 +90,7 @@ class ShareOneFolderController {
     this.progressService.start(goals, i18n.t('Initialize'));
 
     try {
-      await this.shareFoldersService.shareOne(folderId, permissionChanges, passphrase);
+      await this.shareFoldersService.shareOneWithContent(folderId, permissionChanges, passphrase);
       this.progressService.finishStep(i18n.t('Done!'), true);
     } finally {
       this.progressService.close();

@@ -114,7 +114,7 @@ describe("ShareResourceService", () => {
       // Mock the local storage refresh
       jest.spyOn(service.findAndUpdateFoldersLocalStorageService, "findAndUpdateAll").mockImplementation(jest.fn);
 
-      await service.shareOne(folderDto.id, permissionChanges, pgpKeys.admin.passphrase);
+      await service.shareOneWithContent(folderDto.id, permissionChanges, pgpKeys.admin.passphrase);
 
       // Assert share API call.
       expect(permissionChanges.toDto()).toEqual(
@@ -187,7 +187,7 @@ describe("ShareResourceService", () => {
       // Mock the local storage refresh
       jest.spyOn(service.findAndUpdateFoldersLocalStorageService, "findAndUpdateAll").mockImplementation(jest.fn);
 
-      await service.shareOne(folderDto.id, permissionChanges, pgpKeys.admin.passphrase);
+      await service.shareOneWithContent(folderDto.id, permissionChanges, pgpKeys.admin.passphrase);
 
       // Assert share API call.
       expect(shareRequest1Data.permissions).toHaveLength(1);
@@ -278,7 +278,7 @@ describe("ShareResourceService", () => {
       // Mock the local storage refresh
       jest.spyOn(service.findAndUpdateFoldersLocalStorageService, "findAndUpdateAll").mockImplementation(jest.fn);
 
-      await service.shareOne(folderDto.id, permissionChanges, pgpKeys.admin.passphrase);
+      await service.shareOneWithContent(folderDto.id, permissionChanges, pgpKeys.admin.passphrase);
 
       // Assert folders share API call.
       expect(shareFolderRequest1Data.permissions).toHaveLength(1);

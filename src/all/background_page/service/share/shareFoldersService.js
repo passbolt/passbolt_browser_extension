@@ -25,6 +25,8 @@ import GetOrFindFoldersService from "../folder/getOrFindFoldersService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
 
+export const PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE = 1;
+
 class ShareFoldersService {
   /**
    * @constructor
@@ -53,7 +55,7 @@ class ShareFoldersService {
    * @param {string} passphrase The user's private key passphrase
    * @returns {Promise<void>}
    */
-  async shareOne(folderId, permissionsChanges, passphrase) {
+  async shareOneWithContent(folderId, permissionsChanges, passphrase) {
     assertUuid(folderId, 'The parameter "folderId" should be a UUID');
     assertType(permissionsChanges, PermissionChangesCollection, 'The parameter "permissionChanges" should be of type PermissionChangesCollection');
     assertString(passphrase, 'The parameter "passphrase" should be a string');
@@ -104,7 +106,7 @@ class ShareFoldersService {
     const resourcesDescendantWithOwnership = resourcesDescendant.filterByIsOwner();
     const resourcesIdsToRetrievePermissions = [...resourcesDescendantWithOwnership.ids];
 
-    if (!resourcesIdsToRetrievePermissions) {
+    if (!(resourcesIdsToRetrievePermissions?.length)) {
       return new ResourcesCollection([]);
     }
 
@@ -168,11 +170,12 @@ class ShareFoldersService {
    * Save the folders permissions changes on the API.
    * @param {PermissionChangesCollection} permissionChanges The permission changes
    * @returns {Promise<void>}
-   * @private
    */
   async saveFoldersPermissionsChanges(permissionChanges) {
+    assertType(permissionChanges, PermissionChangesCollection, 'The parameter "permissionChanges" should be of type PermissionChangesCollection');
+
     this.progressService.finishStep(i18n.t("Sharing folders"), true);
-    const foldersIds = [...new Set(permissionChanges.extract('aco_foreign_key'))];
+    const foldersIds = [...new Set(permissionChanges.extract("aco_foreign_key"))];
     let sharingCounter = 0;
 
     for (const folderId of foldersIds) {

@@ -239,7 +239,7 @@ class FolderModel {
    *
    * @param {string} folderId the folder to move
    * @param {string} folderParentId the destination folder
-   * @returns {FolderEntity}
+   * @returns {Promise<FolderEntity>}
    */
   async move(folderId, folderParentId) {
     const folderDto = await FolderLocalStorage.getFolderById(folderId);

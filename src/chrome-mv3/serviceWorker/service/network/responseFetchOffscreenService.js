@@ -60,7 +60,6 @@ export default class ResponseFetchOffscreenService {
    * @throws {Error} If the message type is not valid.
    */
   static assertMessage(message) {
-    // console.log(message);
     const FETCH_OFFSCREEN_RESPONSE_TYPES = [FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS, FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR];
 
     if (!FETCH_OFFSCREEN_RESPONSE_TYPES.includes(message?.type)) {

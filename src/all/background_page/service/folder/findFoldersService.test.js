@@ -137,7 +137,7 @@ describe("FindFoldersService", () => {
 
       const folder = await service.findByIdWithPermissions(folderDto.id);
 
-      expect(service.findById).toHaveBeenCalledWith(folderDto.id, {'permissions.user.profile': true, 'permissions.group': true});
+      expect(service.findById).toHaveBeenCalledWith(folderDto.id, {'permissions.user.profile': true, 'permissions.group': true, "permission": true});
       expect(folder.toDto(FolderEntity.ALL_CONTAIN_OPTIONS)).toEqual(folderDto);
     });
 

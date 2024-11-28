@@ -42,6 +42,8 @@ import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import NeededSecretsCollection from "../../model/entity/secret/needed/neededSecretsCollection";
 import SecretsCollection from "../../model/entity/secret/secretsCollection";
 
+export const PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL = 8;
+
 class ShareResourceService {
   /**
    * @constructor
@@ -68,6 +70,7 @@ class ShareResourceService {
    * @param {PermissionChangesCollection} permissionChanges The permission changes
    * @param {string} passphrase The user's private key passphrase
    * @returns {Promise<void>}
+   * @todo resource ids is not necessary, it can be retrieved from the resources permissions changes
    */
   async shareAll(resourcesIds, permissionChanges, passphrase) {
     assertArray(resourcesIds, 'The parameter "resourcesIds" should be an array');

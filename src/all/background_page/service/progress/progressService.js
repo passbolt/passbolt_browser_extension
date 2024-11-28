@@ -30,7 +30,6 @@ class ProgressService {
     this.lastTimeCall = null;
     this.message = null;
     this.isClose = false;
-    this._updateProgressBar = this._updateProgressBar.bind(this);
   }
 
   /**
@@ -85,7 +84,7 @@ class ProgressService {
   /**
    * Updates the progress bar with the latest finished step.
    * @param {string|null} [message = null] The message to display
-   * @param {bool} [forceMessageDisplay = false] Should the message display be forced.
+   * @param {boolean} [forceMessageDisplay = false] Should the message display be forced.
    */
   finishStep(message = null, forceMessageDisplay = false) {
     this.finishSteps(1, message, forceMessageDisplay);
@@ -102,7 +101,7 @@ class ProgressService {
     if (message !== null) {
       this.message = message;
     }
-    this._debounceAction(this._updateProgressBar, forceMessageDisplay);
+    this._debounceAction(() => this._updateProgressBar(), forceMessageDisplay);
   }
 
   /**
@@ -111,7 +110,7 @@ class ProgressService {
    */
   updateStepMessage(message) {
     this.message = message;
-    this._debounceAction(this._updateProgressBar);
+    this._debounceAction(() => this._updateProgressBar());
   }
 
   /**

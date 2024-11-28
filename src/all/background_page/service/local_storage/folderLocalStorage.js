@@ -67,7 +67,7 @@ class FolderLocalStorage {
    * Set the folders local storage.
    *
    * @param {FoldersCollection} foldersCollection The folders to insert in the local storage.
-   * @return {void}
+   * @return {Promise<void>}
    */
   static async set(foldersCollection) {
     await lock.acquire();

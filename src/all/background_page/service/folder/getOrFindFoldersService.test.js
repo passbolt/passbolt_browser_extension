@@ -21,6 +21,8 @@ import GetOrFindFoldersService from "./getOrFindFoldersService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import FolderLocalStorage from "../local_storage/folderLocalStorage";
 import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import {defaultFoldersCollectionDto} from "passbolt-styleguide/src/shared/models/entity/folder/foldersCollection.test.data";
+import {v4 as uuidv4} from "uuid";
 
 jest.useFakeTimers();
 
@@ -107,6 +109,39 @@ describe("GetOrFindFoldersService", () => {
       expect(FolderService.prototype.findAll).not.toHaveBeenCalled();
       // Validation should be called twice, once when building the collection mock, and once by the getOrFindAll.
       expect(FoldersCollection.prototype.validateSchema).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("::getOrFindById", () => {
+    it("retrieves a folder from the in a collection given its id", async() => {
+      expect.assertions(1);
+
+      const folders = new FoldersCollection(defaultFoldersCollectionDto());
+      await FolderLocalStorage.set(folders);
+
+      const service = new GetOrFindFoldersService(account, apiClientOptions);
+      const folder = await service.getOrFindById(folders.items[2].id);
+
+      expect(folder).toStrictEqual(folders.items[2]);
+    });
+
+    it("returns undefined if nothing is found", async() => {
+      expect.assertions(1);
+
+      const folders = new FoldersCollection(defaultFoldersCollectionDto());
+      await FolderLocalStorage.set(folders);
+
+      const service = new GetOrFindFoldersService(account, apiClientOptions);
+      const folder = await service.getOrFindById(uuidv4());
+
+      expect(folder).toBeUndefined();
+    });
+
+    it("should assert its parameter", async() => {
+      expect.assertions(1);
+
+      const service = new GetOrFindFoldersService(account, apiClientOptions);
+      await expect(() => service.getOrFindById("test")).rejects.toThrow(new Error("The given parameter is not a valid UUID"));
     });
   });
 });

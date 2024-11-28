@@ -76,14 +76,14 @@ describe("ShareOneFolderController", () => {
       const foldersDto = [defaultFolderDto({id: folderIdToShare})];
       jest.spyOn(controller.getOrFindFoldersService, "getOrFindAll").mockImplementation(() => new FoldersCollection(foldersDto));
       // mock passphrase service
-      jest.spyOn(controller.shareFoldersService, "shareOne").mockImplementation(jest.fn);
+      jest.spyOn(controller.shareFoldersService, "shareOneWithContent").mockImplementation(jest.fn);
       // mock share folders service
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementation(() => pgpKeys.admin.passphrase);
 
       await controller.exec(folderIdToShare, permissionsChangesDto);
 
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalled();
-      expect(controller.shareFoldersService.shareOne).toHaveBeenCalledWith(folderIdToShare, new PermissionChangesCollection(permissionsChangesDto), pgpKeys.admin.passphrase);
+      expect(controller.shareFoldersService.shareOneWithContent).toHaveBeenCalledWith(folderIdToShare, new PermissionChangesCollection(permissionsChangesDto), pgpKeys.admin.passphrase);
     });
   });
 });

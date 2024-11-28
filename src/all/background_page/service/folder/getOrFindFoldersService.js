@@ -14,6 +14,7 @@
 import FindAndUpdateFoldersLocalStorageService from "./findAndUpdateFoldersLocalStorageService";
 import FolderLocalStorage from "../local_storage/folderLocalStorage";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
+import {assertUuid} from "../../utils/assertions";
 
 /**
  * The service aims to get folders from the local storage if it is set, or retrieve them from the API and
@@ -45,5 +46,18 @@ export default class GetOrFindFoldersService {
 
     // Otherwise retrieve the folders and update the local storage.
     return this.findAndUpdateFoldersLocalStorage.findAndUpdateAll();
+  }
+
+  /**
+   * Get or find a folder given its id.
+   * @param {string} folderId the folder to find.
+   * @return {Promise<FolderEntity>}
+   */
+  async getOrFindById(folderId) {
+    assertUuid(folderId);
+
+    const foldersCollection = await this.getOrFindAll();
+
+    return foldersCollection.getById(folderId);
   }
 }

@@ -68,7 +68,7 @@ describe("FindAcoPermissionsForDisplayController", () => {
       // expectations
       expect(controller.findPermissionService.findAllByAcoForeignKeyForDisplay).toHaveBeenCalledTimes(0);
       expect(controller.findFolderService.findById).toHaveBeenCalledTimes(1);
-      expect(controller.findFolderService.findById).toHaveBeenCalledWith(folderId, {'permissions.user.profile': true, 'permissions.group': true});
+      expect(controller.findFolderService.findById).toHaveBeenCalledWith(folderId, {'permissions.user.profile': true, 'permissions.group': true, "permission": true});
       expect(permissionsCollection.toDto()).toEqual(folderDto.permissions);
     });
 

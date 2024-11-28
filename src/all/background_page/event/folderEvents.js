@@ -1,17 +1,25 @@
 /**
- * Folder events
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
- * @copyright (c) 2019 Passbolt SA
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         1.0.0
  */
+
 import FolderModel from "../model/folder/folderModel";
 import FolderCreateController from "../controller/folder/folderCreateController";
-import MoveController from "../controller/move/moveController";
 import FolderEntity from "../model/entity/folder/folderEntity";
 import FindAndUpdateResourcesLocalStorage from "../service/resource/findAndUpdateResourcesLocalStorageService";
 import UpdateAllFolderLocalStorageController
   from "../controller/folderLocalStorage/updateAllFoldersLocalStorageController";
 import FindFolderDetailsController from "../controller/folder/findFolderDetailsController";
+import MoveFolderController from "../controller/move/moveFolderController";
 
 /**
  * Listens to the folder events
@@ -102,17 +110,14 @@ const listen = function(worker, apiClientOptions, account) {
   /*
    * Open the folder move confirmation dialog.
    *
-   * @listens passbolt.folders.open-move-confirmation-dialog
-   * @param {object} moveDto {resources: array of uuids, folders: array of uuids, folderParentId: uuid}
+   * @listens passbolt.folders.move-one-folder
+   * @param {uuid} requestId The request identifier
+   * @param {string} folderId The folder id to move
+   * @param {string} destinationFolderId The destination folder id
    */
-  worker.port.on('passbolt.folders.open-move-confirmation-dialog', async(requestId, moveDto) => {
-    try {
-      const controller = new MoveController(worker, requestId, apiClientOptions, account);
-      await controller.main(moveDto);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.folders.move-by-id', async(requestId, folderId, destinationFolderId) => {
+    const controller = new MoveFolderController(worker, requestId, apiClientOptions, account);
+    await controller.exec(folderId, destinationFolderId);
   });
 };
 

@@ -154,7 +154,7 @@ class FoldersCollection extends EntityV2Collection {
     const children = inputCollection.folders.filter(item => item.folderParentId === parentId);
     if (children.length) {
       try {
-        children.forEach(child => outputCollection.push(child));
+        outputCollection.pushMany(children);
       } catch (error) {
         /*
          * children are already in collection

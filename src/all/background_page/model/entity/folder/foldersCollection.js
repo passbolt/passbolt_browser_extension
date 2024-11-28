@@ -125,11 +125,10 @@ class FoldersCollection extends EntityV2Collection {
   /**
    * Get the first item that matches the given id
    * @param {string} id
-   * @returns {*} FolderEntity or undefined
+   * @returns {FolderEntity} FolderEntity or undefined
    */
   getById(id) {
-    const found = this._items.filter(folder => folder.id === id);
-    return found.length ? found[0] : undefined;
+    return this._items.find(folder => folder.id === id);
   }
 
   /**

@@ -36,7 +36,7 @@ const STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE = 1 // Calculate folders permission
   + 1 // Confirm share operation
   + STEPS_TO_COMPLETE_SHARE;
 
-export const PROGRESS_STEPS_MOVE_ONE = 1 // Retrieve folders permissions
+export const PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE = 1 // Retrieve folders permissions
   + 1 // Retrieve resources permissions
   + STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE
   + 1 // Move folder

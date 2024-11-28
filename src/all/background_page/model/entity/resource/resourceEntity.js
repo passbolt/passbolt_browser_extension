@@ -435,14 +435,13 @@ class ResourceEntity extends EntityV2 {
   }
 
   /**
-   * Assert a given folder can be moved
-   * @param {ResourceEntity} resourceToMove
-   * @param {FolderEntity} parentFolder
-   * @param {(FolderEntity|null)} destinationFolder
+   * Assert the current entity can be moved to the destination folder given a parent folder
+   * @param {FolderEntity|null} parentFolder
+   * @param {FolderEntity|null} destinationFolder
    * @returns {boolean}
    */
-  static canResourceMove(resourceToMove, parentFolder, destinationFolder) {
-    if (resourceToMove.isReadOnly()) {
+  canMove(parentFolder, destinationFolder) {
+    if (this.isReadOnly()) {
       return ((parentFolder === null || parentFolder.isPersonal()) &&
         (destinationFolder === null || destinationFolder.isPersonal()));
     }

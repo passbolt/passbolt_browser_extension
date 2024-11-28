@@ -12,7 +12,7 @@
  * @since         4.10.1
  */
 import FolderEntity from "../../model/entity/folder/folderEntity";
-import MoveOneFolderService, {PROGRESS_STEPS_MOVE_ONE} from "./moveOneFolderService";
+import MoveOneFolderService, {PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE} from "./moveOneFolderService";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
@@ -3923,7 +3923,7 @@ describe("MoveOneFolderService", () => {
         expect(progressService.finishStep).toHaveBeenNthCalledWith(5, "Confirming share operation", true);
         expect(progressService.finishStep).toHaveBeenNthCalledWith(6, "Moving folder", true);
         expect(progressService.finishStep).toHaveBeenNthCalledWith(7, "Updating folders local storage", true);
-        expect(progressService._progress).toEqual(PROGRESS_STEPS_MOVE_ONE);
+        expect(progressService._progress).toEqual(PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE);
       });
 
       it("notifies of its progress when there are resources and folders to share.", async() => {
@@ -3993,7 +3993,7 @@ describe("MoveOneFolderService", () => {
         expect(progressService.finishStep).toHaveBeenNthCalledWith(5, "Confirming share operation", true);
         expect(progressService.finishStep).toHaveBeenNthCalledWith(6, "Moving folder", true);
         expect(progressService.finishStep).toHaveBeenNthCalledWith(7, "Updating folders local storage", true);
-        expect(progressService._progress).toEqual(PROGRESS_STEPS_MOVE_ONE - PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL - PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE); // Discount the share operations that are mocked.
+        expect(progressService._progress).toEqual(PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE - PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL - PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE); // Discount the share operations that are mocked.
       });
     });
   });

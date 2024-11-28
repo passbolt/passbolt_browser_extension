@@ -19,6 +19,7 @@ import ResourceUpdateLocalStorageController
 import FindAllIdsByIsSharedWithGroupController from "../controller/resource/findAllIdsByIsSharedWithGroupController";
 import FindAllByIdsForDisplayPermissionsController
   from "../controller/resource/findAllByIdsForDisplayPermissionsController";
+import MoveResourcesController from "../controller/move/moveResourcesController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -145,6 +146,19 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.find-all-by-ids-for-display-permissions', async(requestId, resourcesIds) => {
     const controller = new FindAllByIdsForDisplayPermissionsController(worker, requestId, apiClientOptions, account);
     await controller._exec(resourcesIds);
+  });
+
+  /*
+   * Moves the given resources to a new folder.
+   *
+   * @listens passbolt.resources.move-by-ids
+   * @param {uuid} requestId The request identifier
+   * @param {string} destinationFolderId The destination folder id
+   * @param {string} resourcesIds The resources ids to move
+   */
+  worker.port.on('passbolt.resources.move-by-ids', async(requestId, resourcesIds, destinationFolderId) => {
+    const controller = new MoveResourcesController(worker, requestId, apiClientOptions, account);
+    await controller.exec(resourcesIds, destinationFolderId);
   });
 };
 

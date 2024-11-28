@@ -20,9 +20,9 @@ import MoveService from "../../service/api/move/moveService";
 import FolderService from "../../service/api/folder/folderService";
 import ShareService from "../../service/api/share/shareService";
 import splitBySize from "../../utils/array/splitBySize";
-import Validator from "validator";
 import FindAndUpdateFoldersLocalStorageService
   from "../../service/folder/findAndUpdateFoldersLocalStorageService";
+import {assertUuid} from "../../utils/assertions";
 
 const BULK_OPERATION_SIZE = 5;
 
@@ -115,7 +115,7 @@ class FolderModel {
   /**
    * Get all folders from API and map API result to folder collection
    *
-   * @return {FoldersCollection}
+   * @returns {Promise<FoldersCollection>}
    * @deprecated should use findFoldersService.
    */
   async findAllForShare(foldersIds) {
@@ -126,7 +126,7 @@ class FolderModel {
   /**
    * Get folder from API and map API result to folder Entity
    *
-   * @return {FolderEntity}
+   * @returns {Promise<FolderEntity>}
    * @deprecated should use findFoldersService.
    */
   async findForShare(folderId) {
@@ -381,9 +381,9 @@ class FolderModel {
     if (folderId === null) {
       return;
     }
-    if (!Validator.isUUID(folderId)) {
-      throw new TypeError(`Folder exists check expect a uuid.`);
-    }
+
+    assertUuid(folderId, `Folder exists check expect a uuid.`);
+
     const folderDto = await FolderLocalStorage.getFolderById(folderId);
     if (!folderDto) {
       // TODO check remotely?

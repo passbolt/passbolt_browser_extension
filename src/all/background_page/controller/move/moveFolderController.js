@@ -14,7 +14,7 @@
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
-import MoveOneFolderService, {PROGRESS_STEPS_MOVE_ONE} from "../../service/move/moveOneFolderService";
+import MoveOneFolderService, {PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE} from "../../service/move/moveOneFolderService";
 import ConfirmMoveStrategyService from "../../service/move/confirmMoveStrategyService";
 import FolderModel from "../../model/folder/folderModel";
 import {assertUuid} from "../../utils/assertions";
@@ -74,7 +74,7 @@ class MoveFolderController {
 
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
 
-    this.progressService.start(PROGRESS_STEPS_MOVE_ONE, i18n.t('Initialize'));
+    this.progressService.start(PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE, i18n.t('Initialize'));
 
     try {
       await this.moveOneFolderService.moveOne(folderId, destinationFolderId, this.confirmMoveStrategyService, passphrase);

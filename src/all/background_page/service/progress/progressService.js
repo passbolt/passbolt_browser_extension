@@ -94,7 +94,7 @@ class ProgressService {
    * Updates the progress bar given a step count.
    * @param {number} stepCount the count of step to update the progress bar with.
    * @param {string|null} [message = null] The message to display. If null, the update of the message is ignored
-   * @param {bool} [forceMessageDisplay = false] Should the message display be forced.
+   * @param {boolean} [forceMessageDisplay = false] Should the message display be forced.
    */
   finishSteps(stepCount, message = null, forceMessageDisplay = false) {
     this._progress += stepCount;

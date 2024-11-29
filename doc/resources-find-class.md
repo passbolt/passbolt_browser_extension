@@ -267,7 +267,7 @@ classDiagram
         }
 
         class SaveSessionKeysService {
-            +save(SessionKeysCollection collection, ?string passphrase, ?boolean retry) Promise
+            +save(SessionKeysCollection collection, ?string passphrase, ?boolean retryUpdate) Promise
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

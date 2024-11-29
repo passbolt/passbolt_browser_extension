@@ -18,7 +18,7 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SaveSessionKeysService from "./saveSessionKeysService";
 import {
-  defaultSessionKeysDtos
+  sharedResourcesSessionKeys
 } from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection.test.data";
 import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
@@ -54,7 +54,7 @@ describe("SaveSessionKeysService", () => {
       await expect(() => saveSessionKeysService.save()).rejects.toThrow("The parameter \"sessionKeys\" should be a SessionKeysCollection.");
       await expect(() => saveSessionKeysService.save(42)).rejects.toThrow("The parameter \"sessionKeys\" should be a SessionKeysCollection.");
       await expect(() => saveSessionKeysService.save({})).rejects.toThrow("The parameter \"sessionKeys\" should be a SessionKeysCollection.");
-      const sessionKeys = new SessionKeysCollection(defaultSessionKeysDtos());
+      const sessionKeys = new SessionKeysCollection(sharedResourcesSessionKeys());
       await expect(() => saveSessionKeysService.save(sessionKeys, 42)).rejects.toThrow("The parameter \"passphrase\" should be a string.");
       const passphrase = pgpKeys.admin.passphrase;
       await expect(() => saveSessionKeysService.save(sessionKeys, passphrase, 42)).rejects.toThrow("The parameter \"retryUpdate\" should be a boolean.");
@@ -62,13 +62,13 @@ describe("SaveSessionKeysService", () => {
 
     it("throws if the user passphrase is not passed or retrieved from the storage.", async() => {
       expect.assertions(1);
-      const sessionKeys = new SessionKeysCollection(defaultSessionKeysDtos());
+      const sessionKeys = new SessionKeysCollection(sharedResourcesSessionKeys());
       await expect(() => saveSessionKeysService.save(sessionKeys, null)).rejects.toThrow(UserPassphraseRequiredError);
     });
 
     it("save a new session keys bundle when none were yet persisted.", async() => {
       expect.assertions(2);
-      const sessionKeysDto = defaultSessionKeysDtos();
+      const sessionKeysDto = sharedResourcesSessionKeys();
       const sessionKeys = new SessionKeysCollection(sessionKeysDto);
 
       // Mock the retrieval of existing session keys bundles.
@@ -92,7 +92,7 @@ describe("SaveSessionKeysService", () => {
       const existingSessionKeysBundleDto = decryptedSessionKeysBundleDto();
       const existingSessionsKeysBundlesDto = [existingSessionKeysBundleDto];
       const existingSessionKeysBundles = new SessionKeysBundlesCollection(existingSessionsKeysBundlesDto);
-      const newSessionKeysDto = [...existingSessionKeysBundleDto.data.session_keys, ...defaultSessionKeysDtos()];
+      const newSessionKeysDto = [...existingSessionKeysBundleDto.data.session_keys, ...sharedResourcesSessionKeys()];
       const newSessionKeys = new SessionKeysCollection(newSessionKeysDto);
 
       // Mock the retrieval of existing session keys bundles.
@@ -119,7 +119,7 @@ describe("SaveSessionKeysService", () => {
       const existingSessionKeysBundleDto2 = decryptedSessionKeysBundleDto({user_id: existingSessionKeysBundleDto1.user_id, modified: "2021-10-11T08:09:00+00:00"});
       const existingSessionsKeysBundlesDto = [existingSessionKeysBundleDto1, existingSessionKeysBundleDto2];
       const existingSessionKeysBundles = new SessionKeysBundlesCollection(existingSessionsKeysBundlesDto);
-      const newSessionKeysDto = [...existingSessionKeysBundleDto1.data.session_keys, ...defaultSessionKeysDtos()];
+      const newSessionKeysDto = [...existingSessionKeysBundleDto1.data.session_keys, ...sharedResourcesSessionKeys()];
       const newSessionKeys = new SessionKeysCollection(newSessionKeysDto);
 
       // Mock the retrieval of existing session keys bundles.

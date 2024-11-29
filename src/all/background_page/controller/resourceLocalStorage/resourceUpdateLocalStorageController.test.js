@@ -26,6 +26,7 @@ import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/
 import {TEST_RESOURCE_TYPE_V5_DEFAULT} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import {METADATA_KEY_TYPE_USER_KEY} from "../../model/entity/resource/resourceEntity";
 import {v4 as uuidv4} from "uuid";
+import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 
 describe("ResourceUpdateLocalStorageController", () => {
   let controller, worker;
@@ -71,6 +72,7 @@ describe("ResourceUpdateLocalStorageController", () => {
           resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
           metadata_key_type: METADATA_KEY_TYPE_USER_KEY,
           metadata_key_id: uuidv4(),
+          metadata: metadata.withAdaKey.encryptedMetadata[0]
         }
       )
       ]);

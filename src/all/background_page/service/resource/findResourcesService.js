@@ -100,7 +100,7 @@ export default class FindResourcesService {
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
 
-    await this.decryptMetadataService.decryptAllFromForeignModels(resources, undefined, {ignoreDecryptionError: true});
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources, undefined, {ignoreDecryptionError: true, updateSessionKeys: true});
     resources.filterOutMetadataEncrypted();
 
     return resources;

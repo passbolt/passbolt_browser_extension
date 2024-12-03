@@ -39,6 +39,7 @@ import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entit
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -102,7 +103,8 @@ describe("EncryptMetadataService", () => {
       expect(resourceEntity.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_USER_KEY);
       expect(resourceEntity.metadataKeyId).toBeNull();
 
-      await decryptService.decryptOneWithUserKey(resourceEntity, pgpKeys.ada.passphrase);
+      const adasPrivateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptService.decryptMetadataWithGpgKey(resourceEntity, adasPrivateKeyDecrypted);
 
       expect(resourceEntity.isMetadataDecrypted()).toBeTruthy();
     });
@@ -268,7 +270,8 @@ describe("EncryptMetadataService", () => {
       expect(expectedResult.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_USER_KEY);
       expect(expectedResult.metadataKeyId).toBeNull();
 
-      await decryptService.decryptOneWithUserKey(expectedResult, pgpKeys.ada.passphrase);
+      const adasPrivateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptService.decryptMetadataWithGpgKey(expectedResult, adasPrivateKeyDecrypted);
 
       expect(expectedResult.isMetadataDecrypted()).toBeTruthy();
     });

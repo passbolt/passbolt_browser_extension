@@ -251,7 +251,8 @@ describe("ResourceCreateService", () => {
       // Decrypt metadata
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
       expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+      const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
       //Validate secret
       expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
@@ -292,7 +293,8 @@ describe("ResourceCreateService", () => {
       // Decrypt metadata
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
       expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+      const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
       //Validate secret
       expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
@@ -333,7 +335,8 @@ describe("ResourceCreateService", () => {
       // Decrypt metadata
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
       expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+      const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
       //Validate secret
       expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
@@ -467,7 +470,8 @@ describe("ResourceCreateService", () => {
       // Decrypt metadata
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
       expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+      const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
       expect(resourceCreateService.share).toHaveBeenCalledTimes(1);
       expect(ShareModel.prototype.bulkShareResources).toHaveBeenCalledTimes(0);

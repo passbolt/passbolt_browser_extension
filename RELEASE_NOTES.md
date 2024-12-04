@@ -1,8 +1,8 @@
-Song:
+Song: https://youtu.be/pTrNdtFQbek?si=xtA4tlI08dYdKajJ
 
-Passbolt v4.10.2 is a maintenance update that prepares for the upcoming v5 release, improving cryptographic performance by supporting encryption and decryption with session keys.
+Passbolt v4.10.2 Release Candidate is part of a long series of maintenance updates aimed at laying the groundwork for the upcoming v5 release and addressing bugs reported by the community. This update ensures the browser extension is fully compatible with the new v5 resource formats, allowing developers to prepare their integrations under the best possible conditions.
 
-Thank you to our community for your continued support.
+Thank you to the community for your reports.
 
 ### Added
 PB-35706: WP3-3.7 Webapp EditStandaloneTotp component updates resources of type v5

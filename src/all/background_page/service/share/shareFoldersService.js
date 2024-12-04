@@ -179,7 +179,7 @@ class ShareFoldersService {
     let sharingCounter = 0;
 
     for (const folderId of foldersIds) {
-      this.progressService.updateStepMessage(i18n.t("Sharing folders {{counter}}/{{total}}", {counter: ++sharingCounter, total: folderId.length}));
+      this.progressService.updateStepMessage(i18n.t("Sharing folders {{counter}}/{{total}}", {counter: ++sharingCounter, total: foldersIds.length}));
       const folderPermissionChanges = permissionChanges.items.filter(permissionChange => permissionChange.acoForeignKey === folderId);
       await this.shareService.shareFolder(folderId, {permissions: folderPermissionChanges});
     }

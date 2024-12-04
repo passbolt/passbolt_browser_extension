@@ -140,6 +140,7 @@ class PermissionChangesCollection extends EntityCollection {
    * ==================================================
    */
   /**
+   * @todo comment has to be reviewed.
    * Return true if the changes can be applied
    * @param {string} aco folder or resource to reuse the changes for
    * @param {string} acoId uuid of the folder or resource to reuse the changes for
@@ -153,6 +154,7 @@ class PermissionChangesCollection extends EntityCollection {
     }
     const result = new PermissionChangesCollection([]);
     for (const change of changes) {
+      // Get the existing permission on the resource/folder that has the same user/group than the change.
       const permission = permissions.getByAro(change.aro, change.aroForeignKey);
       switch (change.scenario) {
         case PermissionChangeEntity.PERMISSION_CHANGE_DELETE:

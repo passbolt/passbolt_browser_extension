@@ -34,7 +34,6 @@ export default class FindResourcesService {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.executeConcurrentlyService = new ExecuteConcurrentlyService();
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
   }
 
@@ -66,7 +65,7 @@ export default class FindResourcesService {
   /**
    * Find all by ids
    * @param {Object} contains
-   * @param {Array<uuid>} resourcesIds
+   * @param {Array<string>} resourcesIds
    * @returns {Promise<ResourcesCollection>}
    */
   async findAllByIds(resourcesIds, contains = {}) {
@@ -81,9 +80,9 @@ export default class FindResourcesService {
       return async() => await this.findAll(contains, filter);
     });
 
-
     // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
-    const arrayOfCollection = await this.executeConcurrentlyService.execute(callbacks, 5);
+    const executeConcurrentlyService = new ExecuteConcurrentlyService();
+    const arrayOfCollection = await executeConcurrentlyService.execute(callbacks, 5);
     const resourcesCollection = new ResourcesCollection();
 
     arrayOfCollection.forEach(collection => {
@@ -101,7 +100,7 @@ export default class FindResourcesService {
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
 
-    await this.decryptMetadataService.decryptAllFromForeignModels(resources, undefined, {ignoreDecryptionError: true});
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources, undefined, {ignoreDecryptionError: true, updateSessionKeys: true});
     resources.filterOutMetadataEncrypted();
 
     return resources;
@@ -121,21 +120,54 @@ export default class FindResourcesService {
 
   /**
    * Retrieve all resources by ids for sharing.
-   * @param {Array<uuid>} resourceIds
+   * @param {Array<string>} resourcesIds The resource ids to retrieve.
    * @returns {Promise<ResourcesCollection>}
    */
   async findAllByIdsForShare(resourcesIds) {
     assertArrayUUID(resourcesIds);
 
     const contains = {
+      "secret": true
+    };
+    const resources =  await this.findAllByIds(resourcesIds, contains);
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources);
+
+    return resources;
+  }
+
+  /**
+   * Retrieve all resources by ids with permissions.
+   * @param {Array<string>} resourcesIds The resource ids to retrieve.
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByIdsWithPermissions(resourcesIds) {
+    assertArrayUUID(resourcesIds);
+
+    const contains = {
+      "permission": true,
+      "permissions": true,
+    };
+
+    return this.findAllByIds(resourcesIds, contains);
+  }
+
+  /**
+   * Retrieve all resources by ids for display permissions.
+   * @param {Array<string>} resourcesIds The resource ids to retrieve.
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByIdsForDisplayPermissions(resourcesIds) {
+    assertArrayUUID(resourcesIds);
+
+    const contains = {
       "permission": true,
       "permissions.user.profile": true,
       "permissions.group": true,
-      "secret": true
     };
-    const resourceCollection =  await this.findAllByIds(resourcesIds, contains);
+    const resources = await this.findAllByIds(resourcesIds, contains);
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources);
 
-    return resourceCollection;
+    return resources;
   }
 
   /**

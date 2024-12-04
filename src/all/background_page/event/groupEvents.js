@@ -106,13 +106,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.groups.update', async(requestId, groupDto) => {
     const controller = new GroupsUpdateController(worker, requestId, apiClientOptions, account);
-    try {
-      const groupUpdated = await controller.main(groupDto);
-      worker.port.emit(requestId, 'SUCCESS', groupUpdated);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    controller._exec(groupDto);
   });
 
   /*

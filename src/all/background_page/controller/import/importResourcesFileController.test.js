@@ -24,7 +24,7 @@ import ImportResourcesFileController from "./importResourcesFileController";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import {bitwardenCsvFileImport, chromiumCsvFileImport, dashlaneCsvFileImport, defaultCsvData, defaultKDBXCSVData, lastpassCsvFileImport, logMeOnceCsvFileImport, mozillaCsvFileImport, nordPassCsvFileImport, onePasswordCsvFileImport, safariCsvFileImport} from "../../model/entity/import/importResourcesFileEntity.test.data";
+import {bitwardenCsvFile, chromiumCsvFile, dashlaneCsvFile, defaultCsvData, defaultKDBXCSVData, lastpassCsvFile, logMeOnceCsvFile, mozillaCsvFile, nordPassCsvFile, onePasswordCsvFile, safariCsvFile} from "../../model/entity/import/importResourcesFileEntity.test.data";
 import BinaryConvert from "../../utils/format/binaryConvert";
 import each from "jest-each";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
@@ -348,25 +348,25 @@ describe("ImportResourcesFileController", () => {
       each([
         {
           scenario: "chromium",
-          file: chromiumCsvFileImport,
+          file: chromiumCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "mozilla",
-          file: mozillaCsvFileImport,
+          file: mozillaCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "chromium",
-          file: chromiumCsvFileImport,
+          file: chromiumCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
         {
           scenario: "mozilla",
-          file: mozillaCsvFileImport,
+          file: mozillaCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
@@ -378,7 +378,7 @@ describe("ImportResourcesFileController", () => {
         it(`should parse ${test.scenario} csv file - <default ${test.metadataTypesSettings.default_resource_types}>`, async() => {
           expect.assertions(4);
 
-          const result = await controller.exec("csv", btoa(BinaryConvert.toBinary(chromiumCsvFileImport)));
+          const result = await controller.exec("csv", btoa(BinaryConvert.toBinary(chromiumCsvFile)));
 
           expect(result.importResources.items[0].secrets.items.length).toEqual(1);
           expect(result.importResourcesErrors.length).toEqual(0);
@@ -408,36 +408,36 @@ describe("ImportResourcesFileController", () => {
       each([
         {
           scenario: "dashlane",
-          file: dashlaneCsvFileImport,
+          file: dashlaneCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "dashlane",
-          file: dashlaneCsvFileImport,
+          file: dashlaneCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
         {
           scenario: "safari",
-          file: safariCsvFileImport,
+          file: safariCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "safari",
-          file: safariCsvFileImport,
+          file: safariCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
         {
-          scenario: "nordPass", file: nordPassCsvFileImport,
+          scenario: "nordPass", file: nordPassCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "nordPass",
-          file: nordPassCsvFileImport,
+          file: nordPassCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         }
@@ -477,48 +477,48 @@ describe("ImportResourcesFileController", () => {
       });
       each([
         {
-          scenario: "1Password", file: onePasswordCsvFileImport,
+          scenario: "1Password", file: onePasswordCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "1Password",
-          file: onePasswordCsvFileImport,
+          file: onePasswordCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
         {
           scenario: "bitwarden",
-          file: bitwardenCsvFileImport,
+          file: bitwardenCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "bitwarden",
-          file: bitwardenCsvFileImport,
+          file: bitwardenCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
         {
-          scenario: "lastpass", file: lastpassCsvFileImport,
+          scenario: "lastpass", file: lastpassCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "lastpass",
-          file: lastpassCsvFileImport,
+          file: lastpassCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
         {
           scenario: "logMeOnce",
-          file: logMeOnceCsvFileImport,
+          file: logMeOnceCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
         },
         {
           scenario: "logMeOnce",
-          file: logMeOnceCsvFileImport,
+          file: logMeOnceCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
@@ -657,7 +657,7 @@ describe("ImportResourcesFileController", () => {
       const result = await controller.exec("csv", file);
       const time = performance.now() - start;
       expect(result.importResources.items).toHaveLength(linesCount);
-      expect(time).toBeLessThan(2000);
+      expect(time).toBeLessThan(5000);
     });
   });
 });

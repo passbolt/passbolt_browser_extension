@@ -251,7 +251,8 @@ describe("ResourceCreateService", () => {
       // Decrypt metadata
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
       expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+      const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
       //Validate secret
       expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
@@ -292,7 +293,8 @@ describe("ResourceCreateService", () => {
       // Decrypt metadata
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
       expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+      const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
       //Validate secret
       expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
@@ -333,7 +335,8 @@ describe("ResourceCreateService", () => {
       // Decrypt metadata
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
       expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+      const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
       //Validate secret
       expect(JSON.parse(decryptedSecretSent)).toEqual(plaintextDto);
@@ -406,7 +409,7 @@ describe("ResourceCreateService", () => {
         return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       });
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [resourceDto]);
-      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [defaultFolderDto({id: folderId}, {withPermissions: 2})]);
+      jest.spyOn(FolderService.prototype, "findAllForShare").mockImplementation(() => [defaultFolderDto({id: folderId}, {withPermissions: {count: 2}})]);
       jest.spyOn(ShareService.prototype, "simulateShareResource").mockImplementation(() => shareResourceChanges);
       jest.spyOn(ShareService.prototype, "shareFolder").mockImplementation(() => shareResourceChanges);
       jest.spyOn(ShareService.prototype, "shareResource").mockImplementation(() => jest.fn());
@@ -467,7 +470,8 @@ describe("ResourceCreateService", () => {
       // Decrypt metadata
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
       expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithUserKey(resourceEntityUpdated, pgpKeys.ada.passphrase);
+      const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
       expect(resourceCreateService.share).toHaveBeenCalledTimes(1);
       expect(ShareModel.prototype.bulkShareResources).toHaveBeenCalledTimes(0);

@@ -49,6 +49,7 @@ class ResourceService extends AbstractService {
       'secret',
       'permission',
       // find all
+      'permissions',
       'permissions.user.profile',
       'permissions.group',
       // if tag plugin

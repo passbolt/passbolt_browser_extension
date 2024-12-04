@@ -17,7 +17,6 @@ import PermissionEntity from "../entity/permission/permissionEntity";
 import PermissionsCollection from "../entity/permission/permissionsCollection";
 import ResourceEntity from "../entity/resource/resourceEntity";
 import PermissionChangesCollection from "../entity/permission/change/permissionChangesCollection";
-import MoveService from "../../service/api/move/moveService";
 import ResourceService from "../../service/api/resource/resourceService";
 import PlaintextEntity from "../entity/plaintext/plaintextEntity";
 import splitBySize from "../../utils/array/splitBySize";
@@ -34,7 +33,6 @@ class ResourceModel {
    */
   constructor(apiClientOptions) {
     this.resourceService = new ResourceService(apiClientOptions);
-    this.moveService = new MoveService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
   }
 
@@ -48,6 +46,7 @@ class ResourceModel {
    *
    * @param {Array} folderIds The folder id
    * @return {ResourcesCollection}
+   * @deprecated should use getOrFindResourcesService and collection filtering. See shareFoldersService usage.
    */
   async getAllByParentIds(folderIds) {
     const localResources = await ResourceLocalStorage.get();
@@ -66,6 +65,7 @@ class ResourceModel {
    *
    * @param {Array} resourceIds The resource ids
    * @return {ResourcesCollection}
+   * @deprecated should use getOrFindResourcesService and collection filtering.
    */
   async getAllByIds(resourceIds) {
     const localResources = await ResourceLocalStorage.get();
@@ -78,6 +78,7 @@ class ResourceModel {
    *
    * @param {string} resourceId uuid
    * @returns {Promise<ResourceEntity>}
+   * @deprecated should use getOrFindResourcesService and collection filtering.
    */
   async getById(resourceId) {
     const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
@@ -207,17 +208,6 @@ class ResourceModel {
   async delete(resourceId) {
     await this.resourceService.delete(resourceId);
     await ResourceLocalStorage.delete(resourceId);
-  }
-
-  /**
-   * Move resources using Passbolt API
-   *
-   * @param {ResourceEntity} resourceEntity the resource entity
-   * @param {(string|null)} folderParentId the folder parent
-   */
-  async move(resourceEntity, folderParentId) {
-    resourceEntity.folderParentId = folderParentId;
-    await this.moveService.move(resourceEntity);
   }
 
   /*
@@ -472,10 +462,9 @@ class ResourceModel {
     }
     for (const i in resourceIds) {
       if (!resources.find(item => item.id === resourceIds[i])) {
-        return false;
+        throw new Error(`Resource with id ${resourceIds[i]} does not exist.`);
       }
     }
-    return true;
   }
 }
 

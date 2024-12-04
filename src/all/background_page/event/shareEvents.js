@@ -1,18 +1,21 @@
 /**
- * Share Listeners
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
- * Used for sharing passwords
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
  *
- * @copyright (c) 2017 Passbolt SARL
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         1.0.0
  */
+
 import FolderModel from "../model/folder/folderModel";
 import ShareResourcesController from "../controller/share/shareResourcesController";
-import ShareFoldersController from "../controller/share/shareFoldersController";
-import FoldersCollection from "../model/entity/folder/foldersCollection";
-import PermissionChangesCollection from "../model/entity/permission/change/permissionChangesCollection";
+import ShareOneFolderController from "../controller/share/shareOneFolderController";
 import SearchUsersAndGroupsController from "../controller/share/searchUsersAndGroupsController";
-import FindResourcesForShareController from "../controller/share/findResourcesForShareController";
 
 /**
  * Listens the share events
@@ -21,16 +24,6 @@ import FindResourcesForShareController from "../controller/share/findResourcesFo
  * @param {AccountEntity} account the user account
  */
 const listen = function(worker, apiClientOptions, account) {
-  /*
-   * Retrieve the resources to share.
-   * @listens passbolt.share.find-resources-for-share
-   * @param {array} resourcesIds The ids of the resources to retrieve.
-   */
-  worker.port.on('passbolt.share.find-resources-for-share', async(requestId, resourcesIds) => {
-    const controller = new FindResourcesForShareController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourcesIds);
-  });
-
   /*
    * Retrieve the folders to share.
    * @listens passbolt.share.get-folders
@@ -51,10 +44,12 @@ const listen = function(worker, apiClientOptions, account) {
    * Encrypt the shared password for all the new users it has been shared with.
    * @listens passbolt.share.submit
    * @param requestId {uuid} The request identifier
+   * @param resourcesId {array<string>} The resources ids to share
+   * @param permissionChangesDto {array} The permission changes
    */
-  worker.port.on('passbolt.share.resources.save', async(requestId, resources, changes) => {
+  worker.port.on('passbolt.share.resources.save', async(requestId, resourcesIds, permissionChangesDto) => {
     const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions, account);
-    await shareResourcesController._exec(resources, changes);
+    await shareResourcesController._exec(resourcesIds, permissionChangesDto);
   });
 
   /*
@@ -62,18 +57,12 @@ const listen = function(worker, apiClientOptions, account) {
    *
    * @listens passbolt.share.folders.save
    * @param requestId {uuid} The request identifier
+   * @param folderId {uuid} The folder id to share
+   * @param permissionChangesDto {array} The permission changes
    */
-  worker.port.on('passbolt.share.folders.save', async(requestId, foldersDto, changesDto) => {
-    try {
-      const folders = new FoldersCollection(foldersDto);
-      const permissionChanges = new PermissionChangesCollection(changesDto);
-      const shareFoldersController = new ShareFoldersController(worker, requestId, apiClientOptions, account);
-      await shareFoldersController.main(folders, permissionChanges);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.share.folders.save', async(requestId, folderId, permissionChangesDto) => {
+    const shareFoldersController = new ShareOneFolderController(worker, requestId, apiClientOptions, account);
+    await shareFoldersController._exec(folderId, permissionChangesDto);
   });
 
   /**

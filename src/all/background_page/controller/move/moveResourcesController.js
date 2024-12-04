@@ -11,20 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Keyring from "../../model/keyring";
-import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
-import FolderModel from "../../model/folder/folderModel";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
-import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
-import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
-import Log from "../../model/log";
-import ShareModel from "../../model/share/shareModel";
-import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
-import FindResourcesService from "../../service/resource/findResourcesService";
-
+import MoveResourcesService, {PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL} from "../../service/move/moveResourcesService";
+import {assertArrayUUID, assertUuid} from "../../utils/assertions";
+import GetOrFindFoldersService from "../../service/folder/getOrFindFoldersService";
+import i18n from "../../sdk/i18n";
 
 class MoveResourcesController {
   /**
@@ -38,222 +30,45 @@ class MoveResourcesController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = new FolderModel(apiClientOptions, account);
-    this.resourceModel = new ResourceModel(apiClientOptions, account);
-    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
-    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
-    this.shareModel = new ShareModel(apiClientOptions);
-    this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker);
     this.getPassphraseService = new GetPassphraseService(account);
+    this.moveResourcesService = new MoveResourcesService(apiClientOptions, account, this.progressService);
+    this.getOrFindFoldersService = new GetOrFindFoldersService(account, apiClientOptions);
   }
 
   /**
    * Move content.
    *
-   * @param {array} resourcesIds: The resources ids to move
-   * @param {(string|null)} destinationFolderId: The destination folder
+   * @param {Array<string>} resourcesIds
+   * @param {string|null} destinationFolderId
    */
-  async main(resourcesIds, destinationFolderId) {
-    await this.assertValidMoveParameters(resourcesIds, destinationFolderId);
+  async _exec(resourcesIds, destinationFolderId) {
     try {
-      await this.getPassphrase();
-    } catch (error) {
-      this.cleanup();
-      throw error;
-    }
-    try {
-      this.progressService.title = this.getProgressTitle();
-      this.progressService.start(null, i18n.t('Initializing ...'));
-
-      await this.findAllForShare();
-      this.filterOutResourcesThatWontMove();
-
-      this.progressService.updateGoals(this.getGoals());
-
-      await this.progressService.finishStep(i18n.t('Calculating changes ...'), true);
-      await this.calculateChanges();
-
-      await this.move();
-      await this.share();
-      await this.progressService.finishStep(i18n.t('Done'), true);
-      await this.progressService.close();
-      this.cleanup();
+      const result = await this.exec(resourcesIds, destinationFolderId);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      await this.progressService.close();
-      this.cleanup();
-      throw error;
+      this.worker.port.emit(this.requestId, 'ERROR', error);
     }
   }
 
   /**
-   * Sanity check
-   * @returns {Promise<void>}
+   * @param {Array<string>} resourcesIds The resources ids to move
+   * @param {string} [destinationFolderId=null] The target destination folder, or null if root.
    */
-  async assertValidMoveParameters(resourcesIds, destinationFolderId) {
+  async exec(resourcesIds, destinationFolderId = null) {
+    assertArrayUUID(resourcesIds, "The resourceIds should be a valid array of UUID");
     if (destinationFolderId !== null) {
-      await this.folderModel.assertFolderExists(destinationFolderId);
-    }
-    if (resourcesIds.length) {
-      await this.resourceModel.assertResourcesExist(resourcesIds);
-    } else {
-      throw new Error(i18n.t('Could not move, expecting at least a resource to be provided.'));
-    }
-    this.destinationFolderId = destinationFolderId;
-    this.resourcesIds = resourcesIds;
-  }
-
-  /**
-   * GetPassphrase
-   * @returns {Promise<void>}
-   */
-  async getPassphrase() {
-    /*
-     * Get the passphrase if needed and decrypt secret key
-     * We do this to confirm the move even if there is nothing to decrypt/re-encrypt
-     */
-    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-    this.privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-  }
-
-  /**
-   * findAllForShare
-   * @returns {Promise<void>}
-   */
-  async findAllForShare() {
-    this.resources = await this.findResourcesService.findAllByIdsForShare(this.resourcesIds);
-    const parentIds = [...new Set(this.resources.folderParentIds)];
-
-    if (this.destinationFolderId) {
-      this.destinationFolder = await this.folderModel.findForShare([this.destinationFolderId]);
-    } else {
-      this.destinationFolder = null;
+      assertUuid(destinationFolderId, "The destinationFolderId should be a valid UUID");
     }
 
-    if (parentIds.length) {
-      this.resourcesParentFolders = await this.folderModel.findAllForShare(parentIds);
-    }
-  }
-
-  /**
-   * Filter out work needed on resources
-   * @return void
-   */
-  filterOutResourcesThatWontMove() {
-    // Remove resources that are directly selected that can't be moved
-    const resourceIdsToRemove = [];
-    for (const resource of this.resources) {
-      let parent = null;
-      if (resource.folderParentId !== null) {
-        parent = this.resourcesParentFolders.getById(resource.folderParentId);
-      }
-      if (!ResourceEntity.canResourceMove(resource, parent, this.destinationFolder)) {
-        console.warn(`Resource ${resource.metadata.name} can not be moved, skipping.`);
-        resourceIdsToRemove.push(resource.id);
-      }
-    }
-    this.resources.removeMany(resourceIdsToRemove);
-  }
-
-  /**
-   * Set goals and init progress counter
-   * @returns {number}
-   */
-  getGoals() {
-    // goals = (number of resources to move * get move, secret, decrypt, share) + calculate changes + sync keyring
-    return (this.resources.length * 5) + 1;
-  }
-
-  /**
-   * Build changes to be used in bulk share
-   */
-  async calculateChanges() {
-    this.changes = new PermissionChangesCollection([]);
-    for (const resource of this.resources) {
-      await this.progressService.finishStep(i18n.t('Calculating changes for {{name}}', {name: resource.metadata.name}));
-      /*
-       * A user who can update a resource can move it
-       * But to change the rights they need to be owner
-       */
-      if (!resource.permission.isOwner()) {
-        break;
-      }
-
-      /*
-       * When a shared folder is moved, we do not change permissions when:
-       * - move is from the root to a personal folder
-       * - move is from a personal folder to a personal folder;
-       * - move is from a personal folder to the root.
-       */
-      if (resource.isShared()
-        && (this.destinationFolderId === null || this.destinationFolder.isPersonal())
-        && (resource.folderParentId === null || resource.isPersonal())) {
-        break;
-      }
-
-      const parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
-      const changes = this.resourceModel.calculatePermissionsChangesForMove(resource, parent, this.destinationFolder);
-      this.changes.merge(changes);
-    }
-  }
-
-  /**
-   * Change resources folder parent id
-   * @returns {Promise<void>}
-   */
-  async move() {
-    const resourceIdsToRemove = [];
-    for (const resource of this.resources) {
-      if (resource.folderParentId !== this.destinationFolderId) {
-        await this.progressService.finishStep(i18n.t('Moving {{name}}', {name: resource.metadata.name}));
-        await this.resourceModel.move(resource, this.destinationFolderId);
-      } else {
-        Log.write({level: 'debug', message: `Resource ${resource.metadata.name} is already in the folder, skipping.`});
-        resourceIdsToRemove.push(resource.id);
-      }
-    }
-    this.resources.removeMany(resourceIdsToRemove);
-    if (this.resources.length > 0) {
-      await this.resourceModel.updateCollection(this.resources);
-    }
-  }
-
-  /**
-   * Bulk share
-   * @returns {Promise<void>}
-   */
-  async share() {
-    const resourcesDto = this.resources.toDto({secrets: true});
-    const changesDto = this.changes.toDto();
-    if (changesDto.length) {
-      await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
-      await this.keyring.sync();
-      await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
-        await this.progressService.finishStep(message);
-      });
-      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
-    }
-  }
-
-  /**
-   * flush sensitive info at the end or in case of error
-   * @returns {void}
-   */
-  cleanup() {
-    this.privateKey = null;
-  }
-
-
-  /**
-   * Get the title to display on the progress dialog
-   * @returns {string}
-   */
-  getProgressTitle() {
-    if (this.resourcesIds.length === 1) {
-      return i18n.t('Moving one resource');
-    } else {
-      return i18n.t('Moving {{total}} resources', {total: this.resourcesIds.length});
+    this.progressService.start(PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL, i18n.t('Initializing ...'));
+    this.progressService.title = i18n.t('Moving {{count}} resources', {count: resourcesIds.length});
+    try {
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+      await this.moveResourcesService.moveAll(resourcesIds, destinationFolderId, passphrase);
+    } finally {
+      this.progressService.close();
     }
   }
 }

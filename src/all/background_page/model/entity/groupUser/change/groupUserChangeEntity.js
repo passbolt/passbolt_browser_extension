@@ -95,7 +95,6 @@ class GroupUserChangeEntity extends Entity {
       default:
         throw new TypeError('GroupUserChangeEntity createFromGroupUser unsupported operation');
     }
-
     return new GroupUserChangeEntity(changeDto);
   }
 

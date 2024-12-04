@@ -20,9 +20,9 @@ import MoveService from "../../service/api/move/moveService";
 import FolderService from "../../service/api/folder/folderService";
 import ShareService from "../../service/api/share/shareService";
 import splitBySize from "../../utils/array/splitBySize";
-import Validator from "validator";
 import FindAndUpdateFoldersLocalStorageService
-  from "../../service/folder/update/findAndUpdateFoldersLocalStorageService";
+  from "../../service/folder/findAndUpdateFoldersLocalStorageService";
+import {assertUuid} from "../../utils/assertions";
 
 const BULK_OPERATION_SIZE = 5;
 
@@ -51,6 +51,7 @@ class FolderModel {
    *
    * @param {string} folderId uuid
    * @returns {Promise<FolderEntity|null>}
+   * @deprecated should use getOrFindResourcesService and collection filtering.
    */
   async getById(folderId) {
     const folderDto = await FolderLocalStorage.getFolderById(folderId);
@@ -64,6 +65,7 @@ class FolderModel {
    * @param {array} folderIds The folder ids
    * @param {boolean} [withChildren] optional default false
    * @return {Promise<FoldersCollection>}
+   * @deprecated should use getOrFindResourcesService and collection filtering.
    */
   async getAllByIds(folderIds, withChildren) {
     const outputCollection = new FoldersCollection([]);
@@ -91,6 +93,7 @@ class FolderModel {
    *
    * @param {array} folderIds The folder ids
    * @return {FoldersCollection}
+   * @deprecated should use getOrFindFoldersService and collection filtering. See shareFoldersService usage.
    */
   async getAllChildren(folderIds) {
     const foldersDto = await FolderLocalStorage.get();
@@ -112,7 +115,8 @@ class FolderModel {
   /**
    * Get all folders from API and map API result to folder collection
    *
-   * @return {FoldersCollection}
+   * @returns {Promise<FoldersCollection>}
+   * @deprecated should use findFoldersService.
    */
   async findAllForShare(foldersIds) {
     const foldersDtos = await this.folderService.findAllForShare(foldersIds);
@@ -122,7 +126,8 @@ class FolderModel {
   /**
    * Get folder from API and map API result to folder Entity
    *
-   * @return {FolderEntity}
+   * @returns {Promise<FolderEntity>}
+   * @deprecated should use findFoldersService.
    */
   async findForShare(folderId) {
     const foldersDtos = await this.folderService.findAllForShare([folderId]);
@@ -234,7 +239,7 @@ class FolderModel {
    *
    * @param {string} folderId the folder to move
    * @param {string} folderParentId the destination folder
-   * @returns {FolderEntity}
+   * @returns {Promise<FolderEntity>}
    */
   async move(folderId, folderParentId) {
     const folderDto = await FolderLocalStorage.getFolderById(folderId);
@@ -370,33 +375,19 @@ class FolderModel {
    *
    * @param {(string|null)} folderId folderId
    * @throws {Error} if the folder does not exist
+   * @deprecated should use getOrFindFoldersService.
    */
   async assertFolderExists(folderId) {
     if (folderId === null) {
       return;
     }
-    if (!Validator.isUUID(folderId)) {
-      throw new TypeError(`Folder exists check expect a uuid.`);
-    }
+
+    assertUuid(folderId, `Folder exists check expect a uuid.`);
+
     const folderDto = await FolderLocalStorage.getFolderById(folderId);
     if (!folderDto) {
       // TODO check remotely?
       throw new Error(`Folder with id ${folderId} does not exist.`);
-    }
-  }
-
-  /**
-   * Assert that all the folders are in the local storage
-   *
-   * @param {Array} folderIds array of uuid
-   * @throws {Error} if a folder does not exist
-   */
-  async assertFoldersExist(folderIds) {
-    if (!Array.isArray(folderIds)) {
-      throw new TypeError(`Folders exist check expect an array of uuid.`);
-    }
-    for (const i in folderIds) {
-      await this.assertFolderExists(folderIds[i]);
     }
   }
 }

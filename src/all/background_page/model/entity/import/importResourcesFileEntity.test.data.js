@@ -76,58 +76,64 @@ export const defaultImportResourceFileOptionsDto = (data = {}) => ({
 /**
  * Without folder fields / totp / description
  */
-export const chromiumCsvFileImport =  [
-  "name,username,url,password",
-  "Password 1,Username 1,https://url1.com,Password 1",
-].join("\n");
+export const chromiumCsvFile = [
+  '"name","url","username","password"',
+  '"Password 1","https://url1.com","Username 1","Password 1"',
+].join("\r\n");
 
-export const mozillaCsvFileImport =  [
-  "url,username,url,password",
-  "Password 1,Username 1,https://url1.com,Password 1",
-].join("\n");
+export const mozillaCsvFile = [
+  '"url","username","password","httpRealm","formActionOrigin","guid","timeCreated","timeLastUsed","timePasswordChanged"',
+  '"https://url1.com","Username 1","Password 1","","","","","",""',
+].join("\r\n");
 
 /**
  * With description fields
  */
 
-export const dashlaneCsvFileImport =  [
-  "username,username1,username2,username3,title,password,note,url,category, otpSecret",
-  "Username 1,not supported,not supported,not supported,Password 1,Password 1,Description 1,https://url1.com,Password 1,not supported,not supported",
-].join("\n");
+export const dashlaneCsvFile = [
+  '"username","username2","username3","title","password","note","url","category","otpSecret"',
+  '"Username 1","","","Password 1","Password 1","Description 1","https://url1.com","",""',
+].join("\r\n");
 
-export const safariCsvFileImport =  [
-  "Title,Username,URL,Password,Notes,OTPAuth",
-  "Password 1,Username 1,https://url1.com,Password 1,Description 1,not supported",
-].join("\n");
-export const nordPassCsvFileImport =  [
-  "name,username,url,password,note",
-  "Password 1,Username 1,https://url1.com,Password 1,Description 1",
-].join("\n");
+export const safariCsvFile = [
+  '"Title","URL","Username","Password","Notes","OTPAuth"',
+  '"Password 1","https://url1.com","Username 1","Password 1","Description 1",""',
+].join("\r\n");
+
+export const nordPassCsvFile = [
+  '"name","url","username","password","note","cardholername","cardnumber","cvc","expirydate","zipcode","folder","full_name","phone_number","email","address1","address2","city","country","state","type"',
+  '"Password 1","https://url1.com","Username 1","Password 1","Description 1","","","","","","Folder 1","","","","","","","","",""',
+].join("\r\n");
 
 /**
  * With folder and description fields
  */
-export const onePasswordCsvFileImport =  [
-  "Title,Username,Url,Password,Notes,Type",
-  "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
-].join("\n");
+export const onePasswordCsvFile = [
+  '"Title","Username","Url","Password","Notes","Type"',
+  '"Password 1","Username 1","https://url1.com","Password 1","Description 1","Folder 1"',
+].join("\r\n");
 
-export const bitwardenCsvFileImport =  [
-  "name,login_username,login_uri,login_password,notes,folder",
-  "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
-].join("\n");
+export const bitwardenCsvFile = [
+  '"name","login_username","login_uri","login_password","notes","folder"',
+  '"Password 1","Username 1","https://url1.com","Password 1","Description 1","Folder 1"',
+].join("\r\n");
 
-export const lastpassCsvFileImport =  [
-  "name,username,url,password,extra,grouping",
-  "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
-].join("\n");
+export const lastpassCsvFile = [
+  '"url","username","password","totp","extra","name","grouping","fav"',
+  '"https://url1.com","Username 1","Password 1","","Description 1","Password 1","Folder 1",""',
+].join("\r\n");
 
-export const logMeOnceCsvFileImport =  [
-  "name,username,url,password,note,group",
-  "Password 1,Username 1,https://url1.com,Password 1,Description 1,Folder 1",
-].join("\n");
+export const logMeOnceCsvFile = [
+  '"name","url","note","group","username","password","extra"',
+  '"Password 1","https://url1.com","Description 1","Folder 1","Username 1","Password 1",""',
+].join("\r\n");
+
+export const KdbxCsvFile = [
+  '"Title","Username","URL","Password","Notes","Group","TOTP"',
+  '"Password 1","Username 1","https://url1.com","Password 1","Description 1","Folder 1","otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"'
+].join("\r\n");
 
 export const KdbxCsvFileTotpData = [
   "Title,Username,URL,Password,Notes,Group,TOTP",
   "Password 1,Username 1,https://url1.com,,,,otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"
-].join("\n");
+].join("\r\n");

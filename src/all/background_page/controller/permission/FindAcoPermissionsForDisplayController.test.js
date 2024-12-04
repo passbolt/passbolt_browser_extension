@@ -35,7 +35,7 @@ describe("FindAcoPermissionsForDisplayController", () => {
       // initialisation
       const controller = new FindAcoPermissionsForDisplayController(null, null, defaultApiClientOptions(), account);
       const resourceId = uuidv4();
-      const permissionsDto = defaultPermissionsDtos(10, {}, {withUser: true});
+      const permissionsDto = defaultPermissionsDtos({}, {withUser: true});
       // mocked function
       jest.spyOn(controller.findPermissionService, "findAllByAcoForeignKeyForDisplay").mockImplementationOnce(() => new PermissionsCollection(permissionsDto));
       jest.spyOn(controller.findFolderService, "findById");
@@ -68,7 +68,7 @@ describe("FindAcoPermissionsForDisplayController", () => {
       // expectations
       expect(controller.findPermissionService.findAllByAcoForeignKeyForDisplay).toHaveBeenCalledTimes(0);
       expect(controller.findFolderService.findById).toHaveBeenCalledTimes(1);
-      expect(controller.findFolderService.findById).toHaveBeenCalledWith(folderId, {'permissions.user.profile': true, 'permissions.group': true});
+      expect(controller.findFolderService.findById).toHaveBeenCalledWith(folderId, {'permissions.user.profile': true, 'permissions.group': true, "permission": true});
       expect(permissionsCollection.toDto()).toEqual(folderDto.permissions);
     });
 

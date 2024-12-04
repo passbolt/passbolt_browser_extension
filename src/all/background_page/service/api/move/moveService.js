@@ -13,6 +13,7 @@
 import ResourceEntity from "../../../model/entity/resource/resourceEntity";
 import FolderEntity from "../../../model/entity/folder/folderEntity";
 import AbstractService from "../abstract/abstractService";
+import {assertUuid} from "../../../utils/assertions";
 
 const MOVE_SERVICE_RESOURCE_NAME = 'move';
 const MOVE_SERVICE_FOREIGN_MODEL_FOLDER = 'Folder';
@@ -60,6 +61,28 @@ class MoveService extends AbstractService {
 
     const url = `${foreignModel.toLowerCase()}/${entity.id}`;
     const data = entity.toDto();
+    const response = await this.apiClient.update(url, data);
+    return response.body;
+  }
+
+  /**
+   * Move a resource.
+   *
+   * @param {string} id The resource id.
+   * @param {string} destinationFolderId The destination folder parent id.
+   * @returns {Promise<void>}
+   * @public
+   */
+  async moveResource(id, destinationFolderId) {
+    assertUuid(id, "The parameter 'id' should be a UUID.");
+    if (destinationFolderId !== null) {
+      assertUuid(destinationFolderId, "The parameter 'destinationFolderId' should be a UUID or null.");
+    }
+
+    const url = `resource/${id}`;
+    const data = {
+      folder_parent_id: destinationFolderId
+    };
     const response = await this.apiClient.update(url, data);
     return response.body;
   }

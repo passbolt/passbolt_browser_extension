@@ -14,11 +14,18 @@
 
 import ProgressService from "./progressService";
 
-describe("AccountRecoveryOrganizationPolicyEntity builder", () => {
-  it("should emit the right events with the right information", async() => {
+beforeEach(() => {
+  jest.clearAllTimers();
+  jest.useFakeTimers();
+});
+
+describe("ProgressService", () => {
+  it("should emit the right events with the right information", () => {
     const title = "Progress bar title";
-    const goals = 3;
+    const goals = 10;
     const message = "message";
+    const stepMessageBelowDebounceLimit = "step message update not to display";
+    const stepMessageOverDebounceUpdated = "step message update to display";
     const mockedWorker = {
       port: {
         emit: jest.fn()
@@ -26,24 +33,36 @@ describe("AccountRecoveryOrganizationPolicyEntity builder", () => {
     };
     const progressService = new ProgressService(mockedWorker, title);
 
-    expect.assertions(8);
+    expect.assertions(12);
     progressService.start(goals, message);
     expect(progressService.progress).toBe(0);
 
     expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.open-progress-dialog', title, goals, message);
 
-    await progressService.finishStep(message, true);
+    progressService.finishStep(message, true);
     expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', message, 1);
     expect(progressService.progress).toBe(1);
 
-    await progressService.finishStep(null, true);
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', null, 2);
+    progressService.finishStep(null, true);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', message, 2);
     expect(progressService.progress).toBe(2);
 
     progressService.updateGoals(1);
     expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update-goals', 1);
 
-    await progressService.close();
+    progressService.updateStepMessage(stepMessageBelowDebounceLimit);
+    expect(mockedWorker.port.emit).not.toHaveBeenCalledWith('passbolt.progress.update', stepMessageBelowDebounceLimit, 2);
+
+    jest.advanceTimersByTime(81);
+    progressService.updateStepMessage(stepMessageOverDebounceUpdated);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', stepMessageOverDebounceUpdated, 2);
+
+    jest.advanceTimersByTime(81);
+    progressService.finishSteps(8);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', stepMessageOverDebounceUpdated, 10);
+    expect(progressService.progress).toBe(10);
+
+    progressService.close();
     expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.close-progress-dialog');
   });
 

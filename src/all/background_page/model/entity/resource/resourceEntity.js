@@ -26,8 +26,8 @@ import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'Resource';
 
-const METADATA_KEY_TYPE_USER_KEY = "user_key";
-const METADATA_KEY_TYPE_METADATA_KEY = "shared_key";
+export const METADATA_KEY_TYPE_USER_KEY = "user_key";
+export const METADATA_KEY_TYPE_METADATA_KEY = "shared_key";
 
 const SUPPORTED_METADATA_KEY_TYPES = [
   METADATA_KEY_TYPE_USER_KEY,
@@ -176,7 +176,7 @@ class ResourceEntity extends EntityV2 {
         "metadata": {"anyOf": [
           {
             "type": "string",
-            "pattern": /^-----BEGIN PGP MESSAGE-----\n\n([a-zA-Z0-9/+=]{1,64}\n)*=[a-zA-Z0-9/+=]{4}\n-----END PGP MESSAGE-----$/m
+            "pattern": /^-----BEGIN PGP MESSAGE-----([\r\n])([ -9;-~]{1,76}: [ -~]{1,76}([\r\n]))*\n([a-zA-Z0-9\/+=]{1,76}([\r\n]))*=[a-zA-Z0-9\/+=]{4}([\r\n])-----END PGP MESSAGE-----([\r\n]*)$/
           },
           ResourceMetadataEntity.getSchema()
         ]},
@@ -348,7 +348,7 @@ class ResourceEntity extends EntityV2 {
       return this._props.personal;
     }
     if (this.permissions) {
-      return this.permissions.length === 1;
+      return this.permissions.length === 1; //@todo dangerous, could be a group permission having mulitple members.
     }
     return null;
   }
@@ -378,6 +378,14 @@ class ResourceEntity extends EntityV2 {
    */
   isMetadataDecrypted() {
     return Boolean(this._metadata);
+  }
+
+  /**
+   * Check if the metadata key type is user key.
+   * @returns {boolean}
+   */
+  isMetadataKeyTypeUserKey() {
+    return this._props.metadata_key_type === METADATA_KEY_TYPE_USER_KEY;
   }
 
   /**
@@ -427,14 +435,13 @@ class ResourceEntity extends EntityV2 {
   }
 
   /**
-   * Assert a given folder can be moved
-   * @param {ResourceEntity} resourceToMove
-   * @param {FolderEntity} parentFolder
-   * @param {(FolderEntity|null)} destinationFolder
+   * Assert the current entity can be moved to the destination folder given a parent folder
+   * @param {FolderEntity|null} parentFolder
+   * @param {FolderEntity|null} destinationFolder
    * @returns {boolean}
    */
-  static canResourceMove(resourceToMove, parentFolder, destinationFolder) {
-    if (resourceToMove.isReadOnly()) {
+  canMove(parentFolder, destinationFolder) {
+    if (this.isReadOnly()) {
       return ((parentFolder === null || parentFolder.isPersonal()) &&
         (destinationFolder === null || destinationFolder.isPersonal()));
     }

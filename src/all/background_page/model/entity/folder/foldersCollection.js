@@ -102,25 +102,19 @@ class FoldersCollection extends EntityV2Collection {
     return this._items.map(folder => folder.folderParentIds);
   }
 
+  /*
+   * ==================================================
+   * Filters
+   * ==================================================
+   */
+
   /**
-   * Return a new collection with all resources the current user is owner
+   * Return a new collection with all folders the current user is owner.
    *
    * @returns {FoldersCollection}
    */
-  getAllWhereOwner() {
-    return new FoldersCollection(this._items.filter(f => f.isOwner()));
-  }
-
-  /**
-   * Get an entity folder parent path.
-   * @param {FolderEntity|ResourceEntity} entity
-   * @returns {string}
-   */
-  getFolderParentPath(entity) {
-    return this.getAllParents(entity).items
-      .reverse()
-      .map(folderParentEntity => folderParentEntity.name)
-      .join("/");
+  filterByIsOwner() {
+    return new FoldersCollection(this._items.filter(f => f.isOwner()), {validate: false});
   }
 
   /*
@@ -131,11 +125,10 @@ class FoldersCollection extends EntityV2Collection {
   /**
    * Get the first item that matches the given id
    * @param {string} id
-   * @returns {*} FolderEntity or undefined
+   * @returns {FolderEntity} FolderEntity or undefined
    */
   getById(id) {
-    const found = this._items.filter(folder => folder.id === id);
-    return found.length ? found[0] : undefined;
+    return this._items.find(folder => folder.id === id);
   }
 
   /**
@@ -160,7 +153,7 @@ class FoldersCollection extends EntityV2Collection {
     const children = inputCollection.folders.filter(item => item.folderParentId === parentId);
     if (children.length) {
       try {
-        children.forEach(child => outputCollection.push(child));
+        outputCollection.pushMany(children);
       } catch (error) {
         /*
          * children are already in collection

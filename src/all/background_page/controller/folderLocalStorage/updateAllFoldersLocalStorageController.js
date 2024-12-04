@@ -12,7 +12,7 @@
  * @since         4.9.4
  */
 import FindAndUpdateFoldersLocalStorageService
-  from "../../service/folder/update/findAndUpdateFoldersLocalStorageService";
+  from "../../service/folder/findAndUpdateFoldersLocalStorageService";
 
 class UpdateAllFolderLocalStorageController {
   /**

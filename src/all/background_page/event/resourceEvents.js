@@ -17,6 +17,9 @@ import FindResourceDetailsController from "../controller/resource/findResourceDe
 import ResourceUpdateLocalStorageController
   from "../controller/resourceLocalStorage/resourceUpdateLocalStorageController";
 import FindAllIdsByIsSharedWithGroupController from "../controller/resource/findAllIdsByIsSharedWithGroupController";
+import FindAllByIdsForDisplayPermissionsController
+  from "../controller/resource/findAllByIdsForDisplayPermissionsController";
+import MoveResourcesController from "../controller/move/moveResourcesController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -28,7 +31,7 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.update-local-storage', async requestId => {
     Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     const controller = new ResourceUpdateLocalStorageController(worker, requestId, apiClientOptions, account);
-    await controller._exec({updatePeriodThreshold: 10000});
+    await controller._exec();
   });
 
   /**
@@ -133,6 +136,29 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.set-expiration-date', async(requestId, passwordExpiryResourcesCollectionDto) => {
     const controller = new SetResourcesExpiryDateController(worker, requestId, apiClientOptions);
     await controller._exec(passwordExpiryResourcesCollectionDto);
+  });
+
+  /*
+   * Retrieve all resources by ids with their permissions.
+   * @listens passbolt.resources.find-all-by-ids-with-permissions
+   * @param {array} resourcesIds The ids of the resources to retrieve.
+   */
+  worker.port.on('passbolt.resources.find-all-by-ids-for-display-permissions', async(requestId, resourcesIds) => {
+    const controller = new FindAllByIdsForDisplayPermissionsController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourcesIds);
+  });
+
+  /*
+   * Moves the given resources to a new folder.
+   *
+   * @listens passbolt.resources.move-by-ids
+   * @param {uuid} requestId The request identifier
+   * @param {string} destinationFolderId The destination folder id
+   * @param {string} resourcesIds The resources ids to move
+   */
+  worker.port.on('passbolt.resources.move-by-ids', async(requestId, resourcesIds, destinationFolderId) => {
+    const controller = new MoveResourcesController(worker, requestId, apiClientOptions, account);
+    await controller.exec(resourcesIds, destinationFolderId);
   });
 };
 

@@ -112,20 +112,20 @@ class ResourcesCollection extends EntityV2Collection {
     return this._items.findIndex(r => (r.id === resourceId));
   }
 
-  /**
-   * Return a new collection with all resources the current user is owner
-   *
-   * @returns {ResourcesCollection}
-   */
-  getAllWhereOwner() {
-    return new ResourcesCollection(this._items.filter(r => r.isOwner()));
-  }
-
   /*
    * ==================================================
    * Filters
    * ==================================================
    */
+
+  /**
+   * Return a new collection with all resources the current user is owner
+   *
+   * @returns {ResourcesCollection}
+   */
+  filterByIsOwner() {
+    return new ResourcesCollection(this._items.filter(r => r.isOwner()), {validate: false});
+  }
 
   /**
    * Filter by resource types.
@@ -173,6 +173,13 @@ class ResourcesCollection extends EntityV2Collection {
    */
   filterOutMetadataEncrypted() {
     this.filterByCallback(resource => resource.isMetadataDecrypted());
+  }
+
+  /**
+   * Filter out resources having their metadata not encrypted with a user key.
+   */
+  filterOutMetadataNotEncryptedWithUserKey() {
+    this.filterByCallback(resource => resource.isMetadataKeyTypeUserKey());
   }
 
   /*

@@ -15,7 +15,7 @@ classDiagram
 
         class ExportResourcesFileController {
             event "passbolt.export-resources.export-to-file"
-            +exec(object exportResourcesFileDto) Promise~ResourcesCollection~
+            +exec(object exportResourcesFileDto) Promise~ExportResourcesFileEntity~
         }
 
         class FindAllIdsByIsSharedWithGroupController{
@@ -74,7 +74,9 @@ classDiagram
             +findAllByHasAccessForLocalStorage(uuid acoForeignKey) Promise~ResourcesCollection~
             +findAllByIds(Array~uuid~ resourcesIds, object contains) Promise~ResourcesCollection~
             +findAllForLocalStorage() Promise~ResourcesCollection~
+            +findAllByIdsForDisplayPermissions(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findAllByIdsForShare() Promise~ResourcesCollection~
+            +findAllByIdsWithPermissions(array~uuid~ resourcesIds) Promise~ResourcesCollection~
             +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findOneById(string uuid, object contains) Promise~ResourceEntity~
@@ -84,6 +86,11 @@ classDiagram
         class ImportResourcesService {
             +parseFile(ImportResourcesFileEntity import) Promise~void~
             +importFile(ImportResourcesFileEntity import, string passphrase) Promise~ImportResourcesFileEntity~
+        }
+
+        class ExportResourcesService {
+            +prepareExportContent(ExportResourcesFileEntity import) Promise~void~
+            +exportToFile(ExportResourcesFileEntity import, string passphrase) Promise~void~
         }
 
         class UpdateResourceService {
@@ -247,7 +254,8 @@ classDiagram
 
         class GetOrFindSessionKeysService {
             +getOrFindAllBundles() Promise~SessionKeysBundlesCollection~
-            +getOrFindAllByForeignModelAndForeignIds(string foreignModel, array foreignIds): SessionKeysCollection
+            +getOrFindAll(): Promise~SessionKeysCollection~
+            +getOrFindAllByForeignModelAndForeignIds(string foreignModel, array foreignIds): Promise~SessionKeysCollection~
         }
 
         class FindAndUpdateSessionKeysBundlesSessionStorageService {
@@ -259,7 +267,7 @@ classDiagram
         }
 
         class SaveSessionKeysService {
-            +save(SessionKeysCollection collection, ?string passphrase, ?boolean retry) Promise
+            +save(SessionKeysCollection collection, ?string passphrase, ?boolean retryUpdate) Promise
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -268,13 +276,14 @@ classDiagram
 
         class SessionKeysBundlesApiService {
             +create(SessionKeysBundleEntity entity) Promise~object~
-            +delete(string entityId) Promise
+            +delete(string id) Promise
             +findAll() Promise~array~
-            +udpate(string entityId, SessionKeysBundleEntity entity) Promise~object~
+            +udpate(string id, SessionKeysBundleEntity entity) Promise~object~
         }
 
         class SessionKeysBundlesSessionStorageService {
             -$_runtimeCachedData object
+            +hasCachedData(): boolean
             +get() Promise~array~
             +set(SessionKeysBundlesCollection collection) Promise
             +flush(AccountEntity account) Promise
@@ -400,6 +409,7 @@ classDiagram
             +get metadata() string|MetadataEntity
             +set metadata(string|MetadataEntity metadata)
             +isMetadataDecrypted() boolean
+            +isMetadataKeyTypeUserKey() boolean
         }
 
         class ResourcesCollection {
@@ -407,6 +417,7 @@ classDiagram
             +filterOutByMetadataDecrypted() void
             +filterByResourceTypes(ResourceTypesCollection collection) void
             +filterBySuggestResources(string url) void
+            +filterOutMetadataNotEncryptedWithUserKey() void
         }
 
         class ResourceTypesCollection {
@@ -433,6 +444,17 @@ classDiagram
             +get version() string
         }
 
+        class SecretsCollection {
+        }
+
+        class SecretEntity {
+            +uuid props.id
+            +string props.data
+            +string props.created
+            +string props.created_by
+            +string props.modified_by
+        }
+
         class SessionKeysCollection {
         }
 
@@ -445,32 +467,49 @@ classDiagram
 
         class SessionKeysBundlesCollection {
             +hasDecryptedSessionKeys() boolean
+            +sortByModified() void
         }
 
         class SessionKeysBundleEntity {
             -uuid props.id
             -uuid props.user_id
             -string props.data
-            -SessionKeysCollection _session_keys
             -string props.created
             -string props.modified
-            +get data() string
+            +get data() string|SessionKeysBundleDataEntity
             +set data(string data)
+            +isDecrypted() boolean
+        }
+
+        class SessionKeysBundleDataEntity {
+            -string props.object_type
+            -SessionKeysCollection _session_keys
             +get sessionKeys() SessionKeysCollection
             +set sessionKeys(SessionKeysCollection collection)
-            +isDecrypted() boolean
         }
     }
 
-    namespace ShareServicesNs {
+    namespace ShareNs {
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Share controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
         class ShareResourcesController {
             event "passbolt.share.resources.save"
-            +exec(array resources, array changes) Promise
+            +exec(array~uuid~ resourcesIds, array~object~ permissionChangesDto) Promise
         }
 
-        class ShareResourcesService {
-            +exec(array resources, array changes, string passphrase) Promise
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Share service
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class ShareResourceService {
+            +exec(array~uuid~ resourcesIds, PermissionChangesCollection permissionChanges, string passphrase) Promise
         }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Share models
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class ShareService {
             +shareResource(string resourceId, object data) Promise~object~
@@ -482,6 +521,7 @@ classDiagram
     CreateResourceController*--CreateResourceService
     CreateResourceController*--GetPassphraseService
     ExportResourcesFileController*--FindResourcesService
+    ExportResourcesFileController*--ExportResourcesService
     FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
     FindResourcesForShareController*--FindResourcesService
     FindResourceDetailsController*--FindResourcesService
@@ -510,6 +550,8 @@ classDiagram
     ImportResourcesService*--EncryptMetadataService
     ImportResourcesService*--ResourceService
     ImportResourcesService*--ResourcesLocalStorageService
+    ExportResourcesService*--FindResourcesService
+    ExportResourcesService*--DecryptMetadataService
     UpdateResourceService*--EncryptMetadataService
     UpdateResourceService*--ResourceService
     UpdateResourceService*--ResourcesLocalStorageService
@@ -575,16 +617,25 @@ classDiagram
     ResourceEntity*--ResourceTypeEntity
     ResourceTypesCollection*--ResourceTypeEntity
     ResourcesCollection*--ResourceEntity
+    SecretsCollection*--SecretEntity
     SessionKeysCollection*--SessionKeyEntity
     SessionKeysBundlesCollection*--SessionKeysBundleEntity
-    SessionKeysBundleEntity*--SessionKeysCollection
+    SessionKeysBundleEntity*--SessionKeysBundleDataEntity
+    SessionKeysBundleDataEntity*--SessionKeysCollection
 
     %% Auth services relationship.
     style PassphraseStorageService fill:#DEE5D4
 
-    %% Share services relationship.
-    style ShareService fill:#DEE5D4
+
+    %% Share controllers relationships
+    ShareResourcesController*--ShareResourceService
     style ShareResourcesController fill:#D2E0FB
-    ShareResourcesController*--ShareResourcesService
-    ShareResourcesService*--ShareService
+    %% Share services relationships.
+    ShareResourceService*--EncryptMetadataService
+    ShareResourceService*--FindAndUpdateResourcesLocalStorageService
+    ShareResourceService*--GetOrFindResourcesService
+    ShareResourceService*--ResourceService
+    ShareResourceService*--ShareService
+    %% Share models relationships.
+    style ShareService fill:#DEE5D4
 ```

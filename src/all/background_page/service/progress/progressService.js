@@ -18,6 +18,11 @@
 const STEP_DELAY_MS = 80;
 
 class ProgressService {
+  /**
+   * @constructor
+   * @param {Worker} worker
+   * @param {string} title
+   */
   constructor(worker, title) {
     this.worker = worker;
     this._title = title;
@@ -25,7 +30,6 @@ class ProgressService {
     this.lastTimeCall = null;
     this.message = null;
     this.isClose = false;
-    this._updateProgressBar = this._updateProgressBar.bind(this);
   }
 
   /**
@@ -57,7 +61,7 @@ class ProgressService {
    * Start the progression of a task by:
    *  - settings the target goal
    *  - opening a progress dialog
-   * @param {int|null} goals The total progress goals
+   * @param {number|null} goals The total progress goals
    * @param {string|null} message The initial message to display
    */
   start(goals, message) {
@@ -70,8 +74,7 @@ class ProgressService {
 
   /**
    * Changes the goal count of the current progression
-   * @param {int} goals
-   * @param {string|null} message
+   * @param {number} goals
    */
   updateGoals(goals) {
     this._goals = goals;
@@ -80,13 +83,34 @@ class ProgressService {
 
   /**
    * Updates the progress bar with the latest finished step.
-   * @param {string|null} message (Optional) The message to display
-   * @param {bool} forceMessageDisplay (Optional) Should the message display be forced. Default false.
+   * @param {string|null} [message = null] The message to display
+   * @param {boolean} [forceMessageDisplay = false] Should the message display be forced.
    */
-  finishStep(message, forceMessageDisplay = false) {
-    this._progress++;
+  finishStep(message = null, forceMessageDisplay = false) {
+    this.finishSteps(1, message, forceMessageDisplay);
+  }
+
+  /**
+   * Updates the progress bar given a step count.
+   * @param {number} stepCount the count of step to update the progress bar with.
+   * @param {string|null} [message = null] The message to display. If null, the update of the message is ignored
+   * @param {boolean} [forceMessageDisplay = false] Should the message display be forced.
+   */
+  finishSteps(stepCount, message = null, forceMessageDisplay = false) {
+    this._progress += stepCount;
+    if (message !== null) {
+      this.message = message;
+    }
+    this._debounceAction(() => this._updateProgressBar(), forceMessageDisplay);
+  }
+
+  /**
+   * Update step message, conserving the same progress.
+   * @param {string} message The message to display
+   */
+  updateStepMessage(message) {
     this.message = message;
-    this._debounceAction(this._updateProgressBar, forceMessageDisplay);
+    this._debounceAction(() => this._updateProgressBar());
   }
 
   /**

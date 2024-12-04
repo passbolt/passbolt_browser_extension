@@ -74,6 +74,11 @@ class DecryptMetadataService {
    */
   async decryptAllFromForeignModelsWithSessionKeys(collection) {
     let sessionKeys = new SessionKeysCollection();
+    const filteredCollection = collection.items.filter(entity => !entity.isMetadataDecrypted());
+
+    if (!filteredCollection.length) {
+      return sessionKeys;
+    }
 
     try {
       sessionKeys = await this.getOrFindSessionKeysService.getOrFindAllByForeignModelAndForeignIds("Resource", collection.ids);

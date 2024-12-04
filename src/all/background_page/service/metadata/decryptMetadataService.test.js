@@ -212,11 +212,13 @@ describe("DecryptMetadataService", () => {
     });
 
     it("does nothing if the metadata is already decrypted", async() => {
-      expect.assertions(3);
+      expect.assertions(4);
 
       const collectionDto = defaultResourceDtosCollection();
       const collection = new ResourcesCollection(collectionDto);
 
+
+      jest.spyOn(service.getOrFindSessionKeysService, "getOrFindAllByForeignModelAndForeignIds");
       const spyOnFindMetadataKeys = jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll");
 
       let isAllResourceMetadataDecrypted = collection.resources.reduce((accumulator, resource) => accumulator && resource.isMetadataDecrypted(), true);
@@ -228,6 +230,7 @@ describe("DecryptMetadataService", () => {
       expect(isAllResourceMetadataDecrypted).toStrictEqual(true);
 
       expect(spyOnFindMetadataKeys).not.toHaveBeenCalled();
+      expect(service.getOrFindSessionKeysService.getOrFindAllByForeignModelAndForeignIds).not.toHaveBeenCalled();
     });
 
     it("throws an error if no matching metadata key is found", async() => {

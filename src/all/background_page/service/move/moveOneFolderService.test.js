@@ -24,7 +24,7 @@ import {
   ownerFolderPermissionDto,
   ownerMinimalFolderPermissionDto,
   ownerMinimalPermissionDto,
-  ownerPermissionDto
+  ownerPermissionDto, readFolderPermissionDto
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import {v4 as uuidv4} from "uuid";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
@@ -3853,6 +3853,55 @@ describe("MoveOneFolderService", () => {
           {...subFolder2ToMovePerms[2], delete: true},
         ]);
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(expectedFolderPermissionChanges);
+        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
+      });
+
+      it("read shared folder, root parent, to private folder, no children folder, no resources", async() => {
+        expect.assertions(9);
+
+        const folderToMovePerm = readFolderPermissionDto({aro_foreign_key: account.id});
+        const folderToMovePerms = [folderToMovePerm, ...defaultPermissionsDtos({
+          aco: 'Folder',
+          aco_foreign_key: folderToMovePerm.aco_foreign_key
+        }, {count: 2})];
+        const destinationFolderPerm = ownerFolderPermissionDto({aro_foreign_key: account.id});
+        const destinationFolderPerms = [destinationFolderPerm];
+
+        const destinationFolderDto = defaultFolderDto({
+          id: destinationFolderPerm.aco_foreign_key,
+          personal: true,
+          permission: destinationFolderPerm,
+          permissions: destinationFolderPerms,
+        });
+        const folderToMoveDto = defaultFolderDto({
+          id: folderToMovePerm.aco_foreign_key,
+          permission: folderToMovePerm,
+          permissions: folderToMovePerms
+        });
+        const foldersDto = [folderToMoveDto, destinationFolderDto];
+        const resourcesDto = [];
+
+        await FolderLocalStorage.set(new FoldersCollection(foldersDto));
+        jest.spyOn(service.findFoldersService, "findAllByIdsWithPermissions").mockImplementation(ids => new FoldersCollection(foldersDto.filter(folderDto => ids.includes(folderDto.id))));
+        jest.spyOn(service.findFoldersService, "findByIdWithPermissions").mockImplementation(id => new FolderEntity(foldersDto.find(folderDto => folderDto.id === id)));
+        jest.spyOn(service.findResourcesService, "findAllByIdsWithPermissions").mockImplementation(ids => new ResourcesCollection(resourcesDto.filter(resourceDto => ids.includes(resourceDto.id))));
+        await ResourceLocalStorage.set(new ResourcesCollection(resourcesDto));
+        jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
+        jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
+        jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
+        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
+
+        await service.moveOne(folderToMoveDto.id, destinationFolderDto.id, moveStrategyService, pgpKeys.admin.passphrase);
+
+        expect(service.findFoldersService.findAllByIdsWithPermissions).not.toHaveBeenCalled();
+        expect(service.findFoldersService.findByIdWithPermissions).toHaveBeenCalledTimes(1);
+        expect(service.findFoldersService.findByIdWithPermissions).toHaveBeenCalledWith(destinationFolderDto.id);
+        expect(service.findResourcesService.findAllByIdsWithPermissions).not.toHaveBeenCalled();
+        expect(moveStrategyService.confirm).not.toHaveBeenCalled();
+        expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
+        expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
         expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });

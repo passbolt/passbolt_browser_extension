@@ -138,6 +138,9 @@ class MoveOneFolderService {
     if (folder.isOwner()) {
       foldersIdsToRetrievePermissions.unshift(folder.id);
     }
+    if (!foldersIdsToRetrievePermissions.length) {
+      return new FoldersCollection();
+    }
 
     return this.findFoldersService.findAllByIdsWithPermissions(foldersIdsToRetrievePermissions);
   }

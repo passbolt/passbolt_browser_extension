@@ -274,7 +274,7 @@ module.exports = function (grunt) {
         }, {
           // Fonts
           cwd: path.node_modules + 'passbolt-styleguide/src/fonts',
-          src: ['opensans-bold.woff', 'opensans-regular.woff', 'passbolt.ttf', 'inconsolata-regular.ttf'],
+          src: ['opensans-bold.woff', 'opensans-regular.woff', 'obfuscation-regular.otf', 'inconsolata-regular.ttf'],
           dest: path.build_web_accessible_resources + 'fonts',
           expand: true
         }, {

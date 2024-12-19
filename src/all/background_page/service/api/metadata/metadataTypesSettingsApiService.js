@@ -13,6 +13,9 @@
  */
 
 import AbstractService from "../abstract/abstractService";
+import {assertType} from "../../../utils/assertions";
+import MetadataTypesSettingsEntity
+  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 const METADATA_TYPES_SETTINGS_API_SERVICE_RESOURCE_NAME = "metadata/types/settings";
 
@@ -35,6 +38,19 @@ class MetadataTypesSettingsApiService extends AbstractService {
   async findSettings() {
     const apiResult = await this.apiClient.findAll();
     return apiResult.body;
+  }
+
+  /**
+   * Save the metadata types settings on the API.
+   * @param {MetadataTypesSettingsEntity} settings the settings to save
+   * @returns {Promise<Object>} Response body
+   * @throws {TypeError} If the settings property is not of MetadataTypesSettingsEntity type
+   * @public
+   */
+  async save(settings) {
+    assertType(settings, MetadataTypesSettingsEntity);
+    const response = await this.apiClient.create(settings.toDto());
+    return response.body;
   }
 }
 

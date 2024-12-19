@@ -136,7 +136,7 @@ classDiagram
 
         class GetOrFindMetadataTypesSettingsController {
             event "passbolt.metadata.get-or-find-metadata-types-settings"
-            +exec() Promise~MetdataTypesSettingsEntity~
+            +exec() Promise~MetadataTypesSettingsEntity~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -179,9 +179,6 @@ classDiagram
 
         class GetOrFindMetadataKeysService {
             +getOrFindAll() Promise~MetadataKeysCollection~
-%%            +getOrFindOneByIsLatest() Promise~MetadataKeyEntity~
-%%            +getOrFindOneById(uuid foreignKeyId) Promise~MetadataKeyEntity~
-%%            +getOrFindAllByIds(array~uuid~ foreignKeyIds) Promise~MetadataKeysCollection~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -227,6 +224,7 @@ classDiagram
 
         class MetadataTypesSettingsApiService {
             +findSettings() Promise~object~
+            +save(MetadataTypesSettingsEntity entity) Promise~object~
         }
 
         class MetadataTypesSettingsLocalStorage {
@@ -517,7 +515,7 @@ classDiagram
         }
     }
 
-    %% Resource controllers relationships
+%% Resource controllers relationships
     CreateResourceController*--CreateResourceService
     CreateResourceController*--GetPassphraseService
     ExportResourcesFileController*--FindResourcesService
@@ -539,7 +537,7 @@ classDiagram
     style ImportResourcesFileController fill:#D2E0FB
     style UpdateAllResourcesLocalStorageController fill:#D2E0FB
     style UpdateResourceController fill:#D2E0FB
-    %% Resource services relationships.
+%% Resource services relationships.
     CreateResourceService*--EncryptMetadataService
     CreateResourceService*--ResourceService
     CreateResourceService*--ResourcesLocalStorageService
@@ -555,14 +553,14 @@ classDiagram
     UpdateResourceService*--EncryptMetadataService
     UpdateResourceService*--ResourceService
     UpdateResourceService*--ResourcesLocalStorageService
-    %% Resource models relationships.
+%% Resource models relationships.
     style ResourceService fill:#DEE5D4
     style ResourcesLocalStorageService fill:#DEE5D4
 
-    %% Metadata controllers relationships
+%% Metadata controllers relationships
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
-    %% Metadata services relationships.
+%% Metadata services relationships.
     DecryptMetadataKeyService*--PassphraseStorageService
     DecryptMetadataService*--GetOrFindMetadataKeysService
     DecryptMetadataService*--GetOrFindSessionKeysService
@@ -586,7 +584,7 @@ classDiagram
     GetOrFindMetadataKeysService*--MetadataKeysSessionStorageService
     GetOrFindMetadataSettingsService*--FindAndUpdateMetadataSettingsService
     GetOrFindMetadataSettingsService*--MetadataTypesSettingsLocalStorage
-    %% Metadata models relationships.
+%% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
     style MetadataKeysSettingsLocalStorage fill:#DEE5D4
     style MetadataKeysSessionStorageService fill:#DEE5D4
@@ -594,7 +592,7 @@ classDiagram
     style MetadataTypesSettingsApiService fill:#DEE5D4
     style MetadataTypesSettingsLocalStorage fill:#DEE5D4
 
-    %% Session keys service relationships
+%% Session keys service relationships
     DecryptSessionKeysBundlesService*--PassphraseStorageService
     FindAndUpdateSessionKeysBundlesSessionStorageService*--FindSessionKeysService
     FindAndUpdateSessionKeysBundlesSessionStorageService*--SessionKeysBundlesSessionStorageService
@@ -605,11 +603,11 @@ classDiagram
     SaveSessionKeysService*--EncryptSessionKeysBundlesService
     SaveSessionKeysService*--SessionKeysBundlesApiService
     SaveSessionKeysService*--SessionKeysBundlesSessionStorageService
-    %% Session keys models relationships.
+%% Session keys models relationships.
     style SessionKeysBundlesApiService fill:#DEE5D4
     style SessionKeysBundlesSessionStorageService fill:#DEE5D4
 
-    %% Entities relationships
+%% Entities relationships
     MetadataKeyEntity*--MetadataPrivateKeysCollection
     MetadataKeysCollection*--MetadataKeyEntity
     MetadataPrivateKeysCollection*--MetadataPrivateKeyEntity
@@ -623,19 +621,19 @@ classDiagram
     SessionKeysBundleEntity*--SessionKeysBundleDataEntity
     SessionKeysBundleDataEntity*--SessionKeysCollection
 
-    %% Auth services relationship.
+%% Auth services relationship.
     style PassphraseStorageService fill:#DEE5D4
 
 
-    %% Share controllers relationships
+%% Share controllers relationships
     ShareResourcesController*--ShareResourceService
     style ShareResourcesController fill:#D2E0FB
-    %% Share services relationships.
+%% Share services relationships.
     ShareResourceService*--EncryptMetadataService
     ShareResourceService*--FindAndUpdateResourcesLocalStorageService
     ShareResourceService*--GetOrFindResourcesService
     ShareResourceService*--ResourceService
     ShareResourceService*--ShareService
-    %% Share models relationships.
-    style ShareService fill:#DEE5D4
+%% Share models relationships.
+    style ShareService fill:#DEE5D4j
 ```

@@ -1,5 +1,4 @@
 ```mermaid
-%%{init: {'theme':'neutral', 'layout': 'elk', 'elk': {'mergeEdges': true, 'nodePlacementStrategy': 'LINEAR_SEGMENTS'}}}%%
 classDiagram
 
     namespace ResourcesNs {
@@ -198,6 +197,10 @@ classDiagram
         class GetOrFindMetadataSettingsService {
             +getOrFindKeysSettings() Promise~MetadataKeysSettingsEntity~
             +getOrFindTypesSettings() Promise~MetadataTypesSettingsEntity~
+        }
+
+        class SaveMetadataSettingsService {
+            +saveTypesSettings(MetadataTypesSettingsEntity entity) Promise~MetadataTypesSettingsEntity~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -584,6 +587,8 @@ classDiagram
     GetOrFindMetadataKeysService*--MetadataKeysSessionStorageService
     GetOrFindMetadataSettingsService*--FindAndUpdateMetadataSettingsService
     GetOrFindMetadataSettingsService*--MetadataTypesSettingsLocalStorage
+    SaveMetadataSettingsService*--MetadataTypesSettingsApiService
+    SaveMetadataSettingsService*--MetadataTypesSettingsLocalStorage
 %% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
     style MetadataKeysSettingsLocalStorage fill:#DEE5D4
@@ -635,5 +640,5 @@ classDiagram
     ShareResourceService*--ResourceService
     ShareResourceService*--ShareService
 %% Share models relationships.
-    style ShareService fill:#DEE5D4j
+    style ShareService fill:#DEE5D4
 ```

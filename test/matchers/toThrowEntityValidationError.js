@@ -15,12 +15,12 @@ const getPropertyValueByPath = (obj, path) => path
   .split('.')
   .reduce((accumulator, key) => accumulator?.[key], obj);
 
-exports.toThrowEntityValidationError = function(received, propertyPath, validationRule, dto) {
+exports.toThrowEntityValidationError = async function(received, propertyPath, validationRule, dto) {
   const {printExpected, printReceived, matcherHint} = this.utils;
   let errorDetails;
 
   try {
-    received();
+    await received();
   } catch (error) {
     errorDetails = error.details;
   }

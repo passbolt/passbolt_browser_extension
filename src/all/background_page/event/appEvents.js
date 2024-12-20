@@ -13,16 +13,24 @@
 
 import GetOrganizationPolicyController from "../controller/accountRecovery/getOrganizationPolicyController";
 import User from "../model/user";
-import AccountRecoverySaveOrganizationPolicyController from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
-import AccountRecoveryValidatePublicKeyController from "../controller/accountRecovery/accountRecoveryValidatePublicKeyController";
-import AccountRecoveryValidateOrganizationPrivateKeyController from "../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController";
-import AccountRecoveryGetUserRequestsController from "../controller/accountRecovery/accountRecoveryGetUserRequestsController";
+import AccountRecoverySaveOrganizationPolicyController
+  from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
+import AccountRecoveryValidatePublicKeyController
+  from "../controller/accountRecovery/accountRecoveryValidatePublicKeyController";
+import AccountRecoveryValidateOrganizationPrivateKeyController
+  from "../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController";
+import AccountRecoveryGetUserRequestsController
+  from "../controller/accountRecovery/accountRecoveryGetUserRequestsController";
 import AccountRecoveryGetRequestController from "../controller/accountRecovery/accountRecoveryGetRequestController";
 import ReviewRequestController from "../controller/accountRecovery/reviewRequestController";
-import AccountRecoveryGenerateOrganizationKeyController from "../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController";
-import AccountRecoverySaveUserSettingsController from "../controller/accountRecovery/accountRecoverySaveUserSettingController";
-import HasUserPostponedUserSettingInvitationController from "../controller/accountRecovery/hasUserPostponedUserSettingInvitationController";
-import PostponeUserSettingInvitationController from "../controller/accountRecovery/postponeUserSettingInvitationController";
+import AccountRecoveryGenerateOrganizationKeyController
+  from "../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController";
+import AccountRecoverySaveUserSettingsController
+  from "../controller/accountRecovery/accountRecoverySaveUserSettingController";
+import HasUserPostponedUserSettingInvitationController
+  from "../controller/accountRecovery/hasUserPostponedUserSettingInvitationController";
+import PostponeUserSettingInvitationController
+  from "../controller/accountRecovery/postponeUserSettingInvitationController";
 import FileService from "../service/file/fileService";
 import WorkerService from "../service/worker/workerService";
 import TestSsoAuthenticationController from "../controller/sso/testSsoAuthenticationController";
@@ -37,12 +45,17 @@ import SavePasswordPoliciesController from "../controller/passwordPolicies/saveP
 import FindPasswordPoliciesController from "../controller/passwordPolicies/findPasswordPoliciesController";
 import ExportDesktopAccountController from "../controller/exportAccount/exportDesktopAccountController";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
-import FindUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/findUserPassphrasePoliciesController";
-import SaveUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/saveUserPassphrasePoliciesController";
+import FindUserPassphrasePoliciesController
+  from "../controller/userPassphrasePolicies/findUserPassphrasePoliciesController";
+import SaveUserPassphrasePoliciesController
+  from "../controller/userPassphrasePolicies/saveUserPassphrasePoliciesController";
 import SavePasswordExpirySettingsController from "../controller/passwordExpiry/savePasswordExpirySettingsController";
-import DeletePasswordExpirySettingsController from "../controller/passwordExpiry/deletePasswordExpirySettingsController";
-import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
+import DeletePasswordExpirySettingsController
+  from "../controller/passwordExpiry/deletePasswordExpirySettingsController";
+import GetOrFindPasswordExpirySettingsController
+  from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
+import SaveMetadataTypesController from "../controller/metadata/saveMetadataTypesSettingsController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -283,6 +296,18 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.metadata.get-or-find-metadata-types-settings', async requestId => {
     const controller = new GetOrFindMetadataTypesController(worker, requestId, apiClientOptions, account);
     await controller._exec();
+  });
+
+  /*
+   * Save metadata types settings.
+   *
+   * @listens passbolt.metadata.save-metadata-types-settings
+   * @param requestId {uuid} The request identifier
+   * @param dto {object} The metadata types settings dto
+   */
+  worker.port.on('passbolt.metadata.save-metadata-types-settings', async(requestId, dto) => {
+    const controller = new SaveMetadataTypesController(worker, requestId, apiClientOptions, account);
+    await controller._exec(dto);
   });
 };
 export const AppEvents = {listen};

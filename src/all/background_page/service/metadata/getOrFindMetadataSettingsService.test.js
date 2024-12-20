@@ -47,7 +47,7 @@ describe("GetOrFindMetadataSettingsService", () => {
     getOrFindMetadataSettingsService.metadataKeysSettingsLocalStorage.flush();
   });
 
-  describe("::getOrFindMetadataTypesSettings", () => {
+  describe("::getOrFindTypesSettings", () => {
     it("with empty storage, retrieves the metadata types settings from the API and store them into the local storage.", async() => {
       expect.assertions(3);
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
@@ -95,7 +95,7 @@ describe("GetOrFindMetadataSettingsService", () => {
     });
   });
 
-  describe("::getOrFindMetadataKeysSettings", () => {
+  describe("::getOrFindKeysSettings", () => {
     it("with empty storage, retrieves the metadata keys settings from the API and store them into the local storage.", async() => {
       expect.assertions(3);
       const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();

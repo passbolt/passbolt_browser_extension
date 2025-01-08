@@ -372,8 +372,17 @@ classDiagram
             -boolean props.allow_creation_of_v4_folders
             -boolean props.allow_creation_of_v4_tags
             -boolean props.allow_creation_of_v4_comments
+            -boolean props.allow_v5_v4_downgrade
+            -boolean props.allow_v5_v4_downgrade
             +createFromV4Default() MetadataTypesSettingsEntity
             +createFromDefault(?object data) MetadataTypesSettingsEntity
+            +get defaultResourceTypes(): string
+            +get allowCreationOfV5Resources(): boolean
+            +get allowCreationOfV4Resources(): boolean
+            +get isDefaultResourceTypeV5(): boolean
+            +get isDefaultResourceTypeV4(): boolean
+            +get allowV5V4Downgrade(): boolean
+            +get allowV4V5Upgrade(): boolean
         }
 
         class MetadataKeysSettingsEntity {

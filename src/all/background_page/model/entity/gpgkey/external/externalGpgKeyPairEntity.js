@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import ExternalGpgKeyEntity from "./externalGpgKeyEntity";
+import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 

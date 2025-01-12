@@ -14,7 +14,7 @@
 
 import GetKeyInfoController from "./getKeyInfoController";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {adaExternalPrivateGpgKeyEntityDto} from "../../model/entity/gpgkey/external/externalGpgKeyEntity.test.data";
+import {adaExternalPrivateGpgKeyEntityDto} from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity.test.data";
 
 describe("GetKeyInfoController", () => {
   it("Should return the key info.", async() => {

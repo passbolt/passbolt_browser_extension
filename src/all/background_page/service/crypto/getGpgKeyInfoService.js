@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
+import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import goog from "../../utils/format/emailaddress";
 import GpgKeyError from "../../error/GpgKeyError";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";

@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import ExternalGpgKeyPairEntity from "./externalGpgKeyPairEntity";
-import {ExternalGpgKeyEntityFixtures} from "./externalGpgKeyEntity.test.fixtures";
+import {ExternalGpgKeyEntityFixtures} from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity.test.fixtures";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 

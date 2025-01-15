@@ -21,6 +21,7 @@ class FindMetadataKeysService {
    * Constructor
    *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} account the user account
    * @public
    */
   constructor(apiClientOptions, account) {

@@ -318,8 +318,13 @@ classDiagram
             -string props.modified
             -string props.modified_by
             -string props.deleted
+            -string props.expired
             +get metadataPrivateKeys() MetadataPrivateKeysCollection
+            +get armoredKey() string
+            +get id() string
             +get created() string
+            +fingerprint() string
+            +get expired() string
         }
 
         class MetadataKeysCollection {

@@ -56,7 +56,7 @@ describe("FindMetadataKeysApiService", () => {
       expect(resultDto).toHaveLength(apiMetadataKeysCollection.length);
       expect(resultDto.hasEncryptedKeys()).toStrictEqual(false);
       expect(spyOnFindService).toHaveBeenCalledTimes(1);
-      expect(spyOnFindService).toHaveBeenCalledWith({});
+      expect(spyOnFindService).toHaveBeenCalledWith({}, {});
     });
 
     it("throws an error if the keys from the API is already decrypted", async() => {
@@ -105,6 +105,17 @@ describe("FindMetadataKeysApiService", () => {
 
       await expect(() => service.findAll(fakeContains)).rejects.toThrow(expectedError);
     });
+
+    it("throws an error if the given filters are not supported", async() => {
+      expect.assertions(1);
+
+      const service = new FindMetadataKeysService(apiClientOptions);
+      const filters = {wrongOne: true};
+
+      const expectedError = new Error("Unsupported filter parameter used, please check supported filters");
+
+      await expect(() => service.findAll({}, filters)).rejects.toThrow(expectedError);
+    });
   });
 
   describe('::findAllForSessionStorage', () => {
@@ -127,7 +138,7 @@ describe("FindMetadataKeysApiService", () => {
       expect(resultDto).toHaveLength(apiMetadataKeysCollection.length);
       expect(resultDto.hasEncryptedKeys()).toStrictEqual(false);
       expect(spyOnFindService).toHaveBeenCalledTimes(1);
-      expect(spyOnFindService).toHaveBeenCalledWith({metadata_private_keys: true});
+      expect(spyOnFindService).toHaveBeenCalledWith({metadata_private_keys: true}, {deleted: false});
     });
 
     it("throws an error if the keys from the API is already decrypted", async() => {

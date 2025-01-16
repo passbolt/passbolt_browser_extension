@@ -57,6 +57,9 @@ import GetOrFindPasswordExpirySettingsController
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 import SaveMetadataTypesController from "../controller/metadata/saveMetadataTypesSettingsController";
 import FindAllNonDeletedMetadataKeysController from "../controller/metadata/findAllNonDeletedMetadataKeysController";
+import FindMetadataKeysSettingsController
+  from "../controller/metadata/findMetadataKeysSettingsController";
+import FindMetadataTypesSettingsController from "../controller/metadata/findMetadataTypesSettingsController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -296,6 +299,29 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.metadata.find-all-non-deleted-metadata-keys', async requestId => {
     const controller = new FindAllNonDeletedMetadataKeysController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Get or find metadata keys settings.
+   *
+   * @listens passbolt.metadata.find-metadata-keys-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-metadata-keys-settings', async requestId => {
+    const controller = new FindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+
+  /*
+   * Get or find metadata types settings.
+   *
+   * @listens passbolt.metadata.find-metadata-types-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-metadata-types-settings', async requestId => {
+    const controller = new FindMetadataTypesSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 

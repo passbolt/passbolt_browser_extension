@@ -47,9 +47,9 @@ describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
   });
 
   describe("::findAndUpdateAll", () => {
-    it("should throw an error if the user passphrase is not set", async() => {
+    it("should throw an error if the user passphrase is not set and is required", async() => {
       expect.assertions(1);
-      const metadataKeysDto = defaultMetadataKeysDtos();
+      const metadataKeysDto = defaultMetadataKeysDtos(1, {}, {withMetadataPrivateKeys: true});
       jest.spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll").mockImplementation(() => metadataKeysDto);
 
       await expect(() => findAndUpdateKeysSessionStorageService.findAndUpdateAll()).rejects.toThrow(UserPassphraseRequiredError);

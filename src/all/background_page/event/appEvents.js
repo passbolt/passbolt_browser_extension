@@ -56,6 +56,7 @@ import GetOrFindPasswordExpirySettingsController
   from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 import SaveMetadataTypesController from "../controller/metadata/saveMetadataTypesSettingsController";
+import FindAllNonDeletedMetadataKeysController from "../controller/metadata/findAllNonDeletedMetadataKeysController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -286,6 +287,17 @@ const listen = function(worker, apiClientOptions, account) {
    *  Metadata events.
    * ==================================================================================
    */
+
+  /*
+   * Find all non deleted metadata keys.
+   *
+   * @listens passbolt.metadata.find-all-non-deleted-metadata-keys
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-all-non-deleted-metadata-keys', async requestId => {
+    const controller = new FindAllNonDeletedMetadataKeysController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
 
   /*
    * Get or find metadata types settings.

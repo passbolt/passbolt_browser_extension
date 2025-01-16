@@ -133,6 +133,11 @@ classDiagram
     %% Metadata controllers
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+        class FindAllNonDeletedMetadataKeysController {
+            event "passbolt.metadata.find-all-non-deleted-metadata-keys"
+            +exec() Promise~MetadataKeysCollection~
+        }
+
         class GetOrFindMetadataTypesSettingsController {
             event "passbolt.metadata.get-or-find-metadata-types-settings"
             +exec() Promise~MetadataTypesSettingsEntity~
@@ -174,6 +179,7 @@ classDiagram
         class FindMetadataKeysService {
             +findAll(object contains) Promise~MetadataKeysCollection~
             +findAllForSessionStorage() Promise~MetadataKeysCollection~
+            +findAllNonDeleted() Promise~MetadataKeysCollection~
         }
 
         class GetOrFindMetadataKeysService {
@@ -575,7 +581,9 @@ classDiagram
     style ResourcesLocalStorageService fill:#DEE5D4
 
 %% Metadata controllers relationships
+    FindAllNonDeletedMetadataKeysController*--FindMetadataKeysService
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
+    style FindAllNonDeletedMetadataKeysController fill:#D2E0FB
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
 %% Metadata services relationships.
     DecryptMetadataKeyService*--PassphraseStorageService

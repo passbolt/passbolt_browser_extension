@@ -67,6 +67,15 @@ class FindMetadataKeysService {
   findAllForSessionStorage() {
     return this.findAll({metadata_private_keys: true}, {deleted: false});
   }
+
+  /**
+   * Retrieve the all non deleted metadata keys from the API.
+   * @returns {Promise<MetadataKeysCollection>}
+   * @public
+   */
+  findAllNonDeleted() {
+    return this.findAll({}, {deleted: false});
+  }
 }
 
 export default FindMetadataKeysService;

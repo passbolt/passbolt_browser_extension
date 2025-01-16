@@ -26,6 +26,9 @@ import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {decryptedMetadataPrivateKeyDto, defaultMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 import {v4 as uuidv4} from "uuid";
+import {
+  defaultMetadataKeysDtos
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 
 describe("FindMetadataKeysApiService", () => {
   let apiClientOptions, account;
@@ -119,7 +122,7 @@ describe("FindMetadataKeysApiService", () => {
   });
 
   describe('::findAllForSessionStorage', () => {
-    it("retrieves the settings from API with the right contains", async() => {
+    it("retrieves the metadata keys from API with the right contains", async() => {
       expect.assertions(5);
 
       const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
@@ -175,6 +178,23 @@ describe("FindMetadataKeysApiService", () => {
       const service = new FindMetadataKeysService(apiClientOptions);
 
       await expect(() => service.findAllForSessionStorage()).rejects.toThrow(PassboltServiceUnavailableError);
+    });
+  });
+
+  describe('::findAllNonDeleted', () => {
+    it("retrieves metadata keys from API with the right filter", async() => {
+      expect.assertions(3);
+
+      const apiMetadataKeysCollection = defaultMetadataKeysDtos();
+      const service = new FindMetadataKeysService(apiClientOptions, account);
+      jest.spyOn(service, "findAll")
+        .mockImplementation(() => new MetadataKeysCollection(apiMetadataKeysCollection));
+
+      const metadataKeys = await service.findAllNonDeleted();
+
+      expect(metadataKeys).toBeInstanceOf(MetadataKeysCollection);
+      expect(metadataKeys).toHaveLength(apiMetadataKeysCollection.length);
+      expect(service.findAll).toHaveBeenCalledWith({}, {deleted: false});
     });
   });
 });

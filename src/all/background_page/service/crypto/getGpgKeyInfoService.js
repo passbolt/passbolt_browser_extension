@@ -17,7 +17,6 @@ import goog from "../../utils/format/emailaddress";
 import GpgKeyError from "../../error/GpgKeyError";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
-
 class GetGpgKeyInfoService {
   /**
    * Returns the information of the given key.

@@ -304,7 +304,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
       await expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
-    it("does not retrieve the passphrase the metadata private keys associated to the collection public keys are already decrypted", async() => {
+    it("does not retrieve the passphrase if the metadata private keys associated to the collection public keys are already decrypted", async() => {
       expect.assertions(1);
 
       jest.spyOn(PassphraseStorageService, "get");

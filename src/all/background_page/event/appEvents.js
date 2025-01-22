@@ -60,6 +60,7 @@ import FindAllNonDeletedMetadataKeysController from "../controller/metadata/find
 import FindMetadataKeysSettingsController
   from "../controller/metadata/findMetadataKeysSettingsController";
 import FindMetadataTypesSettingsController from "../controller/metadata/findMetadataTypesSettingsController";
+import GenerateMetadataPrivateKeyController from "../controller/metadata/generateMetadataPrivateKeyController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -313,6 +314,16 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec();
   });
 
+  /*
+   * Generate metadata key.
+   *
+   * @listens passbolt.metadata.generate-metadata-key
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.generate-metadata-key', async requestId => {
+    const controller = new GenerateMetadataPrivateKeyController(worker, requestId, account);
+    await controller._exec();
+  });
 
   /*
    * Get or find metadata types settings.

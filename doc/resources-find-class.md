@@ -138,6 +138,11 @@ classDiagram
             +exec() Promise~MetadataKeysCollection~
         }
 
+        class GenerateMetadataPrivateKeyController {
+            event "passbolt.metadata.generate-metadata-key"
+            +exec() Promise~ExternalGpgKeyPairEntity~
+        }
+
         class GetOrFindMetadataTypesSettingsController {
             event "passbolt.metadata.get-or-find-metadata-types-settings"
             +exec() Promise~MetadataTypesSettingsEntity~
@@ -180,6 +185,10 @@ classDiagram
             +findAll(object contains) Promise~MetadataKeysCollection~
             +findAllForSessionStorage() Promise~MetadataKeysCollection~
             +findAllNonDeleted() Promise~MetadataKeysCollection~
+        }
+
+        class GenerateMetadataKeyService {
+            +generateKey(string passphrase) Promise~ExternalGpgKeyPairEntity~
         }
 
         class GetOrFindMetadataKeysService {
@@ -315,6 +324,38 @@ classDiagram
     }
 
     namespace EntityCollectionNs {
+        class ExternalGpgKeyEntity {
+            -string props.armored_key
+            -string props.key_id
+            -array props.user_ids
+            -string props.fingerprint
+            -string props.expires
+            -string props.created
+            -string props.algorithm
+            -number props.length
+            -string props.curve
+            -boolean props.private
+            -boolean props.revoked
+            +get armoredKey() string
+            +get keyId() string
+            +get userIds() array
+            +get fingerprint() string
+            +get expires() string
+            +get isValid() boolean
+            +get created() string
+            +get algorithm() string
+            +get length() number
+            +get curve() string
+            +get revoked() boolean
+            +get private() boolean
+            +get isExpired() boolean
+        }
+
+        class ExternalGpgKeyPairEntity {
+            +get publicKey() ExternalGpgKeyEntity
+            +get privateKey() ExternalGpgKeyEntity
+        }
+
         class MetadataKeyEntity {
             -uuid props.id
             -string props.fingerprint
@@ -582,8 +623,11 @@ classDiagram
 
 %% Metadata controllers relationships
     FindAllNonDeletedMetadataKeysController*--FindMetadataKeysService
+    GenerateMetadataPrivateKeyController*--GenerateMetadataKeyService
+    GenerateMetadataPrivateKeyController*--GetPassphraseService
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
     style FindAllNonDeletedMetadataKeysController fill:#D2E0FB
+    style GenerateMetadataPrivateKeyController fill:#D2E0FB
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
 %% Metadata services relationships.
     DecryptMetadataKeyService*--PassphraseStorageService

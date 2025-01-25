@@ -171,11 +171,18 @@ classDiagram
         class DecryptMetadataPrivateKeyService {
             +decryptOne(MetadataPrivateKeyEntity entity, ?string passphrase) Promise
             +decryptAll(MetadataPrivateKeyCollection collection, ?string passphrase) Promise
+            +decryptAllFromMetadataKeysCollection(MetadataKeysCollection collection, ?string passphrase) Promise
         }
 
         class EncryptMetadataService {
             +encryptOneForForeignModel(Entity entity, ?string passphrase) Promise
             +encryptAllForForeignModels(Collection collection, ?string passphrase) Promise
+        }
+
+        class EncryptMetadataPrivateKeyService {
+            +encryptOne(MetadataPrivateKeyEntity metadataPrivateKey, openpgp.PrivateKey userPrivateKey) Promise
+            +encryptAll(MetadataPrivateKeyCollection metadataPrivateKeys, openpgp.PrivateKey userPrivateKey) Promise
+            +encryptAllFromMetadataKeyEntity(MetadataKeyEntity metadataKey, openpgp.PrivateKey userPrivateKey) Promise
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -521,6 +528,7 @@ classDiagram
             +set armoredKey(string armordKey) void
             +set data(string data) void
             +isDecrypted() boolean
+            +get userId() string
         }
 
         class MetadataPrivateKeyDataEntity {
@@ -856,7 +864,7 @@ classDiagram
     FindAndUpdateMetadataSettingsService*--MetadataKeysSettingsLocalStorage
     FindAndUpdateMetadataSettingsService*--FindMetadataSettingsService
     FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorage
-    FindMetadataKeysService*--DecryptMetadataKeyService
+    FindMetadataKeysService*--DecryptMetadataPrivateKeysService
     FindMetadataKeysService*--MetadataKeyApiService
     FindMetadataSettingsService*--MetadataKeysSettingsApiService
     FindMetadataSettingsService*--MetadataTypesSettingsApiService

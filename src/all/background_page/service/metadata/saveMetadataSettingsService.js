@@ -16,6 +16,10 @@ import MetadataTypesSettingsEntity
 import MetadataTypesSettingsApiService from "../api/metadata/metadataTypesSettingsApiService";
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
 import {assertType} from "../../utils/assertions";
+import MetadataKeysSettingsApiService from "../api/metadata/metadataKeysSettingsApiService";
+import MetadataKeysSettingsEntity
+  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSettingsLocalStorage";
 
 /**
  * The service aims to save metadata settings.
@@ -27,8 +31,25 @@ export default class SaveMetadataSettingsService {
    * @param {ApiClientOptions} apiClientOptions The api client options
    */
   constructor(account, apiClientOptions) {
+    this.metadataKeysSettingsApiService = new MetadataKeysSettingsApiService(apiClientOptions);
     this.metadataTypesSettingsApiService = new MetadataTypesSettingsApiService(apiClientOptions);
+    this.metadataKeysSettingsLocalStorage = new MetadataKeysSettingsLocalStorage(account);
     this.metadataTypesSettingsLocalStorage = new MetadataTypesSettingsLocalStorage(account);
+  }
+
+  /**
+   * Save the metadata keys settings to the API and update local storage with the latest version.
+   * @param {MetadataKeysSettingsEntity} settings The settings to save.
+   * @return {Promise<MetadataKeysSettingsEntity>}
+   * @throws {TypeError} if the `settings` argument is not of type MetadataKeysSettingsEntity
+   */
+  async saveKeysSettings(settings) {
+    assertType(settings, MetadataKeysSettingsEntity);
+    const savedSettingsDto = await this.metadataKeysSettingsApiService.save(settings);
+    const savedSettings = new MetadataKeysSettingsEntity(savedSettingsDto);
+    await this.metadataKeysSettingsLocalStorage.set(savedSettings);
+
+    return savedSettings;
   }
 
   /**

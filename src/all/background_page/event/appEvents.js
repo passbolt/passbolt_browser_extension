@@ -55,12 +55,13 @@ import DeletePasswordExpirySettingsController
 import GetOrFindPasswordExpirySettingsController
   from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
-import SaveMetadataTypesController from "../controller/metadata/saveMetadataTypesSettingsController";
+import SaveMetadataTypesSettingsController from "../controller/metadata/saveMetadataTypesSettingsController";
 import FindAllNonDeletedMetadataKeysController from "../controller/metadata/findAllNonDeletedMetadataKeysController";
 import FindMetadataKeysSettingsController
   from "../controller/metadata/findMetadataKeysSettingsController";
 import FindMetadataTypesSettingsController from "../controller/metadata/findMetadataTypesSettingsController";
 import GenerateMetadataPrivateKeyController from "../controller/metadata/generateMetadataPrivateKeyController";
+import SaveMetadataKeysSettingsController from "../controller/metadata/saveMetadataKeysSettingsController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -348,6 +349,18 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   /*
+   * Save metadata keys settings.
+   *
+   * @listens passbolt.metadata.save-metadata-keys-settings
+   * @param requestId {uuid} The request identifier
+   * @param dto {object} The metadata keys settings dto
+   */
+  worker.port.on('passbolt.metadata.save-metadata-keys-settings', async(requestId, dto) => {
+    const controller = new SaveMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec(dto);
+  });
+
+  /*
    * Save metadata types settings.
    *
    * @listens passbolt.metadata.save-metadata-types-settings
@@ -355,7 +368,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param dto {object} The metadata types settings dto
    */
   worker.port.on('passbolt.metadata.save-metadata-types-settings', async(requestId, dto) => {
-    const controller = new SaveMetadataTypesController(worker, requestId, apiClientOptions, account);
+    const controller = new SaveMetadataTypesSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec(dto);
   });
 };

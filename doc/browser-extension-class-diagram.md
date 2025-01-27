@@ -134,6 +134,11 @@ classDiagram
     %% Metadata controllers
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+        class CreateMetadataKeyController {
+            event "passbolt.metadata.create-key"
+            +exec() Promise~MetadataKeyEntity~
+        }
+
         class FindAllNonDeletedMetadataKeysController {
             event "passbolt.metadata.find-all-non-deleted-metadata-keys"
             +exec() Promise~MetadataKeysCollection~
@@ -168,7 +173,7 @@ classDiagram
             +decryptAllFromForeignModels(Collection collection, ?string passphrase, ?object options) Promise
         }
 
-        class DecryptMetadataPrivateKeyService {
+        class DecryptMetadataPrivateKeysService {
             +decryptOne(MetadataPrivateKeyEntity entity, ?string passphrase) Promise
             +decryptAll(MetadataPrivateKeyCollection collection, ?string passphrase) Promise
             +decryptAllFromMetadataKeysCollection(MetadataKeysCollection collection, ?string passphrase) Promise
@@ -179,7 +184,7 @@ classDiagram
             +encryptAllForForeignModels(Collection collection, ?string passphrase) Promise
         }
 
-        class EncryptMetadataPrivateKeyService {
+        class EncryptMetadataPrivateKeysService {
             +encryptOne(MetadataPrivateKeyEntity metadataPrivateKey, openpgp.PrivateKey userPrivateKey) Promise
             +encryptAll(MetadataPrivateKeyCollection metadataPrivateKeys, openpgp.PrivateKey userPrivateKey) Promise
             +encryptAllFromMetadataKeyEntity(MetadataKeyEntity metadataKey, openpgp.PrivateKey userPrivateKey) Promise
@@ -189,7 +194,11 @@ classDiagram
     %% Metadata Keys services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        class DecryptMetadataKeyService {
+        class CreateMetadataKeyService {
+            +create(ExternalGpgKeyPairEntity entity, string passphrase) MetadataKeyEntity
+        }
+
+        class DecryptMetadataPrivateKeysService {
             +decryptOne(MetadataPrivateKeyEntity entity, ?string passphrase) Promise~MetadataPrivateKeyEntity~
             +decryptAll(MetadataPrivateKeysCollection collection, ?string passphrase) Promise~MetadataPrivateKeysCollection~
             +decryptAllFromMetdataKeysCollection(MetadataKeysCollection collection, ?string passphrase) Promise~MetadataKeysCollection~
@@ -797,17 +806,17 @@ classDiagram
 
 %% Resource controllers relationships
     CreateResourceController*--CreateResourceService
-    CreateResourceController*--GetPassphraseService
+%%    CreateResourceController*--GetPassphraseService
     ExportResourcesFileController*--FindResourcesService
     ExportResourcesFileController*--ExportResourcesService
     FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
     FindResourcesForShareController*--FindResourcesService
     FindResourceDetailsController*--FindResourcesService
     FindAndUpdateResourcesLocalStorageService*--ResourcesLocalStorageService
-    ImportResourcesFileController*--GetPassphraseService
+%%    ImportResourcesFileController*--GetPassphraseService
     ImportResourcesFileController*--ImportResourcesService
     UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
-    UpdateResourceController*--GetPassphraseService
+%%    UpdateResourceController*--GetPassphraseService
     UpdateResourceController*--UpdateResourceService
     style CreateResourceController fill:#D2E0FB
     style ExportResourcesFileController fill:#D2E0FB
@@ -838,27 +847,34 @@ classDiagram
     style ResourcesLocalStorageService fill:#DEE5D4
 
 %% Metadata controllers relationships
+%%    CreateMetadataKeyController*--GetPassphraseService
+    CreateMetadataKeyController*--CreateMetadataKeyService
     FindAllNonDeletedMetadataKeysController*--FindMetadataKeysService
     GenerateMetadataPrivateKeyController*--GenerateMetadataKeyService
-    GenerateMetadataPrivateKeyController*--GetPassphraseService
+%%    GenerateMetadataPrivateKeyController*--GetPassphraseService
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
     SaveMetadataKeysSettingsController*--SaveMetadataSettingsService
     SaveMetadataTypesSettingsController*--SaveMetadataSettingsService
+    style CreateMetadataKeyController fill:#D2E0FB
     style FindAllNonDeletedMetadataKeysController fill:#D2E0FB
     style GenerateMetadataPrivateKeyController fill:#D2E0FB
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
     style SaveMetadataKeysSettingsController fill:#D2E0FB
     style SaveMetadataTypesSettingsController fill:#D2E0FB
 %% Metadata services relationships.
-    DecryptMetadataKeyService*--PassphraseStorageService
+    CreateMetadataKeyService*--EncryptMetadataPrivateKeysService
+    CreateMetadataKeyService*--FindUsersService
+    CreateMetadataKeyService*--GetOrFindMetadataSettingsService
+    CreateMetadataKeyService*--MetadataKeyApiService
+%%    DecryptMetadataPrivateKeysService*--PassphraseStorageService
     DecryptMetadataService*--GetOrFindMetadataKeysService
     DecryptMetadataService*--GetOrFindSessionKeysService
-    DecryptMetadataService*--PassphraseStorageService
+%%    DecryptMetadataService*--PassphraseStorageService
     DecryptMetadataService*--ResourcesLocalStorageService
     DecryptMetadataService*--SaveSessionKeysService
     EncryptMetadataService*--GetOrFindMetadataKeysService
     EncryptMetadataService*--GetOrFindMetadataSettingsService
-    EncryptMetadataService*--PassphraseStorageService
+%%    EncryptMetadataService*--PassphraseStorageService
     FindAndUpdateMetadataKeysSessionStorageService*--FindMetadataKeysService
     FindAndUpdateMetadataKeysSessionStorageService*--MetadataKeysSessionStorageService
     FindAndUpdateMetadataSettingsService*--MetadataKeysSettingsLocalStorage
@@ -886,7 +902,7 @@ classDiagram
     style MetadataTypesSettingsLocalStorage fill:#DEE5D4
 
 %% Session keys service relationships
-    DecryptSessionKeysBundlesService*--PassphraseStorageService
+%%    DecryptSessionKeysBundlesService*--PassphraseStorageService
     FindAndUpdateSessionKeysBundlesSessionStorageService*--FindSessionKeysService
     FindAndUpdateSessionKeysBundlesSessionStorageService*--SessionKeysBundlesSessionStorageService
     FindSessionKeysService*--DecryptSessionKeysBundlesService

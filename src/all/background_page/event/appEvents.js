@@ -62,6 +62,7 @@ import FindMetadataKeysSettingsController
 import FindMetadataTypesSettingsController from "../controller/metadata/findMetadataTypesSettingsController";
 import GenerateMetadataPrivateKeyController from "../controller/metadata/generateMetadataPrivateKeyController";
 import SaveMetadataKeysSettingsController from "../controller/metadata/saveMetadataKeysSettingsController";
+import CreateMetadataKeyController from "../controller/metadata/createMetadataKeyController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -369,6 +370,18 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.metadata.save-metadata-types-settings', async(requestId, dto) => {
     const controller = new SaveMetadataTypesSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec(dto);
+  });
+
+  /*
+   * Create metadata key.
+   *
+   * @listens passbolt.metadata.create-key
+   * @param requestId {uuid} The request identifier
+   * @param dto {object} The metadata key pair dto.
+   */
+  worker.port.on('passbolt.metadata.create-key', async(requestId, dto) => {
+    const controller = new CreateMetadataKeyController(worker, requestId, account, apiClientOptions);
     await controller._exec(dto);
   });
 };

@@ -306,6 +306,33 @@ classDiagram
         }
     }
 
+    namespace UsersNs {
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Users controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Users services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class FindUsersService {
+            +findAll(object contains, object filters, boolean ignoreInvalidEntity) Promise~UsersCollection~
+            +findAllActive() Promise~UsersCollection~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Users services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class UserService {
+            +get RESOURCE_NAME() string
+            +getSupportedContainOptions() array$
+            +getSupportedFilterOptions() array$
+            +findAll(object contains, object filters, object orders) Promise~array~
+        }
+    }
+
     namespace Auth-service {
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -324,6 +351,51 @@ classDiagram
     }
 
     namespace EntityCollectionNs {
+        class AccountRecoveryPrivateKeyPasswordsCollection {
+            +filterByForeignModel(string foreignModel)
+        }
+
+        class AccountRecoveryPrivateKeyPasswordEntity {
+            -uuid props.id
+            -uuid props.private_key_id
+            -string props.recipient_foreign_model
+            -string props.recipient_foreign_key
+            -string props.recipient_fingerprint
+            -string props.data
+            +get id() string
+            +get privateKeyId() string
+            +get recipientForeignKey() string
+            +get data() string
+            +get recipientForeignModel() string
+            +get recipientFingerprint() string
+        }
+
+        class AccountRecoveryUserSettingEntity {
+            -uuid props.id
+            -uuid props.user_id
+            -string props.status
+            -string props.created
+            -string props.created_by
+            -string props.modified
+            -string props.modified_by
+            -AccountRecoveryPrivateKeyEntity _account_recovery_private_key
+            +get status() string
+            +get isApproved() boolean
+            +get isRejected() boolean
+            +get accountRecoveryPrivateKey() accountRecoveryPrivateKey
+        }
+
+        class AvatarEntity {
+            -uuid props.id
+            -string props.created
+            -string props.modified
+            +get id() string
+            +get urlMedium() string
+            +get urlSmall() string
+            +get created() string
+            +get modified() string
+        }
+
         class ExternalGpgKeyEntity {
             -string props.armored_key
             -string props.key_id
@@ -354,6 +426,47 @@ classDiagram
         class ExternalGpgKeyPairEntity {
             +get publicKey() ExternalGpgKeyEntity
             +get privateKey() ExternalGpgKeyEntity
+        }
+
+        class GpgkeyEntity {
+            -uuid props.id
+            -uuid props.user_id
+            -string props.fingerprint
+            -string props.armored_key
+            -boolean props.deleted
+            -string props.type
+            -string props.uid
+            -integer props.bits
+            -string props.key_created
+            -string props.expires
+            -string props.created
+            -string props.modified
+            +get id() string
+            +get userId() string
+            +get armoredKey() string
+            +get fingerprint() boolean
+            +get created() string
+            +get modified() string
+            +get isDeleted() boolean
+        }
+
+        class GroupsUsersCollection {
+            +getById(string id) GroupUserEntity
+            +getGroupUserByUserId(string userId) GroupUserEntity
+        }
+
+        class GroupUserEntity {
+            -uuid props.id
+            -uuid props.user_id
+            -uuid props.group_id
+            -boolean props.is_admin
+            -string props.created
+            +get id() string
+            +get userId() string
+            +get groupId() string
+            +get isAdmin() boolean
+            +get created() string
+            +set id(string id)
         }
 
         class MetadataKeyEntity {
@@ -445,6 +558,36 @@ classDiagram
             +createFromDefault(?object data) MetadataKeysSettingsEntity
         }
 
+        class PendingAccountRecoveryRequestEntity {
+            -uuid props.id
+            -string props.status
+            -string props.created
+            -string props.created_by
+            -string props.modified
+            -string props.modified_by
+            +get id() string
+            +get status() string
+        }
+
+        class ProfileEntity {
+            -uuid props.id
+            -uuid props.user_id
+            -string props.first_name
+            -string props.last_name
+            -string props.created
+            -string props.modified
+            -AvatarEntity _avatar
+            +get id() string
+            +get name() string
+            +get firstName() string
+            +get lastName() string
+            +get userId() string
+            +get isActive() boolean
+            +get created() string
+            +get modified() string
+            +get avatar() AvatarEntity
+        }
+
         class ResourceEntity {
             -uuid props.id
             -uuid props.resource_type_id
@@ -506,6 +649,20 @@ classDiagram
             +get version() string
         }
 
+        class RoleEntity {
+            -uuid props.id
+            -string props.name
+            -string props.description
+            -string props.created
+            -string props.modified
+            +get id() string
+            +get name() string
+            +get description() string
+            +get created() string
+            +get modified() string
+            +get isAdmin() boolean
+        }
+
         class SecretsCollection {
         }
 
@@ -548,6 +705,44 @@ classDiagram
             -SessionKeysCollection _session_keys
             +get sessionKeys() SessionKeysCollection
             +set sessionKeys(SessionKeysCollection collection)
+        }
+
+        class UserEntity {
+            -uuid props.id
+            -string props.username
+            -boolean props.active
+            -boolean props.deleted
+            -boolean props.disabled
+            -string props.created
+            -string props.modified
+            -string props.last_logged_in
+            -boolean props.is_mfa_enabled
+            -string props.locale
+            -RoleEntity _role
+            -ProfileEntity _profile
+            -GpgkeyEntity _gpgkey
+            -GroupsUsersCollection _groups_users
+            -AccountRecoveryUserSettingEntity _account_recovery_user_setting
+            -PendingAccountRecoveryRequestEntity _pending_account_recovery_request
+            +get id() string
+            +get roleId() string
+            +get username() string
+            +get isActive() boolean
+            +get isDeleted() boolean
+            +get created() string
+            +get modified() string
+            +get lastLoggedIn() string
+            +get locale() string
+            +get profile() ProfileEntity
+            +get role() RoleEntity
+            +get gpgkey() GpgkeyEntity
+            +get groupsUsers() GroupsUsersCollection
+            +get accountRecoveryUserSetting() AccountRecoveryUserSettingEntity
+            +get pendingAccountRecoveryUserRequest() AccountRecoveryRequestEntity
+            +set locale(string locale)
+        }
+
+        class UsersCollection {
         }
     }
 
@@ -678,12 +873,24 @@ classDiagram
     style SessionKeysBundlesApiService fill:#DEE5D4
     style SessionKeysBundlesSessionStorageService fill:#DEE5D4
 
+%% User controllers relationships
+%% User services relationships.
+    FindUsersService*--UserService
+%% Resource models relationships.
+    style UserService fill:#DEE5D4
+
 %% Entities relationships
+    AccountRecoveryPrivateKeyPasswordsCollection*--AccountRecoveryPrivateKeyPasswordEntity
+    AccountRecoveryUserSettingEntity*--AccountRecoveryPrivateKeyPasswordsCollection
+    GroupsUsersCollection*--GroupUserEntity
     MetadataKeyEntity*--MetadataPrivateKeysCollection
     MetadataKeysCollection*--MetadataKeyEntity
     MetadataPrivateKeysCollection*--MetadataPrivateKeyEntity
+    MetadataPrivateKeyEntity*--MetadataPrivateKeyDataEntity
+    ProfileEntity*--AvatarEntity
     ResourceEntity*--MetadataKeyEntity
     ResourceEntity*--ResourceTypeEntity
+    ResourceEntity*--SecretsCollection
     ResourceTypesCollection*--ResourceTypeEntity
     ResourcesCollection*--ResourceEntity
     SecretsCollection*--SecretEntity
@@ -691,10 +898,16 @@ classDiagram
     SessionKeysBundlesCollection*--SessionKeysBundleEntity
     SessionKeysBundleEntity*--SessionKeysBundleDataEntity
     SessionKeysBundleDataEntity*--SessionKeysCollection
+    UsersCollection*--UserEntity
+    UserEntity*--AccountRecoveryUserSettingEntity
+    UserEntity*--GpgkeyEntity
+    UserEntity*--GroupsUsersCollection
+    UserEntity*--PendingAccountRecoveryRequestEntity
+    UserEntity*--ProfileEntity
+    UserEntity*--RoleEntity
 
 %% Auth services relationship.
     style PassphraseStorageService fill:#DEE5D4
-
 
 %% Share controllers relationships
     ShareResourcesController*--ShareResourceService

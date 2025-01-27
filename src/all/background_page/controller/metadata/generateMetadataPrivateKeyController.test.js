@@ -33,7 +33,7 @@ describe("GenerateMetadataPrivateKeyController", () => {
 
   describe("::exec", () => {
     it("generates a metadata key", async() => {
-      expect.assertions(2);
+      expect.assertions(3);
 
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockResolvedValue(pgpKeys.ada.passphrase);
       jest.spyOn(controller.generateMetadataKeyService, "generateKey");
@@ -41,6 +41,7 @@ describe("GenerateMetadataPrivateKeyController", () => {
       const keyPair = await controller.exec();
 
       expect(keyPair).toBeInstanceOf(ExternalGpgKeyPairEntity);
+      expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalled();
       expect(controller.generateMetadataKeyService.generateKey).toHaveBeenCalledWith(pgpKeys.ada.passphrase);
     });
 

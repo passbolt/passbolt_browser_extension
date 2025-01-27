@@ -14,6 +14,7 @@
 
 import {assertType} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
+import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 
 const METADATA_KEYS_API_SERVICE_RESOURCE_NAME = "metadata/keys";
 
@@ -48,6 +49,21 @@ class MetadataKeysApiService extends AbstractService {
     return [
       'deleted',
     ];
+  }
+
+  /**
+   * Create a metadata key using Passbolt API
+   *
+   * @param {MetadataKeyEntity} metadataKey The metadata key to create
+   * @returns {Promise<*>} Response body
+   * @throws {TypeError} if the `metadataKey` argument is not of type MetadataKeyEntity
+   * @public
+   */
+  async create(metadataKey) {
+    assertType(metadataKey, MetadataKeyEntity);
+    const data = metadataKey.toDto({metadata_private_keys: true});
+    const response = await this.apiClient.create(data);
+    return response.body;
   }
 
   /**

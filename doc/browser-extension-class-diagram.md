@@ -1,4 +1,5 @@
 ```mermaid
+
 classDiagram
 
     namespace ResourcesNs {
@@ -148,6 +149,16 @@ classDiagram
             +exec() Promise~MetadataTypesSettingsEntity~
         }
 
+        class SaveMetadataKeysSettingsController {
+            event "passbolt.metadata.save-metadata-keys-settings"
+            +exec() Promise~MetadataKeysSettingsEntity~
+        }
+
+        class SaveMetadataTypesSettingsController {
+            event "passbolt.metadata.save-metadata-types-settings"
+            +exec() Promise~MetadataTypesSettingsEntity~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -215,7 +226,8 @@ classDiagram
         }
 
         class SaveMetadataSettingsService {
-            +saveTypesSettings(MetadataTypesSettingsEntity entity) Promise~MetadataTypesSettingsEntity~
+            +saveKeysSettings(MetadataKeysSettingsEntity settings) Promoise~MetadataKeysSettingsEntity~
+            +saveTypesSettings(MetadataTypesSettingsEntity settings) Promise~MetadataTypesSettingsEntity~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -238,6 +250,7 @@ classDiagram
 
         class MetadataKeysSettingsApiService {
             +findSettings() Promise~object~
+            +save(MetadataSaveSettingsEntity entity) Promise~object~
         }
 
         class MetadataTypesSettingsApiService {
@@ -821,9 +834,13 @@ classDiagram
     GenerateMetadataPrivateKeyController*--GenerateMetadataKeyService
     GenerateMetadataPrivateKeyController*--GetPassphraseService
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
+    SaveMetadataKeysSettingsController*--SaveMetadataSettingsService
+    SaveMetadataTypesSettingsController*--SaveMetadataSettingsService
     style FindAllNonDeletedMetadataKeysController fill:#D2E0FB
     style GenerateMetadataPrivateKeyController fill:#D2E0FB
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
+    style SaveMetadataKeysSettingsController fill:#D2E0FB
+    style SaveMetadataTypesSettingsController fill:#D2E0FB
 %% Metadata services relationships.
     DecryptMetadataKeyService*--PassphraseStorageService
     DecryptMetadataService*--GetOrFindMetadataKeysService
@@ -850,6 +867,8 @@ classDiagram
     GetOrFindMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     SaveMetadataSettingsService*--MetadataTypesSettingsApiService
     SaveMetadataSettingsService*--MetadataTypesSettingsLocalStorage
+    SaveMetadataSettingsService*--MetadataKeysSettingsApiService
+    SaveMetadataSettingsService*--MetadataKeysSettingsLocalStorage
 %% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
     style MetadataKeysSettingsLocalStorage fill:#DEE5D4

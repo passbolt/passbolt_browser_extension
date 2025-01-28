@@ -24,6 +24,8 @@ import MetadataTypesSettingsApiService from "./metadataTypesSettingsApiService";
 import {mockApiResponseError} from "passbolt-styleguide/test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
+import MetadataTypesSettingsEntity
+  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 describe("MetadataTypesSettingsApiService", () => {
   let apiClientOptions;
@@ -62,6 +64,33 @@ describe("MetadataTypesSettingsApiService", () => {
       const service = new MetadataTypesSettingsApiService(apiClientOptions);
 
       await expect(() => service.findSettings()).rejects.toThrow(PassboltServiceUnavailableError);
+    });
+  });
+
+  describe('::save', () => {
+    it("Save the settings on the API.", async() => {
+      expect.assertions(2);
+
+      const settingsDto = defaultMetadataTypesSettingsV50FreshDto();
+      const settings = new MetadataTypesSettingsEntity(settingsDto);
+      fetch.doMockOnceIf(/metadata\/types\/settings/, async req => {
+        expect(req.method).toEqual("POST");
+        const reqPayload = await req.json();
+        return mockApiResponse(defaultMetadataTypesSettingsV50FreshDto(reqPayload));
+      });
+
+      const service = new MetadataTypesSettingsApiService(apiClientOptions);
+      const resultDto = await service.save(settings);
+
+      expect(resultDto).toEqual(expect.objectContaining(settingsDto));
+    });
+
+    it("throws an invalid parameter error if the settings parameter is not valid", async() => {
+      expect.assertions(1);
+
+      const service = new MetadataTypesSettingsApiService(apiClientOptions);
+
+      await expect(() => service.save(42)).rejects.toThrow(TypeError);
     });
   });
 });

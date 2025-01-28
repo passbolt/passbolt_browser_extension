@@ -50,7 +50,7 @@ class DecryptMetadataPrivateKeysService {
 
     const message = await OpenpgpAssertion.readMessageOrFail(metadataPrivateKeyEntity.data);
 
-    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+    passphrase = passphrase || await this.getPassphraseFromSessionStorageOrFail();
 
     const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     const decryptedMessage = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey);
@@ -74,7 +74,7 @@ class DecryptMetadataPrivateKeysService {
   async decryptAll(metadataPrivateKeysCollection, passphrase = null) {
     assertType(metadataPrivateKeysCollection, MetadataPrivateKeysCollection, "The given collection is not of the type MetadataPrivateKeysCollection");
 
-    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+    passphrase = passphrase || await this.getPassphraseFromSessionStorageOrFail();
 
     const items = metadataPrivateKeysCollection.items;
     for (let i = 0; i < items.length; i++) {
@@ -88,32 +88,35 @@ class DecryptMetadataPrivateKeysService {
    * and mutate all metadata private key entities with their decrypted result.
    *
    * @param {MetadataKeysCollection} metadataKeysCollection the metadata keys collection to decrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
    * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.
-   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
+   * @throws {UserPassphraseRequiredError} if metadata private keys decryption is required and the `passphrase` is not
+   *   given and cannot be retrieved from the session storage.
    */
   async decryptAllFromMetadataKeysCollection(metadataKeysCollection, passphrase = null) {
     assertType(metadataKeysCollection, MetadataKeysCollection, "The given collection is not of the type MetadataKeysCollection");
 
-    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
-
     const items = metadataKeysCollection.items;
     for (let i = 0; i < items.length; i++) {
-      const metadataKeysCollection = items[i].metadataPrivateKeys;
-      await this.decryptAll(metadataKeysCollection, passphrase);
+      const metadataPrivateKeysCollection = items[i].metadataPrivateKeys;
+      if (!metadataPrivateKeysCollection || !metadataPrivateKeysCollection.length || !metadataKeysCollection?.hasEncryptedKeys()) {
+        continue;
+      }
+      passphrase = passphrase || await this.getPassphraseFromSessionStorageOrFail();
+      await this.decryptAll(metadataPrivateKeysCollection, passphrase);
     }
   }
 
   /**
-   * Retrieve the user passphrase from the local storage or fail.
+   * Retrieve the user passphrase from the session storage or fail.
    *
    * @returns {Promise<string>}
-   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
+   * @throws {UserPassphraseRequiredError} if the `passphrase` cannot be retrieved.
    * @private
    */
-  async getPassphraseFromLocalStorageOrFail() {
+  async getPassphraseFromSessionStorageOrFail() {
     const passphrase = await PassphraseStorageService.get();
     if (!passphrase) {
       throw new UserPassphraseRequiredError();

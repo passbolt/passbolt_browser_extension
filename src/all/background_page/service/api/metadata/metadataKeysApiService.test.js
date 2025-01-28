@@ -22,6 +22,7 @@ import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/Pass
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 import MetadataKeysApiService from "./metadataKeysApiService";
+import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 
 describe("MetadataKeysApiService", () => {
   let apiClientOptions, account;
@@ -62,6 +63,37 @@ describe("MetadataKeysApiService", () => {
       const service = new MetadataKeysApiService(apiClientOptions);
 
       await expect(() => service.findAll()).rejects.toThrow(PassboltServiceUnavailableError);
+    });
+  });
+
+  describe('::create', () => {
+    it("Create a metadata key on the API.", async() => {
+      expect.assertions(5);
+
+      const dto = defaultMetadataKeyDto({}, {withMetadataPrivateKeys: true});
+      const metadataKey = new MetadataKeyEntity(dto);
+      let reqPayload;
+      fetch.doMockOnceIf(/metadata\/keys/, async req => {
+        expect(req.method).toEqual("POST");
+        reqPayload = await req.json();
+        return mockApiResponse(defaultMetadataKeyDto(reqPayload));
+      });
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      const resultDto = await service.create(metadataKey);
+
+      expect(resultDto).toEqual(expect.objectContaining(dto));
+      expect(reqPayload).toEqual(expect.objectContaining(dto));
+      expect(reqPayload.metadata_private_keys).not.toBeUndefined();
+      expect(reqPayload.metadata_private_keys).toEqual(dto.metadata_private_keys);
+    });
+
+    it("throws an invalid parameter error if the metadata key parameter is not valid", async() => {
+      expect.assertions(1);
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+
+      await expect(() => service.create(42)).rejects.toThrow(TypeError);
     });
   });
 });

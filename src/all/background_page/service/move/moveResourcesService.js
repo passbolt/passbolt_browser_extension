@@ -226,6 +226,7 @@ class MoveResourcesService {
     for (const resource of resources) {
       this.progressService.updateStepMessage(i18n.t('Moving {{name}}', {name: resource.metadata.name}));
       await this.moveApiService.moveResource(resource.id, destinationFolderId);
+      resource.folderParentId = destinationFolderId;
     }
 
     await this.resourceModel.updateCollection(resources);

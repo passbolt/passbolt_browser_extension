@@ -56,6 +56,7 @@ import GetOrFindPasswordExpirySettingsController
   from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 import SaveMetadataTypesController from "../controller/metadata/saveMetadataTypesSettingsController";
+import GetCsrfTokenController from "../controller/auth/getCsrfTokenController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -308,6 +309,21 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.metadata.save-metadata-types-settings', async(requestId, dto) => {
     const controller = new SaveMetadataTypesController(worker, requestId, apiClientOptions, account);
     await controller._exec(dto);
+  });
+
+  /*
+   * ==================================================================================
+   *  Auth events.
+   * ==================================================================================
+   */
+
+  /**
+   * Get the CSRF token from
+   */
+  worker.port.on('passbolt.auth.get-csrf-token', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new GetCsrfTokenController(worker, requestId, apiClientOptions);
+    await controller._exec();
   });
 };
 export const AppEvents = {listen};

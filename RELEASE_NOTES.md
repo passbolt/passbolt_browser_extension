@@ -1,55 +1,49 @@
-Song: https://youtu.be/pTrNdtFQbek?si=xtA4tlI08dYdKajJ
+Song: https://youtu.be/3RmQTYLD398?si=Eye1bVyIM2DTax2v
 
-Passbolt v4.10.2 is part of a long series of maintenance updates aimed at laying the groundwork for the upcoming v5 release and addressing bugs reported by the community. This update ensures the browser extension is fully compatible with the new v5 resource formats, allowing developers to prepare their integrations under the best possible conditions.
+Passbolt v4.11.0 introduces beta support for encrypted metadata in the administration settings, laying groundwork for the upcoming v5 release and its new resource format. This beta feature allows developers and integrators to explore and adapt their systems ahead of the transition.
 
-Thank you to the community for your reports.
+This release also resolves a security issue where an attacker could modify the Passbolt URL in certain emails if an administrator’s configuration was invalid. Additionally, role-based access control is now enforced for the “Copy to Clipboard” feature in the browser extension. Vulnerabilities in dependencies—though not directly impacting Passbolt—have been addressed as well.
+
+As one of the final updates in the v4 series, this version prepares administrators for v5. While v4.11.0 does not require PHP 8.2, v5 will. We recommend beginning to plan or upgrade PHP to ensure a smooth transition. If a server migration is needed, please consult the online documentation.
+
+Thank you to the community for your feedback and support.
 
 ### Added
-PB-35706: WP3-3.7 Webapp EditStandaloneTotp component updates resources of type v5
-PB-35741: WP3-5.5 Export resources of type v5
-PB-35743: WP3-5.4 Migrate export resources controller logic into a dedicated service
-PB-35753: WP3-6.3 Migrate update group controller logic into a dedicated service
-PB-35771: WP3-8.1 Implement SessionKeyEntity entity to support session key
-PB-35772: WP3-8.2 Implement SessionKeysCollection collection to support collection of session keys
-PB-35773: WP3-8.3 Implement SessionKeysBundleEntity entity to support persisted collection session keys as stored on the API or local storage
-PB-35857: WP3-8.9 Implement SessionKeysBundlesSessionStorageService to store and retrieve session keys bundles from session storage
-PB-35858: WP3-8.4 Implement SessionKeysBundlesCollection collection to support collection of session keys bundle entity
-PB-35862: WP3-8.5 Implement decryptOne on DecryptSessionKeysBundles service to decrypt a session key bundle
-PB-35863: WP3-8.6 Implement decryptAll on DecryptSessionKeysBundlesService service to decrypt a sessions keys bundles collection
-PB-35864: WP3-8.7 Implement findAll on SessionKeysBundlesApiService to retrieve session keys bundles from the API
-PB-35867: WP3-8.8 Implement findAllBundles on FindSessionKeysService to retrieve sessions keys bundles from the API
-PB-35869: WP3-8.10 Implement findAndUpdateAllBundles on FindAndUpdateSessionKeysSessionStorageService to retrieve session keys bundles from the API and store them in the session storage
-PB-35876: WP3-8.11 Implement getOrFindAllBundles on GetOrFindSessionKeysService to retrieve session keys from store or from the API and store them in the session storage
-PB-35877: WP3-8.12 Implement getOrFindAllByForeignModelAndForeignIds on GetOrFindSessionKeysService to retrieve session keys from storage or from the API and store them in the session storage
-PB-35878: WP3-8.20 DecryptMetadataService should use the session keys when decrypting metadata of a collection of resources
-PB-35879: WP3-8.13 Implement decryptWithSessionKey on DecryptMessageService
-PB-35881: WP3-8.14 Implement GetSessionKeyService crypto service
-PB-35886: WP3-8.15 Implement create on SessionKeysBundlesApiService to create a session keys bundle on the API
-PB-35887: WP3-8.16 Implement delete on SessionKeysBundlesApiService to delete a session keys bundle on the API
-PB-35888: WP3-8.17 Implement update on SessionKeysBundlesApiService to update a session keys bundle on the API
-PB-35889: WP3-8.18 Implement encryptOne on EncryptSessionKeysBundlesService to encrypt session keys bundle session keys prior to persist the data
-PB-35890: WP3-8.19 Implement save on SaveSessionKeysService to persist sessions keys on API
-PB-35948: WP3-8.21 Implement SessionKeysBundleDataEntity entity to support persisted collection decrypted session keys bundle
-PB-36286: WP3-6.7 ShareDialog should not have to share resources by passing resources and all its details to the service worker
-PB-36509: WP3-6.5 Migrate move resource controller logic into a dedicated service
-PB-36511: WP3-6.8 Migrate share folder logic from controller/share model to service
-PB-36513: WP3-6.10 Migrate move folder controller logic into a dedicated service
-PB-36520: WP3-8.22 DecryptMetadataService should persists session keys changes after a decryptAllFromForeignModels is performed
-PB-36522: WP3-1.1 Remember the passphrase for a minimum default period after sign-in to allow smooth decryption of the metadata
-PB-36523: WP3-1.2 Updating resources local storage requiring user passphrase should request the user passphrase if not present in the session storage
-PB-36559: WP3-6.8.1 Implement findFoldersService findAllByIds to support request batch splitting
-PB-36560: WP3-6.8.2 Implement getOrFindFoldersService to retrieve folders from local storage or update if with API
-PB-36561: WP3-6.8.3 Implement findByIdsWithPermissions on findResourcesService and findFoldersService
-PB-36583: WP3-8.4.1 Add same user id build rules for SessionKeysBundlesCollection
-PB-36598: WP3-2.21 Validate GPG armored message to support iOS format
-PB-36897: WP4-1.2 Migration Storybook new CSF format
-PB-36945: WP3-8.24 GetOrFindSessionKeys getOrFindAll shouldn't crash if no sessions keys bundle is found
-
-### Security
-PB-36967: Upgrade vulnerable library cross-spawn
+PB-37669: WP5-1.1 Implement save method in ServiceWorker
+PB-37670: WP5-1.2 Implement SaveMetadataSettingsService in the Service Worker to handle saving of metadata types settings
+PB-37671: WP5-1.3 Implement SaveMetadataTypesSettingsController in the Service Worker to expose metadata types settings save functionality to the content code
+PB-37672: WP5-1.4 Implement MetadataSettingsBextService in the Content Code to handle Service Worker requests that handles metadata types settings
+PB-37673: WP5-1.5 Add MetadataTypesSettingsEntity in the Content Code to support the metadata types settings form data
+PB-37676: WP5-1.6 Implement DisplayContentTypesMetadataAdministrationActions in the content Code to support content types metadata administration actions
+PB-37677: WP5-1.7 Implement DisplayContentTypesMetadataAdministration in the Content Code to display the metadata content types administration form
+PB-38019: WP5-1.8 Implement entity v2 required getter, setter, and comparison function to handle form data
+PB-38020: WP5-1.9 Add allow_v4_v5_upgrade property to metadata types settings entity
+PB-38021: WP5-1.10 Implement verifyDataHealth on MetadataTypesSettingsFormEntity to verify the settings health and help prevent problematic situations
+PB-38022: WP5-2.2 Metadata keys collection shouldn’t try to decrypt metadata private key that are not encrypted
+PB-38093: WP5-2.1 Make ExternalGpgKeyEntity and ExternalGpgCollection accessible to the content code
+PB-38105: WP5-2.3 Add support of expired on metadata key entity
+PB-38106: WP5-2.4 Find all metadata keys for session storage should not retrieve deleted keys
+PB-38108: WP5-2.5 Apply style on content types encrypted metadata administration screen
+PB-38111: WP5-2.6 Implement MetadataKeysServiceWorkerService in the Content Code to request the Service Worker to retrieve metadata keys
+PB-38121: WP5-2.7 Implement findKeysSettings in MetadataSettingsServiceWorkerService in the Content Code to request the Service Worker to retrieve metadata keys settings
+PB-38124: WP5-2.8 Implement GpgServiceWorkerService in the Content Code to request the Service Worker and retrieve gpg keys info
+PB-38135: WP5-2.9 Implement DisplayContentTypeMetadataKeysAdministration component to read metadata keys settings
+PB-38186: WP5-2.11 Make ExternalGpgKeyPairEntity accessible to the content code
+PB-38194: WP5-2.10 Implement generate function on MetadataKeysServiceWorkerService to support new metadata key generation in content types metadata keys administration page
+PB-38198: WP5-2.12 As an administrator I can generate metadata key when there is none yet active
+PB-38201: WP5-2.13 Implement findAll and findAllActive on findUsersService to retrieve respectively all users and only active users
+PB-38258: WP5-2.14 Implement saveKeysSettings function on MetadataSettingsServiceWorkerService to save metadata keys settings in the content types metadata keys administration page
+PB-38259: WP5-2.15 Implement EncryptMetadataPrivateKeysService to encrypt metadata private key data
+PB-38260: WP5-2.16 Implement save capability on the metadata keys settings administration page
 
 ### Fixed
-PB-36501: GITHUB Fix share dialog autocomplete sorting
+PB-37682: URI not stored when password is weak with the quick access
+PB-38125: Display auto-fill CTA when the browsed page does not display its iframes
+
+### Security
+PB-37706: Fix RBAC preview and copying should no be allowed after group filter
+PB-38310: Upgrade i18next-parser undici dependency
 
 ### Maintenance
-PB-36972: Update progress service to propose an API to control step count to finish
+PB-38027: Remove .page.js from styleguide code coverage
+PB-38243: Upgrade playwright dependency and fix CI

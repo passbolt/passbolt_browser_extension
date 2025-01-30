@@ -59,8 +59,8 @@ class ExportResourcesFileController {
     const exportResourcesFileEntity = new ExportResourcesFileEntity(exportResourcesFileDto);
     this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t("Generate file"));
     try {
-      await this.exportResourcesService.prepareExportContent(exportResourcesFileEntity);
       const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+      await this.exportResourcesService.prepareExportContent(exportResourcesFileEntity, passphrase);
       await this.exportResourcesService.exportToFile(exportResourcesFileEntity, passphrase);
       const date = new Date().toISOString().slice(0, 10);
       const filename = `passbolt-export-${date}.${exportResourcesFileEntity.fileType}`;

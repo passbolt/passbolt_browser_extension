@@ -22,6 +22,11 @@ import {
   defaultMetadataTypesSettingsV4Dto,
   defaultMetadataTypesSettingsV50FreshDto
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import {
+  defaultMetadataKeysSettingsDto
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
+import MetadataKeysSettingsEntity
+  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -89,6 +94,60 @@ describe("SaveMetadataSettingsService", () => {
 
       await expect(() => saveMetadataSettingsService.saveTypesSettings(metadataTypesSettings))
         .toThrowEntityValidationError("default_resource_types", "required");
+    });
+  });
+
+  describe("::saveKeysSettings", () => {
+    it("saves the metadata keys settings to the API and store them into the local storage.", async() => {
+      expect.assertions(3);
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
+      const metadataKeysSettings = new MetadataKeysSettingsEntity(metadataKeysSettingsDto);
+
+      jest.spyOn(saveMetadataSettingsService.metadataKeysSettingsApiService, "save")
+        .mockImplementation(settings => settings);
+
+      const savedSettings = await saveMetadataSettingsService.saveKeysSettings(metadataKeysSettings);
+
+      expect(saveMetadataSettingsService.metadataKeysSettingsApiService.save).toHaveBeenCalledWith(metadataKeysSettings);
+      expect(savedSettings.toDto()).toEqual(metadataKeysSettingsDto);
+      const storageValue = await saveMetadataSettingsService.metadataKeysSettingsLocalStorage.get();
+      await expect(storageValue).toEqual(metadataKeysSettingsDto);
+    });
+
+    it("saves the metadata keys settings to the API and replace existing settings already stored in the local storage.", async() => {
+      expect.assertions(3);
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
+      const metadataKeysSettings = new MetadataKeysSettingsEntity(metadataKeysSettingsDto);
+      const originalMetadataKeysSettingsDto = defaultMetadataKeysSettingsDto({zero_knowledge_key_share: true});
+      await saveMetadataSettingsService.metadataKeysSettingsLocalStorage.set(new MetadataKeysSettingsEntity(originalMetadataKeysSettingsDto));
+
+      jest.spyOn(saveMetadataSettingsService.metadataKeysSettingsApiService, "save")
+        .mockImplementation(settings => settings);
+
+      const savedSettings = await saveMetadataSettingsService.saveKeysSettings(metadataKeysSettings);
+
+      expect(saveMetadataSettingsService.metadataKeysSettingsApiService.save).toHaveBeenCalledWith(metadataKeysSettings);
+      expect(savedSettings.toDto()).toEqual(metadataKeysSettingsDto);
+      const storageValue = await saveMetadataSettingsService.metadataKeysSettingsLocalStorage.get();
+      await expect(storageValue).toEqual(metadataKeysSettingsDto);
+    });
+
+    it("throws if the given metadata keys settings is not of type MetadataKeysSettingsEntity.", async() => {
+      expect.assertions(1);
+      await expect(() => saveMetadataSettingsService.saveKeysSettings(42)).rejects.toThrow(TypeError);
+    });
+
+    it("throws if API return invalid settings.", async() => {
+      expect.assertions(1);
+
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
+      const metadataKeysSettings = new MetadataKeysSettingsEntity(metadataKeysSettingsDto);
+
+      jest.spyOn(saveMetadataSettingsService.metadataKeysSettingsApiService, "save")
+        .mockImplementation(() => {});
+
+      await expect(() => saveMetadataSettingsService.saveKeysSettings(metadataKeysSettings))
+        .toThrowEntityValidationError("allow_usage_of_personal_keys", "required");
     });
   });
 });

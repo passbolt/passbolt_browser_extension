@@ -55,7 +55,14 @@ import DeletePasswordExpirySettingsController
 import GetOrFindPasswordExpirySettingsController
   from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
-import SaveMetadataTypesController from "../controller/metadata/saveMetadataTypesSettingsController";
+import SaveMetadataTypesSettingsController from "../controller/metadata/saveMetadataTypesSettingsController";
+import FindAllNonDeletedMetadataKeysController from "../controller/metadata/findAllNonDeletedMetadataKeysController";
+import FindMetadataKeysSettingsController
+  from "../controller/metadata/findMetadataKeysSettingsController";
+import FindMetadataTypesSettingsController from "../controller/metadata/findMetadataTypesSettingsController";
+import GenerateMetadataPrivateKeyController from "../controller/metadata/generateMetadataPrivateKeyController";
+import SaveMetadataKeysSettingsController from "../controller/metadata/saveMetadataKeysSettingsController";
+import CreateMetadataKeyController from "../controller/metadata/createMetadataKeyController";
 import GetCsrfTokenController from "../controller/auth/getCsrfTokenController";
 
 const listen = function(worker, apiClientOptions, account) {
@@ -289,6 +296,50 @@ const listen = function(worker, apiClientOptions, account) {
    */
 
   /*
+   * Find all non deleted metadata keys.
+   *
+   * @listens passbolt.metadata.find-all-non-deleted-metadata-keys
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-all-non-deleted-metadata-keys', async requestId => {
+    const controller = new FindAllNonDeletedMetadataKeysController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Get or find metadata keys settings.
+   *
+   * @listens passbolt.metadata.find-metadata-keys-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-metadata-keys-settings', async requestId => {
+    const controller = new FindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Generate metadata key.
+   *
+   * @listens passbolt.metadata.generate-metadata-key
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.generate-metadata-key', async requestId => {
+    const controller = new GenerateMetadataPrivateKeyController(worker, requestId, account);
+    await controller._exec();
+  });
+
+  /*
+   * Get or find metadata types settings.
+   *
+   * @listens passbolt.metadata.find-metadata-types-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-metadata-types-settings', async requestId => {
+    const controller = new FindMetadataTypesSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
    * Get or find metadata types settings.
    *
    * @listens passbolt.metadata.get-or-find-metadata-types-settings
@@ -300,6 +351,18 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   /*
+   * Save metadata keys settings.
+   *
+   * @listens passbolt.metadata.save-metadata-keys-settings
+   * @param requestId {uuid} The request identifier
+   * @param dto {object} The metadata keys settings dto
+   */
+  worker.port.on('passbolt.metadata.save-metadata-keys-settings', async(requestId, dto) => {
+    const controller = new SaveMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec(dto);
+  });
+
+  /*
    * Save metadata types settings.
    *
    * @listens passbolt.metadata.save-metadata-types-settings
@@ -307,7 +370,19 @@ const listen = function(worker, apiClientOptions, account) {
    * @param dto {object} The metadata types settings dto
    */
   worker.port.on('passbolt.metadata.save-metadata-types-settings', async(requestId, dto) => {
-    const controller = new SaveMetadataTypesController(worker, requestId, apiClientOptions, account);
+    const controller = new SaveMetadataTypesSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec(dto);
+  });
+
+  /*
+   * Create metadata key.
+   *
+   * @listens passbolt.metadata.create-key
+   * @param requestId {uuid} The request identifier
+   * @param dto {object} The metadata key pair dto.
+   */
+  worker.port.on('passbolt.metadata.create-key', async(requestId, dto) => {
+    const controller = new CreateMetadataKeyController(worker, requestId, account, apiClientOptions);
     await controller._exec(dto);
   });
 

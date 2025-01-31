@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import ExternalGpgKeyPairEntity from "../../model/entity/gpgkey/external/externalGpgKeyPairEntity";
+import ExternalGpgKeyPairEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 import * as openpgp from 'openpgp';
 import AppEmailValidatorService from "../validator/appEmailValidatorService";
 import IsEmailValidator from "passbolt-styleguide/src/shared/lib/Validator/IsEmailValidator";

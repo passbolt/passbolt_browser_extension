@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.11.0
  */
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import SaveMetadataSettingsService from "../../service/metadata/saveMetadataSettingsService";
+import MetadataKeysSettingsEntity
+  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 
-class SaveMetadataTypesSettingsController {
+class SaveMetadataKeysSettingsController {
   /**
    * @constructor
    * @param {Worker} worker
@@ -44,14 +44,15 @@ class SaveMetadataTypesSettingsController {
   }
 
   /**
-   * Save the metadata types settings.
-   * @param {object} dto The metadata types settings to save.
-   * @returns {Promise<MetadataTypesSettingsEntity>}
+   * Save the metadata keys settings.
+   * @param {object} dto The metadata keys settings to save.
+   * @returns {Promise<MetadataKeysSettingsEntity>}
+   * @throws {EntityValidationError} If the settings dto does not validate against MetadataKeysSettingsEntity
    */
   async exec(dto) {
-    const settings = new MetadataTypesSettingsEntity(dto);
-    return this.saveMetadaSettingsService.saveTypesSettings(settings);
+    const settings = new MetadataKeysSettingsEntity(dto);
+    return this.saveMetadaSettingsService.saveKeysSettings(settings);
   }
 }
 
-export default SaveMetadataTypesSettingsController;
+export default SaveMetadataKeysSettingsController;

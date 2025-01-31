@@ -21,6 +21,7 @@ class FindMetadataKeysService {
    * Constructor
    *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} account the user account
    * @public
    */
   constructor(apiClientOptions, account) {
@@ -30,16 +31,23 @@ class FindMetadataKeysService {
 
   /**
    * Retrieve the metadata keys from the API.
+   *
+   * @param {Object} [contains] Return entities associated models, example: {metadata_private_keys: true}.
+   * @param {Object} [filters] Return entities applied filters, example: {deleted: true}.
    * @returns {Promise<MetadataKeysCollection>}
    * @public
    */
-  async findAll(contains = {}) {
+  async findAll(contains = {}, filters = {}) {
     const supportedOptions = MetadataKeysApiService.getSupportedContainOptions();
     if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
     }
+    const supportedFilters = MetadataKeysApiService.getSupportedFiltersOptions();
+    if (filters && !Object.keys(filters).every(filter => supportedFilters.includes(filter))) {
+      throw new Error("Unsupported filter parameter used, please check supported filters");
+    }
 
-    const metadataKeysDto = await this.metadataKeysApiService.findAll(contains);
+    const metadataKeysDto = await this.metadataKeysApiService.findAll(contains, filters);
 
     const collection = new MetadataKeysCollection(metadataKeysDto);
     if (collection.hasDecryptedKeys()) {
@@ -57,7 +65,16 @@ class FindMetadataKeysService {
    * @public
    */
   findAllForSessionStorage() {
-    return this.findAll({metadata_private_keys: true});
+    return this.findAll({metadata_private_keys: true}, {deleted: false});
+  }
+
+  /**
+   * Retrieve the all non deleted metadata keys from the API.
+   * @returns {Promise<MetadataKeysCollection>}
+   * @public
+   */
+  findAllNonDeleted() {
+    return this.findAll({}, {deleted: false});
   }
 }
 

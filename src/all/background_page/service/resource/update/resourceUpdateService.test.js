@@ -29,7 +29,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
   adaExternalPublicGpgKeyEntityDto, adminExternalPublicGpgKeyEntityDto, bettyExternalPublicGpgKeyEntityDto
-} from "../../../model/entity/gpgkey/external/externalGpgKeyEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity.test.data";
 import {
   resourceTypePasswordAndDescriptionDto, resourceTypePasswordDescriptionTotpDto,
   resourceTypePasswordStringDto, resourceTypeTotpDto, resourceTypeV5DefaultDto,

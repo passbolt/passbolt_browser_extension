@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import GetDecryptedUserPrivateKeyService from "./getDecryptedUserPrivateKeyService";
-import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
+import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import Keyring from "../../model/keyring";
 

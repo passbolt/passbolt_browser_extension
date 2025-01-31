@@ -11,22 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.11.0
  */
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import SaveMetadataSettingsService from "../../service/metadata/saveMetadataSettingsService";
 
-class SaveMetadataTypesSettingsController {
+import GenerateMetadataKeyService from "../../service/metadata/generateMetadataKeyService";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
+
+class GenerateMetadataPrivateKeyController {
   /**
    * @constructor
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {ApiClientOptions} apiClientOptions the api client options
    * @param {AccountEntity} account the user account
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.saveMetadaSettingsService = new SaveMetadataSettingsService(account, apiClientOptions);
+    this.getPassphraseService = new GetPassphraseService(account);
+    this.generateMetadataKeyService = new GenerateMetadataKeyService(account);
   }
 
   /**
@@ -35,7 +35,7 @@ class SaveMetadataTypesSettingsController {
    */
   async _exec() {
     try {
-      const result = await this.exec.apply(this, arguments);
+      const result = await this.exec();
       this.worker.port.emit(this.requestId, 'SUCCESS', result);
     } catch (error) {
       console.error(error);
@@ -44,14 +44,13 @@ class SaveMetadataTypesSettingsController {
   }
 
   /**
-   * Save the metadata types settings.
-   * @param {object} dto The metadata types settings to save.
-   * @returns {Promise<MetadataTypesSettingsEntity>}
+   * Generate a metadata key.
+   * @returns {Promise<ExternalGpgKeyPairEntity>}
    */
-  async exec(dto) {
-    const settings = new MetadataTypesSettingsEntity(dto);
-    return this.saveMetadaSettingsService.saveTypesSettings(settings);
+  async exec() {
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    return this.generateMetadataKeyService.generateKey(passphrase);
   }
 }
 
-export default SaveMetadataTypesSettingsController;
+export default GenerateMetadataPrivateKeyController;

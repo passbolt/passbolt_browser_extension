@@ -9,13 +9,12 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.11.0
+ * @since         4.10.0
  */
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import SaveMetadataSettingsService from "../../service/metadata/saveMetadataSettingsService";
+import FindAndUpdateMetadataSettingsLocalStorageService
+  from "../../service/metadata/findAndUpdateMetadataSettingsLocalStorageService";
 
-class SaveMetadataTypesSettingsController {
+class FindMetadataTypesSettingsController {
   /**
    * @constructor
    * @param {Worker} worker
@@ -26,7 +25,7 @@ class SaveMetadataTypesSettingsController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.saveMetadaSettingsService = new SaveMetadataSettingsService(account, apiClientOptions);
+    this.findAndUpdateMetadataSettingsLocalStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(account, apiClientOptions);
   }
 
   /**
@@ -35,7 +34,7 @@ class SaveMetadataTypesSettingsController {
    */
   async _exec() {
     try {
-      const result = await this.exec.apply(this, arguments);
+      const result = await this.exec();
       this.worker.port.emit(this.requestId, 'SUCCESS', result);
     } catch (error) {
       console.error(error);
@@ -44,14 +43,12 @@ class SaveMetadataTypesSettingsController {
   }
 
   /**
-   * Save the metadata types settings.
-   * @param {object} dto The metadata types settings to save.
+   * Get or find the metadata types settings entity.
    * @returns {Promise<MetadataTypesSettingsEntity>}
    */
-  async exec(dto) {
-    const settings = new MetadataTypesSettingsEntity(dto);
-    return this.saveMetadaSettingsService.saveTypesSettings(settings);
+  async exec() {
+    return this.findAndUpdateMetadataSettingsLocalStorageService.findAndUpdateTypesSettings();
   }
 }
 
-export default SaveMetadataTypesSettingsController;
+export default FindMetadataTypesSettingsController;

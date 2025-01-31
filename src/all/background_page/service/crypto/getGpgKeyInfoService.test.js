@@ -13,9 +13,9 @@
  */
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import ExternalGpgKeyEntity from "./../../model/entity/gpgkey/external/externalGpgKeyEntity";
+import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import GetGpgKeyInfoService from "./getGpgKeyInfoService";
-import ExternalGpgKeyCollection from "../../model/entity/gpgkey/external/externalGpgKeyCollection";
+import ExternalGpgKeyCollection from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyCollection";
 
 const {
   validKeyDto,

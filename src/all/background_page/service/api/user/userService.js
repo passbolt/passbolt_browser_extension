@@ -50,6 +50,7 @@ class UserService extends AbstractService {
       'gpgkey',
       'groups_users',
       'profile',
+      'role',
       'account_recovery_user_setting',
       'pending_account_recovery_request',
     ];
@@ -65,7 +66,8 @@ class UserService extends AbstractService {
       'search',
       'has-groups',
       'has-access',
-      'is-admin'
+      'is-admin',
+      'is-active'
     ];
   }
 

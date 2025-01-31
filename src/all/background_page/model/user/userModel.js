@@ -22,6 +22,9 @@ import Validator from "validator";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
 
+/**
+ * @deprecated
+ */
 class UserModel {
   /**
    * Constructor

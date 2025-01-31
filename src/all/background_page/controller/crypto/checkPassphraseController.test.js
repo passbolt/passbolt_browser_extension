@@ -13,7 +13,7 @@
  */
 
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
-import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
+import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import CheckPassphraseController from "./checkPassphraseController";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import Keyring from "../../model/keyring";

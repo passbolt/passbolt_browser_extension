@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.11.0
  */
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import SaveMetadataSettingsService from "../../service/metadata/saveMetadataSettingsService";
 
-class SaveMetadataTypesSettingsController {
+import FindAndUpdateMetadataSettingsLocalStorageService
+  from "../../service/metadata/findAndUpdateMetadataSettingsLocalStorageService";
+
+class FindMetadataKeysSettingsController {
   /**
    * @constructor
    * @param {Worker} worker
@@ -26,7 +26,7 @@ class SaveMetadataTypesSettingsController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.saveMetadaSettingsService = new SaveMetadataSettingsService(account, apiClientOptions);
+    this.findAndUpdateMetadataSettingsSessionStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(account, apiClientOptions);
   }
 
   /**
@@ -35,7 +35,7 @@ class SaveMetadataTypesSettingsController {
    */
   async _exec() {
     try {
-      const result = await this.exec.apply(this, arguments);
+      const result = await this.exec();
       this.worker.port.emit(this.requestId, 'SUCCESS', result);
     } catch (error) {
       console.error(error);
@@ -44,14 +44,12 @@ class SaveMetadataTypesSettingsController {
   }
 
   /**
-   * Save the metadata types settings.
-   * @param {object} dto The metadata types settings to save.
-   * @returns {Promise<MetadataTypesSettingsEntity>}
+   * Find the metadata keys settings entity and update the session storage.
+   * @returns {Promise<MetadataKeysSettingsEntity>}
    */
-  async exec(dto) {
-    const settings = new MetadataTypesSettingsEntity(dto);
-    return this.saveMetadaSettingsService.saveTypesSettings(settings);
+  async exec() {
+    return this.findAndUpdateMetadataSettingsSessionStorageService.findAndUpdateKeysSettings();
   }
 }
 
-export default SaveMetadataTypesSettingsController;
+export default FindMetadataKeysSettingsController;

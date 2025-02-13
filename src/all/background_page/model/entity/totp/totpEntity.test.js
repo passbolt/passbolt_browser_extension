@@ -13,7 +13,7 @@
  */
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import TotpEntity from "./totpEntity";
+import ExternalTotpEntity from "./externalTotpEntity";
 import each from "jest-each";
 import {defaultTotpDto} from "./totpDto.test.data";
 import ExternalResourceEntity from "../resource/external/externalResourceEntity";
@@ -24,32 +24,32 @@ import {defaultExternalResourceDto} from "../resource/external/externalResourceE
 describe("Totp entity", () => {
   describe("::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(TotpEntity.name, TotpEntity.getSchema());
+      EntitySchema.validateSchema(ExternalTotpEntity.name, ExternalTotpEntity.getSchema());
     });
 
     it("validates secret_key property", () => {
-      assertEntityProperty.string(TotpEntity, "secret_key");
-      assertEntityProperty.minLength(TotpEntity, "secret_key", 1);
-      assertEntityProperty.required(TotpEntity, "secret_key");
+      assertEntityProperty.string(ExternalTotpEntity, "secret_key");
+      assertEntityProperty.minLength(ExternalTotpEntity, "secret_key", 1);
+      assertEntityProperty.required(ExternalTotpEntity, "secret_key");
     });
 
     it("validates period property", () => {
-      assertEntityProperty.integer(TotpEntity, "period");
-      assertEntityProperty.minimum(TotpEntity, "period", 1);
-      assertEntityProperty.required(TotpEntity, "period");
+      assertEntityProperty.integer(ExternalTotpEntity, "period");
+      assertEntityProperty.minimum(ExternalTotpEntity, "period", 1);
+      assertEntityProperty.required(ExternalTotpEntity, "period");
     });
 
     it("validates digits property", () => {
-      assertEntityProperty.integer(TotpEntity, "digits");
-      assertEntityProperty.minimum(TotpEntity, "digits", 6);
-      assertEntityProperty.maximum(TotpEntity, "digits", 8);
-      assertEntityProperty.required(TotpEntity, "digits");
+      assertEntityProperty.integer(ExternalTotpEntity, "digits");
+      assertEntityProperty.minimum(ExternalTotpEntity, "digits", 6);
+      assertEntityProperty.maximum(ExternalTotpEntity, "digits", 8);
+      assertEntityProperty.required(ExternalTotpEntity, "digits");
     });
 
     it("validates algorithm property", () => {
-      assertEntityProperty.string(TotpEntity, "algorithm");
-      assertEntityProperty.enumeration(TotpEntity, "algorithm", ["SHA1", "SHA256", "SHA512"], ["RSA", "BASE64", "test"]);
-      assertEntityProperty.required(TotpEntity, "algorithm");
+      assertEntityProperty.string(ExternalTotpEntity, "algorithm");
+      assertEntityProperty.enumeration(ExternalTotpEntity, "algorithm", ["SHA1", "SHA256", "SHA512"], ["RSA", "BASE64", "test"]);
+      assertEntityProperty.required(ExternalTotpEntity, "algorithm");
     });
   });
 
@@ -57,7 +57,7 @@ describe("Totp entity", () => {
     it("constructor works if valid minimal DTO is provided", () => {
       expect.assertions(1);
       const dto = defaultTotpDto();
-      const entity = new TotpEntity(dto);
+      const entity = new ExternalTotpEntity(dto);
       expect(entity.toDto()).toStrictEqual(dto);
     });
 
@@ -70,7 +70,7 @@ describe("Totp entity", () => {
     ]).describe("constructor returns validation error if dto is not valid", test => {
       it(`Should not validate: ${test.scenario}`, async() => {
         expect.assertions(1);
-        expect(() => new TotpEntity(test.dto)).toThrow(EntityValidationError);
+        expect(() => new ExternalTotpEntity(test.dto)).toThrow(EntityValidationError);
       });
     });
   });
@@ -83,7 +83,7 @@ describe("Totp entity", () => {
       fields.set("TimeOtp-Algorithm", "HMAC-SHA-256");
       fields.set("TimeOtp-Length", "7");
       fields.set("TimeOtp-Period", "60");
-      const entity = TotpEntity.createTotpFromKdbxWindows(fields);
+      const entity = ExternalTotpEntity.createTotpFromKdbxWindows(fields);
       const dto = {
         secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA",
         period: 60,
@@ -97,20 +97,20 @@ describe("Totp entity", () => {
   describe("::marshal", () => {
     it("should sanitize the secret_key", () => {
       expect.assertions(1);
-      const entity = new TotpEntity(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
+      const entity = new ExternalTotpEntity(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
       expect(entity.secretKey).toStrictEqual("572HKBKB");
     });
 
     it("Sanitising twice should give the same result", () => {
       expect.assertions(1);
-      const entity = new TotpEntity(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
-      const entity2 = new TotpEntity(entity.toDto());
+      const entity = new ExternalTotpEntity(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
+      const entity2 = new ExternalTotpEntity(entity.toDto());
       expect(entity2.secretKey).toStrictEqual("572HKBKB");
     });
 
     it("Sanitize valid DTO should remain the same", () => {
       expect.assertions(1);
-      const entity = new TotpEntity(defaultTotpDto());
+      const entity = new ExternalTotpEntity(defaultTotpDto());
       expect(entity.secretKey).toStrictEqual(defaultTotpDto().secret_key);
     });
   });
@@ -119,13 +119,13 @@ describe("Totp entity", () => {
     it("CreateTotpFromUrl should work with lowercase algorithm", () => {
       const otpUrlData = lowerCaseAlgorithmSetupTotpData();
       const url = new URL(otpUrlData.otpProvisioningUri);
-      expect(() => TotpEntity.createTotpFromUrl(url)).not.toThrow();
+      expect(() => ExternalTotpEntity.createTotpFromUrl(url)).not.toThrow();
     });
 
     it("should works if valid url is provided", () => {
       expect.assertions(1);
       const url = new URL('otpauth://totp/pro.passbolt.local:admin@passbolt.com?issuer=pro.passbolt.local&secret=OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA');
-      const entity = TotpEntity.createTotpFromUrl(url);
+      const entity = ExternalTotpEntity.createTotpFromUrl(url);
       const dto = {
         secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA",
         period: 30,
@@ -138,7 +138,7 @@ describe("Totp entity", () => {
     it("should works if valid url with all possible parameters is provided", () => {
       expect.assertions(1);
       const url = new URL('otpauth://totp/pro.passbolt.local:admin@passbolt.com?issuer=pro.passbolt.local&secret=OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA&period=60&digits=8&algorithm=SHA256');
-      const entity = TotpEntity.createTotpFromUrl(url);
+      const entity = ExternalTotpEntity.createTotpFromUrl(url);
       const dto = {
         secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA",
         period: 60,
@@ -154,7 +154,7 @@ describe("Totp entity", () => {
       expect.assertions(2);
       const urlExpected = new URL('otpauth://totp/pro.passbolt.local%3Aadmin%40passbolt.com?secret=DAV3DS4ERAAF5QGH&issuer=pro.passbolt.local&algorithm=SHA1&digits=6&period=30');
 
-      const entity = new TotpEntity(defaultTotpDto());
+      const entity = new ExternalTotpEntity(defaultTotpDto());
       const externalResourceDto = defaultExternalResourceDto({
         "name": "pro.passbolt.local",
         "username": "admin@passbolt.com",

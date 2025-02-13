@@ -18,7 +18,7 @@ import ResourceEntity from "../resourceEntity";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
 import {defaultExternalResourceDto, defaultExternalResourceImportDto, minimalExternalResourceDto} from "./externalResourceEntity.test.data";
-import TotpEntity from "../../totp/totpEntity";
+import ExternalTotpEntity from "../../totp/externalTotpEntity";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {v4 as uuid} from "uuid";
 import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
@@ -163,7 +163,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.folderParentPath).toStrictEqual(dto.folder_parent_path);
       expect(entity.totp.toDto()).toStrictEqual(dto.totp);
       expect(entity.secrets.toDto()).toStrictEqual(dto.secrets);
-      entity.totp = new TotpEntity(defaultTotpDto({secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"}));
+      entity.totp = new ExternalTotpEntity(defaultTotpDto({secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"}));
       expect(entity.totp.secret_key !== dto.totp.secret_key).toBeTruthy();
     });
 
@@ -327,7 +327,7 @@ describe("ExternalResourceEntity", () => {
         folder_parent_path: "Root/Folder/SubFolder",
         secret_clear: "this is a secret",
         secrets: new ResourceSecretsCollection(defaultResourcesSecretsDtos()),
-        totp: new TotpEntity(defaultTotpDto())
+        totp: new ExternalTotpEntity(defaultTotpDto())
       };
 
       entity.id = expectedData.id;

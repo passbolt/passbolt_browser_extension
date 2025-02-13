@@ -14,7 +14,7 @@
 
 import ExternalFoldersCollection from "../../../model/entity/folder/external/externalFoldersCollection";
 import ExternalResourcesCollection from "../../../model/entity/resource/external/externalResourcesCollection";
-import TotpEntity from "../../../model/entity/totp/totpEntity";
+import ExternalTotpEntity from "../../../model/entity/totp/externalTotpEntity";
 import ResourcesExporter from "../../../model/export/resourcesExporter";
 import FolderModel from "../../../model/folder/folderModel";
 import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
@@ -92,7 +92,7 @@ class ExportResourcesService {
       exportResourceEntity.secretClear = plaintextSecret.password || "";
       exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description || "";
       if (plaintextSecret.totp) {
-        exportResourceEntity.totp = new TotpEntity(plaintextSecret.totp);
+        exportResourceEntity.totp = new ExternalTotpEntity(plaintextSecret.totp);
       }
     }
   }

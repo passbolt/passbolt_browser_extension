@@ -34,7 +34,7 @@ import {resourceCollectionV4ToExport, resourceCollectionV5ToExport} from "./expo
 import {KdbxCsvFile, bitwardenCsvFile, chromiumCsvFile, dashlaneCsvFile, lastpassCsvFile, logMeOnceCsvFile, mozillaCsvFile, nordPassCsvFile, onePasswordCsvFile, safariCsvFile} from "../../../model/entity/import/importResourcesFileEntity.test.data";
 import FolderLocalStorage from "../../local_storage/folderLocalStorage";
 import {defaultTotpDto} from "../../../model/entity/totp/totpDto.test.data";
-import TotpEntity from "../../../model/entity/totp/totpEntity";
+import ExternalTotpEntity from "../../../model/entity/totp/externalTotpEntity";
 import ExternalResourcesCollection from "../../../model/entity/resource/external/externalResourcesCollection";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import ExternalFoldersCollection from "../../../model/entity/folder/external/externalFoldersCollection";
@@ -187,7 +187,7 @@ describe("ExportResourcesService", () => {
           exportResourcesFileEntity.exportFolders = exportFoldersCollection;
           exportResourcesFileEntity.exportResources.items[0].secretClear = "Password 1";
           exportResourcesFileEntity.exportResources.items[0].description = "Description 1";
-          exportResourcesFileEntity.exportResources.items[0].totp = new TotpEntity(defaultTotpDto({secret_key: "THISISASECRET"}));
+          exportResourcesFileEntity.exportResources.items[0].totp = new ExternalTotpEntity(defaultTotpDto({secret_key: "THISISASECRET"}));
           await kdbxExporter.export(exportResourcesFileEntity);
         }
 

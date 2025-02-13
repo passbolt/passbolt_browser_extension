@@ -12,7 +12,7 @@
  */
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
-import TotpEntity from "../../../entity/totp/totpEntity";
+import ExternalTotpEntity from "../../../entity/totp/externalTotpEntity";
 import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 
 class CsvKdbxRowParser extends AbstractCsvRowParser {
@@ -65,7 +65,7 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
    */
   static parseTotp(totpUrl) {
     const totpUrlDecoded = new URL(decodeURIComponent(totpUrl));
-    const totp = TotpEntity.createTotpFromUrl(totpUrlDecoded);
+    const totp = ExternalTotpEntity.createTotpFromUrl(totpUrlDecoded);
     return totp.toDto();
   }
 }

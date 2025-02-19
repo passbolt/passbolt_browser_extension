@@ -43,7 +43,7 @@
   "Initializing ...": "Initializing ...",
   "Mark as expired ...": "Mark as expired ...",
   "MFA authentication is required.": "MFA authentication is required.",
-  "Migrating resources": "Migrating resources",
+  "Migrating metadata": "Migrating metadata",
   "Moving {{count}} resources_one": "Moving one resource",
   "Moving {{count}} resources_other": "Moving {{count}} resources",
   "Moving {{name}}": "Moving {{name}}",

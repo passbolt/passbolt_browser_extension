@@ -29,12 +29,14 @@ import GetOrFindMetadataKeysService from "../metadata/getOrFindMetadataKeysServi
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import {defaultProgressService} from "../progress/progressService.test.data";
 import {TEST_RESOURCE_TYPE_TOTP, TEST_RESOURCE_TYPE_V5_DEFAULT, resourceTypePasswordAndDescriptionDto, resourceTypeTotpDto, resourceTypeV5DefaultDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {defaultMetadataKeysSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import {enableFetchMocks} from "jest-fetch-mock";
 
 describe("MigrateMetadataResourcesService", () => {
   let account = null;
@@ -61,22 +63,22 @@ describe("MigrateMetadataResourcesService", () => {
       const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
       let migrateCallCount = 0;
 
-      expect.assertions(17 + firstBatchToMigrate.length * 2 + nextBatchToMigrate.length * 2);
+      expect.assertions(16 + firstBatchToMigrate.length * 2 + nextBatchToMigrate.length * 2);
       const service = new MigrateMetadataResourcesService(defaultApiClientOptions(), account, progressService);
 
       // Spy initialization
       jest.spyOn(service.migrateMetadataResourcesApiService, "migrate").mockImplementation(async() => migrateCallCount++ > 0
         ? new PassboltResponseEntity(passboltReponseWithCollectionDto([])) //second migrate call, there is no other resource to migrate
         : new PassboltResponseEntity(passboltReponseWithCollectionDto(nextBatchToMigrate))); //first migrate call, there is another page of resources to migrate
-      jest.spyOn(service.findMetadataMigrateResourcesService, "findMigrateDetails").mockReturnValue(migrationDetails);
-      jest.spyOn(service.resourceTypeModel, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
+      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings").mockReturnValue(defaultMetadataKeysSettingsDto());
 
       // running process
       await service.migrate(migrateMetadataEntity, "ada@passbolt.com", {count: 0});
 
       // check expectation
-      expect(service.findMetadataMigrateResourcesService.findMigrateDetails).toHaveBeenCalledTimes(1);
-      expect(service.resourceTypeModel.getOrFindAll).toHaveBeenCalledTimes(1);
+      expect(service.migrateMetadataResourcesApiService.findAll).toHaveBeenCalledTimes(1);
       expect(service.migrateMetadataResourcesApiService.migrate).toHaveBeenCalledTimes(2);
 
       const firstMigrationCallArgs = service.migrateMetadataResourcesApiService.migrate.mock.calls[0];
@@ -89,7 +91,7 @@ describe("MigrateMetadataResourcesService", () => {
         expect(resourceEntity.resourceTypeId).not.toEqual(firstBatchToMigrate[i].resource_type_id); //checking if resource type has been updated
       }
       // args[1] is the `is-shared` param
-      expect(firstMigrationCallArgs[1]).toStrictEqual(false);
+      expect(firstMigrationCallArgs[1]).toStrictEqual({permissions: true});
 
       const secondMigrationCallArgs = service.migrateMetadataResourcesApiService.migrate.mock.calls[1];
       expect(secondMigrationCallArgs[0]).toBeInstanceOf(ResourcesCollection);
@@ -99,16 +101,16 @@ describe("MigrateMetadataResourcesService", () => {
         expect(resourceEntity.isMetadataDecrypted()).toStrictEqual(false); //checking if metadata is encrypted as expected
         expect(resourceEntity.resourceTypeId).not.toEqual(nextBatchToMigrate[i].resource_type_id); //checking if resource type has been updated
       }
-      expect(secondMigrationCallArgs[1]).toStrictEqual(false);
+      expect(secondMigrationCallArgs[1]).toStrictEqual({permissions: true});
 
-      expect(progressService.finishStep).toHaveBeenCalledTimes(1);
-      expect(progressService.updateStepMessage).toHaveBeenCalledTimes(6);
-      expect(progressService.updateStepMessage).toHaveBeenCalledWith(('Retrieving resource types'));
-      expect(progressService.updateStepMessage).toHaveBeenCalledWith(('Retrieving resources to migrate batch number 1'));
+      expect(progressService.finishStep).toHaveBeenCalledTimes(4);
+      expect(progressService.updateStepMessage).toHaveBeenCalledTimes(2);
+      expect(progressService.finishStep).toHaveBeenCalledWith(('Retrieving resource types'));
+      expect(progressService.finishStep).toHaveBeenCalledWith(('Retrieving resources to migrate batch number 1'));
       expect(progressService.updateStepMessage).toHaveBeenCalledWith(('Encrypting resources batch number 1'));
-      expect(progressService.updateStepMessage).toHaveBeenCalledWith(('Updating resources batch number 1 and retrieving next batch'));
+      expect(progressService.finishStep).toHaveBeenCalledWith(('Updating resources batch number 1 and retrieving next batch'));
       expect(progressService.updateStepMessage).toHaveBeenCalledWith(('Encrypting resources batch number 2'));
-      expect(progressService.updateStepMessage).toHaveBeenCalledWith(('Updating resources batch number 2 and retrieving next batch'));
+      expect(progressService.finishStep).toHaveBeenCalledWith(('Updating resources batch number 2 and retrieving next batch'));
     }, 10_000);
 
     it("should retry the process multiple times before aborting it", async() => {
@@ -118,7 +120,6 @@ describe("MigrateMetadataResourcesService", () => {
       const firstBatchToMigrate = defaultResourceDtosCollection();
       const migrateMetadataEntity = new MigrateMetadataEntity(defaultMigrateMetadataDto());
       const migrationDetails = new PassboltResponseEntity(passboltReponseWithCollectionDto(firstBatchToMigrate));
-      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
 
       const service = new MigrateMetadataResourcesService(defaultApiClientOptions(), account, defaultProgressService());
 
@@ -126,9 +127,10 @@ describe("MigrateMetadataResourcesService", () => {
       fetch.doMock(() => mockApiResponseError(409, "Somebody is running the migration meanwhile"));
 
       // Spy initialization
-      jest.spyOn(service.findMetadataMigrateResourcesService, "findMigrateDetails").mockReturnValue(migrationDetails);
-      jest.spyOn(service.resourceTypeModel, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
+      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
       jest.spyOn(service, "_migrateResources");
+      jest.spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings").mockReturnValue(defaultMetadataKeysSettingsDto());
 
       // running process
       const replayOptions = {count: 0};
@@ -159,8 +161,9 @@ describe("MigrateMetadataResourcesService", () => {
       fetch.doMock(() => mockApiResponseError(500, "Something went wrong!"));
 
       // Spy initialization
-      jest.spyOn(service.findMetadataMigrateResourcesService, "findMigrateDetails").mockReturnValue(migrationDetails);
-      jest.spyOn(service.resourceTypeModel, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
+      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings").mockReturnValue(defaultMetadataKeysSettingsDto());
       jest.spyOn(service, "_migrateResources");
 
       // running process
@@ -189,8 +192,9 @@ describe("MigrateMetadataResourcesService", () => {
 
       // Spy initialization
       jest.spyOn(service.migrateMetadataResourcesApiService, "migrate");
-      jest.spyOn(service.findMetadataMigrateResourcesService, "findMigrateDetails").mockReturnValue(migrationDetails);
-      jest.spyOn(service.resourceTypeModel, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
+      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings").mockReturnValue(defaultMetadataKeysSettingsDto());
 
       // running process
       try {
@@ -219,8 +223,9 @@ describe("MigrateMetadataResourcesService", () => {
 
       // Spy initialization
       jest.spyOn(service.migrateMetadataResourcesApiService, "migrate").mockImplementation(async() => new PassboltResponseEntity(passboltReponseWithCollectionDto([])));
-      jest.spyOn(service.findMetadataMigrateResourcesService, "findMigrateDetails").mockReturnValue(migrationDetails);
-      jest.spyOn(service.resourceTypeModel, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
+      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings").mockReturnValue(defaultMetadataKeysSettingsDto());
 
       // running process
       await service.migrate(migrateMetadataEntity, "ada@passbolt.com", {count: 0});

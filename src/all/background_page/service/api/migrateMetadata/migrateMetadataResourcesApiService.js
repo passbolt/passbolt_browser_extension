@@ -36,7 +36,9 @@ class MigrateMetadataResourcesApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return [];
+    return [
+      "permissions",
+    ];
   }
 
   /**
@@ -74,12 +76,13 @@ class MigrateMetadataResourcesApiService extends AbstractService {
    * @returns {Promise<PassboltResponseDto>}
    * @public
    */
-  async migrate(resourcesCollection, filters = {}) {
+  async migrate(resourcesCollection, contains = {}, filters = {}) {
     assertType(resourcesCollection, ResourcesCollection, 'The given resourcesCollection is not a valid ResourcesCollection');
+    contains = contains ? this.formatContainOptions(contains, MigrateMetadataResourcesApiService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(filters, MigrateMetadataResourcesApiService.getSupportedFiltersOptions()) : null;
 
-    const options = {...filters};
-    const response = await this.apiClient.updateAll(resourcesCollection.toDto(), options);
+    const options = {...contains, ...filters};
+    const response = await this.apiClient.create(resourcesCollection.toDto(), options);
     return new PassboltResponseDto(response);
   }
 }

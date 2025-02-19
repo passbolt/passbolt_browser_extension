@@ -15,13 +15,13 @@ import ResourcesCollection from "../../model/entity/resource/resourcesCollection
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import MigrateMetadataResourcesApiService from "../api/migrateMetadata/migrateMetadataResourcesApiService";
 import EncryptMetadataService from "../metadata/encryptMetadataService";
-import FindMetadataMigrateResourcesService from "./findMetadataMigrateResourcesService";
 import {V4_TO_V5_RESOURCE_TYPE_MAPPING} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import i18n from "../../sdk/i18n";
-import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 
 const MAX_PROCESS_REPLAY = 3;
+
+export const MIGRATE_METADATA_BASE_MAIN_STEPS_COUNT = 2;
 
 export default class MigrateMetadataResourcesService {
   /**
@@ -33,7 +33,6 @@ export default class MigrateMetadataResourcesService {
   constructor(apiClientOptions, account, progressService) {
     this.account = account;
     this.migrateMetadataResourcesApiService = new MigrateMetadataResourcesApiService(apiClientOptions);
-    this.findMetadataMigrateResourcesService = new FindMetadataMigrateResourcesService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
     this.progressService = progressService;
@@ -72,8 +71,7 @@ export default class MigrateMetadataResourcesService {
    * @public
    */
   async migrate(migrateMetadataEntity, passphrase, replayOptions = {count: 0}) {
-    this.progressService.finishStep(i18n.t('Migrating resources'), true);
-    await this._runReplayableProcess(async() => this._migrateResources(migrateMetadataEntity, passphrase), replayOptions);
+    await this._runReplayableProcess(() => this._migrateResources(migrateMetadataEntity, passphrase), replayOptions);
   }
 
   /**
@@ -85,15 +83,24 @@ export default class MigrateMetadataResourcesService {
    */
   async _migrateResources(migrateMetadataEntity, passphrase) {
     let resourcePage = 0;
+    const filters = {};
+    const contains = {};
+    /*
+     * If the resources are the  shared resources only, there is no need for permission info as the encryption will happens with the shared key anyway
+     * Otherwise we need permission info to know which user's private key to use for encryption.
+     */
+    if (migrateMetadataEntity.sharedContentOnly) {
+      filters["is-shared"] = true;
+    } else {
+      contains["permissions"] = true;
+    }
 
-    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-
-    this.progressService.updateStepMessage(i18n.t('Retrieving resource types'));
+    this.progressService.finishStep(i18n.t('Retrieving resource types'));
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     const resourceTypesMapping = this._computeResourceTypesMapping(resourceTypes);
 
-    this.progressService.updateStepMessage(i18n.t('Retrieving resources to migrate batch number {{number}}', {number: ++resourcePage}));
-    let migrationDetailsPage = await this.findMetadataMigrateResourcesService.findMigrateDetails(migrateMetadataEntity.sharedContentOnly);
+    this.progressService.finishStep(i18n.t('Retrieving resources to migrate batch number {{number}}', {number: ++resourcePage}));
+    let migrationDetailsPage = await this.migrateMetadataResourcesApiService.findAll(contains, filters);
     let v4ResourcesCollection = new ResourcesCollection(migrationDetailsPage.body);
 
     while (v4ResourcesCollection.length > 0) {
@@ -104,10 +111,10 @@ export default class MigrateMetadataResourcesService {
       }
 
       this.progressService.updateStepMessage(i18n.t('Encrypting resources batch number {{number}}', {number: resourcePage}));
-      await this.encryptMetadataService.encryptAllFromForeignModelsWithSharedKey(v5ResourcesCollection, resourceTypes, userDecryptedPrivateKey);
+      await this.encryptMetadataService.encryptAllFromForeignModels(v5ResourcesCollection, passphrase);
 
-      this.progressService.updateStepMessage(i18n.t('Updating resources batch number {{number}} and retrieving next batch', {number: resourcePage++}));
-      migrationDetailsPage = await this.migrateMetadataResourcesApiService.migrate(v5ResourcesCollection, migrateMetadataEntity.sharedContentOnly);
+      this.progressService.finishStep(i18n.t('Updating resources batch number {{number}} and retrieving next batch', {number: resourcePage++}));
+      migrationDetailsPage = await this.migrateMetadataResourcesApiService.migrate(v5ResourcesCollection, contains, filters);
       v4ResourcesCollection = new ResourcesCollection(migrationDetailsPage.body);
     }
   }

@@ -128,6 +128,36 @@ classDiagram
         }
     }
 
+    namespace ResourceTypesNs {
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Resource Types controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class GetResourceTypesController {
+            +exec() Promise~ResourceTypesCollection~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Resource Types services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class ResourceTypeService {
+            +findAll(object contain, object filters) Promise~array~
+            +findAllByDeletedAndNonDeleted() Promise~ResourceTypesCollection~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Resource Types models
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class ResourceTypeModel {
+            +updateLocalStorage() Promise~ResourceTypesCollection~
+            +getOrFindAll() Promise~ResourceTypesCollection~
+            +getSecretSchemaById(string resourceTypeId) Promise~object~
+        }
+    }
+
     namespace MetadataNs {
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

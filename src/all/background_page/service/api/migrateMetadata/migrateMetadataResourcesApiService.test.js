@@ -23,6 +23,7 @@ import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/
 import {defaultResourceDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import MigrateMetadataResourcesApiService from "./migrateMetadataResourcesApiService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
+import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 
 describe("migrateMetadataResourcesApiService", () => {
   let apiClientOptions;
@@ -67,6 +68,46 @@ describe("migrateMetadataResourcesApiService", () => {
       const service = new MigrateMetadataResourcesApiService(apiClientOptions);
 
       await expect(() => service.findAll()).rejects.toThrow(PassboltServiceUnavailableError);
+    });
+  });
+
+  describe('::migrate', () => {
+    it("should send the updated resources collection to the API and returned the next resources collection page", async() => {
+      expect.assertions(3);
+
+      const nextCollection = defaultResourceDtosCollection();
+      const resourcesCollection = new ResourcesCollection(defaultResourceDtosCollection());
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, async req => {
+        const body = JSON.parse(await req.text());
+        expect(body).toStrictEqual(resourcesCollection.toDto());
+        return mockApiResponseWithPagination(nextCollection, {}, 1);
+      });
+
+      const service = new MigrateMetadataResourcesApiService(apiClientOptions);
+      const result = await service.migrate(resourcesCollection);
+
+      expect(result).toBeInstanceOf(PassboltResponseEntity);
+      expect(result._props.body).toStrictEqual(nextCollection);
+    });
+
+    it("throws API error if the API encountered an issue", async() => {
+      expect.assertions(1);
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => mockApiResponseError(500, "Something wrong happened!"));
+
+      const service = new MigrateMetadataResourcesApiService(apiClientOptions);
+      const resourcesCollection = new ResourcesCollection(defaultResourceDtosCollection());
+
+      await expect(() => service.migrate(resourcesCollection)).rejects.toThrow(PassboltApiFetchError);
+    });
+
+    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async() => {
+      expect.assertions(1);
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => { throw new Error("Service unavailable"); });
+
+      const service = new MigrateMetadataResourcesApiService(apiClientOptions);
+      const resourcesCollection = new ResourcesCollection(defaultResourceDtosCollection());
+
+      await expect(() => service.migrate(resourcesCollection)).rejects.toThrow(PassboltServiceUnavailableError);
     });
   });
 });

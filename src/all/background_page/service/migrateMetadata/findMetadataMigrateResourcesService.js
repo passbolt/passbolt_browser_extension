@@ -26,11 +26,17 @@ export default class FindMetadataMigrateResourcesService {
 
   /**
    * Retrieve the metadata migration details.
+   * @param {boolean} [sharedContentOnly=false]
    * @returns {Promise<PassboltResponsePaginationHeaderEntity>}
    * @public
    */
-  async findMigrateDetails() {
-    const apiResponse = await this.migrateMetadataResourcesApiService.findAll();
+  async findMigrateDetails(sharedContentOnly = false) {
+    const filters = {};
+    if (sharedContentOnly) {
+      filters["is-shared"] = true;
+    }
+
+    const apiResponse = await this.migrateMetadataResourcesApiService.findAll({}, filters);
     return apiResponse.header.pagination;
   }
 }

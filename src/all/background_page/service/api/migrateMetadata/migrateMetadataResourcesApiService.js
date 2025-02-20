@@ -12,6 +12,7 @@
  * @since         4.12.0
  */
 
+import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import {assertType} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 import PassboltResponseDto from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
@@ -63,6 +64,22 @@ class MigrateMetadataResourcesApiService extends AbstractService {
 
     const options = {...contains, ...filters};
     const response = await this.apiClient.findAll(options);
+    return new PassboltResponseDto(response);
+  }
+
+  /**
+   * Update the given resources collection for migrating the metadata on the API.
+   * @param {ResourcesCollection} resourcesCollection.
+   * @param {Object} [filters] Return entities applied filters, example: {is-shared: true}.
+   * @returns {Promise<PassboltResponseDto>}
+   * @public
+   */
+  async migrate(resourcesCollection, filters = {}) {
+    assertType(resourcesCollection, ResourcesCollection, 'The given resourcesCollection is not a valid ResourcesCollection');
+    filters = filters ? this.formatFilterOptions(filters, MigrateMetadataResourcesApiService.getSupportedFiltersOptions()) : null;
+
+    const options = {...filters};
+    const response = await this.apiClient.updateAll(resourcesCollection.toDto(), options);
     return new PassboltResponseDto(response);
   }
 }

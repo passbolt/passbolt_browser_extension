@@ -48,7 +48,7 @@ describe("ResourceType service", () => {
 
       fetch.doMockIf(/resource-types/, async req => {
         const url = new URL(req.url);
-        const data = url.searchParams.get('filter[deleted]')
+        const data = url.searchParams.get('filter[is-deleted]')
           ? expectedDeletedResourceTypesDto
           : expectedAvailableResourceTypesDto;
         return mockApiResponse(data);
@@ -63,7 +63,7 @@ describe("ResourceType service", () => {
       expect(resourceTypesCollection.length).toStrictEqual(expectedDeletedResourceTypesDto.length + expectedAvailableResourceTypesDto.length);
       expect(resourceTypesCollection).toStrictEqual(new ResourceTypesCollection([...expectedAvailableResourceTypesDto, ...expectedDeletedResourceTypesDto]));
       expect(service.findAll).toHaveBeenCalledTimes(2);
-      expect(service.findAll).toHaveBeenCalledWith({resources_count: true}, {deleted: true});
+      expect(service.findAll).toHaveBeenCalledWith({resources_count: true}, {['is-deleted']: true});
       expect(service.findAll).toHaveBeenCalledWith({resources_count: true});
     });
   });

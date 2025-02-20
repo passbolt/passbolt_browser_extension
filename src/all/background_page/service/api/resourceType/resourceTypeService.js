@@ -55,7 +55,7 @@ class ResourceTypeService extends AbstractService {
    */
   static getSupportedFiltersOptions() {
     return [
-      'deleted',
+      'is-deleted',
     ];
   }
 
@@ -83,7 +83,7 @@ class ResourceTypeService extends AbstractService {
    */
   async findAllByDeletedAndNonDeleted() {
     const contain = {resources_count: true};
-    const deletedResourcesType = await this.findAll(contain, {deleted: true});
+    const deletedResourcesType = await this.findAll(contain, {['is-deleted']: true});
     const activeResourcesType = await this.findAll(contain);
 
     return new ResourceTypesCollection([...activeResourcesType, ...deletedResourcesType]);

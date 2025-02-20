@@ -42,10 +42,11 @@ export default class FindMetadataMigrateResourcesController {
 
   /**
    * Find the migration count details.
+   * @param {boolean} sharedContentOnly
    * @returns {Promise<PassboltResponsePaginationHeaderEntity>}
    */
-  async exec() {
-    return await this.findMetadataMigrateResourcesService.findMigrateDetails();
+  async exec(sharedContentOnly) {
+    return await this.findMetadataMigrateResourcesService.findMigrateDetails(sharedContentOnly);
   }
 }
 

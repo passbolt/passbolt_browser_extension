@@ -15,7 +15,7 @@
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import {assertType} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
-import PassboltResponseDto from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
+import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
 const MIGRATE_METADATA_API_SERVICE_RESOURCE_NAME = "metadata/upgrade/resources";
 
@@ -36,7 +36,9 @@ class MigrateMetadataResourcesApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return [];
+    return [
+      "permissions",
+    ];
   }
 
   /**
@@ -54,7 +56,7 @@ class MigrateMetadataResourcesApiService extends AbstractService {
    * Retrieve the metadata migration details from the API.
    * @param {Object} [contains] Return entities associated models, example: {metadata_private_keys: true}.
    * @param {Object} [filters] Return entities applied filters, example: {deleted: true}.
-   * @returns {Promise<PassboltResponseDto>}
+   * @returns {Promise<PassboltResponseEntity>}
    * @public
    */
   async findAll(contains = {}, filters = {}) {
@@ -64,23 +66,24 @@ class MigrateMetadataResourcesApiService extends AbstractService {
 
     const options = {...contains, ...filters};
     const response = await this.apiClient.findAll(options);
-    return new PassboltResponseDto(response);
+    return new PassboltResponseEntity(response);
   }
 
   /**
    * Update the given resources collection for migrating the metadata on the API.
    * @param {ResourcesCollection} resourcesCollection.
    * @param {Object} [filters] Return entities applied filters, example: {is-shared: true}.
-   * @returns {Promise<PassboltResponseDto>}
+   * @returns {Promise<PassboltResponseEntity>}
    * @public
    */
-  async migrate(resourcesCollection, filters = {}) {
+  async migrate(resourcesCollection, contains = {}, filters = {}) {
     assertType(resourcesCollection, ResourcesCollection, 'The given resourcesCollection is not a valid ResourcesCollection');
+    contains = contains ? this.formatContainOptions(contains, MigrateMetadataResourcesApiService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(filters, MigrateMetadataResourcesApiService.getSupportedFiltersOptions()) : null;
 
-    const options = {...filters};
-    const response = await this.apiClient.updateAll(resourcesCollection.toDto(), options);
-    return new PassboltResponseDto(response);
+    const options = {...contains, ...filters};
+    const response = await this.apiClient.create(resourcesCollection.toDto(), options);
+    return new PassboltResponseEntity(response);
   }
 }
 

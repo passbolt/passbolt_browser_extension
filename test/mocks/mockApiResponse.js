@@ -19,6 +19,25 @@
  */
 exports.mockApiResponse = (body = {}, header = {}) => Promise.resolve(JSON.stringify({header: header, body: body}));
 
+/**
+ * Mock an API response that contains pagination information.
+ * @param {Array<*>} body a single page of data to be returned by the API
+ * @param {*} header the header part of the response, the pagination is computed based on the number of element in the body and the pageCount
+ * @param {*} pageCount the number of page the header should indicate.
+ * @returns {Promise<object>}
+ */
+exports.mockApiResponseWithPagination = (body = [], header = {}, pageCount = 1) => Promise.resolve(JSON.stringify({
+  header: {
+    pagination: {
+      count: body.length,
+      limit: pageCount * body.length,
+      page: 1,
+    },
+    ...header
+  },
+  body: body
+}));
+
 exports.mockApiRedirectResponse = (redirectTo, status = 302) => Promise.resolve({
   status: status,
   url: redirectTo,

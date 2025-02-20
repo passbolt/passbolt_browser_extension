@@ -63,6 +63,7 @@ import FindMetadataTypesSettingsController from "../controller/metadata/findMeta
 import GenerateMetadataPrivateKeyController from "../controller/metadata/generateMetadataPrivateKeyController";
 import SaveMetadataKeysSettingsController from "../controller/metadata/saveMetadataKeysSettingsController";
 import CreateMetadataKeyController from "../controller/metadata/createMetadataKeyController";
+import FindMetadataMigrateResourcesController from "../controller/migrateMetadata/findMetadataMigrateResourcesController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -383,6 +384,17 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.metadata.create-key', async(requestId, dto) => {
     const controller = new CreateMetadataKeyController(worker, requestId, account, apiClientOptions);
     await controller._exec(dto);
+  });
+
+  /*
+   * Find metadata migration details.
+   *
+   * @listens passbolt.metadata.find-metadata-migrate-resources-details
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-metadata-migrate-resources-details', async requestId => {
+    const controller = new FindMetadataMigrateResourcesController(worker, requestId, apiClientOptions);
+    await controller._exec();
   });
 };
 export const AppEvents = {listen};

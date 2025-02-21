@@ -18,6 +18,7 @@ import {resourceTypesCollectionDto, resourceTypesV4CollectionDto, resourceTypesV
 import ResourceTypeService from "./resourceTypeService";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {defaultApiClientOptions} from 'passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data';
+import {v4 as uuidv4} from "uuid";
 
 describe("ResourceType service", () => {
   beforeEach(async() => {
@@ -65,6 +66,27 @@ describe("ResourceType service", () => {
       expect(service.findAll).toHaveBeenCalledTimes(2);
       expect(service.findAll).toHaveBeenCalledWith({resources_count: true}, {['is-deleted']: true});
       expect(service.findAll).toHaveBeenCalledWith({resources_count: true});
+    });
+  });
+
+  describe('::undelete', () => {
+    it("Should update the resource given its id", async() => {
+      expect.assertions(2);
+
+      const expectedId = uuidv4();
+
+      let url, body;
+      fetch.doMockIf(/resource-types/, async req => {
+        url = new URL(req.url);
+        body = JSON.parse(await req.text());
+        return mockApiResponse("");
+      });
+
+      const service = new ResourceTypeService(defaultApiClientOptions());
+      await service.undelete(expectedId);
+
+      expect(url.toString()).toContain(expectedId);
+      expect(body).toStrictEqual({deleted: null});
     });
   });
 });

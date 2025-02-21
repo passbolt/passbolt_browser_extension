@@ -102,6 +102,18 @@ class ResourceTypeService extends AbstractService {
     const response = await this.apiClient.update(id, body);
     return new PassboltResponseEntity(response);
   }
+
+  /**
+   * Delete a resource type given its id.
+   * @param {string} id
+   * @returns {Promise<PassboltResponseEntity>}
+   * @public
+   */
+  async delete(id) {
+    assertUuid(id, "The id of the resource type to activate should be a valid uuid.");
+    const response = await this.apiClient.delete(id);
+    return new PassboltResponseEntity(response);
+  }
 }
 
 export default ResourceTypeService;

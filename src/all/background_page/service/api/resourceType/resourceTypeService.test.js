@@ -89,4 +89,23 @@ describe("ResourceType service", () => {
       expect(body).toStrictEqual({deleted: null});
     });
   });
+
+  describe('::delete', () => {
+    it("Should request the API to delete the given resource type", async() => {
+      expect.assertions(1);
+
+      const expectedId = uuidv4();
+
+      let url;
+      fetch.doMockIf(/resource-types/, async req => {
+        url = new URL(req.url);
+        return mockApiResponse(null);
+      });
+
+      const service = new ResourceTypeService(defaultApiClientOptions());
+      await service.delete(expectedId);
+
+      expect(url.toString()).toContain(expectedId);
+    });
+  });
 });

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.6
  */
+import FindAllByDeletedAndNonDeletedResourceTypesContoller from "../controller/resourceType/findAllByDeletedAndNonDeletedResourceTypesContoller";
 import GetResourceTypesController from "../controller/resourceType/getResourceTypesController";
 
 /**
@@ -27,6 +28,17 @@ const listen = function(worker, apiClientOptions) {
    */
   worker.port.on('passbolt.resource-type.get-or-find-all', async requestId => {
     const controller = new GetResourceTypesController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  /*
+   * Find all the resource types (deleted and available) from the API.
+   *
+   * @listens passbolt.resource-type.get-all
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.resource-type.find-all-by-deleted-and-non-deleted', async requestId => {
+    const controller = new FindAllByDeletedAndNonDeletedResourceTypesContoller(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 };

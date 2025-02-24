@@ -135,6 +135,12 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class GetResourceTypesController {
+            event "passbolt.resource-type.get-or-find-all"
+            +exec() Promise~ResourceTypesCollection~
+        }
+
+        class FindAllByDeletedAndNonDeletedResourceTypesContoller {
+            event "passbolt.resource-types.find-all-by-deleted-and-non-deleted"
             +exec() Promise~ResourceTypesCollection~
         }
 

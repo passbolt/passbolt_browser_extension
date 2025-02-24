@@ -13,6 +13,7 @@
 import AbstractService from "../abstract/abstractService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
+import {assertUuid} from "../../../utils/assertions";
 
 const RESOURCE_TYPES_SERVICE_RESOURCE_NAME = 'resource-types';
 
@@ -55,7 +56,7 @@ class ResourceTypeService extends AbstractService {
    */
   static getSupportedFiltersOptions() {
     return [
-      'deleted',
+      'is-deleted',
     ];
   }
 
@@ -83,10 +84,35 @@ class ResourceTypeService extends AbstractService {
    */
   async findAllByDeletedAndNonDeleted() {
     const contain = {resources_count: true};
-    const deletedResourcesType = await this.findAll(contain, {deleted: true});
+    const deletedResourcesType = await this.findAll(contain, {['is-deleted']: true});
     const activeResourcesType = await this.findAll(contain);
 
     return new ResourceTypesCollection([...activeResourcesType, ...deletedResourcesType]);
+  }
+
+  /**
+   * Undelete a resource type given its id.
+   * @param {string} id
+   * @returns {Promise<PassboltResponseEntity>}
+   * @public
+   */
+  async undelete(id) {
+    assertUuid(id, "The id of the resource type to activate should be a valid uuid.");
+    const body = {deleted: null};
+    const response = await this.apiClient.update(id, body);
+    return new PassboltResponseEntity(response);
+  }
+
+  /**
+   * Delete a resource type given its id.
+   * @param {string} id
+   * @returns {Promise<PassboltResponseEntity>}
+   * @public
+   */
+  async delete(id) {
+    assertUuid(id, "The id of the resource type to activate should be a valid uuid.");
+    const response = await this.apiClient.delete(id);
+    return new PassboltResponseEntity(response);
   }
 }
 

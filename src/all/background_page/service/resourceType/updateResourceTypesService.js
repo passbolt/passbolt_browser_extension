@@ -85,6 +85,7 @@ export default class UpdateResourceTypesService {
     assertType(resourceTypesCollection, ResourceTypesCollection, "The resourceTypesCollection parameter should be a valid ResourceTypesCollection");
     const resourceTypesToDelete = resourceTypesCollection.items.filter(rt => rt.isDeleted());
     const resourceTypesToUndelete = resourceTypesCollection.items.filter(rt => !rt.isDeleted());
+
     await this.deleteAll(new ResourceTypesCollection(resourceTypesToDelete, {validate: false}));
     await this.undeleteAll(new ResourceTypesCollection(resourceTypesToUndelete, {validate: false}));
   }

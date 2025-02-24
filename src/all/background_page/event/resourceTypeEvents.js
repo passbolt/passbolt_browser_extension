@@ -13,6 +13,7 @@
  */
 import FindAllByDeletedAndNonDeletedResourceTypesContoller from "../controller/resourceType/findAllByDeletedAndNonDeletedResourceTypesContoller";
 import GetResourceTypesController from "../controller/resourceType/getResourceTypesController";
+import UpdateAllResourceTypesDeletedStatusController from "../controller/resourceType/updateAllResourceTypesDeletedStatusController";
 
 /**
  * Listens the resource type events
@@ -40,6 +41,18 @@ const listen = function(worker, apiClientOptions) {
   worker.port.on('passbolt.resource-type.find-all-by-deleted-and-non-deleted', async requestId => {
     const controller = new FindAllByDeletedAndNonDeletedResourceTypesContoller(worker, requestId, apiClientOptions);
     await controller._exec();
+  });
+
+  /*
+   * Updates the resource types deletion status on the API.
+   *
+   * @listens passbolt.resource-types.update-all-deleted-status
+   * @param requestId {uuid} The request identifier
+   * @param resourceTypesCollectionDto {Array} the collection to update
+   */
+  worker.port.on('passbolt.resource-types.update-all-deleted-status', async(requestId, resourceTypesCollectionDto) => {
+    const controller = new UpdateAllResourceTypesDeletedStatusController(worker, requestId, apiClientOptions);
+    await controller._exec(resourceTypesCollectionDto);
   });
 };
 

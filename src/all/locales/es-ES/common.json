@@ -3,7 +3,7 @@
   "An ECC key should be based on a supported curve.": "Una clave ECC debería basarse en una curva soportada.",
   "An internal error occurred. The server response could not be parsed. Please contact your administrator.": "Se ha producido un error interno. La respuesta del servidor no se ha podido analizar. Por favor, póngase en contacto con su administrador.",
   "An RSA key should have a length of {{size}} bits minimum.": "Una clave RSA debería tener una longitud mínima de {{size}} bits.",
-  "Autofill failed. Could not find the active tab.": "Error al autorrellenar. No se pudo encontrar la pestaña activa.",
+  "Autofill failed. Could not find the active tab.": "El autocompletado ha fallado. No se pudo encontrar la pestaña activa.",
   "Calculate permissions": "Calcular permisos",
   "Calculating changes for {{name}}": "Calculando los cambios en {{name}}",
   "Calculating folders permissions changes": "Calculando cambios de permisos de carpetas",

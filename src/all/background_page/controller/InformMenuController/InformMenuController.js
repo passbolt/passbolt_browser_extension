@@ -20,7 +20,7 @@ import ExternalResourceEntity from "../../model/entity/resource/external/externa
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
 import WorkerService from "../../service/worker/workerService";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
-import ResourceMetadataEntity from "../../model/entity/resource/metadata/resourceMetadataEntity";
+import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 
 /**

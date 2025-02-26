@@ -22,7 +22,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import UserEntity from "../user/userEntity";
-import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
+import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 
 const ENTITY_NAME = 'Resource';
 

@@ -14,7 +14,7 @@ import ResourceEntity from "../resourceEntity";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
 import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
 import TotpEntity from "../../totp/totpEntity";
-import ResourceMetadataEntity from "../metadata/resourceMetadataEntity";
+import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {assertType} from "../../../../utils/assertions";

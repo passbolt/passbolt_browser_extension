@@ -40,7 +40,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import {
   defaultResourceMetadataDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 
 describe("ResourcesCollection", () => {

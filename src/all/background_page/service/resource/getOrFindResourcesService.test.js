@@ -27,7 +27,7 @@ import FindAndUpdateResourcesLocalStorage from "./findAndUpdateResourcesLocalSto
 import {multipleResourceDtos} from "./getOrFindResourcesService.test.data";
 import {resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
+import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 
 jest.useFakeTimers();
 

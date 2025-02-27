@@ -47,7 +47,7 @@ describe("MigrateMetadataResourcesController", () => {
       expect(controller.migrateMetadataResourcesService.migrate).toHaveBeenCalledTimes(1);
       expect(controller.migrateMetadataResourcesService.migrate).toHaveBeenCalledWith(new MigrateMetadataEntity(migrateMetadataDto), passphrase, {count: 0});
       expect(controller.progressService.start).toHaveBeenCalledTimes(1);
-      expect(controller.progressService.start).toHaveBeenCalledWith(pageCount + 3, "Migrating metadata");
+      expect(controller.progressService.start).toHaveBeenCalledWith(pageCount + 2, "Migrating metadata");
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
     });
   });

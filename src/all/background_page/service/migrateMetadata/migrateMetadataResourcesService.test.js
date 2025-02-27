@@ -59,11 +59,19 @@ describe("MigrateMetadataResourcesService", () => {
       const firstBatchToMigrate = defaultResourceDtosCollection();
       const nextBatchToMigrate = defaultResourceDtosCollection();
       const migrateMetadataEntity = new MigrateMetadataEntity(defaultMigrateMetadataDto());
-      const migrationDetails = new PassboltResponseEntity(passboltReponseWithCollectionDto(firstBatchToMigrate));
+      const apiResponseHeaderDto = {
+        pagination: {
+          count: firstBatchToMigrate.length + nextBatchToMigrate.length,
+          limit: firstBatchToMigrate.length,
+          page: 1,
+        }
+      };
+      const migrationDetails = new PassboltResponseEntity(passboltReponseWithCollectionDto(firstBatchToMigrate, {header: apiResponseHeaderDto}));
+      console.log(migrationDetails.header.pagination);
       const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
       let migrateCallCount = 0;
 
-      expect.assertions(16 + firstBatchToMigrate.length * 2 + nextBatchToMigrate.length * 2);
+      expect.assertions(13 + firstBatchToMigrate.length * 2 + nextBatchToMigrate.length * 2);
       const service = new MigrateMetadataResourcesService(defaultApiClientOptions(), account, progressService);
 
       // Spy initialization
@@ -103,14 +111,11 @@ describe("MigrateMetadataResourcesService", () => {
       }
       expect(secondMigrationCallArgs[1]).toStrictEqual({permissions: true});
 
-      expect(progressService.finishStep).toHaveBeenCalledTimes(4);
-      expect(progressService.updateStepMessage).toHaveBeenCalledTimes(2);
+      expect(progressService.finishStep).toHaveBeenCalledTimes(3);
+      expect(progressService.updateStepMessage).not.toHaveBeenCalled();
       expect(progressService.finishStep).toHaveBeenCalledWith(('Retrieving resource types'));
-      expect(progressService.finishStep).toHaveBeenCalledWith(('Retrieving resources to migrate batch number 1'));
-      expect(progressService.updateStepMessage).toHaveBeenCalledWith(('Encrypting resources batch number 1'));
-      expect(progressService.finishStep).toHaveBeenCalledWith(('Updating resources batch number 1 and retrieving next batch'));
-      expect(progressService.updateStepMessage).toHaveBeenCalledWith(('Encrypting resources batch number 2'));
-      expect(progressService.finishStep).toHaveBeenCalledWith(('Updating resources batch number 2 and retrieving next batch'));
+      expect(progressService.finishStep).toHaveBeenCalledWith(('Migrating resources metadata page 1/2'));
+      expect(progressService.finishStep).toHaveBeenCalledWith(('Migrating resources metadata page 2/2'));
     }, 10_000);
 
     it("should retry the process multiple times before aborting it", async() => {

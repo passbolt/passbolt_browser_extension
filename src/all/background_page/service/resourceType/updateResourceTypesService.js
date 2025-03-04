@@ -14,6 +14,7 @@
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {assertType, assertUuid} from "../../utils/assertions";
 import ResourceTypeService from "../api/resourceType/resourceTypeService";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 
 /**
  * The service aims to get resources from the local storage if it is set, or retrieve them from the API and
@@ -26,6 +27,7 @@ export default class UpdateResourceTypesService {
    */
   constructor(apiClientOptions) {
     this.resourceTypeService = new ResourceTypeService(apiClientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
   }
 
   /**
@@ -88,5 +90,7 @@ export default class UpdateResourceTypesService {
 
     await this.deleteAll(new ResourceTypesCollection(resourceTypesToDelete, {validate: false}));
     await this.undeleteAll(new ResourceTypesCollection(resourceTypesToUndelete, {validate: false}));
+
+    await this.resourceTypeModel.updateLocalStorage();
   }
 }

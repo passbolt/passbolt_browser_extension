@@ -137,7 +137,7 @@ describe("UpdateResourceTypesService", () => {
     });
 
     it("should call for the right service with the right arguments.", async() => {
-      expect.assertions(10);
+      expect.assertions(11);
       const resourceTypesDto = resourceTypesCollectionDto();
       for (let i = 0; i < resourceTypesDto.length; i += 2) {
         resourceTypesDto[i].deleted = "2025-02-24T09:00:00+00:00";
@@ -148,6 +148,7 @@ describe("UpdateResourceTypesService", () => {
       const service = new UpdateResourceTypesService(apiClientOptions);
       jest.spyOn(service.resourceTypeService, "delete").mockImplementation(() => {});
       jest.spyOn(service.resourceTypeService, "undelete").mockImplementation(() => {});
+      jest.spyOn(service.resourceTypeModel, "updateLocalStorage").mockImplementation(() => {});
 
       await service.updateAllDeletedStatus(resourcesTypesCollection);
 
@@ -162,6 +163,8 @@ describe("UpdateResourceTypesService", () => {
       expect(service.resourceTypeService.undelete).toHaveBeenCalledWith(resourceTypesDto[5].id);
       expect(service.resourceTypeService.delete).toHaveBeenCalledWith(resourceTypesDto[6].id);
       expect(service.resourceTypeService.undelete).toHaveBeenCalledWith(resourceTypesDto[7].id);
+
+      expect(service.resourceTypeModel.updateLocalStorage).toHaveBeenCalledTimes(1);
     });
   });
 });

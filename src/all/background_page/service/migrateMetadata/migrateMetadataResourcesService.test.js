@@ -67,7 +67,6 @@ describe("MigrateMetadataResourcesService", () => {
         }
       };
       const migrationDetails = new PassboltResponseEntity(passboltReponseWithCollectionDto(firstBatchToMigrate, {header: apiResponseHeaderDto}));
-      console.log(migrationDetails.header.pagination);
       const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
       let migrateCallCount = 0;
 

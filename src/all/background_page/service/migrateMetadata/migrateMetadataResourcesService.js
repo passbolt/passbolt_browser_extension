@@ -21,7 +21,7 @@ import i18n from "../../sdk/i18n";
 
 const MAX_PROCESS_REPLAY = 3;
 
-export const MIGRATE_METADATA_BASE_MAIN_STEPS_COUNT = 2;
+export const MIGRATE_METADATA_BASE_MAIN_STEPS_COUNT = 1;
 
 export default class MigrateMetadataResourcesService {
   /**
@@ -99,21 +99,19 @@ export default class MigrateMetadataResourcesService {
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     const resourceTypesMapping = this._computeResourceTypesMapping(resourceTypes);
 
-    this.progressService.finishStep(i18n.t('Retrieving resources to migrate batch number {{number}}', {number: ++resourcePage}));
     let migrationDetailsPage = await this.migrateMetadataResourcesApiService.findAll(contains, filters);
+    const totalPagesCount = migrationDetailsPage.header.pagination.pageCount;
     let v4ResourcesCollection = new ResourcesCollection(migrationDetailsPage.body);
 
     while (v4ResourcesCollection.length > 0) {
+      this.progressService.finishStep(i18n.t('Migrating resources metadata page {{number}}/{{totalPagesCount}}', {number: ++resourcePage, totalPagesCount: totalPagesCount}));
       const v5ResourcesCollection = this._getUpdatedCollectionWithV5ResourceTypes(v4ResourcesCollection, resourceTypesMapping);
       if (v5ResourcesCollection.length === 0) {
         // if we reach such a state, we might get stuck in an infinite loop as the API will serve again and again the same batch of resources that can't be migrated for some reasons.
         throw new Error("Unexpected empty resources collection to migrate");
       }
 
-      this.progressService.updateStepMessage(i18n.t('Encrypting resources batch number {{number}}', {number: resourcePage}));
       await this.encryptMetadataService.encryptAllFromForeignModels(v5ResourcesCollection, passphrase);
-
-      this.progressService.finishStep(i18n.t('Updating resources batch number {{number}} and retrieving next batch', {number: resourcePage++}));
       migrationDetailsPage = await this.migrateMetadataResourcesApiService.migrate(v5ResourcesCollection, contains, filters);
       v4ResourcesCollection = new ResourcesCollection(migrationDetailsPage.body);
     }

@@ -21,7 +21,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import {
   defaultResourceMetadataDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 import ResourceMetadataEntity from "./metadata/resourceMetadataEntity";
 import {v4 as uuidv4} from "uuid";
 import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";

@@ -128,6 +128,42 @@ classDiagram
         }
     }
 
+    namespace ResourceTypesNs {
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Resource Types controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class GetResourceTypesController {
+            event "passbolt.resource-type.get-or-find-all"
+            +exec() Promise~ResourceTypesCollection~
+        }
+
+        class FindAllByDeletedAndNonDeletedResourceTypesContoller {
+            event "passbolt.resource-types.find-all-by-deleted-and-non-deleted"
+            +exec() Promise~ResourceTypesCollection~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Resource Types services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class ResourceTypeService {
+            +findAll(object contain, object filters) Promise~array~
+            +findAllByDeletedAndNonDeleted() Promise~ResourceTypesCollection~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Resource Types models
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class ResourceTypeModel {
+            +updateLocalStorage() Promise~ResourceTypesCollection~
+            +getOrFindAll() Promise~ResourceTypesCollection~
+            +getSecretSchemaById(string resourceTypeId) Promise~object~
+        }
+    }
+
     namespace MetadataNs {
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -164,6 +200,16 @@ classDiagram
             +exec() Promise~MetadataTypesSettingsEntity~
         }
 
+        class FindMetadataMigrateResourcesController {
+            event "passbolt.metadata.find-metadata-migrate-resources-details"
+            +exec() Promise~PassboltResponsePaginationHeaderEntity~
+        }
+
+        class MigrateMetadataResourcesController {
+            event "passbolt.metadata.migrate-resources-metadata"
+            +exec() Promise~void~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -188,6 +234,14 @@ classDiagram
             +encryptOne(MetadataPrivateKeyEntity metadataPrivateKey, openpgp.PrivateKey userPrivateKey) Promise
             +encryptAll(MetadataPrivateKeyCollection metadataPrivateKeys, openpgp.PrivateKey userPrivateKey) Promise
             +encryptAllFromMetadataKeyEntity(MetadataKeyEntity metadataKey, openpgp.PrivateKey userPrivateKey) Promise
+        }
+
+        class FindMetadataMigrateResourcesService {
+            +findMigrateDetails(boolean sharedContentOnly) Promise~void~
+        }
+
+        class MigrateMetadataResourcesService {
+            +migrate(MigrateMetadataEntity migrateMetadataEntity, string passphrase, replayOptions = {count: 0}) Promise~void~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -279,6 +333,11 @@ classDiagram
             +get() Promise~object~
             +set(MetadataTypesSettingsEntity entity) Promise
             +flush(AccountEntity account) Promise
+        }
+
+        class MigrateMetadataResourcesApiService {
+            +findAll(object contains, object filters) Promise~PassboltResponseEntity~
+            +migrate(ResourcesCollection resourcesCollection, object contains, object filters) Promise~PassboltResponseEntity~
         }
     }
 
@@ -783,6 +842,14 @@ classDiagram
 
         class UsersCollection {
         }
+
+        class MigrateMetadataEntity {
+            -boolean migrate_resources_to_v5
+            -boolean migrate_folders_to_v5
+            -boolean migrate_tags_to_v5
+            -boolean migrate_comments_to_v5
+            -boolean migrate_personal_content
+        }
     }
 
     namespace ShareNs {
@@ -875,6 +942,10 @@ classDiagram
     CreateMetadataKeyService*--FindUsersService
     CreateMetadataKeyService*--GetOrFindMetadataSettingsService
     CreateMetadataKeyService*--MetadataKeyApiService
+    FindMetadataMigrateResourcesService*--MigrateMetadataResourcesApiService
+    MigrateMetadataResourcesService*--MigrateMetadataResourcesApiService
+    MigrateMetadataResourcesService*--EncryptMetadataService
+    MigrateMetadataResourcesService*--ResourceTypeModel
 %%    DecryptMetadataPrivateKeysService*--PassphraseStorageService
     DecryptMetadataService*--GetOrFindMetadataKeysService
     DecryptMetadataService*--GetOrFindSessionKeysService

@@ -64,6 +64,8 @@ import GenerateMetadataPrivateKeyController from "../controller/metadata/generat
 import SaveMetadataKeysSettingsController from "../controller/metadata/saveMetadataKeysSettingsController";
 import CreateMetadataKeyController from "../controller/metadata/createMetadataKeyController";
 import GetCsrfTokenController from "../controller/auth/getCsrfTokenController";
+import FindMetadataMigrateResourcesController from "../controller/migrateMetadata/findMetadataMigrateResourcesController";
+import MigrateMetadataResourcesController from "../controller/migrateMetadata/migrateMetadataResourcesController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -392,13 +394,37 @@ const listen = function(worker, apiClientOptions, account) {
    * ==================================================================================
    */
 
-  /**
+  /*
    * Get the CSRF token from
    */
   worker.port.on('passbolt.auth.get-csrf-token', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetCsrfTokenController(worker, requestId, apiClientOptions);
     await controller._exec();
+  });
+
+  /*
+   * Find metadata migration details.
+   *
+   * @listens passbolt.metadata.find-metadata-migrate-resources-details
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-metadata-migrate-resources-details', async(requestId, sharedContentOnly = false) => {
+    const controller = new FindMetadataMigrateResourcesController(worker, requestId, apiClientOptions);
+    await controller._exec(sharedContentOnly);
+  });
+
+  /*
+   * Migrate metadata.
+   *
+   * @listens passbolt.metadata.migrate-resources-metadata
+   * @param requestId {uuid} The request identifier
+   * @param migrateMetdataDto {object} the migration metadata dto.
+   * @param paginationDetails {object} the pagination details dto.
+   */
+  worker.port.on('passbolt.metadata.migrate-resources-metadata', async(requestId, migrateMetdataDto, paginationDetails) => {
+    const controller = new MigrateMetadataResourcesController(worker, requestId, apiClientOptions, account);
+    await controller._exec(migrateMetdataDto, paginationDetails);
   });
 };
 export const AppEvents = {listen};

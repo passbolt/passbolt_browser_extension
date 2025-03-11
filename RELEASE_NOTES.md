@@ -4,9 +4,10 @@ Passbolt v4.12.0 introduces the final update in the version 4 series. This relea
 
 As always, this version also addresses community-reported issues, including fixes for UI inconsistencies and multi-selection shortcuts that were not working across all environments.
 
-As a final update of the v4 series, system administrators are invited to upgrade their version of PHP to meet Passbolt v5’s minimum requirements: PHP 8.2. Stay tuned—we’ll post a guide on the forum and social media to help you with the process.
+As a final update of the v4 series, system administrators are invited to upgrade their version of PHP to meet Passbolt v5’s minimum requirements: PHP 8.2. We posted a guide in our Weblog to help you with the process: [Preparing for Passbolt v5: PHP 8.2 Requirement](https://www.passbolt.com/blog/preparing-for-passbolt-v5-php-8-2-requirement).
 
 Thank you to the community for your feedback and patience—we’re almost there!
+
 
 ### Added
 PB-38932 WP6-3.1 Implement navigation to content types migrate metadata content administration page

@@ -7,8 +7,8 @@
   "homepage": "https://www.passbolt.com",
   "repository": "https://github.com/passbolt/passbolt_browser_extension",
   "engines": {
-    "node": ">=18.18.0",
-    "npm": ">=9.8.1"
+    "node": ">=22.14.0",
+    "npm": ">=10.9.2"
   },
   "dependencies": {
     "await-lock": "^2.1.0",

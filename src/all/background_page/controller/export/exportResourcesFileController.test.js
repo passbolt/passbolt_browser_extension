@@ -39,7 +39,7 @@ import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import ExternalResourcesCollection from "../../model/entity/resource/external/externalResourcesCollection";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import {defaultTotpDto} from "../../model/entity/totp/totpDto.test.data";
-import TotpEntity from "../../model/entity/totp/totpEntity";
+import ExternalTotpEntity from "../../model/entity/totp/externalTotpEntity";
 import {resourceCollectionV4ToExport} from "../../service/resource/export/exportResourcesService.test.data";
 import {defaultDecryptedSharedMetadataKeysDtos} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
@@ -129,7 +129,7 @@ describe("ExportResourcesFileController", () => {
         exportResourcesFileEntity.exportFolders = exportFoldersCollection;
         exportResourcesFileEntity.exportResources.items[0].secretClear = "Password 1";
         exportResourcesFileEntity.exportResources.items[0].description = "Description 1";
-        exportResourcesFileEntity.exportResources.items[0].totp = new TotpEntity(defaultTotpDto({secret_key: "THISISASECRET"}));
+        exportResourcesFileEntity.exportResources.items[0].totp = new ExternalTotpEntity(defaultTotpDto({secret_key: "THISISASECRET"}));
         await kdbxExporter.export(exportResourcesFileEntity);
       }
       each([

@@ -25,10 +25,10 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data";
 import {defaultResourcesSecretsDtos} from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection.test.data";
-import {defaultSecretDto} from "passbolt-styleguide/src/react-extension/components/Resource/CreateResource/CreateResource.test.data";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import GroupUserEntity from "../../model/entity/groupUser/groupUserEntity";
+import {plaintextSecretPasswordAndDescriptionDto} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 
 describe("GroupUpdateService", () => {
   it("should update the group without cryptographic operations if only the name changed", async() => {
@@ -245,7 +245,7 @@ describe("GroupUpdateService", () => {
     const secrets = defaultResourcesSecretsDtos(1);
 
     const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
-    const originalDecryptedSecret = defaultSecretDto();
+    const originalDecryptedSecret = plaintextSecretPasswordAndDescriptionDto();
     secrets[0].data = await EncryptMessageService.encrypt(JSON.stringify(originalDecryptedSecret), adaPublicKey);
     const needed_secrets = [{
       user_id: newUser.id,

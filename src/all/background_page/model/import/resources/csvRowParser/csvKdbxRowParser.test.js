@@ -191,7 +191,7 @@ describe("CsvKdbxRowParser", () => {
     try {
       CsvKdbxRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
     } catch (error) {
-      expect(error.message).toStrictEqual("Could not validate entity TotpEntity.");
+      expect(error.message).toStrictEqual("Could not validate entity ExternalTotpEntity.");
     }
   });
 });

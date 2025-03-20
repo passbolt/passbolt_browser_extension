@@ -11,76 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.5.0
  */
-import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import TotpEntity from "passbolt-styleguide/src/shared/models/entity/totp/totpEntity";
 
-const RESOURCE_TOTP_KEY_MAX_LENGTH = 1024;
 const SUPPORTED_ALGORITHMS = ["SHA1", "SHA256", "SHA512"];
 const DEFAULT_ALGORITHM = SUPPORTED_ALGORITHMS[0];
 /**
- * Entity related to the TOTP
+ * External related to the TOTP
  */
-class TotpEntity extends EntityV2 {
-  /**
-   * Get current view model schema
-   * @returns {Object} schema
-   */
-  static getSchema() {
-    return {
-      type: "object",
-      required: [
-        "secret_key",
-        "period",
-        "digits",
-        "algorithm",
-      ],
-      properties: {
-        secret_key: {
-          type: "string",
-          minLength: 1,
-          pattern: /^[A-Z2-7]+=*$/, // BASE32
-          maxLength: RESOURCE_TOTP_KEY_MAX_LENGTH
-        },
-        period: {
-          type: "integer",
-          minimum: 1
-        },
-        digits: {
-          type: "integer",
-          minimum: 6,
-          maximum: 8,
-        },
-        algorithm: {
-          type: "string",
-          enum: SUPPORTED_ALGORITHMS
-        }
-      }
-    };
-  }
-
-  /**
-   * @inheritdoc
-   */
-  marshall() {
-    /*
-     * Sanitize secret_key:
-     * - Replace white spaces.
-     * - Capitalize characters.
-     * - Remove all special characters.
-     */
-    if (typeof this._props.secret_key === "string") {
-      this._props.secret_key = this._props.secret_key?.replace(/(\W|_|\s)/g, '').toUpperCase();
-    }
-
-    /*
-     * Sanitize algorithm
-     * - Capitalize characters.
-     */
-    if (typeof this._props.algorithm === "string") {
-      this._props.algorithm = this._props.algorithm?.toUpperCase();
-    }
-    super.marshall();
-  }
-
+class ExternalTotpEntity extends TotpEntity {
   /*
    * ==================================================
    * Dynamic properties getters
@@ -153,7 +91,7 @@ class TotpEntity extends EntityV2 {
   /**
    * Create TOTP from URL
    * @param url {URL}
-   * @return {TotpEntity}
+   * @return {ExternalTotpEntity}
    */
   static createTotpFromUrl(url) {
     const totp = {
@@ -162,13 +100,13 @@ class TotpEntity extends EntityV2 {
       digits: parseInt(url.searchParams.get('digits'), 10) || 6,
       period: parseInt(url.searchParams.get('period'), 10) || 30,
     };
-    return new TotpEntity(totp);
+    return new ExternalTotpEntity(totp);
   }
 
   /**
    * Create TOTP from kdbx windows
    * @param fields {Object}
-   * @return {TotpEntity}
+   * @return {ExternalTotpEntity}
    */
   static createTotpFromKdbxWindows(fields) {
     const totp = {
@@ -177,8 +115,8 @@ class TotpEntity extends EntityV2 {
       digits:  parseInt(fields.get('TimeOtp-Length'), 10) || 6,
       period: parseInt(fields.get('TimeOtp-Period'), 10) || 30
     };
-    return new TotpEntity(totp);
+    return new ExternalTotpEntity(totp);
   }
 }
 
-export default TotpEntity;
+export default ExternalTotpEntity;

@@ -44,6 +44,8 @@ import FoldersCollection from "../../../model/entity/folder/foldersCollection";
 import GetOrFindMetadataKeysService from "../../metadata/getOrFindMetadataKeysService";
 import {defaultDecryptedSharedMetadataKeysDtos} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
+import EncryptMetadataService from "../../metadata/encryptMetadataService";
+import {defaultMetadataKeysSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -53,7 +55,7 @@ beforeEach(async() => {
 });
 
 describe("ExportResourcesService", () => {
-  let service, worker, foldersDto, resourceTypeCollection;
+  let service, worker, foldersDto, resourceTypeCollection, encryptMetadataService;
 
   const account = new AccountEntity(defaultAccountDto({user_id: pgpKeys.ada.userId}));
   const apiClientOptions = defaultApiClientOptions();
@@ -71,9 +73,13 @@ describe("ExportResourcesService", () => {
     const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
     const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
     service = new ExportResourcesService(account, apiClientOptions, new ProgressService(worker, ""));
+    encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
     jest.spyOn(FolderLocalStorage, "get").mockImplementation(() => foldersDto);
     jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypeCollection);
     jest.spyOn(GetOrFindMetadataKeysService.prototype, "getOrFindAll").mockImplementation(() => metadataKeys);
+    encryptMetadataService.getOrFindMetadataSettingsService.metadataKeysSettingsLocalStorage.flush();
+    jest.spyOn(encryptMetadataService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+      .mockImplementationOnce(() => defaultMetadataKeysSettingsDto());
   });
 
   describe("::exportToFile", () => {
@@ -91,7 +97,8 @@ describe("ExportResourcesService", () => {
       ]).describe("Should export the csv file with password and description.", test => {
         each([
           {version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG},
-          {version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG},
+          {version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG, isShared: true},
+          {version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG, isPrivate: true},
         ]).describe(`Should export ${test.format}`, iteration => {
           it(`${iteration.version}`, async() => {
             expect.assertions(1);
@@ -103,20 +110,23 @@ describe("ExportResourcesService", () => {
             };
             const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
 
-            let resourceCollection;
+            let resourceCollectionDto;
             if (iteration.version === "v4") {
-              resourceCollection = await resourceCollectionV4ToExport({
+              resourceCollectionDto = await resourceCollectionV4ToExport({
                 resourceType: resourceType,
                 folder_parent_id: foldersDto[0].id,
               });
             } else {
-              resourceCollection = await resourceCollectionV5ToExport({
+              resourceCollectionDto = await resourceCollectionV5ToExport({
                 resourceType: resourceType,
                 folder_parent_id: foldersDto[0].id,
               });
+              const resourceCollection = new ResourcesCollection(resourceCollectionDto);
+              await encryptMetadataService.encryptAllFromForeignModels(resourceCollection, pgpKeys.ada.passphrase);
+              resourceCollectionDto = resourceCollection.resources;
             }
 
-            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollection);
+            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionDto);
 
             await service.prepareExportContent(exportResourcesFileEntity);
             await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
@@ -142,22 +152,26 @@ describe("ExportResourcesService", () => {
             };
             const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
 
-            let resourceCollection;
+            let resourceCollectionDto;
             if (iteration.version === "v4") {
-              resourceCollection = await resourceCollectionV4ToExport({
+              resourceCollectionDto = await resourceCollectionV4ToExport({
                 resourceType: resourceType,
                 folder_parent_id: foldersDto[0].id,
                 totp: defaultTotpDto({secret_key: "THISISASECRET"})
               });
             } else {
-              resourceCollection = await resourceCollectionV5ToExport({
+              resourceCollectionDto = await resourceCollectionV5ToExport({
                 resourceType: resourceType,
                 folder_parent_id: foldersDto[0].id,
                 totp: defaultTotpDto({secret_key: "THISISASECRET"})
               });
+
+              const resourceCollection = new ResourcesCollection(resourceCollectionDto);
+              await encryptMetadataService.encryptAllFromForeignModels(resourceCollection, pgpKeys.ada.passphrase);
+              resourceCollectionDto = resourceCollection.resources;
             }
 
-            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollection);
+            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionDto);
 
             await service.prepareExportContent(exportResourcesFileEntity);
             await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);

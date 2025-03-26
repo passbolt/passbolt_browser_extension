@@ -20,6 +20,8 @@ import FindAllIdsByIsSharedWithGroupController from "../controller/resource/find
 import FindAllByIdsForDisplayPermissionsController
   from "../controller/resource/findAllByIdsForDisplayPermissionsController";
 import MoveResourcesController from "../controller/move/moveResourcesController";
+import ResetResourceGridUserSettingController
+  from "../controller/resourceGridSetting/resetResourceGridUserSettingController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -124,6 +126,17 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.set-grid-setting', async(requestId, gridSetting) => {
     const setResourceColumnsSettingsController = new SetResourceGridUserSettingController(worker, requestId, account);
     await setResourceColumnsSettingsController._exec(gridSetting);
+  });
+
+  /*
+   * Reset the resources grid settings
+   *
+   * @listens passbolt.resources.reset-grid-setting
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.resources.reset-grid-setting', async requestId => {
+    const resetResourceColumnsSettingsController = new ResetResourceGridUserSettingController(worker, requestId, account);
+    await resetResourceColumnsSettingsController._exec();
   });
 
   /*

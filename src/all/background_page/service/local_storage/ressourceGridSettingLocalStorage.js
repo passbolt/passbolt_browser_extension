@@ -12,6 +12,7 @@
  * @since         4.3.0
  */
 import GridUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/gridUserSetting/gridUserSettingEntity";
+import AccountEntity from "../../model/entity/account/accountEntity";
 
 export const RESOURCE_GRID_USER_SETTING_STORAGE_KEY = 'resourceGridUserSetting';
 
@@ -21,6 +22,9 @@ class ResourceGridUserSettingLocalStorage {
    * @param account the user account
    */
   constructor(account) {
+    if (!account || !(account instanceof AccountEntity)) {
+      throw new TypeError("Parameter `account` should be of key AccountEntity.");
+    }
     this.storageKey = this.getStorageKey(account);
   }
 
@@ -57,12 +61,38 @@ class ResourceGridUserSettingLocalStorage {
 
   /**
    * Set the resource grid setting in local storage.
-   * @param {GridUserSettingEntity} gridUserSettingEntity the value to save.
+   * @param {GridUserSettingEntity} settings the value to save.
    * @return {Promise<void>}
    */
-  async set(gridUserSettingEntity) {
+  async set(settings) {
+    if (!settings || !(settings instanceof GridUserSettingEntity)) {
+      throw new TypeError("Parameter `settings` should be a GridUserSettingEntity.");
+    }
     await navigator.locks.request(this.storageKey, async() => {
-      await browser.storage.local.set({[this.storageKey]: gridUserSettingEntity.toJSON()});
+      await this._setBrowserStorage({[this.storageKey]: settings.toJSON()});
+    });
+  }
+
+  /**
+   * Set the browser storage.
+   * @todo Tool to test the semaphore. A dedicated local storage service could be implemented later on top
+   * of the browser provided one to ease the testing.
+   * @param {object} data The data to store in the local storage.
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _setBrowserStorage(data) {
+    await browser.storage.local.set(data);
+  }
+
+  /**
+   * Flush the resource grid setting local storage.
+   * @return {Promise<void>}
+   */
+  async flush() {
+    const storageKey = this.storageKey;
+    await navigator.locks.request(storageKey, async() => {
+      await browser.storage.local.remove(storageKey);
     });
   }
 }

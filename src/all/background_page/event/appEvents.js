@@ -31,7 +31,6 @@ import HasUserPostponedUserSettingInvitationController
   from "../controller/accountRecovery/hasUserPostponedUserSettingInvitationController";
 import PostponeUserSettingInvitationController
   from "../controller/accountRecovery/postponeUserSettingInvitationController";
-import FileService from "../service/file/fileService";
 import WorkerService from "../service/worker/workerService";
 import TestSsoAuthenticationController from "../controller/sso/testSsoAuthenticationController";
 import GetCurrentSsoSettingsController from "../controller/sso/getCurrentSsoSettingsController";
@@ -66,6 +65,7 @@ import CreateMetadataKeyController from "../controller/metadata/createMetadataKe
 import GetCsrfTokenController from "../controller/auth/getCsrfTokenController";
 import FindMetadataMigrateResourcesController from "../controller/migrateMetadata/findMetadataMigrateResourcesController";
 import MigrateMetadataResourcesController from "../controller/migrateMetadata/migrateMetadataResourcesController";
+import DownloadOrganizationGeneratedKey from "../controller/accountRecovery/downloadOrganizationGenerateKeyController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -111,14 +111,8 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.account-recovery.download-organization-generated-key', async(requestId, privateKey) => {
-    try {
-      const date = new Date().toISOString().slice(0, 10);
-      await FileService.saveFile(`organization-recovery-private-key-${date}.asc`, privateKey, "text/plain", worker.tab.id);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new DownloadOrganizationGeneratedKey(worker, requestId, apiClientOptions);
+    await controller._exec(privateKey);
   });
 
   worker.port.on('passbolt.account-recovery.validate-organization-private-key', async(requestId, accountRecoveryOrganizationPrivateKeyDto) => {

@@ -51,7 +51,7 @@
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-shell": "^4.0.0",
-    "i18next-parser": "^9.0.1",
+    "i18next-parser": "^9.3.0",
     "jest": "^29.6.2",
     "jest-each": "^29.6.2",
     "jest-environment-jsdom": "^29.6.2",

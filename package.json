@@ -32,9 +32,12 @@
   "devDependencies": {
     "@babel/core": "^7.23.2",
     "@babel/eslint-parser": "^7.22.9",
+    "@babel/helpers": "^7.26.10",
     "@babel/plugin-transform-runtime": "^7.22.9",
     "@babel/preset-env": "^7.22.9",
     "@babel/preset-react": "^7.22.5",
+    "@babel/runtime": "^7.27.0",
+    "@babel/runtime-corejs3": "^7.26.10",
     "@svgr/webpack": "^8.1.0",
     "babel-jest": "^29.6.2",
     "babel-loader": "^8.2.3",
@@ -62,6 +65,11 @@
     "web-ext": "^8.0.0",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
+  },
+  "overrides": {
+    "web-ext": {
+      "@babel/runtime": "^7.27.0"
+    }
   },
   "scripts": {
     "build": "npx grunt build",

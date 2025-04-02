@@ -21,6 +21,40 @@ const config = {
         options: {
           presets: ["@babel/react"],
         }
+      },
+      // Transform SVG as react component
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        use: [
+          {
+            loader: "@svgr/webpack",
+            options: {
+              svgoConfig: {
+                plugins: [
+                  {
+                    name: 'preset-default',
+                    params: {
+                      overrides: {
+                        removeViewBox: false,
+                        cleanupIds: false,
+                        removeTitle: false,
+                        removeDesc: false,
+                      },
+                    },
+                  },
+                  {
+                    name: 'prefixIds',
+                    params: {
+                      prefixIds: false,
+                      prefixClassNames: false
+                    },
+                  },
+                ],
+              }
+            }
+          }
+        ],
       }
     ]
   },

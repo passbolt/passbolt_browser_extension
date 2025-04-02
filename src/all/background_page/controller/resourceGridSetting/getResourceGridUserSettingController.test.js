@@ -13,8 +13,9 @@
  */
 
 import GetResourceGridUserSettingController from "./getResourceGridUserSettingController";
-import {v4 as uuid} from "uuid";
 import {RESOURCE_GRID_USER_SETTING_STORAGE_KEY} from "../../service/local_storage/ressourceGridSettingLocalStorage";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 
 beforeEach(() => {
   jest.resetModules();
@@ -24,8 +25,8 @@ beforeEach(() => {
 describe("GetResourceColumnsSettingController", () => {
   describe("GetResourceColumnsSettingController::exec", () => {
     it("Should retrieve the resource columns settings empty if no setting exists in local storage.", async() => {
-      const mockedAccount = {id: uuid()};
-      const controller = new GetResourceGridUserSettingController(null, null, mockedAccount);
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new GetResourceGridUserSettingController(null, null, account);
       const gridUserSetting = await controller.exec();
 
       expect.assertions(1);
@@ -33,12 +34,12 @@ describe("GetResourceColumnsSettingController", () => {
     });
 
     it("Should retrieve the resource columns settings.", async() => {
-      const mockedAccount = {id: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       const columnsSetting = [{id: "name", label: "name"}];
       const sorter = {propertyName: "name", asc: true};
       const gridUserSetting = {columns_setting: columnsSetting, sorter: sorter};
-      jest.spyOn(browser.storage.local, "get").mockImplementationOnce(() => ({[`${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${mockedAccount.id}`]: gridUserSetting}));
-      const controller = new GetResourceGridUserSettingController(null, null, mockedAccount);
+      jest.spyOn(browser.storage.local, "get").mockImplementationOnce(() => ({[`${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${account.id}`]: gridUserSetting}));
+      const controller = new GetResourceGridUserSettingController(null, null, account);
       const gridUserSettingEntity = await controller.exec();
 
       expect.assertions(1);
@@ -47,10 +48,10 @@ describe("GetResourceColumnsSettingController", () => {
     });
 
     it("Should retrieve the resource columns settings empty if an error occurred.", async() => {
-      const mockedAccount = {id: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       const columnsSetting = {};
-      jest.spyOn(browser.storage.local, "get").mockImplementationOnce(() => ({[`${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${mockedAccount.id}`]: columnsSetting}));
-      const controller = new GetResourceGridUserSettingController(null, null, mockedAccount);
+      jest.spyOn(browser.storage.local, "get").mockImplementationOnce(() => ({[`${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${account.id}`]: columnsSetting}));
+      const controller = new GetResourceGridUserSettingController(null, null, account);
       const gridUserSetting = await controller.exec();
 
       expect.assertions(1);

@@ -14,7 +14,7 @@ import ExternalFolderEntity from "../../entity/folder/external/externalFolderEnt
 import ExternalResourceEntity from "../../entity/resource/external/externalResourceEntity";
 import ImportError from "../../../error/importError";
 import * as kdbxweb from 'kdbxweb';
-import TotpEntity from "../../entity/totp/totpEntity";
+import ExternalTotpEntity from "../../entity/totp/externalTotpEntity";
 import ResourcesTypeImportParser from "./resourcesTypeImportParser";
 
 class ResourcesKdbxImportParser {
@@ -166,10 +166,10 @@ class ResourcesKdbxImportParser {
     if (kdbxEntry.fields.get('otp')) {
       const totpUrl = typeof kdbxEntry.fields.get('otp') === 'object' ? kdbxEntry.fields.get('otp').getText() : kdbxEntry.fields.get('otp');
       const totpUrlDecoded = new URL(decodeURIComponent(totpUrl));
-      const totp = TotpEntity.createTotpFromUrl(totpUrlDecoded);
+      const totp = ExternalTotpEntity.createTotpFromUrl(totpUrlDecoded);
       return totp.toDto();
     } else if (typeof kdbxEntry.fields.get('TimeOtp-Secret-Base32') === 'object') {
-      const totp = TotpEntity.createTotpFromKdbxWindows(kdbxEntry.fields);
+      const totp = ExternalTotpEntity.createTotpFromKdbxWindows(kdbxEntry.fields);
       return totp.toDto();
     }
   }

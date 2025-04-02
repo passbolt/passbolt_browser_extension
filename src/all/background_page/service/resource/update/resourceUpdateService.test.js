@@ -49,7 +49,7 @@ import {
   defaultDecryptedSharedMetadataKeysDtos
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
-import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resourceMetadata/resourceMetadataEntity.test.data.js";
+import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data.js";
 
 jest.mock("../../../service/progress/progressService");
 

@@ -50,9 +50,6 @@ import {v4 as uuidv4} from "uuid";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
-import {
-  defaultSecretDto
-} from "passbolt-styleguide/src/react-extension/components/Resource/CreateResource/CreateResource.test.data";
 import expect from "expect";
 import MockPort from "passbolt-styleguide/test/mocks/mockPort";
 import ProgressService from "../progress/progressService";
@@ -131,7 +128,7 @@ describe("ShareResourceService", () => {
         const resourceDto = defaultResourceV4Dto({
           id: resourceIdToShare,
           resource_type_id: scenario.resourceTypeId,
-          secrets: [defaultSecretDto({resource_id: resourceIdToShare, data: resourceSecretData})]
+          secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceIdToShare, data: resourceSecretData})]
         });
         jest.spyOn(service.findResourcesService, "findAllByIdsForShare").mockImplementation(() => new ResourcesCollection([resourceDto]));
 
@@ -235,7 +232,7 @@ describe("ShareResourceService", () => {
         const resourceDto = defaultResourceDto({
           id: resourceIdToShare,
           resource_type_id: scenario.resourceTypeId,
-          secrets: [defaultSecretDto({resource_id: resourceIdToShare, data: resourceSecretData})]
+          secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceIdToShare, data: resourceSecretData})]
         });
         jest.spyOn(service.findResourcesService, "findAllByIdsForShare").mockImplementation(() => new ResourcesCollection([resourceDto]));
 
@@ -334,7 +331,7 @@ describe("ShareResourceService", () => {
           resource_type_id: scenario.resourceTypeId,
           metadata_key_type: METADATA_KEY_TYPE_USER_KEY,
           metadata_key_id: uuidv4(),
-          secrets: [defaultSecretDto({resource_id: resourceIdToShare, data: resourceSecretData})]
+          secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceIdToShare, data: resourceSecretData})]
         });
         jest.spyOn(service.findResourcesService, "findAllByIdsForShare").mockImplementation(() => new ResourcesCollection([resourceDto]));
 
@@ -508,14 +505,14 @@ describe("ShareResourceService", () => {
       const resource1V4Dto = defaultResourceV4Dto({
         id: resourceId1V4,
         resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
-        secrets: [defaultSecretDto({resource_id: resourceId1V4, data: resource1V4SecretData})]
+        secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceId1V4, data: resource1V4SecretData})]
       });
       const resource2V4SecretDataDto = plaintextSecretPasswordDescriptionTotpDto();
       const resource2V4SecretData = await EncryptMessageService.encrypt(JSON.stringify(resource2V4SecretDataDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
       const resource2V4Dto = defaultResourceV4Dto({
         id: resourceId2V4,
         resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
-        secrets: [defaultSecretDto({resource_id: resourceId2V4, data: resource2V4SecretData})]
+        secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceId2V4, data: resource2V4SecretData})]
       });
       const resource1V5SecretDataDto = plaintextSecretPasswordDescriptionTotpDto();
       const resource1V5SecretData = await EncryptMessageService.encrypt(JSON.stringify(resource1V5SecretDataDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
@@ -524,7 +521,7 @@ describe("ShareResourceService", () => {
         metadata_key_type: METADATA_KEY_TYPE_USER_KEY,
         metadata_key_id: uuidv4(),
         resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
-        secrets: [defaultSecretDto({resource_id: resourceId1V5, data: resource1V5SecretData})]
+        secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceId1V5, data: resource1V5SecretData})]
       });
       const resource2V5SecretDataDto = plaintextSecretTotpDto();
       const resource2V5SecretData = await EncryptMessageService.encrypt(JSON.stringify(resource2V5SecretDataDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
@@ -533,14 +530,14 @@ describe("ShareResourceService", () => {
         metadata_key_type: METADATA_KEY_TYPE_USER_KEY,
         metadata_key_id: uuidv4(),
         resource_type_id: TEST_RESOURCE_TYPE_V5_TOTP,
-        secrets: [defaultSecretDto({resource_id: resourceId2V5, data: resource2V5SecretData})]
+        secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceId2V5, data: resource2V5SecretData})]
       });
       const resource3V5SecretDataDto = plaintextSecretPasswordStringDto();
       const resource3V5SecretData = await EncryptMessageService.encrypt(JSON.stringify(resource3V5SecretDataDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
       const resource3V5Dto = defaultResourceDto({
         id: resourceId3V5,
         resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
-        secrets: [defaultSecretDto({resource_id: resourceId3V5, data: resource3V5SecretData})]
+        secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceId3V5, data: resource3V5SecretData})]
       });
 
       const resourcesDto = [resource1V4Dto, resource2V4Dto, resource1V5Dto, resource2V5Dto, resource3V5Dto];

@@ -28,12 +28,7 @@ import {v4 as uuidv4} from "uuid";
 import {minimumPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import {defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {
-  defaultSecretDto
-} from "passbolt-styleguide/src/react-extension/components/Resource/CreateResource/CreateResource.test.data";
-import {
-  plaintextSecretPasswordAndDescriptionDto
-} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
+import {plaintextSecretPasswordAndDescriptionDto} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 import {simulateShareSecretsChangesDto} from "../../service/share/shareResourceService.test.data";
 
 const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
@@ -83,7 +78,7 @@ describe("ShareResourcesController", () => {
       const resourceSecretData = await EncryptMessageService.encrypt(JSON.stringify(secretDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
       const resourceForShareDto = new defaultResourceV4Dto({
         ...resourceDto,
-        secrets: [defaultSecretDto({resource_id: resourceId, data: resourceSecretData})]
+        secrets: [plaintextSecretPasswordAndDescriptionDto({resource_id: resourceId, data: resourceSecretData})]
       });
       jest.spyOn(controller.shareResourceService.findResourcesService, "findAllByIdsForShare").mockImplementation(() => new ResourcesCollection([resourceForShareDto]));
       // Mock keyring.

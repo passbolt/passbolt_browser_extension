@@ -13,8 +13,8 @@
 import ResourceEntity from "../resourceEntity";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
 import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
-import TotpEntity from "../../totp/totpEntity";
-import ResourceMetadataEntity from "../metadata/resourceMetadataEntity";
+import ExternalTotpEntity from "../../totp/externalTotpEntity";
+import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {assertType} from "../../../../utils/assertions";
@@ -39,7 +39,7 @@ class ExternalResourceEntity extends EntityV2 {
     }
 
     if (this._props.totp) {
-      this._totp = new TotpEntity(this._props.totp, {clone: false});
+      this._totp = new ExternalTotpEntity(this._props.totp, {clone: false});
       delete this._props.totp;
     }
   }
@@ -93,7 +93,7 @@ class ExternalResourceEntity extends EntityV2 {
           "type": "string"
         },
         "totp": {
-          ...TotpEntity.getSchema(),
+          ...ExternalTotpEntity.getSchema(),
           "nullable": true,
         },
         "folder_parent_path": {
@@ -375,7 +375,7 @@ class ExternalResourceEntity extends EntityV2 {
 
   /**
    * Get the associated totp if any
-   * @returns {TotpEntity|null}
+   * @returns {ExternalTotpEntity|null}
    */
   get totp() {
     return this._totp || null;
@@ -383,14 +383,14 @@ class ExternalResourceEntity extends EntityV2 {
 
   /**
    * Set the associated totp
-   * @param {TotpEntity|null} totp
+   * @param {ExternalTotpEntity|null} totp
    */
   set totp(totp) {
     if (totp === null) {
       this._totp = null;
       return;
     }
-    assertType(totp, TotpEntity);
+    assertType(totp, ExternalTotpEntity);
     this._totp = totp;
   }
 

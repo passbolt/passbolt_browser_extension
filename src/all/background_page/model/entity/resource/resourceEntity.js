@@ -497,7 +497,7 @@ class ResourceEntity extends EntityV2 {
   toV4Dto(contain) {
     const resourceDTO = this.toDto(contain);
     resourceDTO.name = resourceDTO.metadata.name;
-    resourceDTO.username = resourceDTO.metadata.username || "";
+    resourceDTO.username = resourceDTO.metadata.username;
     resourceDTO.uri = resourceDTO.metadata.uris?.[0] || "";
     resourceDTO.description = resourceDTO.metadata.description;
     delete resourceDTO.metadata;

@@ -61,10 +61,10 @@ class ResourceCreateController {
       const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       this.progressService.start(goals, i18n.t('Initializing'));
       const resourceCreated =  await this.resourceCreateService.create(resourceDto, plaintextDto, passphrase);
-      this.progressService.finishStep(i18n.t('Done!'), true);
+      await this.progressService.finishStep(i18n.t('Done!'), true);
       return resourceCreated;
     } finally {
-      this.progressService.close();
+      await this.progressService.close();
     }
   }
 }

@@ -182,6 +182,7 @@ describe("Resource entity", () => {
       expect(entityV5.metadata).toEqual(resourceDTO.metadata);
     });
   });
+
   describe("ResourceEntity::toDTOv4", () => {
     it("Should transform DTO v5 to v4", () => {
       expect.assertions(5);
@@ -194,6 +195,26 @@ describe("Resource entity", () => {
       expect(dtoV4.username).toEqual(entityV5.metadata.username);
       expect(dtoV4.description).toEqual(entityV5.metadata.description);
       expect(dtoV4.uri).toEqual(entityV5.metadata.uris?.[0]);
+      expect(dtoV4.metadata).toBeUndefined();
+    });
+
+    it("Should set missing data to an empty string", () => {
+      expect.assertions(5);
+
+      const resourceDTO = {
+        resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
+        metadata: {
+          resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
+          name: "no name",
+        },
+      };
+      const entityV5 =  new ResourceEntity(resourceDTO);
+      const dtoV4 = entityV5.toV4Dto();
+
+      expect(dtoV4.name).toEqual(entityV5.metadata.name);
+      expect(dtoV4.username).toEqual("");
+      expect(dtoV4.description).toBeUndefined();
+      expect(dtoV4.uri).toEqual("");
       expect(dtoV4.metadata).toBeUndefined();
     });
   });

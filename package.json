@@ -67,9 +67,7 @@
     "webpack-cli": "^5.1.4"
   },
   "overrides": {
-    "web-ext": {
-      "@babel/runtime": "^7.27.0"
-    }
+    "image-size": "^2.0.2"
   },
   "scripts": {
     "build": "npx grunt build",

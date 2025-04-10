@@ -38,7 +38,7 @@ module.exports = function (grunt) {
    * Import package.json file content
    */
   var pkg = grunt.file.readJSON('package.json');
-  var manifestVersion =  pkg.version.replace(/-.*$/,'');
+  var manifestVersion =  pkg.version.replace(/-.*(\.\d*)$/,'$1');
 
   /**
    * Load and enable Tasks
@@ -160,28 +160,24 @@ module.exports = function (grunt) {
           // Avatar
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/avatar',
-          src: ['user.png', 'group_default.png'],
+          src: ['group_default.png'],
           dest: path.build_web_accessible_resources + 'img/avatar',
           expand: true
         }, {
           // Controls
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/controls',
-          src: [
-            'check_black.svg', 'check_white.svg', 'dot_black.svg', 'dot_white.svg', 'dot_red.svg',
-            'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg', 'chevron-right_black.svg',
-            'chevron-right_white.svg', 'chevron-down_black.svg', 'chevron-down_white.svg', 'chevron-down_blue.svg',
-            'success.svg', 'fail.svg', 'warning.svg'
-          ],
+          src: ['check_tick.svg'],
           dest: path.build_web_accessible_resources + 'img/controls',
           expand: true
-        }, {
+        },
+        {
           // Icons / logo
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
           src: [
-            'icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png',
-            'logo.svg', 'logo_white.png', 'logo_white@2x.png', 'logo_white.svg',
+            'icon-48.png',
+            'logo.svg', 'logo_white.svg',
             'icon-without-badge.svg',
             'icon-inactive.svg',
             'icon-badge-1.svg',
@@ -199,7 +195,6 @@ module.exports = function (grunt) {
           cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
           src: [
             'icon-16.png',
-            'icon-19.png',
             'icon-32.png',
             'icon-32-signout.png',
             'icon-32-badge-1.png',
@@ -209,7 +204,6 @@ module.exports = function (grunt) {
             'icon-32-badge-5.png',
             'icon-32-badge-5+.png',
             'icon-48.png',
-            'icon-64.png',
             'icon-128.png'],
           dest: path.build_web_accessible_resources + 'img/icons',
           expand: true
@@ -224,15 +218,8 @@ module.exports = function (grunt) {
           // Third party logos
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/third_party',
-          src: ['ChromeWebStore.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png', 'appstore.svg', 'playstore.svg'],
+          src: ['appstore.svg', 'playstore.svg'],
           dest: path.build_web_accessible_resources + 'img/third_party',
-          expand: true
-        }, {
-          // theme preview images
-          nonull: true,
-          cwd: path.node_modules + 'passbolt-styleguide/src/img/themes',
-          src: ['default.png', 'midgar.png', 'solarized_dark.png', 'solarized_light.png'],
-          dest: path.build_web_accessible_resources + 'img/themes',
           expand: true
         }, {
           // CSS files default
@@ -274,7 +261,7 @@ module.exports = function (grunt) {
         }, {
           // Fonts
           cwd: path.node_modules + 'passbolt-styleguide/src/fonts',
-          src: ['opensans-bold.woff', 'opensans-regular.woff', 'passbolt.ttf', 'inconsolata-regular.ttf'],
+          src: ['opensans-variable-font.ttf', 'opensans-italic-variable-font.ttf', 'obfuscation-regular.otf', 'inconsolata-regular.ttf'],
           dest: path.build_web_accessible_resources + 'fonts',
           expand: true
         }, {

@@ -1,39 +1,42 @@
-Song: https://www.youtube.com/watch?v=pBZs_Py-1_0
+Song: https://www.youtube.com/watch?v=yf1f8zNvR1I
 
-Passbolt v4.12.0 introduces the final update in the version 4 series. This release completes the groundwork for version 5 and allows integrators to test the migration directly from the UI ahead of the stable release.
+“Even the longest day has its end” goes the old Irish proverb, and here we are at long last announcing the Passbolt 5.x series. This first release v5.0 ships with a complete redesign of the application’s interface, which had remained largely unchanged since Passbolt’s early days and was limiting the addition of new capabilities. The new version offers a more spacious layout that provides room for meaningful information and addresses long-standing ergonomic issues. If you want to know more, check out what changed in this [Passbolt 5, UI Redesign](https://community.passbolt.com/t/passbolt-5-ui-redesign/12717) community post. 
 
-As always, this version also addresses community-reported issues, including fixes for UI inconsistencies and multi-selection shortcuts that were not working across all environments.
+Passbolt v5.0 lays the groundwork for the v5.x series, which will expand the software’s capabilities to handle more sensitive data types that the community has requested, such as key-value pairs, SSH keys, and certificates. The blog article about the passbolt v5.0 release is coming soon.
 
-As a final update of the v4 series, system administrators are invited to upgrade their version of PHP to meet Passbolt v5’s minimum requirements: PHP 8.2. We posted a guide in our Weblog to help you with the process: [Preparing for Passbolt v5: PHP 8.2 Requirement](https://www.passbolt.com/blog/preparing-for-passbolt-v5-php-8-2-requirement).
+Of course, with each major version come the inevitable breaking changes, which we strive to minimize as much as possible. With this release, the minimum server requirement has changed to PHP 8.2 or greater, so be sure to check out our latest blog article on [how to upgrade to PHP 8.2](https://www.passbolt.com/blog/preparing-for-passbolt-v5-php-8-2-requirement). Additionally this is a perfect moment to back up your server data and prepare for the unexpected. 
 
-Thank you to the community for your feedback and patience—we’re almost there!
+Thank you to the community for all your feedback, testing, and support in making this milestone possible. We hope you’ll enjoy what Passbolt v5.0 has to offer and look forward to hearing from you.
 
 
 ### Added
-PB-38932 WP6-3.1 Implement navigation to content types migrate metadata content administration page
-PB-38915 WP6-3.2 Implement findUpgradeContentDetails function on MetadataMigrateContentServiceWorkerService to retrieve content to upgrade details in the content types migrate metadata administration page
-PB-38916 WP6-3.3 Implements MigrateMetadataSettingsFormEntity to handle form data
-PB-38917 WP6-3.4 As an administrator I can see the migrate metadata settings form
-PB-38918 WP6-3.5 Implements MigrateMetadataResourcesService to migrate metadata resources
-PB-38919 WP6-3.6 Implements PassboltResponseEntities to handle passbolt API response
-PB-38921 WP6-3.7 Implements MigrateMetadataResourcesController to run metadata migration from the styleguide
-PB-38923 WP6-3.8 Implements ConfirmMigrateMetadataDialog to warn admin before actually running the migration
-PB-38925 WP6-3.10 Implements MigrateMetadataSettingsActionBar to trigger migration process
-PB-38996 WP6-4.1 Update ResourceTypeEntity to handle the new 'deleted' field
-PB-38998 WP6-4.3 Implements findAllByDeletedAndNonDeleted on FindResourceTypesService  to retrieve all deleted and non deleted resources-types
-PB-38999 WP6-4.4 Implements FindAllByDeletedAndNonDeletedResourceTypesContoller to find all available and deleted resources-types
-PB-39000 WP6-4.5 Implements ResourceTypesServiceWorkerService to request the service worker for retrieving the resource types
-PB-39001 WP6-4.6 Implements ResourceTypesFormEntity to handle the data from the form component
-PB-39002 WP6-4.7 Implements navigation to allow content types administration page
-PB-39003 WP6-4.8 Implements DisplayContentTypesAllowedContentTypesAdministration component to display the administration form
-PB-39004 WP6-4.9 Implements ResourceTypesApiService undelete method to process the undelete of the given resources type
-PB-39005 WP6-4.10 Implements ResourceTypesService delete method to request the API for deleted the given resource type
-PB-39006 WP6-4.11 Implements UpdateResourceTypesService undelete method to process the update of the given resources types
-PB-39009 WP6-4.14 Implements UpdateAllResourceTypesDeletedStatusController to update all  resource types deleted status
-PB-39010 WP6-4.15 Implements ResourceTypesServiceWorkerService update and delete method to communication with the service worker
-PB-39011 WP5-4.16 Add to DisplayResourceTypes a "Save" button to trigger the update process of the allowed resource types
+PB-33425 Allow users to reset resource grid columns to default factory settings through the columns settings dropdown
+PB-35232 Add a resource grid filter to display only private resources
+PB-37332 Rename encrypted description to note and clearly differentiate between the metadata description and the secret note
+PB-37620 Allow users to resize and reorder the users grid
+PB-37638 Add a details sidebar for multiple grid resource selections to allow users to review their selection
+PB-38938 Redirect administrator to a home page instead of the first available settings page
+PB-38940 Organize the administration menu into meaningful sections
+PB-39415 Redesign the application
+PB-39464 Introduce unified and modular resource creation and editing dialogs to support upcoming resource types
+PB-40150 Display a default resource icon in the grid
 
 ### Fixed
-PB-38763 Using V5 format, exporting resources now set all the fields properly
-PB-39388 Edition and creation of resources now export object_type in metadata properly
-PB-39084 When selecting multiple resources, the OS is detected and the right shortcut is used
+PB-28280 Display the complete resource path in sidebar details
+PB-33618 Disable the "select all" dropdown in the users grid until bulk operations are supported
+PB-39994 Display a pending changes banner after modifying administration email notification settings
+PB-39995 Ease identification of generated organization recovery key file name by including the GPG key identifier
+PB-40268 Display a pending changes banner after modifying administration internationalization settings
+PB-40270 Display a pending changes banner after modifying administration email server settings
+PB-40271 Display a pending changes banner after modifying administration RBAC settings
+PB-40272 Display a pending changes banner after modifying administration users directory settings
+PB-40273 Display a pending changes banner after modifying administration SSO settings
+PB-40669 Display loading feedback in the folder navigation tree during folder loading
+PB-40186 WP6-7.5 Validate the object_type property of v5 secrets to mitigate unwanted content decryption attacks
+PB-40576 Reposition the expiry item in resources grid column settings to reflect its lower display priority in the grid
+PB-41275 Display the complete folder path in sidebar details
+
+### Maintenance
+PB-40117 Upgrade browser extensions repositories to node 22
+PB-40687 Upgrade vulnerable library babel and relative
+PB-40688 Upgrade vulnerable library i18next-parser and relative

@@ -421,7 +421,16 @@ classDiagram
         }
     }
 
-    namespace Auth-service {
+    namespace AuthNs {
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Auth controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+        class GetCsrfTokenController{
+            event "passbolt.auth.get-csrf-token"
+            +exec() Promise
+        }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Auth services

@@ -1,6 +1,13 @@
-Passbolt Browser Extension v5 is now available as a release candidate. The application's look and feel has been completely revamped to provide a more user-friendly experience, along with a host of other improvements. For more detailed information, please refer to the changelogs.
+Song: https://www.youtube.com/watch?v=yf1f8zNvR1I
 
-We would also like to thank the community for their invaluable feedback.
+“Even the longest day has its end” goes the old Irish proverb, and here we are at long last announcing the Passbolt 5.x series. This first release v5.0 ships with a complete redesign of the application’s interface, which had remained largely unchanged since Passbolt’s early days and was limiting the addition of new capabilities. The new version offers a more spacious layout that provides room for meaningful information and addresses long-standing ergonomic issues. If you want to know more, check out what changed in this [Passbolt 5, UI Redesign](https://community.passbolt.com/t/passbolt-5-ui-redesign/12717) community post. 
+
+Passbolt v5.0 lays the groundwork for the v5.x series, which will expand the software’s capabilities to handle more sensitive data types that the community has requested, such as key-value pairs, SSH keys, and certificates. The blog article about the passbolt v5.0 release is coming soon.
+
+Of course, with each major version come the inevitable breaking changes, which we strive to minimize as much as possible. With this release, the minimum server requirement has changed to PHP 8.2 or greater, so be sure to check out our latest blog article on [how to upgrade to PHP 8.2](https://www.passbolt.com/blog/preparing-for-passbolt-v5-php-8-2-requirement). Additionally this is a perfect moment to back up your server data and prepare for the unexpected. 
+
+Thank you to the community for all your feedback, testing, and support in making this milestone possible. We hope you’ll enjoy what Passbolt v5.0 has to offer and look forward to hearing from you.
+
 
 ### Added
 PB-33425 Allow users to reset resource grid columns to default factory settings through the columns settings dropdown
@@ -32,4 +39,4 @@ PB-41275 Display the complete folder path in sidebar details
 ### Maintenance
 PB-40117 Upgrade browser extensions repositories to node 22
 PB-40687 Upgrade vulnerable library babel and relative
-40688 Upgrade vulnerable library i18next-parser and relative
+PB-40688 Upgrade vulnerable library i18next-parser and relative

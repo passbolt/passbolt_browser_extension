@@ -1,6 +1,6 @@
 {
   "appName": {
-    "message": "패스볼트 - 오픈소스 암호 관리 프로그램",
+    "message": "패스볼트 - 오픈소스 비밀번호 관리 프로그램",
     "description": "The application name of the extension, displayed in the web store. 45 characters max."
   },
   "appDescription": {

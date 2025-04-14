@@ -1,6 +1,6 @@
 {
   "name": "passbolt-browser-extension",
-  "version": "5.0.0",
+  "version": "5.0.1-rc.0",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2025 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -69,6 +69,9 @@
   "overrides": {
     "web-ext": {
       "@babel/runtime": "^7.27.0"
+    },
+    "addons-linter": {
+      "image-size": "^2.0.2"
     }
   },
   "scripts": {

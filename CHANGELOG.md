@@ -4,6 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.0.1] - 2025-04-14
+### Fixed
+- PB-41438 Prevent users from migrating encrypted notes to cleartext descriptions when editing a resource
+- PB-41540 Display the v5 redesign skeleton while the application is loading
+- PB-41541 Display an ellipsis for long names and usernames on the user badge
+
 ## [5.0.0] - 2025-04-09
 ### Added
 PB-33425 Allow users to reset resource grid columns to default factory settings through the columns settings dropdown
@@ -2074,7 +2080,8 @@ self registration settings option in the left-side bar
 - LU: Logged in user
 
 ## [4.12.0] - 2024-03-10
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.1...HEAD
+[5.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.12.0...v5.0.0
 [4.12.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.11.0...v4.12.0
 [4.11.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.10.2...v4.11.0

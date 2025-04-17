@@ -8,7 +8,7 @@ classDiagram
     %% Resources controllers
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        class CreateResourceController{
+        class ResourceCreateController{
             event "passbolt.resources.create"
             +exec(object resourceDto, object secretDto) Promise~ResourceEntity~
         }
@@ -38,7 +38,7 @@ classDiagram
             +exec(object ImportResourcesFileDto) Promise~ImportResourcesFileEntity~
         }
 
-        class UpdateResourceController{
+        class ResourceUpdateController{
             event "passbolt.resources.update"
             +exec(object resourceDto, object secretDto) Promise~ResourceEntity~
         }
@@ -274,6 +274,27 @@ classDiagram
 
         class GetOrFindMetadataKeysService {
             +getOrFindAll() Promise~MetadataKeysCollection~
+        }
+
+        class VerifyTrustedMetadataKeyService {
+            +constructor(WorkerEntity worker)
+            +verifyAndTrust(string passphrase) Promise~void~
+        }
+
+        class ConfirmMetadataKeyTrustService {
+            +constructor(WorkerEntity worker, ApiClientOptions apiClientOptions, AccountEntity account)
+            +confirm(MetadataKeyEntity metadataKey, MetadataKeyEntity previousMetadataKey) Promise~boolean~
+        }
+
+        class TrustedMetadataKeyLocalStorage {
+            +constructor(AccountEntity account)
+            +get() Promise~Object~
+            +set(MetadataKeyEntity metadataKey) Promise~void~
+        }
+
+        class TrustMetadataKeyService {
+            +constructor(ApiClientOptions apiClientOptions, AccountEntity account)
+            +trust(MetadataKeyEntity metadataKey,  string passphrase) Promise~void~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -582,6 +603,7 @@ classDiagram
             +get created() string
             +fingerprint() string
             +get expired() string
+            +get isSignByMe() boolean | null
         }
 
         class MetadataKeysCollection {
@@ -862,6 +884,10 @@ classDiagram
             +exec(array~uuid~ resourcesIds, array~object~ permissionChangesDto) Promise
         }
 
+        class ShareOneFolderController {
+            event "passbolt.share.folders.save"
+            +exec(string folderId, Array<Object> permissionChangesDto) Promise
+        }
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Share service
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -880,9 +906,25 @@ classDiagram
         }
     }
 
+    namespace MoveNs {
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Move controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class MoveFolderController {
+            event "passbolt.folders.move-by-id'"
+            + exec(string folderId, string|null destinationFolderId)
+        }
+
+        class MoveResourcesController {
+            event "passbolt.resources.move-by-ids"
+            + exec(Array<string> resourcesIds, string|null destinationFolderId)
+        }
+    }
 %% Resource controllers relationships
-    CreateResourceController*--CreateResourceService
-%%    CreateResourceController*--GetPassphraseService
+    ResourceCreateController*--CreateResourceService
+    ResourceCreateController*--VerifyTrustedMetadataKeyService
+%%    ResourceCreateController*--GetPassphraseService
     ExportResourcesFileController*--FindResourcesService
     ExportResourcesFileController*--ExportResourcesService
     FindAllIdsByIsSharedWithGroupController*--FindAndUpdateResourcesLocalStorageService
@@ -891,17 +933,19 @@ classDiagram
     FindAndUpdateResourcesLocalStorageService*--ResourcesLocalStorageService
 %%    ImportResourcesFileController*--GetPassphraseService
     ImportResourcesFileController*--ImportResourcesService
+    ImportResourcesFileController*--VerifyTrustedMetadataKeyService
     UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
-%%    UpdateResourceController*--GetPassphraseService
-    UpdateResourceController*--UpdateResourceService
-    style CreateResourceController fill:#D2E0FB
+%%    ResourceUpdateController*--GetPassphraseService
+    ResourceUpdateController*--UpdateResourceService
+    ResourceUpdateController*--VerifyTrustedMetadataKeyService      
+    style ResourceCreateController fill:#D2E0FB
     style ExportResourcesFileController fill:#D2E0FB
     style FindAllIdsByIsSharedWithGroupController fill:#D2E0FB
     style FindResourceDetailsController fill:#D2E0FB
     style FindResourcesForShareController fill:#D2E0FB
     style ImportResourcesFileController fill:#D2E0FB
     style UpdateAllResourcesLocalStorageController fill:#D2E0FB
-    style UpdateResourceController fill:#D2E0FB
+    style ResourceUpdateController fill:#D2E0FB
 %% Resource services relationships.
     CreateResourceService*--EncryptMetadataService
     CreateResourceService*--ResourceService
@@ -1034,6 +1078,8 @@ classDiagram
 
 %% Share controllers relationships
     ShareResourcesController*--ShareResourceService
+    ShareResourcesController*--VerifyTrustedMetadataKeyService
+    ShareOneFolderController*--VerifyTrustedMetadataKeyService
     style ShareResourcesController fill:#D2E0FB
 %% Share services relationships.
     ShareResourceService*--EncryptMetadataService
@@ -1043,4 +1089,15 @@ classDiagram
     ShareResourceService*--ShareService
 %% Share models relationships.
     style ShareService fill:#DEE5D4
+
+%% Move controllers relationships
+    MoveFolderController*--VerifyTrustedMetadataKeyService
+    MoveResourcesController*--VerifyTrustedMetadataKeyService
+    
+%% Verify trusted metadataKey  service relationships.
+    VerifyTrustedMetadataKeyService*--ConfirmMetadataKeyTrustService
+    VerifyTrustedMetadataKeyService*--GetOrFindMetadataKeysService
+    VerifyTrustedMetadataKeyService*--TrustMetadataKeyService
+    VerifyTrustedMetadataKeyService*--TrustedMetadataKeyLocalStorage
+    TrustMetadataKeyService*--TrustedMetadataKeyLocalStorage
 ```

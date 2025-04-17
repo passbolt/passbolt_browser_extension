@@ -19,6 +19,8 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
+import BinaryConvert from "../../../../utils/format/binaryConvert";
 
 describe("CsvChromiumRowParser", () => {
   it("can parse Chromium based browsers csv", () => {
@@ -51,6 +53,12 @@ describe("CsvChromiumRowParser", () => {
       "password": "Secret 1",
     };
 
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
@@ -62,7 +70,7 @@ describe("CsvChromiumRowParser", () => {
       secret_clear: data.password,
     });
 
-    const externalResourceEntity = CsvChromiumRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvChromiumRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -78,6 +86,12 @@ describe("CsvChromiumRowParser", () => {
       "password": "Secret 1",
     };
 
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
@@ -89,7 +103,7 @@ describe("CsvChromiumRowParser", () => {
       secret_clear: data.password,
     });
 
-    const externalResourceEntity = CsvChromiumRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvChromiumRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());

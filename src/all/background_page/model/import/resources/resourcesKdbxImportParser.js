@@ -141,12 +141,27 @@ class ResourcesKdbxImportParser {
         externalResourceDto.totp = totp;
       }
 
-      // @todo pebble
-      const resourceType = ResourcesTypeImportParser.parseResourceType(externalResourceDto, this.resourceTypesCollection, this.metadataTypesSettings);
-      if (resourceType) {
-        externalResourceDto.resource_type_id = resourceType.id;
+      this.resourceTypesCollection.filterByResourceTypeVersion(this.metadataTypesSettings.defaultResourceTypes);
+
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, this.resourceTypesCollection);
+
+      let resourceType = ResourcesTypeImportParser.findMatchingResourceType(this.resourceTypesCollection, scores);
+
+      if (!resourceType) {
+        resourceType = ResourcesTypeImportParser.findPartialResourceType(this.resourceTypesCollection, scores);
+        if (resourceType) {
+          this.importEntity.importResourcesErrors.push(new ImportError("Resource partially imported", externalResourceDto));
+        }
+        if (!resourceType) {
+          //Fallback default content type not supported
+          resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(this.resourceTypesCollection, this.metadataTypesSettings);
+          this.importEntity.importResourcesErrors.push(new ImportError("Content type not supported but imported with default resource type", externalResourceDto));
+        }
       }
-      // Sanitize.
+
+      //resourceType should never be empty to not block end user
+      externalResourceDto.resource_type_id = resourceType.id;
+
       if (!externalResourceDto.name.length) {
         externalResourceDto.name = ExternalResourceEntity.DEFAULT_RESOURCE_NAME;
       }
@@ -172,52 +187,6 @@ class ResourcesKdbxImportParser {
       const totp = ExternalTotpEntity.createTotpFromKdbxWindows(kdbxEntry.fields);
       return totp.toDto();
     }
-  }
-
-  /**
-   * Get scores for each resources based on the resourceTypes
-   * @param {object} externalResourceDto the csv row data
-   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
-   * @returns {ResourceTypeEntity}
-   */
-  getScores(externalResourceDto, resourceTypesCollection) {
-    const scores = [];
-
-    for (let i = 0; i < resourceTypesCollection.length; i++) {
-      const resourceType = resourceTypesCollection.items[i];
-
-      //Skip legacy resourceType if it exists
-      if (resourceType.slug === "password-string") {
-        continue;
-      }
-
-      const resourceProperties = Object.entries(externalResourceDto)
-        .filter(([, value]) => {
-          if (typeof value === 'string') {
-            return value.length > 0; // Exclude empty strings
-          }
-          return true;
-        })
-        .map(([key]) => key === 'secret_clear' ? 'password' : key);
-      // Exception to be removed with v5: we need to include password inti the resource
-      if (resourceType.slug === "password-description-totp" && resourceProperties.includes("totp") &&  resourceProperties.includes("description")) {
-        externalResourceDto.password = "";
-      }
-
-      const secretsFields = Object.keys(resourceType.definition.secret.properties);
-      const secretsRequiredFields = resourceType.definition.secret.required;
-      const score = resourceProperties.filter(value => secretsFields.includes(value));
-      const matchAllRequiredField = secretsRequiredFields.every(secretsField => score.includes(secretsField));
-
-      scores.push({
-        slug: resourceType.slug,
-        value: score.length,
-        hasRequiredFields: matchAllRequiredField,
-        match: score.length === secretsFields.length,
-      });
-    }
-
-    return scores;
   }
 
   /**

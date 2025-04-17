@@ -17,6 +17,8 @@ import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/e
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
+import BinaryConvert from "../../../../utils/format/binaryConvert";
 
 describe("CsvLastPassRowParser", () => {
   it("can parse LastPass csv", () => {
@@ -50,6 +52,13 @@ describe("CsvLastPassRowParser", () => {
       "extra": "Description 1",
       "grouping": "Folder 1"
     };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
@@ -63,7 +72,7 @@ describe("CsvLastPassRowParser", () => {
       folder_parent_path: data.grouping,
     });
 
-    const externalResourceEntity = CsvLastPassRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -80,6 +89,13 @@ describe("CsvLastPassRowParser", () => {
       "extra": "Description 1",
       "grouping": "Folder 1"
     };
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
@@ -93,7 +109,7 @@ describe("CsvLastPassRowParser", () => {
       folder_parent_path: data.grouping,
     });
 
-    const externalResourceEntity = CsvLastPassRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());

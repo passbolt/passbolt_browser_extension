@@ -127,7 +127,7 @@ class ResourcesCsvImportParser {
 
     data.forEach(row => {
       try {
-        const externalResourceEntity = RowParser.parse(row, this.resourceTypesCollection, this.metadataTypesSettings);
+        const externalResourceEntity = RowParser.parse(row, this.importEntity, this.resourceTypesCollection, this.metadataTypesSettings);
         collection.push(externalResourceEntity);
       } catch (error) {
         this.importEntity.importResourcesErrors.push(new ImportError("Cannot parse resource", row, error));

@@ -12,38 +12,74 @@
  * @since         4.10.0
  */
 
-import {RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_PASSWORD_STRING_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG, RESOURCE_TYPE_V5_PASSWORD_STRING_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_PASSWORD_STRING_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG, RESOURCE_TYPE_V5_PASSWORD_STRING_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 
 class ResourcesTypeImportParser {
   /**
-   * Parse the resource type id
-   * @param {object} externalResourceDto the csv row data
+   * Based on the score, we find the perfect resource type matching with import
    * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
-   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
+   * @param {object} scores the scores calculated for each resourceType
    * @returns {ResourceTypeEntity}
    */
-  static parseResourceType(externalResourceDto, resourceTypesCollection, metadataTypesSettings) {
-    //Filter resource collection based on defaultResourceTypes settings
-    resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
-
-    const scores = this.getScores(externalResourceDto, resourceTypesCollection);
-
+  static findMatchingResourceType(resourceTypesCollection, scores) {
+    //Get highest
     const matchedResourceType = scores
-      .filter(score => score.value > 0)              // Supports at least one parsed property
-      .filter(score => score.hasRequiredFields)      // Meets all required properties
-      .sort((a, b) => b.value - a.value)[0];         // Supports the highest number of properties
+      .filter(score => score.value > 0)                        // Supports at least one parsed property
+      .filter(score => score.missingRequiredFields === 0)      // Meets all required properties
+      .sort((a, b) => b.value - a.value)[0];                   // Supports the highest number of properties
 
     if (!matchedResourceType) {
-      throw new Error("No resource type associated to this row.");
+      return;
     }
     return resourceTypesCollection.getFirst('slug', matchedResourceType.slug);
+  }
+
+  /**
+   * Based on the score, we find the resource type which partially work based on the score
+   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
+   * @param {object} scores the scores calculated for each resourceType
+   * @returns {ResourceTypeEntity}
+   */
+  static findPartialResourceType(resourceTypesCollection, scores) {
+    //Get highest partial match which has at least score to 1
+    const matchedResourceType = scores
+      .filter(score => score.value > 0)                                       // Supports at least one parsed property
+      .sort((a, b) => a.missingRequiredFields - b.missingRequiredFields)[0];  // Supports with the lowest required missing field
+
+    if (!matchedResourceType) {
+      return;
+    }
+
+    return resourceTypesCollection.getFirst('slug', matchedResourceType.slug);
+  }
+
+  /**
+   * Fallback to default resource type if import does not match with any supported resource type
+   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
+   * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
+   * @returns
+   */
+  static fallbackDefaulResourceType(resourceTypesCollection, metadataTypesSettings) {
+    let resourceType;
+
+    if (metadataTypesSettings.isDefaultResourceTypeV5) {
+      resourceType =  resourceTypesCollection.getFirst('slug', RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    } else {
+      resourceType =  resourceTypesCollection.getFirst('slug', RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
+    }
+
+    if (!resourceType) {
+      throw new Error("No resource type associated to this row.");
+    }
+
+    return resourceType;
   }
 
   /**
    * Get scores for each resources based on the resourceTypes
    * @param {object} externalResourceDto the csv row data
    * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
-   * @returns {ResourceTypeEntity}
+   * @returns {Object}
    */
   static getScores(externalResourceDto, resourceTypesCollection) {
     const scores = [];
@@ -72,12 +108,12 @@ class ResourcesTypeImportParser {
       const secretsFields = Object.keys(resourceType.definition.secret.properties);
       const secretsRequiredFields = resourceType.definition.secret.required;
       const score = resourceProperties.filter(value => secretsFields.includes(value));
-      const matchAllRequiredField = secretsRequiredFields.every(secretsField => score.includes(secretsField));
+      const missingRequiredFields = secretsRequiredFields.filter(secretsField => !score.includes(secretsField)).length;
 
       scores.push({
         slug: resourceType.slug,
         value: score.length,
-        hasRequiredFields: matchAllRequiredField,
+        missingRequiredFields: missingRequiredFields,
         match: score.length === secretsFields.length,
       });
     }

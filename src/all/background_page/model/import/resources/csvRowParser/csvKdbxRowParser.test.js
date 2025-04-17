@@ -17,6 +17,8 @@ import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entit
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import BinaryConvert from "../../../../utils/format/binaryConvert";
+import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
 
 describe("CsvKdbxRowParser", () => {
   it("can parse kdbx csv", () => {
@@ -50,6 +52,12 @@ describe("CsvKdbxRowParser", () => {
       "Group": "Folder 1"
     };
 
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
@@ -63,7 +71,7 @@ describe("CsvKdbxRowParser", () => {
       folder_parent_path: data.Group,
     });
 
-    const externalResourceEntity = CsvKdbxRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvKdbxRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -81,6 +89,12 @@ describe("CsvKdbxRowParser", () => {
       "Group": "Folder 1"
     };
 
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
@@ -94,7 +108,7 @@ describe("CsvKdbxRowParser", () => {
       folder_parent_path: data.Group,
     });
 
-    const externalResourceEntity = CsvKdbxRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvKdbxRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -112,6 +126,12 @@ describe("CsvKdbxRowParser", () => {
       "Group": "Folder 1"
     };
 
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
@@ -131,7 +151,7 @@ describe("CsvKdbxRowParser", () => {
       }
     });
 
-    const externalResourceEntity = CsvKdbxRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvKdbxRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -149,6 +169,12 @@ describe("CsvKdbxRowParser", () => {
       "Group": "Folder 1"
     };
 
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
@@ -168,7 +194,7 @@ describe("CsvKdbxRowParser", () => {
       }
     });
 
-    const externalResourceEntity = CsvKdbxRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvKdbxRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -189,7 +215,13 @@ describe("CsvKdbxRowParser", () => {
       "Group": "Folder 1"
     };
     try {
-      CsvKdbxRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+      const importDto = {
+        "ref": "import-ref",
+        "file_type": "csv",
+        "file": btoa(BinaryConvert.toBinary(data))
+      };
+      const importEntity = new ImportResourcesFileEntity(importDto);
+      CsvKdbxRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
     } catch (error) {
       expect(error.message).toStrictEqual("Could not validate entity ExternalTotpEntity.");
     }

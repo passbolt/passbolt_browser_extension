@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import ImportError from "../../../../error/importError";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
@@ -32,12 +33,13 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
 
   /**
    * Parse a csv row
-   * @param {object} data the csv row data
+   * @param {object} data the csv row data$
+   * @param {ImportResourcesFileEntity} importEntity The import entity
    * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
    * @param {MetadataTypesSettingsEntity} metadataTypesSettings The metadata types from the organization
    * @returns {ExternalResourceEntity}
    */
-  static parse(data, resourceTypesCollection, metadataTypesSettings) {
+  static parse(data, importEntity, resourceTypesCollection, metadataTypesSettings) {
     const externalResourceDto = {};
 
     for (const propertyName in this.mapping) {
@@ -45,7 +47,23 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }
     }
-    const resourceType = ResourcesTypeImportParser.parseResourceType(externalResourceDto, resourceTypesCollection, metadataTypesSettings);
+
+    resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+    const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+    let resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+    if (!resourceType) {
+      resourceType = ResourcesTypeImportParser.findPartialResourceType(resourceTypesCollection, scores);
+      if (resourceType) {
+        importEntity.importResourcesErrors.push(new ImportError("Resource partially imported", externalResourceDto, new Error("We used the closest resource type supported.")));
+      }
+      if (!resourceType) {
+        //Fallback default content type not supported
+        resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, scores);
+        importEntity.importResourcesErrors.push(new ImportError("Imported with default content type", externalResourceDto, new Error("No resource type associated to this row.")));
+      }
+    }
+
     externalResourceDto.resource_type_id = resourceType.id;
 
     return new ExternalResourceEntity(externalResourceDto);

@@ -268,7 +268,7 @@ describe("ResourcesCsvImportParser", () => {
       expect(error.data.path).toEqual(path);
     });
 
-    it(`should not parse empty row and add it to import error <${test.scenario}>`, async() => {
+    it(`should parse empty row and add import error <${test.scenario}>`, async() => {
       expect.assertions(4);
 
       const csv = "Title,Username,URL,Password,Notes,Group\n" +
@@ -283,10 +283,31 @@ describe("ResourcesCsvImportParser", () => {
 
       await importer.parseImport();
 
-      expect(importEntity.importResources.items).toHaveLength(0);
+      expect(importEntity.importResources.items).toHaveLength(1);
       expect(importEntity.importResourcesErrors).toHaveLength(1);
       expect(importEntity.importResourcesErrors[0]).toBeInstanceOf(ImportError);
       expect(importEntity.importResourcesErrors[0].sourceError).toEqual(new Error("No resource type associated to this row."));
+    });
+
+    it(`should parse partial matching row and add import error <${test.scenario}>`, async() => {
+      expect.assertions(4);
+
+      const csv = "Title,Username,URL,Password,Notes,Group\n" +
+          ",,,,Notes,\n";
+      const importDto = {
+        "ref": "import-ref",
+        "file_type": "csv",
+        "file": btoa(BinaryConvert.toBinary(csv))
+      };
+      const importEntity = new ImportResourcesFileEntity(importDto);
+      const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, test.metadataTypesSettings);
+
+      await importer.parseImport();
+
+      expect(importEntity.importResources.items).toHaveLength(1);
+      expect(importEntity.importResourcesErrors).toHaveLength(1);
+      expect(importEntity.importResourcesErrors[0]).toBeInstanceOf(ImportError);
+      expect(importEntity.importResourcesErrors[0].sourceError).toEqual(new Error("We used the closest resource type supported."));
     });
   });
 

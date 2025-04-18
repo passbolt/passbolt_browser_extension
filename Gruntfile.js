@@ -38,7 +38,7 @@ module.exports = function (grunt) {
    * Import package.json file content
    */
   var pkg = grunt.file.readJSON('package.json');
-  var manifestVersion =  pkg.version.replace(/-.*(\.\d*)$/,'$1');
+  var manifestVersion =  pkg.version.replace(/-.*(\.\d*)$/, '$1');
 
   /**
    * Load and enable Tasks

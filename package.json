@@ -1,6 +1,6 @@
 {
   "name": "passbolt-browser-extension",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2025 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -21,7 +21,7 @@
     "locutus": "~2.0.9",
     "openpgp": "^5.11.1",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "^5.0.0",
+    "passbolt-styleguide": "^5.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
@@ -69,6 +69,9 @@
   "overrides": {
     "web-ext": {
       "@babel/runtime": "^7.27.0"
+    },
+    "addons-linter": {
+      "image-size": "^2.0.2"
     }
   },
   "scripts": {

@@ -595,6 +595,7 @@ classDiagram
             -uuid props.metadata_key_id
             -uuid props.user_id
             -string props.data
+            -string|null props.data_signed_by_current_user
             -string props.armored_key
             -string props.created
             -string props.created_by
@@ -602,8 +603,10 @@ classDiagram
             -string props.modified_by
             +get data() string|MetadataPrivateKeyDataEntity
             +get metadataKeyId() string
+            +get isDataSignedByCurrentUser() string|null
             +set armoredKey(string armordKey) void
             +set data(string data) void
+            +set isDataSignedByCurrentUser(string|null value) void
             +isDecrypted() boolean
             +get userId() string
         }

@@ -625,6 +625,14 @@ classDiagram
             +hasEncryptedPrivateKeys() boolean
         }
 
+        class MetadataTrustedKeyEntity {
+            -string props.fingerprint
+            -string props.signed
+            +get fingerprint() string
+            +get signed() string
+            +isMetadataKeyTrusted(MetadataPrivateKeyDataEntity metadataPrivateKeyData) boolean
+        }
+
         class MetadataTypesSettingsEntity {
             -string props.default_resource_types
             -string props.default_folder_type

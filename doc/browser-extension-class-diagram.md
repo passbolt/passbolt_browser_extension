@@ -580,14 +580,16 @@ classDiagram
             +get armoredKey() string
             +get id() string
             +get created() string
-            +fingerprint() string
+            +get fingerprint() string
             +get expired() string
+            +assertFingerprintPublicAndPrivateKeysMatch() void
         }
 
         class MetadataKeysCollection {
             +getFirstByLatestCreated() MetadataKeyEntity
             +hasDecryptedKeys() boolean
             +hasEncryptedKeys() boolean
+            +assertFingerprintsPublicAndPrivateKeysMatch(): void
         }
 
         class MetadataPrivateKeyEntity {
@@ -618,6 +620,7 @@ classDiagram
             -string props.armored_key
             -string props.passphrase
             +get armoredKey() string
+            +get fingerprint() string
         }
 
         class MetadataPrivateKeysCollection {

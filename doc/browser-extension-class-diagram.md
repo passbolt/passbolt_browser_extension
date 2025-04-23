@@ -241,7 +241,7 @@ classDiagram
         }
 
         class MigrateMetadataResourcesService {
-            +migrate(MigrateMetadataEntity migrateMetadataEntity, string passphrase, replayOptions = {count: 0}) Promise~void~
+            +migrate(MigrateMetadataEntity migrateMetadataEntity, string passphrase, replayOptions = count: 0) Promise~void~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -523,6 +523,15 @@ classDiagram
         class ExternalGpgKeyPairEntity {
             +get publicKey() ExternalGpgKeyEntity
             +get privateKey() ExternalGpgKeyEntity
+        }
+
+        class ExternalGpgKeyEntity {
+            -string props.issuer_fingerprint
+            -boolean props.is_verified
+            -string props.created
+            +get issuerFingerprint() string
+            +get isVerified() boolean
+            +get created() string
         }
 
         class GpgkeyEntity {

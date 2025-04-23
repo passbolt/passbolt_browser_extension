@@ -335,6 +335,13 @@ classDiagram
             +flush(AccountEntity account) Promise
         }
 
+        class TrustedMetadataKeyLocalStorage {
+            -$_runtimeCachedData object
+            +get() Promise~object~
+            +set(MetadataTrustedKeyEntity entity) Promise
+            +flush(AccountEntity account) Promise
+        }
+
         class MigrateMetadataResourcesApiService {
             +findAll(object contains, object filters) Promise~PassboltResponseEntity~
             +migrate(ResourcesCollection resourcesCollection, object contains, object filters) Promise~PassboltResponseEntity~
@@ -639,7 +646,7 @@ classDiagram
             -string props.signed
             +get fingerprint() string
             +get signed() string
-            +isMetadataKeyTrusted(MetadataPrivateKeyDataEntity metadataPrivateKeyData) boolean
+            +isMetadataKeyTrusted(MetadataPrivateKeyEntity metadataPrivateKey) boolean
         }
 
         class MetadataTypesSettingsEntity {

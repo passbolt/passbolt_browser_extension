@@ -81,7 +81,7 @@ class DecryptMessageService {
    * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys (optional) The key(s) to check the signature for.
    * @param {boolean} [options.throwOnInvalidSignaturesVerification=true] Should throw when verifying the signatures corresponding to the verification keys
    * @param {boolean} [options.returnOnlyData=true] Should return only data without signatures
-   * @returns {Promise<string>}
+   * @returns {Promise<string|openpgp.DecryptMessageResult>}
    * @throws {Error} if the given signatures don't match the message to decrypt.
    */
   static async decrypt(message, decryptionKey, verificationKeys = null, options = {}) {

@@ -353,6 +353,26 @@ const assertClearMessage = message => {
   }
 };
 
+/**
+ * Assert the given verificationResult is an openpgp.VerificationResult to assert signature
+ * @param {openpgp.VerificationResult} verificationResult
+ * @returns {void}
+ * @throws {Error} if the verificationResult is not an openpgp.VerificationResult
+ */
+const assertVerificationResult = verificationResult => {
+  if (!(verificationResult.keyID && verificationResult.keyID instanceof Object)) {
+    throw new Error(i18n.t("The verificationResult keyID should be a valid keyID Object."));
+  }
+
+  if (!(verificationResult.signature instanceof Promise)) {
+    throw new Error(i18n.t("The verificationResult signature should be a valid verified Promise<openpgp.Signature>."));
+  }
+
+  if (!(verificationResult.verified instanceof Promise)) {
+    throw new Error(i18n.t("The verificationResult verified should be a valid verified Promise<boolean>."));
+  }
+};
+
 export const OpenpgpAssertion = {
   assertMessage,
   assertClearMessage,
@@ -368,6 +388,7 @@ export const OpenpgpAssertion = {
   assertSessionKey,
   assertKeys,
   assertKey,
+  assertVerificationResult,
   readMessageOrFail,
   readClearMessageOrFail,
   createCleartextMessageOrFail,

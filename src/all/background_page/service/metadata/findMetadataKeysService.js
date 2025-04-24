@@ -15,6 +15,9 @@
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import DecryptMetadataPrivateKeysService from "../metadata/decryptMetadataPrivateKeysService";
 import MetadataKeysApiService from "../api/metadata/metadataKeysApiService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 class FindMetadataKeysService {
   /**
@@ -48,13 +51,14 @@ class FindMetadataKeysService {
     }
 
     const metadataKeysDto = await this.metadataKeysApiService.findAll(contains, filters);
-
     const collection = new MetadataKeysCollection(metadataKeysDto);
+
     if (collection.hasDecryptedKeys()) {
       throw new Error("The metadata private keys should not be decrypted.");
     }
 
     await this.decryptMetadataPrivateKeysService.decryptAllFromMetadataKeysCollection(collection);
+    await this.assertArmoredFingerprintPublicAndEntitysMatch(collection);
 
     return collection;
   }
@@ -75,6 +79,31 @@ class FindMetadataKeysService {
    */
   findAllNonDeleted() {
     return this.findAll({}, {deleted: false});
+  }
+
+  /**
+   * Verify the metadata public key entity fingerprint is equal to the  armored key fingerprint
+   * @param {MetadataKeysCollection} collection
+   * @private
+   */
+  async assertArmoredFingerprintPublicAndEntitysMatch(collection) {
+    for (const [index, metadataKey] of collection.items.entries()) {
+      try {
+        const publicMetadataKey = await OpenpgpAssertion.readKeyOrFail(metadataKey.armoredKey);
+        console.log(publicMetadataKey.getFingerprint().toLowerCase());
+        console.log(metadataKey.fingerprint.toLowerCase());
+
+        if (publicMetadataKey.getFingerprint().toLowerCase() !== metadataKey.fingerprint.toLowerCase()) {
+          const error = new EntityValidationError();
+          error.addError(`metadata_public_keys.${index}.fingerprint`, 'fingerprint_match', 'The fingerprint of the metadata armored public key does not match the entity fingerprint');
+          throw error;
+        }
+      } catch (error) {
+        const collectionValidationError = new CollectionValidationError();
+        collectionValidationError.addItemValidationError(index, error);
+        throw collectionValidationError;
+      }
+    }
   }
 }
 

@@ -47,7 +47,8 @@ describe("GetOrFindMetadataKeysService", () => {
 
       const id = uuidv4();
       const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const apiMetadataKeysCollectionDto = [defaultMetadataKeyDto({id, metadata_private_keys})];
+      const fingerprint = "c0dce0aaea4d8cce961c26bddfb6e74e598f025c";
+      const apiMetadataKeysCollectionDto = [defaultMetadataKeyDto({id, metadata_private_keys, fingerprint})];
       const expectedMetadataKeysDto = JSON.parse(JSON.stringify(apiMetadataKeysCollectionDto));
       expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
 

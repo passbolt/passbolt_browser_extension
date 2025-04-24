@@ -29,6 +29,8 @@ import {v4 as uuidv4} from "uuid";
 import {
   defaultMetadataKeysDtos
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("FindMetadataKeysApiService", () => {
   let apiClientOptions, account;
@@ -48,7 +50,8 @@ describe("FindMetadataKeysApiService", () => {
 
       const id = uuidv4();
       const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys})];
+      const fingerprint = "c0dce0aaea4d8cce961c26bddfb6e74e598f025c";
+      const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys, fingerprint})];
 
       const service = new FindMetadataKeysService(apiClientOptions, account);
       const spyOnFindService = jest.spyOn(service.metadataKeysApiService, "findAll");
@@ -60,6 +63,33 @@ describe("FindMetadataKeysApiService", () => {
       expect(resultDto.hasEncryptedKeys()).toStrictEqual(false);
       expect(spyOnFindService).toHaveBeenCalledTimes(1);
       expect(spyOnFindService).toHaveBeenCalledWith({}, {});
+    });
+
+    it("throw an error if fingerprint is not matching with the armored public key", async() => {
+      expect.assertions(2);
+
+      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
+      spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
+
+      const id = uuidv4();
+      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
+      const fingerprint = "c0dce0aaea4d8cce961c26bddfb6e74e598f025d";
+      const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys, fingerprint})];
+
+      const service = new FindMetadataKeysService(apiClientOptions, account);
+      const spyOnFindService = jest.spyOn(service.metadataKeysApiService, "findAll");
+      spyOnFindService.mockImplementation(() => apiMetadataKeysCollection);
+      try {
+        await service.findAll();
+      } catch (error) {
+        const entityValidationError = new EntityValidationError();
+        entityValidationError.addError('metadata_public_keys.0.fingerprint', 'fingerprint_match', 'The fingerprint of the metadata armored public key does not match the entity fingerprint');
+        const collectionValidationError = new CollectionValidationError();
+        collectionValidationError.addItemValidationError(0, entityValidationError);
+
+        expect(error).toBeInstanceOf(CollectionValidationError);
+        expect(error).toEqual(collectionValidationError);
+      }
     });
 
     it("throws an error if the keys from the API is already decrypted", async() => {
@@ -130,7 +160,8 @@ describe("FindMetadataKeysApiService", () => {
 
       const id = uuidv4();
       const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys})];
+      const fingerprint = "c0dce0aaea4d8cce961c26bddfb6e74e598f025c";
+      const apiMetadataKeysCollection = [defaultMetadataKeyDto({id, metadata_private_keys, fingerprint})];
 
       const service = new FindMetadataKeysService(apiClientOptions, account);
       const spyOnFindService = jest.spyOn(service.metadataKeysApiService, "findAll");

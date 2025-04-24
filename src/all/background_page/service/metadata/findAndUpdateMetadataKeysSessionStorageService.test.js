@@ -60,7 +60,7 @@ describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
 
       const id = uuidv4();
       const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto})];
+      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
       const expectedMetadataKeysDto = JSON.parse(JSON.stringify(metadataKeysDto));
       expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
 
@@ -86,13 +86,13 @@ describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
       // Store information in storage.
       const storedId = uuidv4();
       const storedMetadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: storedId, data: JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData)})];
-      const storedMetadataKeysDto = [defaultMetadataKeyDto({id: storedId, metadata_private_keys: storedMetadataPrivateKeysDto})];
+      const storedMetadataKeysDto = [defaultMetadataKeyDto({id: storedId, metadata_private_keys: storedMetadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
       await findAndUpdateKeysSessionStorageService.metadataKeysSessionStorage.set(new MetadataKeysCollection(storedMetadataKeysDto));
 
       // Mock data relative to service call
       const id = uuidv4();
       const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto})];
+      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
       const expectedMetadataKeysDto = JSON.parse(JSON.stringify(metadataKeysDto));
       expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
 
@@ -112,7 +112,7 @@ describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
       // Mock data relative to service call
       const id = uuidv4();
       const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto})];
+      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
       const expectedMetadataKeysDto = JSON.parse(JSON.stringify(metadataKeysDto));
       expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
 

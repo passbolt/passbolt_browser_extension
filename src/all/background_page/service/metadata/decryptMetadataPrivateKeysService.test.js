@@ -56,6 +56,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
       await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey)).not.toThrow();
     }, 10 * 1000);
 
+
     it("should retrieve the passphrase from the storage", async() => {
       expect.assertions(2);
 

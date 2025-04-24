@@ -244,6 +244,10 @@ classDiagram
             +migrate(MigrateMetadataEntity migrateMetadataEntity, string passphrase, replayOptions = count: 0) Promise~void~
         }
 
+        class ConfirmMetadataKeyContentCodeService {
+            +requestConfirm(MetdataTrustedKeyEntity trustedKey, MetadataKeyEntity metadataKey) Promise~boolean~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata Keys services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

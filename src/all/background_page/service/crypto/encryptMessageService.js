@@ -43,9 +43,10 @@ class EncryptMessageService {
    * @param {string} message The message to encrypt.
    * @param {openpgp.PublicKey} encryptionKey The public key(s) to use to encrypt the message
    * @param {array<openpgp.PrivateKey>} signingKeys The private key(s) to use to sign the message.
+   * @param {Date} options.signatureDate Specific data for signature
    * @returns {Promise<string>} the encrypted message in its armored version
    */
-  static async encrypt(message, encryptionKey, signingKeys = null) {
+  static async encrypt(message, encryptionKey, signingKeys = null, options = {}) {
     OpenpgpAssertion.assertPublicKey(encryptionKey);
     if (signingKeys) {
       OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
@@ -56,6 +57,7 @@ class EncryptMessageService {
       message: gpgMessage,
       encryptionKeys: encryptionKey,
       signingKeys: signingKeys,
+      date: options.signatureDate
     });
   }
 }

@@ -30,7 +30,7 @@ describe("metadataPrivateKeyApiService", () => {
   });
 
   describe('::update', () => {
-    it("Save the settings on the API.", async() => {
+    it("Save the new metadata key on the API.", async() => {
       expect.assertions(2);
 
       const encryptedMetadataPrivateKey = defaultMetadataPrivateKeyDto();

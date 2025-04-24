@@ -36,8 +36,29 @@ beforeEach(() => {
 
 describe("DecryptMetadataPrivateKeysService", () => {
   describe("::decryptOne", () => {
-    it("should decrypt a MetadataPrivateKeyEntity", async() => {
-      expect.assertions(3);
+    it("should decrypt a MetadataPrivateKeyEntity and verify if key is signed by user", async() => {
+      expect.assertions(4);
+
+      const account = new AccountEntity(defaultAccountDto());
+
+      const dto = defaultMetadataPrivateKeyDto();
+      dto.data = pgpKeys.metadataKey.encryptedSignedMetadataPrivateKeyDataMessage;
+
+      const metadataPrivateKeyEntity = new MetadataPrivateKeyEntity(dto);
+      const service = new DecryptMetadataPrivateKeysService(account);
+
+      await service.decryptOne(metadataPrivateKeyEntity, pgpKeys.ada.passphrase);
+
+      expect(metadataPrivateKeyEntity._props.data).toBeUndefined();
+      expect(metadataPrivateKeyEntity.data).toBeInstanceOf(MetadataPrivateKeyDataEntity);
+      expect(metadataPrivateKeyEntity.isDataSignedByCurrentUser).toEqual("2025-04-23T13:27:55.000Z");
+
+      const openPgpPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
+      await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey)).not.toThrow();
+    }, 10 * 1000);
+
+    it("should decrypt a MetadataPrivateKeyEntity and should not raise error if key is not verified", async() => {
+      expect.assertions(4);
 
       const account = new AccountEntity(defaultAccountDto());
 
@@ -51,6 +72,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       expect(metadataPrivateKeyEntity._props.data).toBeUndefined();
       expect(metadataPrivateKeyEntity.data).toBeInstanceOf(MetadataPrivateKeyDataEntity);
+      expect(metadataPrivateKeyEntity.isDataSignedByCurrentUser).toBeNull();
 
       const openPgpPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
       await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey)).not.toThrow();

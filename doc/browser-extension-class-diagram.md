@@ -346,6 +346,10 @@ classDiagram
             +flush(AccountEntity account) Promise
         }
 
+        class GetMetadataTrustedKeyService {
+            +get() Promise~MetadataTrustedKey|null~
+        }
+
         class MigrateMetadataResourcesApiService {
             +findAll(object contains, object filters) Promise~PassboltResponseEntity~
             +migrate(ResourcesCollection resourcesCollection, object contains, object filters) Promise~PassboltResponseEntity~
@@ -1007,6 +1011,7 @@ classDiagram
     SaveMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     SaveMetadataSettingsService*--MetadataKeysSettingsApiService
     SaveMetadataSettingsService*--MetadataKeysSettingsLocalStorage
+    GetMetadataTrustedKeyService*--TrustedMetadataKeyLocalStorage
 %% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
     style MetadataKeysSettingsLocalStorage fill:#DEE5D4

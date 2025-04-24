@@ -308,8 +308,13 @@ classDiagram
     %% Metadata models
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        class MetadataKeyApiService {
+        class MetadataKeysApiService {
             +findAll(object contains) Promise~array~
+            +create(MetadataKeyEntity metadataKey) Promise~*string*~
+        }
+
+        class MetadataPrivateKeyApiService {
+            +update(MetadataPrivateKeyEntity metadataPrivateKey) Promise~string~
         }
 
         class MetadataKeysSettingsLocalStorage {

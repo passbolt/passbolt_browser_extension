@@ -90,8 +90,6 @@ class FindMetadataKeysService {
     for (const [index, metadataKey] of collection.items.entries()) {
       try {
         const publicMetadataKey = await OpenpgpAssertion.readKeyOrFail(metadataKey.armoredKey);
-        console.log(publicMetadataKey.getFingerprint().toLowerCase());
-        console.log(metadataKey.fingerprint.toLowerCase());
 
         if (publicMetadataKey.getFingerprint().toLowerCase() !== metadataKey.fingerprint.toLowerCase()) {
           const error = new EntityValidationError();

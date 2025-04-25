@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import GroupUserEntity from "../groupUser/groupUserEntity";
-import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
-import UserEntity from "../user/userEntity";
+import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
+import UserEntity from "../user/userEntity";
 
 const ENTITY_NAME = 'Group';
 const GROUP_NAME_MIN_LENGTH = 1;

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import GroupUserChangeEntity from "./groupUserChangeEntity";
-import GroupUserEntity from "../groupUserEntity";
+import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 
 describe("Group user change entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

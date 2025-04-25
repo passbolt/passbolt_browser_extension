@@ -19,11 +19,11 @@ import AccountRecoveryResponseService from "../../service/api/accountRecovery/ac
 import AccountRecoveryPrivateKeyPasswordService from "../../service/api/accountRecovery/accountRecoveryPrivateKeyPasswordService";
 import AccountRecoveryContinueService from "../../service/api/accountRecovery/accountRecoveryContinueService";
 import SetupService from "../../service/api/setup/setupService";
-import AccountRecoveryPrivateKeyPasswordsCollection from "../entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
+import AccountRecoveryPrivateKeyPasswordsCollection from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
 import AccountRecoveryResponseEntity from "../entity/accountRecovery/accountRecoveryResponseEntity";
 import AccountRecoveryRequestEntity from "../entity/accountRecovery/accountRecoveryRequestEntity";
 import AccountRecoveryRequestsCollection from "../entity/accountRecovery/accountRecoveryRequestsCollection";
-import AccountRecoveryUserSettingEntity from "../entity/accountRecovery/accountRecoveryUserSettingEntity";
+import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import Validator from "validator";
 
 /**

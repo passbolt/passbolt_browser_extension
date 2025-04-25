@@ -27,7 +27,7 @@ import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/gro
 import {defaultResourcesSecretsDtos} from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection.test.data";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import GroupUserEntity from "../../model/entity/groupUser/groupUserEntity";
+import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import {plaintextSecretPasswordAndDescriptionDto} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 
 describe("GroupUpdateService", () => {

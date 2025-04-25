@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import ProfileEntity from "../profile/profileEntity";
+import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/profileEntity";
 import UserEntity from "../user/userEntity";
 import SecurityTokenEntity from "../securityToken/securityTokenEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";

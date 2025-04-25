@@ -19,8 +19,8 @@ import {
   minimumGroupUserDto
 } from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
-import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
-import GroupUserEntity from "../groupUser/groupUserEntity";
+import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
+import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 
 describe("GroupEntity", () => {
   describe("GroupEntity::getSchema", () => {

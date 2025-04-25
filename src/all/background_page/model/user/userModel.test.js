@@ -12,15 +12,15 @@
  * @since         4.8.0
  */
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {enableFetchMocks} from "jest-fetch-mock";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import PendingAccountRecoveryRequestEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/pendingAccountRecoveryRequestEntity";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import ProfileEntity from "../entity/profile/profileEntity";
-import AccountRecoveryUserSettingEntity from "../entity/accountRecovery/accountRecoveryUserSettingEntity";
-import PendingAccountRecoveryRequestEntity from "../entity/accountRecovery/pendingAccountRecoveryRequestEntity";
-import GroupsUsersCollection from "../entity/groupUser/groupsUsersCollection";
+import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/profileEntity";
+import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
 import UserModel from "./userModel";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import UserEntity from "../entity/user/userEntity";

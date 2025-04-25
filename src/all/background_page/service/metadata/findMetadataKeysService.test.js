@@ -172,7 +172,7 @@ describe("FindMetadataKeysApiService", () => {
       expect(resultDto).toHaveLength(apiMetadataKeysCollection.length);
       expect(resultDto.hasEncryptedKeys()).toStrictEqual(false);
       expect(spyOnFindService).toHaveBeenCalledTimes(1);
-      expect(spyOnFindService).toHaveBeenCalledWith({metadata_private_keys: true}, {deleted: false});
+      expect(spyOnFindService).toHaveBeenCalledWith({metadata_private_keys: true, creator: true}, {deleted: false});
     });
 
     it("throws an error if the keys from the API is already decrypted", async() => {

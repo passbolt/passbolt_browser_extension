@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import GroupUserEntity from "../groupUserEntity";
+import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'GroupUser';

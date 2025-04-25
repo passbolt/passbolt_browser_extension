@@ -14,7 +14,7 @@
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import SetupModel from "../../model/setup/setupModel";
-import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import WorkerService from "../../service/worker/workerService";
 import AuthVerifyServerKeyService from "../../service/api/auth/authVerifyServerKeyService";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";

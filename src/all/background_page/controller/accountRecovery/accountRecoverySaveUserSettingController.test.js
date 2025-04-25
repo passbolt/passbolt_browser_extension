@@ -15,7 +15,7 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import User from "../../model/user";
 import AccountRecoverySaveUserSettingsController from "./accountRecoverySaveUserSettingController";
-import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import {
   createAcceptedAccountRecoveryUserSettingDto,
   createRejectedAccountRecoveryUserSettingDto

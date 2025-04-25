@@ -14,7 +14,7 @@
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
-import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import BuildApprovedAccountRecoveryUserSettingEntityService from "../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";

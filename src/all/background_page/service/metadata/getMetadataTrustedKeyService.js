@@ -28,7 +28,7 @@ class GetMetadataTrustedKeyService {
 
   /**
    * Retrieve the trusted metadata key from localstorage
-   * @return {Promise<MetadataTrustedKey|null>}
+   * @return {Promise<MetadataTrustedKeyEntity|null>}
    */
   async get() {
     const metadataTrustedKeyFromLocalstorage = await this.trustedMetadataKeyLocalStorage.get();

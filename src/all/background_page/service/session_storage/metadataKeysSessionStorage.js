@@ -96,6 +96,26 @@ class MetadataKeysSessionStorage {
   }
 
   /**
+   * Update a metadata key in the session storage.
+   * @param {MetadataKeyEntity} metadataKeyEntity The metadata key to update
+   * @throws {Error} if the metadata key does not exist in the session storage
+   */
+  async update(metadataKeyEntity) {
+    MetadataKeysSessionStorage.assertEntityBeforeSave(metadataKeyEntity);
+
+    await navigator.locks.request(this.storageKey, async() => {
+      const metadataKeys = await this.get() || [];
+      const metadataKeyIndex = metadataKeys.findIndex(item => item.id === metadataKeyEntity.id);
+      if (metadataKeyIndex === -1) {
+        throw new Error('The metadata key could not be found in the session storage');
+      }
+      metadataKeys[metadataKeyIndex] = metadataKeyEntity.toDto(MetadataKeysSessionStorage.DEFAULT_CONTAIN);
+      await this._setBrowserStorage({[this.storageKey]: metadataKeys});
+      MetadataKeysSessionStorage._runtimeCachedData[this.account.id] = metadataKeys;
+    });
+  }
+
+  /**
    * Make sure the entity meet some minimal requirements before being stored
    *
    * @param {MetadataKeyEntity} metadataKey

@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.10.0
  */
+import crypto from "crypto";
 
-export const buildMockedCryptoKey = ({algoName = "AES-GCM", algoLength = 256, extractable = true, usages = ['encrypt', 'decrypt']}) =>
+export const buildMockedCryptoKey = ({algoName = "AES-GCM", algoLength = 256, extractable = true, usages = ['encrypt', 'decrypt']} = {}) =>
   crypto.subtle.generateKey({
     name: algoName,
     length: algoLength

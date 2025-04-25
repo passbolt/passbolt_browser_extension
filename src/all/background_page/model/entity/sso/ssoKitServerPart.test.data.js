@@ -12,7 +12,10 @@
  * @since         3.9.0
  */
 
-export const generateSsoKitServerData = ({alg = "A256GCM", ext = true, k = "string", key_ops = ["encrypt", "decrypt"], kty = "oct"} = {}) => {
-  const key = {alg, ext, k, key_ops, kty};
-  return Buffer.from(JSON.stringify(key)).toString("base64");
+import {buildMockedCryptoKey} from "../../../utils/assertions.test.data";
+
+export const generateSsoKitServerData = async({alg = "AES-GCM", ext = true, key_ops = ["encrypt", "decrypt"]} = {}) => {
+  const ssoServerKey = await buildMockedCryptoKey({algoName: alg, extractable: ext, usages: key_ops});
+  const exportedKey = await crypto.subtle.exportKey("jwk", ssoServerKey);
+  return Buffer.from(JSON.stringify(exportedKey)).toString("base64");
 };

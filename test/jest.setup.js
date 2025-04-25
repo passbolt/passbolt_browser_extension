@@ -13,9 +13,10 @@
  */
 
 import "./mocks/mockWebExtensionPolyfill";
+import "./mocks/mockJsDomPolyfill";
 import browser from "../src/all/common/polyfill/browserPolyfill";
 import "./mocks/mockTextEncoder";
-import "passbolt-styleguide/test/mocks/mockCrypto";
+import "./mocks/mockCryptoKey";
 import "./matchers/extendExpect";
 import MockNavigatorLocks from './mocks/mockNavigatorLocks';
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
@@ -74,3 +75,6 @@ beforeEach(async() => {
   keyring.flush(Keyring.PUBLIC);
   keyring.flush(Keyring.PRIVATE);
 });
+
+// force navigator to be considered online
+navigator.onLine = true;

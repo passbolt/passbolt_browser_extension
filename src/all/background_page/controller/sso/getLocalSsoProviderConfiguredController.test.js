@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import "../../../../../test/mocks/mockCryptoKey";
 import "../../../../../test/mocks/mockSsoDataStorage";
 import GetLocalSsoProviderConfiguredController from "./getLocalSsoProviderConfiguredController";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
@@ -21,7 +20,7 @@ describe("GetLocalSsoProviderConfiguredController", () => {
   describe("GetLocalSsoProviderConfiguredController::exec", () => {
     it("Should return the local SSO kit.", async() => {
       expect.assertions(1);
-      const ssoLocalKit = clientSsoKit();
+      const ssoLocalKit = await clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
 
       const controller = new GetLocalSsoProviderConfiguredController();
@@ -40,7 +39,7 @@ describe("GetLocalSsoProviderConfiguredController", () => {
 
     it("Should return null if the local SSO kit is not complete.", async() => {
       expect.assertions(1);
-      const ssoLocalKit = clientSsoKit({id: null});
+      const ssoLocalKit = await clientSsoKit({id: null});
       SsoDataStorage.setMockedData(ssoLocalKit);
 
       const controller = new GetLocalSsoProviderConfiguredController();

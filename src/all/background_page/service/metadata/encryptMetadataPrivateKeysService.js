@@ -65,7 +65,7 @@ class EncryptMetadataPrivateKeysService {
       return OpenpgpAssertion.readKeyOrFail(this.account.serverPublicArmoredKey);
     }
 
-    const userPublicGpgKey = await this.keyring.findPublic(userId);
+    const userPublicGpgKey = this.keyring.findPublic(userId);
 
     if (!userPublicGpgKey) {
       throw new Error(`The public key for the user with ID ${userId} could not be found.`);

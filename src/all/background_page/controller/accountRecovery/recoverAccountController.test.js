@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
-import "../../../../../test/mocks/mockCryptoKey";
 import {enableFetchMocks} from "jest-fetch-mock";
 import each from "jest-each";
 import User from "../../model/user";

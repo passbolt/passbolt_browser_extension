@@ -11,52 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+import crypto from "crypto";
 
-import {generateSsoKitServerData} from "../../src/all/background_page/model/entity/sso/ssoKitServerPart.test.data";
-
-class CryptoKey {
-  constructor(algorithm, extractable, usages) {
-    this.extractable = extractable;
-    this.algorithm = algorithm;
-    this.usages = usages;
-  }
+if (!global.crypto) {
+  Object.defineProperty(global, "crypto", {
+    value: crypto
+  });
 }
 
-global.CryptoKey = CryptoKey;
-
-class CryptoSubtle {
-  constructor() {
-    this.exportKey = jest.fn().mockImplementation(this.exportKey.bind(this));
-    this.importKey = jest.fn().mockImplementation(this.importKey.bind(this));
-    this.decrypt = jest.fn().mockImplementation(this.decrypt.bind(this));
-    this.encrypt = jest.fn().mockImplementation(this.encrypt.bind(this));
-    this.generateKey = jest.fn().mockImplementation(this.generateKey.bind(this));
-  }
-
-  async generateKey(algorithm, extractable, capabilities) {
-    return new CryptoKey(algorithm, extractable, capabilities);
-  }
-
-  async exportKey(keyFormat, keyInformation) {
-    const b64Key = generateSsoKitServerData({ext: keyInformation.extractable, key_ops: keyInformation.usages});
-    return JSON.parse(Buffer.from(b64Key, "base64").toString());
-  }
-
-  async importKey(keyFormat, keyBinData, algorithm, extractable, capabilities) {
-    const algo = {
-      name: algorithm,
-      length: keyBinData.length
-    };
-    return new CryptoKey(algo, extractable, capabilities);
-  }
-
-  async decrypt(algorithm, key, buffer) {
-    return buffer;
-  }
-
-  async encrypt(algorithm, key, buffer) {
-    return buffer;
-  }
+if (!global.CryptoKey) {
+  Object.defineProperty(global, "CryptoKey", {
+    value: crypto.webcrypto.CryptoKey
+  });
 }
 
-global.crypto.subtle = new CryptoSubtle();

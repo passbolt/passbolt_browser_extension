@@ -12,7 +12,6 @@
  * @since         4.0.0
  */
 import '../../../../../test/mocks/mockSsoDataStorage';
-import '../../../../../test/mocks/mockCryptoKey';
 import {enableFetchMocks} from "jest-fetch-mock";
 import HasSsoLoginErrorController from './hasSsoLoginErrorController';
 import each from 'jest-each';

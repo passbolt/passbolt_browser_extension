@@ -37,7 +37,7 @@ describe("FileService", () => {
         const url = script.func.apply(null, script.args);
         return [{result: url}];
       });
-      jest.spyOn(self.URL, "createObjectURL").mockImplementationOnce(() => resultUrl);
+      jest.spyOn(global.URL, "createObjectURL").mockImplementationOnce(() => resultUrl);
       // process
       await FileService.saveFile("filename", "Text", null, 1);
       // expectation

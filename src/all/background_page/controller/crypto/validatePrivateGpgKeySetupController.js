@@ -96,9 +96,9 @@ class ValidatePrivateGpgKeySetupController {
    */
   static _isCurveSupported(curve) {
     const supportedCurve = [
-      "p256",
-      "p384",
-      "p521",
+      "nistP256",
+      "nistP384",
+      "nistP521",
       "secp256k1",
       "ed25519",
       "curve25519",

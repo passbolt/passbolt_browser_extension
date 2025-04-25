@@ -67,7 +67,7 @@ describe("DecryptUserAuthTokenService", () => {
     it("should throw if the encrypted message cannot be decrypted if the user private key", async() => {
       expect.assertions(1);
       await expect(() => DecryptUserAuthTokenService.decryptToken(bettyEncryptedAuthToken, pgpKeys.ada.private, pgpKeys.ada.passphrase))
-        .rejects.toThrow(new TypeError("Error decrypting message: Session key decryption failed."));
+        .rejects.toThrow(new TypeError("Error decrypting message: No decryption key packets found"));
     });
 
     it("should throw if the token does not validate", async() => {

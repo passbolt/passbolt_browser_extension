@@ -51,9 +51,6 @@ describe("UpdatePrivateKeyController", () => {
   };
 
   describe("UpdatePrivateKeyController::exec", () => {
-    const data = generateSsoKitServerData({});
-    const dto = {data};
-
     it("Should trigger the download of the recovery kit with the new passphrase.", async() => {
       expect.assertions(4);
 
@@ -127,10 +124,13 @@ describe("UpdatePrivateKeyController", () => {
 
     it("Should update the local SSO kit if one already exists.", async() => {
       expect.assertions(2);
+      const data = await generateSsoKitServerData();
+      const dto = {data};
+
       const newPassphrase = "newPassphrase";
-      const ssoKit = clientSsoKit();
+      const ssoKit = await clientSsoKit();
       const newSsoKitId = uuidv4();
-      const newSsoKit = new SsoKitClientPartEntity(clientSsoKit({id: newSsoKitId}));
+      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({id: newSsoKitId}));
       const worker = {
         tab: {
           id: uuidv4()
@@ -198,10 +198,12 @@ describe("UpdatePrivateKeyController", () => {
 
     it("Should not update the passsphrase if the kit can't be send to the server.", async() => {
       mockOrganisationSettingCall(true);
+      const data = await generateSsoKitServerData();
+      const dto = {data};
       const newPassphrase = "newPassphrase";
-      const ssoKit = clientSsoKit();
+      const ssoKit = await clientSsoKit();
       const newSsoKitId = uuidv4();
-      const newSsoKit = new SsoKitClientPartEntity(clientSsoKit({id: newSsoKitId}));
+      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({id: newSsoKitId}));
       const worker = {
         tab: {
           id: uuidv4()
@@ -237,10 +239,12 @@ describe("UpdatePrivateKeyController", () => {
     });
 
     it("Should ignore the sso kit deletion on server side if it gets a 404.", async() => {
+      const data = await generateSsoKitServerData();
+      const dto = {data};
       const newPassphrase = "newPassphrase";
-      const ssoKit = clientSsoKit();
+      const ssoKit = await clientSsoKit();
       const newSsoKitId = uuidv4();
-      const newSsoKit = new SsoKitClientPartEntity(clientSsoKit({id: newSsoKitId}));
+      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({id: newSsoKitId}));
       const worker = {
         tab: {
           id: uuidv4()
@@ -274,9 +278,9 @@ describe("UpdatePrivateKeyController", () => {
 
     it("Should not generate another SSO kit if the passphrase can't be rotated.", async() => {
       const newPassphrase = "newPassphrase";
-      const ssoKit = clientSsoKit();
+      const ssoKit = await clientSsoKit();
       const newSsoKitId = uuidv4();
-      const newSsoKit = new SsoKitClientPartEntity(clientSsoKit({id: newSsoKitId}));
+      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({id: newSsoKitId}));
       const worker = {
         tab: {
           id: uuidv4()

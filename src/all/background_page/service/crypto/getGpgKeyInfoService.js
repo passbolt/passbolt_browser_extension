@@ -71,7 +71,7 @@ class GetGpgKeyInfoService {
       expires: expirationTime,
       algorithm: this.formatAlgorithm(algorithmInfo.algorithm),
       length: this.getKeyLength(algorithmInfo),
-      curve: algorithmInfo.curve || null,
+      curve: this.getCurveName(algorithmInfo.curve),
       private: key.isPrivate(),
       revoked: await key.isRevoked()
     };
@@ -98,12 +98,12 @@ class GetGpgKeyInfoService {
         return "ecdh";
       case "ecdsa":
         return "ecdsa";
-      case "eddsa":
-        return "eddsa";
       case "aedh":
         return "aedh";
       case "aedsa":
         return "aedsa";
+      case "eddsaLegacy":
+        return "eddsa";
       default:
         throw new Error("Unknown algorithm.");
     }
@@ -124,27 +124,44 @@ class GetGpgKeyInfoService {
     //algorithm are ECDSA or EdDSA
     const curveName = algorithmInfo?.curve.toString().toLowerCase();
     switch (curveName) {
-      case "p256":
-      case "ed25519":
+      case "nistP256":
+      case "ed25519legacy":
       case "secp256k1":
       case "curve25519":
       case "brainpoolp256r1": {
         return 256;
       }
       case "brainpoolp384r1":
-      case "p384": {
+      case "nistP384": {
         return 384;
       }
       case "brainpoolp512r1": {
         return 512;
       }
-      case "p521": {
+      case "nistP521": {
         return 521;
       }
     }
 
     //@todo check if we covered every cases especially for algo like: AEDH and AEDSA
     return undefined;
+  }
+
+  static getCurveName(curve) {
+    if (!curve) {
+      return null;
+    }
+
+    switch (curve) {
+      case "ed25519Legacy": {
+        return "ed25519";
+      }
+      case "curve25519Legacy": {
+        return "curve25519";
+      }
+    }
+
+    return curve;
   }
 }
 

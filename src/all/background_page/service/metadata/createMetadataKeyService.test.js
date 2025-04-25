@@ -60,8 +60,8 @@ describe("CreateMetadataKeyService", () => {
       };
       const metadataKeyPair = new ExternalGpgKeyPairEntity(metadataKeyPairDto);
 
-      service.keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
-      service.keyring.importPublic(pgpKeys.betty.public, pgpKeys.betty.userId);
+      await service.keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
+      await service.keyring.importPublic(pgpKeys.betty.public, pgpKeys.betty.userId);
       jest.spyOn(service.keyring, "sync").mockImplementation(() => 2);
       jest.spyOn(service.getOrFindMetadataSettings, "getOrFindKeysSettings").mockReturnValue(new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto()));
       jest.spyOn(service.findUsersService, "findAllActive").mockReturnValue(new UsersCollection([users.ada, users.betty]));
@@ -120,8 +120,8 @@ describe("CreateMetadataKeyService", () => {
       };
       const metadataKeyPair = new ExternalGpgKeyPairEntity(metadataKeyPairDto);
 
-      service.keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
-      service.keyring.importPublic(pgpKeys.betty.public, pgpKeys.betty.userId);
+      await service.keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
+      await service.keyring.importPublic(pgpKeys.betty.public, pgpKeys.betty.userId);
       jest.spyOn(service.keyring, "sync").mockImplementation(() => 2);
       const metadataKeysSettings = new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto({zero_knowledge_key_share: true}));
       jest.spyOn(service.getOrFindMetadataSettings, "getOrFindKeysSettings").mockReturnValue(metadataKeysSettings);

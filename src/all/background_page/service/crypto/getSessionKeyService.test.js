@@ -33,7 +33,7 @@ describe("GetSessionKeyService", () => {
       const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(messageEncryptedArmored);
       await DecryptMessageService.decrypt(messageEncrypted, privateKey);
       const sessionKey = GetSessionKeyService.getFromGpgMessage(messageEncrypted);
-      const openPgpSessionKey = await OpenpgpAssertion.readSessionKeyOrFail(sessionKey);
+      const openPgpSessionKey = OpenpgpAssertion.readSessionKeyOrFail(sessionKey);
 
       expect(() => EntitySchema.validateProp("session_key", sessionKey, SessionKeyEntity.getSchema().properties.session_key)).not.toThrowError();
       expect(() => OpenpgpAssertion.assertSessionKey(openPgpSessionKey)).not.toThrowError();

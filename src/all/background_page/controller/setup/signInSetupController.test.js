@@ -13,7 +13,6 @@
  */
 
 import "../../../../../test/mocks/mockSsoDataStorage";
-import "../../../../../test/mocks/mockCryptoKey";
 import {enableFetchMocks} from "jest-fetch-mock";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
@@ -30,6 +29,7 @@ import {withAzureSsoSettings} from "../sso/getCurrentSsoSettingsController.test.
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import PostLoginService from "../../service/auth/postLoginService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -87,9 +87,10 @@ describe("SignInSetupController", () => {
       fetch.doMockOnceIf(new RegExp('/settings.json'), () => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
       fetch.doMockOnceIf(new RegExp('/sso/settings/current.json'), () => mockApiResponse(withAzureSsoSettings()));
       jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
-      jest.spyOn(PassphraseStorageService, "set");
-      jest.spyOn(PostLoginService, "exec");
+      jest.spyOn(PassphraseStorageService, "set").mockImplementation(async() => {});
+      jest.spyOn(PostLoginService, "exec").mockImplementation(async() => {});
       jest.spyOn(browser.tabs, "update");
+      jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
 
       SsoDataStorage.setMockedData(null);
 

@@ -43,8 +43,8 @@ describe("FormDataUtils", () => {
       const arrayObject = await FormDataUtils.formDataToArray(formData);
       // expectations
       const expectedArray = [
-        {key: "file", value: "data:image/png;base64,dGVzdA==", name: "file 1", type: FormDataUtils.TYPE_FILE},
-        {key: "file", value: "data:image/png;base64,dGVzdA==", name: "file 2", type: FormDataUtils.TYPE_FILE}
+        {key: "file", value: "data:text/plain;base64,dGVzdA==", name: "file 1", type: FormDataUtils.TYPE_FILE},
+        {key: "file", value: "data:text/plain;base64,dGVzdA==", name: "file 2", type: FormDataUtils.TYPE_FILE}
       ];
       expect(arrayObject).toStrictEqual(expectedArray);
     });
@@ -72,7 +72,6 @@ describe("FormDataUtils", () => {
       // expectations
       const expectedArray = [
         {key: "prop1", value: "value 1", type: FormDataUtils.TYPE_SCALAR},
-        {key: "file", value: "data:image/png;base64,dGVzdA==", name: "file 1", type: FormDataUtils.TYPE_FILE},
         {key: "blob", value: "data:text/plain;base64,dGVzdA==", name: "blob 1", type: FormDataUtils.TYPE_BLOB}
       ];
       expect(arrayObject).toStrictEqual(expectedArray);

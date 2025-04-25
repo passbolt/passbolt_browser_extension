@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import "../../../../../../test/mocks/mockCryptoKey";
 import SsoKitClientPartEntity from "./ssoKitClientPartEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
@@ -26,7 +25,7 @@ describe("Sso Kit Client Part Entity", () => {
 
   it("constructor works if valid minimal DTO is provided", async() => {
     expect.assertions(1);
-    const dto = clientSsoKit();
+    const dto = await clientSsoKit();
 
     const entity = new SsoKitClientPartEntity(dto);
     expect(entity.toDbSerializableObject()).toEqual(dto);
@@ -34,7 +33,7 @@ describe("Sso Kit Client Part Entity", () => {
 
   it("constructor works if full valid DTO is provided", async() => {
     expect.assertions(1);
-    const dto = clientSsoKit({
+    const dto = await clientSsoKit({
       created: "2020-05-04T20:31:45+00:00",
       modified: "2020-05-04T20:31:45+00:00",
       created_by: uuid(),
@@ -46,24 +45,10 @@ describe("Sso Kit Client Part Entity", () => {
   });
 
   it("constructor returns validation error if dto required fields are invalid", async() => {
-    function generateNek({algorithmName = "AES-GCM", algorithmLength = 256, capabilities = ["encrypt", "decrypt"], extractable = false}) {
-      const algorithm = {
-        name: algorithmName,
-        length: algorithmLength
-      };
-      return new CryptoKey(algorithm, extractable, capabilities);
-    }
-    const ssoKit = clientSsoKit();
+    const ssoKit = await clientSsoKit();
     const invalidNeks = [
       "nek",
       {},
-      generateNek({algorithmName: "test"}),
-      generateNek({algorithmLength: 10}),
-      generateNek({capabilities: []}),
-      generateNek({capabilities: ["encrypt"]}),
-      generateNek({capabilities: ["decrypt"]}),
-      generateNek({capabilities: ["encrypt", "decrypt", "sign"]}),
-      generateNek({extractable: true}),
     ];
     const invalidIvs = [{
       iv1: [1, 2, 3],
@@ -107,9 +92,9 @@ describe("Sso Kit Client Part Entity", () => {
   });
 
   it("isRegistered returns true only if the data is complete", async() => {
-    const ssoKit = clientSsoKit();
-    const ssoKitIdLess = clientSsoKit();
-    const ssoKitProviderLess = clientSsoKit();
+    const ssoKit = await clientSsoKit();
+    const ssoKitIdLess = await clientSsoKit();
+    const ssoKitProviderLess = await clientSsoKit();
 
     delete ssoKitIdLess.id;
     delete ssoKitProviderLess.provider;

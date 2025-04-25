@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import "../../../../../test/mocks/mockCryptoKey";
 import DecryptSsoPassphraseService from "./decryptSsoPassphraseService";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
 import {buildMockedCryptoKey} from "../../utils/assertions.test.data";
 import GenerateSsoIvService from "./generateSsoIvService";
+import EncryptSsoPassphraseService from "./encryptSsoPassphraseService";
 
 describe("DecryptSsoPassphrase service", () => {
   const key1Promise = buildMockedCryptoKey({algoName: "AES-GCM", extractable: false});
@@ -23,44 +23,16 @@ describe("DecryptSsoPassphrase service", () => {
   const iv1 = GenerateSsoIvService.generateIv();
   const iv2 = GenerateSsoIvService.generateIv();
   const buffer1 = Buffer.from("This is a buffer").toString('base64');
-  const buffer2 = Buffer.from("This is a second buffer");
 
   it('should decrypt the passphrase if all data are correct', async() => {
-    expect.assertions(7);
+    expect.assertions(1);
     const key1 = await key1Promise;
     const key2 = await key2Promise;
 
-    let step = 0;
     const expectedDecryptedPassphrase = "passphrase";
 
-    const firstDecrypyCallExpectation = (algo, key, buffer) => {
-      expect(algo).toStrictEqual({
-        name: "AES-GCM",
-        iv: iv2
-      });
-      expect(key).toBe(key2);
-      expect(buffer).toStrictEqual(Buffer.from(buffer1, 'base64'));
-      return buffer2;
-    };
-
-    const secondDecrypyCallExpectation = (algo, key, buffer) => {
-      expect(algo).toStrictEqual({
-        name: "AES-GCM",
-        iv: iv1
-      });
-      expect(key).toBe(key1);
-      expect(buffer).toBe(buffer2);
-      return expectedDecryptedPassphrase;
-    };
-
-    crypto.subtle.decrypt.mockImplementation(async(algo, key, buffer) => {
-      step++;
-      return step === 1
-        ? firstDecrypyCallExpectation(algo, key, buffer)
-        : secondDecrypyCallExpectation(algo, key, buffer);
-    });
-
-    const decrypted = await DecryptSsoPassphraseService.decrypt(buffer1, key1, key2, iv1, iv2);
+    const encrypted = await EncryptSsoPassphraseService.encrypt(expectedDecryptedPassphrase, key1, key2, iv1, iv2);
+    const decrypted = await DecryptSsoPassphraseService.decrypt(encrypted, key1, key2, iv1, iv2);
     expect(decrypted).toStrictEqual(expectedDecryptedPassphrase);
   });
 
@@ -68,10 +40,6 @@ describe("DecryptSsoPassphrase service", () => {
     expect.assertions(1);
     const key1 = await key1Promise;
     const key2 = await key2Promise;
-
-    crypto.subtle.decrypt.mockImplementation(async() => {
-      throw new Error("Unable to decrypt somehow");
-    });
 
     try {
       await DecryptSsoPassphraseService.decrypt(buffer1, key1, key2, iv1, iv2);
@@ -84,17 +52,6 @@ describe("DecryptSsoPassphrase service", () => {
     expect.assertions(1);
     const key1 = await key1Promise;
     const key2 = await key2Promise;
-
-    let step = 0;
-    const firstDecrypyCallExpectation = async() => buffer2;
-    const secondDecrypyCallExpectation =  async() => { throw new Error("Unable to decrypt somehow"); };
-
-    crypto.subtle.decrypt.mockImplementation(async(algo, key, buffer) => {
-      step++;
-      return step === 1
-        ? firstDecrypyCallExpectation(algo, key, buffer)
-        : secondDecrypyCallExpectation(algo, key, buffer);
-    });
 
     try {
       await DecryptSsoPassphraseService.decrypt(buffer1, key1, key2, iv1, iv2);

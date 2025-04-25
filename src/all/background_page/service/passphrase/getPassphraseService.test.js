@@ -28,6 +28,7 @@ import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {v4 as uuid} from "uuid";
 import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
+import KeepSessionAliveService from "../session_storage/keepSessionAliveService";
 
 jest.mock("../ui/quickAccess.service");
 jest.mock("../session_storage/passphraseStorageService");
@@ -73,6 +74,8 @@ describe("GetPassphraseService", () => {
   describe("GetPassphraseService::getPassphrase", () => {
     it("should return the user's private key's passphrase that the user entered when the local storage is empty", async() => {
       expect.assertions(2);
+      jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
+
       const worker = getTestWorker();
       PassphraseStorageService.get.mockImplementation(async() => null);
       const service = new GetPassphraseService(account);
@@ -98,6 +101,7 @@ describe("GetPassphraseService", () => {
   describe("GetPassphraseService::requestPassphrase", () => {
     it("should call `passbolt.passphrase.request` to retrieve passphrase from a user input", async() => {
       expect.assertions(1);
+      jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
       const worker = getTestWorker();
       const service = new GetPassphraseService(account);
       const receivedPassphrase = await service.requestPassphrase(worker);
@@ -129,6 +133,7 @@ describe("GetPassphraseService", () => {
       expect.assertions(1);
       const quickAccessWorker = getTestWorker();
 
+      jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
       WorkerService.waitExists.mockImplementation(() => {});
       PassphraseStorageService.get.mockImplementation(async() => null);
       PortManager.isPortExist.mockImplementation(async() => true);
@@ -157,6 +162,7 @@ describe("GetPassphraseService", () => {
       };
       let requestId = null;
 
+      jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
       PassphraseStorageService.get.mockImplementation(async() => null);
       WorkerService.waitExists.mockImplementation(() => {});
       WorkersSessionStorage.getWorkersByNameAndTabId.mockImplementation(async() => [quickAccessWorker]);
@@ -205,6 +211,7 @@ describe("GetPassphraseService", () => {
   describe("GetPassphraseService::rememberPassphrase", () => {
     it("should call the storage service to remember the session", async() => {
       expect.assertions(4);
+      jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
       const service = new GetPassphraseService(account);
       const setStorageSpy = jest.spyOn(service.userRememberMeLatestChoiceStorage, "set");
 

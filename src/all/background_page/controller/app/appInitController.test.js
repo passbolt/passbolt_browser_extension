@@ -12,7 +12,6 @@
  * @since         3.9.0
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
-import "../../../../../test/mocks/mockCryptoKey";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import AppInitController from "./appInitController";
 import User from "../../model/user";
@@ -67,13 +66,13 @@ describe("AppInitController", () => {
       expect.assertions(3);
       await MockExtension.withConfiguredAccount();
 
-      const ssoClientKitDto = clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
+      const ssoClientKitDto = await clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
       delete ssoClientKitDto.id; // let's ensure there is no id for this test
       const storedSsoKit = new SsoKitClientPartEntity(ssoClientKitDto);
       SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
 
       const userInstance = User.getInstance();
-      const storedServerSsoKit = {data: generateSsoKitServerData({})};
+      const storedServerSsoKit = {data: await generateSsoKitServerData({})};
       const ssoKitServerResponse = Object.assign({}, storedServerSsoKit, {id: uuid()});
 
       jest.spyOn(userInstance.settings, "sync").mockImplementation(async() => null);

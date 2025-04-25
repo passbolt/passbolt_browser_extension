@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import "../../../../../test/mocks/mockCryptoKey";
 import "../../../../../test/mocks/mockSsoDataStorage";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
@@ -26,7 +25,7 @@ describe("UpdateLocalSsoProviderController", () => {
       expect.assertions(1);
       const expectedProvider = GoogleSsoSettingsEntity.PROVIDER_ID;
 
-      const ssoKit = clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
+      const ssoKit = await clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
       SsoDataStorage.setMockedData(ssoKit);
 
       const controller = new UpdateLocalSsoProviderController();
@@ -40,7 +39,7 @@ describe("UpdateLocalSsoProviderController", () => {
       expect.assertions(1);
       const expectedProvider = "invalid-provider";
 
-      SsoDataStorage.setMockedData(clientSsoKit());
+      SsoDataStorage.setMockedData(await clientSsoKit());
 
       const controller = new UpdateLocalSsoProviderController();
       try {

@@ -78,7 +78,7 @@ describe("ResourceUpdateLocalStorageController", () => {
       ]);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
       jest.spyOn(GetPassphraseService.prototype, "requestPassphrase").mockImplementation(() => pgpKeys.ada.passphrase);
-      jest.spyOn(PassphraseStorageService, "set");
+      jest.spyOn(PassphraseStorageService, "set").mockImplementation(() => {});
 
       await controller._exec();
 

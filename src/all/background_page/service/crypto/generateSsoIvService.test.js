@@ -11,10 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import "../../../../../test/mocks/mockCryptoKey";
 import GenerateSsoIvService from "./generateSsoIvService";
-
-jest.spyOn(self.crypto, "getRandomValues");
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -22,20 +19,18 @@ beforeEach(() => {
 
 describe("GenerateSsoIv service", () => {
   it("should generate an IV compatible with SSO's algorithm by default", async() => {
-    expect.assertions(3);
+    expect.assertions(2);
 
-    const iv = await GenerateSsoIvService.generateIv();
+    const iv = GenerateSsoIvService.generateIv();
     expect(iv).toBeInstanceOf(Uint8Array);
     expect(iv.length).toBe(12);
-    expect(crypto.getRandomValues).toHaveBeenCalledTimes(1);
   });
 
   it("should generate an IV with the demanded size", async() => {
-    expect.assertions(3);
+    expect.assertions(2);
 
-    const iv2 = await GenerateSsoIvService.generateIv(6);
+    const iv2 = GenerateSsoIvService.generateIv(6);
     expect(iv2).toBeInstanceOf(Uint8Array);
     expect(iv2.length).toBe(6);
-    expect(crypto.getRandomValues).toHaveBeenCalledTimes(1);
   });
 });

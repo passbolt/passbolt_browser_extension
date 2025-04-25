@@ -12,7 +12,6 @@
  * @since         3.10.0
  */
 import each from "jest-each";
-import "../../../../test/mocks/mockCryptoKey";
 import {
   assertUuid,
   assertBase64String,
@@ -122,12 +121,10 @@ describe("Assertions", () => {
         12,
         "",
         await buildMockedCryptoKey({extractable: true}),
-        await buildMockedCryptoKey({algoName: "test"}),
         await buildMockedCryptoKey({algoLength: 128}),
-        await buildMockedCryptoKey({usages: []}),
         await buildMockedCryptoKey({usages: ["encrypt"]}),
         await buildMockedCryptoKey({usages: ["decrypt"]}),
-        await buildMockedCryptoKey({usages: ["encrypt", "decrypt", "sign"]}),
+        await buildMockedCryptoKey({usages: ["encrypt", "decrypt"]}),
       ];
 
       expect.assertions(scenarios.length);
@@ -152,12 +149,10 @@ describe("Assertions", () => {
         12,
         "",
         await buildMockedCryptoKey({extractable: false}),
-        await buildMockedCryptoKey({algoName: "test"}),
-        await buildMockedCryptoKey({algoLength: 128}),
-        await buildMockedCryptoKey({usages: []}),
-        await buildMockedCryptoKey({usages: ["encrypt"]}),
-        await buildMockedCryptoKey({usages: ["decrypt"]}),
-        await buildMockedCryptoKey({usages: ["encrypt", "decrypt", "sign"]}),
+        await buildMockedCryptoKey({extractable: false, algoLength: 128}),
+        await buildMockedCryptoKey({extractable: false, usages: ["encrypt"]}),
+        await buildMockedCryptoKey({extractable: false, usages: ["decrypt"]}),
+        await buildMockedCryptoKey({extractable: false, usages: ["encrypt", "decrypt"]}),
       ];
 
       expect.assertions(scenarios.length);

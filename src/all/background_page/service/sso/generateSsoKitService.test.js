@@ -12,7 +12,6 @@
  * @since         3.9.0
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
-import "../../../../../test/mocks/mockCryptoKey";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import {withAzureSsoSettings} from "../../controller/sso/getCurrentSsoSettingsController.test.data";
 import GenerateSsoKitService from "./generateSsoKitService";

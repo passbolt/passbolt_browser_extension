@@ -33,18 +33,18 @@ describe("metadataPrivateKeyApiService", () => {
     it("Save the new metadata key on the API.", async() => {
       expect.assertions(2);
 
-      const encryptedMetadataPrivateKey = defaultMetadataPrivateKeyDto();
+      const encryptedMetadataPrivateKeyDto = defaultMetadataPrivateKeyDto();
 
-      fetch.doMockOnceIf(new RegExp(`/metadata/keys/private/${encryptedMetadataPrivateKey.id}`), async req => {
+      fetch.doMockOnceIf(new RegExp(`/metadata/keys/private/${encryptedMetadataPrivateKeyDto.id}`), async req => {
         expect(req.method).toEqual("PUT");
-        return mockApiResponse(encryptedMetadataPrivateKey);
+        return mockApiResponse(encryptedMetadataPrivateKeyDto);
       });
 
-      const entity = new MetadataPrivateKeyEntity(encryptedMetadataPrivateKey);
+      const entity = new MetadataPrivateKeyEntity(encryptedMetadataPrivateKeyDto);
       const service = new MetadataPrivateKeyApiService(apiClientOptions);
       const resultDto = await service.update(entity);
 
-      expect(resultDto).toEqual(encryptedMetadataPrivateKey.data);
+      expect(resultDto).toEqual(encryptedMetadataPrivateKeyDto);
     });
 
     it("throws an invalid parameter error if the settings parameter is not valid", async() => {

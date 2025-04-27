@@ -90,9 +90,9 @@ describe("VerifyOrTrustMetadataKeyService", () => {
       metadata_private_keys[0].data.fingerprint = metadataKeyTrusted.fingerprint;
       const metadataKeyDto = defaultMetadataKeyDto({id: id, metadata_private_keys: metadata_private_keys, fingerprint: metadataKeyTrusted.fingerprint});
       const metadataKeyEntity = new MetadataKeyEntity(metadataKeyDto);
-      metadataKeyEntity.metadataPrivateKeys.items[0].isDataSignedByCurrentUser = metadataKeyTrusted.signed;
+      metadataKeyEntity.metadataPrivateKeys.items[0].dataSignedByCurrentUser = metadataKeyTrusted.signed;
       const metadataKeysCollection = new MetadataKeysCollection([metadataKeyDto]);
-      metadataKeysCollection.getFirstByLatestCreated().metadataPrivateKeys.items[0].isDataSignedByCurrentUser = metadataKeyTrusted.signed;
+      metadataKeysCollection.getFirstByLatestCreated().metadataPrivateKeys.items[0].dataSignedByCurrentUser = metadataKeyTrusted.signed;
       metadataKeysSessionStorage.set(metadataKeysCollection);
 
       jest.spyOn(MetadataPrivateKeyApiService.prototype, "update").mockImplementationOnce(() => pgpKeys.metadataKey.encryptedSignedMetadataPrivateKeyDataMessage);

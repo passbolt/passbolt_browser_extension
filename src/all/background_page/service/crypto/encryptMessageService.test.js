@@ -165,5 +165,15 @@ describe("EncryptMessageService", () => {
       expect.assertions(1);
       await expect(resultEncrypt).rejects.toThrow("The private key should be decrypted.");
     });
+
+    it("should throw an error if the optional date parameter is not of Date type", async() => {
+      const messageClear = "message clear";
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const signingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const resultEncrypt = EncryptMessageService.encrypt(messageClear, publicKey, [signingKey], {date: 42});
+
+      expect.assertions(1);
+      await expect(resultEncrypt).rejects.toThrow("The optional 'date' parameter should be of type Date.");
+    });
   });
 });

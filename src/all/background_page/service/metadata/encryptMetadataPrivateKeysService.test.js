@@ -29,6 +29,7 @@ import EncryptMetadataPrivateKeysService from "./encryptMetadataPrivateKeysServi
 import Keyring from "../../model/keyring";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
+import FindSignatureService from "../crypto/findSignatureService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -81,6 +82,27 @@ describe("EncryptMetadataPrivateKeysService", () => {
       expect(decryptedData).toEqual(dto.data);
     }, 10 * 1000);
 
+    it("encrypts a metadata private key and override the signature date.", async() => {
+      expect.assertions(4);
+
+      await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
+      const dto = decryptedMetadataPrivateKeyDto({user_id: pgpKeys.ada.userId});
+      const metadataPrivateKey = new MetadataPrivateKeyEntity(dto);
+      const date = new Date(2025, 1, 1);
+
+      await service.encryptOne(metadataPrivateKey, userPrivateKey, {date});
+
+      expect(metadataPrivateKey._data).toBeUndefined();
+      expect(typeof metadataPrivateKey.data).toBe("string");
+      const recipientPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const message = await OpenpgpAssertion.readMessageOrFail(metadataPrivateKey.data);
+      const decryptResult = await DecryptMessageService.decrypt(message, recipientPrivateKey, [userPrivateKey], {returnOnlyData: false});
+      const signature = await FindSignatureService.findSignatureForGpgKey(decryptResult.signatures, userPrivateKey);
+      const decryptedData = JSON.parse(decryptResult.data);
+      expect(decryptedData).toEqual(dto.data);
+      expect(signature.created).toEqual(date.toISOString());
+    }, 10 * 1000);
+
     it("does nothing if the data is already encrypted", async() => {
       expect.assertions(2);
       const dto = defaultMetadataPrivateKeyDto();
@@ -118,6 +140,18 @@ describe("EncryptMetadataPrivateKeysService", () => {
       const dto = defaultMetadataPrivateKeyDto();
       const metadataPrivateKey = new MetadataPrivateKeyEntity(dto);
       await expect(() => service.encryptOne(metadataPrivateKey, "test")).rejects.toThrowError(expectedError);
+    });
+
+    it("throws an error if the optional date parameter is not of Date type.", async() => {
+      expect.assertions(1);
+
+      await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
+      const dto = decryptedMetadataPrivateKeyDto({user_id: pgpKeys.ada.userId});
+      const metadataPrivateKey = new MetadataPrivateKeyEntity(dto);
+
+      const promise = service.encryptOne(metadataPrivateKey, userPrivateKey, {date: 42});
+
+      await expect(promise).rejects.toThrow("The optional 'date' parameter should be of type Date.");
     });
   });
 

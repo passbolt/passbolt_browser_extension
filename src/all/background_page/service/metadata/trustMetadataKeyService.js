@@ -55,7 +55,7 @@ class TrustMetadataKeyService {
     const decryptedUserPrivateKey = await DecryptPrivateKeyService.decrypt(encryptedUserPrivateKey, passphrase);
 
     if (metadataKey.metadataPrivateKeys.hasDecryptedPrivateKeys()) {
-      // Clone to keep decrypted private key to update only the property isDataSignedByCurrentUser
+      // Clone to keep decrypted private key to update only the property dataSignedByCurrentUser
       const metadataPrivateKeysDecrypted = new MetadataPrivateKeysCollection(metadataKey.metadataPrivateKeys.toDto());
       await this.encryptMetadataPrivateKeysService.encryptAllFromMetadataKeyEntity(metadataKey, decryptedUserPrivateKey, {signatureDate: signedDate});
 
@@ -64,7 +64,7 @@ class TrustMetadataKeyService {
         const metadataPrivateKeyDecrypted = metadataPrivateKeysDecrypted.items[i];
         if (!metadataPrivateKey.isDecrypted) {
           await this.updateMetadataKeyPrivateService.update(metadataPrivateKey);
-          metadataPrivateKeyDecrypted.isDataSignedByCurrentUser = signedDate.toISOString();
+          metadataPrivateKeyDecrypted.dataSignedByCurrentUser = signedDate.toISOString();
           metadataPrivateKeyDecrypted.modified = signedDate.toISOString();
           metadataPrivateKeyDecrypted.modifiedBy = this.account.userId;
           metadataKey.metadataPrivateKeys.items[i] = metadataPrivateKeyDecrypted;

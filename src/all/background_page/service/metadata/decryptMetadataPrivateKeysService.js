@@ -69,7 +69,7 @@ class DecryptMetadataPrivateKeysService {
     const externalGpgSignature = await FindSignatureService.findSignatureForGpgKey(decryptedMessage.signatures, userPublicKey);
 
     if (externalGpgSignature && externalGpgSignature.isVerified) {
-      metadataPrivateKeyEntity.isDataSignedByCurrentUser = externalGpgSignature.created;
+      metadataPrivateKeyEntity.dataSignedByCurrentUser = externalGpgSignature.created;
     }
   }
 

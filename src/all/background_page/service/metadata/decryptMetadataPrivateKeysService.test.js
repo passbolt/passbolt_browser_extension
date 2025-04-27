@@ -51,7 +51,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       expect(metadataPrivateKeyEntity._props.data).toBeUndefined();
       expect(metadataPrivateKeyEntity.data).toBeInstanceOf(MetadataPrivateKeyDataEntity);
-      expect(metadataPrivateKeyEntity.isDataSignedByCurrentUser).toEqual("2025-04-23T13:27:55.000Z");
+      expect(metadataPrivateKeyEntity.dataSignedByCurrentUser).toEqual("2025-04-23T13:27:55.000Z");
 
       const openPgpPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
       await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey)).not.toThrow();
@@ -72,7 +72,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       expect(metadataPrivateKeyEntity._props.data).toBeUndefined();
       expect(metadataPrivateKeyEntity.data).toBeInstanceOf(MetadataPrivateKeyDataEntity);
-      expect(metadataPrivateKeyEntity.isDataSignedByCurrentUser).toBeNull();
+      expect(metadataPrivateKeyEntity.dataSignedByCurrentUser).toBeNull();
 
       const openPgpPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
       await expect(() => OpenpgpAssertion.assertDecryptedPrivateKey(openPgpPrivateKey)).not.toThrow();

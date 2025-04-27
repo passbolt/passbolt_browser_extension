@@ -14,6 +14,7 @@
 
 import * as openpgp from 'openpgp';
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import {assertType} from "../../utils/assertions";
 
 class EncryptMessageService {
   /**
@@ -51,6 +52,9 @@ class EncryptMessageService {
     OpenpgpAssertion.assertPublicKey(encryptionKey);
     if (signingKeys) {
       OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
+    }
+    if (typeof options?.date !== "undefined") {
+      assertType(options?.date, Date, "The optional 'date' parameter should be of type Date.");
     }
 
     const gpgMessage = await OpenpgpAssertion.createMessageOrFail(message);

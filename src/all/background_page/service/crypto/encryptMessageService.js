@@ -43,7 +43,8 @@ class EncryptMessageService {
    * @param {string} message The message to encrypt.
    * @param {openpgp.PublicKey} encryptionKey The public key(s) to use to encrypt the message
    * @param {array<openpgp.PrivateKey>} signingKeys The private key(s) to use to sign the message.
-   * @param {Date} options.signatureDate Specific data for signature
+   * @param {object} [options]
+   * @param {Date} [options.date] Override the creation date of the message signature
    * @returns {Promise<string>} the encrypted message in its armored version
    */
   static async encrypt(message, encryptionKey, signingKeys = null, options = {}) {
@@ -57,7 +58,7 @@ class EncryptMessageService {
       message: gpgMessage,
       encryptionKeys: encryptionKey,
       signingKeys: signingKeys,
-      date: options.signatureDate
+      date: options.date
     });
   }
 }

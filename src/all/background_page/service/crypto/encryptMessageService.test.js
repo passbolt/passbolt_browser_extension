@@ -17,6 +17,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "./decryptMessageService";
 import EncryptMessageService from "./encryptMessageService";
 import * as openpgp from 'openpgp';
+import FindSignatureService from "./findSignatureService";
 
 /**
  * Unit tests on ConfirmSaveAccountRecoverySettings in regard of specifications
@@ -117,6 +118,25 @@ describe("EncryptMessageService", () => {
       const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(resultEncrypt);
       const resultDecrypt = await DecryptMessageService.decrypt(messageEncrypted, privateDecryptedKey, verificationKeys);
       expect(resultDecrypt).toEqual(messageClear);
+    }, 10 * 1000);
+
+    it("should encrypt asymmetrically and sign using a specific date", async() => {
+      const messageClear = "message clear";
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const signingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const date = new Date(2025, 1, 1);
+      const resultEncrypt = await EncryptMessageService.encrypt(messageClear, publicKey, [signingKey], {date});
+
+      expect.assertions(3);
+      expect(resultEncrypt).toBeTruthy();
+      const userBKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
+      const verificationKeys = [userBKey];
+      const privateDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(resultEncrypt);
+      const resultDecrypt = await DecryptMessageService.decrypt(messageEncrypted, privateDecryptedKey, verificationKeys, {returnOnlyData: false});
+      const signature = await FindSignatureService.findSignatureForGpgKey(resultDecrypt.signatures, userBKey);
+      expect(resultDecrypt.data).toEqual(messageClear);
+      expect(signature.created).toEqual(date.toISOString());
     }, 10 * 1000);
 
     it("should encrypt asymmetrically and sign with multiple keys", async() => {

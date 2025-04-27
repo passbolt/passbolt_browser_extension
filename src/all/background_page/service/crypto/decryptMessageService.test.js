@@ -208,8 +208,7 @@ describe("DecryptMessageService", () => {
       expect(resultDecrypt).toEqual(messageClear);
     }, 10 * 1000);
 
-
-    it("should not throw an error if it cannot verify a signature with verification keys", async() => {
+    it("should not throw an error if the message is signed but no verification key is passed while decrypting", async() => {
       const messageClear = "message clear";
       const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
       const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);

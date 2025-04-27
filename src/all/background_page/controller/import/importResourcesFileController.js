@@ -17,6 +17,7 @@ import ProgressService from "../../service/progress/progressService";
 import ImportResourcesService from "../../service/resource/import/ImportResourcesService";
 import {assertBase64String} from "../../utils/assertions";
 import FileTypeError from "../../error/fileTypeError";
+import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
 const INITIAL_PROGRESS_GOAL = 100;
 class ImportResourcesFileController {
@@ -32,6 +33,7 @@ class ImportResourcesFileController {
     this.progressService = new ProgressService(this.worker, i18n.t("Importing ..."));
     this.getPassphraseService = new GetPassphraseService(account);
     this.importResourcesService = new ImportResourcesService(account, apiClientOptions, this.progressService);
+    this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
 
@@ -65,13 +67,15 @@ class ImportResourcesFileController {
     //assert file type
     assertBase64String(file);
 
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
+
     this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t('Initialize'));
     await this.progressService.finishStep(null, true);
 
     try {
       const importEntity = ImportResourcesFileEntity.buildImportEntity(fileType, file, options);
       await this.importResourcesService.parseFile(importEntity);
-      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       const importedFile = await this.importResourcesService.importFile(importEntity, passphrase);
       return importedFile;
     } finally {

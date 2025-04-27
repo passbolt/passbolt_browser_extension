@@ -32,17 +32,18 @@ describe("UpdateMetadataKeyPrivateService", () => {
 
   describe('::update', () => {
     it("Save the settings on the API.", async() => {
-      expect.assertions(1);
+      expect.assertions(2);
 
-      const encryptedMetadataPrivateKey = defaultMetadataPrivateKeyDto();
+      const encryptedMetadataPrivateKeyDto = defaultMetadataPrivateKeyDto();
+      const encryptedMetadataPrivateKey = new MetadataPrivateKeyEntity(encryptedMetadataPrivateKeyDto);
 
-      jest.spyOn(MetadataPrivateKeyApiService.prototype, "update").mockImplementationOnce(() => encryptedMetadataPrivateKey.data);
+      jest.spyOn(MetadataPrivateKeyApiService.prototype, "update").mockImplementationOnce(() => encryptedMetadataPrivateKeyDto);
 
-      const entity = new MetadataPrivateKeyEntity(encryptedMetadataPrivateKey);
       const service = new UpdateMetadataKeyPrivateService(apiClientOptions);
-      const resultDto = await service.update(entity);
+      const updatedMetadataPrivateKey = await service.update(encryptedMetadataPrivateKey);
 
-      expect(resultDto.data).toEqual(encryptedMetadataPrivateKey.data);
+      expect(updatedMetadataPrivateKey).toBeInstanceOf(MetadataPrivateKeyEntity);
+      expect(updatedMetadataPrivateKey.toDto()).toEqual(encryptedMetadataPrivateKeyDto);
     });
 
     it("throws an invalid parameter error if the settings parameter is not valid", async() => {

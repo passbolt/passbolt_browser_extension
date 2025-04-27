@@ -17,6 +17,7 @@ import UserModel from "../../model/user/userModel";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ResourceUpdateService from "../../service/resource/update/resourceUpdateService";
+import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
 class ResourceUpdateController {
   /**
@@ -35,6 +36,7 @@ class ResourceUpdateController {
     this.progressService = new ProgressService(this.worker, i18n.t("Updating password"));
     this.getPassphraseService = new GetPassphraseService(account);
     this.resourceUpdateService = new ResourceUpdateService(account, apiClientOptions, this.progressService);
+    this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
   /**
@@ -61,9 +63,11 @@ class ResourceUpdateController {
    * @returns {Promise<Object>} updated resource
    */
   async exec(resourceDto, plaintextDto) {
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
+    this.progressService.start(1, i18n.t('Updating resource'));
+
     try {
-      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-      this.progressService.start(1, i18n.t('Updating resource'));
       const resourceUpdated =  await this.resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
       await this.progressService.finishStep(i18n.t('Done!'), true);
       return resourceUpdated;

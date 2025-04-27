@@ -44,8 +44,8 @@ describe("ConfirmMetadataKeyContentCodeService", () => {
       const result = await service.requestConfirm(metadataTrustedKeyEntity, metadataKeyEntity);
 
       const expectedDto = {
-        metadataTrustedKey: metadataTrustedKeyEntity.toDto(),
-        metadataKey: metadataKeyEntity.toContentCodeConfirmTrustRequestDto()
+        metadata_trusted_key: metadataTrustedKeyEntity.toDto(),
+        metadata_key: metadataKeyEntity.toContentCodeConfirmTrustRequestDto()
       };
 
       expect(result).toBeTruthy();

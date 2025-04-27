@@ -29,23 +29,20 @@ export default class UpdateMetadataKeyPrivateService {
   }
 
   /**
-   * Update and verify the metadata private key on the Passbolt API
+   * Update the metadata private key on the Passbolt API
    *
-   * @param {MetadataPrivateKeyEntity} metadataPrivateKey The settings to save.
+   * @param {MetadataPrivateKeyEntity} metadataPrivateKey The metadata private key to update
    * @returns {Promise<MetadataPrivateKeyEntity>} The updated metadata key
    * @throws {Error} if the `metadataPrivateKey` key is decrypted
    * @throws {TypeError} if the `metadataPrivateKey` argument is not of type MetadataPrivateKeyEntity
    */
   async update(metadataPrivateKey) {
     assertType(metadataPrivateKey, MetadataPrivateKeyEntity);
-
     if (metadataPrivateKey.isDecrypted) {
       throw new Error("Metadata private key should be encrypted ");
     }
-    const privateKey = await this.metadataPrivateKeyApiService.update(metadataPrivateKey);
 
-    metadataPrivateKey.data = privateKey;
-
-    return metadataPrivateKey;
+    const metadataPrivateKeyDto = await this.metadataPrivateKeyApiService.update(metadataPrivateKey);
+    return new MetadataPrivateKeyEntity(metadataPrivateKeyDto);
   }
 }

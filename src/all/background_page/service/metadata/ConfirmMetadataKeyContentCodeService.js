@@ -34,12 +34,12 @@ class ConfirmMetadataKeyContentCodeService {
     assertType(metadataTrustedKey, MetadataTrustedKeyEntity, 'The given metadata trusted key entity is not a MetadataTrustedKeyEntity');
     assertType(metadataKey, MetadataKeyEntity, 'The given metadata key entity is not a MetadataKeyEntity');
 
-    const dto = {
-      metadataTrustedKey: metadataTrustedKey.toDto(),
-      metadataKey: metadataKey.toContentCodeConfirmTrustRequestDto()
+    const data = {
+      metadata_trusted_key: metadataTrustedKey.toDto(),
+      metadata_key: metadataKey.toContentCodeConfirmTrustRequestDto()
     };
 
-    return await this.worker.port.request("passbolt.metadata-key.trust-confirm", dto);
+    return await this.worker.port.request("passbolt.metadata-key.trust-confirm", data);
   }
 }
 

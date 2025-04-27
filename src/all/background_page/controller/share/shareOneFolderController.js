@@ -18,6 +18,7 @@ import ProgressService from "../../service/progress/progressService";
 import ShareFoldersService from "../../service/share/shareFoldersService";
 import {assertArray, assertNonEmptyArray, assertUuid} from "../../utils/assertions";
 import GetOrFindFoldersService from "../../service/folder/getOrFindFoldersService";
+import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
 class ShareOneFolderController {
   /**
@@ -35,6 +36,7 @@ class ShareOneFolderController {
     this.shareFoldersService = new ShareFoldersService(apiClientOptions, account, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
     this.getOrFindFoldersService = new GetOrFindFoldersService(account, apiClientOptions);
+    this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
   /**
@@ -66,6 +68,7 @@ class ShareOneFolderController {
 
     const permissionChanges = new PermissionChangesCollection(permissionChangesDto);
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
     const folder = (await this.getOrFindFoldersService.getOrFindAll()).getById(folderId);
     this.progressService.title = i18n.t('Sharing folder {{name}}', {name: folder.name});

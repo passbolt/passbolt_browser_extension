@@ -12,13 +12,15 @@
  * @since         5.1.0
  */
 
-import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
+import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 import {assertString} from "../../utils/assertions";
-import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import GetMetadataTrustedKeyService from "./getMetadataTrustedKeyService";
 import ConfirmMetadataKeyContentCodeService from "./ConfirmMetadataKeyContentCodeService";
 import TrustMetadataKeyService from "./trustMetadataKeyService";
 import UntrustedMetadataKeyError from "../../error/UntrustedMetadataKeyError";
+import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
+import i18n from "../../sdk/i18n";
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 class VerifyOrTrustMetadataKeyService {
   /**
@@ -27,8 +29,10 @@ class VerifyOrTrustMetadataKeyService {
    * @param {ApiClientOptions} apiClientOptions the api client options
    */
   constructor(worker, account, apiClientOptions) {
+    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindMetadataKeysService = new GetOrFindMetadataKeysService(account, apiClientOptions);
     this.metadataKeysSessionStorage = new MetadataKeysSessionStorage(account);
-    this.getTrustedMetadataKeyLocalStorage = new GetMetadataTrustedKeyService(account);
+    this.getMetadataTrustedKeyService = new GetMetadataTrustedKeyService(account);
     this.confirmMetadataKeyContentCodeService = new ConfirmMetadataKeyContentCodeService(worker);
     this.trustMetadataKeyService = new TrustMetadataKeyService(account, apiClientOptions);
   }
@@ -41,24 +45,44 @@ class VerifyOrTrustMetadataKeyService {
    * @throws {UntrustedMetadataKeyError} If user has not confirmed the new metadata key.
    */
   async verifyTrustedOrTrustNewMetadataKey(passphrase) {
+    const organizationSettings = await this.organisationSettingsModel.getOrFind();
+    const metadataIsEnabled = organizationSettings.isPluginEnabled("metadata");
+    if (!metadataIsEnabled) {
+      return;
+    }
+
     assertString(passphrase, 'The parameter "passphrase" should be a string.');
 
-    const metadataKeys = await this.metadataKeysSessionStorage.get();
-    const metadataKeysCollection = new MetadataKeysCollection(metadataKeys, {validate: false});
-    const metadataKey = metadataKeysCollection.getFirstByLatestCreated();
-    const metadataTrustedKey = await this.getTrustedMetadataKeyLocalStorage.get();
+    const metadataKeys = await this.getOrFindMetadataKeysService.getOrFindAll();
+    const activeMetadataKey = metadataKeys.getFirstByLatestCreated();
+    const activeMetadataPrivateKey = activeMetadataKey.metadataPrivateKeys.items[0];
 
-    if (metadataTrustedKey === null && metadataKey !== null) {
-      await this.trustMetadataKeyService.trust(metadataKey, passphrase);
-    } else if (metadataTrustedKey.isMetadataKeyTrusted(metadataKey?.metadataPrivateKeys.items[0])) {
+    // Not active metadata key needs to be trusted.
+    if (activeMetadataKey === null) {
       return;
+    }
+
+    const metadataTrustedKey = await this.getMetadataTrustedKeyService.get();
+
+    // Trust on first use.
+    if (metadataTrustedKey === null) {
+      await this.trustMetadataKeyService.trust(activeMetadataPrivateKey, passphrase);
+      return;
+    }
+
+    // Active metadata key is already trusted.
+    if (metadataTrustedKey.isMetadataKeyTrusted(activeMetadataKey)) {
+      return;
+    }
+
+    // Request the user to trust the key
+    const userConfirmation = await this.confirmMetadataKeyContentCodeService.requestConfirm(metadataTrustedKey, activeMetadataKey);
+    if (userConfirmation) {
+      await this.trustMetadataKeyService.trust(activeMetadataPrivateKey, passphrase);
     } else {
-      const userConfirmation = await this.confirmMetadataKeyContentCodeService.requestConfirm(metadataTrustedKey, metadataKey);
-      if (userConfirmation) {
-        await this.trustMetadataKeyService.trust(metadataKey, passphrase);
-      } else {
-        throw new UntrustedMetadataKeyError("The user has not confirmed the new metadata key");
-      }
+      const errorMessage = `${i18n.t("The encryption key used to share metadata between users could not be verified and is considered untrusted.")}
+        ${i18n.t("The operation has been aborted to maintain security integrity.")}`;
+      throw new UntrustedMetadataKeyError(errorMessage);
     }
   }
 }

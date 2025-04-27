@@ -33,14 +33,14 @@ class MetadataPrivateKeyApiService extends AbstractService  {
    * Update a metadata private key on the Passbolt API
    *
    * @param {MetadataPrivateKeyEntity} metadataPrivateKey The metadata private key to update
-   * @returns {Promise<String>} The encrypted metatadata key saved
+   * @returns {Promise<object>} The updated metadata private key
    * @throws {TypeError} if the `metadataKey` argument is not of type MetadataPrivateKeyEntity
    * @public
    */
   async update(metadataPrivateKey) {
     assertType(metadataPrivateKey, MetadataPrivateKeyEntity);
     const response = await this.apiClient.update(metadataPrivateKey.id, metadataPrivateKey.toDataDto());
-    return response.body.data;
+    return response.body;
   }
 }
 

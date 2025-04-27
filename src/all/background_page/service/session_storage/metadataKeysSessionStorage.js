@@ -162,7 +162,7 @@ class MetadataKeysSessionStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {metadata_private_keys: true};
+    return {metadata_private_keys: true, creator: true};
   }
 }
 

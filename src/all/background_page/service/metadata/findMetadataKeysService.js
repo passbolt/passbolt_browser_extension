@@ -69,7 +69,7 @@ class FindMetadataKeysService {
    * @public
    */
   findAllForSessionStorage() {
-    return this.findAll({metadata_private_keys: true, creator: true}, {deleted: false});
+    return this.findAll({metadata_private_keys: true, creator: true, "creator.profile": true}, {deleted: false});
   }
 
   /**

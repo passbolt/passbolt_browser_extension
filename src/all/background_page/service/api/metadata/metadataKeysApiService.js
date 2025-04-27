@@ -38,6 +38,7 @@ class MetadataKeysApiService extends AbstractService {
     return [
       'metadata_private_keys',
       'creator',
+      'creator.profile',
     ];
   }
 

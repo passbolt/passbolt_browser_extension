@@ -16,6 +16,7 @@ import i18n from "../../sdk/i18n";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import ProgressService from "../../service/progress/progressService";
 import ResourceCreateService from "../../service/resource/create/resourceCreateService";
+import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
 class ResourceCreateController {
   /**
@@ -32,6 +33,7 @@ class ResourceCreateController {
     this.progressService = new ProgressService(this.worker, i18n.t('Creating password'));
     this.resourceCreateService = new ResourceCreateService(account, apiClientOptions, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
+    this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
   /**
@@ -56,10 +58,12 @@ class ResourceCreateController {
    * @returns {Promise<void>}
    */
   async exec(resourceDto, plaintextDto) {
+    const goals = resourceDto.folder_parent_id ? 10 : 3;
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
+    this.progressService.start(goals, i18n.t('Initializing'));
+
     try {
-      const goals = resourceDto.folder_parent_id ? 10 : 3;
-      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-      this.progressService.start(goals, i18n.t('Initializing'));
       const resourceCreated =  await this.resourceCreateService.create(resourceDto, plaintextDto, passphrase);
       await this.progressService.finishStep(i18n.t('Done!'), true);
       return resourceCreated;

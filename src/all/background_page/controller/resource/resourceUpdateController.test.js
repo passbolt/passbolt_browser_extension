@@ -90,7 +90,8 @@ describe("ResourceUpdateController", () => {
   describe("ResourceUpdateController::exec", () => {
     it("Should call progress service without user goals", async() => {
       expect.assertions(2);
-      jest.spyOn(ResourceLocalStorage, "updateResource").mockImplementationOnce(jest.fn());
+      jest.spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey").mockImplementationOnce(jest.fn);
+      jest.spyOn(controller.resourceUpdateService, "exec").mockImplementationOnce(jest.fn);
       await controller.exec(defaultResourceDto(), null);
       expect(controller.progressService.start).toHaveBeenCalledTimes(1);
       expect(controller.progressService.start).toHaveBeenCalledWith(1, 'Updating resource');
@@ -106,7 +107,8 @@ describe("ResourceUpdateController", () => {
 
     it("Should close progressService when update succeed", async() => {
       expect.assertions(2);
-      jest.spyOn(ResourceLocalStorage, "updateResource").mockImplementationOnce(jest.fn());
+      jest.spyOn(ResourceLocalStorage, "updateResource").mockImplementationOnce(jest.fn);
+      jest.spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey").mockImplementationOnce(jest.fn);
       await controller.exec(defaultResourceDto(), null);
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
       expect(controller.progressService.close).toHaveBeenCalled();

@@ -12,7 +12,7 @@
  * @since         5.1.0
  */
 class UntrustedMetadataKeyError extends Error {
-  constructor(message) {
+  constructor(message = "The metadata key is not trusted.") {
     super(message);
     this.name = 'UntrustedMetadataKeyError';
   }

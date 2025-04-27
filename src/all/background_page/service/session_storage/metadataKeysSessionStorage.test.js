@@ -20,6 +20,8 @@ import {
   defaultMetadataKeysDtos
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
+import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
+import {defaultMetadataPrivateKeyDto, decryptedMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -142,6 +144,66 @@ describe("MetadataKeysSessionStorage", () => {
       expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: collectionDto2});
       promisesResolvers[1]();
       await resultPromise2;
+    });
+  });
+
+  describe("::updatePrivateKey", () => {
+    it("stores content in the session storage.", async() => {
+      expect.assertions(3);
+      const dtos = defaultDecryptedSharedMetadataKeysDtos();
+      const collection = new MetadataKeysCollection(dtos);
+      await storage.set(collection);
+      const date = (new Date()).toISOString();
+      const metadataPrivateKeyDto = decryptedMetadataPrivateKeyDto({
+        id: dtos[0].metadata_private_keys[0].id,
+        metadata_key_id: dtos[0].id,
+        user_id: dtos[0].metadata_private_keys[0].user_id,
+        data_signed_by_current_user: date
+      });
+      const metadataPrivateKey = new MetadataPrivateKeyEntity(metadataPrivateKeyDto);
+      const updatedDtos = JSON.parse(JSON.stringify(dtos));
+      updatedDtos[0].metadata_private_keys[0].data_signed_by_current_user = date;
+      updatedDtos[0].metadata_private_keys[0].created_by = metadataPrivateKeyDto.created_by;
+      updatedDtos[0].metadata_private_keys[0].modified_by = metadataPrivateKeyDto.modified_by;
+      await storage.updatePrivateKey(metadataPrivateKey);
+
+      // Expect the session storage (mocked here) to be set.
+      expect(browser.storage.session.store[storage.storageKey]).toEqual(updatedDtos);
+      // Expect the runtime cache to be set.
+      expect(MetadataKeysSessionStorage._runtimeCachedData[account.id]).toEqual(updatedDtos);
+      // Expect the get to retrieve the set data.
+      const resultGet = await storage.get();
+      expect(resultGet).toEqual(updatedDtos);
+    });
+
+    it("throws if no data is given to update.", async() => {
+      expect.assertions(3);
+      await expect(() => storage.updatePrivateKey()).rejects.toThrow(TypeError);
+      // Expect the session storage (mocked here) to not be set.
+      expect(browser.storage.session.store[storage.storageKey]).toBeUndefined();
+      // Expect the runtime cache to not be set.
+      expect(MetadataKeysSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
+    });
+
+    it("throws if invalid data is given to update.", async() => {
+      expect.assertions(3);
+      await expect(() => storage.updatePrivateKey({})).rejects.toThrow(TypeError);
+      // Expect the session storage (mocked here) to not be set.
+      expect(browser.storage.session.store[storage.storageKey]).toBeUndefined();
+      // Expect the runtime cache to not be set.
+      expect(MetadataKeysSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
+    });
+
+    it("throws if encrypted data given to update.", async() => {
+      expect.assertions(1);
+      const metadataPrivateKey = new MetadataPrivateKeyEntity(defaultMetadataPrivateKeyDto());
+      await expect(() => storage.updatePrivateKey(metadataPrivateKey)).rejects.toThrow(new TypeError("The metadata private key should be decrypted."));
+    });
+
+    it("throws if the associated metadata key cannot be found.", async() => {
+      expect.assertions(1);
+      const metadataPrivateKey = new MetadataPrivateKeyEntity(decryptedMetadataPrivateKeyDto());
+      await expect(() => storage.updatePrivateKey(metadataPrivateKey)).rejects.toThrow(new TypeError("The metadata key could not be found in the session storage"));
     });
   });
 

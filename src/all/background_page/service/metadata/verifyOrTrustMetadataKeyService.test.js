@@ -15,172 +15,132 @@
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
-import {decryptedMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
-import MetadataPrivateKeyApiService from "../api/metadata/metadataPrivateKeyApiService";
-import TrustedMetadataKeyLocalStorage from "../local_storage/trustedMetadataKeyLocalStorage";
+import {
+  decryptedMetadataPrivateKeyDto
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 import {
   defaultMetadataTrustedKeyDto
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity.test.data";
-import MetadataTrustedKeyEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity";
-import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
+import MetadataTrustedKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity";
 import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import {v4 as uuidv4} from "uuid";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import VerifyOrTrustMetadataKeyService from "./verifyOrTrustMetadataKeyService";
 import UntrustedMetadataKeyError from "../../error/UntrustedMetadataKeyError";
+import {
+  defaultCeOrganizationSettings
+} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 
 describe("VerifyOrTrustMetadataKeyService", () => {
-  let account, storage, apiClientOptions, metadataKeysSessionStorage;
+  let account, apiClientOptions, service;
   beforeEach(async() => {
     jest.clearAllMocks();
     account = new AccountEntity(defaultAccountDto());
     await MockExtension.withConfiguredAccount();
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-    storage = new TrustedMetadataKeyLocalStorage(account);
-    metadataKeysSessionStorage = new MetadataKeysSessionStorage(account);
-    // flush account related storage before each.
-    await storage.flush();
-    await metadataKeysSessionStorage.flush();
+    service = new VerifyOrTrustMetadataKeyService(null, account, apiClientOptions);
+    // Flush the storages.
+    await service.metadataKeysSessionStorage.flush();
+    // Mock the site settings
+    const siteSettingsDto = defaultCeOrganizationSettings();
+    jest.spyOn(service.organisationSettingsModel.organizationSettingsService, "find").mockImplementation(() => siteSettingsDto);
   });
 
   describe('::verifyTrustedOrTrustNewMetadataKey', () => {
-    it("Should update trusted metadata key local storage with the trusted key information without confirmation", async() => {
-      expect.assertions(7);
+    it("does nothing if the plugin metadata is disabled", async() => {
+      expect.assertions(1);
 
-      let trustedMetadataKey = await storage.get();
-      expect(trustedMetadataKey).toBeUndefined();
+      const siteSettingsDto = defaultCeOrganizationSettings();
+      delete siteSettingsDto.passbolt.plugins.metadata;
+      jest.spyOn(service.organisationSettingsModel.organizationSettingsService, "find").mockImplementation(() => siteSettingsDto);
+      await expect(service.verifyTrustedOrTrustNewMetadataKey(pgpKeys.ada.passphrase)).resolves.not.toThrow();
+    });
+
+    it("trusts the metadata key if no metadata key already trusted.", async() => {
+      expect.assertions(2);
 
       const id = uuidv4();
-      const metadata_private_keys = [decryptedMetadataPrivateKeyDto({metadata_key_id: id, user_id: account.userId})];
-      const metadataKeyDto = defaultMetadataKeyDto({id, metadata_private_keys});
-      const metadataKeyEntity = new MetadataKeyEntity(metadataKeyDto);
+      const metadataPrivateKeysDto = [decryptedMetadataPrivateKeyDto({metadata_key_id: id, user_id: account.userId})];
+      const metadataKeyDto = defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto});
       const metadataKeysCollection = new MetadataKeysCollection([metadataKeyDto]);
-      metadataKeysSessionStorage.set(metadataKeysCollection);
+      service.metadataKeysSessionStorage.set(metadataKeysCollection);
 
-      jest.spyOn(MetadataPrivateKeyApiService.prototype, "update").mockImplementationOnce(() => pgpKeys.metadataKey.encryptedSignedMetadataPrivateKeyDataMessage);
-      jest.spyOn(MetadataKeysSessionStorage.prototype, "update");
+      jest.spyOn(service.trustMetadataKeyService, "trust").mockImplementationOnce(jest.fn);
+      jest.spyOn(service.confirmMetadataKeyContentCodeService, "requestConfirm").mockImplementationOnce(jest.fn);
 
-      const service = new VerifyOrTrustMetadataKeyService(null, account, apiClientOptions);
-      jest.spyOn(service.confirmMetadataKeyContentCodeService, "requestConfirm");
-      await service.verifyTrustedOrTrustNewMetadataKey("ada@passbolt.com");
+      await service.verifyTrustedOrTrustNewMetadataKey(pgpKeys.ada.passphrase);
 
-      trustedMetadataKey = await storage.get();
-      const metadataKeysDtos = await metadataKeysSessionStorage.get();
-
-      expect(trustedMetadataKey).not.toBeUndefined();
-      expect(trustedMetadataKey.fingerprint).toEqual(metadataKeyEntity.fingerprint);
-      expect(trustedMetadataKey.signed).toBeDefined();
-      expect(metadataKeysSessionStorage.update).toHaveBeenCalled();
-      expect(metadataKeysDtos[0].metadata_private_keys[0].data_signed_by_current_user).toBeDefined();
+      expect(service.trustMetadataKeyService.trust).toHaveBeenCalledWith(metadataKeysCollection.items[0].metadataPrivateKeys.items[0], pgpKeys.ada.passphrase);
       expect(service.confirmMetadataKeyContentCodeService.requestConfirm).not.toHaveBeenCalled();
     });
 
-    it("Should not update trusted metadata key local storage with the trusted key information if metadata key already trusted", async() => {
-      expect.assertions(6);
-
-      const metadataKeyTrusted = new MetadataTrustedKeyEntity(defaultMetadataTrustedKeyDto());
-      await storage.set(metadataKeyTrusted);
+    it("does nothing if the metadata key is already trusted.", async() => {
+      expect.assertions(2);
 
       const id = uuidv4();
-      const metadata_private_keys = [decryptedMetadataPrivateKeyDto({metadata_key_id: id, user_id: account.userId})];
-      metadata_private_keys[0].data.fingerprint = metadataKeyTrusted.fingerprint;
-      const metadataKeyDto = defaultMetadataKeyDto({id: id, metadata_private_keys: metadata_private_keys, fingerprint: metadataKeyTrusted.fingerprint});
-      const metadataKeyEntity = new MetadataKeyEntity(metadataKeyDto);
-      metadataKeyEntity.metadataPrivateKeys.items[0].dataSignedByCurrentUser = metadataKeyTrusted.signed;
+      const fingerprint = pgpKeys.metadataKey.fingerprint;
+      const metadataPrivateKeysDto = [decryptedMetadataPrivateKeyDto({metadata_key_id: id, user_id: account.userId})];
+      const metadataKeyDto = defaultMetadataKeyDto({id: id, fingerprint: fingerprint, metadata_private_keys: metadataPrivateKeysDto});
       const metadataKeysCollection = new MetadataKeysCollection([metadataKeyDto]);
-      metadataKeysCollection.getFirstByLatestCreated().metadataPrivateKeys.items[0].dataSignedByCurrentUser = metadataKeyTrusted.signed;
-      metadataKeysSessionStorage.set(metadataKeysCollection);
+      service.metadataKeysSessionStorage.set(metadataKeysCollection);
+      const trustedMetadataKey = new MetadataTrustedKeyEntity({
+        fingerprint: metadataKeyDto.fingerprint,
+        signed: (new Date()).toISOString()
+      });
+      await service.getMetadataTrustedKeyService.trustedMetadataKeyLocalStorage.set(trustedMetadataKey);
 
-      jest.spyOn(MetadataPrivateKeyApiService.prototype, "update").mockImplementationOnce(() => pgpKeys.metadataKey.encryptedSignedMetadataPrivateKeyDataMessage);
-      jest.spyOn(MetadataKeysSessionStorage.prototype, "update");
+      jest.spyOn(service.trustMetadataKeyService, "trust").mockImplementationOnce(jest.fn);
+      jest.spyOn(service.confirmMetadataKeyContentCodeService, "requestConfirm").mockImplementationOnce(jest.fn);
 
-      const service = new VerifyOrTrustMetadataKeyService(null, account, apiClientOptions);
-      jest.spyOn(service.confirmMetadataKeyContentCodeService, "requestConfirm").mockImplementationOnce(() => true);
-      jest.spyOn(service.trustMetadataKeyService.updateMetadataKeyPrivateService, "update");
-      await service.verifyTrustedOrTrustNewMetadataKey("ada@passbolt.com");
+      await service.verifyTrustedOrTrustNewMetadataKey(pgpKeys.ada.passphrase);
 
-      const trustedMetadataKey = await storage.get();
-      const metadataKeysDtos = await metadataKeysSessionStorage.get();
-
-      expect(trustedMetadataKey).not.toBeUndefined();
-      expect(trustedMetadataKey).toStrictEqual(metadataKeyTrusted.toDto());
-      !expect(metadataKeysSessionStorage.update).not.toHaveBeenCalledWith(metadataKeyEntity);
-      expect(metadataKeysDtos[0].metadata_private_keys[0].data_signed_by_current_user).toBeDefined();
+      expect(service.trustMetadataKeyService.trust).not.toHaveBeenCalled();
       expect(service.confirmMetadataKeyContentCodeService.requestConfirm).not.toHaveBeenCalled();
-      expect(service.trustMetadataKeyService.updateMetadataKeyPrivateService.update).not.toHaveBeenCalled();
     });
 
-    it("Should update trusted metadata key local storage with the trusted key information with user confirmation", async() => {
-      expect.assertions(7);
-
-      const metadataKeyTrusted = new MetadataTrustedKeyEntity(defaultMetadataTrustedKeyDto());
-      await storage.set(metadataKeyTrusted);
+    it("throws if the active metadata key is not the one already trusted, and the user does not trust it.", async() => {
+      expect.assertions(2);
 
       const id = uuidv4();
-      const metadata_private_keys = [decryptedMetadataPrivateKeyDto({metadata_key_id: id, user_id: account.userId})];
-      metadata_private_keys[0].data.fingerprint = metadataKeyTrusted.fingerprint;
-      const metadataKeyDto = defaultMetadataKeyDto({id: id, metadata_private_keys: metadata_private_keys, fingerprint: metadataKeyTrusted.fingerprint});
-      const metadataKeyEntity = new MetadataKeyEntity(metadataKeyDto);
+      const fingerprint = pgpKeys.metadataKey.fingerprint;
+      const metadataPrivateKeysDto = [decryptedMetadataPrivateKeyDto({metadata_key_id: id, user_id: account.userId})];
+      const metadataKeyDto = defaultMetadataKeyDto({id: id, fingerprint: fingerprint, metadata_private_keys: metadataPrivateKeysDto});
       const metadataKeysCollection = new MetadataKeysCollection([metadataKeyDto]);
-      metadataKeysSessionStorage.set(metadataKeysCollection);
+      service.metadataKeysSessionStorage.set(metadataKeysCollection);
+      const trustedMetadataKey = new MetadataTrustedKeyEntity(defaultMetadataTrustedKeyDto({fingerprint: pgpKeys.ada.fingerprint}));
+      await service.getMetadataTrustedKeyService.trustedMetadataKeyLocalStorage.set(trustedMetadataKey);
 
-      jest.spyOn(MetadataPrivateKeyApiService.prototype, "update").mockImplementationOnce(() => pgpKeys.metadataKey.encryptedSignedMetadataPrivateKeyDataMessage);
-      jest.spyOn(MetadataKeysSessionStorage.prototype, "update");
-
-      const service = new VerifyOrTrustMetadataKeyService(null, account, apiClientOptions);
-      jest.spyOn(service.confirmMetadataKeyContentCodeService, "requestConfirm").mockImplementationOnce(() => true);
-      jest.spyOn(service.trustMetadataKeyService.updateMetadataKeyPrivateService, "update");
-      await service.verifyTrustedOrTrustNewMetadataKey("ada@passbolt.com");
-
-      const trustedMetadataKey = await storage.get();
-      const metadataKeysDtos = await metadataKeysSessionStorage.get();
-
-      expect(trustedMetadataKey).not.toBeUndefined();
-      expect(trustedMetadataKey.fingerprint).toEqual(metadataKeyEntity.fingerprint);
-      expect(trustedMetadataKey.signed).toBeDefined();
-      expect(metadataKeysSessionStorage.update).toHaveBeenCalled();
-      expect(metadataKeysDtos[0].metadata_private_keys[0].data_signed_by_current_user).toBeDefined();
-      expect(service.confirmMetadataKeyContentCodeService.requestConfirm).toHaveBeenCalled();
-      expect(service.trustMetadataKeyService.updateMetadataKeyPrivateService.update).toHaveBeenCalled();
-    });
-
-    it("Should not update trusted metadata key local storage with the trusted key information with user confirmation", async() => {
-      expect.assertions(7);
-
-      const metadataKeyTrusted = new MetadataTrustedKeyEntity(defaultMetadataTrustedKeyDto());
-      await storage.set(metadataKeyTrusted);
-
-      const id = uuidv4();
-      const metadata_private_keys = [decryptedMetadataPrivateKeyDto({metadata_key_id: id, user_id: account.userId})];
-      metadata_private_keys[0].data.fingerprint = metadataKeyTrusted.fingerprint;
-      const metadataKeyDto = defaultMetadataKeyDto({id: id, metadata_private_keys: metadata_private_keys, fingerprint: metadataKeyTrusted.fingerprint});
-      const metadataKeysCollection = new MetadataKeysCollection([metadataKeyDto]);
-      metadataKeysSessionStorage.set(metadataKeysCollection);
-
-      jest.spyOn(MetadataPrivateKeyApiService.prototype, "update").mockImplementationOnce(() => pgpKeys.metadataKey.encryptedSignedMetadataPrivateKeyDataMessage);
-      jest.spyOn(MetadataKeysSessionStorage.prototype, "update");
-
-      const service = new VerifyOrTrustMetadataKeyService(null, account, apiClientOptions);
+      jest.spyOn(service.trustMetadataKeyService, "trust").mockImplementationOnce(jest.fn);
       jest.spyOn(service.confirmMetadataKeyContentCodeService, "requestConfirm").mockImplementationOnce(() => false);
-      jest.spyOn(service.trustMetadataKeyService.updateMetadataKeyPrivateService, "update");
 
-      try {
-        await service.verifyTrustedOrTrustNewMetadataKey("ada@passbolt.com");
-      } catch (error) {
-        const trustedMetadataKey = await storage.get();
-        const metadataKeysDtos = await metadataKeysSessionStorage.get();
-        expect(trustedMetadataKey).not.toBeUndefined();
-        expect(trustedMetadataKey).toStrictEqual(metadataKeyTrusted.toDto());
-        expect(metadataKeysSessionStorage.update).not.toHaveBeenCalled();
-        expect(metadataKeysDtos[0].metadata_private_keys[0].data_signed_by_current_user).toBeNull();
-        expect(service.confirmMetadataKeyContentCodeService.requestConfirm).toHaveBeenCalled();
-        expect(service.trustMetadataKeyService.updateMetadataKeyPrivateService.update).not.toHaveBeenCalled();
-        expect(error).toStrictEqual(new UntrustedMetadataKeyError("The user has not confirmed the new metadata key"));
-      }
+      expect(() => service.verifyTrustedOrTrustNewMetadataKey(pgpKeys.ada.passphrase)).rejects.toThrow(UntrustedMetadataKeyError);
+      expect(service.trustMetadataKeyService.trust).not.toHaveBeenCalled();
+    });
+
+    it("trusts the active metadata key if the key is not the one already trusted, and the user confirm it trusts it.", async() => {
+      expect.assertions(1);
+
+      const id = uuidv4();
+      const fingerprint = pgpKeys.metadataKey.fingerprint;
+      const metadataPrivateKeysDto = [decryptedMetadataPrivateKeyDto({metadata_key_id: id, user_id: account.userId})];
+      const metadataKeyDto = defaultMetadataKeyDto({id: id, fingerprint: fingerprint, metadata_private_keys: metadataPrivateKeysDto});
+      const metadataKeysCollection = new MetadataKeysCollection([metadataKeyDto]);
+      service.metadataKeysSessionStorage.set(metadataKeysCollection);
+      const trustedMetadataKey = new MetadataTrustedKeyEntity(defaultMetadataTrustedKeyDto({fingerprint: pgpKeys.ada.fingerprint}));
+      await service.getMetadataTrustedKeyService.trustedMetadataKeyLocalStorage.set(trustedMetadataKey);
+
+      jest.spyOn(service.trustMetadataKeyService, "trust").mockImplementationOnce(jest.fn);
+      jest.spyOn(service.confirmMetadataKeyContentCodeService, "requestConfirm").mockImplementationOnce(() => true);
+
+      await service.verifyTrustedOrTrustNewMetadataKey(pgpKeys.ada.passphrase);
+      expect(service.trustMetadataKeyService.trust).toHaveBeenCalledWith(metadataKeysCollection.items[0].metadataPrivateKeys.items[0], pgpKeys.ada.passphrase);
+    });
+
+    it("throws if the passphrase parameter is not valid.", async() => {
+      expect.assertions(1);
+      await expect(() => service.verifyTrustedOrTrustNewMetadataKey(42)).rejects.toThrow("The parameter \"passphrase\" should be a string.");
     });
   });
 });

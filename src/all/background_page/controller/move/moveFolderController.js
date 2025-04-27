@@ -18,6 +18,7 @@ import MoveOneFolderService, {PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE} from "../../s
 import ConfirmMoveStrategyService from "../../service/move/confirmMoveStrategyService";
 import FolderModel from "../../model/folder/folderModel";
 import {assertUuid} from "../../utils/assertions";
+import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
 class MoveFolderController {
   /**
@@ -36,6 +37,7 @@ class MoveFolderController {
     this.moveOneFolderService = new MoveOneFolderService(apiClientOptions, account, this.progressService);
     this.confirmMoveStrategyService = new ConfirmMoveStrategyService(worker);
     this.folderModel = new FolderModel(apiClientOptions, account);
+    this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
   /**
@@ -73,6 +75,7 @@ class MoveFolderController {
     }
 
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
     this.progressService.start(PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE, i18n.t('Initialize'));
 

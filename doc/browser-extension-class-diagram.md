@@ -248,6 +248,14 @@ classDiagram
             +requestConfirm(MetdataTrustedKeyEntity trustedKey, MetadataKeyEntity metadataKey) Promise~boolean~
         }
 
+        class TrustMetadataKeyService {
+            +trust(MetadataPrivateKeyEntity metadataPrivateKey, string passphrase) Promise~void~
+        }
+
+        class VerifyOrTrustMetadataKeyService {
+            +verifyTrustedOrTrustNewMetadataKey(string passphrase) Promise~void~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata Keys services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

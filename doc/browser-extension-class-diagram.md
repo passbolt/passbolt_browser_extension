@@ -252,6 +252,10 @@ classDiagram
             +trust(MetadataPrivateKeyEntity metadataPrivateKey, string passphrase) Promise~void~
         }
 
+        class VerifyOrTrustMetadataKeyService {
+            +verifyTrustedOrTrustNewMetadataKey(string passphrase) Promise~void~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata Keys services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

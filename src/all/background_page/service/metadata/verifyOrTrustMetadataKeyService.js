@@ -55,13 +55,13 @@ class VerifyOrTrustMetadataKeyService {
 
     const metadataKeys = await this.getOrFindMetadataKeysService.getOrFindAll();
     const activeMetadataKey = metadataKeys.getFirstByLatestCreated();
-    const activeMetadataPrivateKey = activeMetadataKey.metadataPrivateKeys.items[0];
 
     // Not active metadata key needs to be trusted.
     if (activeMetadataKey === null) {
       return;
     }
 
+    const activeMetadataPrivateKey = activeMetadataKey.metadataPrivateKeys.items[0];
     const metadataTrustedKey = await this.getMetadataTrustedKeyService.get();
 
     // Trust on first use.

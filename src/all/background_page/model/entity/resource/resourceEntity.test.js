@@ -26,6 +26,7 @@ import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity
 import {v4 as uuidv4} from "uuid";
 import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 import expect from "expect";
+import PermissionEntity from "../permission/permissionEntity";
 
 describe("Resource entity", () => {
   describe("ResourceEntity::getSchema", () => {
@@ -319,6 +320,45 @@ describe("Resource entity", () => {
       } catch (error) {
         expect(error.getError("metadata_key_id", "format")).toEqual("The metadata_key_id is not a valid uuid.");
       }
+    });
+  });
+
+  describe("getter::soleOwnerId", () => {
+    it("Should return null if no permission is set", () => {
+      expect.assertions(1);
+
+      const entity =  new ResourceEntity(defaultResourceDto());
+
+      expect(entity.soleOwnerId).toBeNull();
+    });
+
+    it("Should return null if multiple permission is set", () => {
+      expect.assertions(1);
+
+      const resourceDTO = defaultResourceDto({}, {withPermissions: {count: 2}});
+      const entity =  new ResourceEntity(resourceDTO);
+
+      expect(entity.soleOwnerId).toBeNull();
+    });
+
+    it("Should return the group id if it is the only permission set", () => {
+      expect.assertions(1);
+
+      const resourceDTO = defaultResourceDto({}, {withPermissions: {count: 1}});
+      resourceDTO.permissions[0].aro = PermissionEntity.ARO_GROUP;
+      const entity =  new ResourceEntity(resourceDTO);
+
+      expect(entity.soleOwnerId).toStrictEqual(resourceDTO.permissions[0].aro_foreign_key);
+    });
+
+    it("Should return the user id if it is the only permission set", () => {
+      expect.assertions(1);
+
+      const resourceDTO = defaultResourceDto({}, {withPermissions: {count: 1}});
+      resourceDTO.permissions[0].aro = PermissionEntity.ARO_USER;
+      const entity =  new ResourceEntity(resourceDTO);
+
+      expect(entity.soleOwnerId).toStrictEqual(resourceDTO.permissions[0].aro_foreign_key);
     });
   });
 

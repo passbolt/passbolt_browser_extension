@@ -20,11 +20,12 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import {defaultMigrateMetadataDto} from "passbolt-styleguide/src/shared/models/entity/metadata/migrateMetadataEntity.test.data";
 import MigrateMetadataEntity from "passbolt-styleguide/src/shared/models/entity/metadata/migrateMetadataEntity";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
+import Keyring from "../../model/keyring";
 
 describe("MigrateMetadataResourcesController", () => {
   describe("::exec", () => {
     it("Migrate the resources metadata.", async() => {
-      expect.assertions(6);
+      expect.assertions(7);
 
       const passphrase = "ada@passbolt.com";
       const migrateMetadataDto = defaultMigrateMetadataDto();
@@ -40,6 +41,7 @@ describe("MigrateMetadataResourcesController", () => {
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockReturnValue(passphrase);
       jest.spyOn(controller.progressService, "start");
       jest.spyOn(controller.progressService, "close");
+      jest.spyOn(Keyring.prototype, "sync").mockImplementation(() => {});
 
       await controller.exec(migrateMetadataDto, paginationDatils);
 
@@ -47,8 +49,9 @@ describe("MigrateMetadataResourcesController", () => {
       expect(controller.migrateMetadataResourcesService.migrate).toHaveBeenCalledTimes(1);
       expect(controller.migrateMetadataResourcesService.migrate).toHaveBeenCalledWith(new MigrateMetadataEntity(migrateMetadataDto), passphrase, {count: 0});
       expect(controller.progressService.start).toHaveBeenCalledTimes(1);
-      expect(controller.progressService.start).toHaveBeenCalledWith(pageCount + 2, "Migrating metadata");
+      expect(controller.progressService.start).toHaveBeenCalledWith(pageCount + 3, "Migrating metadata");
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
+      expect(Keyring.prototype.sync).toHaveBeenCalledTimes(1);
     });
   });
 });

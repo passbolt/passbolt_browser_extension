@@ -18,6 +18,7 @@ import EncryptMetadataService from "../metadata/encryptMetadataService";
 import {V4_TO_V5_RESOURCE_TYPE_MAPPING} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import i18n from "../../sdk/i18n";
+import PermissionEntity from "../../model/entity/permission/permissionEntity";
 
 const MAX_PROCESS_REPLAY = 3;
 
@@ -105,7 +106,7 @@ export default class MigrateMetadataResourcesService {
 
     while (v4ResourcesCollection.length > 0) {
       this.progressService.finishStep(i18n.t('Migrating resources metadata page {{number}}/{{totalPagesCount}}', {number: ++resourcePage, totalPagesCount: totalPagesCount}));
-      const v5ResourcesCollection = this._getUpdatedCollectionWithV5ResourceTypes(v4ResourcesCollection, resourceTypesMapping);
+      const v5ResourcesCollection = this._prepareResourcesCollectionForMetadataEncryption(v4ResourcesCollection, resourceTypesMapping);
       if (v5ResourcesCollection.length === 0) {
         // if we reach such a state, we might get stuck in an infinite loop as the API will serve again and again the same batch of resources that can't be migrated for some reasons.
         throw new Error("Unexpected empty resources collection to migrate");
@@ -145,13 +146,13 @@ export default class MigrateMetadataResourcesService {
   }
 
   /**
-   * Updates the resource types on the given collection.
+   * Updates the resource types on the given collection and the personal field.
    * @param {ResourcesCollection} resourcesCollection
    * @param {ResourceTypesCollection} resourceTypes
    * @returns {ResourcesCollection}
    * @private
    */
-  _getUpdatedCollectionWithV5ResourceTypes(resourcesCollection, resourceTypesMapping) {
+  _prepareResourcesCollectionForMetadataEncryption(resourcesCollection, resourceTypesMapping) {
     const updatedResourcesCollection = new ResourcesCollection();
     for (let i = 0; i < resourcesCollection.length; i++) {
       const currentV4Resource = resourcesCollection.items[i];
@@ -161,13 +162,29 @@ export default class MigrateMetadataResourcesService {
         continue;
       }
 
-      const resourceV5Dto = currentV4Resource.toDto();
+      const resourceV5Dto = currentV4Resource.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS);
       resourceV5Dto.resource_type_id = matchingV5ResourceTypeId;
       resourceV5Dto.metadata.resource_type_id = matchingV5ResourceTypeId;
 
       const resource = new ResourceEntity(resourceV5Dto);
+      resource.personal = this._isPersonalResource(resource);
+
       updatedResourcesCollection.push(resource);
     }
     return updatedResourcesCollection;
+  }
+
+  /**
+   * Returns true if the resource dto metadata should be encrypted with owner's key.
+   * @param {ResourceEntity} resource
+   * @returns {boolean}
+   */
+  _isPersonalResource(resource) {
+    const permissions = resource.permissions;
+    if (!permissions || permissions.length !== 1) {
+      return false;
+    }
+
+    return permissions.items[0].aro === PermissionEntity.ARO_USER;
   }
 }

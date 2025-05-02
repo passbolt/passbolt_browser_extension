@@ -318,7 +318,7 @@ describe("ResourcesCsvImportParser", () => {
       uri: `https://url${num}.com`,
       description: `Description ${num}`,
       secret_clear: `Secret ${num}`,
-      folder_parent_path: ``
+      folder_parent_path: ``,
     }, data);
   }
 

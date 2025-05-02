@@ -261,6 +261,7 @@ describe("ExternalResourceEntity", () => {
           resource_type_id: dto.resource_type_id,
         },
         secrets: dto.secrets,
+        personal: true,
       });
     });
 

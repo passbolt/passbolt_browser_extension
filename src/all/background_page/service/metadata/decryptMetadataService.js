@@ -23,6 +23,8 @@ import GetOrFindSessionKeysService from "../sessionKey/getOrFindSessionKeysServi
 import GetSessionKeyService from "../crypto/getSessionKeyService";
 import SaveSessionKeysService from "../sessionKey/saveSessionKeysService";
 import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 
 class DecryptMetadataService {
   /**
@@ -111,6 +113,7 @@ class DecryptMetadataService {
     const gpgMessage = await OpenpgpAssertion.readMessageOrFail(entity.metadata);
     const decryptedData = await DecryptMessageService.decryptWithSessionKey(gpgMessage, sessionKey);
     entity.metadata = JSON.parse(decryptedData);
+    this.assertValidMetadataObjectType(entity);
   }
 
   /**
@@ -243,6 +246,7 @@ class DecryptMetadataService {
     const decryptedData = await DecryptMessageService.decrypt(gpgMessage, decryptionKey);
 
     entity.metadata = JSON.parse(decryptedData);
+    this.assertValidMetadataObjectType(entity);
 
     return gpgMessage;
   }
@@ -279,6 +283,20 @@ class DecryptMetadataService {
         this.handleError(error, options);
       }
     });
+  }
+
+  /**
+   * Assert that the metadata object_type field is valid.
+   *
+   * @param {Resource} entity the resource to check the metadata object_type from.
+   * @throws {EntityValidationError} if the object_type value is not set or not set with the expected value.
+   */
+  assertValidMetadataObjectType(entity) {
+    if (entity.metadata.objectType !== ResourceMetadataEntity.METADATA_OBJECT_TYPE) {
+      const error = new EntityValidationError();
+      error.addError('metadata.object_type', 'required-v5', `The resource metadata object_type is required and must be set to '${ResourceMetadataEntity.METADATA_OBJECT_TYPE}'.`);
+      throw error;
+    }
   }
 
   /**

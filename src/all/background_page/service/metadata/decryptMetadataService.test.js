@@ -32,6 +32,12 @@ import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/
 import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 import {defaultSessionKeyDto} from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeyEntity.test.data";
 import SessionKeyEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeyEntity";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EncryptMessageService from "../crypto/encryptMessageService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import GetSessionKeyService from "../crypto/getSessionKeyService";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -463,5 +469,54 @@ describe("DecryptMetadataService", () => {
       expect(service.saveSessionKeysService.save).toHaveBeenCalledTimes(1);
       expect(service.saveSessionKeysService.save).toHaveBeenCalledWith(sessionKeys);
     });
+  });
+
+  describe("::decryptMetadataWithGpgKey", () => {
+    it("should throw an exception if the object_type is not set properly when decrypting with a GPG key", async() => {
+      const metadataDto = Object.assign({}, metadata.withAdaKey.decryptedMetadata[0]);
+      delete metadataDto.object_type;
+
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const encryptedMetadata = await EncryptMessageService.encrypt(JSON.stringify(metadataDto), publicKey, [privateKey]);
+
+      const resourceDto = defaultResourceDto({
+        metadata_key_id: null,
+        metadata_key_type: "user_key",
+        metadata: encryptedMetadata,
+      });
+
+      const entity = new ResourceEntity(resourceDto);
+
+      const expectedError = new EntityValidationError();
+      expectedError.addError('metadata.object_type', 'required-v5', "The resource metadata object_type is required and must be set to 'PASSBOLT_RESOURCE_METADATA'."),
+      await expect(() =>  service.decryptMetadataWithGpgKey(entity, privateKey)).rejects.toThrowError(expectedError);
+    }, 10_000);
+
+    it("should throw an exception if the object_type is not set properly when decrypting with a session key", async() => {
+      const metadataDto = Object.assign({}, metadata.withAdaKey.decryptedMetadata[0]);
+      delete metadataDto.object_type;
+
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+
+      const encryptedMetadata = await EncryptMessageService.encrypt(JSON.stringify(metadataDto), publicKey, [privateKey]);
+      const encryptedMetadataGpgMessage = await OpenpgpAssertion.readMessageOrFail(encryptedMetadata);
+
+      await DecryptMessageService.decrypt(encryptedMetadataGpgMessage, privateKey);
+      const sessionKeyString = GetSessionKeyService.getFromGpgMessage(encryptedMetadataGpgMessage);
+
+      const resourceDto = defaultResourceDto({
+        metadata_key_id: null,
+        metadata_key_type: "user_key",
+        metadata: encryptedMetadata,
+      });
+
+      const entity = new ResourceEntity(resourceDto);
+
+      const expectedError = new EntityValidationError();
+      expectedError.addError('metadata.object_type', 'required-v5', "The resource metadata object_type is required and must be set to 'PASSBOLT_RESOURCE_METADATA'."),
+      await expect(() =>  service.decryptMetadataWithSessionKey(entity, sessionKeyString)).rejects.toThrowError(expectedError);
+    }, 10_000);
   });
 });

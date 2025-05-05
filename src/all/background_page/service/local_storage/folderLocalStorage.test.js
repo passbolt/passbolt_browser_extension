@@ -352,6 +352,26 @@ describe("FolderLocalStorage", () => {
       expect(localStorageData[FOLDERS_LOCAL_STORAGE_KEY][0]).toEqual(folderDto2);
     });
 
+    it("Should delete the folder and keep items inside", async() => {
+      expect.assertions(5);
+      const folderDto1 = defaultFolderDto();
+      const folderDto2 = defaultFolderDto();
+      folderDto2.folder_parent_id = folderDto1.id;
+      const folderDto3 = defaultFolderDto();
+      folderDto3.folder_parent_id = folderDto2.id;
+      const foldersDtos = [folderDto1, folderDto2, folderDto3];
+      await browser.storage.local.set({[FOLDERS_LOCAL_STORAGE_KEY]: foldersDtos});
+      await FolderLocalStorage.delete(folderDto2.id);
+      // folder 3 should have folder parent id set to null due to the deletion of its parent
+      folderDto3.folder_parent_id = null;
+      const localStorageData = await browser.storage.local.get([FOLDERS_LOCAL_STORAGE_KEY]);
+      expect(localStorageData[FOLDERS_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
+      expect(localStorageData[FOLDERS_LOCAL_STORAGE_KEY]).toHaveLength(2);
+      expect(localStorageData[FOLDERS_LOCAL_STORAGE_KEY][0]).toEqual(folderDto1);
+      expect(localStorageData[FOLDERS_LOCAL_STORAGE_KEY][1]).toEqual(folderDto3);
+      expect(localStorageData[FOLDERS_LOCAL_STORAGE_KEY][1].folder_parent_id).toEqual(null);
+    });
+
     it("Should update cache after deleting the folder", async() => {
       expect.assertions(5);
       const folderDto1 = defaultFolderDto();

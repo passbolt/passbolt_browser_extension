@@ -56,6 +56,7 @@ export const resourceCollectionV5ToExport = async(data = {}, options = {}) => {
     username: "Username 1",
     uris: ["https://url1.com"],
     resource_type_id: resourceType.id,
+    object_type: "PASSBOLT_RESOURCE_METADATA",
   };
   const dto = defaultResourceDto({
     id: id,

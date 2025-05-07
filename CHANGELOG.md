@@ -4,6 +4,79 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.1.0] - 2025-05-12
+
+### Added
+- PB-41340 Add dedicated input to fix autofill on specific website
+- PB-41734 SPKD-1.1 Rename metadata private key getter/setter dataSignedByCurrentUser & ensure constructor pass options to its parent class to ensure validation can be disabled
+- PB-41735 SPKD-1.2 Verify the metadata public key entity fingerprint is equal to the  armored key fingerprint in FindMetadataKeysService findAll
+- PB-41737 SPKD-1.3 Verify metadata private  key data entity fingerprint with armored key fingerprint in DecryptMetadataPrivateKeysService decryptOne
+- PB-41738 SPKD-1.4 Assert metadata keys collection fingerprints public/private integrity in DecryptMetadataPrivateKeysService decryptAllFromMetadataKeysCollection
+- PB-41739 SPKD-1.5 Adapt DecryptMessageService.decrypt to return the raw OpenPGP decryption result, including signatures, without throwing an error when signature verification fails
+- PB-41740 SPKD-1.7 Implement findVerifiedSignatureForGpgKey in src/all/background_page/service/crypto/findSignatures utils to retrieve a signature for a given OpenPGP key
+- PB-41741 SPKD-1.8 Check current user signature when decrypting Metadata Private Key Data
+- PB-41742 SPKD-1.6 Implement ExternalGpgSignatureEntity to carry OpenPGP signature data
+- PB-41743 SPKD-1.9 Implement MetadataTrustedKeyEntity to carry the information relative to a trusted metadata key
+- PB-41744 SPKD-1.10 Implement TrustedMetadataKeyLocalStorage to support the persistence of the trusted metadata key
+- PB-41746 SPKD-2.1 Implement bext ConfirmMetadataKeyContentCodeService to request user to confirm trusted metadata keys changes
+- PB-41747 SPKD-2.2 Implement confirm metadata key event handler and dialog on the web application
+- PB-41748 SPKD-2.3 Implement confirm metadata key event handler and dialog on the quick application
+- PB-41749 SPKD-2.4 Implement GetMetadataTrustedKeyService get to retrieve the trusted metadata key from the local storage
+- PB-41753 SPKD-2.8 Implement VerifyOrTrustMetadataKeyService verifyTrustedOrTrustNewMetadataKey to verify that the current active metadata key is trusted or request the user to trust it
+- PB-41750 SPKD-2.5 Implement MetadataPrivateKeyApiService update to update a trusted metadata key on the API
+- PB-41751 SPKD-2.6 Implement UpdateMetadataKeyPrivateService update function to update a trusted metadata key
+- PB-41752 SPKD-2.7 Implement TrustMetadataKeyService trust to trust a new metadata key
+- PB-41847 SPKD-2.18 Add creator field to metadataKeyEntity test data
+- PB-41916 SPKD-2.19 Flush Metadata Keys Settings storage when a user is signed-out
+- PB-41918 SPKD-2.20 Adapt EncryptMessageService.encrypt so that it can sign a message with a specified date
+- PB-41919 SPKD-2.21 Adapt EncryptMetadataPrivateKeysService.encryptOne so that it can sign a message with a specified date
+- PB-41958 SPKD-2.10 Verify and trust metadata key prior to encrypt metadata
+- PB-41961 SPKD-2.21 Add in diagram TrustMetadataKeyService
+- PB-41962 SPKD-2.22 Add unit test and in the diagram for VerifyOrTrustMetadataKeyService
+
+### Fixed
+- PB-35383 refresh folders list after delete parent folder and keep items inside
+- PB-39607 metadata migration should encrypt metadata with user's key when encrypting a personal resource
+- PB-40181 The session keys cache items are missing modified field
+- PB-41296 on a fresh install + first login after setup (firefox + debian) going to the user workspace crashes as roles are not defined
+- PB-41304 import password errors (UAT required & fix)
+- PB-41305 clicking on folder parent in location of a resource in the right sidebar just close the panel
+- PB-41407 account recovery in user profile can crash when clicking on review
+- PB-41638 Hide administration workspace shifter on desktop app
+- PB-41716 Permalink when paste in url and local storage is not loaded yet
+- PB-41753 safer key public distribution confirmation in quickaccess
+- PB-41776 password input with show icon can display a broken UI
+- PB-41841 user workspace displays a blank screen when accessing a user's URL directly from the browser
+- PB-41846 Other type resource dialog TOTP does not open a TOTP but a password + totp
+- PB-42030 'where to find my account kit' does no open the browser for help
+- PB-42033 design of security token in input field could be broken with some characters
+- PB-42046 set empty translations with their default string
+- PB-42105 import of resources process always uses shared metadata key instead of personal key
+- PB-42106 throw an error while decrypting resource metadata if the decrypted metadata object type is not valid
+- PB-41378 UI minor bug: multiple resource select, right sidebar cropped
+- PB-41435 Display the folder context menu above the “More” button
+- PB-41551 Show a disabled style when dragging an item over an invalid drop target
+- PB-41550 Refresh the folder tree after the folder‑hierarchy cache updates (order issue)
+- PB-41627 UI bug: Note formatting in the right sidebar
+- PB-41759 Browser extension should enforce object_type on metadata of resource creation / edition
+
+### Maintenance
+- PB-38199 Update administration page Role-Based Access Control save behavior
+- PB-41346 Remove mfa settings screens from API
+- PB-41366 ECC-1.1 Update browser extension outdated OpenPGP.js to version 6
+- PB-41384 Upgrade vulnerable lib on bext 'image-size'
+- PB-41385 2.1 Display react list for folder tree
+- PB-41386 2.2 Folders updated should be refreshed in the folder tree
+- PB-41387 2.3 Navigate to a folder form route should scroll the folder tree to see the selected folder
+- PB-41388 2.4 Update the padding according to the depth of the folder
+- PB-41414 WP4-14.2 Migrate import account kit screen
+- PB-41646 UI adjustment: All tables should have a 0.8rem gap
+- PB-41648 UI adjustment: Name column size in grid should be large by default
+- PB-41647 UI adjustment: All dialog & setting primary should have a regular font weight
+- PB-41653 UI adjustment: Grid select column, padding left & right 1.6rem
+- PB-41709 Add activity diagram to verify metadata keys
+- PB-41720 Add licence on SVG in the folder svg on the styleguide
+
 ## [5.0.1] - 2025-04-14
 ### Fixed
 - PB-41438 Prevent users from migrating encrypted notes to cleartext descriptions when editing a resource
@@ -12,307 +85,307 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [5.0.0] - 2025-04-09
 ### Added
-PB-33425 Allow users to reset resource grid columns to default factory settings through the columns settings dropdown
-PB-35232 Add a resource grid filter to display only private resources
-PB-37332 Rename encrypted description to note and clearly differentiate between the metadata description and the secret note
-PB-37620 Allow users to resize and reorder the users grid
-PB-37638 Add a details sidebar for multiple grid resource selections to allow users to review their selection
-PB-38938 Redirect administrator to a home page instead of the first available settings page
-PB-38940 Organize the administration menu into meaningful sections
-PB-39415 Redesign the application
-PB-39464 Introduce unified and modular resource creation and editing dialogs to support upcoming resource types
-PB-40150 Display a default resource icon in the grid
+- PB-33425 Allow users to reset resource grid columns to default factory settings through the columns settings dropdown
+- PB-35232 Add a resource grid filter to display only private resources
+- PB-37332 Rename encrypted description to note and clearly differentiate between the metadata description and the secret note
+- PB-37620 Allow users to resize and reorder the users grid
+- PB-37638 Add a details sidebar for multiple grid resource selections to allow users to review their selection
+- PB-38938 Redirect administrator to a home page instead of the first available settings page
+- PB-38940 Organize the administration menu into meaningful sections
+- PB-39415 Redesign the application
+- PB-39464 Introduce unified and modular resource creation and editing dialogs to support upcoming resource types
+- PB-40150 Display a default resource icon in the grid
 
 ### Fixed
-PB-28280 Display the complete resource path in sidebar details
-PB-33618 Disable the "select all" dropdown in the users grid until bulk operations are supported
-PB-39994 Display a pending changes banner after modifying administration email notification settings
-PB-39995 Ease identification of generated organization recovery key file name by including the GPG key identifier
-PB-40268 Display a pending changes banner after modifying administration internationalization settings
-PB-40270 Display a pending changes banner after modifying administration email server settings
-PB-40271 Display a pending changes banner after modifying administration RBAC settings
-PB-40272 Display a pending changes banner after modifying administration users directory settings
-PB-40273 Display a pending changes banner after modifying administration SSO settings
-PB-40669 Display loading feedback in the folder navigation tree during folder loading
-PB-40186 WP6-7.5 Validate the object_type property of v5 secrets to mitigate unwanted content decryption attacks
-PB-40576 Reposition the expiry item in resources grid column settings to reflect its lower display priority in the grid
-PB-41275 Display the complete folder path in sidebar details
+- PB-28280 Display the complete resource path in sidebar details
+- PB-33618 Disable the "select all" dropdown in the users grid until bulk operations are supported
+- PB-39994 Display a pending changes banner after modifying administration email notification settings
+- PB-39995 Ease identification of generated organization recovery key file name by including the GPG key identifier
+- PB-40268 Display a pending changes banner after modifying administration internationalization settings
+- PB-40270 Display a pending changes banner after modifying administration email server settings
+- PB-40271 Display a pending changes banner after modifying administration RBAC settings
+- PB-40272 Display a pending changes banner after modifying administration users directory settings
+- PB-40273 Display a pending changes banner after modifying administration SSO settings
+- PB-40669 Display loading feedback in the folder navigation tree during folder loading
+- PB-40186 WP6-7.5 Validate the object_type property of v5 secrets to mitigate unwanted content decryption attacks
+- PB-40576 Reposition the expiry item in resources grid column settings to reflect its lower display priority in the grid
+- PB-41275 Display the complete folder path in sidebar details
 
 ### Maintenance
-PB-40117 Upgrade browser extensions repositories to node 22
-PB-40687 Upgrade vulnerable library babel and relative
-40688 Upgrade vulnerable library i18next-parser and relative
+- PB-40117 Upgrade browser extensions repositories to node 22
+- PB-40687 Upgrade vulnerable library babel and relative
+- PB-40688 Upgrade vulnerable library i18next-parser and relative
 
 ## [4.12.0] - 2024-03-10
 ### Added
-PB-38932 WP6-3.1 Implement navigation to content types migrate metadata content administration page
-PB-38915 WP6-3.2 Implement findUpgradeContentDetails function on MetadataMigrateContentServiceWorkerService to retrieve content to upgrade details in the content types migrate metadata administration page
-PB-38916 WP6-3.3 Implements MigrateMetadataSettingsFormEntity to handle form data
-PB-38917 WP6-3.4 As an administrator I can see the migrate metadata settings form
-PB-38918 WP6-3.5 Implements MigrateMetadataResourcesService to migrate metadata resources
-PB-38919 WP6-3.6 Implements PassboltResponseEntities to handle passbolt API response
-PB-38921 WP6-3.7 Implements MigrateMetadataResourcesController to run metadata migration from the styleguide
-PB-38923 WP6-3.8 Implements ConfirmMigrateMetadataDialog to warn admin before actually running the migration
-PB-38925 WP6-3.10 Implements MigrateMetadataSettingsActionBar to trigger migration process
-PB-38996 WP6-4.1 Update ResourceTypeEntity to handle the new 'deleted' field
-PB-38998 WP6-4.3 Implements findAllByDeletedAndNonDeleted on FindResourceTypesService  to retrieve all deleted and non deleted resources-types
-PB-38999 WP6-4.4 Implements FindAllByDeletedAndNonDeletedResourceTypesContoller to find all available and deleted resources-types
-PB-39000 WP6-4.5 Implements ResourceTypesServiceWorkerService to request the service worker for retrieving the resource types
-PB-39001 WP6-4.6 Implements ResourceTypesFormEntity to handle the data from the form component
-PB-39002 WP6-4.7 Implements navigation to allow content types administration page
-PB-39003 WP6-4.8 Implements DisplayContentTypesAllowedContentTypesAdministration component to display the administration form
-PB-39004 WP6-4.9 Implements ResourceTypesApiService undelete method to process the undelete of the given resources type
-PB-39005 WP6-4.10 Implements ResourceTypesService delete method to request the API for deleted the given resource type
-PB-39006 WP6-4.11 Implements UpdateResourceTypesService undelete method to process the update of the given resources types
-PB-39009 WP6-4.14 Implements UpdateAllResourceTypesDeletedStatusController to update all  resource types deleted status
-PB-39010 WP6-4.15 Implements ResourceTypesServiceWorkerService update and delete method to communication with the service worker
-PB-39011 WP5-4.16 Add to DisplayResourceTypes a "Save" button to trigger the update process of the allowed resource types
+- PB-38932 WP6-3.1 Implement navigation to content types migrate metadata content administration page
+- PB-38915 WP6-3.2 Implement findUpgradeContentDetails function on MetadataMigrateContentServiceWorkerService to retrieve content to upgrade details in the content types migrate metadata administration page
+- PB-38916 WP6-3.3 Implements MigrateMetadataSettingsFormEntity to handle form data
+- PB-38917 WP6-3.4 As an administrator I can see the migrate metadata settings form
+- PB-38918 WP6-3.5 Implements MigrateMetadataResourcesService to migrate metadata resources
+- PB-38919 WP6-3.6 Implements PassboltResponseEntities to handle passbolt API response
+- PB-38921 WP6-3.7 Implements MigrateMetadataResourcesController to run metadata migration from the styleguide
+- PB-38923 WP6-3.8 Implements ConfirmMigrateMetadataDialog to warn admin before actually running the migration
+- PB-38925 WP6-3.10 Implements MigrateMetadataSettingsActionBar to trigger migration process
+- PB-38996 WP6-4.1 Update ResourceTypeEntity to handle the new 'deleted' field
+- PB-38998 WP6-4.3 Implements findAllByDeletedAndNonDeleted on FindResourceTypesService  to retrieve all deleted and non deleted resources-types
+- PB-38999 WP6-4.4 Implements FindAllByDeletedAndNonDeletedResourceTypesContoller to find all available and deleted resources-types
+- PB-39000 WP6-4.5 Implements ResourceTypesServiceWorkerService to request the service worker for retrieving the resource types
+- PB-39001 WP6-4.6 Implements ResourceTypesFormEntity to handle the data from the form component
+- PB-39002 WP6-4.7 Implements navigation to allow content types administration page
+- PB-39003 WP6-4.8 Implements DisplayContentTypesAllowedContentTypesAdministration component to display the administration form
+- PB-39004 WP6-4.9 Implements ResourceTypesApiService undelete method to process the undelete of the given resources type
+- PB-39005 WP6-4.10 Implements ResourceTypesService delete method to request the API for deleted the given resource type
+- PB-39006 WP6-4.11 Implements UpdateResourceTypesService undelete method to process the update of the given resources types
+- PB-39009 WP6-4.14 Implements UpdateAllResourceTypesDeletedStatusController to update all  resource types deleted status
+- PB-39010 WP6-4.15 Implements ResourceTypesServiceWorkerService update and delete method to communication with the service worker
+- PB-39011 WP5-4.16 Add to DisplayResourceTypes a "Save" button to trigger the update process of the allowed resource types
 
 ### Fixed
-PB-38763 Using V5 format, exporting resources now set all the fields properly
-PB-39388 Edition and creation of resources now export object_type in metadata properly
-PB-39084 When selecting multiple resources, the OS is detected and the right shortcut is used
+- PB-38763 Using V5 format, exporting resources now set all the fields properly
+- PB-39388 Edition and creation of resources now export object_type in metadata properly
+- PB-39084 When selecting multiple resources, the OS is detected and the right shortcut is used
 
 ## [4.11.0] - 2024-01-29
 ### Added
-PB-37669: WP5-1.1 Implement save method in ServiceWorker
-PB-37670: WP5-1.2 Implement SaveMetadataSettingsService in the Service Worker to handle saving of metadata types settings
-PB-37671: WP5-1.3 Implement SaveMetadataTypesSettingsController in the Service Worker to expose metadata types settings save functionality to the content code
-PB-37672: WP5-1.4 Implement MetadataSettingsBextService in the Content Code to handle Service Worker requests that handles metadata types settings
-PB-37673: WP5-1.5 Add MetadataTypesSettingsEntity in the Content Code to support the metadata types settings form data
-PB-37676: WP5-1.6 Implement DisplayContentTypesMetadataAdministrationActions in the content Code to support content types metadata administration actions
-PB-37677: WP5-1.7 Implement DisplayContentTypesMetadataAdministration in the Content Code to display the metadata content types administration form
-PB-38019: WP5-1.8 Implement entity v2 required getter, setter, and comparison function to handle form data
-PB-38020: WP5-1.9 Add allow_v4_v5_upgrade property to metadata types settings entity
-PB-38021: WP5-1.10 Implement verifyDataHealth on MetadataTypesSettingsFormEntity to verify the settings health and help prevent problematic situations
-PB-38022: WP5-2.2 Metadata keys collection shouldn’t try to decrypt metadata private key that are not encrypted
-PB-38093: WP5-2.1 Make ExternalGpgKeyEntity and ExternalGpgCollection accessible to the content code
-PB-38105: WP5-2.3 Add support of expired on metadata key entity
-PB-38106: WP5-2.4 Find all metadata keys for session storage should not retrieve deleted keys
-PB-38108: WP5-2.5 Apply style on content types encrypted metadata administration screen
-PB-38111: WP5-2.6 Implement MetadataKeysServiceWorkerService in the Content Code to request the Service Worker to retrieve metadata keys
-PB-38121: WP5-2.7 Implement findKeysSettings in MetadataSettingsServiceWorkerService in the Content Code to request the Service Worker to retrieve metadata keys settings
-PB-38124: WP5-2.8 Implement GpgServiceWorkerService in the Content Code to request the Service Worker and retrieve gpg keys info
-PB-38135: WP5-2.9 Implement DisplayContentTypeMetadataKeysAdministration component to read metadata keys settings
-PB-38186: WP5-2.11 Make ExternalGpgKeyPairEntity accessible to the content code
-PB-38194: WP5-2.10 Implement generate function on MetadataKeysServiceWorkerService to support new metadata key generation in content types metadata keys administration page
-PB-38198: WP5-2.12 As an administrator I can generate metadata key when there is none yet active
-PB-38201: WP5-2.13 Implement findAll and findAllActive on findUsersService to retrieve respectively all users and only active users
-PB-38258: WP5-2.14 Implement saveKeysSettings function on MetadataSettingsServiceWorkerService to save metadata keys settings in the content types metadata keys administration page
-PB-38259: WP5-2.15 Implement EncryptMetadataPrivateKeysService to encrypt metadata private key data
-PB-38260: WP5-2.16 Implement save capability on the metadata keys settings administration page
+- PB-37669 WP5-1.1 Implement save method in ServiceWorker
+- PB-37670 WP5-1.2 Implement SaveMetadataSettingsService in the Service Worker to handle saving of metadata types settings
+- PB-37671 WP5-1.3 Implement SaveMetadataTypesSettingsController in the Service Worker to expose metadata types settings save functionality to the content code
+- PB-37672 WP5-1.4 Implement MetadataSettingsBextService in the Content Code to handle Service Worker requests that handles metadata types settings
+- PB-37673 WP5-1.5 Add MetadataTypesSettingsEntity in the Content Code to support the metadata types settings form data
+- PB-37676 WP5-1.6 Implement DisplayContentTypesMetadataAdministrationActions in the content Code to support content types metadata administration actions
+- PB-37677 WP5-1.7 Implement DisplayContentTypesMetadataAdministration in the Content Code to display the metadata content types administration form
+- PB-38019 WP5-1.8 Implement entity v2 required getter, setter, and comparison function to handle form data
+- PB-38020 WP5-1.9 Add allow_v4_v5_upgrade property to metadata types settings entity
+- PB-38021 WP5-1.10 Implement verifyDataHealth on MetadataTypesSettingsFormEntity to verify the settings health and help prevent problematic situations
+- PB-38022 WP5-2.2 Metadata keys collection shouldn’t try to decrypt metadata private key that are not encrypted
+- PB-38093 WP5-2.1 Make ExternalGpgKeyEntity and ExternalGpgCollection accessible to the content code
+- PB-38105 WP5-2.3 Add support of expired on metadata key entity
+- PB-38106 WP5-2.4 Find all metadata keys for session storage should not retrieve deleted keys
+- PB-38108 WP5-2.5 Apply style on content types encrypted metadata administration screen
+- PB-38111 WP5-2.6 Implement MetadataKeysServiceWorkerService in the Content Code to request the Service Worker to retrieve metadata keys
+- PB-38121 WP5-2.7 Implement findKeysSettings in MetadataSettingsServiceWorkerService in the Content Code to request the Service Worker to retrieve metadata keys settings
+- PB-38124 WP5-2.8 Implement GpgServiceWorkerService in the Content Code to request the Service Worker and retrieve gpg keys info
+- PB-38135 WP5-2.9 Implement DisplayContentTypeMetadataKeysAdministration component to read metadata keys settings
+- PB-38186 WP5-2.11 Make ExternalGpgKeyPairEntity accessible to the content code
+- PB-38194 WP5-2.10 Implement generate function on MetadataKeysServiceWorkerService to support new metadata key generation in content types metadata keys administration page
+- PB-38198 WP5-2.12 As an administrator I can generate metadata key when there is none yet active
+- PB-38201 WP5-2.13 Implement findAll and findAllActive on findUsersService to retrieve respectively all users and only active users
+- PB-38258 WP5-2.14 Implement saveKeysSettings function on MetadataSettingsServiceWorkerService to save metadata keys settings in the content types metadata keys administration page
+- PB-38259 WP5-2.15 Implement EncryptMetadataPrivateKeysService to encrypt metadata private key data
+- PB-38260 WP5-2.16 Implement save capability on the metadata keys settings administration page
 
 ### Fixed
-PB-37682: URI not stored when password is weak with the quick access
-PB-38125: Display auto-fill CTA when the browsed page does not display its iframes
+- PB-37682 URI not stored when password is weak with the quick access
+- PB-38125 Display auto-fill CTA when the browsed page does not display its iframes
 
 ### Security
-PB-37706: Fix RBAC preview and copying should no be allowed after group filter
-PB-38310: Upgrade i18next-parser undici dependency
+- PB-37706 Fix RBAC preview and copying should no be allowed after group filter
+- PB-38310 Upgrade i18next-parser undici dependency
 
 ### Maintenance
-PB-38027: Remove .page.js from styleguide code coverage
-PB-38243: Upgrade playwright dependency and fix CI
+- PB-38027 Remove .page.js from styleguide code coverage
+- PB-38243 Upgrade playwright dependency and fix CI
 
 ## [4.10.2] - 2024-12-05
 ### Added
-PB-35706: WP3-3.7 Webapp EditStandaloneTotp component updates resources of type v5
-PB-35741: WP3-5.5 Export resources of type v5
-PB-35743: WP3-5.4 Migrate export resources controller logic into a dedicated service
-PB-35753: WP3-6.3 Migrate update group controller logic into a dedicated service
-PB-35771: WP3-8.1 Implement SessionKeyEntity entity to support session key
-PB-35772: WP3-8.2 Implement SessionKeysCollection collection to support collection of session keys
-PB-35773: WP3-8.3 Implement SessionKeysBundleEntity entity to support persisted collection session keys as stored on the API or local storage
-PB-35857: WP3-8.9 Implement SessionKeysBundlesSessionStorageService to store and retrieve session keys bundles from session storage
-PB-35858: WP3-8.4 Implement SessionKeysBundlesCollection collection to support collection of session keys bundle entity
-PB-35862: WP3-8.5 Implement decryptOne on DecryptSessionKeysBundles service to decrypt a session key bundle
-PB-35863: WP3-8.6 Implement decryptAll on DecryptSessionKeysBundlesService service to decrypt a sessions keys bundles collection
-PB-35864: WP3-8.7 Implement findAll on SessionKeysBundlesApiService to retrieve session keys bundles from the API
-PB-35867: WP3-8.8 Implement findAllBundles on FindSessionKeysService to retrieve sessions keys bundles from the API
-PB-35869: WP3-8.10 Implement findAndUpdateAllBundles on FindAndUpdateSessionKeysSessionStorageService to retrieve session keys bundles from the API and store them in the session storage
-PB-35876: WP3-8.11 Implement getOrFindAllBundles on GetOrFindSessionKeysService to retrieve session keys from store or from the API and store them in the session storage
-PB-35877: WP3-8.12 Implement getOrFindAllByForeignModelAndForeignIds on GetOrFindSessionKeysService to retrieve session keys from storage or from the API and store them in the session storage
-PB-35878: WP3-8.20 DecryptMetadataService should use the session keys when decrypting metadata of a collection of resources
-PB-35879: WP3-8.13 Implement decryptWithSessionKey on DecryptMessageService
-PB-35881: WP3-8.14 Implement GetSessionKeyService crypto service
-PB-35886: WP3-8.15 Implement create on SessionKeysBundlesApiService to create a session keys bundle on the API
-PB-35887: WP3-8.16 Implement delete on SessionKeysBundlesApiService to delete a session keys bundle on the API
-PB-35888: WP3-8.17 Implement update on SessionKeysBundlesApiService to update a session keys bundle on the API
-PB-35889: WP3-8.18 Implement encryptOne on EncryptSessionKeysBundlesService to encrypt session keys bundle session keys prior to persist the data
-PB-35890: WP3-8.19 Implement save on SaveSessionKeysService to persist sessions keys on API
-PB-35948: WP3-8.21 Implement SessionKeysBundleDataEntity entity to support persisted collection decrypted session keys bundle
-PB-36286: WP3-6.7 ShareDialog should not have to share resources by passing resources and all its details to the service worker
-PB-36509: WP3-6.5 Migrate move resource controller logic into a dedicated service
-PB-36511: WP3-6.8 Migrate share folder logic from controller/share model to service
-PB-36513: WP3-6.10 Migrate move folder controller logic into a dedicated service
-PB-36520: WP3-8.22 DecryptMetadataService should persists session keys changes after a decryptAllFromForeignModels is performed
-PB-36522: WP3-1.1 Remember the passphrase for a minimum default period after sign-in to allow smooth decryption of the metadata
-PB-36523: WP3-1.2 Updating resources local storage requiring user passphrase should request the user passphrase if not present in the session storage
-PB-36559: WP3-6.8.1 Implement findFoldersService findAllByIds to support request batch splitting
-PB-36560: WP3-6.8.2 Implement getOrFindFoldersService to retrieve folders from local storage or update if with API
-PB-36561: WP3-6.8.3 Implement findByIdsWithPermissions on findResourcesService and findFoldersService
-PB-36583: WP3-8.4.1 Add same user id build rules for SessionKeysBundlesCollection
-PB-36598: WP3-2.21 Validate GPG armored message to support iOS format
-PB-36897: WP4-1.2 Migration Storybook new CSF format
-PB-36945: WP3-8.24 GetOrFindSessionKeys getOrFindAll shouldn't crash if no sessions keys bundle is found
+- PB-35706 WP3-3.7 Webapp EditStandaloneTotp component updates resources of type v5
+- PB-35741 WP3-5.5 Export resources of type v5
+- PB-35743 WP3-5.4 Migrate export resources controller logic into a dedicated service
+- PB-35753 WP3-6.3 Migrate update group controller logic into a dedicated service
+- PB-35771 WP3-8.1 Implement SessionKeyEntity entity to support session key
+- PB-35772 WP3-8.2 Implement SessionKeysCollection collection to support collection of session keys
+- PB-35773 WP3-8.3 Implement SessionKeysBundleEntity entity to support persisted collection session keys as stored on the API or local storage
+- PB-35857 WP3-8.9 Implement SessionKeysBundlesSessionStorageService to store and retrieve session keys bundles from session storage
+- PB-35858 WP3-8.4 Implement SessionKeysBundlesCollection collection to support collection of session keys bundle entity
+- PB-35862 WP3-8.5 Implement decryptOne on DecryptSessionKeysBundles service to decrypt a session key bundle
+- PB-35863 WP3-8.6 Implement decryptAll on DecryptSessionKeysBundlesService service to decrypt a sessions keys bundles collection
+- PB-35864 WP3-8.7 Implement findAll on SessionKeysBundlesApiService to retrieve session keys bundles from the API
+- PB-35867 WP3-8.8 Implement findAllBundles on FindSessionKeysService to retrieve sessions keys bundles from the API
+- PB-35869 WP3-8.10 Implement findAndUpdateAllBundles on FindAndUpdateSessionKeysSessionStorageService to retrieve session keys bundles from the API and store them in the session storage
+- PB-35876 WP3-8.11 Implement getOrFindAllBundles on GetOrFindSessionKeysService to retrieve session keys from store or from the API and store them in the session storage
+- PB-35877 WP3-8.12 Implement getOrFindAllByForeignModelAndForeignIds on GetOrFindSessionKeysService to retrieve session keys from storage or from the API and store them in the session storage
+- PB-35878 WP3-8.20 DecryptMetadataService should use the session keys when decrypting metadata of a collection of resources
+- PB-35879 WP3-8.13 Implement decryptWithSessionKey on DecryptMessageService
+- PB-35881 WP3-8.14 Implement GetSessionKeyService crypto service
+- PB-35886 WP3-8.15 Implement create on SessionKeysBundlesApiService to create a session keys bundle on the API
+- PB-35887 WP3-8.16 Implement delete on SessionKeysBundlesApiService to delete a session keys bundle on the API
+- PB-35888 WP3-8.17 Implement update on SessionKeysBundlesApiService to update a session keys bundle on the API
+- PB-35889 WP3-8.18 Implement encryptOne on EncryptSessionKeysBundlesService to encrypt session keys bundle session keys prior to persist the data
+- PB-35890 WP3-8.19 Implement save on SaveSessionKeysService to persist sessions keys on API
+- PB-35948 WP3-8.21 Implement SessionKeysBundleDataEntity entity to support persisted collection decrypted session keys bundle
+- PB-36286 WP3-6.7 ShareDialog should not have to share resources by passing resources and all its details to the service worker
+- PB-36509 WP3-6.5 Migrate move resource controller logic into a dedicated service
+- PB-36511 WP3-6.8 Migrate share folder logic from controller/share model to service
+- PB-36513 WP3-6.10 Migrate move folder controller logic into a dedicated service
+- PB-36520 WP3-8.22 DecryptMetadataService should persists session keys changes after a decryptAllFromForeignModels is performed
+- PB-36522 WP3-1.1 Remember the passphrase for a minimum default period after sign-in to allow smooth decryption of the metadata
+- PB-36523 WP3-1.2 Updating resources local storage requiring user passphrase should request the user passphrase if not present in the session storage
+- PB-36559 WP3-6.8.1 Implement findFoldersService findAllByIds to support request batch splitting
+- PB-36560 WP3-6.8.2 Implement getOrFindFoldersService to retrieve folders from local storage or update if with API
+- PB-36561 WP3-6.8.3 Implement findByIdsWithPermissions on findResourcesService and findFoldersService
+- PB-36583 WP3-8.4.1 Add same user id build rules for SessionKeysBundlesCollection
+- PB-36598 WP3-2.21 Validate GPG armored message to support iOS format
+- PB-36897 WP4-1.2 Migration Storybook new CSF format
+- PB-36945 WP3-8.24 GetOrFindSessionKeys getOrFindAll shouldn't crash if no sessions keys bundle is found
 
 ### Security
-PB-36967: Upgrade vulnerable library cross-spawn
+- PB-36967 Upgrade vulnerable library cross-spawn
 
 ### Fixed
-PB-36501: GITHUB Fix share dialog autocomplete sorting
+- PB-36501 GITHUB Fix share dialog autocomplete sorting
 
 ### Maintenance
-PB-36972: Update progress service to propose an API to control step count to finish
+- PB-36972 Update progress service to propose an API to control step count to finish
 
 ## [4.10.0] - 2024-10-30
 ### Added
-PB-16113 As LU I should be able to drag and drop a resource I own on a shared tag
-PB-35412 WP3-2.1 Implement MetadataPrivateKey entity to support metadata private key
-PB-35419 WP3-2.3 Implement MetadataPrivateKeys collection to support collection of metadata private keys
-PB-35420 WP3-2.5 Implement MetadataKey entity to support metadata key
-PB-35421 WP3-2.6 Implement MetadataKeys collection to support collection of metadata keys
-PB-35422 WP3-2.2 Implement decryptOne on DecryptMetadataPrivateKeys service to decrypt a metadata private key
-PB-35424 WP3-2.4 Implement decryptAll on DecryptMetadataPrivateKeys service to decrypt a metadata private keys collection
-PB-35425 WP3-2.7 Implement decryptAllFromMetdataKeysCollection on DecryptMetadataPrivateKeys service to decrypt metadata private keys on MetadataKeys collection
-PB-35426 WP3-2.8 Implement the function findAll on the FindMetadataKeys service to retrieve metadata keys from the API and decrypt any metadata private keys found if any
-PB-35427 WP3-2.9 Implement the function findAllForSessionStorage on the FindMetadataKeys service to retrieve metadata keys for the Session storage
-PB-35428 WP3-2.10 Adapt resource entity to support both encrypted metadata and non encrypted metadata
-PB-35429 WP3-2.11 Implement decryptAllFromForeignModels on DecryptMetadata service to decrypt metadata on a resource collection
-PB-35430 WP3-2.12 Decrypt metadata of v5 resources types when retrieving resources from the API
-PB-35684 WP3-3.4 Implement encryptOneForForeignModel on EncryptMetadata service to encrypt metadata on a resource
-PB-35686 WP3-3.5 Encrypt metadata of v5 resource types when editing new resource types
-PB-35688 WP3-3.1 Add necessary capabilities to resource types collection and entity to support v5 types in the UI
-PB-35692 WP3-4.1 implement metadata types settings entity to support metadata types settings
-PB-35693 WP3-4.2 Implement findSettings on MetadataTypesSettingsApiService to retrieve metadata types settings
-PB-35694 WP3-4.3 Implement findTypesSettings on FindMetadataSettingsService to retrieve metadata types settings entity
-PB-35695 WP3-4.4 IImplement MetadataTypesSettingsLocalStorage to store and retrieve metadata types settings from local storage
-PB-35696 WP3-4.5 Implement findAndUpdateTypesSettings on FindAndUpdateMetadataSettingsService to retrieve metadata types settings from the API and store them in the local storage
-PB-35698 WP3-4.7 Implement GetOrFindMetadataTypesSettingsController to provide capability to retrieve the metadata types settings from the UI
-PB-35700 WP3-4.6 Implement getOrFindMetadataTypesSettings on GetOrFindMetadataSettingsService to retrieve metadata types settings from store or from the API and store them in the local storage
-PB-36225 WP3-4.10 Create resource service should determine personal resource only with permissions of the destination folder
-PB-35701 WP3-4.8 WebApp/QuickApp lazy loads metadata types settings and provide it to components that need them
-PB-35703 WP3-4.10 WebApp CreateResource component creates resources of type v5
-PB-35704 WP3-4.11 Webapp CreateStandaloneTotp component creates resources of type v5
-PB-35705 WP3-3.6 Webapp EditResource component updates resources of type v5
-PB-35707 WP3-4.12 Encrypt metadata of v5 resource types when creating new resources
-PB-35710 WP3-5.1 Migrate import resources controller logic into a dedicated service
-PB-35718 WP3-5.2 Resources import parsers should determine imported resource type based on imported data and configuration
-PB-35721 WP3-5.3 import resources of type v5
-PB-35755 WP3-6.2 Share resources of type v5
-PB-35853 WP3-4.14 Add resource types v5 to the list of supported resource types
-PB-35893 WP3-7.1 Implement MetadataKeysSettingsEntity to support metadata keys settings
-PB-35895 WP3-7.2 Implement findSettings on MetadataKeysSettingsApiService to retrieve metadata keys settings
-PB-35896 WP3-7.3 Implement findKeysSettings on FindMetadataSettingsService to retrieve metadata keys settings as entity
-PB-35897 WP3-7.4 Implement MetadataKeysSettingsLocalStorageService to store and retrieve metadata keys settings from local storage
-PB-35898 WP3-7.5 Implement findAndUpdateKeysSettings on FindAndUpdateMetadataSettingsService to retrieve metadata keys settings from the API and store them in the local storage
-PB-35899 WP3-7.6 Implement getOrFindMetadataKeysSettings on GetOrFindMetadataSettingsService to retrieve metadata keys settings from storage or from the API and store them in the local storage
-PB-35900 WP3-7.7 Enforce metadata encryption using the metadata key as dictated by the metadata key settings
-PB-35901 WP3-5.6 Implement encryptAllFromForeignModels on EncryptMetadata service to encrypt metadata on a collection of resources
-PB-35902 WP3-9.1 Implement MetadataKeysSessionStorageService to store and retrieve metadata keys from session storage
-PB-35903 WP3-9.2 Implement findAndUpdateAll on FindAndUpdateKeysSessionStorageService to retrieve metadata keys from the API and store them in the local storage
-PB-35904 WP3-9.3 Implement getOrFindAll on GetOrFindMetadataKeysService to retrieve metadata keys from storage or from the API and store them in the local storage
-PB-35907 WP3-9.5 decrypt metadata service should retrieve keys from session storage
-PB-35912 WP3-2.16 Implement MetadataPrivateKeyData entity to support decrypted metadata private key data
-PB-35914 WP3-2.19 Update metadata_key_type to be aligned with the API value for the shared_key
-PB-35915 WP3-2.18 update the resource metadata object_type to be aligned with the API
-PB-35947 WP3-2.17 Update MetadataPrivateKey entity to support MetadataPrivateKeyData
-PB-35982 WP3-2.20 allow a metadata_key_id to be set when metadata_key_type is set to 'user_key'
-PB-35989 WP3-4.13 QuickApp components creates resource of type v5 accordingly to metadata settings
-PB-36187 WP3-9.5.1 Refactor decryptMetadataService to welcome keys coming from getOrFindMetadataKeys
-PB-36226 Create an event to get the account of the user
-PB-36230 WP3-5.3.2 Encrypt EncryptMetadataService.encryptAllFromForeignModels should not crash if v4 resource type are sent for encryption
-PB-36231 WP3-5.3.3 ImportResourceService should encrypt a v5 resource type metadata
+- PB-16113 As LU I should be able to drag and drop a resource I own on a shared tag
+- PB-35412 WP3-2.1 Implement MetadataPrivateKey entity to support metadata private key
+- PB-35419 WP3-2.3 Implement MetadataPrivateKeys collection to support collection of metadata private keys
+- PB-35420 WP3-2.5 Implement MetadataKey entity to support metadata key
+- PB-35421 WP3-2.6 Implement MetadataKeys collection to support collection of metadata keys
+- PB-35422 WP3-2.2 Implement decryptOne on DecryptMetadataPrivateKeys service to decrypt a metadata private key
+- PB-35424 WP3-2.4 Implement decryptAll on DecryptMetadataPrivateKeys service to decrypt a metadata private keys collection
+- PB-35425 WP3-2.7 Implement decryptAllFromMetdataKeysCollection on DecryptMetadataPrivateKeys service to decrypt metadata private keys on MetadataKeys collection
+- PB-35426 WP3-2.8 Implement the function findAll on the FindMetadataKeys service to retrieve metadata keys from the API and decrypt any metadata private keys found if any
+- PB-35427 WP3-2.9 Implement the function findAllForSessionStorage on the FindMetadataKeys service to retrieve metadata keys for the Session storage
+- PB-35428 WP3-2.10 Adapt resource entity to support both encrypted metadata and non encrypted metadata
+- PB-35429 WP3-2.11 Implement decryptAllFromForeignModels on DecryptMetadata service to decrypt metadata on a resource collection
+- PB-35430 WP3-2.12 Decrypt metadata of v5 resources types when retrieving resources from the API
+- PB-35684 WP3-3.4 Implement encryptOneForForeignModel on EncryptMetadata service to encrypt metadata on a resource
+- PB-35686 WP3-3.5 Encrypt metadata of v5 resource types when editing new resource types
+- PB-35688 WP3-3.1 Add necessary capabilities to resource types collection and entity to support v5 types in the UI
+- PB-35692 WP3-4.1 implement metadata types settings entity to support metadata types settings
+- PB-35693 WP3-4.2 Implement findSettings on MetadataTypesSettingsApiService to retrieve metadata types settings
+- PB-35694 WP3-4.3 Implement findTypesSettings on FindMetadataSettingsService to retrieve metadata types settings entity
+- PB-35695 WP3-4.4 IImplement MetadataTypesSettingsLocalStorage to store and retrieve metadata types settings from local storage
+- PB-35696 WP3-4.5 Implement findAndUpdateTypesSettings on FindAndUpdateMetadataSettingsService to retrieve metadata types settings from the API and store them in the local storage
+- PB-35698 WP3-4.7 Implement GetOrFindMetadataTypesSettingsController to provide capability to retrieve the metadata types settings from the UI
+- PB-35700 WP3-4.6 Implement getOrFindMetadataTypesSettings on GetOrFindMetadataSettingsService to retrieve metadata types settings from store or from the API and store them in the local storage
+- PB-36225 WP3-4.10 Create resource service should determine personal resource only with permissions of the destination folder
+- PB-35701 WP3-4.8 WebApp/QuickApp lazy loads metadata types settings and provide it to components that need them
+- PB-35703 WP3-4.10 WebApp CreateResource component creates resources of type v5
+- PB-35704 WP3-4.11 Webapp CreateStandaloneTotp component creates resources of type v5
+- PB-35705 WP3-3.6 Webapp EditResource component updates resources of type v5
+- PB-35707 WP3-4.12 Encrypt metadata of v5 resource types when creating new resources
+- PB-35710 WP3-5.1 Migrate import resources controller logic into a dedicated service
+- PB-35718 WP3-5.2 Resources import parsers should determine imported resource type based on imported data and configuration
+- PB-35721 WP3-5.3 import resources of type v5
+- PB-35755 WP3-6.2 Share resources of type v5
+- PB-35853 WP3-4.14 Add resource types v5 to the list of supported resource types
+- PB-35893 WP3-7.1 Implement MetadataKeysSettingsEntity to support metadata keys settings
+- PB-35895 WP3-7.2 Implement findSettings on MetadataKeysSettingsApiService to retrieve metadata keys settings
+- PB-35896 WP3-7.3 Implement findKeysSettings on FindMetadataSettingsService to retrieve metadata keys settings as entity
+- PB-35897 WP3-7.4 Implement MetadataKeysSettingsLocalStorageService to store and retrieve metadata keys settings from local storage
+- PB-35898 WP3-7.5 Implement findAndUpdateKeysSettings on FindAndUpdateMetadataSettingsService to retrieve metadata keys settings from the API and store them in the local storage
+- PB-35899 WP3-7.6 Implement getOrFindMetadataKeysSettings on GetOrFindMetadataSettingsService to retrieve metadata keys settings from storage or from the API and store them in the local storage
+- PB-35900 WP3-7.7 Enforce metadata encryption using the metadata key as dictated by the metadata key settings
+- PB-35901 WP3-5.6 Implement encryptAllFromForeignModels on EncryptMetadata service to encrypt metadata on a collection of resources
+- PB-35902 WP3-9.1 Implement MetadataKeysSessionStorageService to store and retrieve metadata keys from session storage
+- PB-35903 WP3-9.2 Implement findAndUpdateAll on FindAndUpdateKeysSessionStorageService to retrieve metadata keys from the API and store them in the local storage
+- PB-35904 WP3-9.3 Implement getOrFindAll on GetOrFindMetadataKeysService to retrieve metadata keys from storage or from the API and store them in the local storage
+- PB-35907 WP3-9.5 decrypt metadata service should retrieve keys from session storage
+- PB-35912 WP3-2.16 Implement MetadataPrivateKeyData entity to support decrypted metadata private key data
+- PB-35914 WP3-2.19 Update metadata_key_type to be aligned with the API value for the shared_key
+- PB-35915 WP3-2.18 update the resource metadata object_type to be aligned with the API
+- PB-35947 WP3-2.17 Update MetadataPrivateKey entity to support MetadataPrivateKeyData
+- PB-35982 WP3-2.20 allow a metadata_key_id to be set when metadata_key_type is set to 'user_key'
+- PB-35989 WP3-4.13 QuickApp components creates resource of type v5 accordingly to metadata settings
+- PB-36187 WP3-9.5.1 Refactor decryptMetadataService to welcome keys coming from getOrFindMetadataKeys
+- PB-36226 Create an event to get the account of the user
+- PB-36230 WP3-5.3.2 Encrypt EncryptMetadataService.encryptAllFromForeignModels should not crash if v4 resource type are sent for encryption
+- PB-36231 WP3-5.3.3 ImportResourceService should encrypt a v5 resource type metadata
 
 ### Improved
-PB-35702 WP3-4.9 WebApp DisplayResourcesWorkspaceMainMenu should be able to determine the type of content to create
-PB-35718 WP3-5.2 Resources import parsers should determine imported resource type based on imported data and configuration
-PB-35802 WP3-3.2 WebApp lazy loads resource types and replace resourceTypeSettings usage with it
-PB-35803 WP3-3.2 QuickApp lazy loads resource types and replace resourceTypeSettings usage with it
-PB-35987 WP3-4.13 QuickApp components creates resource button should be display only when possible
-PB-35988 WP3-4.13 Inform components creates or save resources should be display only when possible
+- PB-35702 WP3-4.9 WebApp DisplayResourcesWorkspaceMainMenu should be able to determine the type of content to create
+- PB-35718 WP3-5.2 Resources import parsers should determine imported resource type based on imported data and configuration
+- PB-35802 WP3-3.2 WebApp lazy loads resource types and replace resourceTypeSettings usage with it
+- PB-35803 WP3-3.2 QuickApp lazy loads resource types and replace resourceTypeSettings usage with it
+- PB-35987 WP3-4.13 QuickApp components creates resource button should be display only when possible
+- PB-35988 WP3-4.13 Inform components creates or save resources should be display only when possible
 
 ### Fixed
-PB-35709 Fix: theme back to default randomly after refresh or navigation
-PB-35714 Fix: Infinite loading when user try an account recovery process on another profile with an extension installed
-PB-35861 Fix: Wrong resource type is displayed in resource sidebar
-PB-36123 Fix: Filtering resources with a second group should not enter in a filtering loop between the first and second selected groups
-PB-36236 Fix: Resource type requirements when retrieving resources to export resulting in cardinality issue with some environment
+- PB-35709 Fix: theme back to default randomly after refresh or navigation
+- PB-35714 Fix: Infinite loading when user try an account recovery process on another profile with an extension installed
+- PB-35861 Fix: Wrong resource type is displayed in resource sidebar
+- PB-36123 Fix: Filtering resources with a second group should not enter in a filtering loop between the first and second selected groups
+- PB-36236 Fix: Resource type requirements when retrieving resources to export resulting in cardinality issue with some environment
 
 ### Maintenance
-PB-35762 WP3-6.1 Migrate share resources model logic into a dedicated service
-PB-35788 WP3-3.2 Handle resource types settings using an HOC
+- PB-35762 WP3-6.1 Migrate share resources model logic into a dedicated service
+- PB-35788 WP3-3.2 Handle resource types settings using an HOC
 
 ## [4.9.4] - 2024-09-30
 ### Fixed
-- PB-33927: Update the label for password expiry email notification
-- PB-34743: Fix: folder's sidebar information misses the creator and modifier information
-- PB-35351: Fix: Grid columns resizing unexpectedly
+- PB-33927 Update the label for password expiry email notification
+- PB-34743 Fix: folder's sidebar information misses the creator and modifier information
+- PB-35351 Fix: Grid columns resizing unexpectedly
 
 ### Maintenance
-- PB-34313: E2EE WP2 documentation permissions finder class
-- PB-34612: As a desktop app I should see the dotnet error message in of http error
-- PB-34632: WP2-1.1 Migrate ResourceTypeEntity to EntityV2
-- PB-34633: WP2-1.2 Migrate ResourceTypesCollection to EntityV2Collection
-- PB-34634: WP2-1.3 Migrate CommentEntity to EntityV2
-- PB-34635: WP2-1.4 Migrate CommentsCollection to EntityV2Collection
-- PB-34636: WP2-1.5 migrate external resource entity to entity v2
-- PB-34637: WP2-1.6 migrate external resources collection to entity v2 collection
-- PB-34638: WP2-1.7 migrate external folder entity to entity v2
-- PB-34639: WP2-1.8 migrate external folders collection to entity v2 collection
-- PB-34640: WP2-1.9 Migrate ExportResourcesFileEntity to EntityV2
-- PB-34641: WP2-1.10 Migrate PermissionTransferEntity to EntityV2
-- PB-34642: WP2-1.11 Migrate PermissionTransfersCollection to EntityV2Collection
-- PB-34643: WP2-1.12 Migrate GroupDeleteTransferEntity to EntityV2
-- PB-34644: WP2-1.14 Migrate GroupUserTransfersCollection to EntityV2Collection
-- PB-34645: WP2-1.15 Migrate UserDeleteTransferEntity to EntityV2
-- PB-34646: WP2-1.13 Migrate GroupUserTransferEntity to EntityV2
-- PB-34647: WP2-1.16 Migrate NeededSecretEntity to EntityV2
-- PB-34648: WP2-1.17 Migrate NeededSecretsCollection to EntityV2Collection
-- PB-34649: WP2-1.18 Migrate SecretEntity to EntityV2
-- PB-34650: WP2-1.19 Migrate SecretsCollection to EntityV2Collection
-- PB-34651: WP2-1.20 Migrate GroupUpdateDryRunResultEntity to EntityV2
-- PB-34656: WP2-1.25 Migrate ImportResourcesFileEntity to EntityV2
-- PB-34657: WP2-1.26 Migrate PlaintextEntity to EntityV2
-- PB-34658: WP2-1.27 Migrate TotpEntity to EntityV2
-- PB-34747: WP2-1.28 Remove not used sanitizeDto from GroupsUsersCollection
-- PB-35124: Migrate 'gte' and 'lte' props of schemas to 'minimum' and 'maximum'
-- PB-35125: WP2-2.6 Find resource permissions by requesting dedicated API permissions entry point
-- PB-35128: WP2-2.1 unnecessary quick a api call when displaying home page
-- PB-35161: WP2-2.2 unnecessary quick a api call for filtering resources: filter by favourite
-- PB-35170: WP2-2.5 unnecessary quick a api call for filtering resources: filter by tags
-- PB-35172: WP2-2.7 Find folder permissions by requesting dedicated API permissions entry point
-- PB-35174: WP2-4.1 Migrate Webapp resource create form in view model
-- PB-35175: WP2-4.2 Migrate Webapp resource edit form in view model
-- PB-35177: WP2-4.3 Migrate Quickaccess resource create form in view model
-- PB-35178: WP2-4.4 Migrate Quickaccess resource auto-save form in view model
-- PB-35179: WP2-4.5 Migrate Webapp edit description from sidebar form in view model ?
-- PB-35180: WP2-2.8 Copy/preview password/totp should find single secret by requesting dedicated API secrets entry point
-- PB-35182: WP2-3.1 Migrate the resource types event 'passbolt.resource-type.get-all' into a controller
-- PB-35233: WP2-5.1 PlainText entity schema should be provided by the browser extension
-- PB-35253: WP2-3.2 Migrate resource update controller logic into service
-- PB-35255: WP2-3.3 Migrate resource “update-local-storage” event logic to a dedicated controller
-- PB-35256: WP2-5.2 Unit test performance of new collection v2 and ensure no regression is introduced
-- PB-35261: WP2-2.10 Shift resources & folders and update local storage debounce...
-- PB-35261: WP2-2.10 Decouple logic of update local storage, find all and get or find all in order to prepare for resource with encrypted metadata
-- PB-35323: Ensure resource test factory does not contain any metadata at the root of the resource
-- PB-35338: WP2-2.11 Folders update local storage should handle threshold period to limit the number of API request
-- PB-35339: Review resource update service test
-- PB-35340: WP2-2.12 drop resources collection sanitise dto
-- PB-35341: WP2-2.13 Migrate findAll from ResourceModel into FindResourceService
-- PB-35342: WP2-2.14 Leverage local storage when filtering resources by group
-- PB-35344: WP2-2.15 Migrate findSuggestedResources from resource model to...
-- PB-35345: WP2-2.16 Migrate findAllForShare from resource api service to FindResources service
-- PB-35346: WP2-2.17 migrate find all for decrypt from resource api service to find resources service
-- PB-35348: WP2-2.18 Migrate findById to the FindResourcesService
-- PB-35359: WP3 Class diagram of resources types local storage HOC
-- PB-35359: WP3 Update resource class diagram to support resource edit with v5
-- PB-35359: Technical specifications: WP3 support v5 resource types with v4 UI
-- PB-35414: WP2-2.16 Create ExecuteConcurrentlyService to perform query in parallel
+- PB-34313 E2EE WP2 documentation permissions finder class
+- PB-34612 As a desktop app I should see the dotnet error message in of http error
+- PB-34632 WP2-1.1 Migrate ResourceTypeEntity to EntityV2
+- PB-34633 WP2-1.2 Migrate ResourceTypesCollection to EntityV2Collection
+- PB-34634 WP2-1.3 Migrate CommentEntity to EntityV2
+- PB-34635 WP2-1.4 Migrate CommentsCollection to EntityV2Collection
+- PB-34636 WP2-1.5 migrate external resource entity to entity v2
+- PB-34637 WP2-1.6 migrate external resources collection to entity v2 collection
+- PB-34638 WP2-1.7 migrate external folder entity to entity v2
+- PB-34639 WP2-1.8 migrate external folders collection to entity v2 collection
+- PB-34640 WP2-1.9 Migrate ExportResourcesFileEntity to EntityV2
+- PB-34641 WP2-1.10 Migrate PermissionTransferEntity to EntityV2
+- PB-34642 WP2-1.11 Migrate PermissionTransfersCollection to EntityV2Collection
+- PB-34643 WP2-1.12 Migrate GroupDeleteTransferEntity to EntityV2
+- PB-34644 WP2-1.14 Migrate GroupUserTransfersCollection to EntityV2Collection
+- PB-34645 WP2-1.15 Migrate UserDeleteTransferEntity to EntityV2
+- PB-34646 WP2-1.13 Migrate GroupUserTransferEntity to EntityV2
+- PB-34647 WP2-1.16 Migrate NeededSecretEntity to EntityV2
+- PB-34648 WP2-1.17 Migrate NeededSecretsCollection to EntityV2Collection
+- PB-34649 WP2-1.18 Migrate SecretEntity to EntityV2
+- PB-34650 WP2-1.19 Migrate SecretsCollection to EntityV2Collection
+- PB-34651 WP2-1.20 Migrate GroupUpdateDryRunResultEntity to EntityV2
+- PB-34656 WP2-1.25 Migrate ImportResourcesFileEntity to EntityV2
+- PB-34657 WP2-1.26 Migrate PlaintextEntity to EntityV2
+- PB-34658 WP2-1.27 Migrate TotpEntity to EntityV2
+- PB-34747 WP2-1.28 Remove not used sanitizeDto from GroupsUsersCollection
+- PB-35124 Migrate 'gte' and 'lte' props of schemas to 'minimum' and 'maximum'
+- PB-35125 WP2-2.6 Find resource permissions by requesting dedicated API permissions entry point
+- PB-35128 WP2-2.1 unnecessary quick a api call when displaying home page
+- PB-35161 WP2-2.2 unnecessary quick a api call for filtering resources: filter by favourite
+- PB-35170 WP2-2.5 unnecessary quick a api call for filtering resources: filter by tags
+- PB-35172 WP2-2.7 Find folder permissions by requesting dedicated API permissions entry point
+- PB-35174 WP2-4.1 Migrate Webapp resource create form in view model
+- PB-35175 WP2-4.2 Migrate Webapp resource edit form in view model
+- PB-35177 WP2-4.3 Migrate Quickaccess resource create form in view model
+- PB-35178 WP2-4.4 Migrate Quickaccess resource auto-save form in view model
+- PB-35179 WP2-4.5 Migrate Webapp edit description from sidebar form in view model ?
+- PB-35180 WP2-2.8 Copy/preview password/totp should find single secret by requesting dedicated API secrets entry point
+- PB-35182 WP2-3.1 Migrate the resource types event 'passbolt.resource-type.get-all' into a controller
+- PB-35233 WP2-5.1 PlainText entity schema should be provided by the browser extension
+- PB-35253 WP2-3.2 Migrate resource update controller logic into service
+- PB-35255 WP2-3.3 Migrate resource “update-local-storage” event logic to a dedicated controller
+- PB-35256 WP2-5.2 Unit test performance of new collection v2 and ensure no regression is introduced
+- PB-35261 WP2-2.10 Shift resources & folders and update local storage debounce...
+- PB-35261 WP2-2.10 Decouple logic of update local storage, find all and get or find all in order to prepare for resource with encrypted metadata
+- PB-35323 Ensure resource test factory does not contain any metadata at the root of the resource
+- PB-35338 WP2-2.11 Folders update local storage should handle threshold period to limit the number of API request
+- PB-35339 Review resource update service test
+- PB-35340 WP2-2.12 drop resources collection sanitise dto
+- PB-35341 WP2-2.13 Migrate findAll from ResourceModel into FindResourceService
+- PB-35342 WP2-2.14 Leverage local storage when filtering resources by group
+- PB-35344 WP2-2.15 Migrate findSuggestedResources from resource model to...
+- PB-35345 WP2-2.16 Migrate findAllForShare from resource api service to FindResources service
+- PB-35346 WP2-2.17 migrate find all for decrypt from resource api service to find resources service
+- PB-35348 WP2-2.18 Migrate findById to the FindResourcesService
+- PB-35359 WP3 Class diagram of resources types local storage HOC
+- PB-35359 WP3 Update resource class diagram to support resource edit with v5
+- PB-35359 Technical specifications: WP3 support v5 resource types with v4 UI
+- PB-35414 WP2-2.16 Create ExecuteConcurrentlyService to perform query in parallel
 
 ### Security
-- PB-35129: Upgrade vulnerable library webpack
-- PB-35354: Upgrade vulnerable library path-to-regexp
+- PB-35129 Upgrade vulnerable library webpack
+- PB-35354 Upgrade vulnerable library path-to-regexp
 
 ## [4.9.3] - 2024-09-03
 ### Fixed
@@ -320,48 +393,48 @@ PB-35788 WP3-3.2 Handle resource types settings using an HOC
 
 ## [4.9.2] - 2024-08-26
 ### Fixed
-- PB-33861: Resources with personal field set to null should be considered as personal resources
-- PB-34314: Fix shadow-dom autofill fields
-- PB-34236: Fix Retrieving folder activities displaying no data
+- PB-33861 Resources with personal field set to null should be considered as personal resources
+- PB-34314 Fix shadow-dom autofill fields
+- PB-34236 Fix Retrieving folder activities displaying no data
 
 ### Maintenance
-- PB-34313: Add resources type retrieval requirements documentation
-- PB-34259: E2EE WP1 - Transform dtos from v4 to v5
-- PB-34260: E2EE WP1 - Display resource sidebar information section in v5
-- PB-34261: E2EE WP1 - Display resource sidebar activity section in v5
-- PB-34262: E2EE WP1 - Display resource sidebar description section in v5
-- PB-34263: E2EE WP1 - Display copy username to clipboard from more menu using v5
-- PB-34264: E2EE WP1 - Display resource grid using v5
-- PB-34265: E2EE WP1 - Display resource grid contextual menu using v5
-- PB-34266: E2EE WP1 - Display quickaccess resource view page in v5
-- PB-34267: E2EE WP1 - Display quickaccess home page in v5
-- PB-34268: E2EE WP1 - Display inform menu in v5
-- PB-34269: E2EE WP1 - Autofill resources from Quickaccess in v5 format
-- PB-34270: E2EE WP1 - Make resource entity compatible with v4 and v5
-- PB-34271: E2EE WP1 - Display inform and toolbar suggested resources badge CTA in v5
-- PB-34272: E2EE WP1 - Search resource in webapp using v5
-- PB-34287: E2EE WP1 - Create password resource from webapp in v5 format
-- PB-34288: E2EE WP1 - Create standalone TOTP resource in v5 format
-- PB-34289: E2EE WP1 - Edit password resource in v5 format
-- PB-34290: E2EE WP1 - Edit standalone TOTP resource in v5 format
-- PB-34291: E2EE WP1 - Edit resource description from sidebar in v5 format
-- PB-34292: E2EE WP1 - Delete resource(s) in v5 format
-- PB-34293: E2EE WP1 - Share resource(s) in v5 format
-- PB-34294: E2EE WP1 - Import resource(s) in v5 format
-- PB-34295: E2EE WP1 - Export resource(s) in v5 format
-- PB-34296: E2EE WP1 - Move resource(s) in v5 format
-- PB-34297: E2EE WP1 - Create password resource from quickaccess in v5 format
-- PB-34298: E2EE WP1 - Auto-save password resource from quickaccess in v5 format
-- PB-34299: E2EE WP1 - Make resource entity compatible only with v5
-- PB-34311: E2EE WP1 - Make resource V4 and V5 compatible in both ways
-- PB-34315: E2EE WP1 - Transform DTO to V4 for API and adapt resource validation to v5
-- PB-34391: E2EE WP1 - Enforce resource type id should be required and not null
-- PB-34392: E2EE WP1 - Validate Metadata.uris as array of string, and maxLength
+- PB-34313 Add resources type retrieval requirements documentation
+- PB-34259 E2EE WP1 - Transform dtos from v4 to v5
+- PB-34260 E2EE WP1 - Display resource sidebar information section in v5
+- PB-34261 E2EE WP1 - Display resource sidebar activity section in v5
+- PB-34262 E2EE WP1 - Display resource sidebar description section in v5
+- PB-34263 E2EE WP1 - Display copy username to clipboard from more menu using v5
+- PB-34264 E2EE WP1 - Display resource grid using v5
+- PB-34265 E2EE WP1 - Display resource grid contextual menu using v5
+- PB-34266 E2EE WP1 - Display quickaccess resource view page in v5
+- PB-34267 E2EE WP1 - Display quickaccess home page in v5
+- PB-34268 E2EE WP1 - Display inform menu in v5
+- PB-34269 E2EE WP1 - Autofill resources from Quickaccess in v5 format
+- PB-34270 E2EE WP1 - Make resource entity compatible with v4 and v5
+- PB-34271 E2EE WP1 - Display inform and toolbar suggested resources badge CTA in v5
+- PB-34272 E2EE WP1 - Search resource in webapp using v5
+- PB-34287 E2EE WP1 - Create password resource from webapp in v5 format
+- PB-34288 E2EE WP1 - Create standalone TOTP resource in v5 format
+- PB-34289 E2EE WP1 - Edit password resource in v5 format
+- PB-34290 E2EE WP1 - Edit standalone TOTP resource in v5 format
+- PB-34291 E2EE WP1 - Edit resource description from sidebar in v5 format
+- PB-34292 E2EE WP1 - Delete resource(s) in v5 format
+- PB-34293 E2EE WP1 - Share resource(s) in v5 format
+- PB-34294 E2EE WP1 - Import resource(s) in v5 format
+- PB-34295 E2EE WP1 - Export resource(s) in v5 format
+- PB-34296 E2EE WP1 - Move resource(s) in v5 format
+- PB-34297 E2EE WP1 - Create password resource from quickaccess in v5 format
+- PB-34298 E2EE WP1 - Auto-save password resource from quickaccess in v5 format
+- PB-34299 E2EE WP1 - Make resource entity compatible only with v5
+- PB-34311 E2EE WP1 - Make resource V4 and V5 compatible in both ways
+- PB-34315 E2EE WP1 - Transform DTO to V4 for API and adapt resource validation to v5
+- PB-34391 E2EE WP1 - Enforce resource type id should be required and not null
+- PB-34392 E2EE WP1 - Validate Metadata.uris as array of string, and maxLength
 
 ### Security
-- PB-34237: Upgrade vulnerable library i18next-parser
-- PB-34305: Upgrade lockfile-lint library on passbolt_api package-lock.json
-- PB-34422: Remove grunt-browserify dev dependency from browser extension
+- PB-34237 Upgrade vulnerable library i18next-parser
+- PB-34305 Upgrade lockfile-lint library on passbolt_api package-lock.json
+- PB-34422 Remove grunt-browserify dev dependency from browser extension
 
 ## [4.9.1] - 2024-07-23
 ### Fixed
@@ -996,7 +1069,7 @@ PB-35788 WP3-3.2 Handle resource types settings using an HOC
 - PB-23279 As a user completing a setup I should not have access to the background page decryption secret capabilities
 
 ### Maintenance
-PB-19641 Handle the setup and recover runtime object
+- PB-19641 Handle the setup and recover runtime object
 - PB-19675 As a signed-in user I want to perform a recover using the browser extension with MV3
 - PB-19676 As a signed-in user I want to perform a setup using the browser extension with mv3
 - PB-19677 As a signed-in user I want to perform a sign-in using the browser extension with MV3
@@ -1055,7 +1128,7 @@ PB-19641 Handle the setup and recover runtime object
 
 ## [3.9.2] - 2023-01-31
 ### Fixed
-- PB-22557: As LU I should be able to download file on chromium based browsers
+- PB-22557 As LU I should be able to download file on chromium based browsers
 
 ## [3.9.0] - 2023-01-18
 ### Added
@@ -1083,8 +1156,8 @@ self registration settings option in the left-side bar
 - PB-21490 As an administrator I shouldn't see the "save required" banner after saving the SMTP settings
 - PB-20559 As an administrator I want clearer account recovery email notification descriptions relative to administrators
 - PB-21746 As a signed-in user I want to autofill french authentication form using french language as field name
-- PB-21612: Refactor fileController into a dedicated service
-- PB-19156: Replace setInterval by alarm in worker::waitExists
+- PB-21612 Refactor fileController into a dedicated service
+- PB-19156 Replace setInterval by alarm in worker::waitExists
 
 ### Fixed
 - PB-19649 As a user sharing a resource/folder, I should be able to see the number of users contained in groups search result
@@ -1109,42 +1182,42 @@ self registration settings option in the left-side bar
 
 ## [3.8.2] - 2022-11-27
 ### Fixed
-- PB-21565: As a logged-in user, I should decide to keep my session alive until I sign out
-- PB-21372: As a logged-in user, I should see folders without caret aligned
+- PB-21565 As a logged-in user, I should decide to keep my session alive until I sign out
+- PB-21372 As a logged-in user, I should see folders without caret aligned
 
 ## [3.8.0] - 2022-11-04
 ### Added
-- PB-19151: As a logged-in user, I want to be able to use Solarized light and dark themes
-- PB-19220: As an administrator, I want to manage the organization SMTP settings in the administration workspace
+- PB-19151 As a logged-in user, I want to be able to use Solarized light and dark themes
+- PB-19220 As an administrator, I want to manage the organization SMTP settings in the administration workspace
 
 ### Improved
-- PB-19229: As an administration, I want to see the passwords I entered in the MFA administration settings forms
-- PB-19226: As a logged-in user, I want to move resources to another folder with better performances
-- PB-19034: As a group manager I should see if there is more than 3 users in a group I'm editing
-- PB-19214: As a logged-in user, I want to see long entities names fitting in dialog
+- PB-19229 As an administration, I want to see the passwords I entered in the MFA administration settings forms
+- PB-19226 As a logged-in user, I want to move resources to another folder with better performances
+- PB-19034 As a group manager I should see if there is more than 3 users in a group I'm editing
+- PB-19214 As a logged-in user, I want to see long entities names fitting in dialog
 
 ### Fixed
-- PB-19228: As a user, I should see a feedback when the password or description fields content is truncated by a field limit
-- PB-19216: As a logged-in user, I want to populate a form from the Quick Access after the generation of new credentials
-- PB-20978: As a logged-in user, I want to autocomplete using reserved keywords
+- PB-19228 As a user, I should see a feedback when the password or description fields content is truncated by a field limit
+- PB-19216 As a logged-in user, I want to populate a form from the Quick Access after the generation of new credentials
+- PB-20978 As a logged-in user, I want to autocomplete using reserved keywords
 
 ### Security
-- PB-19537: As a user I want my password fields to be hidden in Passbolt forms when the form is being submitted
-- PB-18639: Restrict the port connection to our extension only for chrome
+- PB-19537 As a user I want my password fields to be hidden in Passbolt forms when the form is being submitted
+- PB-18639 Restrict the port connection to our extension only for chrome
 
 ### Maintenance
-- PB-19237: As a developer, I should see the “change user passphrase” stories in storybook
-- PB-18499: [MV3] Bootstrap MV3 build
-- PB-18600: [MV3] Migrate passphrase “remember me” code into a service
-- PB-18640: [MV3] Use alarms API instead of setTimeout and setInterval
-- PB-18641: [MV3] Use ProgressService instead of ProgressController
-- PB-18649: Use navigator.clipboard API instead of the copy to clipboard iframe mechanism
-- PB-18657: [MV3] Implement a scripting polyfill to ensure scripts and css can be injected with both manifest versions
-- PB-19231: Improve “select” styleguide component unit tests coverage
-- PB-19232: Implement browser extension app url parser
-- PB-19238: Move events create and get to dedicated controllers
-- PB-19558: Run storybook test against CI
-- PB-19586: Create email notifications actions
+- PB-19237 As a developer, I should see the “change user passphrase” stories in storybook
+- PB-18499 [MV3] Bootstrap MV3 build
+- PB-18600 [MV3] Migrate passphrase “remember me” code into a service
+- PB-18640 [MV3] Use alarms API instead of setTimeout and setInterval
+- PB-18641 [MV3] Use ProgressService instead of ProgressController
+- PB-18649 Use navigator.clipboard API instead of the copy to clipboard iframe mechanism
+- PB-18657 [MV3] Implement a scripting polyfill to ensure scripts and css can be injected with both manifest versions
+- PB-19231 Improve “select” styleguide component unit tests coverage
+- PB-19232 Implement browser extension app url parser
+- PB-19238 Move events create and get to dedicated controllers
+- PB-19558 Run storybook test against CI
+- PB-19586 Create email notifications actions
 
 ## [3.7.3] - 2022-09-24
 ### Security
@@ -1152,22 +1225,22 @@ self registration settings option in the left-side bar
 
 ## [3.7.2] - 2022-09-13
 ### Fixed
-- PB-17158: As LU I want to see an entropy at 0 when the typed passphrase is exposed in a data breach
-- PB-18370: As LU I want to see the user settings yubikey form matching the common form style
-- PB-18417: As AN I want to see the server key change error with the proper design
-- PB-17154: As AD I want to see the input field in user directory UI with the proper design
+- PB-17158 As LU I want to see an entropy at 0 when the typed passphrase is exposed in a data breach
+- PB-18370 As LU I want to see the user settings yubikey form matching the common form style
+- PB-18417 As AN I want to see the server key change error with the proper design
+- PB-17154 As AD I want to see the input field in user directory UI with the proper design
 
 ### Maintenance
-- PB-17720: As AD I wish the account recovery setting page not to refresh infinitely
-- PB-18498: As a developer I wish to build the background page in manifest version 2 with webpack
+- PB-17720 As AD I wish the account recovery setting page not to refresh infinitely
+- PB-18498 As a developer I wish to build the background page in manifest version 2 with webpack
 
 ### Improved
-- PB-16898: As AN I want to the full list of supported browser if I'm not using one
-- PB-18495: As LU I want to see effective date as tooltip of calculated relative date
-- PB-17152: As LU for a first install with chrome, I wish to see the 'eye catcher' with a good contrast
-- PB-18659: As LU I want to be able to give to folder names up to 256 characters
-- PB-17062: As a developer I can customize and test new theme on storybook
-- PB-16946: As a developer I want to have a new theme in Storybook
+- PB-16898 As AN I want to the full list of supported browser if I'm not using one
+- PB-18495 As LU I want to see effective date as tooltip of calculated relative date
+- PB-17152 As LU for a first install with chrome, I wish to see the 'eye catcher' with a good contrast
+- PB-18659 As LU I want to be able to give to folder names up to 256 characters
+- PB-17062 As a developer I can customize and test new theme on storybook
+- PB-16946 As a developer I want to have a new theme in Storybook
 
 ## [3.7.1] - 2022-08-11
 ### Fixed
@@ -1649,7 +1722,7 @@ self registration settings option in the left-side bar
 - Add npm version in package.json
 - Do not display the domain the extension is configured for when triggering reconfig on another.
 - Fix backward compatibility with v2.12
-- PB-1089: Bump dependencies to higher versions
+- PB-1089 Bump dependencies to higher versions
 - Styleguide update
 
 ## [2.12.3] - 2020-05-18
@@ -1660,54 +1733,54 @@ self registration settings option in the left-side bar
 
 ## [2.12.2] - 2020-04-14
 ### Fixed
-- PB-1209: Bump jQuery to v3.5
+- PB-1209 Bump jQuery to v3.5
 
 ## [2.12.1] - 2020-03-04
 ### Improved
-- PB-1089: Bump dependencies to higher versions
+- PB-1089 Bump dependencies to higher versions
 
 ## [2.12.0] - 2019-12-05
 ### Improved
-- PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
+- PB-649 The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
 
 ### Fixed
 - GROOVE-1610: Fix share operation should not fail silently
 - GITHUB-84: Fix high server session timeout setting can lead to constant sessions check in legacy systems
-- PB-879: Fix the setup security token validation bug
-- PB-883: The quickaccess suggestion should filter passwords by uri protocol and port if provided.
-- PB-766: Fix 414 server issues for features that work with batch of resources. Reduce the size of the batches.
+- PB-879 Fix the setup security token validation bug
+- PB-883 The quickaccess suggestion should filter passwords by uri protocol and port if provided.
+- PB-766 Fix 414 server issues for features that work with batch of resources. Reduce the size of the batches.
 
 ## [2.11.3] - 2019-11-28
 - GROOVE-1605 Revert to OpenPGP v2.6.2
 
 ## [2.11.2] - 2019-11-19
-- PB-847: The quickaccess should suggest resources only if the current tab domain matches or is a subdomain of the resource uri.
+- PB-847 The quickaccess should suggest resources only if the current tab domain matches or is a subdomain of the resource uri.
 
 ## [2.11.1] - 2019-09-16
-- PB-125: Sessions should be extended by default when user ask to remember passphrase.
+- PB-125 Sessions should be extended by default when user ask to remember passphrase.
 
 ## [2.11.0] - 2019-08-08
 ### Improved
-- PB-242: Add local storage resources capabilities to manipulate the resources (add, delete, update)
+- PB-242 Add local storage resources capabilities to manipulate the resources (add, delete, update)
 - GITHUB-79: Improve autofill compatibility, trigger an input event instead a change event while filling forms
-- PB-278: #GITHUB-61: Improve autofill compatibility, support Docker and AWS forms
-- PB-432: Improve autofill compatibility, support reddit.com
-- PB-433: Improve autofill compatibility, support Zoho CRM
+- PB-278 #GITHUB-61: Improve autofill compatibility, support Docker and AWS forms
+- PB-432 Improve autofill compatibility, support reddit.com
+- PB-433 Improve autofill compatibility, support Zoho CRM
 - GITHUB-78: Improve autofill compatibility, fill only username if no password fill present
-- PB-494: Improve autofill compatibility, ignore hidden fields
-- PB-514: Improve autofill compatibility, fill iframe forms
+- PB-494 Improve autofill compatibility, ignore hidden fields
+- PB-514 Improve autofill compatibility, fill iframe forms
 
 ### Fixed
-- PB-544: Fix login passphrase remember me and quickaccess
-- PB-533: Fix session expired management
-- PB-515: Autofill should not fill if the url in the tab have changed between the time the user clicked on the button to fill and the data is sent to the page.
+- PB-544 Fix login passphrase remember me and quickaccess
+- PB-533 Fix session expired management
+- PB-515 Autofill should not fill if the url in the tab have changed between the time the user clicked on the button to fill and the data is sent to the page.
 
 ## [2.10.2] - 2019-07-10
 - GITHUB-66: The browser extension doesn't build by default on unix system
 - GITHUB-70: Fix autofill for self-hosted GitLab instance does not work
 - GITHUB-71: Fix autofill for openstack horizon does not work
-- PB-449: Fix image url when using non local image storage
-- PB-449: Fix auth redirect when passbolt is installed in directory
+- PB-449 Fix image url when using non local image storage
+- PB-449 Fix auth redirect when passbolt is installed in directory
 
 ### Improved
 - Update the resources local storage when add, delete or update resources
@@ -1718,31 +1791,31 @@ self registration settings option in the left-side bar
 
 ## [2.10.0] - 2019-05-17
 ### Added
-- PB-189: Quickaccess: As LU I can browse my passwords with the quickaccess using filters
+- PB-189 Quickaccess: As LU I can browse my passwords with the quickaccess using filters
 
 ### Fixed
-- PB-40: Quickaccess: Don't hide not sanitized uri in the resource view screen
+- PB-40 Quickaccess: Don't hide not sanitized uri in the resource view screen
 
 ## [2.9.2] - 2019-04-25
 ### Fixed
-- PB-227: Fix browser extension backward compatibility with API < v2.2.0
+- PB-227 Fix browser extension backward compatibility with API < v2.2.0
 
 ## [2.9.1] - 2019-04-25
 ### Fixed
-- PB-3: Quickaccess: Fix resource create screen styleguide
+- PB-3 Quickaccess: Fix resource create screen styleguide
 
 ## [2.9.0] - 2019-04-24
 ### Add
-- PB-3: Quickaccess: As LU I can add a password via the quickaccess
+- PB-3 Quickaccess: As LU I can add a password via the quickaccess
 
 ## [2.8.3] - 2019-04-17
 ### Fixed
 - GITHUB-58: Use consistent wording to define a gpg private key passphrase
 - GITHUB-64: As AP when I am logging in with the quickaccess I should see a relevant error message in any cases
 - GITHUB-63: Fix password generation mask
-- PB-177: Upgrade Jquery to v3.4
-- PB-178: Drop fetch polyfill for chrome
-- PB-153: Fix dictionary test result when pwnedpassword is unavailable
+- PB-177 Upgrade Jquery to v3.4
+- PB-178 Drop fetch polyfill for chrome
+- PB-153 Fix dictionary test result when pwnedpassword is unavailable
 - GITHUB-14: As LU I should be able to navigate into the passphrase popup with the keyboard
 
 ## [2.8.2] - 2019-04-02
@@ -1752,11 +1825,11 @@ self registration settings option in the left-side bar
 
 ## [2.8.1] - 2019-04-02
 ### Fixed
-- PB-97: Fix - As a user I cannot login using the QuickAccess if i'm using MFA
+- PB-97 Fix - As a user I cannot login using the QuickAccess if i'm using MFA
 
 ## [2.8.0] - 2019-04-01
 ### Add
-- PB-3: Quickaccess: Simplified app to access passwords from the browser extension
+- PB-3 Quickaccess: Simplified app to access passwords from the browser extension
 
 ## [2.7.0] - 2019-02-08
 ### Improvement
@@ -2080,7 +2153,8 @@ self registration settings option in the left-side bar
 - LU: Logged in user
 
 ## [4.12.0] - 2024-03-10
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.0...HEAD
+[5.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.1...v5.1.0
 [5.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.12.0...v5.0.0
 [4.12.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.11.0...v4.12.0

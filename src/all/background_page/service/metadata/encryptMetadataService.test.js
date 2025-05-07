@@ -40,6 +40,7 @@ import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -253,6 +254,9 @@ describe("EncryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
+      const keyring = new Keyring();
+      await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
+
       jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
@@ -355,6 +359,8 @@ describe("EncryptMetadataService", () => {
       jest.spyOn(encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
         .mockImplementationOnce(() => defaultMetadataKeysSettingsDto());
 
+      const keyring = new Keyring();
+      await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
 
       await encryptService.encryptAllFromForeignModels(collection, pgpKeys.ada.passphrase);
 

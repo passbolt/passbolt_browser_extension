@@ -18,7 +18,7 @@ import EncryptMessageService from "../crypto/encryptMessageService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
-import {assertAnyTypeOf} from "../../utils/assertions";
+import {assertAnyTypeOf, assertType} from "../../utils/assertions";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService";
 import FoldersCollection from '../../model/entity/folder/foldersCollection';
@@ -27,6 +27,8 @@ import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import {
   RESOURCE_TYPE_VERSION_5
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import Keyring from '../../model/keyring';
+import ExternalGpgKeyEntity from 'passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity';
 
 class EncryptMetadataService {
   /**
@@ -39,6 +41,8 @@ class EncryptMetadataService {
     this.getOrFindMetadataKeysService = new GetOrFindMetadataKeysService(account, apiClientOptions);
     this.resourceTypesModel = new ResourceTypeModel(apiClientOptions);
     this.account = account;
+    this.keyring = new Keyring();
+    this._usersPublicGpgKeys = {};
   }
 
   /**
@@ -153,8 +157,6 @@ class EncryptMetadataService {
    * @returns {Promise<void>}
    */
   async encryptAllFromForeignModelsWithUserKey(collection, resourceTypesV5, userDecryptedPrivateKey) {
-    const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
-
     for (const entity of collection) {
       if (!entity.isPersonal()) {
         continue;
@@ -164,9 +166,12 @@ class EncryptMetadataService {
         return;
       }
 
+      const userId = entity.soleOwnerId || this.account.userId;
+      const userPublicKey = await this._retrieveRecipientKey(userId);
+
       const serializedMetadata = JSON.stringify(entity.metadata.toDto());
       const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [userDecryptedPrivateKey]);
-      entity._props.metadata_key_id = null;
+      entity.metadataKeyId = null;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
       entity.metadata = encryptedMetadata;
     }
@@ -218,6 +223,46 @@ class EncryptMetadataService {
   async allowUsageOfPersonalKeys() {
     const metadataKeysSettingsEntity = await this.getOrFindMetadataSettingsService.getOrFindKeysSettings();
     return metadataKeysSettingsEntity.allowUsageOfPersonalKeys;
+  }
+
+  /**
+   * Retrieve the recipient's public key. If no user ID is provided, the recipient defaults to the API.
+   * @param {string} - The user ID to retrieve the public key for.
+   * @returns {Promise<openpgp.PublicKey>} - The recipient's public key.
+   * @throws {Error} If no public key is found in the keyring for the given user ID.
+   * @throws {Error} If the public key found for the user ID is expired.
+   * @private
+   */
+  async _retrieveRecipientKey(userId) {
+    if (this._usersPublicGpgKeys[userId]) {
+      return this._usersPublicGpgKeys[userId];
+    }
+
+    if (userId === this.account.userId) {
+      this._usersPublicGpgKeys[userId] = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
+      return this._usersPublicGpgKeys[userId];
+    }
+
+    const userPublicGpgKey = this.keyring.findPublic(userId);
+    this.assertValidPublicGpgKey(userPublicGpgKey, userId);
+
+    this._usersPublicGpgKeys[userId] = await OpenpgpAssertion.readKeyOrFail(userPublicGpgKey.armoredKey);
+    return this._usersPublicGpgKeys[userId];
+  }
+
+  /**
+   * Assert that the given public gpg key is valid for the sake of metadata encryption.
+   *
+   * @param {ExternalGpgKeyEntity} publicGpgKey
+   * @throws {TypeError} if publicGpgKey is not an ExternalGpgKeyEntity.
+   * @throws {Error} if the key is expired
+   */
+  assertValidPublicGpgKey(publicGpgKey) {
+    assertType(publicGpgKey, ExternalGpgKeyEntity, "The public gpg key should be a valid ExternalGpgKeyEntity");
+
+    if (publicGpgKey.isExpired) {
+      throw new Error(`The public key for the user with fingerprint ${publicGpgKey.fingerprint} is expired.`);
+    }
   }
 }
 

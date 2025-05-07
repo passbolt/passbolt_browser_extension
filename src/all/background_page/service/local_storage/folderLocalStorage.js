@@ -179,7 +179,17 @@ class FolderLocalStorage {
     try {
       const folders = await FolderLocalStorage.get() || [];
       if (folders.length > 0) {
-        const folderIndex = folders.findIndex(item => item.id === folderId);
+        let folderIndex = -1;
+        // Loop into folders to update subfolders and get index of the folder to delete
+        folders.forEach((folder, index) => {
+          if (folderId === folder.id) {
+            // Get the index of the folder to delete
+            folderIndex = index;
+          } else if (folderId === folder.folder_parent_id) {
+            // Update sub folders with folder parent id to null
+            folder.folder_parent_id = null;
+          }
+        });
         if (folderIndex !== -1) {
           folders.splice(folderIndex, 1);
         }

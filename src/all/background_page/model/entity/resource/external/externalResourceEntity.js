@@ -175,6 +175,7 @@ class ExternalResourceEntity extends EntityV2 {
       folder_parent_id: this.folderParentId,
       resource_type_id: this.resourceTypeId,
       expired: this.expired,
+      personal: true, //set to true to enforce usage of user's key to encrypt metadata during import
     };
   }
 

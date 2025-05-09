@@ -32,14 +32,16 @@ export default class GetOrFindMetadataKeysService {
 
   /**
    * Get the metadata keys from the session storage, or retrieve them from the API and update the session storage.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<MetadataKeysCollection>}
    */
-  async getOrFindAll() {
+  async getOrFindAll(passphrase = null) {
     const metadataKeys = await this.metadataKeysSessionStorage.get();
     if (metadataKeys) {
       return new MetadataKeysCollection(metadataKeys);
     }
 
-    return this.findAndUpdateMetadataKeysService.findAndUpdateAll();
+    return this.findAndUpdateMetadataKeysService.findAndUpdateAll(passphrase);
   }
 }

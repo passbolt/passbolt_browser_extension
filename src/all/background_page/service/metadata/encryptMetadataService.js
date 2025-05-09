@@ -74,7 +74,7 @@ class EncryptMetadataService {
       entity._props.metadata_key_id = null;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
     } else {
-      const {metadataKeyId, metadataPublicKey, metadataPrivateKey} = await this.getLatestMetadataKeysAndId();
+      const {metadataKeyId, metadataPublicKey, metadataPrivateKey} = await this.getLatestMetadataKeysAndId(passphrase);
       encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, metadataPublicKey, [userPrivateKey, metadataPrivateKey]);
       entity.metadataKeyId = metadataKeyId;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
@@ -86,7 +86,8 @@ class EncryptMetadataService {
    * Encrypts a collection.
    *
    * @param {ResourcesCollection|FoldersCollection} collection the collection to encrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the user private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    * @throws {Error} if metadata key cannot be retrieved.
@@ -115,7 +116,7 @@ class EncryptMetadataService {
     if (canUsePersonalKeys) {
       await this.encryptAllFromForeignModelsWithUserKey(collection, resourceTypesV5Collection, userDecryptedPrivateKey);
     }
-    await this.encryptAllFromForeignModelsWithSharedKey(collection, resourceTypesV5Collection, userDecryptedPrivateKey);
+    await this.encryptAllFromForeignModelsWithSharedKey(collection, resourceTypesV5Collection, userDecryptedPrivateKey, passphrase);
   }
 
   /**
@@ -125,10 +126,12 @@ class EncryptMetadataService {
    * @param {ResourcesCollection|FoldersCollection} collection the collection to run metadata encryption on.
    * @param {ResourceTypesCollection} resourceTypesV5 The resource types to encrypt the metadata for.
    * @param {openpgp.PrivateKey} userDecryptedPrivateKey The user decrypted private key
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<void>}
    */
-  async encryptAllFromForeignModelsWithSharedKey(collection, resourceTypesV5, userDecryptedPrivateKey) {
-    const {metadataKeyId, metadataPublicKey, metadataPrivateKey} = await this.getLatestMetadataKeysAndId();
+  async encryptAllFromForeignModelsWithSharedKey(collection, resourceTypesV5, userDecryptedPrivateKey, passphrase = null) {
+    const {metadataKeyId, metadataPublicKey, metadataPrivateKey} = await this.getLatestMetadataKeysAndId(passphrase);
 
     for (const entity of collection) {
       // If resource type v4, nothing to do.
@@ -177,15 +180,16 @@ class EncryptMetadataService {
     }
   }
 
-
   /**
    * Retrieve the id and keys from latest metadataKeysCollection.
    *
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<{id: string, metadataPublicKey: openpgp.PublicKey, metadataPrivateKey: openpgp.PrivateKey>}
    * @private
    */
-  async getLatestMetadataKeysAndId() {
-    const metadataKeysCollection = await this.getOrFindMetadataKeysService.getOrFindAll();
+  async getLatestMetadataKeysAndId(passphrase = null) {
+    const metadataKeysCollection = await this.getOrFindMetadataKeysService.getOrFindAll(passphrase);
     const metadataKeyEntity = metadataKeysCollection.getFirstByLatestCreated();
 
     if (metadataKeyEntity === null) {

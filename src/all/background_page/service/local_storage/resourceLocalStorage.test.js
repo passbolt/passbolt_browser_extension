@@ -16,6 +16,7 @@ import ResourceLocalStorage, {RESOURCES_LOCAL_STORAGE_KEY} from "./resourceLocal
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 
 describe("ResourceLocalStorage", () => {
   describe("::get", () => {
@@ -177,13 +178,13 @@ describe("ResourceLocalStorage", () => {
     it("Should throw if no data passed as parameter", async() => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.addResources();
-      await expect(promise).rejects.toThrow("The parameter resourcesEntities should be an array");
+      await expect(promise).rejects.toThrow("he `resources` parameter should be of type ResourcesCollection");
     });
 
     it("Should throw if the resourcesEntities parameter is not an array", async() => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.addResources(42);
-      await expect(promise).rejects.toThrow("The parameter resourcesEntities should be an array");
+      await expect(promise).rejects.toThrow("he `resources` parameter should be of type ResourcesCollection");
     });
 
     it("Should throw if one of the resources does not validate", async() => {
@@ -192,7 +193,7 @@ describe("ResourceLocalStorage", () => {
       delete resourceDto1.id;
       const resource1 = new ResourceEntity(resourceDto1);
       const resource2 = new ResourceEntity(defaultResourceDto());
-      const resourcesArr = [resource1, resource2];
+      const resourcesArr = new ResourcesCollection([resource1, resource2]);
       const promise = ResourceLocalStorage.addResources(resourcesArr);
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects ResourceEntity id to be set");
     });
@@ -203,7 +204,7 @@ describe("ResourceLocalStorage", () => {
       const resource1 = new ResourceEntity(resourceDto1);
       const resourceDto2 = defaultResourceDto();
       const resource2 = new ResourceEntity(resourceDto2);
-      const resourcesArr = [resource1, resource2];
+      const resourcesArr = new ResourcesCollection([resource1, resource2]);
       await ResourceLocalStorage.addResources(resourcesArr);
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
@@ -218,7 +219,7 @@ describe("ResourceLocalStorage", () => {
       const resource1 = new ResourceEntity(resourceDto1);
       const resourceDto2 = defaultResourceDto();
       const resource2 = new ResourceEntity(resourceDto2);
-      const resourcesArr = [resource1, resource2];
+      const resourcesArr = new ResourcesCollection([resource1, resource2]);
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.addResources(resourcesArr);
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
@@ -534,6 +535,13 @@ describe("ResourceLocalStorage", () => {
       delete resourceDto.permission;
       const resource = new ResourceEntity(resourceDto);
       await expect(() => ResourceLocalStorage.assertEntityBeforeSave(resource)).toThrow("ResourceLocalStorage::set expects ResourceEntity permission to be set");
+    });
+
+    it("Should throw if the resource metadata are encrypted", async() => {
+      expect.assertions(1);
+      const resourceDto = defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[0]});
+      const resource = new ResourceEntity(resourceDto);
+      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(resource)).toThrow("ResourceLocalStorage::set expects ResourceEntity metadata to be decrypted");
     });
   });
 

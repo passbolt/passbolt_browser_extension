@@ -215,68 +215,6 @@ class ResourceModel {
    *  Bulk operations
    * ==============================================================
    */
-  /**
-   * Create a bulk of resources
-   * @param {ResourcesCollection} collection The collection of resources to import
-   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<array<ResourceEntity|Error>>}
-   */
-  async bulkCreate(collection, callbacks) {
-    let result = [];
-
-    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
-    const chunks = splitBySize(collection.resources, BULK_OPERATION_SIZE);
-    for (const chunkIndex in chunks) {
-      const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async(resourceId, mapIndex) => {
-        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
-        return this._bulkCreate_createResource(resourceId, collectionIndex, callbacks);
-      });
-
-      const bulkPromises = await Promise.allSettled(promises);
-      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
-      result = [...result, ...intermediateResult];
-    }
-
-    // Insert the created resources in the local storage
-    const createdResources = result.filter(row => row instanceof ResourceEntity);
-    await ResourceLocalStorage.addResources(createdResources);
-
-    return result;
-  }
-
-  /**
-   * Create a resource for the bulkCreate function.
-   * @param {ResourceEntity} resourceEntity The resource to create
-   * @param {int} collectionIndex The index of the resource in the initial collection
-   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<ResourceEntity>}
-   * @throws Exception if the resource cannot be created
-   * @private
-   */
-  async _bulkCreate_createResource(resourceEntity, collectionIndex, callbacks) {
-    callbacks = callbacks || {};
-    const successCallback = callbacks.successCallback || (() => {});
-    const errorCallback = callbacks.errorCallback || (() => {});
-
-    try {
-      /*
-       * Here we create entity just like in this.create
-       * but we don't add the resource entity in the local storage just yet,
-       * we wait until all resources are created in order to speed things up
-       */
-      const data = resourceEntity.toV4Dto({secrets: true});
-      const contain = {permission: true, favorite: true, tags: true, folder: true};
-      const resourceDto = await this.resourceService.create(data, contain);
-      const createdResourceEntity = new ResourceEntity(resourceDto);
-      successCallback(createdResourceEntity, collectionIndex);
-      return createdResourceEntity;
-    } catch (error) {
-      console.error(error);
-      errorCallback(error, collectionIndex);
-      throw error;
-    }
-  }
 
   /**
    * Delete a bulk of resources

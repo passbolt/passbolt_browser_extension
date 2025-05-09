@@ -94,7 +94,7 @@ describe("ShareResourceService", () => {
     keyring.importPublic(pgpKeys.carol.public, pgpKeys.carol.userId);
   });
 
-  describe("::share", () => {
+  describe("::shareAll", () => {
     each([
       {title: "with password string", secretClear: plaintextSecretPasswordStringDto(), resourceTypeId: TEST_RESOURCE_TYPE_PASSWORD_STRING},
       {title: "with password and description", secretClear: plaintextSecretPasswordAndDescriptionDto(), resourceTypeId: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION},

@@ -305,7 +305,7 @@ describe("FindResourcesService", () => {
       expect(resourcesCollection).toEqual(new ResourcesCollection(collection));
     });
 
-    it("should call the api with is-shared-with-group and the groupId associated ", async() => {
+    it("should call the api with is-shared-with-group and the groupId associated", async() => {
       expect.assertions(2);
 
       const collection = multipleResourceDtos();
@@ -319,8 +319,7 @@ describe("FindResourcesService", () => {
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId});
     });
 
-
-    it("should call the api with is-shared-with-group and the groupId associated ", async() => {
+    it("should call the api with is-shared-with-group and the groupId associated", async() => {
       expect.assertions(2);
 
       const collection = multipleResourceDtos();
@@ -333,6 +332,46 @@ describe("FindResourcesService", () => {
       expect(service.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId});
     });
+
+    it("should return a collection with resources metadata decrypted", async() => {
+      expect.assertions(2);
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+
+      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+      const resourceTypesDto = resourceTypesCollectionDto();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
+      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+
+      const resources = await findResourcesService.findAllByIsSharedWithGroupForLocalStorage(groupId);
+
+      expect(resources).toHaveLength(resourcesDto.length);
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
+    }, 10 * 1000);
+
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(2);
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+
+      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+      const resourceTypesDto = resourceTypesCollectionDto();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+      jest.spyOn(PassphraseStorageService, "get");
+      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+
+      const resources = await findResourcesService.findAllByIsSharedWithGroupForLocalStorage(groupId, pgpKeys.ada.passphrase);
+
+      expect(resources).toHaveLength(resourcesDto.length);
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
+    }, 10 * 1000);
   });
 
   describe("::findAllByIds", () => {

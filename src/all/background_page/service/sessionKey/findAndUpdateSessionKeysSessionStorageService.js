@@ -35,9 +35,11 @@ export default class FindAndUpdateSessionKeysSessionStorageService {
 
   /**
    * Retrieve the session keys bundles from the API and store them in the session storage.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the session key bundle.  Marked as optional
+   * as it might be available in the passphrase session storage.
    * @returns {Promise<SessionKeysBundlesCollection>}
    */
-  async findAndUpdateAllBundles() {
+  async findAndUpdateAllBundles(passphrase = null) {
     const lockKey = `${FIND_AND_UPDATE_SESSION_KEYS_SS_LOCK_PREFIX}${this.account.id}`;
 
     // If no update is in progress, refresh the session storage.
@@ -51,7 +53,7 @@ export default class FindAndUpdateSessionKeysSessionStorageService {
       }
 
       // Lock is granted, retrieve the metadata types settings and update the local storage.
-      const sessionKeysBundlesCollection = await this.findSessionKeysService.findAllBundles();
+      const sessionKeysBundlesCollection = await this.findSessionKeysService.findAllBundles(passphrase);
       await this.sessionKeysBundlesSessionStorageService.set(sessionKeysBundlesCollection);
       return sessionKeysBundlesCollection;
     });

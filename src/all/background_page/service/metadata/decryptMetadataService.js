@@ -43,7 +43,8 @@ class DecryptMetadataService {
    * Decrypts the metadata of all entities from the given collection and mutates the entities with the decrypted results.
    *
    * @param {ResourcesCollection} collection the collection to decrypt the metadata for.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional
+   * as it might be available in the passphrase session storage.
    * @param {object} [options]
    * @param {boolean} [options.ignoreDecryptionError = false] if set to true any decryption errors will be ignored
    * @param {boolean} [options.updateSessionKeys = false] if set to true, update the sessions keys if changes discovered.
@@ -55,12 +56,12 @@ class DecryptMetadataService {
     const ignoreDecryptionError = options?.ignoreDecryptionError || false;
     const updateSessionKeys = options?.updateSessionKeys || false;
 
-    const sessionKeys = await this.decryptAllFromForeignModelsWithSessionKeys(collection);
-    const decryptWithSharedKeySessionKeysDto = await this.decryptAllFromForeignModelsWithSharedKey(collection, {ignoreDecryptionError});
+    const sessionKeys = await this.decryptAllFromForeignModelsWithSessionKeys(collection, passphrase);
+    const decryptWithSharedKeySessionKeysDto = await this.decryptAllFromForeignModelsWithSharedKey(collection, passphrase, {ignoreDecryptionError});
     const decryptWithUserKeySessionKeysDto = await this.decryptAllFromForeignModelsWithUserKey(collection, passphrase, {ignoreDecryptionError});
     await this.assertMetadataDecrypted(collection, options);
     if (updateSessionKeys) {
-      await this.saveSessionKeys(sessionKeys, decryptWithSharedKeySessionKeysDto, decryptWithUserKeySessionKeysDto);
+      await this.saveSessionKeys(sessionKeys, decryptWithSharedKeySessionKeysDto, decryptWithUserKeySessionKeysDto, passphrase);
     }
   }
 
@@ -71,10 +72,12 @@ class DecryptMetadataService {
    * Ignore any errors. Metadata that is not decrypted will be processed using user or metadata shared keys.
    *
    * @param {ResourcesCollection} collection the collection to run metadata decryption on.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the session key. Marked as optional
+   * as it might be available in the passphrase session storage.
    * @returns {Promise<SessionKeysCollection>}
    * @private
    */
-  async decryptAllFromForeignModelsWithSessionKeys(collection) {
+  async decryptAllFromForeignModelsWithSessionKeys(collection, passphrase = null) {
     let sessionKeys = new SessionKeysCollection();
     const filteredCollection = collection.items.filter(entity => !entity.isMetadataDecrypted());
 
@@ -83,7 +86,7 @@ class DecryptMetadataService {
     }
 
     try {
-      sessionKeys = await this.getOrFindSessionKeysService.getOrFindAllByForeignModelAndForeignIds("Resource", collection.ids);
+      sessionKeys = await this.getOrFindSessionKeysService.getOrFindAllByForeignModelAndForeignIds("Resource", collection.ids, passphrase);
       for (const sessionKey of sessionKeys) {
         try {
           const entity = collection.getFirst("id", sessionKey.foreignId);
@@ -121,12 +124,14 @@ class DecryptMetadataService {
    * mutates the entities with the decrypted metadata.
    *
    * @param {ResourcesCollection|FoldersCollection} collection the collection to run metadata decryption on.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata key. Marked as optional
+   * as it might be available in the passphrase session storage.
    * @param {object} [options]
    * @param {boolean} [options.ignoreDecryptionError = false] if set to true any decryption errors will be ignored
    * @returns {Promise<array>} The session keys dto retrieved after decrypting the metadata
    * @private
    */
-  async decryptAllFromForeignModelsWithSharedKey(collection, options = {}) {
+  async decryptAllFromForeignModelsWithSharedKey(collection, passphrase = null, options = {}) {
     const filteredCollection = collection.items.filter(entity =>
       entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY
       && !entity.isMetadataDecrypted()
@@ -135,7 +140,7 @@ class DecryptMetadataService {
       return [];
     }
 
-    const metadataKeys = await this.getOrFindMetadataKeysService.getOrFindAll();
+    const metadataKeys = await this.getOrFindMetadataKeysService.getOrFindAll(passphrase);
     const metadataOpenPgpPrivateKeys = {}; // Cache already read private keys.
     const sessionKeysDtos = [];
 
@@ -323,9 +328,11 @@ class DecryptMetadataService {
    * @param {SessionKeysCollection} sessionKeys The original session keys to save.
    * @param {array} decryptWithSharedKeySessionKeys The new session keys discovered when decrypting the metadata with the shared key.
    * @param {array} decryptWithUserKeySessionKeys The new session keys discovered when decrypting the metadata with the user key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the user private key. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<void>}
    */
-  async saveSessionKeys(sessionKeys, decryptWithSharedKeySessionKeys, decryptWithUserKeySessionKeys) {
+  async saveSessionKeys(sessionKeys, decryptWithSharedKeySessionKeys, decryptWithUserKeySessionKeys, passphrase = null) {
     try {
       const newSessionKeys = [...decryptWithSharedKeySessionKeys, ...decryptWithUserKeySessionKeys];
 
@@ -334,7 +341,7 @@ class DecryptMetadataService {
       }
 
       sessionKeys.pushMany(newSessionKeys, {ignoreInvalidEntity: true});
-      await this.saveSessionKeysService.save(sessionKeys);
+      await this.saveSessionKeysService.save(sessionKeys, passphrase);
     } catch (error) {
       console.warn("Unable to save the metadata session keys.", {cause: error});
     }

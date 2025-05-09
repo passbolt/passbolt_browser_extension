@@ -41,7 +41,7 @@ describe("GetOrFindSessionKeysService", () => {
 
   describe("::getOrFindAllBundles", () => {
     it("with empty storage, retrieves the session keys bundles from the API and store them into the session storage.", async() => {
-      expect.assertions(3);
+      expect.assertions(4);
 
       const apiSessionKeysBundlesCollectionDto = defaultSessionKeysBundlesDtos();
 
@@ -58,9 +58,24 @@ describe("GetOrFindSessionKeysService", () => {
       const expectedSessionKeysBundlesDto = [...apiSessionKeysBundlesCollectionDto];
       expectedSessionKeysBundlesDto.forEach(sessionKeysBundleDto => sessionKeysBundleDto.data = JSON.parse(pgpKeys.metadataKey.decryptedSessionKeysDataMessage));
 
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
       expect(collection.toDto()).toEqual(expectedSessionKeysBundlesDto);
       const storageValue = await getOrFindSessionKeysService.sessionKeysBundlesSessionStorageService.get();
       await expect(storageValue).toEqual(expectedSessionKeysBundlesDto);
+    });
+
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(1);
+
+      const apiSessionKeysBundlesCollectionDto = defaultSessionKeysBundlesDtos();
+
+      jest.spyOn(getOrFindSessionKeysService.findAndUpdateSessionKeysService.findSessionKeysService.sesionKeysBundlesApiService, "findAll")
+        .mockImplementation(() => apiSessionKeysBundlesCollectionDto);
+      jest.spyOn(PassphraseStorageService, "get");
+
+      await getOrFindSessionKeysService.getOrFindAllBundles(pgpKeys.ada.passphrase);
+
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
     it("with populated storage, retrieves the session keys bundles from the session storage.", async() => {
@@ -81,7 +96,7 @@ describe("GetOrFindSessionKeysService", () => {
 
   describe("::getOrFindAll", () => {
     it("returns an empty session keys collection if no bundles is found.", async() => {
-      expect.assertions(1);
+      expect.assertions(2);
 
       const apiSessionKeysBundlesCollectionDto = [];
 
@@ -92,6 +107,21 @@ describe("GetOrFindSessionKeysService", () => {
       const collection = await getOrFindSessionKeysService.getOrFindAll();
 
       expect(collection).toHaveLength(0);
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(1);
+
+      const apiSessionKeysBundlesCollectionDto = [];
+
+      jest.spyOn(getOrFindSessionKeysService.findAndUpdateSessionKeysService.findSessionKeysService.sesionKeysBundlesApiService, "findAll")
+        .mockImplementation(() => apiSessionKeysBundlesCollectionDto);
+      jest.spyOn(PassphraseStorageService, "get");
+
+      await getOrFindSessionKeysService.getOrFindAll(pgpKeys.ada.passphrase);
+
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
     it("with empty storage, retrieves the session keys bundles from the API and concatenate all session keys.", async() => {
@@ -138,7 +168,7 @@ describe("GetOrFindSessionKeysService", () => {
 
   describe("::getOrFindAllByForeignModelAndForeignIds", () => {
     it("with empty storage, retrieves the session keys bundles from the API and get all session keys by foreign model and foreign ids.", async() => {
-      expect.assertions(1);
+      expect.assertions(2);
 
       const apiSessionKeysBundlesCollectionDto = defaultSessionKeysBundlesDtos();
 
@@ -153,6 +183,21 @@ describe("GetOrFindSessionKeysService", () => {
       const expectedSessionKeysDto = expectedSessionKeysBundlesDto[0].data.session_keys;
 
       expect(collection.toDto()).toEqual(expectedSessionKeysDto);
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(1);
+
+      const apiSessionKeysBundlesCollectionDto = defaultSessionKeysBundlesDtos();
+
+      jest.spyOn(getOrFindSessionKeysService.findAndUpdateSessionKeysService.findSessionKeysService.sesionKeysBundlesApiService, "findAll")
+        .mockImplementation(() => apiSessionKeysBundlesCollectionDto);
+      jest.spyOn(PassphraseStorageService, "get");
+
+      await getOrFindSessionKeysService.getOrFindAllByForeignModelAndForeignIds("Resource", ["8e3874ae-4b40-590b-968a-418f704b9d9a"], pgpKeys.ada.passphrase);
+
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
     it("with populated storage, retrieves the session keys bundles from the session storage and get all session keys by foreign model and foreign ids.", async() => {

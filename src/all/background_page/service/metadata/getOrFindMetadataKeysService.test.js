@@ -42,8 +42,8 @@ describe("GetOrFindMetadataKeysService", () => {
   });
 
   describe("::getOrFindMetadataTypesSettings", () => {
-    it("with empty storage, retrieves the metadata types settings from the API and store them into the session storage.", async() => {
-      expect.assertions(3);
+    it("with empty storage, retrieves the metadata types settings from the API and store them into the session storage, using the passphrase from the session storage.", async() => {
+      expect.assertions(4);
 
       const id = uuidv4();
       const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
@@ -65,6 +65,26 @@ describe("GetOrFindMetadataKeysService", () => {
       expect(collection.toDto(MetadataKeyEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedMetadataKeysDto);
       const storageValue = await getOrFindMetadataKeysService.metadataKeysSessionStorage.get();
       await expect(storageValue).toEqual(expectedMetadataKeysDto);
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(1);
+
+      const id = uuidv4();
+      const metadata_private_keys = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
+      const fingerprint = "c0dce0aaea4d8cce961c26bddfb6e74e598f025c";
+      const apiMetadataKeysCollectionDto = [defaultMetadataKeyDto({id, metadata_private_keys, fingerprint})];
+      const expectedMetadataKeysDto = JSON.parse(JSON.stringify(apiMetadataKeysCollectionDto));
+      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
+
+      jest.spyOn(getOrFindMetadataKeysService.findAndUpdateMetadataKeysService.findMetadataKeysService.metadataKeysApiService, "findAll")
+        .mockImplementation(() => apiMetadataKeysCollectionDto);
+      jest.spyOn(PassphraseStorageService, "get");
+
+      await getOrFindMetadataKeysService.getOrFindAll(pgpKeys.ada.passphrase);
+
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
     it("with populated storage, retrieves the metadata keys from the session storage.", async() => {

@@ -53,7 +53,7 @@ class VerifyOrTrustMetadataKeyService {
 
     assertString(passphrase, 'The parameter "passphrase" should be a string.');
 
-    const metadataKeys = await this.getOrFindMetadataKeysService.getOrFindAll();
+    const metadataKeys = await this.getOrFindMetadataKeysService.getOrFindAll(passphrase);
     const activeMetadataKey = metadataKeys.getFirstByLatestCreated();
 
     // Not active metadata key needs to be trusted.

@@ -54,7 +54,7 @@ describe("DecryptMetadataService", () => {
 
   describe("::decryptAllFromForeignModels", () => {
     it("decrypts the metadata of a ResourcesCollection with the shared metadata key", async() => {
-      expect.assertions(2);
+      expect.assertions(3);
 
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
       const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(10, {
@@ -67,21 +67,25 @@ describe("DecryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
 
       jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(PassphraseStorageService, "get");
 
       const isAllResourceMetadataEncrypted = collection.resources.reduce((accumulator, resource) => accumulator && !resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataEncrypted).toStrictEqual(true);
 
       await service.decryptAllFromForeignModels(collection, passphrase);
 
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
       const isAllResourceMetadataDecrypted = collection.resources.reduce((accumulator, resource) => accumulator && resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataDecrypted).toStrictEqual(true);
     });
 
     it("decrypts the metadata of a ResourcesCollection with the user key", async() => {
-      expect.assertions(2);
+      expect.assertions(3);
 
       const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos();
       const collection = new ResourcesCollection(collectionDto);
+
+      jest.spyOn(PassphraseStorageService, "get");
 
       account = new AccountEntity(defaultAccountDto());
       const passphrase = pgpKeys.ada.passphrase;
@@ -92,12 +96,13 @@ describe("DecryptMetadataService", () => {
 
       await service.decryptAllFromForeignModels(collection, passphrase);
 
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
       const isAllResourceMetadataDecrypted = collection.resources.reduce((accumulator, resource) => accumulator && resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataDecrypted).toStrictEqual(true);
     });
 
     it("decrypts the metadata of a ResourcesCollection with the session keys", async() => {
-      expect.assertions(12);
+      expect.assertions(13);
 
       const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos();
       const collection = new ResourcesCollection(collectionDto);
@@ -106,12 +111,14 @@ describe("DecryptMetadataService", () => {
       const sessionKeys = new SessionKeysCollection(sessionKeysDtos);
 
       jest.spyOn(service.getOrFindSessionKeysService, "getOrFindAllByForeignModelAndForeignIds").mockImplementation(() => sessionKeys);
+      jest.spyOn(PassphraseStorageService, "get");
 
       const isAllResourceMetadataEncrypted = collection.items.findIndex(resource => resource.isMetadataDecrypted()) !== -1;
       expect(isAllResourceMetadataEncrypted).toStrictEqual(false);
       await service.decryptAllFromForeignModels(collection);
 
       const isAllResourceMetadataDecrypted = collection.items.findIndex(resource => !resource.isMetadataDecrypted()) !== -1;
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
       expect(isAllResourceMetadataDecrypted).toStrictEqual(false);
       for (let i = 0; i < collection.length; i++) {
         expect(collection.items[i].metadata.toDto()).toEqual(metadata.withSharedKey.decryptedMetadata[i % metadata.withSharedKey.encryptedMetadata.length]);
@@ -467,7 +474,7 @@ describe("DecryptMetadataService", () => {
       await service.decryptAllFromForeignModels(collection, null, {updateSessionKeys: true});
 
       expect(service.saveSessionKeysService.save).toHaveBeenCalledTimes(1);
-      expect(service.saveSessionKeysService.save).toHaveBeenCalledWith(sessionKeys);
+      expect(service.saveSessionKeysService.save).toHaveBeenCalledWith(sessionKeys, null);
     });
   });
 

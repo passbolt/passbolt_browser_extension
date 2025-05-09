@@ -34,9 +34,11 @@ export default class FindAndUpdateMetadataKeysSessionStorageService {
 
   /**
    * Retrieve the metadata keys from the API and store them in the session storage.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<MetadataKeysCollection>}
    */
-  async findAndUpdateAll() {
+  async findAndUpdateAll(passphrase = null) {
     const lockKey = `${FIND_AND_UPDATE_METADATA_KEYS_SS_LOCK_PREFIX}${this.account.id}`;
 
     // If no update is in progress, refresh the session storage.
@@ -49,7 +51,7 @@ export default class FindAndUpdateMetadataKeysSessionStorageService {
       }
 
       // Lock is granted, retrieve the metadata keys and update the session storage.
-      const metadataKeys = await this.findMetadataKeysService.findAllForSessionStorage();
+      const metadataKeys = await this.findMetadataKeysService.findAllForSessionStorage(passphrase);
       await this.metadataKeysSessionStorage.set(metadataKeys);
       return metadataKeys;
     });

@@ -37,10 +37,12 @@ class FindMetadataKeysService {
    *
    * @param {Object} [contains] Return entities associated models, example: {metadata_private_keys: true}.
    * @param {Object} [filters] Return entities applied filters, example: {deleted: true}.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<MetadataKeysCollection>}
    * @public
    */
-  async findAll(contains = {}, filters = {}) {
+  async findAll(contains = {}, filters = {}, passphrase = null) {
     const supportedOptions = MetadataKeysApiService.getSupportedContainOptions();
     if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
@@ -57,7 +59,7 @@ class FindMetadataKeysService {
       throw new Error("The metadata private keys should not be decrypted.");
     }
 
-    await this.decryptMetadataPrivateKeysService.decryptAllFromMetadataKeysCollection(collection);
+    await this.decryptMetadataPrivateKeysService.decryptAllFromMetadataKeysCollection(collection, passphrase);
     await this.assertArmoredFingerprintPublicAndEntitysMatch(collection);
 
     return collection;
@@ -65,11 +67,13 @@ class FindMetadataKeysService {
 
   /**
    * Retrieve the metadata keys from the API with the contained data necessary for the local storage.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<MetadataKeysCollection>}
    * @public
    */
-  findAllForSessionStorage() {
-    return this.findAll({metadata_private_keys: true, creator: true, "creator.profile": true}, {deleted: false});
+  findAllForSessionStorage(passphrase = null) {
+    return this.findAll({metadata_private_keys: true, creator: true, "creator.profile": true}, {deleted: false}, passphrase);
   }
 
   /**

@@ -23,11 +23,19 @@ import ResourceTypeService from "../../service/api/resourceType/resourceTypeServ
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {multipleResourceDtos} from "../../service/resource/findResourcesService.test.data";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
+import {
+  TEST_RESOURCE_TYPE_V5_DEFAULT
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {METADATA_KEY_TYPE_USER_KEY} from "../../model/entity/resource/resourceEntity";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 describe("FindAllIdsByIsSharedWithGroupController", () => {
   let controller, worker, groupId;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     worker = {
       port: {
         emit: jest.fn()
@@ -39,6 +47,7 @@ describe("FindAllIdsByIsSharedWithGroupController", () => {
     controller = new FindAllIdsByIsSharedWithGroupController(worker, null, apiClientOptions, account);
     jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
   });
+
   describe("FindAllIdsByIsSharedWithGroupController::_exec", () => {
     it("Shoul emit a success message when resource ids can be retrieved", async() => {
       expect.assertions(1);
@@ -62,6 +71,7 @@ describe("FindAllIdsByIsSharedWithGroupController", () => {
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'ERROR', error);
     });
   });
+
   describe("FindAllIdsByIsSharedWithGroupController::exec", () => {
     it("Should return the resources ids link to the group Id and call findAndUpdateByIsSharedWithGroup method", async() => {
       expect.assertions(3);
@@ -76,6 +86,30 @@ describe("FindAllIdsByIsSharedWithGroupController", () => {
       expect(resourceIds).toEqual(expectedResult);
       expect(FindAndUpdateResourcesLocalStorage.prototype.findAndUpdateByIsSharedWithGroup).toHaveBeenCalledTimes(1);
       expect(FindAndUpdateResourcesLocalStorage.prototype.findAndUpdateByIsSharedWithGroup).toHaveBeenCalledWith(groupId);
+    });
+
+    it("requests the user passphrase whenever the decryption of the metadata requires it and try to load the data again", async() => {
+      expect.assertions(3);
+
+      const resourcesDto = [defaultResourceDto({
+        resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
+        metadata_key_type: METADATA_KEY_TYPE_USER_KEY,
+        metadata_key_id: uuidv4(),
+        metadata: metadata.withAdaKey.encryptedMetadata[0]
+      }
+      )];
+      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateByIsSharedWithGroup");
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockReturnValue(pgpKeys.ada.passphrase);
+
+      const result = await controller.exec(groupId);
+      expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
+      const expectedResourcesDto = JSON.parse(JSON.stringify(resourcesDto));
+      expectedResourcesDto[0].metadata = metadata.withAdaKey.decryptedMetadata[0];
+      expectedResourcesDto[0].metadata.description = ""; // Encrypted and decrypted dummy data are not equivalent.
+      expectedResourcesDto[0].metadata.username = "shared@passbolt.com"; // Encrypted and decrypted dummy data are not equivalent.
+      expect(result).toEqual([resourcesDto[0].id]);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup).toHaveBeenCalledTimes(2);
     });
 
     it("Should allow a group to not include any resources", async() => {

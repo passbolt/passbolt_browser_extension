@@ -86,12 +86,15 @@ class FindAndUpdateResourcesLocalStorage {
   }
 
   /**
-   * Find and update the local storage with all the resources retrieved from the API.
-   * @param {uuid} groupId
+   * Find and update the local storage with the resources filtered by group id retrieved from the API.
+   * @param {string} groupId The group id to filter the resources with.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @return {Promise<ResourcesCollection>} The resource shared with the group
+   * @throw {TypeError} If the groupId is not valid UUID
    */
-  async findAndUpdateByIsSharedWithGroup(groupId) {
-    const resourcesCollection = await this.findResourcesServices.findAllByIsSharedWithGroupForLocalStorage(groupId);
+  async findAndUpdateByIsSharedWithGroup(groupId, passphrase = null) {
+    const resourcesCollection = await this.findResourcesServices.findAllByIsSharedWithGroupForLocalStorage(groupId, passphrase);
     await ResourceLocalStorage.addOrReplaceResourcesCollection(resourcesCollection);
     return resourcesCollection;
   }

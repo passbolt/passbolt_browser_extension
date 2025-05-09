@@ -208,7 +208,7 @@ describe("FindResourcesService", () => {
     });
 
     it("should return a collection with resources metadata decrypted", async() => {
-      expect.assertions(1);
+      expect.assertions(2);
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
 
@@ -224,6 +224,27 @@ describe("FindResourcesService", () => {
       const resources = await findResourcesService.findAllForLocalStorage();
 
       expect(resources).toHaveLength(resourcesDto.length);
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(2);
+    }, 10 * 1000);
+
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(2);
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+
+      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+      const resourceTypesDto = resourceTypesCollectionDto();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+      jest.spyOn(PassphraseStorageService, "get");
+      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+
+      const resources = await findResourcesService.findAllForLocalStorage(pgpKeys.ada.passphrase);
+
+      expect(resources).toHaveLength(resourcesDto.length);
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     }, 10 * 1000);
 
     it("should return a collection with resources metadata decrypted and resources metadata encrypted filtered out (shared key cannot be found)", async() => {

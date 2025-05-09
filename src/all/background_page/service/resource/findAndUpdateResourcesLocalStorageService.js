@@ -41,10 +41,13 @@ class FindAndUpdateResourcesLocalStorage {
 
   /**
    * Find and update the local storage with all the resources retrieved from the API.
-   * @param {number} [updatePeriodThreshold] Do not update the local storage if the threshold is not overdue.
-   * @return {Promise<RessourceCollection>}
+   * @param {object} [options={}] Options.
+   * @param {number} [options.updatePeriodThreshold] Do not update the local storage if the threshold is not overdue.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
+   * @return {Promise<ResourcesCollection>}
    */
-  async findAndUpdateAll({updatePeriodThreshold} = {}) {
+  async findAndUpdateAll({updatePeriodThreshold} = {}, passphrase = null) {
     assertNumber(updatePeriodThreshold, "Parameter updatePeriodThreshold should be a number.");
 
     const lockKey = `${RESOURCES_UPDATE_ALL_LS_LOCK_PREFIX}${this.account.id}`;
@@ -74,7 +77,7 @@ class FindAndUpdateResourcesLocalStorage {
       }
 
       // Lock is granted, retrieve all resources and update the local storage.
-      const resourcesCollection = await this.findResourcesServices.findAllForLocalStorage();
+      const resourcesCollection = await this.findResourcesServices.findAllForLocalStorage(passphrase);
       await ResourceLocalStorage.set(resourcesCollection);
       FindAndUpdateResourcesLocalStorage.lastUpdateAllTimes[this.account.id] = Date.now();
       // Return the updated resources collection from the API

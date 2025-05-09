@@ -34,7 +34,6 @@ describe("FindAndUpdateSessionKeysSessionStorageService", () => {
   beforeEach(async() => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
-    jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
     findAndUpdateSessionKeysSessionStorageService = new FindAndUpdateSessionKeysSessionStorageService(account, apiClientOptions);
     // flush account related storage before each.
     findAndUpdateSessionKeysSessionStorageService.sessionKeysBundlesSessionStorageService.flush();
@@ -42,24 +41,38 @@ describe("FindAndUpdateSessionKeysSessionStorageService", () => {
 
   describe("::findAndUpdateAllBundles", () => {
     it("retrieves the session keys bundles from the API and store them into the session storage.", async() => {
-      expect.assertions(2);
+      expect.assertions(3);
       const sessionKeysBundlesDto = defaultSessionKeysBundlesDtos();
       jest.spyOn(findAndUpdateSessionKeysSessionStorageService.findSessionKeysService.sesionKeysBundlesApiService, "findAll").mockImplementation(() => sessionKeysBundlesDto);
+      jest.spyOn(PassphraseStorageService, "get").mockImplementationOnce(() => pgpKeys.ada.passphrase);
 
       const collection = await findAndUpdateSessionKeysSessionStorageService.findAndUpdateAllBundles();
 
       const expectedSessionKeysBundlesDto = [...sessionKeysBundlesDto];
       expectedSessionKeysBundlesDto.forEach(sessionKeysBundleDto => sessionKeysBundleDto.data = JSON.parse(pgpKeys.metadataKey.decryptedSessionKeysDataMessage));
 
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
       expect(collection.toDto()).toEqual(expectedSessionKeysBundlesDto);
       const storageValue = await findAndUpdateSessionKeysSessionStorageService.sessionKeysBundlesSessionStorageService.get();
       expect(storageValue).toEqual(expectedSessionKeysBundlesDto);
+    });
+
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(1);
+      const sessionKeysBundlesDto = defaultSessionKeysBundlesDtos();
+      jest.spyOn(findAndUpdateSessionKeysSessionStorageService.findSessionKeysService.sesionKeysBundlesApiService, "findAll").mockImplementation(() => sessionKeysBundlesDto);
+      jest.spyOn(PassphraseStorageService, "get");
+
+      await findAndUpdateSessionKeysSessionStorageService.findAndUpdateAllBundles(pgpKeys.ada.passphrase);
+
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
     it("retrieves empty array of session keys bundles from the API and store them into the session storage.", async() => {
       expect.assertions(2);
       const sessionKeysBundlesDto = [];
       jest.spyOn(findAndUpdateSessionKeysSessionStorageService.findSessionKeysService.sesionKeysBundlesApiService, "findAll").mockImplementation(() => sessionKeysBundlesDto);
+      jest.spyOn(PassphraseStorageService, "get").mockImplementationOnce(() => pgpKeys.ada.passphrase);
 
       const collection = await findAndUpdateSessionKeysSessionStorageService.findAndUpdateAllBundles();
 
@@ -73,6 +86,7 @@ describe("FindAndUpdateSessionKeysSessionStorageService", () => {
       const sessionKeysBundlesDto = defaultSessionKeysBundlesDtos();
       jest.spyOn(findAndUpdateSessionKeysSessionStorageService.findSessionKeysService.sesionKeysBundlesApiService, "findAll").mockImplementation(() => sessionKeysBundlesDto);
       await findAndUpdateSessionKeysSessionStorageService.sessionKeysBundlesSessionStorageService.set(new SessionKeysBundlesCollection(defaultSessionKeysBundlesDtos({}, {withDecryptedSessionKeysBundle: true})));
+      jest.spyOn(PassphraseStorageService, "get").mockImplementationOnce(() => pgpKeys.ada.passphrase);
 
       const collection = await findAndUpdateSessionKeysSessionStorageService.findAndUpdateAllBundles();
 
@@ -91,6 +105,7 @@ describe("FindAndUpdateSessionKeysSessionStorageService", () => {
       const promise = new Promise(_resolve => resolve = _resolve);
       jest.spyOn(findAndUpdateSessionKeysSessionStorageService.findSessionKeysService.sesionKeysBundlesApiService, "findAll").mockImplementation(() => promise);
       await findAndUpdateSessionKeysSessionStorageService.sessionKeysBundlesSessionStorageService.set(new SessionKeysBundlesCollection(defaultSessionKeysBundlesDtos({}, {withDecryptedSessionKeysBundle: true})));
+      jest.spyOn(PassphraseStorageService, "get").mockImplementationOnce(() => pgpKeys.ada.passphrase);
 
       const promiseFirstCall = findAndUpdateSessionKeysSessionStorageService.findAndUpdateAllBundles();
       const promiseSecondCall = findAndUpdateSessionKeysSessionStorageService.findAndUpdateAllBundles();

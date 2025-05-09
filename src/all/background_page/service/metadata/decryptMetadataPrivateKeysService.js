@@ -38,7 +38,8 @@ class DecryptMetadataPrivateKeysService {
    * If the private key was already decrypted, nothing happens.
    *
    * @param {MetadataPrivateKeyEntity} metadataPrivateKeyEntity the metadata private key entity to decrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key. Marked as
+   * optional as it might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `metadataPrivateKeyEntity` is not of type MetadataPrivateKeyEntity
    * @throws {Error} if metadata private key entity data is not a valid openPGP message.
@@ -77,7 +78,8 @@ class DecryptMetadataPrivateKeysService {
    * Decrypts a collection of metadata private key entities and mutate all entities with their decrypted result.
    *
    * @param {MetadataPrivateKeysCollection} metadataPrivateKeysCollection the metadata private keys collection to decrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key. Marked as
+   * optional as it might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
    * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.
@@ -100,7 +102,8 @@ class DecryptMetadataPrivateKeysService {
    * and mutate all metadata private key entities with their decrypted result.
    *
    * @param {MetadataKeysCollection} metadataKeysCollection the metadata keys collection to decrypt.
-   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key. Marked as
+   * optional as it might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
    * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.

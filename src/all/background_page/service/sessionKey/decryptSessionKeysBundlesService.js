@@ -35,7 +35,8 @@ class DecryptSessionKeysBundlesService {
    * If the bundle was already decrypted, nothing happens.
    *
    * @param {SessionKeysBundleEntity} sessionKeysBundleEntity the session key bundle entity to decrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the information.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the session key bundle. Marked as optional
+   * as it might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `sessionKeysBundleEntity` is not of the expected type
    * @throws {Error} if session keys bundle entity data is not a valid openPGP message.
@@ -62,7 +63,8 @@ class DecryptSessionKeysBundlesService {
    * Decrypts a collection of session keys bundle entities and mutate all entities with their decrypted result.
    *
    * @param {SessionKeysBundlesCollection} sessionKeysBundlesCollection the session keys bundles collection to decrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the session key bundles. Marked as optional
+   * as it might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `sessionKeysBundlesCollection` is not of type SessionKeysBundlesCollection
    * @throws {Error} if one of the session keys bundle entity data is not a valid openPGP message.

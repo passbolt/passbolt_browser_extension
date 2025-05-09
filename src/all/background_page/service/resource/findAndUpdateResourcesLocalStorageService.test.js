@@ -47,6 +47,7 @@ describe("UpdateResourcesLocalStorage", () => {
       service = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
     });
+
     it("asserts updatePeriodThreshold parameter", async() => {
       expect.assertions(1);
       const options = new ApiClientOptions().setBaseUrl('https://localhost');

@@ -54,6 +54,13 @@ class ResourceUpdateLocalStorageController {
    */
   async exec() {
     try {
+      /**
+       * Try to fetch the resources.
+       * If the user passphrase is required but not in sessionStorage, prompt the user. The passphrase is needed when:
+       * 1. the metadata could be decrypted with a metadata session key, but the session keys are themselves encrypted;
+       * 2. the metadata is encrypted with the shared‑metadata key, but this one is not yet decrypted in the session storage;
+       * 3. the metadata is encrypted with the user’s private key.
+       */
       await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll({updatePeriodThreshold: 10000});
     } catch (error) {
       if (!(error instanceof UserPassphraseRequiredError)) {

@@ -13,6 +13,8 @@
  */
 import {assertArrayUUID} from "../../utils/assertions";
 import FindResourcesService from "../../service/resource/findResourcesService";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
+import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 
 class FindAllByIdsForDisplayPermissionsController {
   /**
@@ -26,11 +28,12 @@ class FindAllByIdsForDisplayPermissionsController {
     this.worker = worker;
     this.requestId = requestId;
     this.findResourcesService = new FindResourcesService(account, apiClientOptions);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
    * Controller executor.
-   * @param {Array<uuid>} resourceIds The resources ids
+   * @param {Array<string>} resourceIds The resources ids
    * @returns {Promise<void>}
    */
   async _exec(resourceIds) {
@@ -45,13 +48,28 @@ class FindAllByIdsForDisplayPermissionsController {
 
   /**
    * Find the resource to display the permissions for.
-   * @param {Array<uuid>} resourceIds The resources ids
+   * @param {Array<string>} resourceIds The resources ids
    * @returns {Promise<ResourcesCollection>}
    */
   async exec(resourceIds) {
     assertArrayUUID(resourceIds);
 
-    return this.findResourcesService.findAllByIdsForDisplayPermissions(resourceIds);
+    try {
+      /**
+       * Try to fetch the resources.
+       * If the user passphrase is required but not in sessionStorage, prompt the user. The passphrase is needed when:
+       * 1. the metadata could be decrypted with a metadata session key, but the session keys are themselves encrypted;
+       * 2. the metadata is encrypted with the shared‑metadata key, but this one is not yet decrypted in the session storage;
+       * 3. the metadata is encrypted with the user’s private key.
+       */
+      return await this.findResourcesService.findAllByIdsForDisplayPermissions(resourceIds);
+    } catch (error) {
+      if (!(error instanceof UserPassphraseRequiredError)) {
+        throw error;
+      }
+      const passphrase =  await this.getPassphraseService.getPassphrase(this.worker, 60);
+      return this.findResourcesService.findAllByIdsForDisplayPermissions(resourceIds, passphrase);
+    }
   }
 }
 

@@ -64,7 +64,7 @@ describe("ResourceUpdateLocalStorageController", () => {
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'ERROR', error);
     });
 
-    it("Should request passphrase if not set for decryption", async() => {
+    it("requests the user passphrase whenever the decryption of the metadata requires it and try to load the data again", async() => {
       expect.assertions(1);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [defaultResourceDto(

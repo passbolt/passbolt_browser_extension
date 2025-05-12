@@ -21,6 +21,7 @@ import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/Pass
 import Validator from "validator";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
+import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
 
 /**
  * @deprecated
@@ -35,6 +36,7 @@ class UserModel {
    */
   constructor(apiClientOptions, account = null) {
     this.userService = new UserService(apiClientOptions);
+    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
     this.account = account;
   }
 
@@ -48,8 +50,13 @@ class UserModel {
     // contain pending_account_recovery_request is only available for admin or recovery contact role
     const contains =  {profile: true, gpgkey: false, groups_users: false, last_logged_in: true, pending_account_recovery_request: true, account_recovery_user_setting: true};
     // Add is_mfa_enabled contain if the user account role name is admin
+
     if (this.account && this.account.roleName === RoleEntity.ROLE_ADMIN) {
       contains.is_mfa_enabled = true;
+      const organizationSettings = await this.organisationSettingsModel.getOrFind();
+      if (organizationSettings.isPluginEnabled("metadata")) {
+        contains.missing_metadata_keys_ids = true;
+      }
     }
     const usersCollection = await this.findAll(contains, null, null, true);
     await UserLocalStorage.set(usersCollection);

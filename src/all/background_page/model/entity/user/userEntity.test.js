@@ -26,6 +26,7 @@ import GpgkeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/gp
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import PendingAccountRecoveryRequestEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/pendingAccountRecoveryRequestEntity";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
+import {v4 as uuid} from "uuid";
 
 describe("UserEntity", () => {
   describe("UserEntity::getSchema", () => {
@@ -277,6 +278,40 @@ describe("UserEntity", () => {
       };
       const entity2 = new UserEntity(dto2);
       expect(entity2.isMfaEnabled).toBeNull();
+    });
+  });
+  describe("::missingMetadataKeysIds", () => {
+    it("should return an empty array if missing_metadata_keys_ids is not defined", () => {
+      expect.assertions(1);
+
+      const dto = defaultUserDto({}, {
+        withRole: true,
+        withGpgkey: true,
+      });
+      const entity = new UserEntity(dto);
+
+      expect(entity.missingMetadataKeysIds).toEqual([]);
+    });
+    it("should return an array of missing_metadata_keys_ids", () => {
+      expect.assertions(1);
+      const uuid1 = uuid();
+      const uuid2 = uuid();
+
+      const dto = defaultUserDto({
+        missing_metadata_keys_ids: [
+          uuid1,
+          uuid2
+        ]
+      }, {
+        withRole: true,
+        withGpgkey: true,
+      });
+      const entity = new UserEntity(dto);
+
+      expect(entity.missingMetadataKeysIds).toEqual([
+        uuid1,
+        uuid2
+      ]);
     });
   });
 });

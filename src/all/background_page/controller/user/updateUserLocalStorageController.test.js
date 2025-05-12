@@ -19,12 +19,20 @@ import UpdateUserLocalStorageController from "./updateUserLocalStorageController
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {adminAccountDto, defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import {defaultCeOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
 
 beforeEach(() => {
   enableFetchMocks();
 });
 
 describe("UpdateUserLocalStorageController", () => {
+  beforeEach(() => {
+    const siteSettingsDto = defaultCeOrganizationSettings();
+
+    jest.spyOn(OrganizationSettingsService.prototype, "find")
+      .mockImplementation(() => siteSettingsDto);
+  });
   describe("UpdateUserLocalStorageController::exec", () => {
     it("Should update the user local storage for a user having a role user.", async() => {
       expect.assertions(1);

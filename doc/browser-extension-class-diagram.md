@@ -915,8 +915,12 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class GenerateSetupKeyPairController {
-          +exec(passphraseDto string) Promise
-          -_buildGenerateKeyPairOptionsEntity(passphrase string) Promise~GenerateGpgKeyPairOptionsEntity~
+            +exec(passphraseDto string) Promise
+            -_buildGenerateKeyPairOptionsEntity(passphrase string) Promise~GenerateGpgKeyPairOptionsEntity~
+        }
+
+        class AccountRecoveryGenerateOrganizationKeyController {
+            +exec(generateGpgKeyPairOptionsDto object) Promise~ExternalGpgKeyPairEntity~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1165,6 +1169,10 @@ classDiagram
 
 %% GpgKey controllers relationships
     GenerateSetupKeyPairController*--FindUserGpgKeyPoliciesSettingsService
+    GenerateSetupKeyPairController*--GenerateGpgKeyPairService
+    GenerateSetupKeyPairController*--GenerateGpgKeyPairOptionsEntity
+    AccountRecoveryGenerateOrganizationKeyController*--GenerateGpgKeyPairService
+    AccountRecoveryGenerateOrganizationKeyController*--GenerateGpgKeyPairOptionsEntity
 %% GpgKey services relationships
     FindUserGpgKeyPoliciesSettingsService*--UserGpgKeyPoliciesSettingsApiService
 ```

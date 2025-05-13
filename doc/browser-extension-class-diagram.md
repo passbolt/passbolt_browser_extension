@@ -915,7 +915,11 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class UserGpgKeyPoliciesSettingsApiService {
-            +findSettingsAsGuest(userId string, authenticationToken string) Promise~object~~
+            +findSettingsAsGuest(userId string, authenticationToken string) Promise~object~
+        }
+
+        class FindUserGpgKeyPoliciesSettingsService {
+            +findSettingsAsGuest(userId string, authenticationToken string) Promise~UserGpgKeyPoliciesSettingsEntity~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -9,79 +9,115 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.10.0
+ * @since         5.1.1
  */
 
 import FindUserGpgKeyPoliciesSettingsService from "./findUserGpgKeyPoliciesSettingsService";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import MetadataTypesSettingsApiService from "../api/metadata/metadataTypesSettingsApiService";
-import {
-  defaultMetadataTypesSettingsV4Dto,
-  defaultMetadataTypesSettingsV50FreshDto
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import {defaultMetadataKeysSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
-import MetadataKeysSettingsApiService from "../api/metadata/metadataKeysSettingsApiService";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
+import {v4 as uuidV4} from "uuid";
+import UserGpgKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userGpgKeyPolicies/UserGpgKeyPoliciesSettingsEntity";
+import {defaultUserGpgKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userGpgKeyPolicies/UserGpgKeyPoliciesSettingsEntity.test.data";
+import {anonymousOrganizationSettings, defaultCeOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("FindMetadataSettingsService", () => {
-  let findMetadataTypesSettingsService, apiClientOptions;
-
-  beforeEach(async() => {
-    apiClientOptions = defaultApiClientOptions();
-    findMetadataTypesSettingsService = new FindUserGpgKeyPoliciesSettingsService(apiClientOptions);
-  });
-
-  describe("::findTypesSettings", () => {
+describe("FindUserGpgKeyPoliciesSettingsService", () => {
+  describe("::findSettingsAsGuest", () => {
     it("retrieve the metadata types settings.", async() => {
-      expect.assertions(2);
-      const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
-      jest.spyOn(MetadataTypesSettingsApiService.prototype, "findSettings").mockImplementation(() => metadataTypesSettingsDto);
+      expect.assertions(3);
 
-      const entity = await findMetadataTypesSettingsService.findTypesSettings();
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
 
-      expect(entity).toBeInstanceOf(MetadataTypesSettingsEntity);
-      expect(entity.toDto()).toEqual(metadataTypesSettingsDto);
+      const gpgKeyPoliciesDto = defaultUserGpgKeyPoliciesSettingsDto();
+      const service = new FindUserGpgKeyPoliciesSettingsService(apiClientOptions, account);
+
+      jest.spyOn(service.organizationSettingsModel, "getOrFind").mockImplementation(() => new OrganizationSettingsEntity(defaultCeOrganizationSettings()));
+      jest.spyOn(service.userGpgKeyPoliciesSettingsApiService, "findSettingsAsGuest").mockImplementation(() => gpgKeyPoliciesDto);
+
+      const userId = uuidV4();
+      const authenticationToken = uuidV4();
+      const result = await service.findSettingsAsGuest(userId, authenticationToken);
+
+      expect(result).toBeInstanceOf(UserGpgKeyPoliciesSettingsEntity);
+      expect(result.preferredKeyType).toStrictEqual(gpgKeyPoliciesDto.preferred_key_type);
+      expect(result.source).toStrictEqual(gpgKeyPoliciesDto.source);
     });
 
-    it("marshall the API data with local default", async() => {
-      expect.assertions(2);
-      jest.spyOn(MetadataTypesSettingsApiService.prototype, "findSettings").mockImplementation(() => {});
+    it("should return default setting if plugin is disabled", async() => {
+      expect.assertions(3);
 
-      const entity = await findMetadataTypesSettingsService.findTypesSettings();
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
 
-      expect(entity).toBeInstanceOf(MetadataTypesSettingsEntity);
-      // The value of the default are expected to evolve with passbolt transitioning to v5 types.
-      expect(entity.toDto()).toEqual(defaultMetadataTypesSettingsV4Dto());
+      const gpgKeyPoliciesDto = UserGpgKeyPoliciesSettingsEntity.createFromDefault();
+      const service = new FindUserGpgKeyPoliciesSettingsService(apiClientOptions, account);
+
+      const orgSettings = anonymousOrganizationSettings();
+      delete orgSettings.passbolt.plugins?.userGpgKeyPolicies;
+
+      jest.spyOn(service.organizationSettingsModel, "getOrFind").mockImplementation(() => new OrganizationSettingsEntity(orgSettings));
+      jest.spyOn(service.userGpgKeyPoliciesSettingsApiService, "findSettingsAsGuest").mockImplementation(() => { throw new Error("Something went wrong!"); });
+
+      const userId = uuidV4();
+      const authenticationToken = uuidV4();
+      const result = await service.findSettingsAsGuest(userId, authenticationToken);
+
+      expect(result).toBeInstanceOf(UserGpgKeyPoliciesSettingsEntity);
+      expect(result.preferredKeyType).toStrictEqual(gpgKeyPoliciesDto.preferredKeyType);
+      expect(result.source).toStrictEqual(gpgKeyPoliciesDto.source);
     });
-  });
 
-  describe("::findKeysSettings", () => {
-    it("retrieve the metadata keys settings.", async() => {
-      expect.assertions(2);
-      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
-      jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => metadataKeysSettingsDto);
+    it("should return default setting if something goes wrong on the API", async() => {
+      expect.assertions(3);
 
-      const entity = await findMetadataTypesSettingsService.findKeysSettings();
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
 
-      expect(entity).toBeInstanceOf(MetadataKeysSettingsEntity);
-      expect(entity.toDto()).toEqual(metadataKeysSettingsDto);
+      const gpgKeyPoliciesDto = UserGpgKeyPoliciesSettingsEntity.createFromDefault();
+      const service = new FindUserGpgKeyPoliciesSettingsService(apiClientOptions, account);
+
+      jest.spyOn(service.organizationSettingsModel, "getOrFind").mockImplementation(() => new OrganizationSettingsEntity(defaultCeOrganizationSettings()));
+      jest.spyOn(service.userGpgKeyPoliciesSettingsApiService, "findSettingsAsGuest").mockImplementation(() => { throw new Error("Something went wrong!"); });
+
+      const userId = uuidV4();
+      const authenticationToken = uuidV4();
+      const result = await service.findSettingsAsGuest(userId, authenticationToken);
+
+      expect(result).toBeInstanceOf(UserGpgKeyPoliciesSettingsEntity);
+      expect(result.preferredKeyType).toStrictEqual(gpgKeyPoliciesDto.preferredKeyType);
+      expect(result.source).toStrictEqual(gpgKeyPoliciesDto.source);
     });
 
-    it("marshall the API data with local default", async() => {
-      expect.assertions(2);
-      jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => {});
+    it("should throw an error if userId is not a valid UUID.", async() => {
+      expect.assertions(1);
 
-      const entity = await findMetadataTypesSettingsService.findKeysSettings();
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
 
-      expect(entity).toBeInstanceOf(MetadataKeysSettingsEntity);
-      expect(entity.toDto()).toEqual(defaultMetadataKeysSettingsDto());
+      const service = new FindUserGpgKeyPoliciesSettingsService(apiClientOptions, account);
+
+      const userId = "test";
+      const authenticationToken = uuidV4();
+      await expect(() => service.findSettingsAsGuest(userId, authenticationToken)).rejects.toThrow("The userId must be a valid UUID");
+    });
+
+    it("should throw an error if authenticationToken is not a valid UUID.", async() => {
+      expect.assertions(1);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+
+      const service = new FindUserGpgKeyPoliciesSettingsService(apiClientOptions, account);
+
+      const userId = uuidV4();
+      const authenticationToken = "test";
+      await expect(() => service.findSettingsAsGuest(userId, authenticationToken)).rejects.toThrow("The authenticationToken must be a valid UUID");
     });
   });
 });

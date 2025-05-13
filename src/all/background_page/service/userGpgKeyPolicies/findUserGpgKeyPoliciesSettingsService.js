@@ -12,6 +12,7 @@
  * @since         5.1.0
  */
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import {assertUuid} from "../../utils/assertions";
 import UserGpgKeyPoliciesSettingsApiService from "../api/userGpgKeyPolicies/userGpgKeyPoliciesSettingsApiService";
 import UserGpgKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userGpgKeyPolicies/UserGpgKeyPoliciesSettingsEntity";
 
@@ -38,10 +39,11 @@ export default class FindUserGpgKeyPoliciesSettingsService {
    * @returns {Promise<UserGpgKeyPoliciesSettingsEntity>}
    */
   async findSettingsAsGuest(userId, authenticationToken) {
-    // todo assert authentication token
+    assertUuid(userId, "The userId must be a valid UUID");
+    assertUuid(authenticationToken, "The authenticationToken must be a valid UUID");
 
     const organizationSettings = await this.organizationSettingsModel.getOrFind();
-    const isUserGpgKeyPoliciesPluginEnabled = organizationSettings.isPluginEnabled("UserGpgKeyPolicies");
+    const isUserGpgKeyPoliciesPluginEnabled = organizationSettings.isPluginEnabled("userGpgKeyPolicies");
 
     if (isUserGpgKeyPoliciesPluginEnabled) {
       try {

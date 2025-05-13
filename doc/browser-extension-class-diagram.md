@@ -911,6 +911,15 @@ classDiagram
 
     namespace GpgKeyNs {
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% GpgKey controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class GenerateSetupKeyPairController {
+          +exec(passphraseDto string) Promise
+          -_buildGenerateKeyPairOptionsEntity(passphrase string) Promise~GenerateGpgKeyPairOptionsEntity~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% GpgKey services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1153,4 +1162,9 @@ classDiagram
     ShareResourceService*--ShareService
 %% Share models relationships.
     style ShareService fill:#DEE5D4
+
+%% GpgKey controllers relationships
+    GenerateSetupKeyPairController*--FindUserGpgKeyPoliciesSettingsService
+%% GpgKey services relationships
+    FindUserGpgKeyPoliciesSettingsService*--UserGpgKeyPoliciesSettingsApiService
 ```

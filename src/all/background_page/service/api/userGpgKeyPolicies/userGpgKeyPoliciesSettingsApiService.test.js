@@ -9,88 +9,61 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.10.0
+ * @since         5.1.1
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
-import AccountEntity from "../../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
-import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
-import {
-  defaultMetadataKeysSettingsDto
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import UserGpgKeyPoliciesSettingsApiService from "./userGpgKeyPoliciesSettingsApiService";
-import {mockApiResponseError} from "passbolt-styleguide/test/mocks/mockApiResponse";
-import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
-import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import {defaultUserGpgKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userGpgKeyPolicies/UserGpgKeyPoliciesSettingsEntity.test.data";
+import {v4 as uuidV4} from "uuid";
 
-describe("MetadataKeysSettingsApiService", () => {
-  let apiClientOptions;
-  beforeEach(async() => {
-    enableFetchMocks();
-    fetch.resetMocks();
-    const account = new AccountEntity(defaultAccountDto());
-    apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-  });
+beforeEach(async() => {
+  jest.clearAllMocks();
+  enableFetchMocks();
+});
 
-  describe('::findSettings', () => {
+describe("UserGpgKeyPolicieesSettingsApiService", () => {
+  describe('::findSettingsAsGuest', () => {
     it("retrieves the settings from API", async() => {
       expect.assertions(1);
-      fetch.doMockOnceIf(/metadata\/keys\/settings/, () => mockApiResponse(defaultMetadataKeysSettingsDto()));
 
-      const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
-      const resultDto = await service.findSettings();
+      const apiResponse = defaultUserGpgKeyPoliciesSettingsDto();
+      fetch.doMockOnceIf(/user-gpg-key-policies\/settings/, () => mockApiResponse(apiResponse));
 
-      const expectedDto = defaultMetadataKeysSettingsDto();
-      expect(resultDto).toStrictEqual(expectedDto);
-    });
-
-    it("throws API error if the API encountered an issue", async() => {
-      expect.assertions(1);
-      fetch.doMockOnceIf(/metadata\/keys\/settings/, () => mockApiResponseError(500, "Something wrong happened!"));
-
+      const apiClientOptions = defaultApiClientOptions();
       const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
 
-      await expect(() => service.findSettings()).rejects.toThrow(PassboltApiFetchError);
+      const userId = uuidV4();
+      const authenticationToken = uuidV4();
+      const resultDto = await service.findSettingsAsGuest(userId, authenticationToken);
+
+      expect(resultDto).toStrictEqual(apiResponse);
     });
 
-    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async() => {
-      expect.assertions(1);
-      fetch.doMockOnceIf(/metadata\/keys\/settings/, () => { throw new Error("Service unavailable"); });
-
-      const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
-
-      await expect(() => service.findSettings()).rejects.toThrow(PassboltServiceUnavailableError);
-    });
-  });
-
-  describe('::save', () => {
-    it("Save the settings on the API.", async() => {
-      expect.assertions(2);
-
-      const settingsDto = defaultMetadataKeysSettingsDto();
-      const settings = new MetadataKeysSettingsEntity(settingsDto);
-      fetch.doMockOnceIf(/metadata\/keys\/settings/, async req => {
-        expect(req.method).toEqual("POST");
-        const reqPayload = await req.json();
-        return mockApiResponse(defaultMetadataKeysSettingsDto(reqPayload));
-      });
-
-      const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
-      const resultDto = await service.save(settings);
-
-      expect(resultDto).toEqual(expect.objectContaining(settingsDto));
-    });
-
-    it("throws an invalid parameter error if the settings parameter is not valid", async() => {
+    it("throws an error if the userId is not a valid UUID", async() => {
       expect.assertions(1);
 
+      const apiClientOptions = defaultApiClientOptions();
       const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
 
-      await expect(() => service.save(42)).rejects.toThrow(TypeError);
+      const userId = "test";
+      const authenticationToken = uuidV4();
+
+      await expect(() => service.findSettingsAsGuest(userId, authenticationToken)).rejects.toThrow();
+    });
+
+    it("throws an error if the authenticationToken is not a valid UUID", async() => {
+      expect.assertions(1);
+
+      const apiClientOptions = defaultApiClientOptions();
+      const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
+
+      const userId = uuidV4();
+      const authenticationToken = "test";
+
+      await expect(() => service.findSettingsAsGuest(userId, authenticationToken)).rejects.toThrow();
     });
   });
 });

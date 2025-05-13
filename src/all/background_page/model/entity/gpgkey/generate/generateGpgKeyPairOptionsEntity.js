@@ -160,7 +160,6 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
       userIDs: [this.userId],
       passphrase: this.passphrase,
       type: this.type,
-      curve: this.curve,
       date: this.date,
     };
 

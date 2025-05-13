@@ -43,11 +43,11 @@ export default class FindUserGpgKeyPoliciesSettingsService {
     const organizationSettings = await this.organizationSettingsModel.getOrFind();
     const isUserGpgKeyPoliciesPluginEnabled = organizationSettings.isPluginEnabled("UserGpgKeyPolicies");
 
-    if(isUserGpgKeyPoliciesPluginEnabled) {
+    if (isUserGpgKeyPoliciesPluginEnabled) {
       try {
         const dto = await this.userGpgKeyPoliciesSettingsApiService.findSettingsAsGuest(userId, authenticationToken);
         return UserGpgKeyPoliciesSettingsEntity.createFromDefault(dto);
-      } catch(error) {
+      } catch (error) {
         console.error(error);
       }
     }

@@ -13,7 +13,6 @@
  */
 
 import AbstractService from "../abstract/abstractService";
-import user from "../../../model/user";
 
 const USER_GPG_KEY_POLICIES_SETTINGS_API_SERVICE_RESOURCE_NAME = "user-gpg-key-policies/settings";
 

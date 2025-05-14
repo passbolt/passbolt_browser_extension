@@ -323,6 +323,7 @@ classDiagram
 
         class MetadataPrivateKeyApiService {
             +update(MetadataPrivateKeyEntity metadataPrivateKey) Promise~string~
+            +create(ShareMetadataPrivateKeysCollection metadataPrivateKeysCollection) Promise~void~
         }
 
         class MetadataKeysSettingsLocalStorage {
@@ -667,7 +668,6 @@ classDiagram
 
         class ShareMetadataPrivateKeysCollection {
             +validateBuildRules(item, options): void
-            +assertSameUserId(item): void
             +hasDecryptedPrivateKeys(): boolean
             +hasEncryptedPrivateKeys(): boolean
         }

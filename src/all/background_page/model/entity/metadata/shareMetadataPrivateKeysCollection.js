@@ -26,9 +26,8 @@ class ShareMetadataPrivateKeysCollection extends EntityV2Collection {
 
   /**
    * @inheritDoc
-   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
-   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by user ID.
-   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection share the same metadata key ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection use the same user ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection have a different metadata key ID.
    */
   constructor(dtos = [], options = {}) {
     super(dtos, options);
@@ -41,7 +40,7 @@ class ShareMetadataPrivateKeysCollection extends EntityV2Collection {
    */
 
   /**
-   * Get share metadata private keys collection schema
+   * Get metadata private keys collection schema
    *
    * @returns {Object} schema
    */
@@ -54,20 +53,18 @@ class ShareMetadataPrivateKeysCollection extends EntityV2Collection {
 
   /**
    * @inheritDoc
-   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
-   * @param {Set} [options.uniqueMetadataKeyIdsSetCache] A set of unique metadata key ids.
-   * @throws {EntityValidationError} If a permission already exists with the same id.
+   * @throws {EntityValidationError} If a metadata private key already exists with the same metdata_key_id.
+   * @throws {EntityValidationError} If a metadata private key does not use the same user_id as the others.
    */
-  validateBuildRules(item, options = {}) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
-    this.assertNotExist("metadata_key_id", item._props.metadata_key_id, {haystackSet: options?.uniqueMetadataKeyIdsSetCache});
+  validateBuildRules(item) {
+    this.assertNotExist("metadata_key_id", item._props.metadata_key_id);
     this.assertSameUserId(item);
   }
 
   /**
    * Assert the collection is about the same user id.
    * @param {MetadataPrivateKeyEntity} item
-   * @throws {EntityValidationError} if a secret for another resource already exist
+   * @throws {EntityValidationError} if the given metadata private key use a different user_id.
    * @private
    */
   assertSameUserId(item) {
@@ -75,7 +72,7 @@ class ShareMetadataPrivateKeysCollection extends EntityV2Collection {
       return;
     }
     //Search for a different userId
-    const hasDifferentUserId = this._items.find(metadataPrivateKeyEntity => metadataPrivateKeyEntity.userId !== item.userId);
+    const hasDifferentUserId = this._items[0].userId !== item.userId;
 
     if (!hasDifferentUserId) {
       return;

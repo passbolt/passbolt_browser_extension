@@ -14,7 +14,7 @@
 
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ShareMetadataPrivateKeysCollection from "./shareMetadataPrivateKeysCollection";
-import {defaultMinimalShareMetadataPrivateKeysDtos, defaultShareMetadataPrivateKeysDtos, shareMetadataPrivateKeysWithDecryptedKeyDtos, shareMetadataPrivateKeysWithDifferentUserIdDtos, shareMetadataPrivateKeysWithEncryptedKeyDtos, shareMetadataPrivateKeysWithSameIdDtos, shareMetadataPrivateKeysWithSameMetadataKeyIdDtos} from "./shareMetadataPrivateKeysCollection.test.data";
+import {defaultMinimalShareMetadataPrivateKeysDtos, defaultShareMetadataPrivateKeysDtos, shareMetadataPrivateKeysWithDecryptedKeyDtos, shareMetadataPrivateKeysWithDifferentUserIdDtos, shareMetadataPrivateKeysWithEncryptedKeyDtos, shareMetadataPrivateKeysWithSameMetadataKeyIdDtos} from "./shareMetadataPrivateKeysCollection.test.data";
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
 
 describe("ShareMetadataPrivateKeysCollection", () => {
@@ -82,26 +82,6 @@ describe("ShareMetadataPrivateKeysCollection", () => {
       const dtos = defaultShareMetadataPrivateKeysDtos();
       delete dtos[1].data;
       delete dtos[1].armored_key;
-
-      const collection = new ShareMetadataPrivateKeysCollection(dtos, {ignoreInvalidEntity: true});
-
-      expect(collection.items).toHaveLength(1);
-      expect(collection.items[0]._props.id).toEqual(dtos[0].id);
-    });
-
-    it("should throw if one of data item does not validate the unique id build rule", () => {
-      expect.assertions(1);
-
-      const dtos = shareMetadataPrivateKeysWithSameIdDtos();
-
-      expect(() => new ShareMetadataPrivateKeysCollection(dtos))
-        .toThrowCollectionValidationError("1.id.unique");
-    });
-
-    it("should, with enabling the ignore invalid option, ignore items which do not validate the unique id build rule", () => {
-      expect.assertions(2);
-
-      const dtos = shareMetadataPrivateKeysWithSameIdDtos();
 
       const collection = new ShareMetadataPrivateKeysCollection(dtos, {ignoreInvalidEntity: true});
 

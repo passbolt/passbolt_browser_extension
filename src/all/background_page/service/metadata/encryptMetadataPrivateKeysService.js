@@ -44,7 +44,7 @@ class EncryptMetadataPrivateKeysService {
    * @throws {TypeError} If `options.date` is defined and not of type Date.
    * @throws {Error} If `userPrivateKey` is not a decrypted OpenPGP private key.
    */
-  async encryptOne(metadataPrivateKey, userPrivateKey, options = {}) {
+  async encryptOne(metadataPrivateKey, userPrivateKey = null, options = {}) {
     assertType(metadataPrivateKey, MetadataPrivateKeyEntity, "The 'metadataPrivateKey' parameter should be of type MetadataPrivateKeysEntity.");
     if (typeof options?.date !== "undefined") {
       assertType(options?.date, Date, "The optional 'date' parameter should be of type Date.");
@@ -56,8 +56,9 @@ class EncryptMetadataPrivateKeysService {
 
     const recipientPublicKey = await this._retrieveRecipientKey(metadataPrivateKey.userId);
     const message = JSON.stringify(metadataPrivateKey.data);
-    const encryptOptions = {date: options?.date};
-    metadataPrivateKey.data = await EncryptMessageService.encrypt(message, recipientPublicKey, [userPrivateKey], encryptOptions);
+    const encryptOptions =  {date: options?.date};
+    const signingKeys = userPrivateKey ? [userPrivateKey] : null;
+    metadataPrivateKey.data = await EncryptMessageService.encrypt(message, recipientPublicKey, signingKeys, encryptOptions);
   }
 
   /**

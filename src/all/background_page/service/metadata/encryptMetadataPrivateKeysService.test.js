@@ -103,6 +103,27 @@ describe("EncryptMetadataPrivateKeysService", () => {
       expect(signature.created).toEqual(date.toISOString());
     }, 10 * 1000);
 
+
+    it("should encrypt a metadata private key and without sign it.", async() => {
+      expect.assertions(4);
+
+      await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
+      const dto = decryptedMetadataPrivateKeyDto({user_id: pgpKeys.ada.userId});
+      const metadataPrivateKey = new MetadataPrivateKeyEntity(dto);
+
+      await service.encryptOne(metadataPrivateKey, userPrivateKey);
+
+      expect(metadataPrivateKey._data).toBeUndefined();
+      expect(typeof metadataPrivateKey.data).toBe("string");
+      const recipientPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const message = await OpenpgpAssertion.readMessageOrFail(metadataPrivateKey.data);
+      const decryptResult = await DecryptMessageService.decrypt(message, recipientPrivateKey);
+
+      const decryptedData = JSON.parse(decryptResult);
+      expect(decryptedData).toEqual(dto.data);
+      expect(decryptResult.signatures).toBeUndefined();
+    }, 10 * 1000);
+
     it("does nothing if the data is already encrypted", async() => {
       expect.assertions(2);
       const dto = defaultMetadataPrivateKeyDto();

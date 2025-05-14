@@ -197,7 +197,7 @@ export const defaultCeOrganizationSettings = siteSettings => {
       "version": "1.0.0",
       "enabled": true
     },
-    "userGpgKeyPolicies": {
+    "userKeyPolicies": {
       "version": "1.0.0",
       "enabled": true,
       "source": "file",

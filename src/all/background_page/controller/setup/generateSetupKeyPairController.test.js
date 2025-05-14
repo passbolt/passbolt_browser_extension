@@ -23,8 +23,8 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import {v4 as uuidv4} from "uuid";
 import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
-import UserGpgKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userGpgKeyPolicies/UserGpgKeyPoliciesSettingsEntity";
-import {defaultUserGpgKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userGpgKeyPolicies/UserGpgKeyPoliciesSettingsEntity.test.data";
+import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
+import {defaultUserKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
 
 describe("GenerateSetupKeyPairController", () => {
   describe("GenerateSetupKeyPairController::exec", () => {
@@ -112,7 +112,7 @@ describe("GenerateSetupKeyPairController", () => {
       const temporaryAccountEntity = new AccountTemporaryEntity({account: setupAccountDto, worker_id: workerId});
       await AccountTemporarySessionStorageService.set(temporaryAccountEntity);
       const controller = new GenerateSetupKeyPairController({port: {_port: {name: workerId}}}, null, defaultApiClientOptions());
-      jest.spyOn(controller.findUserGpgKeyPoliciesSettingsService, "findSettingsAsGuest").mockImplementation(() => new UserGpgKeyPoliciesSettingsEntity(defaultUserGpgKeyPoliciesSettingsDto()));
+      jest.spyOn(controller.findUserKeyPoliciesSettingsService, "findSettingsAsGuest").mockImplementation(() => new UserKeyPoliciesSettingsEntity(defaultUserKeyPoliciesSettingsDto()));
 
       await controller.exec(generateKeyPairDto);
       const account = (await AccountTemporarySessionStorageService.get(workerId)).account;

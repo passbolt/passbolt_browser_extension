@@ -15,9 +15,9 @@
 import {assertUuid} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
-const USER_GPG_KEY_POLICIES_SETTINGS_API_SERVICE_RESOURCE_NAME = "user-gpg-key-policies/settings";
+const USER_KEY_POLICIES_SETTINGS_API_SERVICE_RESOURCE_NAME = "setup/user-key-policies/settings";
 
-class UserGpgKeyPoliciesSettingsApiService extends AbstractService {
+class UserKeyPoliciesSettingsApiService extends AbstractService {
   /**
    * Constructor
    *
@@ -25,7 +25,7 @@ class UserGpgKeyPoliciesSettingsApiService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, USER_GPG_KEY_POLICIES_SETTINGS_API_SERVICE_RESOURCE_NAME);
+    super(apiClientOptions, USER_KEY_POLICIES_SETTINGS_API_SERVICE_RESOURCE_NAME);
   }
 
   /**
@@ -49,4 +49,4 @@ class UserGpgKeyPoliciesSettingsApiService extends AbstractService {
   }
 }
 
-export default UserGpgKeyPoliciesSettingsApiService;
+export default UserKeyPoliciesSettingsApiService;

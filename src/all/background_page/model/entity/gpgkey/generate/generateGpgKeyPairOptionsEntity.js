@@ -13,8 +13,10 @@
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import AppEmailValidatorService from "../../../../service/validator/appEmailValidatorService";
-import {GPG_KEY_TYPE_RSA, GPG_KEY_TYPE_EDDSA} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
+import {GPG_KEY_CURVE_25519, GPG_KEY_TYPE_CURVE} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import {assertType} from "../../../../utils/assertions";
+import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
 
 const ENTITY_NAME = "GenerateGpgKeyPairOptionsEntity";
 
@@ -51,13 +53,13 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
   validateBuildRules() {
     if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA && Boolean(this._props.curve)) {
       const error = new EntityValidationError();
-      error.addError("curve", "unwanted_curve", "The curve should not be set when the type is set to 'rsa'");
+      error.addError("curve", "unwanted_curve", `The curve should not be set when the type is set to '${GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA}'`);
       throw error;
     }
 
     if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC && Boolean(this._props.keySize)) {
       const error = new EntityValidationError();
-      error.addError("keySize", "unwanted_keySize", "The keySize should not be set when the type is set to 'ecc'");
+      error.addError("keySize", "unwanted_keySize", `The keySize should not be set when the type is set to '${GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC}'`);
       throw error;
     }
   }
@@ -94,11 +96,13 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
         },
         "keySize": {
           "type": "integer",
-          "minLength": GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE
+          "minLength": GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE,
+          "nullable": true,
         },
         "curve": {
           "type": "string",
           "minLength": [GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519],
+          "nullable": true,
         },
         "date": {
           "type": "integer"
@@ -110,25 +114,30 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
   /**
    * Create entity for user key generation.
    *
-   * @param {string} apiGpgKeyType API gpg key type preference: rsa or eddsa. Default to rsa.
+   * @param {UserKeyPoliciesSettingsEntity} userKeyPolicy API gpg key type preference: rsa or eddsa. Default to rsa.
    * @param {object} generateGpgKeyPairDto The dto used for key creation
    * @return {GenerateGpgKeyPairOptionsEntity}
+   * @throws {TypeError} if the `userKeyPolicy` is not a UserKeyPoliciesSettingsEntity
    */
-  static createForUserKeyGeneration(apiGpgKeyType = GPG_KEY_TYPE_RSA, generateGpgKeyPairDto) {
-    const type = apiGpgKeyType?.toLowerCase() === GPG_KEY_TYPE_EDDSA ?
-      GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC :
-      GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA;
+  static createForUserKeyGeneration(userKeyPolicy, generateGpgKeyPairDto) {
+    assertType(userKeyPolicy, UserKeyPoliciesSettingsEntity, "The userKeyPolicy should be a valid 'UserKeyPoliciesSettingsEntity'");
+
+    const type = userKeyPolicy.preferredKeyType === GPG_KEY_TYPE_CURVE
+      ? GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC
+      : GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA;
+
+    const curve = userKeyPolicy.preferredKeyCurve === GPG_KEY_CURVE_25519
+      ? GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519
+      : null;
+
+    const keySize = userKeyPolicy.preferredKeySize;
 
     const updatedGenerateKeyPairDto = {
       ...generateGpgKeyPairDto,
-      type: type
+      curve,
+      type,
+      keySize,
     };
-
-    if (type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC) {
-      updatedGenerateKeyPairDto.curve = GenerateGpgKeyPairOptionsEntity.DEFAULT_ECC_KEY_CURVE;
-    } else if (type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA) {
-      updatedGenerateKeyPairDto.keySize = GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE;
-    }
 
     return new GenerateGpgKeyPairOptionsEntity(updatedGenerateKeyPairDto);
   }

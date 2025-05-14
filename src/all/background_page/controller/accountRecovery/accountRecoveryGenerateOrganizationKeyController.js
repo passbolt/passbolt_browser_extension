@@ -16,6 +16,12 @@ import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/
 import GenerateGpgKeyPairService from "../../service/crypto/generateGpgKeyPairService";
 
 /**
+ * The account recovery organization key size.
+ * @type {number}
+ */
+const ACCOUNT_RECOVERY_ORGANIZATION_KEY_SIZE = 4096;
+
+/**
  * Controller related to the generation of the account recovery organization key
  */
 class AccountRecoveryGenerateOrganizationKeyController {
@@ -52,11 +58,14 @@ class AccountRecoveryGenerateOrganizationKeyController {
    * @returns {Promise<ExternalGpgKeyPairEntity>}
    */
   async exec(generateGpgKeyPairOptionsDto = {}) {
-    generateGpgKeyPairOptionsDto = {
+    // Enforce the key size & type.
+    const enforcedGenerateGpgKeyPairOptionsDto = {
       ...generateGpgKeyPairOptionsDto,
+      type: GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA,
+      keySize: ACCOUNT_RECOVERY_ORGANIZATION_KEY_SIZE,
       date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
     };
-    const generateKeyPairOptions = GenerateGpgKeyPairOptionsEntity.createForOrkKeyGeneration(generateGpgKeyPairOptionsDto);
+    const generateKeyPairOptions = GenerateGpgKeyPairOptionsEntity.createForOrkKeyGeneration(enforcedGenerateGpgKeyPairOptionsDto);
     return GenerateGpgKeyPairService.generateKeyPair(generateKeyPairOptions);
   }
 }

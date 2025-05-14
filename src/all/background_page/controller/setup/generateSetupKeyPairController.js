@@ -17,7 +17,6 @@ import GenerateGpgKeyPairService from "../../service/crypto/generateGpgKeyPairSe
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 import FindUserGpgKeyPoliciesSettingsService
   from "../../service/userGpgKeyPolicies/findUserGpgKeyPoliciesSettingsService";
 
@@ -39,7 +38,6 @@ class GenerateSetupKeyPairController {
     // The temporary account stored in the session storage
     this.temporaryAccount = null;
     this.findUserGpgKeyPoliciesSettingsService = new FindUserGpgKeyPoliciesSettingsService(apiClientOptions);
-    this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
   }
 
   /**

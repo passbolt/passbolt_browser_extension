@@ -27,10 +27,7 @@ import {GPG_KEY_TYPE_EDDSA, GPG_KEY_TYPE_RSA} from "passbolt-styleguide/src/shar
 describe("GenerateGpgKeyPairOptionsEntity", () => {
   describe("::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(
-        GenerateGpgKeyPairOptionsEntity.name,
-        GenerateGpgKeyPairOptionsEntity.getSchema()
-      );
+      EntitySchema.validateSchema(GenerateGpgKeyPairOptionsEntity.ENTITY_NAME, GenerateGpgKeyPairOptionsEntity.getSchema());
     });
 
     it("validates name property", () => {
@@ -58,7 +55,17 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
           GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC,
         ]
       );
-      assertEntityProperty.required(GenerateGpgKeyPairOptionsEntity, "type");
+    });
+
+    it("validates keySize property", () => {
+      assertEntityProperty.integer(GenerateGpgKeyPairOptionsEntity, "keySize");
+      assertEntityProperty.notRequired(GenerateGpgKeyPairOptionsEntity, "keySize");
+    });
+
+    it("validates curve property", () => {
+      assertEntityProperty.string(GenerateGpgKeyPairOptionsEntity, "curve");
+      assertEntityProperty.enumeration(GenerateGpgKeyPairOptionsEntity, "curve", [GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519]);
+      assertEntityProperty.notRequired(GenerateGpgKeyPairOptionsEntity, "curve");
     });
   });
 
@@ -82,7 +89,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
     });
 
     it("throws validation errors with an invalid DTO", () => {
-      expect.assertions(6);
+      expect.assertions(7);
       try {
         const dto = {
           name: "", // invalid min length
@@ -99,14 +106,39 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
         expect(error.hasError("passphrase", "minLength")).toBe(true);
         expect(error.hasError("keySize", "type")).toBe(true);
         expect(error.hasError("type", "enum")).toBe(true);
+        expect(error.hasError("curve", "enum")).toBe(false);
       }
     });
 
-    it("allows non‑standard email if custom validation is configured", () => {
+    it("throws validation error if the type is 'rsa' and the curve is set", () => {
+      expect.assertions(1);
+      const dto = defaultDto({
+        type: GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA,
+        curve: GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519,
+      });
+
+      const expectedError = new EntityValidationError();
+      expectedError.addError("curve", "unwanted_curve", "The curve should not be set when the type is set to 'rsa'");
+      expect(() => new GenerateGpgKeyPairOptionsEntity(dto)).toThrow(expectedError);
+    });
+
+    it("throws validation error if the type is 'ecc' and the keySize is set", () => {
+      expect.assertions(1);
+      const dto = defaultDto({
+        type: GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC,
+        keySize: GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE,
+      });
+
+      const expectedError = new EntityValidationError();
+      expectedError.addError("keySize", "unwanted_keySize", "The keySize should not be set with the type is set to 'ecc'");
+      expect(() => new GenerateGpgKeyPairOptionsEntity(dto)).toThrow(expectedError);
+    });
+
+    it("allows non-standard email if custom validation is configured", () => {
       expect.assertions(1);
       const organizationSettings = customEmailValidationProOrganizationSettings();
       OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
-      const dto = defaultDto({ email: "ada@passbolt.c" });
+      const dto = defaultDto({email: "ada@passbolt.c"});
       const entity = new GenerateGpgKeyPairOptionsEntity(dto);
       expect(entity.email).toEqual("ada@passbolt.c");
     });
@@ -123,11 +155,11 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
 
       expect(entity.type).toBe(GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC);
       expect(entity.curve).toBe(GenerateGpgKeyPairOptionsEntity.DEFAULT_ECC_KEY_CURVE);
-      expect(entity.rsaBits).toBeUndefined();
+      expect(entity.rsaBits).toBeNull();
     });
 
     it("creates RSA entity when api type is rsa (default)", () => {
-      expect.assertions(3);
+      expect.assertions(4);
       const dto = minimalDto();
       let entity = GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(
         GPG_KEY_TYPE_RSA,
@@ -135,7 +167,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
       );
       expect(entity.type).toBe(GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA);
       expect(entity.rsaBits).toBe(GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE);
-      expect(entity.curve).toBeUndefined();
+      expect(entity.curve).toBeNull();
 
       // Implicit default
       entity = GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(undefined, dto);
@@ -158,38 +190,60 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
     const entity = new GenerateGpgKeyPairOptionsEntity(dto);
 
     it("::userId returns {name, email}", () => {
-      expect(entity.userId).toStrictEqual({ name: dto.name, email: dto.email });
+      expect.assertions(1);
+      expect(entity.userId).toStrictEqual({name: dto.name, email: dto.email});
     });
 
     it("::name returns name", () => {
+      expect.assertions(1);
       expect(entity.name).toBe(dto.name);
     });
 
     it("::email returns email", () => {
+      expect.assertions(1);
       expect(entity.email).toBe(dto.email);
     });
 
     it("::rsaBits returns keySize", () => {
+      expect.assertions(1);
       expect(entity.rsaBits).toBe(dto.keySize);
     });
 
     it("::date returns provided date if set", () => {
+      expect.assertions(1);
       const now = Date.now();
-      const e = new GenerateGpgKeyPairOptionsEntity(defaultDto({ date: now }));
+      const e = new GenerateGpgKeyPairOptionsEntity(defaultDto({date: now}));
       expect(e.date.getTime()).toBe(now);
     });
 
-    it("::toGenerateOpenpgpKeyDto returns formatted dto", () => {
+    it("::toGenerateOpenpgpKeyDto returns formatted dto with rsa key", () => {
+      expect.assertions(1);
       const dto = minimalDto();
       const e = new GenerateGpgKeyPairOptionsEntity(dto);
       const result = e.toGenerateOpenpgpKeyDto();
 
       expect(result).toStrictEqual({
-        userIDs: [{ name: dto.name, email: dto.email }],
+        userIDs: [{name: dto.name, email: dto.email}],
         rsaBits: e.rsaBits,
         passphrase: dto.passphrase,
         type: e.type,
-        curve: e.curve,
+        date: e.date,
+      });
+    });
+
+    it("::toGenerateOpenpgpKeyDto returns formatted dto with ecc key", () => {
+      expect.assertions(1);
+      const dto = minimalDto({
+        type: "ecc",
+      });
+      const e = new GenerateGpgKeyPairOptionsEntity(dto);
+      const result = e.toGenerateOpenpgpKeyDto();
+
+      expect(result).toStrictEqual({
+        userIDs: [{name: dto.name, email: dto.email}],
+        curve: "ed25519",
+        passphrase: dto.passphrase,
+        type: e.type,
         date: e.date,
       });
     });

@@ -665,6 +665,13 @@ classDiagram
             +hasEncryptedPrivateKeys() boolean
         }
 
+        class ShareMetadataPrivateKeysCollection {
+            +validateBuildRules(item, options): void
+            +assertSameUserId(item): void
+            +hasDecryptedPrivateKeys(): boolean
+            +hasEncryptedPrivateKeys(): boolean
+        }
+
         class MetadataTrustedKeyEntity {
             -string props.fingerprint
             -string props.signed
@@ -889,7 +896,7 @@ classDiagram
             +get groupsUsers() GroupsUsersCollection
             +get accountRecoveryUserSetting() AccountRecoveryUserSettingEntity
             +get pendingAccountRecoveryUserRequest() AccountRecoveryRequestEntity
-            +get missingMetadataKeysIds() array~uuid~
+            +get missingMetadataKeysIds() array~uuid~ 
             +set locale(string locale)
         }
 

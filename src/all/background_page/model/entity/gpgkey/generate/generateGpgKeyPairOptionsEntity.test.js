@@ -22,7 +22,12 @@ import {
 } from "../../organizationSettings/organizationSettingsEntity.test.data";
 import GenerateGpgKeyPairOptionsEntity from "./generateGpgKeyPairOptionsEntity";
 import {defaultDto, minimalDto} from "./generateGpgKeyPairOptionsEntity.test.data";
-import {GPG_KEY_TYPE_EDDSA, GPG_KEY_TYPE_RSA} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
+import {defaultUserKeyPoliciesSettingsDto, rsaUserKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
+import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
+
+beforeEach(() => {
+  jest.useFakeTimers(); //avoid slight nano seconds shift in test when comparing dates that makes test failing while they shouldn't
+});
 
 describe("GenerateGpgKeyPairOptionsEntity", () => {
   describe("::getSchema", () => {
@@ -148,10 +153,8 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
     it("creates ECC entity when api type is eddsa", () => {
       expect.assertions(3);
       const dto = minimalDto();
-      const entity = GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(
-        GPG_KEY_TYPE_EDDSA,
-        dto
-      );
+      const userKeyPolicies = new UserKeyPoliciesSettingsEntity(defaultUserKeyPoliciesSettingsDto());
+      const entity = GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(userKeyPolicies, dto);
 
       expect(entity.type).toBe(GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC);
       expect(entity.curve).toBe(GenerateGpgKeyPairOptionsEntity.DEFAULT_ECC_KEY_CURVE);
@@ -159,19 +162,14 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
     });
 
     it("creates RSA entity when api type is rsa (default)", () => {
-      expect.assertions(4);
+      expect.assertions(3);
       const dto = minimalDto();
-      let entity = GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(
-        GPG_KEY_TYPE_RSA,
-        dto
-      );
-      expect(entity.type).toBe(GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA);
-      expect(entity.rsaBits).toBe(GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE);
-      expect(entity.curve).toBeNull();
+      const userKeyPolicies = new UserKeyPoliciesSettingsEntity(rsaUserKeyPoliciesSettingsDto());
+      const entity = GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(userKeyPolicies, dto);
 
-      // Implicit default
-      entity = GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(undefined, dto);
       expect(entity.type).toBe(GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA);
+      expect(entity.rsaBits).toBe(userKeyPolicies.preferredKeySize);
+      expect(entity.curve).toBeNull();
     });
   });
 

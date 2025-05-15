@@ -529,7 +529,7 @@ classDiagram
             -string props.expires
             -string props.created
             -string props.algorithm
-            -number props.length
+            -integer props.length
             -string props.curve
             -boolean props.private
             -boolean props.revoked
@@ -541,7 +541,7 @@ classDiagram
             +get isValid() boolean
             +get created() string
             +get algorithm() string
-            +get length() number
+            +get length() integer
             +get curve() string
             +get revoked() boolean
             +get private() boolean
@@ -915,8 +915,7 @@ classDiagram
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         class GenerateSetupKeyPairController {
-            +exec(passphraseDto string) Promise
-            -_buildGenerateKeyPairOptionsEntity(passphrase string) Promise~GenerateGpgKeyPairOptionsEntity~
+            +exec(object generateGpgKeyDto) Promise
         }
 
         class AccountRecoveryGenerateOrganizationKeyController {
@@ -927,25 +926,26 @@ classDiagram
     %% GpgKey services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        class UserGpgKeyPoliciesSettingsApiService {
+        class FindUserKeyPoliciesSettingsService {
+            +findSettingsAsGuest(userId string, authenticationToken string) Promise~UserKeyPoliciesSettingsEntity~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% GpgKey models
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class UserKeyPoliciesSettingsApiService {
             +findSettingsAsGuest(userId string, authenticationToken string) Promise~object~
         }
 
-        class FindUserGpgKeyPoliciesSettingsService {
-            +findSettingsAsGuest(userId string, authenticationToken string) Promise~UserGpgKeyPoliciesSettingsEntity~
-        }
-
-    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% GpgKey entities
-    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        class UserGpgKeyPoliciesSettingsEntity {
+        class UserKeyPoliciesSettingsEntity {
             -string props.preferred_key_type
             -string props.source
 
             +get preferredKeyType() string
             +get source() string|null
 
-            +createFromDefault(data: object)$ UserGpgKeyPoliciesSettingsEntity
+            +createFromDefault(data: object)$ UserKeyPoliciesSettingsEntity
         }
 
         class GenerateGpgKeyPairOptionsEntity {
@@ -955,9 +955,9 @@ classDiagram
             -string props.email
             -string props.passphrase
             -string props.type
-            -number props.keySize
+            -integer props.keySize
             -string props.curve
-            -number props.date
+            -integer props.date
 
             +toGenerateOpenpgpKeyDto() object
             +get userId() string
@@ -966,12 +966,12 @@ classDiagram
             +get type() string
             +get passphrase() string
             +get curve() string|null
-            +get rsaBits() number|null
+            +get rsaBits() integer|null
             +get date() Date
             +createForUserKeyGeneration(apiGpgKeyType string, generateGpgKeyPairDto object)$ GenerateGpgKeyPairOptionsEntity
             +createForOrkKeyGeneration(generateGpgKeyPairDto object)$ GenerateGpgKeyPairOptionsEntity
             +get ENTITY_NAME() string
-            +get DEFAULT_RSA_KEY_SIZE() number
+            +get DEFAULT_RSA_KEY_SIZE() integer
             +get DEFAULT_KEY_TYPE() string
             +get DEFAULT_ECC_KEY_CURVE() string
             +get KEY_TYPE_RSA() string
@@ -1168,11 +1168,11 @@ classDiagram
     style ShareService fill:#DEE5D4
 
 %% GpgKey controllers relationships
-    GenerateSetupKeyPairController*--FindUserGpgKeyPoliciesSettingsService
+    GenerateSetupKeyPairController*--FindUserKeyPoliciesSettingsService
     GenerateSetupKeyPairController*--GenerateGpgKeyPairService
     GenerateSetupKeyPairController*--GenerateGpgKeyPairOptionsEntity
     AccountRecoveryGenerateOrganizationKeyController*--GenerateGpgKeyPairService
     AccountRecoveryGenerateOrganizationKeyController*--GenerateGpgKeyPairOptionsEntity
 %% GpgKey services relationships
-    FindUserGpgKeyPoliciesSettingsService*--UserGpgKeyPoliciesSettingsApiService
+    FindUserKeyPoliciesSettingsService*--UserKeyPoliciesSettingsApiService
 ```

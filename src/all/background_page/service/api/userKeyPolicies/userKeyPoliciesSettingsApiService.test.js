@@ -14,9 +14,9 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
-import UserGpgKeyPoliciesSettingsApiService from "./userGpgKeyPoliciesSettingsApiService";
+import UserKeyPoliciesSettingsApiService from "./userKeyPoliciesSettingsApiService";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultUserGpgKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userGpgKeyPolicies/UserGpgKeyPoliciesSettingsEntity.test.data";
+import {defaultUserKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
 import {v4 as uuidV4} from "uuid";
 
 beforeEach(async() => {
@@ -29,11 +29,11 @@ describe("UserGpgKeyPolicieesSettingsApiService", () => {
     it("retrieves the settings from API", async() => {
       expect.assertions(1);
 
-      const apiResponse = defaultUserGpgKeyPoliciesSettingsDto();
-      fetch.doMockOnceIf(/user-gpg-key-policies\/settings/, () => mockApiResponse(apiResponse));
+      const apiResponse = defaultUserKeyPoliciesSettingsDto();
+      fetch.doMockOnceIf(/setup\/user-key-policies\/settings/, () => mockApiResponse(apiResponse));
 
       const apiClientOptions = defaultApiClientOptions();
-      const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
+      const service = new UserKeyPoliciesSettingsApiService(apiClientOptions);
 
       const userId = uuidV4();
       const authenticationToken = uuidV4();
@@ -46,7 +46,7 @@ describe("UserGpgKeyPolicieesSettingsApiService", () => {
       expect.assertions(1);
 
       const apiClientOptions = defaultApiClientOptions();
-      const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
+      const service = new UserKeyPoliciesSettingsApiService(apiClientOptions);
 
       const userId = "test";
       const authenticationToken = uuidV4();
@@ -58,7 +58,7 @@ describe("UserGpgKeyPolicieesSettingsApiService", () => {
       expect.assertions(1);
 
       const apiClientOptions = defaultApiClientOptions();
-      const service = new UserGpgKeyPoliciesSettingsApiService(apiClientOptions);
+      const service = new UserKeyPoliciesSettingsApiService(apiClientOptions);
 
       const userId = uuidV4();
       const authenticationToken = "test";

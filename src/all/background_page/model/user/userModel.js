@@ -83,6 +83,10 @@ class UserModel {
     let user = await UserMeSessionStorageService.get(this.account);
     if (!user || refreshCache) {
       const contains = {profile: true, role: true, account_recovery_user_setting: true};
+      const organizationSettings = await this.organisationSettingsModel.getOrFind();
+      if (organizationSettings.isPluginEnabled("metadata")) {
+        contains.missing_metadata_keys_ids = true;
+      }
       user = await this.findOne(this.account.userId, contains, true);
       await UserMeSessionStorageService.set(this.account, user);
     }

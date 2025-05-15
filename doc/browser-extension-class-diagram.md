@@ -767,7 +767,7 @@ classDiagram
             -string props.created_by
             -string props.modified
             -string props.modified_by
-            -MetadataEntity _metadata
+            -ResourceMetadataEntity _metadata
             -FavoriteEntity _favorite
             -PermissionEntity _permission
             -PermissionsCollection _permissions
@@ -776,8 +776,8 @@ classDiagram
             -TagsCollection _tags
             -UserEntity _creator
             -UserEntity _modifier
-            +get metadata() string|MetadataEntity
-            +set metadata(string|MetadataEntity metadata)
+            +get metadata() string|ResourceMetadataEntity
+            +set metadata(string|ResourceMetadataEntity metadata)
             +isMetadataDecrypted() boolean
             +isMetadataKeyTypeUserKey() boolean
         }
@@ -905,11 +905,42 @@ classDiagram
             +get groupsUsers() GroupsUsersCollection
             +get accountRecoveryUserSetting() AccountRecoveryUserSettingEntity
             +get pendingAccountRecoveryUserRequest() AccountRecoveryRequestEntity
-            +get missingMetadataKeysIds() array~uuid~ 
+            +get missingMetadataKeysIds() array~uuid~
             +set locale(string locale)
         }
 
         class UsersCollection {
+        }
+
+        class ResourceMetadataEntity {
+
+            -string props.object_type
+            -string props.resource_type_id
+            -string props.name
+            -string props.username
+            -array props.uris
+            -string props.description
+            -IconEntity _icon
+
+            +get objectType() string|null
+            +get name() string
+            +get username() string
+            +get description() string|null
+            +get resourceTypeId() string
+            +get uris() Array;
+            +get icon() IconEntity|null
+            +get METADATA_OBJECT_TYPE()$ string
+            +get URI_MAX_LENGTH()$ number
+        }
+
+        class IconEntity {
+            -string props.type
+            -intger props.value
+            -string props.background_color
+
+            +get type string|null
+            +get value integer|null
+            +get backgroundColor string|null
         }
 
         class MigrateMetadataEntity {

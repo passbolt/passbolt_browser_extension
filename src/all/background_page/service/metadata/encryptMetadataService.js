@@ -29,6 +29,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import Keyring from '../../model/keyring';
 import ExternalGpgKeyEntity from 'passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity';
+import ResourceMetadataEntity from 'passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity';
 
 class EncryptMetadataService {
   /**
@@ -65,7 +66,7 @@ class EncryptMetadataService {
 
     passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
     const userPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    const serializedMetadata = JSON.stringify(entity.metadata.toDto());
+    const serializedMetadata = JSON.stringify(entity.metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN));
 
     let encryptedMetadata;
     if (entity.isPersonal() && await this.allowUsageOfPersonalKeys()) {
@@ -143,7 +144,7 @@ class EncryptMetadataService {
         continue;
       }
 
-      const serializedMetadata = JSON.stringify(entity.metadata.toDto());
+      const serializedMetadata = JSON.stringify(entity.metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN));
       const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, metadataPublicKey, [userDecryptedPrivateKey, metadataPrivateKey]);
       entity.metadataKeyId = metadataKeyId;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
@@ -172,7 +173,7 @@ class EncryptMetadataService {
       const userId = entity.soleOwnerId || this.account.userId;
       const userPublicKey = await this._retrieveRecipientKey(userId);
 
-      const serializedMetadata = JSON.stringify(entity.metadata.toDto());
+      const serializedMetadata = JSON.stringify(entity.metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN));
       const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [userDecryptedPrivateKey]);
       entity.metadataKeyId = null;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;

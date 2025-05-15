@@ -208,7 +208,7 @@ class ResourceEntity extends EntityV2 {
    */
   toDto(contain) {
     const result = Object.assign({}, this._props);
-    result.metadata = result.metadata || this._metadata.toDto();
+    result.metadata = result.metadata || this._metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN);
     if (!contain) {
       return result;
     }
@@ -644,7 +644,7 @@ class ResourceEntity extends EntityV2 {
    */
   set metadata(metadata) {
     if (metadata instanceof ResourceMetadataEntity) {
-      this._metadata = new ResourceMetadataEntity(metadata.toDto(), {validate: false});
+      this._metadata = new ResourceMetadataEntity(metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN), {validate: false});
       delete this._props.metadata;
     } else if (typeof metadata === "object") {
       this._metadata = new ResourceMetadataEntity(metadata);

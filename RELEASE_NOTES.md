@@ -1,8 +1,16 @@
 Song: https://www.youtube.com/watch?v=d9WHUTKMD8k
 
-Passbolt Browser Extension v5.1.0 is now available as a release candidate. This version introduces encrypted resource metadata (beta) for all users, along with numerous enhancements and bug fixes. For full details, please see the changelog.
+The 5.1 release adds support for encrypted resource metadata features as an opt-in feature. Early adopters can turn it on, test real-world workflows and feed back improvements, while more cautious teams, or teams with a lot of custom integrations, can wait until they are ready.
 
-We would also like to thank the community for their invaluable feedback.
+This is a major milestone for the product, further extending Passbolt’s security model to improve confidentiality for the contextual information surrounding credentials. This means that metadata such as names, login URLs, and similar fields are now also cryptographically protected. As is customary for high-risk security features, this implementation has been audited by security researchers from Cure53 with a public report publication coming soon.
+
+To ensure a smooth and cautious rollout, the feature is released in beta with v5.1 and is scheduled for stable release in v5.2. If you want to know more about how to enable it and start testing, a blog article published shortly, will provide a step-by-step guidance on how to activate the feature and a deeper dive into what’s changed.
+
+Additionally, the password expiry feature is now enabled by default for new installations. This capability is considered a security best practice, helping organizations enforce rotation policies and mitigate risks associated with long-lived shared credentials. For existing instances, administrators can enable this feature manually from the administration workspace. To learn more, check out the blog article: [Passbolt’s New Automation of Shared Passwords Expiry](https://www.passbolt.com/blog/passbolts-new-automation-of-shared-passwords-expiry).
+
+As usual, this release also includes a few bug fixes and performance improvements, like a faster folder tree that handles 5,000+ folders for the ones that are running a tight ship.
+
+As always, thank you to our community for your feedback, contributions, and bug reports. A special thanks to the CakePHP maintainers for the fast post v5 upgrade support!
 
 ### Added
 - PB-41340 Add dedicated input to fix autofill on specific website

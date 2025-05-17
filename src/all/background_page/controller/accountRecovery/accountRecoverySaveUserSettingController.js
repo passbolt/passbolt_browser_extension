@@ -18,7 +18,7 @@ import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryMod
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import User from "../../model/user";
-import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import BuildApprovedAccountRecoveryUserSettingEntityService from "../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService";
 
 

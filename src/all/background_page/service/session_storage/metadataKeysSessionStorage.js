@@ -13,6 +13,7 @@
  */
 import AccountEntity from "../../model/entity/account/accountEntity";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
+import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
 
 export const METADATA_KEYS_SESSION_STORAGE_KEY = "metadata_keys";
 
@@ -96,6 +97,31 @@ class MetadataKeysSessionStorage {
   }
 
   /**
+   * Update a metadata key in the session storage.
+   * @param {MetadataPrivateKeyEntity} metadataPrivateKey The metadata private key to update
+   * @throws {Error} if the metadata key does not exist in the session storage
+   */
+  async updatePrivateKey(metadataPrivateKey) {
+    if (!metadataPrivateKey || !(metadataPrivateKey instanceof MetadataPrivateKeyEntity)) {
+      throw new TypeError("The parameter `metadataPrivateKey` should be of type MetadataPrivateKeyEntity.");
+    }
+    if (!metadataPrivateKey.isDecrypted) {
+      throw new Error("The metadata private key should be decrypted.");
+    }
+
+    await navigator.locks.request(this.storageKey, async() => {
+      const metadataKeys = await this.get() || [];
+      const metadataKeyIndex = metadataKeys.findIndex(item => item.id === metadataPrivateKey.metadataKeyId);
+      if (metadataKeyIndex === -1) {
+        throw new Error('The metadata key could not be found in the session storage');
+      }
+      metadataKeys[metadataKeyIndex].metadata_private_keys[0] = metadataPrivateKey.toDto();
+      await this._setBrowserStorage({[this.storageKey]: metadataKeys});
+      MetadataKeysSessionStorage._runtimeCachedData[this.account.id] = metadataKeys;
+    });
+  }
+
+  /**
    * Make sure the entity meet some minimal requirements before being stored
    *
    * @param {MetadataKeyEntity} metadataKey
@@ -142,7 +168,7 @@ class MetadataKeysSessionStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {metadata_private_keys: true};
+    return {metadata_private_keys: true, creator: true};
   }
 }
 

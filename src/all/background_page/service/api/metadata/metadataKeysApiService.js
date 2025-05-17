@@ -37,6 +37,8 @@ class MetadataKeysApiService extends AbstractService {
   static getSupportedContainOptions() {
     return [
       'metadata_private_keys',
+      'creator',
+      'creator.profile',
     ];
   }
 

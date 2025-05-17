@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.6.0
  */
-import expect from "expect";
 import {v4 as uuidv4} from "uuid";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";

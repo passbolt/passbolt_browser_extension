@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
-import GroupsUsersCollection from "../groupsUsersCollection";
+import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
 import GroupUserChangeEntity from "./groupUserChangeEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 

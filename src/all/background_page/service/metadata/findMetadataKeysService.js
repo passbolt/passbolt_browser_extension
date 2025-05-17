@@ -15,6 +15,9 @@
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import DecryptMetadataPrivateKeysService from "../metadata/decryptMetadataPrivateKeysService";
 import MetadataKeysApiService from "../api/metadata/metadataKeysApiService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 class FindMetadataKeysService {
   /**
@@ -34,10 +37,12 @@ class FindMetadataKeysService {
    *
    * @param {Object} [contains] Return entities associated models, example: {metadata_private_keys: true}.
    * @param {Object} [filters] Return entities applied filters, example: {deleted: true}.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<MetadataKeysCollection>}
    * @public
    */
-  async findAll(contains = {}, filters = {}) {
+  async findAll(contains = {}, filters = {}, passphrase = null) {
     const supportedOptions = MetadataKeysApiService.getSupportedContainOptions();
     if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
@@ -48,24 +53,27 @@ class FindMetadataKeysService {
     }
 
     const metadataKeysDto = await this.metadataKeysApiService.findAll(contains, filters);
-
     const collection = new MetadataKeysCollection(metadataKeysDto);
+
     if (collection.hasDecryptedKeys()) {
       throw new Error("The metadata private keys should not be decrypted.");
     }
 
-    await this.decryptMetadataPrivateKeysService.decryptAllFromMetadataKeysCollection(collection);
+    await this.decryptMetadataPrivateKeysService.decryptAllFromMetadataKeysCollection(collection, passphrase);
+    await this.assertArmoredFingerprintPublicAndEntitysMatch(collection);
 
     return collection;
   }
 
   /**
    * Retrieve the metadata keys from the API with the contained data necessary for the local storage.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<MetadataKeysCollection>}
    * @public
    */
-  findAllForSessionStorage() {
-    return this.findAll({metadata_private_keys: true}, {deleted: false});
+  findAllForSessionStorage(passphrase = null) {
+    return this.findAll({metadata_private_keys: true, creator: true, "creator.profile": true}, {deleted: false}, passphrase);
   }
 
   /**
@@ -75,6 +83,29 @@ class FindMetadataKeysService {
    */
   findAllNonDeleted() {
     return this.findAll({}, {deleted: false});
+  }
+
+  /**
+   * Verify the metadata public key entity fingerprint is equal to the  armored key fingerprint
+   * @param {MetadataKeysCollection} collection
+   * @private
+   */
+  async assertArmoredFingerprintPublicAndEntitysMatch(collection) {
+    for (const [index, metadataKey] of collection.items.entries()) {
+      try {
+        const publicMetadataKey = await OpenpgpAssertion.readKeyOrFail(metadataKey.armoredKey);
+
+        if (publicMetadataKey.getFingerprint().toLowerCase() !== metadataKey.fingerprint.toLowerCase()) {
+          const error = new EntityValidationError();
+          error.addError(`metadata_public_keys.${index}.fingerprint`, 'fingerprint_match', 'The fingerprint of the metadata armored public key does not match the entity fingerprint');
+          throw error;
+        }
+      } catch (error) {
+        const collectionValidationError = new CollectionValidationError();
+        collectionValidationError.addItemValidationError(index, error);
+        throw collectionValidationError;
+      }
+    }
   }
 }
 

@@ -49,14 +49,14 @@ describe("ResourcesKdbxImportParser", () => {
 
   it("should read import file protected by password", async() => {
     expect.assertions(1);
-    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
+    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-with-all-resource-types.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
       "file_type": "kdbx",
       "file": file,
       "options": {
         "credentials": {
-          "password": "passbolt"
+          "password": "test"
         }
       }
     };

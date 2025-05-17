@@ -240,10 +240,13 @@ describe("RequestFetchOffscreenService", () => {
 
     it("should throw and not fallback on fetchOffscreen if the navigator is not online", async() => {
       expect.assertions(1);
+
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
+
+      navigator.onLine = false;
       fetch.doMockOnce(() => Promise.reject({}));
-      jest.spyOn(navigator, 'onLine', 'get').mockReturnValueOnce(false);
+
       const requestPromise = RequestFetchOffscreenService.fetchNative(resource, options);
       await expect(requestPromise).rejects.toThrow();
     });

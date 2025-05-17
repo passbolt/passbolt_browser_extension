@@ -31,6 +31,7 @@ import MetadataKeysSessionStorage, {
 import SessionKeysBundlesSessionStorageService, {
   SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY
 } from "../sessionStorage/sessionKeysBundlesSessionStorageService";
+import {METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY} from "../local_storage/metadataKeysSettingsLocalStorage";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -77,7 +78,7 @@ describe("LocalStorageService", () => {
     });
 
     it("Should flush all storage (with an account set)", async() => {
-      expect.assertions(24);
+      expect.assertions(25);
       // mock data
       MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -91,7 +92,7 @@ describe("LocalStorageService", () => {
       // process
       await LocalStorageService.flush();
       // expectations
-      expect(browser.storage.local.remove).toHaveBeenCalledTimes(12);
+      expect(browser.storage.local.remove).toHaveBeenCalledTimes(13);
       expect(browser.storage.session.remove).toHaveBeenCalledTimes(5);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
@@ -112,6 +113,7 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_POLICIES_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${METADATA_TYPES_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.session.remove).toHaveBeenCalledWith(`${METADATA_KEYS_SESSION_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.session.remove).toHaveBeenCalledWith(`${SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY}-${account.id}`);
       expect(UserMeSessionStorageService.remove).toHaveBeenCalledWith(account);

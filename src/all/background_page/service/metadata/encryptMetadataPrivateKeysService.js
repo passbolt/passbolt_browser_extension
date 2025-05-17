@@ -32,16 +32,23 @@ class EncryptMetadataPrivateKeysService {
 
   /**
    * Encrypt a metadata private key and mutate the metadata private key entity data with the encrypted result.
+   * Additionally sign the encrypted message with the given private key.
    * If the private key is already encrypted, no action is taken.
    *
    * @param {MetadataPrivateKeyEntity} metadataPrivateKey The metadata private key entity to encrypt.
    * @param {openpgp.PrivateKey} userPrivateKey The user's decrypted private key.
+   * @param {object} [options]
+   * @param {Date} [options.date] Override the creation date of the message signature
    * @returns {Promise<void>}
    * @throws {TypeError} If `metadataPrivateKey` is not of type MetadataPrivateKeyEntity.
+   * @throws {TypeError} If `options.date` is defined and not of type Date.
    * @throws {Error} If `userPrivateKey` is not a decrypted OpenPGP private key.
    */
-  async encryptOne(metadataPrivateKey, userPrivateKey) {
+  async encryptOne(metadataPrivateKey, userPrivateKey, options = {}) {
     assertType(metadataPrivateKey, MetadataPrivateKeyEntity, "The 'metadataPrivateKey' parameter should be of type MetadataPrivateKeysEntity.");
+    if (typeof options?.date !== "undefined") {
+      assertType(options?.date, Date, "The optional 'date' parameter should be of type Date.");
+    }
     await OpenpgpAssertion.assertDecryptedPrivateKey(userPrivateKey);
     if (!metadataPrivateKey.isDecrypted) {
       return;
@@ -49,7 +56,8 @@ class EncryptMetadataPrivateKeysService {
 
     const recipientPublicKey = await this._retrieveRecipientKey(metadataPrivateKey.userId);
     const message = JSON.stringify(metadataPrivateKey.data);
-    metadataPrivateKey.data = await EncryptMessageService.encrypt(message, recipientPublicKey, [userPrivateKey]);
+    const encryptOptions = {date: options?.date};
+    metadataPrivateKey.data = await EncryptMessageService.encrypt(message, recipientPublicKey, [userPrivateKey], encryptOptions);
   }
 
   /**
@@ -65,7 +73,7 @@ class EncryptMetadataPrivateKeysService {
       return OpenpgpAssertion.readKeyOrFail(this.account.serverPublicArmoredKey);
     }
 
-    const userPublicGpgKey = (await this.keyring.findPublic(userId));
+    const userPublicGpgKey = this.keyring.findPublic(userId);
 
     if (!userPublicGpgKey) {
       throw new Error(`The public key for the user with ID ${userId} could not be found.`);

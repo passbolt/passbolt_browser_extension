@@ -46,6 +46,8 @@ describe("PostLoginService", () => {
       jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(jest.fn());
       jest.spyOn(PortManager, "getPortById").mockImplementationOnce(() => informCtaPortWrapper);
       jest.spyOn(informCtaPortWrapper, "emit");
+      jest.spyOn(toolbarService, "handleUserLoggedIn").mockImplementation(async() => {});
+      jest.spyOn(StartLoopAuthSessionCheckService, "exec").mockImplementation(async() => {});
 
       // execution
       await PostLoginService.exec();
@@ -72,6 +74,8 @@ describe("PostLoginService", () => {
       // function mocked
       jest.spyOn(BrowserTabService, "sendMessage");
       jest.spyOn(PortManager, "isPortExist").mockImplementation(() => true);
+      jest.spyOn(toolbarService, "handleUserLoggedIn").mockImplementation(async() => {});
+      jest.spyOn(StartLoopAuthSessionCheckService, "exec").mockImplementation(async() => {});
       // execution
       await PostLoginService.exec();
       // Waiting all promises are resolved
@@ -84,8 +88,8 @@ describe("PostLoginService", () => {
     it("Should call all the services that reacts on a post login event", async() => {
       expect.assertions(2);
 
-      jest.spyOn(StartLoopAuthSessionCheckService, "exec");
-      jest.spyOn(toolbarService, "handleUserLoggedIn");
+      jest.spyOn(StartLoopAuthSessionCheckService, "exec").mockImplementation(async() => {});
+      jest.spyOn(toolbarService, "handleUserLoggedIn").mockImplementation(async() => {});
 
       await PostLoginService.exec();
 

@@ -32,6 +32,12 @@ import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/
 import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 import {defaultSessionKeyDto} from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeyEntity.test.data";
 import SessionKeyEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeyEntity";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EncryptMessageService from "../crypto/encryptMessageService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import GetSessionKeyService from "../crypto/getSessionKeyService";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -48,7 +54,7 @@ describe("DecryptMetadataService", () => {
 
   describe("::decryptAllFromForeignModels", () => {
     it("decrypts the metadata of a ResourcesCollection with the shared metadata key", async() => {
-      expect.assertions(2);
+      expect.assertions(3);
 
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
       const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(10, {
@@ -61,21 +67,25 @@ describe("DecryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
 
       jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(PassphraseStorageService, "get");
 
       const isAllResourceMetadataEncrypted = collection.resources.reduce((accumulator, resource) => accumulator && !resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataEncrypted).toStrictEqual(true);
 
       await service.decryptAllFromForeignModels(collection, passphrase);
 
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
       const isAllResourceMetadataDecrypted = collection.resources.reduce((accumulator, resource) => accumulator && resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataDecrypted).toStrictEqual(true);
     });
 
     it("decrypts the metadata of a ResourcesCollection with the user key", async() => {
-      expect.assertions(2);
+      expect.assertions(3);
 
       const collectionDto = defaultPrivateResourcesWithEncryptedMetadataDtos();
       const collection = new ResourcesCollection(collectionDto);
+
+      jest.spyOn(PassphraseStorageService, "get");
 
       account = new AccountEntity(defaultAccountDto());
       const passphrase = pgpKeys.ada.passphrase;
@@ -86,12 +96,13 @@ describe("DecryptMetadataService", () => {
 
       await service.decryptAllFromForeignModels(collection, passphrase);
 
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
       const isAllResourceMetadataDecrypted = collection.resources.reduce((accumulator, resource) => accumulator && resource.isMetadataDecrypted(), true);
       expect(isAllResourceMetadataDecrypted).toStrictEqual(true);
     });
 
     it("decrypts the metadata of a ResourcesCollection with the session keys", async() => {
-      expect.assertions(12);
+      expect.assertions(13);
 
       const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos();
       const collection = new ResourcesCollection(collectionDto);
@@ -100,12 +111,14 @@ describe("DecryptMetadataService", () => {
       const sessionKeys = new SessionKeysCollection(sessionKeysDtos);
 
       jest.spyOn(service.getOrFindSessionKeysService, "getOrFindAllByForeignModelAndForeignIds").mockImplementation(() => sessionKeys);
+      jest.spyOn(PassphraseStorageService, "get");
 
       const isAllResourceMetadataEncrypted = collection.items.findIndex(resource => resource.isMetadataDecrypted()) !== -1;
       expect(isAllResourceMetadataEncrypted).toStrictEqual(false);
       await service.decryptAllFromForeignModels(collection);
 
       const isAllResourceMetadataDecrypted = collection.items.findIndex(resource => !resource.isMetadataDecrypted()) !== -1;
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
       expect(isAllResourceMetadataDecrypted).toStrictEqual(false);
       for (let i = 0; i < collection.length; i++) {
         expect(collection.items[i].metadata.toDto()).toEqual(metadata.withSharedKey.decryptedMetadata[i % metadata.withSharedKey.encryptedMetadata.length]);
@@ -461,7 +474,56 @@ describe("DecryptMetadataService", () => {
       await service.decryptAllFromForeignModels(collection, null, {updateSessionKeys: true});
 
       expect(service.saveSessionKeysService.save).toHaveBeenCalledTimes(1);
-      expect(service.saveSessionKeysService.save).toHaveBeenCalledWith(sessionKeys);
+      expect(service.saveSessionKeysService.save).toHaveBeenCalledWith(sessionKeys, null);
     });
+  });
+
+  describe("::decryptMetadataWithGpgKey", () => {
+    it("should throw an exception if the object_type is not set properly when decrypting with a GPG key", async() => {
+      const metadataDto = Object.assign({}, metadata.withAdaKey.decryptedMetadata[0]);
+      delete metadataDto.object_type;
+
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const encryptedMetadata = await EncryptMessageService.encrypt(JSON.stringify(metadataDto), publicKey, [privateKey]);
+
+      const resourceDto = defaultResourceDto({
+        metadata_key_id: null,
+        metadata_key_type: "user_key",
+        metadata: encryptedMetadata,
+      });
+
+      const entity = new ResourceEntity(resourceDto);
+
+      const expectedError = new EntityValidationError();
+      expectedError.addError('metadata.object_type', 'required-v5', "The resource metadata object_type is required and must be set to 'PASSBOLT_RESOURCE_METADATA'."),
+      await expect(() =>  service.decryptMetadataWithGpgKey(entity, privateKey)).rejects.toThrowError(expectedError);
+    }, 10_000);
+
+    it("should throw an exception if the object_type is not set properly when decrypting with a session key", async() => {
+      const metadataDto = Object.assign({}, metadata.withAdaKey.decryptedMetadata[0]);
+      delete metadataDto.object_type;
+
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+
+      const encryptedMetadata = await EncryptMessageService.encrypt(JSON.stringify(metadataDto), publicKey, [privateKey]);
+      const encryptedMetadataGpgMessage = await OpenpgpAssertion.readMessageOrFail(encryptedMetadata);
+
+      await DecryptMessageService.decrypt(encryptedMetadataGpgMessage, privateKey);
+      const sessionKeyString = GetSessionKeyService.getFromGpgMessage(encryptedMetadataGpgMessage);
+
+      const resourceDto = defaultResourceDto({
+        metadata_key_id: null,
+        metadata_key_type: "user_key",
+        metadata: encryptedMetadata,
+      });
+
+      const entity = new ResourceEntity(resourceDto);
+
+      const expectedError = new EntityValidationError();
+      expectedError.addError('metadata.object_type', 'required-v5', "The resource metadata object_type is required and must be set to 'PASSBOLT_RESOURCE_METADATA'."),
+      await expect(() =>  service.decryptMetadataWithSessionKey(entity, sessionKeyString)).rejects.toThrowError(expectedError);
+    }, 10_000);
   });
 });

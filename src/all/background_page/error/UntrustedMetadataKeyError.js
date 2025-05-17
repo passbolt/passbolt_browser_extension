@@ -9,16 +9,13 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.9.0
+ * @since         5.1.0
  */
+class UntrustedMetadataKeyError extends Error {
+  constructor(message = "The metadata key is not trusted.") {
+    super(message);
+    this.name = 'UntrustedMetadataKeyError';
+  }
+}
 
-/**
- * Default avatar url dto.
- * @param {object} data The data to override
- * @returns {object}
- */
-export const defaultAvatarUrlDto = (data = {}) => ({
-  "medium": "img\/avatar\/user_medium.png",
-  "small": "img\/avatar\/user.png",
-  ...data
-});
+export default UntrustedMetadataKeyError;

@@ -33,13 +33,14 @@ describe("FindSessionKeysService", () => {
   beforeEach(async() => {
     enableFetchMocks();
     fetch.resetMocks();
+    jest.clearAllMocks();
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
   describe('::findAllBundles', () => {
     it("retrieves the session keys bundles from API", async() => {
-      expect.assertions(4);
+      expect.assertions(5);
 
       const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
       spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
@@ -55,6 +56,19 @@ describe("FindSessionKeysService", () => {
       expect(resultDto).toHaveLength(apiSessionKeysBundlesCollection.length);
       expect(resultDto.hasSomeDecryptedSessionKeysBundles()).toStrictEqual(true);
       expect(spyOnFindService).toHaveBeenCalledTimes(1);
+      expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(1);
+      const apiSessionKeysBundlesCollection = defaultSessionKeysBundlesDtos();
+
+      const service = new FindSessionKeysService(apiClientOptions, account);
+      jest.spyOn(PassphraseStorageService, "get");
+      jest.spyOn(service.sesionKeysBundlesApiService, "findAll").mockImplementation(() => apiSessionKeysBundlesCollection);
+      await service.findAllBundles(pgpKeys.ada.passphrase);
+
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
     it("throws an error if the keys from the API is already decrypted", async() => {

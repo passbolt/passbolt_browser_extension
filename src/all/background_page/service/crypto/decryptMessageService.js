@@ -79,28 +79,38 @@ class DecryptMessageService {
    * @param {openpgp.Message} message The message to decrypt.
    * @param {openpgp.PrivateKey} decryptionKey The private key to use to decrypt the message
    * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys (optional) The key(s) to check the signature for.
-   * @returns {Promise<string>}
+   * @param {boolean} [options.throwOnInvalidSignaturesVerification=true] Should throw when verifying the signatures corresponding to the verification keys
+   * @param {boolean} [options.returnOnlyData=true] Should return only data without signatures
+   * @returns {Promise<string|openpgp.DecryptMessageResult>}
    * @throws {Error} if the given signatures don't match the message to decrypt.
    */
-  static async decrypt(message, decryptionKey, verificationKeys = null) {
+  static async decrypt(message, decryptionKey, verificationKeys = null, options = {}) {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertDecryptedPrivateKey(decryptionKey);
+
+    const throwOnInvalidSignaturesVerification = options?.throwOnInvalidSignaturesVerification !== false && Boolean(verificationKeys);
+    const returnOnlyData = options?.returnOnlyData !== false;
+
     if (verificationKeys) {
       OpenpgpAssertion.assertKeys(verificationKeys);
     }
 
-    const {data: decryptedMessage, signatures} = await openpgp.decrypt({
+    const rawResult = await openpgp.decrypt({
       message: message,
       decryptionKeys: decryptionKey,
       verificationKeys: verificationKeys,
-      expectSigned: Boolean(verificationKeys)
+      expectSigned: throwOnInvalidSignaturesVerification
     });
 
-    if (verificationKeys) {
-      await this.doSignatureVerification(signatures);
+    if (throwOnInvalidSignaturesVerification) {
+      await this.doSignatureVerification(rawResult.signatures);
     }
 
-    return decryptedMessage;
+    if (returnOnlyData) {
+      return rawResult.data;
+    }
+
+    return rawResult;
   }
 
   /**

@@ -89,11 +89,11 @@ describe("CreateCommentController", () => {
       expectInvalidField(controller, mockCreation);
     });
     it("Should raise an error if user is offline", async() => {
+      navigator.onLine = false;
       const mockedError = new TypeError("Unable to reach the server, you are not connected to the network");
       fetch.doMock(() => { throw mockedError; });
       const controller = new CreateCommentController(mockedWorker, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller.commentModel, "create");
-      jest.spyOn(navigator, 'onLine', 'get').mockReturnValueOnce(false);
 
       expect.assertions(2);
 

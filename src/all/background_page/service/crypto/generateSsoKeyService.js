@@ -25,7 +25,7 @@ class GenerateSsoKeyService {
       length: 256
     };
     const capabilities = ["encrypt", "decrypt"];
-    return crypto.subtle.generateKey(algorithm, extractable, capabilities);
+    return await crypto.subtle.generateKey(algorithm, extractable, capabilities);
   }
 }
 

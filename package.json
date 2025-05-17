@@ -1,6 +1,6 @@
 {
   "name": "passbolt-browser-extension",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2025 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -13,15 +13,16 @@
   "dependencies": {
     "await-lock": "^2.1.0",
     "downloadjs": "^1.4.7",
+    "eckey-utils": "^0.7.14",
     "i18next": "^23.7.16",
     "i18next-http-backend": "^2.4.2",
     "ip-regex": "^5.0.0",
     "jssha": "~3.3.1",
     "kdbxweb": "2.1.1",
     "locutus": "~2.0.9",
-    "openpgp": "^5.11.1",
+    "openpgp": "6.1",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "^5.0.1",
+    "passbolt-styleguide": "^5.1.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
@@ -47,6 +48,8 @@
     "eslint-plugin-jest": "^27.2.3",
     "eslint-plugin-no-unsanitized": "^4.0.1",
     "eslint-plugin-react": "^7.33.1",
+    "filereader": "^0.10.3",
+    "formdata-node": "^6.0.3",
     "grunt": "^1.0.3",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
@@ -67,12 +70,7 @@
     "webpack-cli": "^5.1.4"
   },
   "overrides": {
-    "web-ext": {
-      "@babel/runtime": "^7.27.0"
-    },
-    "addons-linter": {
-      "image-size": "^2.0.2"
-    }
+    "image-size": "^2.0.2"
   },
   "scripts": {
     "build": "npx grunt build",

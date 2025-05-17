@@ -17,6 +17,7 @@ import {assertArray, assertArrayUUID, assertNonEmptyArray} from "../../utils/ass
 import ShareResourceService from "../../service/share/shareResourceService";
 import i18n from "../../sdk/i18n";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
+import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
 class ShareResourcesController {
   /**
@@ -33,6 +34,7 @@ class ShareResourcesController {
     this.progressService = new ProgressService(this.worker);
     this.shareResourceService = new ShareResourceService(apiClientOptions, account, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
+    this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
   /**
@@ -66,6 +68,7 @@ class ShareResourcesController {
 
     const permissionChanges = new PermissionChangesCollection(permissionChangesDto);
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
     /*
      * 7 steps are required to share resources:

@@ -93,14 +93,16 @@ export default class FindResourcesService {
 
   /**
    * Retrieve all resources for the local storage.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAllForLocalStorage() {
+  async findAllForLocalStorage(passphrase = null) {
     const resources = await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, null, true);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
 
-    await this.decryptMetadataService.decryptAllFromForeignModels(resources, undefined, {ignoreDecryptionError: true, updateSessionKeys: true});
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources, passphrase, {ignoreDecryptionError: true, updateSessionKeys: true});
     resources.filterOutMetadataEncrypted();
 
     return resources;
@@ -154,9 +156,11 @@ export default class FindResourcesService {
   /**
    * Retrieve all resources by ids for display permissions.
    * @param {Array<string>} resourcesIds The resource ids to retrieve.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAllByIdsForDisplayPermissions(resourcesIds) {
+  async findAllByIdsForDisplayPermissions(resourcesIds, passphrase = null) {
     assertArrayUUID(resourcesIds);
 
     const contains = {
@@ -165,7 +169,7 @@ export default class FindResourcesService {
       "permissions.group": true,
     };
     const resources = await this.findAllByIds(resourcesIds, contains);
-    await this.decryptMetadataService.decryptAllFromForeignModels(resources);
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources, passphrase);
 
     return resources;
   }

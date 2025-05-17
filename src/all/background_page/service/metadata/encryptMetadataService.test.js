@@ -40,6 +40,8 @@ import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import passphraseStorageService from "../session_storage/passphraseStorageService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -58,8 +60,8 @@ describe("EncryptMetadataService", () => {
   });
 
   describe("::encryptOneFromForeignModels", () => {
-    it("should encrypt the metadata of a ResourcesEntity with shared metadata key", async() => {
-      expect.assertions(5);
+    it("should encrypt the metadata of a ResourcesEntity with shared metadata key, using the passphrase from the session storage", async() => {
+      expect.assertions(6);
 
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
 
@@ -75,6 +77,7 @@ describe("EncryptMetadataService", () => {
 
       await encryptService.encryptOneForForeignModel(resourceEntity, null);
 
+      expect(passphraseStorageService.get).toHaveBeenCalledTimes(1);
       expect(resourceEntity.isMetadataDecrypted()).toBeFalsy();
       expect(resourceEntity.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
       expect(resourceEntity.metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
@@ -84,8 +87,26 @@ describe("EncryptMetadataService", () => {
       expect(resourceEntity.isMetadataDecrypted()).toBeTruthy();
     });
 
+    it("should not retrieve the passphrase from the session storage if passed as parameter", async() => {
+      expect.assertions(1);
+
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
+
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
+      resourceEntity._props.personal = false;
+
+      jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(PassphraseStorageService, "get");
+
+      await encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase);
+
+      expect(passphraseStorageService.get).not.toHaveBeenCalled();
+    });
+
     it("should encrypt the metadata of a ResourcesEntity with user private key", async() => {
-      expect.assertions(5);
+      expect.assertions(6);
 
       const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
       resourceEntity._props.personal = true;
@@ -94,11 +115,13 @@ describe("EncryptMetadataService", () => {
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(async() => privateKeyDecrypted);
       jest.spyOn(encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
         .mockImplementationOnce(() => metadataKeysSettingsDto);
+      jest.spyOn(PassphraseStorageService, "get");
 
       expect(resourceEntity.isMetadataDecrypted()).toBeTruthy();
 
       await encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase);
 
+      expect(passphraseStorageService.get).not.toHaveBeenCalled();
       expect(resourceEntity.isMetadataDecrypted()).toBeFalsy();
       expect(resourceEntity.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_USER_KEY);
       expect(resourceEntity.metadataKeyId).toBeNull();
@@ -110,7 +133,7 @@ describe("EncryptMetadataService", () => {
     });
 
     it("should encrypt the metadata of a ResourcesEntity with shared metadata key if user is not allowed to use his personal key", async() => {
-      expect.assertions(5);
+      expect.assertions(6);
 
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
@@ -122,11 +145,13 @@ describe("EncryptMetadataService", () => {
       jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
         .mockImplementationOnce(() => metadataKeysSettingsDto);
+      jest.spyOn(passphraseStorageService, "get");
 
       expect(resourceEntity.isMetadataDecrypted()).toBeTruthy();
 
       await encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase);
 
+      expect(passphraseStorageService.get).not.toHaveBeenCalled();
       expect(resourceEntity.isMetadataDecrypted()).toBeFalsy();
       expect(resourceEntity.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
       expect(resourceEntity.metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
@@ -210,7 +235,7 @@ describe("EncryptMetadataService", () => {
   });
 
   describe("::encryptAllFromForeignModels", () => {
-    it("should encrypt the metadata of a ResourceCollection with shared metadata key", async() => {
+    it("should encrypt the metadata of share resources of the collection with the shared metadata key", async() => {
       expect.assertions(5);
 
       const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
@@ -242,7 +267,29 @@ describe("EncryptMetadataService", () => {
       expect(expectedResult.isMetadataDecrypted()).toBeTruthy();
     });
 
-    it("should encrypt the metadata of a ResourcesEntity with user private key", async() => {
+    it("should not retrieve the passphrase from the session storage is passed as parameter", async() => {
+      expect.assertions(1);
+
+      const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
+      resourceEntity._props.personal = false;
+      const collection = new ResourcesCollection([resourceEntity]);
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(PassphraseStorageService, "get");
+      jest.spyOn(encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+        .mockImplementationOnce(() => defaultMetadataKeysSettingsDto());
+
+      await encryptService.encryptAllFromForeignModels(collection, pgpKeys.ada.passphrase);
+
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
+    });
+
+    it("should encrypt the metadata of a personal resource from the collection with user private key", async() => {
       expect.assertions(5);
 
       const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
@@ -252,6 +299,9 @@ describe("EncryptMetadataService", () => {
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+      const keyring = new Keyring();
+      await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
 
       jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
@@ -276,7 +326,7 @@ describe("EncryptMetadataService", () => {
       expect(expectedResult.isMetadataDecrypted()).toBeTruthy();
     });
 
-    it("should encrypt the metadata of a ResourcesEntity with shared metadata key if user is not allowed to use his personal key", async() => {
+    it("should encrypt the metadata of personal resource of the collection with shared metadata key if users are not allowed to use their personal key", async() => {
       expect.assertions(5);
 
       const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT}));
@@ -355,6 +405,8 @@ describe("EncryptMetadataService", () => {
       jest.spyOn(encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
         .mockImplementationOnce(() => defaultMetadataKeysSettingsDto());
 
+      const keyring = new Keyring();
+      await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
 
       await encryptService.encryptAllFromForeignModels(collection, pgpKeys.ada.passphrase);
 

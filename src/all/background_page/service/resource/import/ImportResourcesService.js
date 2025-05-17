@@ -14,7 +14,6 @@
 
 import ImportError from "../../../error/importError";
 import ExternalFoldersCollection from "../../../model/entity/folder/external/externalFoldersCollection";
-import ResourceEntity from "../../../model/entity/resource/resourceEntity";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import SecretEntity from "../../../model/entity/secret/secretEntity";
@@ -33,8 +32,9 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import User from "../../../model/user";
 import i18n from "../../../sdk/i18n";
 import GetOrFindMetadataSettingsService from "../../metadata/getOrFindMetadataSettingsService";
-import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
+import EncryptMetadataService from "../../metadata/encryptMetadataService";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
+import DecryptMetadataService from "../../metadata/decryptMetadataService";
 
 /**
  * The service aim to import the resources from a file and save it to the API / localstorage.
@@ -58,7 +58,8 @@ class ImportResourcesService {
     this.executeConcurrentlyService = new ExecuteConcurrentlyService();
     this.progressService = progressService;
     this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
-    this.encryptService = new EncryptMetadataKeysService(apiClientOptions, account);
+    this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
+    this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
     this.account = account;
   }
 
@@ -74,9 +75,11 @@ class ImportResourcesService {
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     await this.encryptSecrets(importResourcesFile, userId, privateKey);
     importResourcesFile.mustImportFolders && await this.bulkImportFolders(importResourcesFile);
-    const resourcesCollection = new ResourcesCollection(importResourcesFile.importResources.toResourceCollectionImportDto());
-    await this.encryptService.encryptAllFromForeignModels(resourcesCollection, passphrase);
-    await this.bulkImportResources(importResourcesFile, resourcesCollection);
+    const resourceToImportDto = importResourcesFile.importResources.toResourceCollectionImportDto();
+    const resourcesCollection = new ResourcesCollection(resourceToImportDto);
+    const clearTextMetadataResourcesCollection = new ResourcesCollection(resourceToImportDto);
+    await this.encryptMetadataService.encryptAllFromForeignModels(resourcesCollection, passphrase);
+    await this.bulkImportResources(importResourcesFile, resourcesCollection, clearTextMetadataResourcesCollection);
     importResourcesFile.mustTag && await this.bulkTagResources(importResourcesFile);
     await this.progressService.finishStep(null, true);
     return importResourcesFile;
@@ -267,10 +270,12 @@ class ImportResourcesService {
    * Import the resources.
    * @param {ImportResourcesFileEntity} importResourcesFile The import
    * @param {ResourcesCollection} resourcesCollection The collection to import
+   * @param {ResourcesCollection} clearTextMetadataResourcesCollection The collection of resources with their metadata
+   * decrypted, the collection resources index should match the collection with encrypted metadata.
    * @returns {Promise<void>}
    * @private
    */
-  async bulkImportResources(importResourcesFile, resourcesCollection) {
+  async bulkImportResources(importResourcesFile, resourcesCollection, clearTextMetadataResourcesCollection) {
     let importedCount = 0;
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
 
@@ -286,11 +291,12 @@ class ImportResourcesService {
         }
 
         const contain = {permission: true, favorite: true, tags: true, folder: true};
-        const resourceDto = await this.resourceService.create(data, contain);
-        const createdResourceEntity = new ResourceEntity(resourceDto);
-        this.handleImportResourceSuccess(importResourcesFile, ++importedCount, createdResourceEntity, importResourcesFile.importResources.items[index]);
+        const createdResourceDto = await this.resourceService.create(data, contain);
+        // Reuse the original non decrypted resource metadata.
+        createdResourceDto.metadata = clearTextMetadataResourcesCollection.items[index].metadata;
+        this.handleImportResourceSuccess(importResourcesFile, ++importedCount, createdResourceDto, importResourcesFile.importResources.items[index]);
 
-        return createdResourceEntity;
+        return createdResourceDto;
       } catch (error) {
         console.error(error);
         this.handleImportResourceError(importResourcesFile, ++importedCount, error, importResourcesFile.importResources.items[index]
@@ -299,22 +305,22 @@ class ImportResourcesService {
     });
 
     if (callbacks.length > 0) {
-      const createdResources = await this.executeConcurrentlyService.execute(callbacks, 5);
-      await ResourceLocalStorage.addResources(createdResources);
+      const createdResourcesDto = await this.executeConcurrentlyService.execute(callbacks, 5);
+      const createResourcesCollection = new ResourcesCollection(createdResourcesDto);
+      await ResourceLocalStorage.addResources(createResourcesCollection);
     }
   }
-
 
   /**
    * Handle resource import success
    * @param {ImportResourcesFileEntity} importResourcesFile The import
    * @param {int} importedCount The number of resource imported (with success or no)
-   * @param {ResourceEntity} resourceEntity The created resource
+   * @param {object} createdResourceDto The created resource dto.
    * @param {ExternalResourceEntity} externalResourceEntity The external resource entity at the source of the create
    * @private
    */
-  async handleImportResourceSuccess(importResourcesFile, importedCount, resourceEntity, externalResourceEntity) {
-    externalResourceEntity.id = resourceEntity.id;
+  async handleImportResourceSuccess(importResourcesFile, importedCount, createdResourceDto, externalResourceEntity) {
+    externalResourceEntity.id = createdResourceDto.id;
     await this.progressService.finishStep(i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount: importedCount, total: importResourcesFile.importResources.items.length}));
   }
 

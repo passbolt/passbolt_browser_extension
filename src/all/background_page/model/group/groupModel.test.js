@@ -17,7 +17,7 @@ import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/grou
 import GroupLocalStorage from "../../service/local_storage/groupLocalStorage";
 import GroupModel from "./groupModel";
 import {enableFetchMocks} from "jest-fetch-mock";
-import GroupUserEntity from "../entity/groupUser/groupUserEntity";
+import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import UserEntity from "../entity/user/userEntity";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import GroupUpdateEntity from "../entity/group/update/groupUpdateEntity";

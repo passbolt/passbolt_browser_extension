@@ -14,7 +14,6 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import {v4 as uuid} from "uuid";
 import "../../../../../test/mocks/mockSsoDataStorage";
-import "../../../../../test/mocks/mockCryptoKey";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
@@ -39,11 +38,11 @@ describe("GenerateSsoKitController", () => {
   describe("GenerateSsoKitController::exec", () => {
     it("Should generate a brand new kit if none exists.", async() => {
       expect.assertions(6);
-      const data = generateSsoKitServerData({});
+      const data = await generateSsoKitServerData();
       const expectedProvider = AzureSsoSettingsEntity.PROVIDER_ID;
       const expextedKitId = uuid();
       const expectedServerPartKit = new SsoKitServerPartEntity({data});
-      const expectedClientPartKit = new SsoKitClientPartEntity(clientSsoKit());
+      const expectedClientPartKit = new SsoKitClientPartEntity(await clientSsoKit());
       const exepctedClientPartKitWithId = new SsoKitClientPartEntity({...(expectedClientPartKit.toDbSerializableObject()), id: expextedKitId,});
 
       SsoDataStorage.setMockedData(null);
@@ -82,7 +81,7 @@ describe("GenerateSsoKitController", () => {
     it("Should update the provider if a kit exists and the provider changed.", async() => {
       expect.assertions(2);
       const expectedProvider = GoogleSsoSettingsEntity.PROVIDER_ID;
-      const clientSsoKitDto = clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
+      const clientSsoKitDto = await clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
       const storedSsoKit = new SsoKitClientPartEntity(clientSsoKitDto);
 
       SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());

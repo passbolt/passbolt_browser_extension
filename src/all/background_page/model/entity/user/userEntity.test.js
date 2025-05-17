@@ -21,10 +21,10 @@ import OrganizationSettingsEntity from "../organizationSettings/organizationSett
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import ProfileEntity from "../profile/profileEntity";
-import GpgkeyEntity from "../gpgkey/gpgkeyEntity";
-import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
-import PendingAccountRecoveryRequestEntity from "../accountRecovery/pendingAccountRecoveryRequestEntity";
+import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/profileEntity";
+import GpgkeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
+import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import PendingAccountRecoveryRequestEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/pendingAccountRecoveryRequestEntity";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 
 describe("UserEntity", () => {

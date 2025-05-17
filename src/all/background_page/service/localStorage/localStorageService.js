@@ -32,6 +32,7 @@ import User from "../../model/user";
 import PasswordPoliciesLocalStorage from "../local_storage/passwordPoliciesLocalStorage";
 import PasswordExpirySettingsLocalStorage from "../local_storage/passwordExpirySettingsLocalStorage";
 import KeepSessionAliveService from "../session_storage/keepSessionAliveService";
+import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSettingsLocalStorage";
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
@@ -71,6 +72,7 @@ class LocalStorageService {
     (new RbacsLocalStorage(account)).flush();
     (new PasswordPoliciesLocalStorage(account)).flush();
     (new PasswordExpirySettingsLocalStorage(account)).flush();
+    (new MetadataKeysSettingsLocalStorage(account)).flush();
     (new MetadataTypesSettingsLocalStorage(account)).flush();
     (new MetadataKeysSessionStorage(account)).flush();
     (new SessionKeysBundlesSessionStorageService(account)).flush();

@@ -146,6 +146,26 @@ describe("DecryptMessageService", () => {
       expect(resultDecrypt).toEqual(messageClear);
     }, 10 * 1000);
 
+    it("should decrypt a message and return the raw result with options returnOnlyData to false", async() => {
+      const messageClear = "message clear";
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const signingKeyUserA = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const signingKeyUserB = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const verifyingKeyA = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const verifyingKeyB = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
+      const messageEncryptedArmored = await EncryptMessageService.encrypt(messageClear, publicKey, [signingKeyUserA, signingKeyUserB]);
+      const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(messageEncryptedArmored);
+      const resultDecrypt = await DecryptMessageService.decrypt(messageEncrypted, privateKey, [verifyingKeyA, verifyingKeyB], {
+        returnOnlyData: false
+      });
+
+      expect.assertions(3);
+      expect(resultDecrypt.signatures).toBeDefined();
+      expect(resultDecrypt.data).toEqual(messageClear);
+      expect(resultDecrypt.filename).toBeNull();
+    }, 10 * 1000);
+
     it("should throw an error if it cannot decrypt a message", async() => {
       const messageClear = "message clear";
       const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
@@ -170,6 +190,35 @@ describe("DecryptMessageService", () => {
 
       expect.assertions(1);
       await expect(resultDecrypt).rejects.toThrow("Could not find signing key with key ID d3f1fe4be61d7009");
+    }, 10 * 1000);
+
+    it("should not throw an error if it cannot verify a signature and options throwOnInvalidSignaturesVerification is false", async() => {
+      const messageClear = "message clear";
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const signingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const messageEncryptedArmored = await EncryptMessageService.encrypt(messageClear, publicKey, [signingKey]);
+      const verfificationKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
+      const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(messageEncryptedArmored);
+      const resultDecrypt = await DecryptMessageService.decrypt(messageEncrypted, privateKey, [verfificationKey], {
+        throwOnInvalidSignaturesVerification: false
+      });
+
+      expect.assertions(1);
+      expect(resultDecrypt).toEqual(messageClear);
+    }, 10 * 1000);
+
+    it("should not throw an error if the message is signed but no verification key is passed while decrypting", async() => {
+      const messageClear = "message clear";
+      const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const signingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const messageEncryptedArmored = await EncryptMessageService.encrypt(messageClear, publicKey, [signingKey]);
+      const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(messageEncryptedArmored);
+      const resultDecrypt = await DecryptMessageService.decrypt(messageEncrypted, privateKey);
+
+      expect.assertions(1);
+      expect(resultDecrypt).toEqual(messageClear);
     }, 10 * 1000);
 
     it("should throw an error if it cannot verify one of among multiple signatures", async() => {

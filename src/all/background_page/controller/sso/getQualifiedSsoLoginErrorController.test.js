@@ -12,7 +12,6 @@
  * @since         4.0.0
  */
 import '../../../../../test/mocks/mockSsoDataStorage';
-import '../../../../../test/mocks/mockCryptoKey';
 import {clientSsoKit} from '../../model/entity/sso/ssoKitClientPart.test.data';
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
@@ -42,7 +41,7 @@ describe("GetQualifiedSsoLoginErrorController", () => {
 
   it("Should return an Error (unexpected) if the user's SSO kit provider is matching the API's one", async() => {
     expect.assertions(1);
-    SsoDataStorage.setMockedData(clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
+    SsoDataStorage.setMockedData(await clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
     fetch.doMockOnce(() => mockApiResponse({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
 
     const controller = new GetQualifiedSsoLoginErrorController(null, null, defaultApiClientOptions());
@@ -53,7 +52,7 @@ describe("GetQualifiedSsoLoginErrorController", () => {
 
   it("Should return an SsoDisabledError", async() => {
     expect.assertions(1);
-    SsoDataStorage.setMockedData(clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
+    SsoDataStorage.setMockedData(await clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
     fetch.doMockOnce(() => mockApiResponse({provider: null}));
 
     const controller = new GetQualifiedSsoLoginErrorController(null, null, defaultApiClientOptions());
@@ -64,7 +63,7 @@ describe("GetQualifiedSsoLoginErrorController", () => {
 
   it("Should return an SsoProviderMismatchError", async() => {
     expect.assertions(1);
-    SsoDataStorage.setMockedData(clientSsoKit({provider: GoogleSsoSettingsEntity.PROVIDER_ID}));
+    SsoDataStorage.setMockedData(await clientSsoKit({provider: GoogleSsoSettingsEntity.PROVIDER_ID}));
     fetch.doMockOnce(() => mockApiResponse({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
 
     const controller = new GetQualifiedSsoLoginErrorController(null, null, defaultApiClientOptions());

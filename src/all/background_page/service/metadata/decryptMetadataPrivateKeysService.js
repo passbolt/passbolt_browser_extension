@@ -21,6 +21,8 @@ import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/us
 import {assertType} from '../../utils/assertions';
 import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
 import DecryptMessageService from '../crypto/decryptMessageService';
+import FindSignatureService from "../crypto/findSignatureService";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 class DecryptMetadataPrivateKeysService {
   /**
@@ -36,7 +38,8 @@ class DecryptMetadataPrivateKeysService {
    * If the private key was already decrypted, nothing happens.
    *
    * @param {MetadataPrivateKeyEntity} metadataPrivateKeyEntity the metadata private key entity to decrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key. Marked as
+   * optional as it might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `metadataPrivateKeyEntity` is not of type MetadataPrivateKeyEntity
    * @throws {Error} if metadata private key entity data is not a valid openPGP message.
@@ -53,19 +56,30 @@ class DecryptMetadataPrivateKeysService {
     passphrase = passphrase || await this.getPassphraseFromSessionStorageOrFail();
 
     const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    const decryptedMessage = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey);
-
-    const decryptedMetadataPrivateKeyDto = JSON.parse(decryptedMessage);
+    const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
+    const decryptedMessage = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey, [userPublicKey], {
+      returnOnlyData: false,
+      throwOnInvalidSignaturesVerification: false
+    });
+    const decryptedMetadataPrivateKeyDto = JSON.parse(decryptedMessage.data);
     const metadataPrivateKeyDataEntity = new MetadataPrivateKeyDataEntity(decryptedMetadataPrivateKeyDto);
-
     metadataPrivateKeyEntity.data = metadataPrivateKeyDataEntity;
+
+    await this.assertFingerprintPublicAndPrivateKeysMatch(metadataPrivateKeyEntity);
+
+    const externalGpgSignature = await FindSignatureService.findSignatureForGpgKey(decryptedMessage.signatures, userPublicKey);
+
+    if (externalGpgSignature && externalGpgSignature.isVerified) {
+      metadataPrivateKeyEntity.dataSignedByCurrentUser = externalGpgSignature.created;
+    }
   }
 
   /**
    * Decrypts a collection of metadata private key entities and mutate all entities with their decrypted result.
    *
    * @param {MetadataPrivateKeysCollection} metadataPrivateKeysCollection the metadata private keys collection to decrypt.
-   * @param {string} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key. Marked as
+   * optional as it might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
    * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.
@@ -88,7 +102,8 @@ class DecryptMetadataPrivateKeysService {
    * and mutate all metadata private key entities with their decrypted result.
    *
    * @param {MetadataKeysCollection} metadataKeysCollection the metadata keys collection to decrypt.
-   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata private key. Marked as
+   * optional as it might be available in the passphrase session storage.
    * @returns {Promise<void>}
    * @throws {TypeError} if the `MetadataPrivateKeysCollection` is not of type MetadataPrivateKeysCollection
    * @throws {Error} if one of the metadata private key entity data is not a valid openPGP message.
@@ -122,6 +137,23 @@ class DecryptMetadataPrivateKeysService {
       throw new UserPassphraseRequiredError();
     }
     return passphrase;
+  }
+
+  /**
+   * Verify the metadata private key entity fingerprint is equal to the  armored key fingerprint.
+   * @param {MetadataPrivateKeyEntity} metadataPrivateKeyEntity the metadata private key entity to decrypt.
+   * @returns {Promise<void>}
+   * @throws {EntityValidationError} if the fingerprints are not matching.
+   * @private
+   */
+  async assertFingerprintPublicAndPrivateKeysMatch(metadataPrivateKeyEntity) {
+    const armoredMetadataPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
+
+    if (metadataPrivateKeyEntity.data.fingerprint.toLowerCase() !== armoredMetadataPrivateKey.getFingerprint().toLowerCase()) {
+      const error = new EntityValidationError();
+      error.addError(`metadata_private_key`, 'fingerprint_match', 'The fingerprint of the metadata private key does not match the fingerprint of the entity');
+      throw error;
+    }
   }
 }
 

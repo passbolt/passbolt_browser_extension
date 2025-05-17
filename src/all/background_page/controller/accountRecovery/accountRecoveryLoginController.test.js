@@ -12,7 +12,6 @@
  * @since         3.9.0
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
-import "../../../../../test/mocks/mockCryptoKey";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
@@ -34,6 +33,7 @@ import AccountAccountRecoveryEntity from "../../model/entity/account/accountAcco
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
+import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 
 beforeEach(async() => {
   enableFetchMocks();
@@ -69,10 +69,11 @@ describe("AccountRecoveryLoginController", () => {
         const controller = new AccountRecoveryLoginController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
 
         jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
-        jest.spyOn(PassphraseStorageService, "set");
-        jest.spyOn(PostLoginService, "exec");
+        jest.spyOn(PassphraseStorageService, "set").mockImplementation(async() => {});
+        jest.spyOn(PostLoginService, "exec").mockImplementation(async() => {});
         jest.spyOn(browser.tabs, "update");
         jest.spyOn(AccountTemporarySessionStorageService, "remove");
+        jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
 
         expect.assertions(6);
 
@@ -134,7 +135,7 @@ describe("AccountRecoveryLoginController", () => {
 
     it("Should sign-in the user and not generate an SSO kit if SSO organization settings is enabled and a kit already exists.", async() => {
       expect.assertions(1);
-      SsoDataStorage.setMockedData(clientSsoKit());
+      SsoDataStorage.setMockedData(await clientSsoKit());
       jest.spyOn(GenerateSsoKitService, "generate");
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(withAzureSsoSettings());
@@ -170,7 +171,7 @@ describe("AccountRecoveryLoginController", () => {
 
     it("Should sign-in the user and flush SSO kit data if a kit is available locally and the SSO is not configured for the organisation.", async() => {
       expect.assertions(1);
-      SsoDataStorage.setMockedData(clientSsoKit());
+      SsoDataStorage.setMockedData(await clientSsoKit());
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(defaultEmptySettings());
 
@@ -186,7 +187,7 @@ describe("AccountRecoveryLoginController", () => {
 
     it("Should sign-in the user and flush SSO kit data if a kit is available locally and the organization settings is disabled.", async() => {
       expect.assertions(1);
-      SsoDataStorage.setMockedData(clientSsoKit());
+      SsoDataStorage.setMockedData(await clientSsoKit());
       mockOrganisationSettings(false);
 
       const account = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());

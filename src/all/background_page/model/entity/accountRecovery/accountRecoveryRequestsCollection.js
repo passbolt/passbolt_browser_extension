@@ -15,7 +15,7 @@ import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstr
 import AccountRecoveryRequestEntity from "./accountRecoveryRequestEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
-import deduplicateObjects from "../../../utils/array/deduplicateObjects";
+import deduplicateObjects from "passbolt-styleguide/src/shared/utils/deduplicateObjects";
 
 const ENTITY_NAME = 'AccountRecoveryRequest';
 const RULE_UNIQUE_ID = 'unique_id';

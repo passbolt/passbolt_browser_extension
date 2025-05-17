@@ -241,7 +241,19 @@ classDiagram
         }
 
         class MigrateMetadataResourcesService {
-            +migrate(MigrateMetadataEntity migrateMetadataEntity, string passphrase, replayOptions = {count: 0}) Promise~void~
+            +migrate(MigrateMetadataEntity migrateMetadataEntity, string passphrase, replayOptions = count: 0) Promise~void~
+        }
+
+        class ConfirmMetadataKeyContentCodeService {
+            +requestConfirm(MetdataTrustedKeyEntity trustedKey, MetadataKeyEntity metadataKey) Promise~boolean~
+        }
+
+        class TrustMetadataKeyService {
+            +trust(MetadataPrivateKeyEntity metadataPrivateKey, string passphrase) Promise~void~
+        }
+
+        class VerifyOrTrustMetadataKeyService {
+            +verifyTrustedOrTrustNewMetadataKey(string passphrase) Promise~void~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,8 +316,13 @@ classDiagram
     %% Metadata models
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        class MetadataKeyApiService {
+        class MetadataKeysApiService {
             +findAll(object contains) Promise~array~
+            +create(MetadataKeyEntity metadataKey) Promise~*string*~
+        }
+
+        class MetadataPrivateKeyApiService {
+            +update(MetadataPrivateKeyEntity metadataPrivateKey) Promise~string~
         }
 
         class MetadataKeysSettingsLocalStorage {
@@ -333,6 +350,17 @@ classDiagram
             +get() Promise~object~
             +set(MetadataTypesSettingsEntity entity) Promise
             +flush(AccountEntity account) Promise
+        }
+
+        class TrustedMetadataKeyLocalStorage {
+            -$_runtimeCachedData object
+            +get() Promise~object~
+            +set(MetadataTrustedKeyEntity entity) Promise
+            +flush(AccountEntity account) Promise
+        }
+
+        class GetMetadataTrustedKeyService {
+            +get() Promise~MetadataTrustedKey|null~
         }
 
         class MigrateMetadataResourcesApiService {
@@ -525,6 +553,15 @@ classDiagram
             +get privateKey() ExternalGpgKeyEntity
         }
 
+        class ExternalGpgKeyEntity {
+            -string props.issuer_fingerprint
+            -boolean props.is_verified
+            -string props.created
+            +get issuerFingerprint() string
+            +get isVerified() boolean
+            +get created() string
+        }
+
         class GpgkeyEntity {
             -uuid props.id
             -uuid props.user_id
@@ -580,14 +617,16 @@ classDiagram
             +get armoredKey() string
             +get id() string
             +get created() string
-            +fingerprint() string
+            +get fingerprint() string
             +get expired() string
+            +assertFingerprintPublicAndPrivateKeysMatch() void
         }
 
         class MetadataKeysCollection {
             +getFirstByLatestCreated() MetadataKeyEntity
             +hasDecryptedKeys() boolean
             +hasEncryptedKeys() boolean
+            +assertFingerprintsPublicAndPrivateKeysMatch(): void
         }
 
         class MetadataPrivateKeyEntity {
@@ -595,6 +634,7 @@ classDiagram
             -uuid props.metadata_key_id
             -uuid props.user_id
             -string props.data
+            -string|null props.data_signed_by_current_user
             -string props.armored_key
             -string props.created
             -string props.created_by
@@ -602,8 +642,10 @@ classDiagram
             -string props.modified_by
             +get data() string|MetadataPrivateKeyDataEntity
             +get metadataKeyId() string
+            +get dataSignedByCurrentUser() string|null
             +set armoredKey(string armordKey) void
             +set data(string data) void
+            +set dataSignedByCurrentUser(string|null value) void
             +isDecrypted() boolean
             +get userId() string
         }
@@ -615,11 +657,20 @@ classDiagram
             -string props.armored_key
             -string props.passphrase
             +get armoredKey() string
+            +get fingerprint() string
         }
 
         class MetadataPrivateKeysCollection {
             +hasDecryptedPrivateKeys() boolean
             +hasEncryptedPrivateKeys() boolean
+        }
+
+        class MetadataTrustedKeyEntity {
+            -string props.fingerprint
+            -string props.signed
+            +get fingerprint() string
+            +get signed() string
+            +isMetadataKeyTrusted(MetadataPrivateKeyEntity metadataPrivateKey) boolean
         }
 
         class MetadataTypesSettingsEntity {
@@ -973,6 +1024,7 @@ classDiagram
     SaveMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     SaveMetadataSettingsService*--MetadataKeysSettingsApiService
     SaveMetadataSettingsService*--MetadataKeysSettingsLocalStorage
+    GetMetadataTrustedKeyService*--TrustedMetadataKeyLocalStorage
 %% Metadata models relationships.
     style MetadataKeyApiService fill:#DEE5D4
     style MetadataKeysSettingsLocalStorage fill:#DEE5D4

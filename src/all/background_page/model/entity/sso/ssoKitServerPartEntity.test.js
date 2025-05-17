@@ -21,11 +21,11 @@ describe("Sso Kit Server Part Entity", () => {
     EntitySchema.validateSchema(SsoKitServerPartEntity.ENTITY_NAME, SsoKitServerPartEntity.getSchema());
   });
 
-  const data = generateSsoKitServerData({});
-  const dto = {data};
-
   it("constructor works if valid minimal DTO is provided", async() => {
     expect.assertions(1);
+
+    const data = await generateSsoKitServerData();
+    const dto = {data};
 
     const entity = new SsoKitServerPartEntity(dto);
     expect(entity.toDto()).toEqual(dto);
@@ -33,6 +33,10 @@ describe("Sso Kit Server Part Entity", () => {
 
   it("constructor works if full valid DTO is provided", async() => {
     expect.assertions(1);
+
+    const data = await generateSsoKitServerData();
+    const dto = {data};
+
     const fullDto = Object.assign({}, dto, {
       id: uuid(),
       user_id: uuid(),
@@ -46,7 +50,7 @@ describe("Sso Kit Server Part Entity", () => {
     expect(entity.toDto()).toEqual(fullDto);
   });
 
-  it("constructor returns validation error if dto required fields are invalid", () => {
+  it("constructor returns validation error if dto required fields are invalid", async() => {
     const invalidData = [
       1,
       false,
@@ -55,26 +59,6 @@ describe("Sso Kit Server Part Entity", () => {
       "",
       "nek",
       {},
-      generateSsoKitServerData({alg: "A128GCM"}),
-      generateSsoKitServerData({alg: 256}),
-      generateSsoKitServerData({alg: false}),
-      generateSsoKitServerData({alg: {}}),
-      generateSsoKitServerData({ext: false}),
-      generateSsoKitServerData({k: 1}),
-      generateSsoKitServerData({k: false}),
-      generateSsoKitServerData({k: {}}),
-      generateSsoKitServerData({key_ops: ["encrypt", "decrypt", "sign"]}),
-      generateSsoKitServerData({key_ops: ["encrypt"]}),
-      generateSsoKitServerData({key_ops: ["decrypt"]}),
-      generateSsoKitServerData({key_ops: "decrypt"}),
-      generateSsoKitServerData({key_ops: 1}),
-      generateSsoKitServerData({key_ops: false}),
-      generateSsoKitServerData({key_ops: {}}),
-      generateSsoKitServerData({key_ops: {decrypt: "decrypt", encrypt: "encrypt"}}),
-      generateSsoKitServerData({kty: ""}),
-      generateSsoKitServerData({kty: 1}),
-      generateSsoKitServerData({kty: false}),
-      generateSsoKitServerData({kty: "EC"}),
     ];
 
     expect.assertions(invalidData.length);

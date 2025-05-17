@@ -32,11 +32,13 @@ class FindSessionKeysService {
 
   /**
    * Retrieve the session keys bundles from the API.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the session key bundle. Marked as optional
+   * as it might be available in the passphrase session storage.
    * @returns {Promise<SessionKeysBundlesCollection>}
    * @throws {Error} if some session keys bundles are decrypted
    * @public
    */
-  async findAllBundles() {
+  async findAllBundles(passphrase = null) {
     const sessionKeysBundleDto = await this.sesionKeysBundlesApiService.findAll();
 
     const collection = new SessionKeysBundlesCollection(sessionKeysBundleDto);
@@ -44,7 +46,7 @@ class FindSessionKeysService {
       throw new Error("The session keys bundles should not be decrypted.");
     }
 
-    await this.decryptSessionKeysBundlesService.decryptAll(collection);
+    await this.decryptSessionKeysBundlesService.decryptAll(collection, passphrase);
 
     return collection;
   }

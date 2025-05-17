@@ -91,7 +91,7 @@ class ShareResourceService {
      * - Or for which a permission has been removed for which I could be impacted (lost access or privilege)
      */
     this.progressService.finishStep(i18n.t("Updating resources local storage"), true);
-    await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
+    await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll({}, passphrase);
   }
 
   /**

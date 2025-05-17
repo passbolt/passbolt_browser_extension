@@ -17,6 +17,8 @@ import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/e
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import BinaryConvert from "../../../../utils/format/binaryConvert";
+import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
 
 describe("Csv1PasswordRowParser", () => {
   it("can parse 1password csv", () => {
@@ -50,6 +52,13 @@ describe("Csv1PasswordRowParser", () => {
       "Notes": "Description 1",
       "Type": "Folder 1"
     };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
@@ -63,7 +72,7 @@ describe("Csv1PasswordRowParser", () => {
       folder_parent_path: data.Type,
     });
 
-    const externalResourceEntity = Csv1PasswordRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = Csv1PasswordRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -79,6 +88,13 @@ describe("Csv1PasswordRowParser", () => {
       "Notes": "Description 1",
       "Type": "Folder 1"
     };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
     const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
@@ -92,7 +108,7 @@ describe("Csv1PasswordRowParser", () => {
       folder_parent_path: data.Type,
     });
 
-    const externalResourceEntity = Csv1PasswordRowParser.parse(data, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = Csv1PasswordRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());

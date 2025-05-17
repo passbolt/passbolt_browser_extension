@@ -26,6 +26,8 @@ describe("OpenPGP Assertions", () => {
         {key: pgpKeys.ada.public, expectedType: openpgp.PublicKey},
         {key: pgpKeys.ada.private, expectedType: openpgp.PrivateKey},
         {key: pgpKeys.ada.private_decrypted, expectedType: openpgp.PrivateKey},
+        {key: pgpKeys.OpenPpgJsV5EccLegacy.private, expectedType: openpgp.PrivateKey},
+        {key: pgpKeys.OpenPpgJsV5EccLegacy.public, expectedType: openpgp.PublicKey},
       ];
 
       expect.assertions(scenarios.length);
@@ -63,6 +65,8 @@ describe("OpenPGP Assertions", () => {
         pgpKeys.ada.public,
         pgpKeys.ada.private,
         pgpKeys.ada.private_decrypted,
+        pgpKeys.OpenPpgJsV5EccLegacy.public,
+        pgpKeys.OpenPpgJsV5EccLegacy.private,
       ];
 
       expect.assertions(keyList.length + 1);
@@ -181,7 +185,9 @@ describe("OpenPGP Assertions", () => {
       const scenarios = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.public,
         pgpKeys.ada.private,
-        pgpKeys.ada.private_decrypted
+        pgpKeys.ada.private_decrypted,
+        pgpKeys.OpenPpgJsV5EccLegacy.public,
+        pgpKeys.OpenPpgJsV5EccLegacy.private,
       ]);
 
       expect.assertions(scenarios.length);
@@ -214,7 +220,9 @@ describe("OpenPGP Assertions", () => {
       const keys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.public,
         pgpKeys.ada.private,
-        pgpKeys.ada.private_decrypted
+        pgpKeys.ada.private_decrypted,
+        pgpKeys.OpenPpgJsV5EccLegacy.public,
+        pgpKeys.OpenPpgJsV5EccLegacy.private,
       ]);
 
       expect.assertions(1);
@@ -283,7 +291,8 @@ describe("OpenPGP Assertions", () => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.public,
         pgpKeys.betty.public,
-        pgpKeys.ecdsa_p521.public
+        pgpKeys.ecdsa_p521.public,
+        pgpKeys.OpenPpgJsV5EccLegacy.public,
       ]);
 
       expect.assertions(1);
@@ -354,6 +363,7 @@ describe("OpenPGP Assertions", () => {
         pgpKeys.betty.private,
         pgpKeys.betty.private_decrypted,
         pgpKeys.ecdsa_p521.private,
+        pgpKeys.OpenPpgJsV5EccLegacy.private,
       ]);
 
       expect.assertions(1);
@@ -474,6 +484,12 @@ describe("OpenPGP Assertions", () => {
       expect(OpenpgpAssertion.assertEncryptedPrivateKey(key)).toBeUndefined();
     });
 
+    it("Should validate if the key is a legacy ECC key type", async() => {
+      expect.assertions(1);
+      const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.OpenPpgJsV5EccLegacy.private);
+      expect(OpenpgpAssertion.assertEncryptedPrivateKey(key)).toBeUndefined();
+    });
+
     it("Should throw an Error if the key is an not of an expected key type", async() => {
       const typeError = new Error("The key should be a valid openpgp private key.");
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
@@ -502,7 +518,8 @@ describe("OpenPGP Assertions", () => {
     it("Should validate if all the keys are of an expected key type", async() => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.private,
-        pgpKeys.betty.private
+        pgpKeys.betty.private,
+        pgpKeys.OpenPpgJsV5EccLegacy.private,
       ]);
 
       expect.assertions(1);

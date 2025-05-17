@@ -12,7 +12,6 @@
  * @since         3.9.0
  */
 import each from "jest-each";
-import "../../../../../test/mocks/mockCryptoKey";
 import GenerateSsoKeyService from "./generateSsoKeyService";
 
 describe("GenerateSsoKeyService service", () => {
@@ -21,23 +20,17 @@ describe("GenerateSsoKeyService service", () => {
     {isExtractable: true, scenario: "extractable"}
   ]).describe("Should generate a key according to the SSO specification", props => {
     it(`for a key of type: ${props.scenario}`, async() => {
-      expect.assertions(4);
+      expect.assertions(1);
       const exepctedAlgo = {
         name: 'AES-GCM',
         length: 256
       };
-      const expectedCapabilities = ['encrypt', 'decrypt'];
-      const expectedFakeKey = new CryptoKey(exepctedAlgo, props.isExtractable, expectedCapabilities);
 
-      crypto.subtle.generateKey.mockImplementation(async(algorithm, isExtractable, keyCapabilities) => {
-        expect(algorithm).toStrictEqual(exepctedAlgo);
-        expect(isExtractable).toBe(props.isExtractable);
-        expect(keyCapabilities).toStrictEqual(expectedCapabilities);
-        return expectedFakeKey;
-      });
+      const expectedCapabilities = ['encrypt', 'decrypt'];
+      const expectedFakeKey = await crypto.subtle.generateKey(exepctedAlgo, props.isExtractable, expectedCapabilities);
 
       const key = await GenerateSsoKeyService.generateSsoKey(props.isExtractable);
-      expect(key).toBe(expectedFakeKey);
+      expect(key).toStrictEqual(expectedFakeKey);
     });
   });
 });

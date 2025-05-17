@@ -20,7 +20,7 @@ import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryMod
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import DecryptPrivateKeyPasswordDataService from "../../service/accountRecovery/decryptPrivateKeyPasswordDataService";
-import AccountRecoveryPrivateKeyPasswordEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
+import AccountRecoveryPrivateKeyPasswordEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
 import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
 import UserEntity from "../../model/entity/user/userEntity";
 import PrivateGpgkeyEntity from "../../model/entity/gpgkey/privateGpgkeyEntity";

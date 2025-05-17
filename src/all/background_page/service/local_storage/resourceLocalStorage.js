@@ -15,8 +15,9 @@ import Log from "../../model/log";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import Lock from "../../utils/lock";
-import {assertArray, assertType, assertUuid} from "../../utils/assertions";
+import {assertType, assertUuid} from "../../utils/assertions";
 import PasswordExpiryResourceEntity from "../../model/entity/passwordExpiry/passwordExpiryResourceEntity";
+
 const lock = new Lock();
 
 export const RESOURCES_LOCAL_STORAGE_KEY = 'resources';
@@ -124,19 +125,19 @@ class ResourceLocalStorage {
 
   /**
    * Add multiple resources to the local storage
-   * @param {Array<ResourceEntity>} resourceEntities
+   * @param {ResourcesCollection} resources The resources to add to the storage.
    */
-  static async addResources(resourceEntities) {
-    assertArray(resourceEntities, "The parameter resourcesEntities should be an array");
+  static async addResources(resources) {
+    assertType(resources, ResourcesCollection, "The `resources` parameter should be of type ResourcesCollection");
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get() || [];
-      resourceEntities.forEach(resourceEntity => {
+      const storedResources = await ResourceLocalStorage.get() || [];
+      resources.items.forEach(resourceEntity => {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
-        resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+        storedResources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       });
-      await browser.storage.local.set({resources: resources});
-      ResourceLocalStorage._cachedData = resources;
+      await browser.storage.local.set({resources: storedResources});
+      ResourceLocalStorage._cachedData = storedResources;
     } finally {
       lock.release();
     }
@@ -296,6 +297,9 @@ class ResourceLocalStorage {
     }
     if (!resourceEntity.permission) {
       throw new TypeError('ResourceLocalStorage::set expects ResourceEntity permission to be set');
+    }
+    if (!resourceEntity.isMetadataDecrypted()) {
+      throw new TypeError('ResourceLocalStorage::set expects ResourceEntity metadata to be decrypted');
     }
   }
 }

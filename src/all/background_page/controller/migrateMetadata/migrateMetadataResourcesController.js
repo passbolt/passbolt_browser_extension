@@ -18,6 +18,7 @@ import GetPassphraseService from "../../service/passphrase/getPassphraseService"
 import ProgressService from "../../service/progress/progressService";
 import MigrateMetadataEntity from "passbolt-styleguide/src/shared/models/entity/metadata/migrateMetadataEntity";
 import i18n from "../../sdk/i18n";
+import Keyring from "../../model/keyring";
 
 export default class MigrateMetadataResourcesController {
   /**
@@ -60,13 +61,21 @@ export default class MigrateMetadataResourcesController {
     const paginationHeaderEntity = new PassboltResponsePaginationHeaderEntity(passboltResponsePaginationHeaderDto);
 
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    const shouldSyncKeyring = !migrateMetadataEntity.sharedContentOnly;
 
     const stepsCount = MIGRATE_METADATA_BASE_MAIN_STEPS_COUNT // the mandatory migration metadata steps
       + paginationHeaderEntity.pageCount // the number of resource pages to migrate
+      + (shouldSyncKeyring ? 1 : 0) // 1 more step if keyring needs to be sync first
       + 1; // the "Done" step
+
     this.progressService.start(stepsCount, i18n.t("Migrating metadata"));
 
     try {
+      if (shouldSyncKeyring) {
+        this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
+        await (new Keyring()).sync();
+      }
+
       await this.migrateMetadataResourcesService.migrate(migrateMetadataEntity, passphrase, replayOptions);
       this.progressService.finishStep(i18n.t("Done"));
     } finally {

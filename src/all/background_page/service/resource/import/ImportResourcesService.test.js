@@ -342,10 +342,10 @@ describe("ImportResourcesService", () => {
         await decryptMetadataService.decryptAllFromForeignModels(createdCollection, pgpKeys.ada.passphrase);
         expect(createdCollection.items[0].isMetadataDecrypted()).toEqual(true);
         expect(createdCollection.items[1].isMetadataDecrypted()).toEqual(true);
-        expect(createdCollection.items[0].metadataKeyType).toEqual("shared_key");
-        expect(createdCollection.items[0].metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
-        expect(createdCollection.items[1].metadataKeyType).toEqual("shared_key");
-        expect(createdCollection.items[1].metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
+        expect(createdCollection.items[0].metadataKeyType).toEqual("user_key");
+        expect(createdCollection.items[0].metadataKeyId).toBeNull();
+        expect(createdCollection.items[1].metadataKeyType).toEqual("user_key");
+        expect(createdCollection.items[1].metadataKeyId).toBeNull();
         //Checked
         delete createdCollection.items[0]._props.metadata_key_type;
         delete createdCollection.items[1]._props.metadata_key_type;

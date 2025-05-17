@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import ProfileEntity from "../profile/profileEntity";
-import GpgkeyEntity from "../gpgkey/gpgkeyEntity";
-import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
-import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
-import AppEmailValidatorService from "../../../service/validator/appEmailValidatorService";
-import PendingAccountRecoveryRequestEntity from "../accountRecovery/pendingAccountRecoveryRequestEntity";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
+import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
+import PendingAccountRecoveryRequestEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/pendingAccountRecoveryRequestEntity";
+import GpgkeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
+import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/profileEntity";
+import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
+import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import AppEmailValidatorService from "../../../service/validator/appEmailValidatorService";
 
 const ENTITY_NAME = 'User';
 

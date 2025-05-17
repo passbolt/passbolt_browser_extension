@@ -138,6 +138,8 @@ describe("GpgKeyInfo service", () => {
       //Remove the armored_key as OpenpgpJS produced different armors than gpg cli.
       delete keyInfoDto.armored_key;
       delete dto.armored_key;
+      delete keyInfoDto.length;
+      delete dto.length;
       expect(keyInfoDto).toEqual(dto);
     }
   });

@@ -40,8 +40,6 @@ export const formDataBlob = () => {
 export const formDataMixed = () => {
   const formDataBody = new FormData();
   formDataBody.append("prop1", "value 1");
-  const file = new File(['test'], "file 1", {type: 'image/png'});
-  formDataBody.append("file", file, "file 1");
   const blob = new Blob(['test'], {type: 'text/plain'});
   formDataBody.append("blob", blob, "blob 1");
   return formDataBody;

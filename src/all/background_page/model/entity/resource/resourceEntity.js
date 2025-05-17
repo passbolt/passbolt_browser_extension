@@ -340,15 +340,26 @@ class ResourceEntity extends EntityV2 {
    * ==================================================
    */
   /**
-   * Get is personal flag
+   * Get is personal flag computed from the props 'personal' or from the 'permissions'.
    * @returns {(boolean|null)}
    */
   isPersonal() {
     if (Object.prototype.hasOwnProperty.call(this._props, 'personal')) {
       return this._props.personal;
     }
+
+    /*
+     * Determine whether the resource is personal based on its permissions if
+     * `personal` was not already defined.
+     *
+     * Attention: the current implementation is not faithful to the API
+     * specification and could cause misunderstandings or side‑effect issues
+     * that are difficult to debug. The client implementation does not handle
+     * the case where a resource is marked as personal but is shared with a
+     * group of which the user is the only member.
+     */
     if (this.permissions) {
-      return this.permissions.length === 1; //@todo dangerous, could be a group permission having mulitple members.
+      return this.permissions.items.length === 1; //@todo dangerous, could be a group permission having mulitple members.
     }
     return null;
   }
@@ -358,10 +369,11 @@ class ResourceEntity extends EntityV2 {
    * @returns {(boolean|null)}
    */
   isShared() {
-    if (this.isPersonal() === null)  {
+    const personal = this.isPersonal();
+    if (personal === null)  {
       return null;
     }
-    return !this.isPersonal();
+    return !personal;
   }
 
   /**
@@ -413,6 +425,26 @@ class ResourceEntity extends EntityV2 {
       return null;
     }
     return this.permission.type === PermissionEntity.PERMISSION_OWNER;
+  }
+
+  /**
+   * Returns the ID of the sole owner of the current resource.
+   * The sole owner ID could be a user ID or a group ID.
+   * It is computed based on the permissions.
+   *
+   * It returns null if:
+   * - no permissions are set
+   * - more than 1 persmission is set
+   *
+   * @returns {string|null}
+   */
+  get soleOwnerId() {
+    const permissions = this.permissions;
+    if (!permissions || permissions?.length !== 1) {
+      return null;
+    }
+
+    return permissions.items[0].aroForeignKey;
   }
 
   /**

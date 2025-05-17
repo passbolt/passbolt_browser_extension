@@ -78,6 +78,7 @@ describe("ResourceCreateController", () => {
     it("Should call progress service without folder goals", async() => {
       expect.assertions(2);
 
+      jest.spyOn(controller.resourceCreateService, "create").mockImplementationOnce(jest.fn());
       await controller.exec(defaultResourceDto(), secret);
       expect(controller.progressService.start).toHaveBeenCalledTimes(1);
       expect(controller.progressService.start).toHaveBeenCalledWith(3, 'Initializing');

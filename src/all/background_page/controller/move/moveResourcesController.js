@@ -17,6 +17,7 @@ import MoveResourcesService, {PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL} from "../.
 import {assertArrayUUID, assertUuid} from "../../utils/assertions";
 import GetOrFindFoldersService from "../../service/folder/getOrFindFoldersService";
 import i18n from "../../sdk/i18n";
+import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
 class MoveResourcesController {
   /**
@@ -34,6 +35,7 @@ class MoveResourcesController {
     this.getPassphraseService = new GetPassphraseService(account);
     this.moveResourcesService = new MoveResourcesService(apiClientOptions, account, this.progressService);
     this.getOrFindFoldersService = new GetOrFindFoldersService(account, apiClientOptions);
+    this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
   /**
@@ -61,11 +63,12 @@ class MoveResourcesController {
     if (destinationFolderId !== null) {
       assertUuid(destinationFolderId, "The destinationFolderId should be a valid UUID");
     }
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
     this.progressService.start(PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL, i18n.t('Initializing ...'));
     this.progressService.title = i18n.t('Moving {{count}} resources', {count: resourcesIds.length});
     try {
-      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       await this.moveResourcesService.moveAll(resourcesIds, destinationFolderId, passphrase);
     } finally {
       this.progressService.close();

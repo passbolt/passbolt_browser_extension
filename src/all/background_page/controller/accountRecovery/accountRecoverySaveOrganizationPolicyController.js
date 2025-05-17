@@ -23,8 +23,8 @@ import RevokeGpgKeyService from "../../service/crypto/revokeGpgKeyService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import DecryptPrivateKeyPasswordDataService from "../../service/accountRecovery/decryptPrivateKeyPasswordDataService";
 import i18n from "../../sdk/i18n";
-import AccountRecoveryPrivateKeyPasswordEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
-import AccountRecoveryPrivateKeyPasswordsCollection from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
+import AccountRecoveryPrivateKeyPasswordEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
+import AccountRecoveryPrivateKeyPasswordsCollection from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
 import PrivateGpgkeyEntity from "../../model/entity/gpgkey/privateGpgkeyEntity";
 import ProgressService from "../../service/progress/progressService";
 

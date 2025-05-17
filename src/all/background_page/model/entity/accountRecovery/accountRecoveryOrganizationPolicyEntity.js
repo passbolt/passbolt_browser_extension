@@ -15,7 +15,7 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
-import AccountRecoveryPrivateKeyPasswordsCollection from "./accountRecoveryPrivateKeyPasswordsCollection";
+import AccountRecoveryPrivateKeyPasswordsCollection from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
 import UserEntity from "../user/userEntity";
 import AccountRecoveryOrganizationPublicKeyEntity from "./accountRecoveryOrganizationPublicKeyEntity";
 

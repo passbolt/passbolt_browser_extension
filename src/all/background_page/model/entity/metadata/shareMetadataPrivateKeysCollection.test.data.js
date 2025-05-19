@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         5.1.1
+ * @since         5.2.0
  */
 
 import {v4 as uuidv4} from "uuid";

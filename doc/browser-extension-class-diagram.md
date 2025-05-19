@@ -288,6 +288,10 @@ classDiagram
             +getOrFindAll() Promise~MetadataKeysCollection~
         }
 
+        class ShareMetadataKeyPrivateService {
+            +shareMissing(uuid userId, string passphrase) Promise~void~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata Settings services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1006,6 +1010,9 @@ classDiagram
     MigrateMetadataResourcesService*--MigrateMetadataResourcesApiService
     MigrateMetadataResourcesService*--EncryptMetadataService
     MigrateMetadataResourcesService*--ResourceTypeModel
+    ShareMetadataKeyPrivateService*--MetadataPrivateKeyApiService
+    ShareMetadataKeyPrivateService*--GetOrFindMetadataKeysService
+    ShareMetadataKeyPrivateService*--EncryptMetadataPrivateKeysService
 %%    DecryptMetadataPrivateKeysService*--PassphraseStorageService
     DecryptMetadataService*--GetOrFindMetadataKeysService
     DecryptMetadataService*--GetOrFindSessionKeysService

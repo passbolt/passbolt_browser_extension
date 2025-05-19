@@ -210,6 +210,11 @@ classDiagram
             +exec() Promise~void~
         }
 
+        class ShareMetadataKeyPrivateController {
+            event "passbolt.metadata.share-missing-metadata-private-keys-with-user"
+            +exec(uuid userId) Promise~void~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -995,12 +1000,15 @@ classDiagram
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
     SaveMetadataKeysSettingsController*--SaveMetadataSettingsService
     SaveMetadataTypesSettingsController*--SaveMetadataSettingsService
+    ShareMetadataKeyPrivateController*--GetPassphraseService
+    ShareMetadataKeyPrivateController*--VerifyOrTrustMetadataKeyService
     style CreateMetadataKeyController fill:#D2E0FB
     style FindAllNonDeletedMetadataKeysController fill:#D2E0FB
     style GenerateMetadataPrivateKeyController fill:#D2E0FB
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
     style SaveMetadataKeysSettingsController fill:#D2E0FB
     style SaveMetadataTypesSettingsController fill:#D2E0FB
+	ShareMetadataKeyPrivateController*--ShareMetadataKeyPrivateService
 %% Metadata services relationships.
     CreateMetadataKeyService*--EncryptMetadataPrivateKeysService
     CreateMetadataKeyService*--FindUsersService

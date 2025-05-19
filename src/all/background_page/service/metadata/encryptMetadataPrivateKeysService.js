@@ -49,7 +49,10 @@ class EncryptMetadataPrivateKeysService {
     if (typeof options?.date !== "undefined") {
       assertType(options?.date, Date, "The optional 'date' parameter should be of type Date.");
     }
-    await OpenpgpAssertion.assertDecryptedPrivateKey(userPrivateKey);
+
+    if (userPrivateKey) {
+      await OpenpgpAssertion.assertDecryptedPrivateKey(userPrivateKey);
+    }
     if (!metadataPrivateKey.isDecrypted) {
       return;
     }

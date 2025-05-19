@@ -22,6 +22,7 @@ import EncryptMetadataPrivateKeysService from "./encryptMetadataPrivateKeysServi
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import Keyring from "../../model/keyring";
+import UserLocalStorage from "../local_storage/userLocalStorage";
 
 /**
  * The service aims to share metadata private keys with an user.
@@ -60,7 +61,8 @@ export default class ShareMetadataKeyPrivateService {
 
     //Users should be stored into localstorage
     const users = await this.userModel.getOrFindAll();
-    const missingMetadataKeysIds = users.getFirst("id", userId).missingMetadataKeysIds;
+    const targettedUser = users.getFirst("id", userId);
+    let missingMetadataKeysIds = targettedUser.missingMetadataKeysIds;
 
     if (missingMetadataKeysIds.length === 0) {
       return;
@@ -94,5 +96,9 @@ export default class ShareMetadataKeyPrivateService {
     }
 
     await this.metadataPrivateKeyApiService.create(shareMetadataPrivateKeysCollection);
+    const sharedMetadataKeysIds = shareMetadataPrivateKeysCollection.extract("metadata_key_id");
+    missingMetadataKeysIds = missingMetadataKeysIds.filter(missingMetadataKey => !sharedMetadataKeysIds.includes(missingMetadataKey));
+    targettedUser.missingMetadataKeysIds = missingMetadataKeysIds;
+    await UserLocalStorage.updateUser(targettedUser);
   }
 }

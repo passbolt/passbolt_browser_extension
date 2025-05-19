@@ -27,6 +27,7 @@ import Keyring from "../../model/keyring";
 import {enableFetchMocks} from "jest-fetch-mock";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import FindSignatureService from "../crypto/findSignatureService";
+import UserLocalStorage from "../local_storage/userLocalStorage";
 
 describe("ShareMetadataKeyPrivateService", () => {
   let account, apiClientOptions, service, keyring;
@@ -44,6 +45,7 @@ describe("ShareMetadataKeyPrivateService", () => {
     await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
     await keyring.importPublic(pgpKeys.betty.public, pgpKeys.betty.userId);
     jest.spyOn(service.keyring, "sync").mockImplementation(jest.fn());
+    await UserLocalStorage.flush();
   });
 
   describe('::shareMissing', () => {
@@ -81,7 +83,7 @@ describe("ShareMetadataKeyPrivateService", () => {
     });
 
     it("should share and sign the missing data keys signed by the current administrator", async() => {
-      expect.assertions(7);
+      expect.assertions(8);
       const decryptedPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
       const recipientPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
 
@@ -92,7 +94,7 @@ describe("ShareMetadataKeyPrivateService", () => {
       }));
 
       const expectedSharedMetadataPrivateKey = await metadataKeys.items[0].metadataPrivateKeys.items[0].cloneForSharing(users.items[0].id);
-      jest.spyOn(service.userModel, "getOrFindAll").mockImplementationOnce(() => users);
+      await UserLocalStorage.set(users);
       jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll").mockImplementationOnce(() => metadataKeys);
       jest.spyOn(service.metadataPrivateKeyApiService, "create").mockImplementationOnce(async encryptedMetadataPrivateKeys => {
         expect(encryptedMetadataPrivateKeys.items.length).toEqual(1);
@@ -111,13 +113,16 @@ describe("ShareMetadataKeyPrivateService", () => {
 
       await service.shareMissing(pgpKeys.betty.userId, pgpKeys.ada.passphrase);
 
+      const user = await UserLocalStorage.getUserById(pgpKeys.betty.userId);
+
+      expect(user.missing_metadata_keys_ids).toEqual([]);
       expect(service.metadataPrivateKeyApiService.create).toHaveBeenCalled();
       expect(service.encryptMetadataPrivateKeysService.encryptOne).toHaveBeenCalledTimes(1);
     });
 
 
     it("should share and not sign the missing data keys if the current administrator is not signator", async() => {
-      expect.assertions(7);
+      expect.assertions(8);
       const decryptedPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
       const recipientPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
 
@@ -128,7 +133,7 @@ describe("ShareMetadataKeyPrivateService", () => {
       }));
 
       const expectedSharedMetadataPrivateKey = await metadataKeys.items[0].metadataPrivateKeys.items[0].cloneForSharing(users.items[0].id);
-      jest.spyOn(service.userModel, "getOrFindAll").mockImplementationOnce(() => users);
+      await UserLocalStorage.set(users);
       jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll").mockImplementationOnce(() => metadataKeys);
       jest.spyOn(service.metadataPrivateKeyApiService, "create").mockImplementationOnce(async encryptedMetadataPrivateKeys => {
         expect(encryptedMetadataPrivateKeys.items.length).toEqual(1);
@@ -146,23 +151,27 @@ describe("ShareMetadataKeyPrivateService", () => {
       jest.spyOn(service.encryptMetadataPrivateKeysService, "encryptOne");
 
       await service.shareMissing(pgpKeys.betty.userId, pgpKeys.ada.passphrase);
+      const user = await UserLocalStorage.getUserById(pgpKeys.betty.userId);
 
+      expect(user.missing_metadata_keys_ids).toEqual([]);
       expect(service.metadataPrivateKeyApiService.create).toHaveBeenCalled();
       expect(service.encryptMetadataPrivateKeysService.encryptOne).toHaveBeenCalledTimes(1);
     });
 
     it("should return if the current administrator cannot share the missing keys", async() => {
-      expect.assertions(1);
+      expect.assertions(2);
 
       const metadataKeys = new MetadataKeysCollection([]);
       const users = new UsersCollection(usersWithMissingMetadataKeysDto());
 
-      jest.spyOn(service.userModel, "getOrFindAll").mockImplementationOnce(() => users);
+      await UserLocalStorage.set(users);
       jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll").mockImplementationOnce(() => metadataKeys);
       jest.spyOn(service.metadataPrivateKeyApiService, "create");
 
       await service.shareMissing(pgpKeys.betty.userId, pgpKeys.ada.passphrase);
+      const user = await UserLocalStorage.getUserById(pgpKeys.betty.userId);
 
+      expect(user.missing_metadata_keys_ids.length).toEqual(1);
       await expect(service.metadataPrivateKeyApiService.create).not.toHaveBeenCalled();
     });
   });

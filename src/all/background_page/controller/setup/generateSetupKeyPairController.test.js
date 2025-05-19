@@ -23,6 +23,8 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import {v4 as uuidv4} from "uuid";
 import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
+import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
+import {defaultUserKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
 
 describe("GenerateSetupKeyPairController", () => {
   describe("GenerateSetupKeyPairController::exec", () => {
@@ -99,6 +101,44 @@ describe("GenerateSetupKeyPairController", () => {
       const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, generateKeyPairDto.passphrase);
       expect(decryptedPrivateKey).not.toBeNull();
       expect(expectedAccount.passphrase).toStrictEqual(generateKeyPairDto.passphrase);
+    }, 10000);
+
+    it("Should generate an ECC gpg key pair and update the account accordingly.", async() => {
+      expect.assertions(11);
+      await MockExtension.withConfiguredAccount();
+      const generateKeyPairDto = {passphrase: "What a great passphrase!"};
+      const workerId = uuidv4();
+      const setupAccountDto = startAccountSetupDto();
+      const temporaryAccountEntity = new AccountTemporaryEntity({account: setupAccountDto, worker_id: workerId});
+      await AccountTemporarySessionStorageService.set(temporaryAccountEntity);
+      const controller = new GenerateSetupKeyPairController({port: {_port: {name: workerId}}}, null, defaultApiClientOptions());
+      jest.spyOn(controller.findUserKeyPoliciesSettingsService, "findSettingsAsGuest").mockImplementation(() => new UserKeyPoliciesSettingsEntity(defaultUserKeyPoliciesSettingsDto()));
+
+      await controller.exec(generateKeyPairDto);
+      const account = (await AccountTemporarySessionStorageService.get(workerId)).account;
+      const accountPublicKey = await OpenpgpAssertion.readKeyOrFail(account.userPublicArmoredKey);
+      const accountPrivateKey = await OpenpgpAssertion.readKeyOrFail(account.userPrivateArmoredKey);
+      const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPublicKey);
+      const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPrivateKey);
+
+      const expectedUserIds = [{
+        name: `${account.firstName} ${account.lastName}`,
+        email: account.username
+      }];
+      expect(privateKeyInfo.fingerprint).toBe(publicKeyInfo.fingerprint);
+      expect(publicKeyInfo.private).toBe(false);
+      expect(privateKeyInfo.private).toBe(true);
+      expect(publicKeyInfo.length).toBe(256);
+      expect(privateKeyInfo.length).toBe(256);
+      expect(privateKeyInfo.userIds).toStrictEqual(expectedUserIds);
+      expect(privateKeyInfo.algorithm).toStrictEqual("eddsa");
+      expect(publicKeyInfo.algorithm).toStrictEqual("eddsa");
+      expect(publicKeyInfo.curve).toStrictEqual("ed25519");
+      expect(publicKeyInfo.curve).toStrictEqual("ed25519");
+
+      const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(account.userPrivateArmoredKey);
+      const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, generateKeyPairDto.passphrase);
+      expect(decryptedPrivateKey).not.toBeNull();
     }, 10000);
 
     it("Should raise an error if no account has been found.", async() => {

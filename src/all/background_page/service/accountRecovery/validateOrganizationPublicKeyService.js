@@ -14,8 +14,8 @@
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import GetGpgKeyInfoService from "../crypto/getGpgKeyInfoService";
 import AuthVerifyServerKeyService from "../api/auth/authVerifyServerKeyService";
-import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
 import Keyring from "../../model/keyring";
+import {GPG_KEY_TYPE_RSA} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
 
 class ValidateOrganizationPublicKeyService {
   /**
@@ -49,7 +49,7 @@ class ValidateOrganizationPublicKeyService {
       throw new Error("The key should be a valid openpgp key.");
     }
 
-    if (keyInfo.algorithm !== GenerateGpgKeyPairOptionsEntity.TYPE_RSA) {
+    if (keyInfo.algorithm !== GPG_KEY_TYPE_RSA) {
       throw new Error("The key algorithm should be RSA.");
     }
 

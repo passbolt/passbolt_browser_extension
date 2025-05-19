@@ -15,7 +15,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import i18n from "../../sdk/i18n";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
-
+import {GPG_KEY_TYPE_RSA} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
 
 class ValidatePrivateGpgKeySetupController {
   /**
@@ -75,9 +75,9 @@ class ValidatePrivateGpgKeySetupController {
       throw new Error(i18n.t("The private key should not have an expiry date."));
     }
 
-    if (keyInfo.algorithm === GenerateGpgKeyPairOptionsEntity.TYPE_RSA) {
-      if (keyInfo.length < GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_SIZE) {
-        throw new Error(i18n.t("An RSA key should have a length of {{size}} bits minimum.", {size: GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_SIZE}));
+    if (keyInfo.algorithm === GPG_KEY_TYPE_RSA) {
+      if (keyInfo.length < GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE) {
+        throw new Error(i18n.t("An RSA key should have a length of {{size}} bits minimum.", {size: GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE}));
       }
     } else {
       if (!keyInfo.curve) {

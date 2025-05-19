@@ -313,5 +313,27 @@ describe("UserEntity", () => {
         uuid2
       ]);
     });
+
+    it("should set the missing_metadata_keys_ids", () => {
+      expect.assertions(1);
+      const uuid1 = uuid();
+      const uuid2 = uuid();
+
+      const dto = defaultUserDto({
+        missing_metadata_keys_ids: []
+      }, {
+        withRole: true,
+        withGpgkey: true,
+      });
+      const entity = new UserEntity(dto);
+      entity.missingMetadataKeysIds = [
+        uuid1,
+        uuid2
+      ];
+      expect(entity.missingMetadataKeysIds).toEqual([
+        uuid1,
+        uuid2
+      ]);
+    });
   });
 });

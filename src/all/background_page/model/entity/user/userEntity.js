@@ -301,6 +301,14 @@ class UserEntity extends EntityV2 {
   }
 
   /**
+   * Set the user missing metadata keys ids
+   * @params {array} the missing metadata keys ids
+   */
+  set missingMetadataKeysIds(missingMetadataKeysIds) {
+    this._props.missing_metadata_keys_ids = missingMetadataKeysIds;
+  }
+
+  /**
    * UserEntity.ALL_CONTAIN_OPTIONS
    * @returns {object} all contain options that can be used in toDto()
    */

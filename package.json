@@ -62,7 +62,7 @@
     "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^16.0.0",
     "jest-webextension-mock": "^3.8.9",
-    "lockfile-lint": "^4.14.0",
+    "lockfile-lint": "^4.14.1",
     "text-encoding-utf-8": "^1.0.2",
     "uuid": "^8.3.2",
     "web-ext": "^8.0.0",
@@ -70,7 +70,12 @@
     "webpack-cli": "^5.1.4"
   },
   "overrides": {
-    "image-size": "^2.0.2"
+    "image-size": "^2.0.2",
+    "i18next-parser": {
+      "cheerio": {
+        "undici": "6.21.2"
+      }
+    }
   },
   "scripts": {
     "build": "npx grunt build",

@@ -22,11 +22,11 @@ export const usersWithMissingMetadataKeysDto = (data = {}) => {
   const user1 = defaultUserDto({
     id: pgpKeys.betty.userId,
     username: "user1@passbolt.com",
-    missing_metadata_keys_ids: data.missingMetadataKeysIds || [uuidv4()]
+    missing_metadata_key_ids: data.missingMetadataKeysIds || [uuidv4()]
   });
   const user2 = defaultUserDto({
     username: "user2@passbolt.com",
-    missing_metadata_keys_ids: []
+    missing_metadata_key_ids: []
   });
 
   return [user1, user2];

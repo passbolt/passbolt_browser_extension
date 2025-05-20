@@ -162,7 +162,7 @@ describe("UserModel", () => {
       );
     });
 
-    it("should add contains is_mfa_enabled and missing_metadata_keys_ids if user is an administrator and metadata is enabled", async() => {
+    it("should add contains is_mfa_enabled and missing_metadata_key_ids if user is an administrator and metadata is enabled", async() => {
       expect.assertions(1);
       const account = new AccountEntity(adminAccountDto({
         role_name: RoleEntity.ROLE_ADMIN
@@ -198,7 +198,7 @@ describe("UserModel", () => {
           gpgkey: false,
           groups_users: false,
           is_mfa_enabled: true,
-          missing_metadata_keys_ids: true,
+          missing_metadata_key_ids: true,
           pending_account_recovery_request: true,
           profile: true,
         },
@@ -263,7 +263,7 @@ describe("UserModel", () => {
   });
 
   describe("UserModel::getOrFindMe", () => {
-    it("should, with the option profile, role, account_recovery_user_setting without missing_metadata_keys_ids if plugin is disabled", async() => {
+    it("should, with the option profile, role, account_recovery_user_setting without missing_metadata_key_ids if plugin is disabled", async() => {
       expect.assertions(2);
 
       const account = new AccountEntity(adminAccountDto());
@@ -277,7 +277,7 @@ describe("UserModel", () => {
         id: "f642271d-bbb1-401e-bbd1-7ec370f8e19b",
         username: "betty@passbolt.com",
         groups_users: [],
-        missing_metadata_keys_ids: []
+        missing_metadata_key_ids: []
       }, dtoOptions);
 
       //Mock the API call and check if the call is the one expected
@@ -300,7 +300,7 @@ describe("UserModel", () => {
       );
       expect(entity).toEqual(new UserEntity(dto));
     });
-    it("should, with the option profile, role, account_recovery_user_setting and missing_metadata_keys_ids if plugin is enabled", async() => {
+    it("should, with the option profile, role, account_recovery_user_setting and missing_metadata_key_ids if plugin is enabled", async() => {
       expect.assertions(2);
 
       const account = new AccountEntity(adminAccountDto());
@@ -314,7 +314,7 @@ describe("UserModel", () => {
         id: "f642271d-bbb1-401e-bbd1-7ec370f8e19b",
         username: "betty@passbolt.com",
         groups_users: [],
-        missing_metadata_keys_ids: []
+        missing_metadata_key_ids: []
       }, dtoOptions);
 
       //Mock the API call and check if the call is the one expected
@@ -333,7 +333,7 @@ describe("UserModel", () => {
       const entity = await model.getOrFindMe(true);
 
       expect(model.findOne).toHaveBeenCalledWith(
-        "f642271d-bbb1-401e-bbd1-7ec370f8e19b", {"account_recovery_user_setting": true, "missing_metadata_keys_ids": true, "profile": true, "role": true}, true
+        "f642271d-bbb1-401e-bbd1-7ec370f8e19b", {"account_recovery_user_setting": true, "missing_metadata_key_ids": true, "profile": true, "role": true}, true
       );
       expect(entity).toEqual(new UserEntity(dto));
     });

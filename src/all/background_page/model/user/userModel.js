@@ -55,7 +55,7 @@ class UserModel {
       contains.is_mfa_enabled = true;
       const organizationSettings = await this.organisationSettingsModel.getOrFind();
       if (organizationSettings.isPluginEnabled("metadata")) {
-        contains.missing_metadata_keys_ids = true;
+        contains.missing_metadata_key_ids = true;
       }
     }
     const usersCollection = await this.findAll(contains, null, null, true);
@@ -85,9 +85,10 @@ class UserModel {
       const contains = {profile: true, role: true, account_recovery_user_setting: true};
       const organizationSettings = await this.organisationSettingsModel.getOrFind();
       if (organizationSettings.isPluginEnabled("metadata")) {
-        contains.missing_metadata_keys_ids = true;
+        contains.missing_metadata_key_ids = true;
       }
       user = await this.findOne(this.account.userId, contains, true);
+
       await UserMeSessionStorageService.set(this.account, user);
     }
 

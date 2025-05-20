@@ -102,7 +102,7 @@ class UserEntity extends EntityV2 {
           "format": "date-time",
           "nullable": true,
         },
-        "missing_metadata_keys_ids": {
+        "missing_metadata_key_ids": {
           "type": "array",
           "items": {
             "type": "string",
@@ -246,7 +246,7 @@ class UserEntity extends EntityV2 {
    * @returns {(array)} the list of missing metadata keys
    */
   get missingMetadataKeysIds() {
-    return this._props.missing_metadata_keys_ids || [];
+    return this._props.missing_metadata_key_ids || [];
   }
 
   /**
@@ -305,7 +305,7 @@ class UserEntity extends EntityV2 {
    * @params {array} the missing metadata keys ids
    */
   set missingMetadataKeysIds(missingMetadataKeysIds) {
-    this._props.missing_metadata_keys_ids = missingMetadataKeysIds;
+    this._props.missing_metadata_key_ids = missingMetadataKeysIds;
   }
 
   /**

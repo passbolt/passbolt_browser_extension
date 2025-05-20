@@ -66,6 +66,7 @@ import GetCsrfTokenController from "../controller/auth/getCsrfTokenController";
 import FindMetadataMigrateResourcesController from "../controller/migrateMetadata/findMetadataMigrateResourcesController";
 import MigrateMetadataResourcesController from "../controller/migrateMetadata/migrateMetadataResourcesController";
 import DownloadOrganizationGeneratedKey from "../controller/accountRecovery/downloadOrganizationGenerateKeyController";
+import ShareMetadataKeyPrivateController from "../controller/metadata/shareMetadataKeyPrivateController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -419,6 +420,18 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.metadata.migrate-resources-metadata', async(requestId, migrateMetdataDto, paginationDetails) => {
     const controller = new MigrateMetadataResourcesController(worker, requestId, apiClientOptions, account);
     await controller._exec(migrateMetdataDto, paginationDetails);
+  });
+
+  /*
+   * Share missing metadata private key with a user.
+   *
+   * @listens passbolt.metadata.share-missing-metadata-private-keys-with-user
+   * @param requestId {uuid} The request identifier
+   * @param userId {uuid} the user id which missed some metadata private key.
+   */
+  worker.port.on('passbolt.metadata.share-missing-metadata-private-keys-with-user', async(requestId, userId) => {
+    const controller = new ShareMetadataKeyPrivateController(worker, requestId, apiClientOptions, account);
+    await controller._exec(userId);
   });
 };
 export const AppEvents = {listen};

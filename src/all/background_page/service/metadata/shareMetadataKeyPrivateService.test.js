@@ -115,7 +115,7 @@ describe("ShareMetadataKeyPrivateService", () => {
 
       const user = await UserLocalStorage.getUserById(pgpKeys.betty.userId);
 
-      expect(user.missing_metadata_keys_ids).toEqual([]);
+      expect(user.missing_metadata_key_ids).toEqual([]);
       expect(service.metadataPrivateKeyApiService.create).toHaveBeenCalled();
       expect(service.encryptMetadataPrivateKeysService.encryptOne).toHaveBeenCalledTimes(1);
     });
@@ -153,7 +153,7 @@ describe("ShareMetadataKeyPrivateService", () => {
       await service.shareMissing(pgpKeys.betty.userId, pgpKeys.ada.passphrase);
       const user = await UserLocalStorage.getUserById(pgpKeys.betty.userId);
 
-      expect(user.missing_metadata_keys_ids).toEqual([]);
+      expect(user.missing_metadata_key_ids).toEqual([]);
       expect(service.metadataPrivateKeyApiService.create).toHaveBeenCalled();
       expect(service.encryptMetadataPrivateKeysService.encryptOne).toHaveBeenCalledTimes(1);
     });
@@ -171,7 +171,7 @@ describe("ShareMetadataKeyPrivateService", () => {
       await service.shareMissing(pgpKeys.betty.userId, pgpKeys.ada.passphrase);
       const user = await UserLocalStorage.getUserById(pgpKeys.betty.userId);
 
-      expect(user.missing_metadata_keys_ids.length).toEqual(1);
+      expect(user.missing_metadata_key_ids.length).toEqual(1);
       await expect(service.metadataPrivateKeyApiService.create).not.toHaveBeenCalled();
     });
   });

@@ -883,7 +883,7 @@ classDiagram
             -string props.last_logged_in
             -boolean props.is_mfa_enabled
             -string props.locale
-            -array~uuid~ missing_metadata_keys_ids
+            -array~uuid~ missing_metadata_key_ids
             -RoleEntity _role
             -ProfileEntity _profile
             -GpgkeyEntity _gpgkey

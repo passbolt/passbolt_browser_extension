@@ -19,10 +19,10 @@ import TagsCollection from "../tag/tagsCollection";
 import ResourceSecretsCollection from "../secret/resource/resourceSecretsCollection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import UserEntity from "../user/userEntity";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
+import CanSuggestService from "passbolt-styleguide/src/shared/services/canSuggestService/canSuggestService";
 
 const ENTITY_NAME = 'Resource';
 
@@ -492,7 +492,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {boolean}
    */
   isSuggestion(url) {
-    return canSuggestUrl(url, this.metadata.uris?.[0]);
+    return CanSuggestService.canSuggestUri(url, this.metadata.uris?.[0]);
   }
 
   /**

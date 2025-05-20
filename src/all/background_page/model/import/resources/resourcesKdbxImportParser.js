@@ -16,6 +16,7 @@ import ImportError from "../../../error/importError";
 import * as kdbxweb from 'kdbxweb';
 import ExternalTotpEntity from "../../entity/totp/externalTotpEntity";
 import ResourcesTypeImportParser from "./resourcesTypeImportParser";
+import {ICON_TYPE_KEEPASS_ICON_SET} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 
 class ResourcesKdbxImportParser {
   /**
@@ -132,9 +133,24 @@ class ResourcesKdbxImportParser {
       secret_clear: '', // By default a secret can be null
       expired: kdbxEntry.times.expires ? kdbxEntry.times.expiryTime?.toISOString() : null,
     };
+
     if (typeof kdbxEntry.fields.get('Password') === 'object') {
       externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();
     }
+
+    if (kdbxEntry.bgColor || kdbxEntry.icon) {
+      externalResourceDto.icon = {};
+
+      if (kdbxEntry.icon) {
+        externalResourceDto.icon.type = ICON_TYPE_KEEPASS_ICON_SET;
+        externalResourceDto.icon.value = kdbxEntry.icon;
+      }
+
+      if (kdbxEntry.bgColor) {
+        externalResourceDto.icon.background_color = kdbxEntry.bgColor;
+      }
+    }
+
     try {
       const totp = this.getTotp(kdbxEntry);
       if (totp) {

@@ -167,6 +167,18 @@ describe("ExternalResourceEntity", () => {
       expect(entity.totp.secret_key !== dto.totp.secret_key).toBeTruthy();
     });
 
+    it("constructor works even if the icon property cannot be built", () => {
+      expect.assertions(1);
+
+      const dto = defaultExternalResourceDto({
+        icon: {
+          type: "wrong",
+        }
+      });
+
+      expect(() => new ExternalResourceEntity(dto)).not.toThrow();
+    });
+
     it("constructor build resource with default values", () => {
       expect.assertions(2);
 

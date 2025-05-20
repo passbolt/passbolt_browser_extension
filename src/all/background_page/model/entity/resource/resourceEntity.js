@@ -492,7 +492,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {boolean}
    */
   isSuggestion(url) {
-    return CanSuggestService.canSuggestUri(url, this.metadata.uris?.[0]);
+    return CanSuggestService.canSuggestUris(url, this.metadata.uris);
   }
 
   /**

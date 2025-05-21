@@ -4,6 +4,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.1.1] - 2025-05-21
+
+### Added
+- PB-41365 Support options for ECC Key generation
+
+### Fixed
+- PB-41760 On some conditions, scrollbars can appear and break the design
+- PB-42561 The folder tree caret when scrolling appeared in the wrong orientation
+
+### Security
+- PB-42613 Upgrade browser extension OpenPGP.js to the latest version
+
 ## [5.1.0] - 2025-05-12
 
 ### Added
@@ -2153,7 +2165,8 @@ self registration settings option in the left-side bar
 - LU: Logged in user
 
 ## [4.12.0] - 2024-03-10
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.1...HEAD
+[5.1.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.0...v5.1.1
 [5.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.1...v5.1.0
 [5.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.12.0...v5.0.0

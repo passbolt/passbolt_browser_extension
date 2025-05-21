@@ -19,6 +19,7 @@ import ResourcesKdbxExporter from "./resourcesKdbxExporter";
 import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
 import fs from "fs";
 import {defaultTotpDto} from "../../entity/totp/totpDto.test.data";
+import {defaultIconDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/iconEntity.test.data";
 
 global.kdbxweb = kdbxweb;
 kdbxweb.CryptoEngine.argon2 = argon2;
@@ -130,6 +131,39 @@ describe("ResourcesKdbxExporter", () => {
     expect(password3.fields.get('Title')).toEqual("Password 3");
     const secret_key2 = password3.fields.get('TimeOtp-Secret-Base32').getText();
     expect(secret_key2).toEqual("THISISASECRET");
+  });
+
+  it("should export resources with icons and colors if any", async() => {
+    expect.assertions(6);
+
+    const iconDto = defaultIconDto();
+    const exportResource1 = buildImportResourceDto(1);
+    const exportResource2 = buildImportResourceDto(2, {icon: iconDto});
+
+    const exportDto = {
+      "format": "kdbx",
+      "export_resources": [exportResource1, exportResource2],
+      "export_folders": []
+    };
+
+    const exportEntity = new ExportResourcesFileEntity(exportDto);
+    const exporter = new ResourcesKdbxExporter(exportEntity);
+    await exporter.export();
+
+    const kdbxCredentials = new kdbxweb.Credentials(null, null);
+    const kdbxDb = await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
+
+    const kdbxRoot = kdbxDb.groups[0];
+    const password1 = kdbxRoot.entries[0];
+    const password2 = kdbxRoot.entries[1];
+
+    expect(password1.fields.get('Title')).toEqual("Password 1");
+    expect(password1.bgColor).toStrictEqual("");
+    expect(password1.icon).toStrictEqual(0);
+
+    expect(password2.fields.get('Title')).toEqual("Password 2");
+    expect(password2.bgColor).toStrictEqual(iconDto.background_color);
+    expect(password2.icon).toStrictEqual(iconDto.value);
   });
 
   it("should export resources and folders for other keepass", async() => {

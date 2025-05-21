@@ -158,7 +158,7 @@ class ExternalResourceEntity extends EntityV2 {
    * @returns {Object}
    */
   static buildDtoFromResourceEntityDto(resourceEntityDto, externalFolderParent) {
-    return {
+    const data = {
       id: resourceEntityDto.id,
       name: resourceEntityDto.metadata.name,
       username: resourceEntityDto.metadata.username,
@@ -170,6 +170,12 @@ class ExternalResourceEntity extends EntityV2 {
       folder_parent_path: externalFolderParent?.path || "",
       expired: resourceEntityDto.expired || null,
     };
+
+    if (resourceEntityDto.metadata.icon) {
+      data.icon = resourceEntityDto.metadata.icon;
+    }
+
+    return data;
   }
 
   /**
@@ -414,6 +420,14 @@ class ExternalResourceEntity extends EntityV2 {
     }
     assertType(totp, ExternalTotpEntity);
     this._totp = totp;
+  }
+
+  /**
+   * Get the resource icon and color information if any
+   * @returns {IconEntity|null}
+   */
+  get icon() {
+    return this._icon || null;
   }
 
   /*

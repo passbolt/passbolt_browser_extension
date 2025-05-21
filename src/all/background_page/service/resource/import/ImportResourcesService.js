@@ -35,6 +35,7 @@ import GetOrFindMetadataSettingsService from "../../metadata/getOrFindMetadataSe
 import EncryptMetadataService from "../../metadata/encryptMetadataService";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
+import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 
 /**
  * The service aim to import the resources from a file and save it to the API / localstorage.
@@ -293,7 +294,7 @@ class ImportResourcesService {
         const contain = {permission: true, favorite: true, tags: true, folder: true};
         const createdResourceDto = await this.resourceService.create(data, contain);
         // Reuse the original non decrypted resource metadata.
-        createdResourceDto.metadata = clearTextMetadataResourcesCollection.items[index].metadata;
+        createdResourceDto.metadata = clearTextMetadataResourcesCollection.items[index].metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN);
         this.handleImportResourceSuccess(importResourcesFile, ++importedCount, createdResourceDto, importResourcesFile.importResources.items[index]);
 
         return createdResourceDto;

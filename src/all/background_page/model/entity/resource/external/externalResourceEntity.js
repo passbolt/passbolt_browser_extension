@@ -18,6 +18,7 @@ import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {assertType} from "../../../../utils/assertions";
+import IconEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 
 const DEFAULT_RESOURCE_NAME = '(no name)';
 
@@ -41,6 +42,15 @@ class ExternalResourceEntity extends EntityV2 {
     if (this._props.totp) {
       this._totp = new ExternalTotpEntity(this._props.totp, {clone: false});
       delete this._props.totp;
+    }
+
+    if (this._props.icon) {
+      try {
+        this._icon = new IconEntity(this._props.icon, {clone: false});
+      } catch (e) {
+        console.warn("The associated icon entity could not be set.", e);
+      }
+      delete this._props.icon;
     }
   }
 
@@ -100,6 +110,7 @@ class ExternalResourceEntity extends EntityV2 {
           "type": "string"
         },
         "expired": resourceEntitySchema.properties.expired,
+        "icon": IconEntity.getSchema(),
       }
     };
   }
@@ -123,6 +134,10 @@ class ExternalResourceEntity extends EntityV2 {
 
     if (this._totp) {
       result.totp = this._totp.toDto();
+    }
+
+    if (this._icon) {
+      result.icon = this._icon.toDto();
     }
 
     return result;
@@ -162,7 +177,7 @@ class ExternalResourceEntity extends EntityV2 {
    * @returns {Object}
    */
   toResourceEntityImportDto() {
-    return {
+    const data = {
       metadata: {
         object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
         name: this.name,
@@ -177,6 +192,12 @@ class ExternalResourceEntity extends EntityV2 {
       expired: this.expired,
       personal: true, //set to true to enforce usage of user's key to encrypt metadata during import
     };
+
+    if (this._icon) {
+      data.metadata.icon = this._icon.toDto();
+    }
+
+    return data;
   }
 
   /*

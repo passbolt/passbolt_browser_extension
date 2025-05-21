@@ -539,7 +539,7 @@ classDiagram
             -string props.expires
             -string props.created
             -string props.algorithm
-            -number props.length
+            -integer props.length
             -string props.curve
             -boolean props.private
             -boolean props.revoked
@@ -551,7 +551,7 @@ classDiagram
             +get isValid() boolean
             +get created() string
             +get algorithm() string
-            +get length() number
+            +get length() integer
             +get curve() string
             +get revoked() boolean
             +get private() boolean
@@ -570,28 +570,6 @@ classDiagram
             +get issuerFingerprint() string
             +get isVerified() boolean
             +get created() string
-        }
-
-        class GpgkeyEntity {
-            -uuid props.id
-            -uuid props.user_id
-            -string props.fingerprint
-            -string props.armored_key
-            -boolean props.deleted
-            -string props.type
-            -string props.uid
-            -integer props.bits
-            -string props.key_created
-            -string props.expires
-            -string props.created
-            -string props.modified
-            +get id() string
-            +get userId() string
-            +get armoredKey() string
-            +get fingerprint() boolean
-            +get created() string
-            +get modified() string
-            +get isDeleted() boolean
         }
 
         class GroupsUsersCollection {
@@ -980,6 +958,99 @@ classDiagram
         }
     }
 
+    namespace GpgKeyNs {
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% GpgKey controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class GenerateSetupKeyPairController {
+            +exec(object generateGpgKeyDto) Promise
+        }
+
+        class AccountRecoveryGenerateOrganizationKeyController {
+            +exec(generateGpgKeyPairOptionsDto object) Promise~ExternalGpgKeyPairEntity~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% GpgKey services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class FindUserKeyPoliciesSettingsService {
+            +findSettingsAsGuest(userId string, authenticationToken string) Promise~UserKeyPoliciesSettingsEntity~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% GpgKey models
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class UserKeyPoliciesSettingsApiService {
+            +findSettingsAsGuest(userId string, authenticationToken string) Promise~object~
+        }
+
+        class UserKeyPoliciesSettingsEntity {
+            -string props.preferred_key_type
+            -string props.source
+
+            +get preferredKeyType() string
+            +get source() string|null
+
+            +createFromDefault(data: object)$ UserKeyPoliciesSettingsEntity
+        }
+
+        class GenerateGpgKeyPairOptionsEntity {
+            -string props.preferred_key_type
+            -string props.source
+            -string props.name
+            -string props.email
+            -string props.passphrase
+            -string props.type
+            -integer props.keySize
+            -string props.curve
+            -integer props.date
+
+            +toGenerateOpenpgpKeyDto() object
+            +get userId() string
+            +get name() string
+            +get email() string
+            +get type() string
+            +get passphrase() string
+            +get curve() string|null
+            +get rsaBits() integer|null
+            +get date() Date
+            +createForUserKeyGeneration(apiGpgKeyType string, generateGpgKeyPairDto object)$ GenerateGpgKeyPairOptionsEntity
+            +createForOrkKeyGeneration(generateGpgKeyPairDto object)$ GenerateGpgKeyPairOptionsEntity
+            +get ENTITY_NAME() string
+            +get DEFAULT_RSA_KEY_SIZE() integer
+            +get DEFAULT_KEY_TYPE() string
+            +get DEFAULT_ECC_KEY_CURVE() string
+            +get KEY_TYPE_RSA() string
+            +get KEY_TYPE_ECC() string
+            +get KEY_CURVE_ED25519() string
+        }
+
+        class GpgkeyEntity {
+            -uuid props.id
+            -uuid props.user_id
+            -string props.fingerprint
+            -string props.armored_key
+            -boolean props.deleted
+            -string props.type
+            -string props.uid
+            -integer props.bits
+            -string props.key_created
+            -string props.expires
+            -string props.created
+            -string props.modified
+            +get id() string
+            +get userId() string
+            +get armoredKey() string
+            +get fingerprint() boolean
+            +get created() string
+            +get modified() string
+            +get isDeleted() boolean
+        }
+    }
+
 %% Resource controllers relationships
     CreateResourceController*--CreateResourceService
 %%    CreateResourceController*--GetPassphraseService
@@ -1150,4 +1221,13 @@ classDiagram
     ShareResourceService*--ShareService
 %% Share models relationships.
     style ShareService fill:#DEE5D4
+
+%% GpgKey controllers relationships
+    GenerateSetupKeyPairController*--FindUserKeyPoliciesSettingsService
+    GenerateSetupKeyPairController*--GenerateGpgKeyPairService
+    GenerateSetupKeyPairController*--GenerateGpgKeyPairOptionsEntity
+    AccountRecoveryGenerateOrganizationKeyController*--GenerateGpgKeyPairService
+    AccountRecoveryGenerateOrganizationKeyController*--GenerateGpgKeyPairOptionsEntity
+%% GpgKey services relationships
+    FindUserKeyPoliciesSettingsService*--UserKeyPoliciesSettingsApiService
 ```

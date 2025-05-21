@@ -11,42 +11,56 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import AppEmailValidatorService from "../../../../service/validator/appEmailValidatorService";
+import {GPG_KEY_CURVE_25519, GPG_KEY_TYPE_CURVE} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import {assertType} from "../../../../utils/assertions";
+import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
 
 const ENTITY_NAME = "GenerateGpgKeyPairOptionsEntity";
 
-const TYPE_RSA = "rsa";
-const DEFAULT_TYPE = TYPE_RSA;
-const DEFAULT_KEY_SIZE = 3072;
+const KEY_TYPE_RSA = "rsa";
+const KEY_TYPE_ECC = "ecc";
+const KEY_CURVE_ED25519 = "ed25519";
+const DEFAULT_KEY_TYPE = KEY_TYPE_RSA;
+const DEFAULT_RSA_KEY_SIZE = 3072;
+const DEFAULT_RSA_ORK_KEY_SIZE = 4096;
+const DEFAULT_ECC_KEY_CURVE = KEY_CURVE_ED25519;
 
-class GenerateGpgKeyPairOptionsEntity extends Entity {
+export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
   /**
-   * @inheritDoc
+   * @inheritdoc
    */
-  constructor(generateGpgKeyPairDto, options = {}) {
-    GenerateGpgKeyPairOptionsEntity.marshal(generateGpgKeyPairDto);
+  marshall() {
+    if (typeof(this._props.type) === "undefined") {
+      this._props.type = GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_TYPE;
+    }
 
-    super(EntitySchema.validate(
-      GenerateGpgKeyPairOptionsEntity.ENTITY_NAME,
-      generateGpgKeyPairDto,
-      GenerateGpgKeyPairOptionsEntity.getSchema()
-    ), options);
+    if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA && typeof(this._props.keySize) === "undefined") {
+      this._props.keySize = GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE;
+    }
+
+    if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC && typeof(this._props.curve) === "undefined") {
+      this._props.curve = GenerateGpgKeyPairOptionsEntity.DEFAULT_ECC_KEY_CURVE;
+    }
+    super.marshall();
   }
 
   /**
-   * Marshal the dto
-   * @param {Object} generateGpgKeyPairDto generate gpg key pair DTO
-   * @return {Object}
+   * @inheritDoc
    */
-  static marshal(generateGpgKeyPairDto) {
-    if (!generateGpgKeyPairDto.keySize) {
-      generateGpgKeyPairDto.keySize = this.DEFAULT_KEY_SIZE;
+  validateBuildRules() {
+    if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA && Boolean(this._props.curve)) {
+      const error = new EntityValidationError();
+      error.addError("curve", "unwanted_curve", `The curve should not be set when the type is set to '${GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA}'`);
+      throw error;
     }
 
-    if (!generateGpgKeyPairDto.type) {
-      generateGpgKeyPairDto.type = this.DEFAULT_TYPE;
+    if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC && Boolean(this._props.keySize)) {
+      const error = new EntityValidationError();
+      error.addError("keySize", "unwanted_keySize", `The keySize should not be set when the type is set to '${GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC}'`);
+      throw error;
     }
   }
 
@@ -61,7 +75,6 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
         "name",
         "email",
         "passphrase",
-        "keySize",
         "type",
       ],
       "properties": {
@@ -79,17 +92,67 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
         },
         "type": {
           "type": "string",
-          "enum": [GenerateGpgKeyPairOptionsEntity.TYPE_RSA],
+          "enum": [GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA, GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC],
         },
         "keySize": {
           "type": "integer",
-          "minLength": this.DEFAULT_KEY_SIZE
+          "minLength": GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE,
+          "nullable": true,
+        },
+        "curve": {
+          "type": "string",
+          "minLength": [GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519],
+          "nullable": true,
         },
         "date": {
           "type": "integer"
         }
       }
     };
+  }
+
+  /**
+   * Create entity for user key generation.
+   *
+   * @param {UserKeyPoliciesSettingsEntity} userKeyPolicy API gpg key type preference: rsa or eddsa. Default to rsa.
+   * @param {object} generateGpgKeyPairDto The dto used for key creation
+   * @return {GenerateGpgKeyPairOptionsEntity}
+   * @throws {TypeError} if the `userKeyPolicy` is not a UserKeyPoliciesSettingsEntity
+   */
+  static createForUserKeyGeneration(userKeyPolicy, generateGpgKeyPairDto) {
+    assertType(userKeyPolicy, UserKeyPoliciesSettingsEntity, "The userKeyPolicy should be a valid 'UserKeyPoliciesSettingsEntity'");
+
+    const type = userKeyPolicy.preferredKeyType === GPG_KEY_TYPE_CURVE
+      ? GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC
+      : GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA;
+
+    const curve = userKeyPolicy.preferredKeyCurve === GPG_KEY_CURVE_25519
+      ? GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519
+      : null;
+
+    const keySize = userKeyPolicy.preferredKeySize;
+
+    const updatedGenerateKeyPairDto = {
+      ...generateGpgKeyPairDto,
+      curve,
+      type,
+      keySize,
+    };
+
+    return new GenerateGpgKeyPairOptionsEntity(updatedGenerateKeyPairDto);
+  }
+
+  /**
+   * Create entity for account recovery key generation
+   * @param {object} generateGpgKeyPairDto The dto used for key creation
+   * @return {GenerateGpgKeyPairOptionsEntity}
+   */
+  static createForOrkKeyGeneration(generateGpgKeyPairDto) {
+    return new GenerateGpgKeyPairOptionsEntity({
+      ...generateGpgKeyPairDto,
+      type: GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA,
+      keySize: DEFAULT_RSA_ORK_KEY_SIZE,
+    });
   }
 
   /*
@@ -102,13 +165,22 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
    * @returns {object}
    */
   toGenerateOpenpgpKeyDto() {
-    return {
+    const dto = {
       userIDs: [this.userId],
-      rsaBits: this.rsaBits,
       passphrase: this.passphrase,
       type: this.type,
       date: this.date,
     };
+
+    if (this.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA) {
+      dto.rsaBits = this.rsaBits;
+    }
+
+    if (this.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC) {
+      dto.curve = this.curve;
+    }
+
+    return dto;
   }
 
   /*
@@ -141,7 +213,7 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
   }
 
   /**
-   * Get the key type length
+   * Get the key type
    * @returns {string} ie. rsa
    */
   get type() {
@@ -149,11 +221,19 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
   }
 
   /**
+   * Get the key curve
+   * @returns {string|null} ie. ed25519
+   */
+  get curve() {
+    return this._props.curve || null;
+  }
+
+  /**
    * Get the rsa key length
-   * @returns {integer} ie. 4096
+   * @returns {integer|null} ie. 4096
    */
   get rsaBits() {
-    return this._props.keySize;
+    return this._props.keySize || null;
   }
 
   /**
@@ -188,28 +268,50 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
   }
 
   /**
-   * GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_SIZE
+   * GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE
    * @returns {number}
    */
-  static get DEFAULT_KEY_SIZE() {
-    return DEFAULT_KEY_SIZE;
+  static get DEFAULT_RSA_KEY_SIZE() {
+    return DEFAULT_RSA_KEY_SIZE;
   }
 
   /**
-   * GenerateGpgKeyPairOptionsEntity.DEFAULT_TYPE
+   * GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_TYPE
    * @returns {string}
    */
-  static get DEFAULT_TYPE() {
-    return DEFAULT_TYPE;
+  static get DEFAULT_KEY_TYPE() {
+    return DEFAULT_KEY_TYPE;
   }
 
   /**
-   * GenerateGpgKeyPairOptionsEntity.TYPE_RSA
+   * GenerateGpgKeyPairOptionsEntity.DEFAULT_ECC_KEY_CURVE
    * @returns {string}
    */
-  static get TYPE_RSA() {
-    return TYPE_RSA;
+  static get DEFAULT_ECC_KEY_CURVE() {
+    return DEFAULT_ECC_KEY_CURVE;
+  }
+
+  /**
+   * GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA
+   * @returns {string}
+   */
+  static get KEY_TYPE_RSA() {
+    return KEY_TYPE_RSA;
+  }
+
+  /**
+   * GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC
+   * @returns {string}
+   */
+  static get KEY_TYPE_ECC() {
+    return KEY_TYPE_ECC;
+  }
+
+  /**
+   * GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519
+   * @returns {string}
+   */
+  static get KEY_CURVE_ED25519() {
+    return KEY_CURVE_ED25519;
   }
 }
-
-export default GenerateGpgKeyPairOptionsEntity;

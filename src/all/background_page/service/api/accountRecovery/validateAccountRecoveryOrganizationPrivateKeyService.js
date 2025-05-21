@@ -27,6 +27,7 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
    * @throws {WrongOrganizationRecoveryKeyError} If the provided key doesn't match the organization key.
    * @throws {Error} If the private key is encrypted and the passphrase cannot decrypt it
    */
+  // @todo is there a key size validation
   static async validate(accountRecoveryOrganisationPolicyEntity, privateKeyEntity) {
     const accountRecoveryPublicKey = await OpenpgpAssertion.readKeyOrFail(accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey);
     const privateKey = await OpenpgpAssertion.readKeyOrFail(privateKeyEntity.armoredKey);

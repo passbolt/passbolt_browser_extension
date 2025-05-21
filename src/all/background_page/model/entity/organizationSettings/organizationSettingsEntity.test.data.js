@@ -196,6 +196,11 @@ export const defaultCeOrganizationSettings = siteSettings => {
     "metadata": {
       "version": "1.0.0",
       "enabled": true
+    },
+    "userKeyPolicies": {
+      "version": "1.0.0",
+      "enabled": true,
+      "source": "file",
     }
   });
   return Object.assign(defaultData, siteSettings);

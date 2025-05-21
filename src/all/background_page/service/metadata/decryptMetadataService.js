@@ -23,7 +23,6 @@ import GetOrFindSessionKeysService from "../sessionKey/getOrFindSessionKeysServi
 import GetSessionKeyService from "../crypto/getSessionKeyService";
 import SaveSessionKeysService from "../sessionKey/saveSessionKeysService";
 import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 
 class DecryptMetadataService {
@@ -298,9 +297,13 @@ class DecryptMetadataService {
    */
   assertValidMetadataObjectType(entity) {
     if (entity.metadata.objectType !== ResourceMetadataEntity.METADATA_OBJECT_TYPE) {
-      const error = new EntityValidationError();
-      error.addError('metadata.object_type', 'required-v5', `The resource metadata object_type is required and must be set to '${ResourceMetadataEntity.METADATA_OBJECT_TYPE}'.`);
-      throw error;
+      /*
+       * @todo: hotfix for v5.1.2: reintroduce this thrown error when all clients are "enough" migrated to v5 format
+       * const error = new EntityValidationError();
+       * error.addError('metadata.object_type', 'required-v5', `The resource metadata object_type is required and must be set to '${ResourceMetadataEntity.METADATA_OBJECT_TYPE}'.`);
+       * throw error;
+       */
+      console.warn(`Invalid metadata.object_type detected: '${entity.metadata.objectType}' on resource '${entity.id}'. The resource metadata object_type is required and must be set to '${ResourceMetadataEntity.METADATA_OBJECT_TYPE}'`);
     }
   }
 

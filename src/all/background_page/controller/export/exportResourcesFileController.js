@@ -67,10 +67,10 @@ class ExportResourcesFileController {
       const mimeType = {kdbx: "application/x-keepass", csv: "text/csv"}[exportResourcesFileEntity.fileType] || "text/plain";
       const blobFile = exportResourcesFileEntity.toBlob(mimeType);
       await FileService.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
-      await this.progressService.finishStep(i18n.t('Done'), true);
+      this.progressService.finishStep(i18n.t('Done'), true);
       return exportResourcesFileEntity;
     } finally {
-      await this.progressService.close();
+      this.progressService.close();
     }
   }
 }

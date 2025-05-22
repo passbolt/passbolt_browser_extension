@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.1.2] - 2025-05-22
+
+### Fixed
+- PB-42785 invalidate object_type check in metadata now sends a warning message in the console instead of blocking the app
+
 ## [5.1.1] - 2025-05-21
 
 ### Added
@@ -2165,7 +2170,8 @@ self registration settings option in the left-side bar
 - LU: Logged in user
 
 ## [4.12.0] - 2024-03-10
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.2...HEAD
+[5.1.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.1...v5.1.2
 [5.1.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.0...v5.1.1
 [5.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.1...v5.1.0
 [5.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.0...v5.0.1

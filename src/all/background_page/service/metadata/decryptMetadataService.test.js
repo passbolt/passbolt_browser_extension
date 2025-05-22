@@ -497,7 +497,11 @@ describe("DecryptMetadataService", () => {
 
       const expectedError = new EntityValidationError();
       expectedError.addError('metadata.object_type', 'required-v5', "The resource metadata object_type is required and must be set to 'PASSBOLT_RESOURCE_METADATA'."),
-      await expect(() =>  service.decryptMetadataWithGpgKey(entity, privateKey)).rejects.toThrowError(expectedError);
+      /*
+       * @todo: put back throw check when object_type check is enforced again
+       * await expect(() =>  service.decryptMetadataWithGpgKey(entity, privateKey)).rejects.toThrowError(expectedError);
+       */
+      await expect(() =>  service.decryptMetadataWithGpgKey(entity, privateKey)).resolves;
     }, 10_000);
 
     it("should throw an exception if the object_type is not set properly when decrypting with a session key", async() => {
@@ -523,7 +527,11 @@ describe("DecryptMetadataService", () => {
 
       const expectedError = new EntityValidationError();
       expectedError.addError('metadata.object_type', 'required-v5', "The resource metadata object_type is required and must be set to 'PASSBOLT_RESOURCE_METADATA'."),
-      await expect(() =>  service.decryptMetadataWithSessionKey(entity, sessionKeyString)).rejects.toThrowError(expectedError);
+      /*
+       * @todo: put back throw check when object_type check is enforced again
+       * await expect(() =>  service.decryptMetadataWithSessionKey(entity, sessionKeyString)).rejects.toThrowError(expectedError);
+       */
+      expect(() =>  service.decryptMetadataWithSessionKey(entity, sessionKeyString)).resolves;
     }, 10_000);
   });
 });

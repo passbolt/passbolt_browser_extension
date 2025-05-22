@@ -25,7 +25,8 @@ class GenerateGpgKeyPairService {
    * @return {Promise<ExternalGpgKeyPairEntity>}
    */
   static async generateKeyPair(generateGpgKeyPairOptionsEntity) {
-    const openpgpGenerateKeyDto = Object.assign(generateGpgKeyPairOptionsEntity.toGenerateOpenpgpKeyDto(), {format: 'armored'});
+    const openpgpGenerateKeyDto = generateGpgKeyPairOptionsEntity.toGenerateOpenpgpKeyDto();
+    openpgpGenerateKeyDto.format = "armored";
     const shouldOverrideOpenPgpEmailValidation = GenerateGpgKeyPairService.shouldOverrideOpenPgpEmailValidation(generateGpgKeyPairOptionsEntity);
 
     if (shouldOverrideOpenPgpEmailValidation) {

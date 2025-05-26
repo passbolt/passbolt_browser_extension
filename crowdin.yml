@@ -17,5 +17,6 @@ export_languages:
   - pt-BR
   - ro
   - ru
+  - sl
   - sv
 commit_message: '[skip-ci]'

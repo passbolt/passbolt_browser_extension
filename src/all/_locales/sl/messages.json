@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Passbolt - upravljalnik gesel z odprto kodo",
+    "description": "The application name of the extension, displayed in the web store. 45 characters max."
+  },
+  "appDescription": {
+    "message": "Razširitev Passbolt za upravljalnik gesel z odprto kodo za ekipe.",
+    "description": "The description of the extension, displayed in the web store. 85 characters max."
+  }
+}

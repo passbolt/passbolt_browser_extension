@@ -23,6 +23,7 @@ import {
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import EncryptMetadataService from "./encryptMetadataService";
@@ -42,6 +43,8 @@ import {
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import passphraseStorageService from "../session_storage/passphraseStorageService";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -184,6 +187,24 @@ describe("EncryptMetadataService", () => {
 
       const expectedError = new Error("Unable to encrypt the entity metadata, metadata is already encrypted.");
       await expect(() => encryptService.encryptOneForForeignModel(resourceEntityClone, pgpKeys.ada.passphrase)).rejects.toThrow(expectedError);
+    });
+
+    it("should throw an error if the metadata object_type is not defined", async() => {
+      expect.assertions(2);
+
+      const metadataDto = defaultResourceMetadataDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT});
+      delete metadataDto.object_type;
+      const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,  metadata: metadataDto}));
+      resourceEntity._props.personal = true;
+
+      try {
+        await encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase);
+      } catch (error) {
+        const expectedError = new EntityValidationError();
+        expectedError.addError('metadata.object_type', 'required-v5', `The resource metadata object_type is required and must be set to '${resourceEntity.metadata.constructor.METADATA_OBJECT_TYPE} for the the entity (${resourceEntity?.id})'.`);
+        expect(error).toBeInstanceOf(EntityValidationError);
+        expect(error).toStrictEqual(expectedError);
+      }
     });
 
     it("should throw an error if no metadata key is found", async() => {
@@ -446,6 +467,35 @@ describe("EncryptMetadataService", () => {
 
       const expectedError = new Error("Unable to encrypt the collection metadata, a resource metadata is already encrypted.");
       await expect(() => encryptService.encryptAllFromForeignModels(new ResourcesCollection([resourceEntityClone]), pgpKeys.ada.passphrase)).rejects.toThrow(expectedError);
+    });
+
+    it("should throw an error if the metadata object type is not defined", async() => {
+      expect.assertions(2);
+
+      const metadataDto = defaultResourceMetadataDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT});
+      delete metadataDto.object_type;
+      const resourceEntity = new ResourceEntity(defaultResourceDto({resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT, metadata: metadataDto}));
+      resourceEntity._props.personal = true;
+      const collection = new ResourcesCollection([resourceEntity]);
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+        .mockImplementationOnce(() => defaultMetadataKeysSettingsDto());
+
+      try {
+        await encryptService.encryptAllFromForeignModels(collection, pgpKeys.ada.passphrase);
+      } catch (error) {
+        const expectedError = new CollectionValidationError();
+        const validationError = new EntityValidationError();
+        validationError.addError('metadata.object_type', 'required-v5', `The resource metadata object_type is required and must be set to '${resourceEntity.metadata.constructor.METADATA_OBJECT_TYPE} for the the entity (${resourceEntity?.id})'.`);
+        expectedError.addItemValidationError(0, validationError);
+        expect(error).toBeInstanceOf(CollectionValidationError);
+        expect(error).toStrictEqual(expectedError);
+      }
     });
 
     it("should throw an error if no metadata key is found", async() => {

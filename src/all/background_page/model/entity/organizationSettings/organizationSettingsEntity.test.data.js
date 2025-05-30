@@ -105,6 +105,9 @@ export const anonymousOrganizationSettings = (data = {}) => {
             {
               "locale": "sv-SE",
               "label": "Svenska"
+            }, {
+              "locale": "uk-UA",
+              "label": "Українська (beta)"
             }
           ]
         },

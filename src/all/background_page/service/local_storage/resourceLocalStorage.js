@@ -98,11 +98,22 @@ class ResourceLocalStorage {
    * Get a resource from the local storage by id
    *
    * @param {string} id The resource id
-   * @return {object} resource dto object
+   * @return {Promise<object>} resource dto object
    */
   static async getResourceById(id) {
     const resources = await ResourceLocalStorage.get();
     return resources?.find(item => item.id === id);
+  }
+
+  /**
+   * Get resources from the local storage by ids
+   *
+   * @param {Array<string>} ids The resource ids
+   * @return {Promise<Array<object>>} resource dto object
+   */
+  static async getResourcesByIds(ids) {
+    const resources = await ResourceLocalStorage.get();
+    return resources?.filter(item => ids.includes(item.id));
   }
 
 

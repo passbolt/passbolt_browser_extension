@@ -21,6 +21,7 @@ import {assertArrayUUID, assertNonEmptyArray, assertString, assertUuid} from "..
 import FindFoldersService from "../folder/findFoldersService";
 import MoveService from "../api/move/moveService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
+import ResourceUpdateLocalStorageService from "../resource/update/resourceUpdateLocalStorageService";
 
 export const PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL = 1 // Retrieving destination folder permissions
   + 1 // Retrieving resources permissions
@@ -45,6 +46,7 @@ class MoveResourcesService {
     this.shareResourceService = new ShareResourceService(apiClientOptions, account, progressService);
     this.findFoldersService = new FindFoldersService(apiClientOptions);
     this.moveApiService = new MoveService(apiClientOptions);
+    this.resourceUpdateLocalStorageService = new ResourceUpdateLocalStorageService();
   }
 
   /**
@@ -226,10 +228,9 @@ class MoveResourcesService {
     for (const resource of resources) {
       this.progressService.updateStepMessage(i18n.t('Moving {{name}}', {name: resource.metadata.name}));
       await this.moveApiService.moveResource(resource.id, destinationFolderId);
-      resource.folderParentId = destinationFolderId;
     }
-
-    await this.resourceModel.updateCollection(resources);
+    // Update the collection with the resources updated
+    await this.resourceUpdateLocalStorageService.updateFolderParentId(resources.ids, destinationFolderId);
   }
 
   /**

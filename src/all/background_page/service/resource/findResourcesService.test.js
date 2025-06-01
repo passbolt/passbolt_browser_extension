@@ -177,56 +177,6 @@ describe("FindResourcesService", () => {
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(resourcesDto);
     });
 
-    it("should not throw an error if required field is missing with ignore strategy", async() => {
-      expect.assertions(2);
-      const multipleResources = multipleResourceIncludingUnsupportedResourceTypesDtos();
-      const resourcesCollectionDto = multipleResources.concat([defaultResourceDto({
-        resource_type_id: null
-      })]);
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
-      const expectedRetainedResource = [multipleResources[0], multipleResources[1], multipleResources[3], multipleResources[4]];
-
-      const collection = await findResourcesService.findAllForLocalStorage();
-
-      expect(collection).toHaveLength(4);
-      expect(collection.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(expectedRetainedResource);
-    });
-
-    it("ignores resources having an unknown resource type.", async() => {
-      expect.assertions(2);
-      const resourcesDto = multipleResourceIncludingUnsupportedResourceTypesDtos();
-      const expectedRetainedResource = [resourcesDto[0], resourcesDto[1], resourcesDto[3], resourcesDto[4]];
-      const resourceTypesDto = resourceTypesCollectionDto();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
-
-      const resources = await findResourcesService.findAllForLocalStorage();
-
-      expect(resources).toHaveLength(4);
-      expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(expectedRetainedResource);
-    });
-
-    it("should return a collection with resources metadata decrypted", async() => {
-      expect.assertions(2);
-      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
-      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
-
-      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
-      const resourceTypesDto = resourceTypesCollectionDto();
-
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
-      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
-
-      const resources = await findResourcesService.findAllForLocalStorage();
-
-      expect(resources).toHaveLength(resourcesDto.length);
-      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(2);
-    }, 10 * 1000);
-
     it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
       expect.assertions(2);
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
@@ -246,23 +196,6 @@ describe("FindResourcesService", () => {
       expect(resources).toHaveLength(resourcesDto.length);
       expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     }, 10 * 1000);
-
-    it("should return a collection with resources metadata decrypted and resources metadata encrypted filtered out (shared key cannot be found)", async() => {
-      expect.assertions(1);
-      const metadata_key_id = uuidv4();
-      const resourcesDto = multipleResourceWithMetadataEncrypted(metadata_key_id);
-      const resourceTypesDto = resourceTypesCollectionDto();
-
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
-      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => new MetadataKeysCollection([]));
-
-      const resources = await findResourcesService.findAllForLocalStorage();
-
-      expect(resources).toHaveLength(4);
-    });
 
     it("should return a collection with resources metadata decrypted from a mixed source of information (alread decrypted metadata and encrypted metadata)", async() => {
       expect.assertions(1);

@@ -22,7 +22,7 @@ import {
   TEST_RESOURCE_TYPE_PASSWORD_STRING,
   TEST_RESOURCE_TYPE_TOTP
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {defaultResourcesDtos, resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
+import {defaultResourceDtosCollection, defaultResourcesDtos, resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
@@ -411,6 +411,39 @@ describe("ResourcesCollection", () => {
 
       expect(filteredResources).toHaveLength(2);
       expect(filteredResources.ids).toEqual([resource1Id, resource4Id]);
+    });
+  });
+
+  describe("::setDecryptedMetadataFromCollection", () => {
+    it("should set the decrypted data from the given collection to the current one if the resources are not modified.", () => {
+      expect.assertions(4);
+
+      const decryptedCollectionDto = defaultResourceDtosCollection();
+      const encryptedCollectionDto = JSON.parse(JSON.stringify(decryptedCollectionDto));
+
+      encryptedCollectionDto[0].metadata = metadata.withSharedKey.encryptedMetadata[0];
+      encryptedCollectionDto[1].metadata = metadata.withSharedKey.encryptedMetadata[1];
+      encryptedCollectionDto[2].metadata = metadata.withSharedKey.encryptedMetadata[2];
+      encryptedCollectionDto[3].metadata = metadata.withSharedKey.encryptedMetadata[3];
+
+      encryptedCollectionDto[0].modified = (new Date()).toISOString();
+      encryptedCollectionDto[2].modified = (new Date()).toISOString();
+
+      const decryptedCollection = new ResourcesCollection(decryptedCollectionDto);
+      const collection = new ResourcesCollection(encryptedCollectionDto);
+      collection.setDecryptedMetadataFromCollection(decryptedCollection);
+
+      expect(collection.items[0].isMetadataDecrypted()).toStrictEqual(false);
+      expect(collection.items[1].isMetadataDecrypted()).toStrictEqual(true);
+      expect(collection.items[2].isMetadataDecrypted()).toStrictEqual(false);
+      expect(collection.items[3].isMetadataDecrypted()).toStrictEqual(true);
+    });
+
+    it("should assert its parameter", () => {
+      expect.assertions(1);
+
+      const collection = new ResourcesCollection([]);
+      expect(() => collection.setDecryptedMetadataFromCollection("test")).toThrow('The `resourcesCollection` parameter should be a ResourcesCollection.');
     });
   });
 });

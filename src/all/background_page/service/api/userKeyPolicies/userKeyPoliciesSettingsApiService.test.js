@@ -42,6 +42,26 @@ describe("UserGpgKeyPolicieesSettingsApiService", () => {
       expect(resultDto).toStrictEqual(apiResponse);
     });
 
+    it("should call the API with the right parameters", async() => {
+      expect.assertions(2);
+
+      const userId = uuidV4();
+      const authenticationToken = uuidV4();
+      const apiResponse = defaultUserKeyPoliciesSettingsDto();
+
+      fetch.doMockOnceIf(/setup\/user-key-policies\/settings/, async req => {
+        const url = new URL(req.url);
+        expect(url.searchParams.get("user_id")).toStrictEqual(userId);
+        expect(url.searchParams.get("token")).toStrictEqual(authenticationToken);
+        return mockApiResponse(apiResponse);
+      });
+
+      const apiClientOptions = defaultApiClientOptions();
+      const service = new UserKeyPoliciesSettingsApiService(apiClientOptions);
+
+      await service.findSettingsAsGuest(userId, authenticationToken);
+    });
+
     it("throws an error if the userId is not a valid UUID", async() => {
       expect.assertions(1);
 

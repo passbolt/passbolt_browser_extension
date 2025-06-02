@@ -12,7 +12,6 @@
  * @since         4.11.0
  */
 
-import expect from "expect";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import SaveMetadataTypesSettingsController from "./saveMetadataTypesSettingsController";

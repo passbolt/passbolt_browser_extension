@@ -41,7 +41,7 @@ class UserKeyPoliciesSettingsApiService extends AbstractService {
 
     const urlOptions = {
       user_id: userId,
-      authentication_token: authenticationToken
+      token: authenticationToken
     };
 
     const apiResult = await this.apiClient.findAll(urlOptions);

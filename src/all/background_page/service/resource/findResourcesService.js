@@ -44,6 +44,7 @@ export default class FindResourcesService {
    * @param {Object} [filters] optional
    * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<ResourcesCollection>}
+   * @private
    */
   async findAll(contains, filters, ignoreInvalidEntity) {
     //Assert contains
@@ -93,30 +94,27 @@ export default class FindResourcesService {
 
   /**
    * Retrieve all resources for the local storage.
-   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
-   * might be available in the passphrase session storage.
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAllForLocalStorage(passphrase = null) {
-    const resources = await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, null, true);
-    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
-    resources.filterByResourceTypes(resourceTypes);
-
-    await this.decryptMetadataService.decryptAllFromForeignModels(resources, passphrase, {ignoreDecryptionError: true, updateSessionKeys: true});
-    resources.filterOutMetadataEncrypted();
-
-    return resources;
+  async findAllForLocalStorage() {
+    return await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, null, true);
   }
 
   /**
    * Retrieve all resources shared with group for the local storage.
-   * @param {uuid} groupId
+   * @param {string} groupId The group id to filter the resources with.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAllByIsSharedWithGroupForLocalStorage(groupId) {
+  async findAllByIsSharedWithGroupForLocalStorage(groupId, passphrase = null) {
     const resources = await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
+
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources, passphrase, {ignoreDecryptionError: true});
+    resources.filterOutMetadataEncrypted();
+
     return resources;
   }
 

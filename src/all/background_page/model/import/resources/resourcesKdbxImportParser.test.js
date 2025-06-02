@@ -28,6 +28,7 @@ import {
 import {defaultTotpDto} from "../../entity/totp/totpDto.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import {defaultMetadataTypesSettingsV4Dto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import IconEntity, {ICON_TYPE_KEEPASS_ICON_SET} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 
 describe("ResourcesKdbxImportParser", () => {
   const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
@@ -300,6 +301,7 @@ describe("ResourcesKdbxImportParser", () => {
   });
 
   it("should import the expiration date", async() => {
+    expect.assertions(2);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -318,5 +320,31 @@ describe("ResourcesKdbxImportParser", () => {
     // Assert resources
     expect(importEntity.importResources.items).toHaveLength(2);
     expect(importEntity.importResources.items[1].expired).toStrictEqual("2020-11-16T23:00:42.000Z");
+  });
+
+  it("should import the icon and bacgrkound color data if any", async() => {
+    expect.assertions(6);
+    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-with-color-and-icon.kdbx", {encoding: 'base64'});
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "kdbx",
+      "file": file,
+      "options": {
+        "credentials": {
+          "password": "passbolt"
+        }
+      }
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
+    await parser.parseImport();
+
+    // Assert resources
+    expect(importEntity.importResources.items).toHaveLength(2);
+    expect(importEntity.importResources.items[0]._icon).toBeInstanceOf(IconEntity);
+    expect(importEntity.importResources.items[0]._icon.type).toStrictEqual(ICON_TYPE_KEEPASS_ICON_SET);
+    expect(importEntity.importResources.items[0]._icon.value).toStrictEqual(4);
+    expect(importEntity.importResources.items[0]._icon.backgroundColor).toStrictEqual("#FF0000");
+    expect(importEntity.importResources.items[1]._icon).toBeUndefined();
   });
 });

@@ -16,9 +16,11 @@ import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
-import {defaultMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
+import {decryptedMetadataPrivateKeyDto, defaultMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 import MetadataPrivateKeyApiService from "./metadataPrivateKeyApiService";
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
+import {shareMetadataPrivateKeysWithDecryptedKeyDtos, shareMetadataPrivateKeysWithEncryptedKeyDtos} from "../../../model/entity/metadata/shareMetadataPrivateKeysCollection.test.data";
+import ShareMetadataPrivateKeysCollection from "../../../model/entity/metadata/shareMetadataPrivateKeysCollection";
 
 describe("metadataPrivateKeyApiService", () => {
   let apiClientOptions;
@@ -30,7 +32,7 @@ describe("metadataPrivateKeyApiService", () => {
   });
 
   describe('::update', () => {
-    it("Save the new metadata key on the API.", async() => {
+    it("Save the new metadata private key on the API.", async() => {
       expect.assertions(2);
 
       const encryptedMetadataPrivateKeyDto = defaultMetadataPrivateKeyDto();
@@ -53,6 +55,53 @@ describe("metadataPrivateKeyApiService", () => {
       const service = new MetadataPrivateKeyApiService(apiClientOptions);
 
       await expect(() => service.update(42)).rejects.toThrow(TypeError);
+    });
+
+    it("throws an error if the metadata private key is decrypted", async() => {
+      expect.assertions(1);
+
+      const decryptedMetadataPrivateKey = decryptedMetadataPrivateKeyDto();
+      const entity = new MetadataPrivateKeyEntity(decryptedMetadataPrivateKey);
+
+      const service = new MetadataPrivateKeyApiService(apiClientOptions);
+
+      await expect(() => service.update(entity)).rejects.toThrow(Error);
+    });
+  });
+
+  describe('::create', () => {
+    it("Share the metadata private keys with the user on the API.", async() => {
+      expect.assertions(1);
+
+      const shareMetadataPrivateKeysDtos = shareMetadataPrivateKeysWithEncryptedKeyDtos();
+
+      fetch.doMockOnceIf(new RegExp(`/metadata/keys/private`), async req => {
+        expect(req.method).toEqual("POST");
+        return mockApiResponse(shareMetadataPrivateKeysDtos);
+      });
+
+      const entity = new ShareMetadataPrivateKeysCollection(shareMetadataPrivateKeysDtos);
+      const service = new MetadataPrivateKeyApiService(apiClientOptions);
+      await service.create(entity);
+    });
+
+    it("throws an invalid parameter error if the settings parameter is not valid", async() => {
+      expect.assertions(1);
+
+      const service = new MetadataPrivateKeyApiService(apiClientOptions);
+
+      await expect(() => service.create(42)).rejects.toThrow(TypeError);
+    });
+
+    it("throws an error if the metadataPrivateKey is decrypted", async() => {
+      expect.assertions(1);
+
+      const decryptedMetadataPrivateKey = shareMetadataPrivateKeysWithDecryptedKeyDtos();
+      const entity = new ShareMetadataPrivateKeysCollection(decryptedMetadataPrivateKey);
+
+      const service = new MetadataPrivateKeyApiService(apiClientOptions);
+
+      await expect(() => service.create(entity)).rejects.toThrow(Error);
     });
   });
 });

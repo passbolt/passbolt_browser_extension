@@ -13,6 +13,7 @@
 import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
 import * as kdbxweb from 'kdbxweb';
 import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
+import {ICON_TYPE_KEEPASS_ICON_SET} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 
 class ResourcesKdbxExporter {
   /**
@@ -103,6 +104,20 @@ class ResourcesKdbxExporter {
       //explicitly set the expiryTime to undefined as it seems that it takes the current time otherwise
       kdbxEntry.times.expiryTime = undefined;
       kdbxEntry.times.expires = false;
+    }
+
+    if (!externalResourceEntity.icon) {
+      return;
+    }
+
+    const icon = externalResourceEntity.icon;
+
+    if (icon.backgroundColor) {
+      kdbxEntry.bgColor = icon.backgroundColor;
+    }
+
+    if (icon.type === ICON_TYPE_KEEPASS_ICON_SET) {
+      kdbxEntry.icon = icon.value;
     }
   }
 

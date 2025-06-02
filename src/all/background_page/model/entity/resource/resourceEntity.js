@@ -19,10 +19,10 @@ import TagsCollection from "../tag/tagsCollection";
 import ResourceSecretsCollection from "../secret/resource/resourceSecretsCollection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import UserEntity from "../user/userEntity";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
+import CanSuggestService from "passbolt-styleguide/src/shared/services/canSuggestService/canSuggestService";
 
 const ENTITY_NAME = 'Resource';
 
@@ -208,7 +208,7 @@ class ResourceEntity extends EntityV2 {
    */
   toDto(contain) {
     const result = Object.assign({}, this._props);
-    result.metadata = result.metadata || this._metadata.toDto();
+    result.metadata = result.metadata || this._metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN);
     if (!contain) {
       return result;
     }
@@ -492,7 +492,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {boolean}
    */
   isSuggestion(url) {
-    return canSuggestUrl(url, this.metadata.uris?.[0]);
+    return CanSuggestService.canSuggestUris(url, this.metadata.uris);
   }
 
   /**
@@ -644,7 +644,7 @@ class ResourceEntity extends EntityV2 {
    */
   set metadata(metadata) {
     if (metadata instanceof ResourceMetadataEntity) {
-      this._metadata = new ResourceMetadataEntity(metadata.toDto(), {validate: false});
+      this._metadata = new ResourceMetadataEntity(metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN), {validate: false});
       delete this._props.metadata;
     } else if (typeof metadata === "object") {
       this._metadata = new ResourceMetadataEntity(metadata);

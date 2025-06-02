@@ -14,6 +14,7 @@
 import ResourceEntity from "./resourceEntity";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
+import {assertType} from "../../../utils/assertions";
 
 const ENTITY_NAME = 'Resources';
 const RULE_UNIQUE_ID = 'unique_id';
@@ -180,6 +181,35 @@ class ResourcesCollection extends EntityV2Collection {
    */
   filterOutMetadataNotEncryptedWithUserKey() {
     this.filterByCallback(resource => resource.isMetadataKeyTypeUserKey());
+  }
+
+  /**
+   * Update the current collection resource metadata with the given one if the data has not changed.
+   *
+   * @param {ResourcesCollection} resourcesCollection
+   */
+  setDecryptedMetadataFromCollection(resourcesCollection) {
+    assertType(resourcesCollection, ResourcesCollection, 'The `resourcesCollection` parameter should be a ResourcesCollection.');
+
+    const resourceIdsTable = {};
+    resourcesCollection.items.forEach(el => resourceIdsTable[el.id] = el);
+
+    this.items.forEach(encryptedResource => {
+      const decryptedResource = resourceIdsTable[encryptedResource.id];
+      if (!decryptedResource) {
+        // the resource is new and requires a decryption
+        return;
+      }
+
+      const hasResourceChanged = decryptedResource.modified !== encryptedResource.modified;
+      if (hasResourceChanged) {
+        // the resource has changed, the decrypted metadata cannot be set without a new decryption
+        return;
+      }
+
+      // the resource has not changed thus does not requires a new metadata decryption.
+      encryptedResource.metadata = decryptedResource.metadata;
+    });
   }
 
   /*

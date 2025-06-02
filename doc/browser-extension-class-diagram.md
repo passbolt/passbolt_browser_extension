@@ -210,6 +210,11 @@ classDiagram
             +exec() Promise~void~
         }
 
+        class ShareMetadataKeyPrivateController {
+            event "passbolt.metadata.share-missing-metadata-private-keys-with-user"
+            +exec(uuid userId) Promise~void~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -288,6 +293,10 @@ classDiagram
             +getOrFindAll() Promise~MetadataKeysCollection~
         }
 
+        class ShareMetadataKeyPrivateService {
+            +shareMissing(uuid userId, string passphrase) Promise~void~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata Settings services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -323,6 +332,7 @@ classDiagram
 
         class MetadataPrivateKeyApiService {
             +update(MetadataPrivateKeyEntity metadataPrivateKey) Promise~string~
+            +create(ShareMetadataPrivateKeysCollection metadataPrivateKeysCollection) Promise~void~
         }
 
         class MetadataKeysSettingsLocalStorage {
@@ -643,6 +653,12 @@ classDiagram
             +hasEncryptedPrivateKeys() boolean
         }
 
+        class ShareMetadataPrivateKeysCollection {
+            +validateBuildRules(item, options): void
+            +hasDecryptedPrivateKeys(): boolean
+            +hasEncryptedPrivateKeys(): boolean
+        }
+
         class MetadataTrustedKeyEntity {
             -string props.fingerprint
             -string props.signed
@@ -729,7 +745,7 @@ classDiagram
             -string props.created_by
             -string props.modified
             -string props.modified_by
-            -MetadataEntity _metadata
+            -ResourceMetadataEntity _metadata
             -FavoriteEntity _favorite
             -PermissionEntity _permission
             -PermissionsCollection _permissions
@@ -738,8 +754,8 @@ classDiagram
             -TagsCollection _tags
             -UserEntity _creator
             -UserEntity _modifier
-            +get metadata() string|MetadataEntity
-            +set metadata(string|MetadataEntity metadata)
+            +get metadata() string|ResourceMetadataEntity
+            +set metadata(string|ResourceMetadataEntity metadata)
             +isMetadataDecrypted() boolean
             +isMetadataKeyTypeUserKey() boolean
         }
@@ -845,6 +861,7 @@ classDiagram
             -string props.last_logged_in
             -boolean props.is_mfa_enabled
             -string props.locale
+            -array~uuid~ missing_metadata_key_ids
             -RoleEntity _role
             -ProfileEntity _profile
             -GpgkeyEntity _gpgkey
@@ -866,10 +883,42 @@ classDiagram
             +get groupsUsers() GroupsUsersCollection
             +get accountRecoveryUserSetting() AccountRecoveryUserSettingEntity
             +get pendingAccountRecoveryUserRequest() AccountRecoveryRequestEntity
+            +get missingMetadataKeysIds() array~uuid~
             +set locale(string locale)
         }
 
         class UsersCollection {
+        }
+
+        class ResourceMetadataEntity {
+
+            -string props.object_type
+            -string props.resource_type_id
+            -string props.name
+            -string props.username
+            -array props.uris
+            -string props.description
+            -IconEntity _icon
+
+            +get objectType() string|null
+            +get name() string
+            +get username() string
+            +get description() string|null
+            +get resourceTypeId() string
+            +get uris() Array;
+            +get icon() IconEntity|null
+            +get METADATA_OBJECT_TYPE()$ string
+            +get URI_MAX_LENGTH()$ number
+        }
+
+        class IconEntity {
+            -string props.type
+            -intger props.value
+            -string props.background_color
+
+            +get type string|null
+            +get value integer|null
+            +get backgroundColor string|null
         }
 
         class MigrateMetadataEntity {
@@ -1053,12 +1102,15 @@ classDiagram
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
     SaveMetadataKeysSettingsController*--SaveMetadataSettingsService
     SaveMetadataTypesSettingsController*--SaveMetadataSettingsService
+    ShareMetadataKeyPrivateController*--GetPassphraseService
+    ShareMetadataKeyPrivateController*--VerifyOrTrustMetadataKeyService
     style CreateMetadataKeyController fill:#D2E0FB
     style FindAllNonDeletedMetadataKeysController fill:#D2E0FB
     style GenerateMetadataPrivateKeyController fill:#D2E0FB
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
     style SaveMetadataKeysSettingsController fill:#D2E0FB
     style SaveMetadataTypesSettingsController fill:#D2E0FB
+	ShareMetadataKeyPrivateController*--ShareMetadataKeyPrivateService
 %% Metadata services relationships.
     CreateMetadataKeyService*--EncryptMetadataPrivateKeysService
     CreateMetadataKeyService*--FindUsersService
@@ -1068,6 +1120,9 @@ classDiagram
     MigrateMetadataResourcesService*--MigrateMetadataResourcesApiService
     MigrateMetadataResourcesService*--EncryptMetadataService
     MigrateMetadataResourcesService*--ResourceTypeModel
+    ShareMetadataKeyPrivateService*--MetadataPrivateKeyApiService
+    ShareMetadataKeyPrivateService*--GetOrFindMetadataKeysService
+    ShareMetadataKeyPrivateService*--EncryptMetadataPrivateKeysService
 %%    DecryptMetadataPrivateKeysService*--PassphraseStorageService
     DecryptMetadataService*--GetOrFindMetadataKeysService
     DecryptMetadataService*--GetOrFindSessionKeysService

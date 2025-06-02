@@ -17,6 +17,7 @@ import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/r
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import expect from "expect";
 
 describe("ResourceLocalStorage", () => {
   describe("::get", () => {
@@ -125,6 +126,40 @@ describe("ResourceLocalStorage", () => {
       const result = await ResourceLocalStorage.getResourceById(resourcesDto[0].id);
       expect(result).toEqual(expect.any(Object));
       expect(result).toEqual(resourcesDto[0]);
+    });
+  });
+
+  describe("::getResourcesById", () => {
+    it("Should return undefined if the local storage is not yet initialized", async() => {
+      expect.assertions(1);
+      const result = await ResourceLocalStorage.getResourcesByIds([uuidv4(), uuidv4()]);
+      expect(result).toBeUndefined();
+    });
+
+    it("Should return nothing if the target resource is not found in the local storage", async() => {
+      expect.assertions(1);
+      const resourcesDto = [defaultResourceDto(), defaultResourceDto()];
+      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      const result = await ResourceLocalStorage.getResourcesByIds([uuidv4(), uuidv4()]);
+      expect(result).toEqual([]);
+    });
+
+    it("Should return the target resources if found in the local storage", async() => {
+      expect.assertions(2);
+      const resourcesDto = [defaultResourceDto(), defaultResourceDto(), defaultResourceDto()];
+      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      const result = await ResourceLocalStorage.getResourcesByIds([resourcesDto[0].id, resourcesDto[2].id, uuidv4()]);
+      expect(result).toEqual(expect.any(Array));
+      expect(result).toEqual([resourcesDto[0], resourcesDto[2]]);
+    });
+
+    it("Should return the target resources if found in the local storage", async() => {
+      expect.assertions(2);
+      const resourcesDto = [defaultResourceDto(), defaultResourceDto(), defaultResourceDto()];
+      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      const result = await ResourceLocalStorage.getResourcesByIds([resourcesDto[0].id, resourcesDto[1].id, resourcesDto[2].id]);
+      expect(result).toEqual(expect.any(Array));
+      expect(result).toEqual(resourcesDto);
     });
   });
 

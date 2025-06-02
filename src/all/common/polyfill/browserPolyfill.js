@@ -14,6 +14,7 @@
 const browser = require("webextension-polyfill");
 const ScriptingPolyfill = require("./scriptingPolyfill");
 const SessionStoragePolyfill = require("./sessionStoragePolyfill");
+const SafariPolyfill = require("./safariPolyfill");
 
 // mv3 scripting API for mv2
 if (!browser.scripting) {
@@ -26,6 +27,10 @@ if (!browser.storage.session) {
 // mv3 action API polyfill for mv2
 if (!browser.action) {
   browser.action = browser.browserAction;
+}
+
+if (!browser.runtime.onInstalledReason) {
+  SafariPolyfill.setPolyfill(browser);
 }
 
 module.exports = browser;

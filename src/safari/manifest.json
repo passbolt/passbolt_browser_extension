@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "__MSG_appName__",
   "short_name": "passbolt",
   "version": "5.1.1",
@@ -12,9 +12,9 @@
     "128": "webAccessibleResources/img/icons/icon-128.png"
   },
   "background": {
-    "service_worker": "serviceWorker/serviceWorker.js"
+    "page": "index.html"
   },
-  "action": {
+  "browser_action": {
     "default_icon": "webAccessibleResources/img/icons/icon-32.png",
     "default_title": "Passbolt Quickaccess",
     "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
@@ -29,22 +29,19 @@
     }
   },
   "permissions": [
+    "activeTab",
+    "tabs",
     "unlimitedStorage",
     "storage",
-    "tabs",
-    "scripting",
-    "alarms",
+    "background",
+    "clipboardWrite",
     "downloads",
-    "webNavigation"
+    "*://*/*",
+    "alarms",
+    "cookies"
   ],
-  "host_permissions": [
-    "*://*/*"
+  "web_accessible_resources": [
+    "webAccessibleResources/*"
   ],
-  "web_accessible_resources": [{
-    "resources": ["webAccessibleResources/*"],
-    "matches": ["*://*/*"]
-  }],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'"
-  }
+  "content_security_policy": "script-src 'self'; object-src 'none';"
 }

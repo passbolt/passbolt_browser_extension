@@ -66,7 +66,7 @@ browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 /**
  * On update available of the extension, update it when the user is logout
  */
-browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableService.exec);
+browser.runtime?.onUpdateAvailable?.addListener(OnExtensionUpdateAvailableService.exec);
 
 /**
  * Add listener on startup

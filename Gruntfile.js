@@ -55,7 +55,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle']);
   grunt.registerTask('bundle-mv3', ['externalize-locale-strings', 'copy:service_worker', 'copy:web_accessible_resources', 'copy:locales']);
   grunt.registerTask('bundle-chrome-mv3', ['copy:manifest_chrome_mv3', 'bundle-mv3']);
-  grunt.registerTask('bundle-safari', ['copy:manifest_safari', 'bundle-mv3']);
+  grunt.registerTask('bundle-safari', ['copy:manifest_safari', 'bundle']);
 
   grunt.registerTask('build', ['build-firefox-prod', 'build-chrome-prod']);
 
@@ -72,8 +72,8 @@ module.exports = function (grunt) {
   grunt.registerTask('build-chrome-mv3-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome-mv3', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_chrome_mv3_prod']);
 
   grunt.registerTask('build-safari', ['build-safari-debug', 'build-safari-prod']);
-  grunt.registerTask('build-safari-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-safari', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug']);
-  grunt.registerTask('build-safari-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-safari', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod']);
+  grunt.registerTask('build-safari-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-safari', 'shell:build_background_page_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug']);
+  grunt.registerTask('build-safari-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-safari', 'shell:build_background_page_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod']);
 
   grunt.registerTask('externalize-locale-strings', ['shell:externalize']);
 

@@ -23,6 +23,7 @@ import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import ExternalGpgKeyPairEntity
   from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 import Keyring from "../../model/keyring";
+import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 
 /**
  * The service aims to create metadata key.
@@ -40,6 +41,7 @@ export default class CreateMetadataKeyService {
     this.encryptMetadataPrivateKeysService = new EncryptMetadataPrivateKeysService(account);
     this.metadataKeysApiService = new MetadataKeysApiService(apiClientOptions);
     this.getOrFindMetadataSettings = new GetOrFindMetadataSettingsService(account, apiClientOptions);
+    this.metadataKeysSessionStorage = new MetadataKeysSessionStorage(account);
   }
 
   /**
@@ -62,7 +64,8 @@ export default class CreateMetadataKeyService {
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, passphrase);
     await this.encryptMetadataPrivateKeysService.encryptAllFromMetadataKeyEntity(metadataKey, userDecryptedPrivateKey);
     const savedMetadataKeyDto = await this.metadataKeysApiService.create(metadataKey);
-
+    // Flush the metadata key session storage to update the session storage with the new metadata keys
+    await this.metadataKeysSessionStorage.flush();
     return new MetadataKeyEntity(savedMetadataKeyDto);
   }
 

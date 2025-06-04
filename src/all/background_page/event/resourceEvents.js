@@ -22,6 +22,7 @@ import FindAllByIdsForDisplayPermissionsController
 import MoveResourcesController from "../controller/move/moveResourcesController";
 import ResetResourceGridUserSettingController
   from "../controller/resourceGridSetting/resetResourceGridUserSettingController";
+import UpdateResourcesByParentFolderController from "../controller/resource/updateResourcesByParentFolderController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -172,6 +173,16 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.move-by-ids', async(requestId, resourcesIds, destinationFolderId) => {
     const controller = new MoveResourcesController(worker, requestId, apiClientOptions, account);
     await controller.exec(resourcesIds, destinationFolderId);
+  });
+
+  /*
+   * Retrieve all resources by ids with their permissions.
+   * @listens passbolt.resources.update-local-storage-for-parent-folder
+   * @param {string} parentFolderId The id of the parent folder.
+   */
+  worker.port.on('passbolt.resources.update-local-storage-for-parent-folder', async(requestId, parentFolderId) => {
+    const controller = new UpdateResourcesByParentFolderController(worker, requestId, apiClientOptions, account);
+    await controller._exec(parentFolderId);
   });
 };
 

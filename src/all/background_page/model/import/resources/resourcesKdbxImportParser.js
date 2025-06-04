@@ -138,19 +138,6 @@ class ResourcesKdbxImportParser {
       externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();
     }
 
-    if (kdbxEntry.bgColor || kdbxEntry.icon) {
-      externalResourceDto.icon = {};
-
-      if (kdbxEntry.icon) {
-        externalResourceDto.icon.type = ICON_TYPE_KEEPASS_ICON_SET;
-        externalResourceDto.icon.value = kdbxEntry.icon;
-      }
-
-      if (kdbxEntry.bgColor) {
-        externalResourceDto.icon.background_color = kdbxEntry.bgColor;
-      }
-    }
-
     try {
       const totp = this.getTotp(kdbxEntry);
       if (totp) {
@@ -172,6 +159,19 @@ class ResourcesKdbxImportParser {
           //Fallback default content type not supported
           resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(this.resourceTypesCollection, this.metadataTypesSettings);
           this.importEntity.importResourcesErrors.push(new ImportError("Content type not supported but imported with default resource type", externalResourceDto));
+        }
+      }
+
+      if ((kdbxEntry.bgColor || kdbxEntry.icon) && resourceType.isV5()) {
+        externalResourceDto.icon = {};
+
+        if (kdbxEntry.icon) {
+          externalResourceDto.icon.type = ICON_TYPE_KEEPASS_ICON_SET;
+          externalResourceDto.icon.value = kdbxEntry.icon;
+        }
+
+        if (kdbxEntry.bgColor) {
+          externalResourceDto.icon.background_color = kdbxEntry.bgColor;
         }
       }
 

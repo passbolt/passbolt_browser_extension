@@ -81,6 +81,7 @@ classDiagram
             +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
             +findOneById(string uuid, object contains) Promise~ResourceEntity~
             +findOneByIdForDetails(string uuid) Promise~ResourceEntity~
+            +findByIdsForLocalStorage(Array~uuid~ resourcesIds) Promise~ResourcesCollection~
         }
 
         class ImportResourcesService {

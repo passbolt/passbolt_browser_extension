@@ -590,4 +590,102 @@ describe("FindResourcesService", () => {
       await expect(promise).rejects.toThrowError("API error");
     });
   });
+
+  describe("::findByIdsForLocalStorage", () => {
+    let service, expectedContains;
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+      expectedContains = {
+        permission: true,
+        favorite: true,
+        tag: true
+      };
+    });
+
+    it("should retrieve all resources by their ids", async() => {
+      expect.assertions(3);
+
+      const ressourcesDto = multipleResourceDtos();
+      const resourcesIds = ressourcesDto.map(r => r.id);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => ressourcesDto);
+
+      const result = await service.findByIdsForLocalStorage(resourcesIds);
+
+      const resourcesIdsFilter = {"has-id": resourcesIds};
+
+      expect(result).toEqual(new ResourcesCollection(ressourcesDto));
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, resourcesIdsFilter);
+    });
+
+    it("should assert the given ids", async() => {
+      expect.assertions(1);
+
+      const resourcesIds = [uuidv4(), "test"];
+      await expect(() => service.findByIdsForLocalStorage(resourcesIds)).rejects.toThrowError();
+    });
+  });
+
+  describe("::assertContains", () => {
+    it("should not throw errors if all given contains are fine", () => {
+      expect.assertions(1);
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const allContains = {
+        'creator': true,
+        'favorite': true,
+        'modifier': true,
+        'secret': true,
+        'permission': true,
+        'permissions': true,
+        'permissions.user.profile': true,
+        'permissions.group': true,
+        'tag': true,
+        'resource-type': true,
+      };
+
+      expect(() => service.assertContains(allContains)).not.toThrow();
+    });
+
+    it("should not throw errors if the contain has 1 element only", () => {
+      expect.assertions(1);
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const contains = {'permissions.user.profile': true};
+
+      expect(() => service.assertContains(contains)).not.toThrow();
+    });
+
+    it("should not throw errors if the contain is empty", () => {
+      expect.assertions(1);
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const contains = {};
+
+      expect(() => service.assertContains(contains)).not.toThrow();
+    });
+
+    it("should throw an error if at least of the contain is wrong", () => {
+      expect.assertions(1);
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const allContains = {
+        'creator': true,
+        'favorite': true,
+        'modifier': true,
+        'secret': true,
+        'permission': true,
+        'permissions': true,
+        'permissions.user.profile': true,
+        'permissions.group': true,
+        'tag': true,
+        'resource-type': true,
+        'resource-type-wrong': true,
+      };
+
+      expect(() => service.assertContains(allContains)).toThrow();
+    });
+  });
 });

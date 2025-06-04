@@ -628,6 +628,43 @@ describe("FindResourcesService", () => {
     });
   });
 
+  describe("::findByParentFolderIdForLocalStorage", () => {
+    let service, expectedContains, expectedFilters;
+    const parentFolderId = uuidv4();
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+      expectedContains = {
+        permission: true,
+        favorite: true,
+        tag: true
+      };
+
+      expectedFilters = {
+        'has-parent': parentFolderId
+      };
+    });
+
+    it("should retrieve all resources by parent folder id", async() => {
+      expect.assertions(3);
+
+      const ressourcesDto = multipleResourceDtos();
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => ressourcesDto);
+
+      const result = await service.findByParentFolderIdForLocalStorage(parentFolderId);
+
+      expect(result).toEqual(new ResourcesCollection(ressourcesDto));
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, expectedFilters);
+    });
+
+    it("should assert the given id", async() => {
+      expect.assertions(1);
+      await expect(() => service.findByParentFolderIdForLocalStorage("test")).rejects.toThrowError();
+    });
+  });
+
   describe("::assertContains", () => {
     it("should not throw errors if all given contains are fine", () => {
       expect.assertions(1);
@@ -686,6 +723,62 @@ describe("FindResourcesService", () => {
       };
 
       expect(() => service.assertContains(allContains)).toThrow();
+    });
+  });
+
+
+  describe("::assertFilters", () => {
+    it("should not throw errors if all given filters are fine", () => {
+      expect.assertions(1);
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const allFilters = {
+        'is-favorite': true,
+        'is-shared-with-group': uuidv4(),
+        'is-owned-by-me': true,
+        'is-shared-with-me': true,
+        'has-id': uuidv4(),
+        'has-tag': uuidv4(),
+        "has-parent": uuidv4(),
+      };
+
+      expect(() => service.assertFilters(allFilters)).not.toThrow();
+    });
+
+    it("should not throw errors if the contain has 1 element only", () => {
+      expect.assertions(1);
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const contains = {'is-shared-with-me': true};
+
+      expect(() => service.assertFilters(contains)).not.toThrow();
+    });
+
+    it("should not throw errors if the filters is empty", () => {
+      expect.assertions(1);
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const contains = {};
+
+      expect(() => service.assertFilters(contains)).not.toThrow();
+    });
+
+    it("should throw an error if at least of the filters is wrong", () => {
+      expect.assertions(1);
+
+      const service = new FindResourcesService(account, apiClientOptions);
+      const allContains = {
+        'is-favorite': true,
+        'is-shared-with-group': uuidv4(),
+        'is-owned-by-me': true,
+        'is-shared-with-me': true,
+        'has-id': uuidv4(),
+        'has-tag': uuidv4(),
+        "has-parent": uuidv4(),
+        "has-parent-wrong": uuidv4(),
+      };
+
+      expect(() => service.assertFilters(allContains)).toThrow();
     });
   });
 });

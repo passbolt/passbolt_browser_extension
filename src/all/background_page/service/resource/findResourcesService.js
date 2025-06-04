@@ -48,11 +48,7 @@ export default class FindResourcesService {
    */
   async findAll(contains, filters, ignoreInvalidEntity) {
     this.assertContains(contains);
-
-    const supportedFilter = ResourceService.getSupportedFiltersOptions();
-    if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
-      throw new Error("Unsupported filter parameter used, please check supported filters");
-    }
+    this.assertFilters(filters);
 
     const resourcesDto = await this.resourceService.findAll(contains, filters);
     return new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
@@ -227,6 +223,17 @@ export default class FindResourcesService {
   }
 
   /**
+   * Find the resources having the given parentFolderId as direct ancestor.
+   * @param {uuid} parentFolderId
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findByParentFolderIdForLocalStorage(parentFolderId) {
+    assertUuid(parentFolderId);
+    const filters = {"has-parent": parentFolderId};
+    return await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, filters);
+  }
+
+  /**
    * Assert the contains to ensure they match the supported ones.
    * @param {object} contains
    * @private
@@ -235,6 +242,18 @@ export default class FindResourcesService {
     const supportedOptions = ResourceService.getSupportedContainOptions();
     if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
+    }
+  }
+
+  /**
+   * Assert the filters to ensure they match the supported ones.
+   * @param {object} filters
+   * @private
+   */
+  assertFilters(filters) {
+    const supportedFilter = ResourceService.getSupportedFiltersOptions();
+    if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
+      throw new Error("Unsupported filter parameter used, please check supported filters");
     }
   }
 }

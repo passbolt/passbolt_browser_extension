@@ -115,10 +115,10 @@
   "Updating group": "Posodabljam skupino",
   "Updating group ...": "Posodabljam skupino ...",
   "Updating password": "Posodabljam geslo",
-  "Updating resource": "Posodabljam vir",
+  "Updating resource": "Posodabljanje vira",
   "Updating resources local storage": "Posodabljam lokalno shrambo virov",
-  "Updating resources metadata": "Posodabljam metapodatke virov",
-  "Updating resources metadata {{counter}}/{{total}}": "Posodabljam metapodatke virov {{counter}}/{{total}}",
+  "Updating resources metadata": "Posodabljanje metapodatkov virov",
+  "Updating resources metadata {{counter}}/{{total}}": "Posodabljanje metapodatkov virov {{counter}}/{{total}}",
   "Updating users' key...": "Posodabljam ključe uporabnikov...",
   "You have already started the process on another tab.": "Postopek ste že začeli v drugem zavihku."
 }

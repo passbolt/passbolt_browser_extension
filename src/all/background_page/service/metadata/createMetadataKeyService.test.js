@@ -52,7 +52,7 @@ describe("CreateMetadataKeyService", () => {
 
   describe("::create", () => {
     it("creates, with disabled zero knowledge, a metadata key and shares it with all active users and the API keys.", async() => {
-      expect.assertions(24);
+      expect.assertions(25);
 
       const metadataKeyPairDto = {
         private_key: {armored_key: pgpKeys.eddsa_ed25519.private},
@@ -68,8 +68,9 @@ describe("CreateMetadataKeyService", () => {
       let metadataKeyToCreate;
       jest.spyOn(service.metadataKeysApiService, "create").mockImplementation(metadataKey => {
         metadataKeyToCreate = metadataKey;
-        return metadataKey.toDto();
+        return metadataKey.toDto(MetadataKeyEntity.ALL_CONTAIN_OPTIONS);
       });
+      jest.spyOn(service.metadataKeysSessionStorage, "flush");
 
       const metadataKey = await service.create(metadataKeyPair, pgpKeys.ada.passphrase);
 
@@ -78,6 +79,7 @@ describe("CreateMetadataKeyService", () => {
       expect(metadataKeyToCreate.fingerprint).toBe(pgpKeys.eddsa_ed25519.fingerprint);
       expect(metadataKeyToCreate.armoredKey).toBe(pgpKeys.eddsa_ed25519.public);
       expect(metadataKeyToCreate.metadataPrivateKeys.items.length).toBe(3);
+      expect(service.metadataKeysSessionStorage.flush).toHaveBeenCalled();
 
       expect(metadataKeyToCreate.metadataPrivateKeys.items[0].userId).toBe(pgpKeys.ada.userId);
       expect(metadataKeyToCreate.metadataPrivateKeys.items[0].isDecrypted).toBe(false);
@@ -112,7 +114,7 @@ describe("CreateMetadataKeyService", () => {
     }, 10 * 1000);
 
     it("create, with enabled zero knowledge, a metadata key and shares it with all active users only.", async() => {
-      expect.assertions(17);
+      expect.assertions(18);
 
       const metadataKeyPairDto = {
         private_key: {armored_key: pgpKeys.eddsa_ed25519.private},
@@ -129,8 +131,9 @@ describe("CreateMetadataKeyService", () => {
       let metadataKeyToCreate;
       jest.spyOn(service.metadataKeysApiService, "create").mockImplementation(metadataKey => {
         metadataKeyToCreate = metadataKey;
-        return metadataKey.toDto();
+        return metadataKey.toDto(MetadataKeyEntity.ALL_CONTAIN_OPTIONS);
       });
+      jest.spyOn(service.metadataKeysSessionStorage, "flush");
 
       const metadataKey = await service.create(metadataKeyPair, pgpKeys.ada.passphrase);
 
@@ -138,6 +141,7 @@ describe("CreateMetadataKeyService", () => {
       expect(metadataKeyToCreate.fingerprint).toBe(pgpKeys.eddsa_ed25519.fingerprint);
       expect(metadataKeyToCreate.armoredKey).toBe(pgpKeys.eddsa_ed25519.public);
       expect(metadataKeyToCreate.metadataPrivateKeys.items.length).toBe(2);
+      expect(service.metadataKeysSessionStorage.flush).toHaveBeenCalled();
 
       expect(metadataKeyToCreate.metadataPrivateKeys.items[0].userId).toBe(pgpKeys.ada.userId);
       expect(metadataKeyToCreate.metadataPrivateKeys.items[0].isDecrypted).toBe(false);

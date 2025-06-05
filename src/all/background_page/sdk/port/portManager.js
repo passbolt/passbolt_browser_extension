@@ -71,11 +71,24 @@ class PortManager {
     if (sender.tab) {
       // Tab property will only be present when the connection was opened from a tab
       return false;
-    } else {
-      // The sender is a script running in an extension page
-      const popupUrl = await browser.action.getPopup({});
-      return sender.url === popupUrl;
     }
+
+    // The sender is a script running in an extension page
+    const popupUrl = await browser.action.getPopup({});
+    if (sender.url === popupUrl) {
+      return true;
+    }
+
+    //is Safari case?
+    const senderUrl = new URL(sender.url);
+    const isSafari = senderUrl.protocol === "safari-web-extension:";
+    if (isSafari) {
+      //compose an absolute URL with the path to the quickaccess;
+      const expectedQuickaccessURL = await browser.runtime.getURL("webAccessibleResources/quickaccess.html?passbolt=quickaccess");
+      return expectedQuickaccessURL === sender.url;
+    }
+
+    return false;
   }
 
   /**

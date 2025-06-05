@@ -72,7 +72,8 @@ async function addWorkerQuickAccess(workerId, tabId) {
  */
 async function buildDetachedQuickacessUrl(queryParameters, workerId) {
   const browserExtensionUrl = await browser.action.getPopup({});
-  const quickaccessUrl = new URL(browserExtensionUrl);
+  const quickaccessStringUrl = await browser.runtime.getURL(browserExtensionUrl);
+  const quickaccessUrl = new URL(quickaccessStringUrl);
   quickaccessUrl.searchParams.set("passbolt", workerId);
   queryParameters.forEach(queryParameter => quickaccessUrl.searchParams.append(queryParameter.name, queryParameter.value));
   return quickaccessUrl.href;

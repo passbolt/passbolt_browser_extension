@@ -15,10 +15,9 @@
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {multipleResourceDtos} from "../../service/resource/findResourcesService.test.data";
-import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import {v4 as uuidv4} from "uuid";
 import UpdateResourcesByParentFolderController from "./updateResourcesByParentFolderController";
+import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 
 describe("UpdateResourcesByParentFolderController", () => {
   let controller, worker;
@@ -35,18 +34,37 @@ describe("UpdateResourcesByParentFolderController", () => {
   });
 
   describe("::exec", () => {
-    it("should return the resource collection associated to the parent folder id", async() => {
+    it("should call for update the local storage given a folder ID", async() => {
       expect.assertions(2);
 
-      const resourcesCollection = new ResourcesCollection(multipleResourceDtos());
       const parentFolderId = uuidv4();
 
-      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateByParentFolderId").mockImplementation(() => resourcesCollection);
+      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateByParentFolderId").mockImplementation(() => {});
 
-      const result = await controller.exec(parentFolderId);
+      await controller.exec(parentFolderId);
 
-      expect(result).toEqual(resourcesCollection);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId).toHaveBeenCalledTimes(1);
       expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId).toHaveBeenCalledWith(parentFolderId);
+    });
+
+    it("should call for update the local storage given a folder ID a second time with a passphrase if the first time it failed", async() => {
+      expect.assertions(3);
+
+      const parentFolderId = uuidv4();
+      const passphrase = "passphrase";
+
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementation(async() => passphrase);
+      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateByParentFolderId").mockImplementation(async(_, passphrase) => {
+        if (!passphrase) {
+          throw new UserPassphraseRequiredError("Missing passphrase");
+        }
+      });
+
+      await controller.exec(parentFolderId);
+
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId).toHaveBeenCalledTimes(2);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId).toHaveBeenCalledWith(parentFolderId);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId).toHaveBeenCalledWith(parentFolderId, passphrase);
     });
 
     it("should throw an error if the parent folder id is not a valid uuid", async() => {

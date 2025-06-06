@@ -68,7 +68,7 @@ classDiagram
         class FindAndUpdateResourcesLocalStorageService {
             +findAndUpdateAll(FindAndUpdateResourcesLocalStorageOptions) Promise~ResourcesCollection~
             +findAndUpdateByIsSharedWithGroup(uuid groupId) Promise~ResourcesCollection~
-            +findAndUpdateByParentFolderId(uuid parentFolderId) Promise~ResourcesCollection~
+            +findAndUpdateByParentFolderId(uuid parentFolderId, string passphrase) Promise~ResourcesCollection~
         }
 
         class FindAndUpdateResourcesLocalStorageOptions {

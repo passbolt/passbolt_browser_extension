@@ -82,6 +82,7 @@ classDiagram
             +findOneById(string uuid, object contains) Promise~ResourceEntity~
             +findOneByIdForDetails(string uuid) Promise~ResourceEntity~
             +findByIdsForLocalStorage(Array~uuid~ resourcesIds) Promise~ResourcesCollection~
+            +findByParentFolderIdForLocalStorage(string uuid) Promise~ResourcesCollection~
         }
 
         class ImportResourcesService {

@@ -12,7 +12,7 @@
  * @since         4.6.0
  */
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
-import {assertNumber} from "../../utils/assertions";
+import {assertNumber, assertUuid} from "../../utils/assertions";
 import FindResourcesService from "./findResourcesService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
@@ -110,6 +110,19 @@ class FindAndUpdateResourcesLocalStorage {
    */
   async findAndUpdateByIsSharedWithGroup(groupId, passphrase = null) {
     const resourcesCollection = await this.findResourcesServices.findAllByIsSharedWithGroupForLocalStorage(groupId, passphrase);
+    await ResourceLocalStorage.addOrReplaceResourcesCollection(resourcesCollection);
+    return resourcesCollection;
+  }
+
+  /**
+   * Find and update the local storage with the resources filtered by parent folder id retrieved from the API.
+   * @param {string} parentFolderId The parent folder id to filter the resources with.
+   * @return {Promise<ResourcesCollection>} The resource shared with the group
+   * @throw {TypeError} If the parentFolderId is not valid UUID
+   */
+  async findAndUpdateByParentFolderId(parentFolderId) {
+    assertUuid(parentFolderId);
+    const resourcesCollection = await this.findResourcesServices.findByParentFolderIdForLocalStorage(parentFolderId);
     await ResourceLocalStorage.addOrReplaceResourcesCollection(resourcesCollection);
     return resourcesCollection;
   }

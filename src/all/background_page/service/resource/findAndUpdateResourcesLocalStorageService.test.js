@@ -371,4 +371,34 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(expectLocalStorageResult[1]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto2));
     });
   });
+
+  describe("::findAndUpdateByParentFolderId", () => {
+    let service;
+
+    beforeEach(() => {
+      service = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
+    });
+
+    it("should extract the id from the resource collection", async() => {
+      expect.assertions(3);
+
+      const parentFolderId = uuidv4();
+
+      const resourcesDto = multipleResourceDtos();
+      const expectedCollection = new ResourcesCollection(resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(service.findResourcesServices, "findByParentFolderIdForLocalStorage");
+
+      const resourcesCollection = await service.findAndUpdateByParentFolderId(parentFolderId);
+
+      expect(service.findResourcesServices.findByParentFolderIdForLocalStorage).toHaveBeenCalledTimes(1);
+      expect(service.findResourcesServices.findByParentFolderIdForLocalStorage).toHaveBeenCalledWith(parentFolderId);
+      expect(resourcesCollection).toEqual(expectedCollection);
+    });
+
+    it("should assert its parameter", async() => {
+      expect.assertions(1);
+      await expect(() => service.findAndUpdateByParentFolderId("test")).rejects.toThrow();
+    });
+  });
 });

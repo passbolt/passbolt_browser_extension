@@ -47,14 +47,9 @@ export default class FindResourcesService {
    * @private
    */
   async findAll(contains, filters, ignoreInvalidEntity) {
-    //Assert contains
-    const supportedOptions = ResourceService.getSupportedContainOptions();
+    this.assertContains(contains);
+
     const supportedFilter = ResourceService.getSupportedFiltersOptions();
-
-    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
-      throw new Error("Unsupported contains parameter used, please check supported contains");
-    }
-
     if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
       throw new Error("Unsupported filter parameter used, please check supported filters");
     }
@@ -196,12 +191,8 @@ export default class FindResourcesService {
    */
   async findOneById(resourceId, contains = {}) {
     assertUuid(resourceId);
-    //Assert contains
-    const supportedOptions = ResourceService.getSupportedContainOptions();
+    this.assertContains(contains);
 
-    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
-      throw new Error("Unsupported contains parameter used, please check supported contains");
-    }
     const resourcesDto  = await this.resourceService.get(resourceId, contains);
 
     return new ResourceEntity(resourcesDto);
@@ -223,5 +214,27 @@ export default class FindResourcesService {
 
     const resource = this.findOneById(resourceId, contains);
     return resource;
+  }
+
+  /**
+   * Find the resources matching the given ids
+   * @param {Array<uuid>} resourceIds
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findByIdsForLocalStorage(resourceIds) {
+    assertArrayUUID(resourceIds);
+    return await this.findAllByIds(resourceIds, ResourceLocalStorage.DEFAULT_CONTAIN);
+  }
+
+  /**
+   * Assert the contains to ensure they match the supported ones.
+   * @param {object} contains
+   * @private
+   */
+  assertContains(contains) {
+    const supportedOptions = ResourceService.getSupportedContainOptions();
+    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
+      throw new Error("Unsupported contains parameter used, please check supported contains");
+    }
   }
 }

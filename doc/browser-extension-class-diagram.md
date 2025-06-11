@@ -48,6 +48,11 @@ classDiagram
             +exec() Promise
         }
 
+        class UpdateResourcesByParentFolderController {
+            event "passbolt.resources.update-local-storage-for-parent-folder"
+            +exec(string parentFolderId) Promise
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Resources services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1068,6 +1073,7 @@ classDiagram
     UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
 %%    UpdateResourceController*--GetPassphraseService
     UpdateResourceController*--UpdateResourceService
+    UpdateResourcesByParentFolderController *--FindAndUpdateResourcesLocalStorage
     style CreateResourceController fill:#D2E0FB
     style ExportResourcesFileController fill:#D2E0FB
     style FindAllIdsByIsSharedWithGroupController fill:#D2E0FB

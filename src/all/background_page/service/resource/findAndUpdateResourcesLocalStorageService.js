@@ -117,14 +117,52 @@ class FindAndUpdateResourcesLocalStorage {
   /**
    * Find and update the local storage with the resources filtered by parent folder id retrieved from the API.
    * @param {string} parentFolderId The parent folder id to filter the resources with.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @return {Promise<ResourcesCollection>} The resource shared with the group
    * @throw {TypeError} If the parentFolderId is not valid UUID
    */
-  async findAndUpdateByParentFolderId(parentFolderId) {
+  async findAndUpdateByParentFolderId(parentFolderId, passphrase = null) {
     assertUuid(parentFolderId);
-    const resourcesCollection = await this.findResourcesServices.findByParentFolderIdForLocalStorage(parentFolderId);
-    await ResourceLocalStorage.addOrReplaceResourcesCollection(resourcesCollection);
-    return resourcesCollection;
+    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+
+    const apiResourcesCollection = await this.findResourcesServices.findByParentFolderIdForLocalStorage(parentFolderId);
+    apiResourcesCollection.filterByResourceTypes(resourceTypes);
+
+    const apiResourcesCollectionMapIds = apiResourcesCollection.items.reduce((result, resource) => {
+      result[resource.id] = resource;
+      return result;
+    }, {});
+
+    const localStorageResourcesCollection = new ResourcesCollection(await ResourceLocalStorage.get(), {validate: false});
+    const knownResourcesCollectionInFolderIds = localStorageResourcesCollection.items.reduce((result, resource) => {
+      if (resource.folderParentId === parentFolderId) {
+        result.push(resource.id);
+      }
+      return result;
+    }, Array(apiResourcesCollection.length));
+
+    apiResourcesCollection.setDecryptedMetadataFromCollection(localStorageResourcesCollection);
+    localStorageResourcesCollection.updateWithCollection(apiResourcesCollection);
+
+    const movedOrRemovedResourcesIds = knownResourcesCollectionInFolderIds.filter(id => !apiResourcesCollectionMapIds[id]);
+    if (movedOrRemovedResourcesIds.length > 0) {
+      const updatedResources = await this.findResourcesServices.findByIdsForLocalStorage(movedOrRemovedResourcesIds);
+
+      updatedResources.setDecryptedMetadataFromCollection(localStorageResourcesCollection);
+      localStorageResourcesCollection.updateWithCollection(updatedResources);
+
+      //these resources has been actually deleted and need to be removed for the local storage.
+      const remainingResourcesIds = movedOrRemovedResourcesIds
+        .filter(id => !updatedResources.getFirstById(id));
+
+      localStorageResourcesCollection.removeMany(remainingResourcesIds);
+    }
+
+    await this.decryptMetadataService.decryptAllFromForeignModels(localStorageResourcesCollection, passphrase, {ignoreDecryptionError: true, updateSessionKeys: true});
+    localStorageResourcesCollection.filterOutMetadataEncrypted();
+
+    await ResourceLocalStorage.set(localStorageResourcesCollection);
   }
 }
 

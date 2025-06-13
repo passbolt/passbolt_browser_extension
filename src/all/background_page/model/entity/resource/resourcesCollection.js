@@ -336,6 +336,30 @@ class ResourcesCollection extends EntityV2Collection {
     return result;
   }
 
+  /**
+   * Update the current resource collection with the given collection.
+   * If an element already exists, it is replaced, otherwise, it's added.
+   * @param {ResourcesCollection} resourcesCollection
+   */
+  updateWithCollection(resourcesCollection) {
+    assertType(resourcesCollection, ResourcesCollection);
+
+    const resourceMapByIdWithIndex = this.items.reduce((result, resource, currentIndex) => {
+      result[resource.id] = currentIndex;
+      return result;
+    }, {});
+
+    for (let i = 0; i < resourcesCollection.length; i++) {
+      const resource = resourcesCollection.items[i];
+      const mappedResourceIndex = resourceMapByIdWithIndex[resource.id];
+      if (typeof mappedResourceIndex === "undefined") {
+        this.push(resource, {validate: false});
+      } else {
+        this._items[mappedResourceIndex] = resource;
+      }
+    }
+  }
+
   /*
    * ==================================================
    * Static getters

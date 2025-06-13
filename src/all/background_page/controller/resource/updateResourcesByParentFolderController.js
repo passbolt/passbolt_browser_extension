@@ -13,6 +13,8 @@
  */
 import {assertUuid} from "../../utils/assertions";
 import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
+import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 
 class UpdateResourcesByParentFolderController {
   /**
@@ -26,6 +28,7 @@ class UpdateResourcesByParentFolderController {
     this.worker = worker;
     this.requestId = requestId;
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -50,7 +53,17 @@ class UpdateResourcesByParentFolderController {
    */
   async exec(parentFolderId) {
     assertUuid(parentFolderId);
-    return await this.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId(parentFolderId);
+    try {
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId(parentFolderId);
+      return;
+    } catch (error) {
+      if (!(error instanceof UserPassphraseRequiredError)) {
+        throw error;
+      }
+    }
+
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker, 60);
+    await this.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId(parentFolderId, passphrase);
   }
 }
 

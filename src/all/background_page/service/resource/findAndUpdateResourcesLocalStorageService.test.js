@@ -372,7 +372,7 @@ describe("UpdateResourcesLocalStorage", () => {
     });
   });
 
-  describe("::findAndUpdateByParentFolderId", () => {
+  describe("::findAndUpdateAllByParentFolderId", () => {
     let service;
 
     beforeEach(() => {
@@ -387,17 +387,17 @@ describe("UpdateResourcesLocalStorage", () => {
 
       const resourcesDto = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
-      jest.spyOn(service.findResourcesServices, "findByParentFolderIdForLocalStorage");
+      jest.spyOn(service.findResourcesServices, "findAllByParentFolderIdForLocalStorage");
 
-      await service.findAndUpdateByParentFolderId(parentFolderId);
+      await service.findAndUpdateAllByParentFolderId(parentFolderId);
 
-      expect(service.findResourcesServices.findByParentFolderIdForLocalStorage).toHaveBeenCalledTimes(1);
-      expect(service.findResourcesServices.findByParentFolderIdForLocalStorage).toHaveBeenCalledWith(parentFolderId);
+      expect(service.findResourcesServices.findAllByParentFolderIdForLocalStorage).toHaveBeenCalledTimes(1);
+      expect(service.findResourcesServices.findAllByParentFolderIdForLocalStorage).toHaveBeenCalledWith(parentFolderId);
     });
 
     it("should assert its parameter", async() => {
       expect.assertions(1);
-      await expect(() => service.findAndUpdateByParentFolderId("test")).rejects.toThrow();
+      await expect(() => service.findAndUpdateAllByParentFolderId("test")).rejects.toThrow();
     });
 
     it("should update the local storage resource collection by removing deleted resources, moving resources and updating resources data", async() => {
@@ -450,7 +450,7 @@ describe("UpdateResourcesLocalStorage", () => {
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(mockedFindAllApi);
 
-      await service.findAndUpdateByParentFolderId(parentFolderId);
+      await service.findAndUpdateAllByParentFolderId(parentFolderId);
 
       const updatedResourceLocalStorage = new ResourcesCollection(await ResourceLocalStorage.get());
 

@@ -591,7 +591,7 @@ describe("FindResourcesService", () => {
     });
   });
 
-  describe("::findByIdsForLocalStorage", () => {
+  describe("::findAllByIdsForLocalStorage", () => {
     let service, expectedContains;
 
     beforeEach(() => {
@@ -611,7 +611,7 @@ describe("FindResourcesService", () => {
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => ressourcesDto);
 
-      const result = await service.findByIdsForLocalStorage(resourcesIds);
+      const result = await service.findAllByIdsForLocalStorage(resourcesIds);
 
       const resourcesIdsFilter = {"has-id": resourcesIds};
 
@@ -624,11 +624,11 @@ describe("FindResourcesService", () => {
       expect.assertions(1);
 
       const resourcesIds = [uuidv4(), "test"];
-      await expect(() => service.findByIdsForLocalStorage(resourcesIds)).rejects.toThrowError();
+      await expect(() => service.findAllByIdsForLocalStorage(resourcesIds)).rejects.toThrowError();
     });
   });
 
-  describe("::findByParentFolderIdForLocalStorage", () => {
+  describe("::findAllByParentFolderIdForLocalStorage", () => {
     let service, expectedContains, expectedFilters;
     const parentFolderId = uuidv4();
 
@@ -652,7 +652,7 @@ describe("FindResourcesService", () => {
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => ressourcesDto);
 
-      const result = await service.findByParentFolderIdForLocalStorage(parentFolderId);
+      const result = await service.findAllByParentFolderIdForLocalStorage(parentFolderId);
 
       expect(result).toEqual(new ResourcesCollection(ressourcesDto));
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
@@ -661,7 +661,7 @@ describe("FindResourcesService", () => {
 
     it("should assert the given id", async() => {
       expect.assertions(1);
-      await expect(() => service.findByParentFolderIdForLocalStorage("test")).rejects.toThrowError();
+      await expect(() => service.findAllByParentFolderIdForLocalStorage("test")).rejects.toThrowError();
     });
   });
 

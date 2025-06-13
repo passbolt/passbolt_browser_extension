@@ -122,11 +122,11 @@ class FindAndUpdateResourcesLocalStorage {
    * @return {Promise<ResourcesCollection>} The resource shared with the group
    * @throw {TypeError} If the parentFolderId is not valid UUID
    */
-  async findAndUpdateByParentFolderId(parentFolderId, passphrase = null) {
+  async findAndUpdateAllByParentFolderId(parentFolderId, passphrase = null) {
     assertUuid(parentFolderId);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
 
-    const apiResourcesCollection = await this.findResourcesServices.findByParentFolderIdForLocalStorage(parentFolderId);
+    const apiResourcesCollection = await this.findResourcesServices.findAllByParentFolderIdForLocalStorage(parentFolderId);
     apiResourcesCollection.filterByResourceTypes(resourceTypes);
 
     const apiResourcesCollectionMapIds = apiResourcesCollection.items.reduce((result, resource) => {
@@ -147,7 +147,7 @@ class FindAndUpdateResourcesLocalStorage {
 
     const movedOrRemovedResourcesIds = knownResourcesCollectionInFolderIds.filter(id => !apiResourcesCollectionMapIds[id]);
     if (movedOrRemovedResourcesIds.length > 0) {
-      const updatedResources = await this.findResourcesServices.findByIdsForLocalStorage(movedOrRemovedResourcesIds);
+      const updatedResources = await this.findResourcesServices.findAllByIdsForLocalStorage(movedOrRemovedResourcesIds);
 
       updatedResources.setDecryptedMetadataFromCollection(localStorageResourcesCollection);
       localStorageResourcesCollection.updateWithCollection(updatedResources);

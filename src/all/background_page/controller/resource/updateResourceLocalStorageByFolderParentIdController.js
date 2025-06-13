@@ -16,7 +16,7 @@ import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUp
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 
-class UpdateResourcesByParentFolderController {
+class UpdateResourceLocalStorageByFolderParentIdController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
@@ -38,8 +38,8 @@ class UpdateResourcesByParentFolderController {
    */
   async _exec(parentFolderId) {
     try {
-      const result = await this.exec(parentFolderId);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      await this.exec(parentFolderId);
+      this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
@@ -47,14 +47,14 @@ class UpdateResourcesByParentFolderController {
   }
 
   /**
-   * Find the resource to display when filtering by folder.
+   * Update resource local storage resource for a given folder.
    * @param {string} parentFolderId the resources parent folder id
-   * @returns {Promise<ResourcesCollection>}
+   * @returns {Promise<void>}
    */
   async exec(parentFolderId) {
     assertUuid(parentFolderId);
     try {
-      await this.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId(parentFolderId);
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAllByParentFolderId(parentFolderId);
       return;
     } catch (error) {
       if (!(error instanceof UserPassphraseRequiredError)) {
@@ -63,8 +63,8 @@ class UpdateResourcesByParentFolderController {
     }
 
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker, 60);
-    await this.findAndUpdateResourcesLocalStorage.findAndUpdateByParentFolderId(parentFolderId, passphrase);
+    await this.findAndUpdateResourcesLocalStorage.findAndUpdateAllByParentFolderId(parentFolderId, passphrase);
   }
 }
 
-export default UpdateResourcesByParentFolderController;
+export default UpdateResourceLocalStorageByFolderParentIdController;

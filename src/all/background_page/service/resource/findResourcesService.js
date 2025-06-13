@@ -46,7 +46,7 @@ export default class FindResourcesService {
    * @returns {Promise<ResourcesCollection>}
    * @private
    */
-  async findAll(contains, filters, ignoreInvalidEntity) {
+  async findAll(contains, filters, ignoreInvalidEntity = false) {
     this.assertContains(contains);
     this.assertFilters(filters);
 
@@ -60,7 +60,7 @@ export default class FindResourcesService {
    * @param {Array<string>} resourcesIds
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAllByIds(resourcesIds, contains = {}) {
+  async findAllByIds(resourcesIds, contains = {}, ignoreInvalidEntity = false) {
     assertArrayUUID(resourcesIds);
 
     // We split the requests in chunks in order to avoid any too long url error.
@@ -69,7 +69,7 @@ export default class FindResourcesService {
       const filter = {
         "has-id": resourceIds
       };
-      return async() => await this.findAll(contains, filter);
+      return async() => await this.findAll(contains, filter, ignoreInvalidEntity);
     });
 
     // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
@@ -213,24 +213,26 @@ export default class FindResourcesService {
   }
 
   /**
-   * Find the resources matching the given ids
+   * Find all the resources matching the given ids for the local storage.
+   * All entities that cannot be validated will be ignored and excluded from the resulting collection.
    * @param {Array<uuid>} resourceIds
    * @returns {Promise<ResourcesCollection>}
    */
-  async findByIdsForLocalStorage(resourceIds) {
+  async findAllByIdsForLocalStorage(resourceIds) {
     assertArrayUUID(resourceIds);
-    return await this.findAllByIds(resourceIds, ResourceLocalStorage.DEFAULT_CONTAIN);
+    return await this.findAllByIds(resourceIds, ResourceLocalStorage.DEFAULT_CONTAIN, true);
   }
 
   /**
-   * Find the resources having the given parentFolderId as direct ancestor.
+   * Find aoo the resources having the given parentFolderId as direct ancestor for the local storage
+   * All entities that cannot be validated will be ignored and excluded from the resulting collection.
    * @param {uuid} parentFolderId
    * @returns {Promise<ResourcesCollection>}
    */
-  async findByParentFolderIdForLocalStorage(parentFolderId) {
+  async findAllByParentFolderIdForLocalStorage(parentFolderId) {
     assertUuid(parentFolderId);
     const filters = {"has-parent": parentFolderId};
-    return await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, filters);
+    return await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, filters, true);
   }
 
   /**

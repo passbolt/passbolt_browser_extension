@@ -48,7 +48,7 @@ classDiagram
             +exec() Promise
         }
 
-        class UpdateResourcesByParentFolderController {
+        class UpdateResourceLocalStorageByFolderParentIdController{
             event "passbolt.resources.update-local-storage-for-parent-folder"
             +exec(string parentFolderId) Promise
         }
@@ -67,8 +67,8 @@ classDiagram
 
         class FindAndUpdateResourcesLocalStorageService {
             +findAndUpdateAll(FindAndUpdateResourcesLocalStorageOptions) Promise~ResourcesCollection~
+            +findAndUpdateAllByParentFolderId(uuid parentFolderId, string passphrase) Promise~ResourcesCollection~
             +findAndUpdateByIsSharedWithGroup(uuid groupId) Promise~ResourcesCollection~
-            +findAndUpdateByParentFolderId(uuid parentFolderId, string passphrase) Promise~ResourcesCollection~
         }
 
         class FindAndUpdateResourcesLocalStorageOptions {
@@ -85,10 +85,10 @@ classDiagram
             +findAllByIdsWithPermissions(array~uuid~ resourcesIds) Promise~ResourcesCollection~
             +findAllByIsSharedWithGroupForLocalStorage(uuid groupId) Promise~ResourcesCollection~
             +findAllForDecrypt(array~uuid~ resourceIds) Promise~ResourcesCollection~
+            +findAllByIdsForLocalStorage(Array~uuid~ resourcesIds) Promise~ResourcesCollection~
+            +findAllByParentFolderIdForLocalStorage(string uuid) Promise~ResourcesCollection~
             +findOneById(string uuid, object contains) Promise~ResourceEntity~
             +findOneByIdForDetails(string uuid) Promise~ResourceEntity~
-            +findByIdsForLocalStorage(Array~uuid~ resourcesIds) Promise~ResourcesCollection~
-            +findByParentFolderIdForLocalStorage(string uuid) Promise~ResourcesCollection~
         }
 
         class ImportResourcesService {
@@ -1073,7 +1073,7 @@ classDiagram
     UpdateAllResourcesLocalStorageController*--FindAndUpdateResourcesLocalStorageService
 %%    UpdateResourceController*--GetPassphraseService
     UpdateResourceController*--UpdateResourceService
-    UpdateResourcesByParentFolderController *--FindAndUpdateResourcesLocalStorage
+    UpdateResourceLocalStorageByFolderParentIdController *--FindAndUpdateResourcesLocalStorage
     style CreateResourceController fill:#D2E0FB
     style ExportResourcesFileController fill:#D2E0FB
     style FindAllIdsByIsSharedWithGroupController fill:#D2E0FB

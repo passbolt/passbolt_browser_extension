@@ -92,7 +92,7 @@
   "The message should be decrypted.": "Wiadomość powinna zostać odszyfrowana.",
   "The message should be of type string.": "Wiadomość powinna być ciągiem.",
   "The message should contain at least one session key.": "Wiadomość powinna zawierać przynajmniej jeden klucz sesji.",
-  "The operation has been aborted to maintain security integrity.": "The operation has been aborted to maintain security integrity.",
+  "The operation has been aborted to maintain security integrity.": "To działanie zostało przerwane, aby utrzymać integralność zabezpieczeń.",
   "The private key should be a valid openpgp key.": "Klucz prywatny powinien być prawidłowym kluczem openpgp.",
   "The private key should be decrypted.": "Klucz prywatny powinien być odszyfrowany.",
   "The private key should be encrypted.": "Klucz prywatny powinien być zaszyfrowany.",

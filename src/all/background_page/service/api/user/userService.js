@@ -53,6 +53,7 @@ class UserService extends AbstractService {
       'role',
       'account_recovery_user_setting',
       'pending_account_recovery_request',
+      'missing_metadata_key_ids'
     ];
   }
 
@@ -101,6 +102,7 @@ class UserService extends AbstractService {
   async get(id, contains) {
     this.assertValidId(id);
     contains = contains ? this.formatContainOptions(contains, UserService.getSupportedContainOptions()) : null;
+
     const options = {...contains};
     const response = await this.apiClient.get(id, options);
     return response.body;

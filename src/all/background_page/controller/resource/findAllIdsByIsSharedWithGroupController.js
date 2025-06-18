@@ -14,6 +14,8 @@
 
 import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
 import {assertUuid} from "../../utils/assertions";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
+import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 
 class FindAllIdsByIsSharedWithGroupController {
   /**
@@ -28,6 +30,7 @@ class FindAllIdsByIsSharedWithGroupController {
     this.requestId = requestId;
     this.account = account;
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -47,12 +50,31 @@ class FindAllIdsByIsSharedWithGroupController {
 
   /**
    * Abort current request and initiate a new one.
-   * @param {uuid} groupId
-   * @returns {Promise<Array<uuid>>}
+   * @param {string} groupId The group id to filter the resources with
+   * @returns {Promise<Array<string>>} Return the id of filtered resources.
+   * @throw {TypeError} If the groupId is not valid UUID
    */
   async exec(groupId) {
     assertUuid(groupId);
-    return (await this.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup(groupId)).extract("id");
+
+    try {
+      /**
+       * Try to fetch the resources.
+       * If the user passphrase is required but not in sessionStorage, prompt the user. The passphrase is needed when:
+       * 1. the metadata could be decrypted with a metadata session key, but the session keys are themselves encrypted;
+       * 2. the metadata is encrypted with the shared‑metadata key, but this one is not yet decrypted in the session storage;
+       * 3. the metadata is encrypted with the user’s private key.
+       */
+      return (await this.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup(groupId))
+        .extract("id");
+    } catch (error) {
+      if (!(error instanceof UserPassphraseRequiredError)) {
+        throw error;
+      }
+      const passphrase =  await this.getPassphraseService.getPassphrase(this.worker, 60);
+      return (await this.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup(groupId, passphrase))
+        .extract("id");
+    }
   }
 }
 

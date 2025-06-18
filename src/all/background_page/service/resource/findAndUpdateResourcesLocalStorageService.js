@@ -15,6 +15,8 @@ import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import {assertNumber} from "../../utils/assertions";
 import FindResourcesService from "./findResourcesService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import DecryptMetadataService from "../metadata/decryptMetadataService";
 
 const RESOURCES_UPDATE_ALL_LS_LOCK_PREFIX = 'RESOURCES_UPDATE_LS_LOCK_';
 
@@ -37,6 +39,8 @@ class FindAndUpdateResourcesLocalStorage {
   constructor(account, apiClientOptions) {
     this.account = account;
     this.findResourcesServices = new FindResourcesService(account, apiClientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
   }
 
   /**
@@ -77,21 +81,35 @@ class FindAndUpdateResourcesLocalStorage {
       }
 
       // Lock is granted, retrieve all resources and update the local storage.
-      const resourcesCollection = await this.findResourcesServices.findAllForLocalStorage(passphrase);
-      await ResourceLocalStorage.set(resourcesCollection);
+      const localResourcesCollection = new ResourcesCollection(localStorageResourceCollection || [], {validate: isRuntimeCacheInitialized});
+
+      const updatedResourcesCollection = await this.findResourcesServices.findAllForLocalStorage();
+      const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+      updatedResourcesCollection.filterByResourceTypes(resourceTypes);
+      updatedResourcesCollection.setDecryptedMetadataFromCollection(localResourcesCollection);
+
+      await this.decryptMetadataService.decryptAllFromForeignModels(updatedResourcesCollection, passphrase, {ignoreDecryptionError: true, updateSessionKeys: true});
+      updatedResourcesCollection.filterOutMetadataEncrypted();
+
+      await ResourceLocalStorage.set(updatedResourcesCollection);
+
       FindAndUpdateResourcesLocalStorage.lastUpdateAllTimes[this.account.id] = Date.now();
+
       // Return the updated resources collection from the API
-      return resourcesCollection;
+      return updatedResourcesCollection;
     });
   }
 
   /**
-   * Find and update the local storage with all the resources retrieved from the API.
-   * @param {uuid} groupId
+   * Find and update the local storage with the resources filtered by group id retrieved from the API.
+   * @param {string} groupId The group id to filter the resources with.
+   * @param {string|null} [passphrase = null] The passphrase to use to decrypt the metadata. Marked as optional as it
+   * might be available in the passphrase session storage.
    * @return {Promise<ResourcesCollection>} The resource shared with the group
+   * @throw {TypeError} If the groupId is not valid UUID
    */
-  async findAndUpdateByIsSharedWithGroup(groupId) {
-    const resourcesCollection = await this.findResourcesServices.findAllByIsSharedWithGroupForLocalStorage(groupId);
+  async findAndUpdateByIsSharedWithGroup(groupId, passphrase = null) {
+    const resourcesCollection = await this.findResourcesServices.findAllByIsSharedWithGroupForLocalStorage(groupId, passphrase);
     await ResourceLocalStorage.addOrReplaceResourcesCollection(resourcesCollection);
     return resourcesCollection;
   }

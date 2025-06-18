@@ -29,6 +29,9 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import Keyring from '../../model/keyring';
 import ExternalGpgKeyEntity from 'passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity';
+import EntitySchema from 'passbolt-styleguide/src/shared/models/entity/abstract/entitySchema';
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 class EncryptMetadataService {
   /**
@@ -54,18 +57,22 @@ class EncryptMetadataService {
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    * @throws {Error} if metadata key cannot be retrieved.
    * @throws {Error} if metadata is already encrypted.
+   * @throws {Error} if metadata object_type is not defined and valid.
    */
   async encryptOneForForeignModel(entity, passphrase = null) {
     assertAnyTypeOf(entity, [ResourceEntity, FolderEntity], "The given data type is not a ResourceEntity or a FolderEntity");
 
-    // Do nothing is metadata is already encrypted
+    // Do nothing if metadata is already encrypted
     if (!entity.isMetadataDecrypted()) {
       throw new Error("Unable to encrypt the entity metadata, metadata is already encrypted.");
     }
 
+    // Prevent future issue if an encrypted metadata is stored without object_type, this will fail the decryption validation of the entity
+    this.assertValidMetadataObjectType(entity);
+
     passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
     const userPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    const serializedMetadata = JSON.stringify(entity.metadata.toDto());
+    const serializedMetadata = JSON.stringify(entity.metadata.toDto(entity.metadata.constructor.DEFAULT_CONTAIN));
 
     let encryptedMetadata;
     if (entity.isPersonal() && await this.allowUsageOfPersonalKeys()) {
@@ -143,7 +150,7 @@ class EncryptMetadataService {
         continue;
       }
 
-      const serializedMetadata = JSON.stringify(entity.metadata.toDto());
+      const serializedMetadata = JSON.stringify(entity.metadata.toDto(entity.metadata.constructor.DEFAULT_CONTAIN));
       const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, metadataPublicKey, [userDecryptedPrivateKey, metadataPrivateKey]);
       entity.metadataKeyId = metadataKeyId;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
@@ -160,7 +167,7 @@ class EncryptMetadataService {
    * @returns {Promise<void>}
    */
   async encryptAllFromForeignModelsWithUserKey(collection, resourceTypesV5, userDecryptedPrivateKey) {
-    for (const entity of collection) {
+    for (const [index, entity] of collection.items.entries()) {
       if (!entity.isPersonal()) {
         continue;
       }
@@ -169,10 +176,20 @@ class EncryptMetadataService {
         return;
       }
 
+      try {
+        // Prevent future issue if an encrypted metadata is stored without object_type, this will fail the decryption validation of the entity
+        this.assertValidMetadataObjectType(entity);
+      } catch (error) {
+        const collectionValidationError = new CollectionValidationError();
+        collectionValidationError.addItemValidationError(index, error);
+        throw collectionValidationError;
+      }
+
+
       const userId = entity.soleOwnerId || this.account.userId;
       const userPublicKey = await this._retrieveRecipientKey(userId);
 
-      const serializedMetadata = JSON.stringify(entity.metadata.toDto());
+      const serializedMetadata = JSON.stringify(entity.metadata.toDto(entity.metadata.constructor.DEFAULT_CONTAIN));
       const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [userDecryptedPrivateKey]);
       entity.metadataKeyId = null;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
@@ -266,6 +283,22 @@ class EncryptMetadataService {
 
     if (publicGpgKey.isExpired) {
       throw new Error(`The public key for the user with fingerprint ${publicGpgKey.fingerprint} is expired.`);
+    }
+  }
+
+  /**
+   * Assert that the metadata object_type field is valid.
+   *
+   * @param {ResourceEntity || FolderEntity} entity the resource to check the metadata object_type from.
+   * @throws {EntityValidationError} if the object_type value is not set or not set with the expected value.
+   */
+  assertValidMetadataObjectType(entity) {
+    try {
+      EntitySchema.validateProp("object_type", entity.metadata.objectType, entity.metadata.constructor.getSchema().properties.object_type);
+    } catch (error) {
+      const validationError = new EntityValidationError();
+      validationError.addError('metadata.object_type', 'required-v5', `The resource metadata object_type is required and must be set to '${entity.metadata.constructor.METADATA_OBJECT_TYPE}' for the the entity (${entity?.id}).`);
+      throw validationError;
     }
   }
 }

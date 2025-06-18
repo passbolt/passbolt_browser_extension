@@ -171,7 +171,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.resources.move-by-ids', async(requestId, resourcesIds, destinationFolderId) => {
     const controller = new MoveResourcesController(worker, requestId, apiClientOptions, account);
-    await controller.exec(resourcesIds, destinationFolderId);
+    await controller._exec(resourcesIds, destinationFolderId);
   });
 };
 

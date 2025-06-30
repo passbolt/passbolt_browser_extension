@@ -46,18 +46,9 @@ export default class FindResourcesService {
    * @returns {Promise<ResourcesCollection>}
    * @private
    */
-  async findAll(contains, filters, ignoreInvalidEntity) {
-    //Assert contains
-    const supportedOptions = ResourceService.getSupportedContainOptions();
-    const supportedFilter = ResourceService.getSupportedFiltersOptions();
-
-    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
-      throw new Error("Unsupported contains parameter used, please check supported contains");
-    }
-
-    if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
-      throw new Error("Unsupported filter parameter used, please check supported filters");
-    }
+  async findAll(contains, filters, ignoreInvalidEntity = false) {
+    this.assertContains(contains);
+    this.assertFilters(filters);
 
     const resourcesDto = await this.resourceService.findAll(contains, filters);
     return new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
@@ -69,7 +60,7 @@ export default class FindResourcesService {
    * @param {Array<string>} resourcesIds
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAllByIds(resourcesIds, contains = {}) {
+  async findAllByIds(resourcesIds, contains = {}, ignoreInvalidEntity = false) {
     assertArrayUUID(resourcesIds);
 
     // We split the requests in chunks in order to avoid any too long url error.
@@ -78,7 +69,7 @@ export default class FindResourcesService {
       const filter = {
         "has-id": resourceIds
       };
-      return async() => await this.findAll(contains, filter);
+      return async() => await this.findAll(contains, filter, ignoreInvalidEntity);
     });
 
     // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
@@ -196,12 +187,8 @@ export default class FindResourcesService {
    */
   async findOneById(resourceId, contains = {}) {
     assertUuid(resourceId);
-    //Assert contains
-    const supportedOptions = ResourceService.getSupportedContainOptions();
+    this.assertContains(contains);
 
-    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
-      throw new Error("Unsupported contains parameter used, please check supported contains");
-    }
     const resourcesDto  = await this.resourceService.get(resourceId, contains);
 
     return new ResourceEntity(resourcesDto);
@@ -223,5 +210,52 @@ export default class FindResourcesService {
 
     const resource = this.findOneById(resourceId, contains);
     return resource;
+  }
+
+  /**
+   * Find all the resources matching the given ids for the local storage.
+   * All entities that cannot be validated will be ignored and excluded from the resulting collection.
+   * @param {Array<uuid>} resourceIds
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByIdsForLocalStorage(resourceIds) {
+    assertArrayUUID(resourceIds);
+    return await this.findAllByIds(resourceIds, ResourceLocalStorage.DEFAULT_CONTAIN, true);
+  }
+
+  /**
+   * Find all the resources having the given parentFolderId as direct ancestor for the local storage
+   * All entities that cannot be validated will be ignored and excluded from the resulting collection.
+   * @param {uuid} parentFolderId
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllByParentFolderIdForLocalStorage(parentFolderId) {
+    assertUuid(parentFolderId);
+    const filters = {"has-parent": parentFolderId};
+    return await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, filters, true);
+  }
+
+  /**
+   * Assert the contains to ensure they match the supported ones.
+   * @param {object} contains
+   * @private
+   */
+  assertContains(contains) {
+    const supportedOptions = ResourceService.getSupportedContainOptions();
+    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
+      throw new Error("Unsupported contains parameter used, please check supported contains");
+    }
+  }
+
+  /**
+   * Assert the filters to ensure they match the supported ones.
+   * @param {object} filters
+   * @private
+   */
+  assertFilters(filters) {
+    const supportedFilter = ResourceService.getSupportedFiltersOptions();
+    if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
+      throw new Error("Unsupported filter parameter used, please check supported filters");
+    }
   }
 }

@@ -152,7 +152,7 @@ class FindAndUpdateResourcesLocalStorage {
       updatedResources.setDecryptedMetadataFromCollection(localStorageResourcesCollection);
       localStorageResourcesCollection.updateWithCollection(updatedResources);
 
-      //these resources has been actually deleted and need to be removed for the local storage.
+      // These resources have been deleted (or permissions revoked) and need to be removed from the local storage.
       const remainingResourcesIds = movedOrRemovedResourcesIds
         .filter(id => !updatedResources.getFirstById(id));
 

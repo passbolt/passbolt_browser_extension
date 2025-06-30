@@ -224,7 +224,7 @@ export default class FindResourcesService {
   }
 
   /**
-   * Find aoo the resources having the given parentFolderId as direct ancestor for the local storage
+   * Find all the resources having the given parentFolderId as direct ancestor for the local storage
    * All entities that cannot be validated will be ignored and excluded from the resulting collection.
    * @param {uuid} parentFolderId
    * @returns {Promise<ResourcesCollection>}

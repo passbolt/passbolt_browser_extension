@@ -339,6 +339,7 @@ class ResourcesCollection extends EntityV2Collection {
   /**
    * Update the current resource collection with the given collection.
    * If an element already exists, it is replaced, otherwise, it's added.
+   * Note: mutation of the original collection does not trigger collection validation (schema or build rules).
    * @param {ResourcesCollection} resourcesCollection
    */
   updateWithCollection(resourcesCollection) {

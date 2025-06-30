@@ -176,7 +176,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   /*
-   * Retrieve all resources by ids with their permissions.
+   * Update the local storage for resources in the specified parent folder.
    * @listens passbolt.resources.update-local-storage-by-folder-parent-id
    * @param {string} parentFolderId The id of the parent folder.
    */

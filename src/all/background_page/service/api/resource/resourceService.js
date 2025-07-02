@@ -73,6 +73,7 @@ class ResourceService extends AbstractService {
       'has-id',
       // if tag plugin
       'has-tag',
+      "has-parent",
     ];
   }
 

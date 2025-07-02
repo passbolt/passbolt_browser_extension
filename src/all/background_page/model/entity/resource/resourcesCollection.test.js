@@ -446,4 +446,38 @@ describe("ResourcesCollection", () => {
       expect(() => collection.setDecryptedMetadataFromCollection("test")).toThrow('The `resourcesCollection` parameter should be a ResourcesCollection.');
     });
   });
+
+  describe("::updateWithCollection", () => {
+    it("should update the existing resources and add the new ones", () => {
+      expect.assertions(5);
+      const resource1 = defaultResourceDto();
+      const resource2 = defaultResourceDto();
+      const collection = new ResourcesCollection([resource1, resource2]);
+
+      const updatedResource2 = {
+        ...resource2,
+        metadata: defaultResourceMetadataDto({
+          name: "UPDATE - RESOURCE",
+        }),
+      };
+
+      const resource3 = defaultResourceDto();
+      const collectionForUpdate = new ResourcesCollection([resource3, updatedResource2]);
+
+      collection.updateWithCollection(collectionForUpdate);
+
+      expect(collection).toHaveLength(3);
+      expect(collection.items[0].id).toStrictEqual(resource1.id);
+      expect(collection.items[1].id).toStrictEqual(resource2.id);
+      expect(collection.items[1].metadata.name).toStrictEqual(updatedResource2.metadata.name);
+      expect(collection.items[2].id).toStrictEqual(resource3.id);
+    });
+
+    it("should assert its parameters", () => {
+      expect.assertions(1);
+      const collection = new ResourcesCollection([]);
+
+      expect(() => collection.updateWithCollection("test")).toThrow();
+    });
+  });
 });

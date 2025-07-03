@@ -23,7 +23,7 @@ import {
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import expect from "expect";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import MockPort from "passbolt-styleguide/test/mocks/mockPort";
+import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 import {v4 as uuidv4} from "uuid";
 import {minimumPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";

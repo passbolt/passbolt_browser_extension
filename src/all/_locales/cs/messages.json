@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Passbolt - Open Source Passwort Manager",
+    "description": "The application name of the extension, displayed in the web store. 45 characters max."
+  },
+  "appDescription": {
+    "message": "Passbolt - Open Source správce hesel",
+    "description": "The description of the extension, displayed in the web store. 85 characters max."
+  }
+}

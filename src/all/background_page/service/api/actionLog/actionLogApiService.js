@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import AbstractActionLogEntity from "../../../model/entity/actionLog/abstractActionLogEntity";
-import {assertUuid, assertNonEmptyString} from "../../../utils/assertions";
+import {assertUuid, assertNonEmptyString, assertNumber} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
 const RESOURCE_SERVICE_RESOURCE_NAME = 'actionlog';
@@ -77,6 +77,8 @@ class ActionLogService extends AbstractService {
    */
   async findAllFor(foreignModel, foreignId, page, limit) {
     this.assertValidForeignModel(foreignModel);
+    assertNumber(page);
+    assertNumber(limit);
     assertUuid(foreignId);
     if (!page || typeof page !== 'number') {
       throw new TypeError(`ActionLog page should be a valid integer.`);

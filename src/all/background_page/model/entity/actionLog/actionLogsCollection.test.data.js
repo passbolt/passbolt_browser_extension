@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.4.0
  */
-import defaultData from "./defaultActionLogEntity.test.data";
+import {defaultData} from "./defaultActionLogEntity.test.data";
 
 export const defaultActionLogsCollection = [
   defaultData

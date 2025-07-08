@@ -15,7 +15,7 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import {v4 as uuidv4} from "uuid";
 import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
-import ActionLogService from "./actionLogApiService";
+import ActionLogApiService from "./actionLogApiService";
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
@@ -37,7 +37,7 @@ describe("ActionLogService", () => {
       const apiResponse = [defaultActionLogsCollection];
       fetch.doMockOnceIf(/actionlog\/resource/, () => mockApiResponse(apiResponse));
 
-      const service = new ActionLogService(apiClientOptions, account);
+      const service = new ActionLogApiService(apiClientOptions, account);
       const result = await service.findAllFor("Resource", uuidv4(), 1, 5);
 
       expect(result).toBeInstanceOf(Array);
@@ -47,7 +47,7 @@ describe("ActionLogService", () => {
     it("throws API error if the API encountered an issue", async() => {
       expect.assertions(1);
 
-      const service = new ActionLogService(apiClientOptions, account);
+      const service = new ActionLogApiService(apiClientOptions, account);
 
       await expect(() => service.findAllFor("Resource", uuidv4())).rejects.toThrow(TypeError);
     });

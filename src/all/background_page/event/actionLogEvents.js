@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import ActionLogModel from "../model/actionLog/actionLogModel";
+import FindActionLogService from "../model/actionLog/findActionLogService";
 
 /**
  * Listens to the action logs events
@@ -27,9 +27,9 @@ const listen = function(worker, apiClientOptions) {
    */
   worker.port.on('passbolt.actionlogs.find-all-for', async(requestId, foreignModel, foreignId, options) => {
     try {
-      const actionLogModel = new ActionLogModel(apiClientOptions);
+      const findActionLogService = new FindActionLogService(apiClientOptions);
       const {limit, page} = options;
-      const actionLogs = await actionLogModel.findAllFor(foreignModel, foreignId, page, limit);
+      const actionLogs = await findActionLogService.findAllFor(foreignModel, foreignId, page, limit);
       worker.port.emit(requestId, 'SUCCESS', actionLogs);
     } catch (error) {
       console.error(error);

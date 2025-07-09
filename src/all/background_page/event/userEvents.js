@@ -9,13 +9,14 @@
 import UserModel from "../model/user/userModel";
 import AccountModel from "../model/account/accountModel";
 import UpdatePrivateKeyController from "../controller/account/updatePrivateKeyController";
-import UserDeleteTransferEntity from "../model/entity/user/transfer/userDeleteTransferEntity";
 import UserEntity from "../model/entity/user/userEntity";
 import SecurityTokenEntity from "../model/entity/securityToken/securityTokenEntity";
 import AvatarUpdateEntity from "../model/entity/avatar/update/avatarUpdateEntity";
 import UpdateUserLocalStorageController from "../controller/user/updateUserLocalStorageController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import UpdateUserController from "../controller/user/updateUserController";
+import DeleteDryRunUserController from "../controller/user/deleteDryRunUserController";
+import DeleteUserController from "../controller/user/deleteUserController";
 
 /**
  * Listens the user events
@@ -154,16 +155,9 @@ const listen = function(worker, apiClientOptions, account) {
    * @param {string} requestId The request identifier uuid
    * @param {string} userId The user uuid
    */
-  worker.port.on('passbolt.users.delete-dry-run', async(requestId, userId, transferDto) => {
-    try {
-      const userModel = new UserModel(apiClientOptions, account);
-      const transferEntity = transferDto ? new UserDeleteTransferEntity(transferDto) : null;
-      await userModel.deleteDryRun(userId, transferEntity);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.users.delete-dry-run', async(requestId, userId) => {
+    const controller = new DeleteDryRunUserController(worker, requestId, apiClientOptions, account);
+    await controller._exec(userId);
   });
 
   /*
@@ -174,15 +168,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param {object} [transferDto] optional data ownership transfer
    */
   worker.port.on('passbolt.users.delete', async(requestId, userId, transferDto) => {
-    try {
-      const userModel = new UserModel(apiClientOptions, account);
-      const transferEntity = transferDto ? new UserDeleteTransferEntity(transferDto) : null;
-      await userModel.delete(userId, transferEntity);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new DeleteUserController(worker, requestId, apiClientOptions, account);
+    await controller._exec(userId, transferDto);
   });
 
   /*

@@ -371,4 +371,104 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(expectLocalStorageResult[1]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto2));
     });
   });
+
+  describe("::findAndUpdateAllByParentFolderId", () => {
+    let service;
+
+    beforeEach(() => {
+      service = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+    });
+
+    it("should extract the id from the resource collection", async() => {
+      expect.assertions(2);
+
+      const parentFolderId = uuidv4();
+
+      const resourcesDto = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(service.findResourcesServices, "findAllByParentFolderIdForLocalStorage");
+
+      await service.findAndUpdateAllByParentFolderId(parentFolderId);
+
+      expect(service.findResourcesServices.findAllByParentFolderIdForLocalStorage).toHaveBeenCalledTimes(1);
+      expect(service.findResourcesServices.findAllByParentFolderIdForLocalStorage).toHaveBeenCalledWith(parentFolderId);
+    });
+
+    it("should assert its parameter", async() => {
+      expect.assertions(1);
+      await expect(() => service.findAndUpdateAllByParentFolderId("test")).rejects.toThrow();
+    });
+
+    it("should update the local storage resource collection by removing deleted resources, moving resources and updating resources data", async() => {
+      expect.assertions(8);
+
+      const parentFolderId = uuidv4();
+      const otherParentFolderId = uuidv4();
+
+      /*
+       * Resources collection in local storage:
+       * Resource0.folderParentId = null;
+       * Resource1.folderParentId = parentFolderId; // on API it should be modified only
+       * Resource2.folderParentId = parentFolderId; // on API it should be moved
+       * Resource3.folderParentId = parentFolderId; // on API it should be removed
+       */
+
+      const resourcesDto = multipleResourceDtos();
+      resourcesDto[1].folder_parent_id = parentFolderId;
+      resourcesDto[2].folder_parent_id = parentFolderId;
+      resourcesDto[3].folder_parent_id = parentFolderId;
+
+      delete resourcesDto[0].name;
+      delete resourcesDto[1].name;
+      delete resourcesDto[2].name;
+      delete resourcesDto[3].name;
+
+      const localStorageResourceCollection = new ResourcesCollection(resourcesDto);
+      await ResourceLocalStorage.set(localStorageResourceCollection);
+
+      // the resources in the folder on the API does not have resource2 anymore but resources1 remains and is changed.
+      const apiResourcesDtoInFolder = [
+        {...resourcesDto[1]},
+      ];
+      apiResourcesDtoInFolder[0].metadata.name = "Resource1 - UPDATED";
+      apiResourcesDtoInFolder[0].modified = (new Date()).toISOString();
+
+      // resource2 on the API will be return and updated, resource3 will never be sent back as it is deleted
+      const allIdsApiResourcesDto = [
+        {...resourcesDto[2]},
+      ];
+      allIdsApiResourcesDto[0].folder_parent_id = otherParentFolderId;
+
+      async function mockedFindAllApi(_, filter) {
+        const isParentFolderSearchRequest = Boolean(filter["has-parent"]);
+
+        return isParentFolderSearchRequest
+          ? apiResourcesDtoInFolder
+          : allIdsApiResourcesDto;
+      }
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(mockedFindAllApi);
+
+      await service.findAndUpdateAllByParentFolderId(parentFolderId);
+
+      const updatedResourceLocalStorage = new ResourcesCollection(await ResourceLocalStorage.get());
+
+      expect(updatedResourceLocalStorage).toHaveLength(3); //1 resource should be removed compared to the original data
+      const resource0 = updatedResourceLocalStorage.getFirstById(resourcesDto[0].id);
+      expect(resource0.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toStrictEqual(resourcesDto[0]); //this resource should remain unchanged
+
+      const updatedResource1 = updatedResourceLocalStorage.getFirstById(resourcesDto[1].id); // this resource should have been updated but not moved
+      expect(updatedResource1.metadata.name).toStrictEqual("Resource1 - UPDATED");
+      expect(updatedResource1.modified).toStrictEqual(apiResourcesDtoInFolder[0].modified);
+      expect(updatedResource1.folderParentId).toStrictEqual(parentFolderId);
+
+      const updatedResource2 = updatedResourceLocalStorage.getFirstById(resourcesDto[2].id); // this resource should not have changed per say but only moved
+      expect(updatedResource2.modified).toStrictEqual(resourcesDto[2].modified);
+      expect(updatedResource2.folderParentId).toStrictEqual(otherParentFolderId);
+
+      const updatedResource3 = updatedResourceLocalStorage.getFirstById(resourcesDto[3].id); // this resource should have been removed
+      expect(updatedResource3).toBeUndefined();
+    });
+  });
 });

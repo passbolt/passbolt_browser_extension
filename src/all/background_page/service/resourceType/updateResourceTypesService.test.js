@@ -152,7 +152,7 @@ describe("UpdateResourceTypesService", () => {
 
       await service.updateAllDeletedStatus(resourcesTypesCollection);
 
-      expect(service.resourceTypeService.delete).toHaveBeenCalledTimes(4);
+      expect(service.resourceTypeService.delete).toHaveBeenCalledTimes(5);
       expect(service.resourceTypeService.undelete).toHaveBeenCalledTimes(4);
 
       expect(service.resourceTypeService.delete).toHaveBeenCalledWith(resourceTypesDto[0].id);

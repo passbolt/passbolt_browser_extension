@@ -371,7 +371,6 @@ describe("ResourcesKdbxImportParser", () => {
     const importEntity = new ImportResourcesFileEntity(importDto);
     const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
     await parser.parseImport();
-    console.log(importEntity);
 
     // Assert resources
     expect(importEntity.importResources.items).toHaveLength(2);

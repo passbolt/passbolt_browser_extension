@@ -16,26 +16,20 @@ import {
   FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA,
   FETCH_OFFSCREEN_DATA_TYPE_JSON
 } from "../../../offscreens/service/network/fetchOffscreenService";
+import CreateOffscreenDocumentService from "../offscreen/createOffscreenDocumentService";
+import HandleOffscreenResponseService from "../offscreen/handleOffscreenResponseService";
 
 const {SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} = require("../../../offscreens/service/network/fetchOffscreenService");
 
 export const IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY = "IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY";
-const LOCK_CREATE_OFFSCREEN_FETCH_DOCUMENT = "LOCK_CREATE_OFFSCREEN_FETCH_DOCUMENT";
-const FETCH_OFFSCREEN_DOCUMENT_REASON = "WORKERS";
-const OFFSCREEN_URL = "offscreens/fetch.html";
 
 export class RequestFetchOffscreenService {
   /**
    * Preferred strategy cache.
    * @type {boolean|null}
+   * @private
    */
   static isFetchOffscreenPreferredCache = null;
-
-  /**
-   * The stack of requests promises callbacks using the request id as reference.
-   * @type {object}
-   */
-  static offscreenRequestsPromisesCallbacks = {};
 
   /**
    * Fetch external service through fetch offscreen document.
@@ -54,6 +48,7 @@ export class RequestFetchOffscreenService {
   /**
    * Check if the fetch offscreen strategy is preferred.
    * @returns {Promise<boolean>}
+   * @private
    */
   static async isFetchOffscreenPreferred() {
     if (RequestFetchOffscreenService.isFetchOffscreenPreferredCache === null) {
@@ -69,6 +64,7 @@ export class RequestFetchOffscreenService {
    * @param {string} resource The fetch url resource, similar to the native fetch resource parameter.
    * @param {object} options The fetch options, similar to the native fetch option parameter.
    * @returns {Promise<Response>}
+   * @private
    */
   static async fetchNative(resource, options) {
     try {
@@ -89,53 +85,30 @@ export class RequestFetchOffscreenService {
    * @param {string} resource The fetch url resource, similar to the native fetch resource parameter.
    * @param {object} options The fetch options, similar to the native fetch option parameter.
    * @returns {Promise<Response>}
+   * @private
    */
   static async fetchOffscreen(resource, options) {
-    // Create offscreen document if it does not already exist.
-    await navigator.locks.request(
-      LOCK_CREATE_OFFSCREEN_FETCH_DOCUMENT,
-      RequestFetchOffscreenService.createIfNotExistOffscreenDocument);
+    await CreateOffscreenDocumentService.createIfNotExistOffscreenDocument();
 
-    const offscreenFetchId = crypto.randomUUID();
-    const offscreenFetchData = await RequestFetchOffscreenService.buildOffscreenData(offscreenFetchId, resource, options);
+    const requestId = crypto.randomUUID();
+    const offscreenFetchData = await RequestFetchOffscreenService.buildOffscreenData(resource, options);
 
     return new Promise((resolve, reject) => {
       // Stack the response listener callbacks.
-      RequestFetchOffscreenService.offscreenRequestsPromisesCallbacks[offscreenFetchId] = {resolve, reject};
-      return RequestFetchOffscreenService.sendOffscreenMessage(offscreenFetchData)
+      HandleOffscreenResponseService.setResponseCallback(requestId, {resolve, reject});
+      return RequestFetchOffscreenService.sendOffscreenMessage(requestId, offscreenFetchData)
         .catch(reject);
     });
   }
 
   /**
-   * Create fetch offscreen document if it does not exist yet.
-   * @returns {Promise<void>}
-   */
-  static async createIfNotExistOffscreenDocument() {
-    const existingContexts = await chrome.runtime.getContexts({
-      contextTypes: ["OFFSCREEN_DOCUMENT"],
-      documentUrls: [chrome.runtime.getURL(OFFSCREEN_URL)]
-    });
-
-    if (existingContexts.length > 0) {
-      return;
-    }
-
-    await chrome.offscreen.createDocument({
-      url: OFFSCREEN_URL,
-      reasons: [FETCH_OFFSCREEN_DOCUMENT_REASON],
-      justification: "Used to perform fetch to services such as the passbolt API serving invalid certificate.",
-    });
-  }
-
-  /**
    * Build offscreen message data.
-   * @param {string} id The identifier of the offscreen fetch request.
    * @param {string} resource The fetch url resource, similar to the native fetch resource parameter.
-   * @param {object} fetchOptions The fetch options, similar to the native fetch option parameter.
-   * @returns {object}
+   * @param {object} [fetchOptions = {}] The fetch options, similar to the native fetch option parameter.
+   * @returns {Promise<object>}
+   * @private
    */
-  static async buildOffscreenData(id, resource, fetchOptions = {}) {
+  static async buildOffscreenData(resource, fetchOptions = {}) {
     const options = JSON.parse(JSON.stringify(fetchOptions));
 
     // Format FormData fetch options to allow its serialization.
@@ -152,27 +125,29 @@ export class RequestFetchOffscreenService {
       };
     }
 
-    return {id, resource, options};
+    return {resource, options};
   }
 
   /**
    * Send message to the offscreen fetch document.
-   * @param {object} offscreenData The offscreen message data.
-   * @param {string} offscreenData.id The identifier of the offscreen fetch request.
+   * @param {string} id the identified of the request
    * @param {string} offscreenData.resource The fetch url resource, similar to the native fetch resource parameter.
-   * @param {object} offscreenData.fetchOptions The fetch options, similar to the native fetch option parameter.
-   * @returns {Promise<*>}
+   * @param {object} offscreenData.options The fetch options, similar to the native fetch option parameter.
+   * @returns {Promise<void>}
+   * @private
    */
-  static async sendOffscreenMessage(offscreenData) {
+  static async sendOffscreenMessage(id, data) {
     return chrome.runtime.sendMessage({
+      id: id,
+      data: data,
       target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN,
-      data: offscreenData
     });
   }
 
   /**
    * Mark the fetch offscreen strategy as preferred.
-   * return {Promise<void>}
+   * @returns {Promise<void>}
+   * @private
    */
   static async markFetchOffscreenStrategyAsPreferred() {
     RequestFetchOffscreenService.isFetchOffscreenPreferredCache = true;

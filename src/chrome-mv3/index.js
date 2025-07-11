@@ -18,9 +18,9 @@ import TabService from "../all/background_page/service/tab/tabService";
 import OnExtensionUpdateAvailableService
   from "../all/background_page/service/extension/onExtensionUpdateAvailableService";
 import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarmService";
-import ResponseFetchOffscreenService from "./serviceWorker/service/network/responseFetchOffscreenService";
 import OnStartUpService from "../all/background_page/service/extension/onStartUpService";
 import ToolbarService from "../all/background_page/service/toolbar/toolbarService";
+import HandleOffscreenResponseService from "./serviceWorker/service/offscreen/handleOffscreenResponseService";
 
 /**
  * Load all system requirement
@@ -68,9 +68,9 @@ browser.alarms.onAlarm.removeListener(GlobalAlarmService.exec);
 browser.alarms.onAlarm.addListener(GlobalAlarmService.exec);
 
 /**
- * Handle offscreen fetch responses.
+ * Handle offscreen responses.
  */
-chrome.runtime.onMessage.addListener(ResponseFetchOffscreenService.handleFetchResponse);
+chrome.runtime.onMessage.addListener(HandleOffscreenResponseService.handleOffscreenResponse);
 
 /**
  * Handle suggested resources on toolbar icon

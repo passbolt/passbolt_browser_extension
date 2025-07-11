@@ -67,6 +67,8 @@ import FindMetadataMigrateResourcesController from "../controller/migrateMetadat
 import MigrateMetadataResourcesController from "../controller/migrateMetadata/migrateMetadataResourcesController";
 import DownloadOrganizationGeneratedKey from "../controller/accountRecovery/downloadOrganizationGenerateKeyController";
 import ShareMetadataKeyPrivateController from "../controller/metadata/shareMetadataKeyPrivateController";
+import CopyToClipboardController from "../controller/clipboard/copyToClipboardController";
+import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -432,6 +434,37 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.metadata.share-missing-metadata-private-keys-with-user', async(requestId, userId) => {
     const controller = new ShareMetadataKeyPrivateController(worker, requestId, apiClientOptions, account);
     await controller._exec(userId);
+  });
+
+
+  /*
+   * ==================================================================================
+   *  Clipboard events.
+   * ==================================================================================
+   */
+
+  /**
+   * Copies the given content into the clipboard and clear any clipboard flush alarms.
+   *
+   * @listens assbolt.clipboard.copy
+   * @param {string} requestId The request identifier
+   * @param {string} text the content to copy
+   */
+  worker.port.on('passbolt.clipboard.copy', async(requestId, text) => {
+    const clipboardController = new CopyToClipboardController(worker, requestId);
+    await clipboardController._exec(text);
+  });
+
+  /**
+   * Copies temporarily the given content into the clipboard and set a clipboard flush alarm.
+   *
+   * @listens assbolt.clipboard.copy-temporarily
+   * @param {string} requestId The request identifier
+   * @param {string} text the content to copy
+   */
+  worker.port.on('passbolt.clipboard.copy-temporarily', async(requestId, text) => {
+    const clipboardController = new CopyTemporarilyToClipboardController(worker, requestId);
+    await clipboardController._exec(text);
   });
 };
 export const AppEvents = {listen};

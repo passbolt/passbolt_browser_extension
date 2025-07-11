@@ -119,7 +119,7 @@ module.exports = function (grunt) {
       service_worker: {
         files: [
           { expand: true, cwd: path.src_chrome_mv3, src: 'serviceWorker.js', dest: path.build + 'serviceWorker' },
-          { expand: true, cwd: `${path.src_chrome_mv3}/offscreens`, src: 'fetch.html', dest: `${path.build}/offscreens` }
+          { expand: true, cwd: `${path.src_chrome_mv3}/offscreens`, src: 'offscreen.html', dest: `${path.build}/offscreens` },
         ]
       },
       web_accessible_resources: {

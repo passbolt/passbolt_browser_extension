@@ -26,6 +26,7 @@ import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService
 import resourceInProgressCacheService from "../cache/resourceInProgressCache.service";
 import OnExtensionUpdateAvailableService from "../extension/onExtensionUpdateAvailableService";
 import toolbarService from "../toolbar/toolbarService";
+import CopyToClipboardService from "../clipboard/copyToClipboardService";
 
 describe("PostLogoutService", () => {
   beforeEach(() => {
@@ -84,11 +85,12 @@ describe("PostLogoutService", () => {
     });
 
     it("Should call all services that needs to run processes on logout", async() => {
-      expect.assertions(5);
+      expect.assertions(6);
       jest.spyOn(PortManager, "isPortExist").mockImplementation(() => false);
       jest.spyOn(LocalStorageService, "flush");
       jest.spyOn(toolbarService, "handleUserLoggedOut");
       jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
+      jest.spyOn(CopyToClipboardService.prototype, "flushTemporaryContentIfAny");
       jest.spyOn(resourceInProgressCacheService, "reset");
       jest.spyOn(OnExtensionUpdateAvailableService, "handleUserLoggedOut");
 
@@ -99,6 +101,7 @@ describe("PostLogoutService", () => {
       expect(StartLoopAuthSessionCheckService.clearAlarm).toHaveBeenCalledTimes(1);
       expect(resourceInProgressCacheService.reset).toHaveBeenCalledTimes(1);
       expect(OnExtensionUpdateAvailableService.handleUserLoggedOut).toHaveBeenCalledTimes(1);
+      expect(CopyToClipboardService.prototype.flushTemporaryContentIfAny).toHaveBeenCalledTimes(1);
     });
   });
 });

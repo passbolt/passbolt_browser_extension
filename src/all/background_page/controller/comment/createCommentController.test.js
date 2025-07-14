@@ -19,7 +19,7 @@ import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import CreateCommentController from "./createCommentController";
 import {v4 as uuidv4} from "uuid";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import CommentModel from "../../model/comment/commentModel";
+import CommentService from "../../model/comment/commentService";
 import {defaultCommentDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
 
 beforeEach(async() =>  {
@@ -52,14 +52,14 @@ describe("CreateCommentController", () => {
 
       expect(controller.worker).toBe(mockedWorker);
       expect(controller.requestId).toBe(requestId);
-      expect(controller.commentModel).toEqual(expect.objectContaining(new CommentModel(apiClientOption)));
+      expect(controller.commentService).toEqual(expect.objectContaining(new CommentService(apiClientOption)));
     });
   });
   describe("CreateCommentController::exec", () => {
     it("Should create the comment and send the result back.", async() => {
       fetchCommentsMock();
       const controller = new CreateCommentController(null, null, defaultApiClientOptions());
-      const spy = jest.spyOn(controller.commentModel, "create");
+      const spy = jest.spyOn(controller.commentService, "create");
       const createdComment = await controller.exec(mockApiCreation);
 
       expect.assertions(2);
@@ -72,7 +72,7 @@ describe("CreateCommentController", () => {
       const mockedError = new TypeError("Unable to reach the server, an unexpected error occurred");
       fetch.doMock(() => { throw mockedError; });
       const controller = new CreateCommentController(mockedWorker, null, defaultApiClientOptions());
-      const spy = jest.spyOn(controller.commentModel, "create");
+      const spy = jest.spyOn(controller.commentService, "create");
 
       expect.assertions(2);
 
@@ -93,7 +93,7 @@ describe("CreateCommentController", () => {
       const mockedError = new TypeError("Unable to reach the server, you are not connected to the network");
       fetch.doMock(() => { throw mockedError; });
       const controller = new CreateCommentController(mockedWorker, null, defaultApiClientOptions());
-      const spy = jest.spyOn(controller.commentModel, "create");
+      const spy = jest.spyOn(controller.commentService, "create");
 
       expect.assertions(2);
 

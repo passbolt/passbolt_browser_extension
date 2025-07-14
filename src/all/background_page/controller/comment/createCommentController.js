@@ -12,7 +12,7 @@
  * @since         3.8.0
  */
 
-import CommentModel from "../../model/comment/commentModel";
+import CommentService from "../../model/comment/commentService";
 import CommentEntity from "../../model/entity/comment/commentEntity";
 
 class CreateCommentController {
@@ -25,7 +25,7 @@ class CreateCommentController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.commentModel = new CommentModel(apiClientOptions);
+    this.commentService = new CommentService(apiClientOptions);
   }
 
   /**
@@ -50,7 +50,7 @@ class CreateCommentController {
    * @return {Promise<CommentEntity>} The created comment.
    */
   async exec(commentDto) {
-    return this.commentModel.create(new CommentEntity(commentDto));
+    return this.commentService.create(new CommentEntity(commentDto));
   }
 }
 

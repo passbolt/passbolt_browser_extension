@@ -12,7 +12,7 @@
  * @since         3.8.0
  */
 
-import CommentModel from "../../model/comment/commentModel";
+import CommentService from "../../model/comment/commentService";
 import Validator from "validator";
 
 class DeleteCommentController {
@@ -25,7 +25,7 @@ class DeleteCommentController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.commentModel = new CommentModel(apiClientOptions);
+    this.commentService = new CommentService(apiClientOptions);
   }
 
   /**
@@ -59,7 +59,7 @@ class DeleteCommentController {
       throw new Error("The comment id should be a valid uuid.");
     }
 
-    await this.commentModel.delete(commentId);
+    await this.commentService.delete(commentId);
   }
 }
 

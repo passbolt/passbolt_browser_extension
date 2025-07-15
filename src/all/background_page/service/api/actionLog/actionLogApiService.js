@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import AbstractActionLogEntity from "../../../model/entity/actionLog/abstractActionLogEntity";
+import {assertUuid, assertNonEmptyString, assertNumber} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
 const RESOURCE_SERVICE_RESOURCE_NAME = 'actionlog';
@@ -76,7 +77,9 @@ class ActionLogService extends AbstractService {
    */
   async findAllFor(foreignModel, foreignId, page, limit) {
     this.assertValidForeignModel(foreignModel);
-    this.assertValidId(foreignId);
+    assertNumber(page);
+    assertNumber(limit);
+    assertUuid(foreignId);
     if (!page || typeof page !== 'number') {
       throw new TypeError(`ActionLog page should be a valid integer.`);
     }
@@ -102,9 +105,7 @@ class ActionLogService extends AbstractService {
    * @public
    */
   assertValidForeignModel(foreignModel) {
-    if (!foreignModel || typeof foreignModel !== 'string') {
-      throw new TypeError(`ActionLog foreign model should be a valid string.`);
-    }
+    assertNonEmptyString(foreignModel, 'ActionLog foreign model should be a valid string.');
     if (!AbstractActionLogEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
       throw new TypeError(`ActionLog foreign model ${foreignModel} in not in the list of supported models.`);
     }

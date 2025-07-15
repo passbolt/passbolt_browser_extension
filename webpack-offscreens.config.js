@@ -3,7 +3,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 const config = {
   entry: {
-    'fetch': path.resolve(__dirname, './src/chrome-mv3/offscreens/fetch.js'),
+    'offscreen': path.resolve(__dirname, './src/chrome-mv3/offscreens/offscreen.js'),
   },
   mode: 'production',
   module: {

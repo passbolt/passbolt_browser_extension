@@ -38,7 +38,6 @@ import {ThemeEvents} from "../event/themeEvents";
 import {MobileEvents} from "../event/mobileEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import {MfaEvents} from "../event/mfaEvents";
-import {ClipboardEvents} from "../event/clipboardEvents";
 import {v4 as uuid} from "uuid";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {enableFetchMocks} from "jest-fetch-mock";
@@ -75,13 +74,12 @@ jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(MobileEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PermissionEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
 
 describe("App", () => {
-  beforeEach(async() => {
+  beforeEach(() => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
@@ -89,7 +87,7 @@ describe("App", () => {
 
   describe("App::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(34);
+      expect.assertions(33);
       // data mocked
       const port = {
         _port: {
@@ -137,7 +135,6 @@ describe("App", () => {
       expect(MobileEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(PownedPasswordEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(MfaEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(ClipboardEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(PermissionEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AccountEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
@@ -168,7 +165,6 @@ describe("App", () => {
         MobileEvents,
         PownedPasswordEvents,
         MfaEvents,
-        ClipboardEvents,
         RememberMeEvents,
         PermissionEvents,
         AccountEvents

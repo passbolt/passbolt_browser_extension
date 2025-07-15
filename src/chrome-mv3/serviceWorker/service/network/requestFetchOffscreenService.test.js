@@ -25,6 +25,8 @@ import {
 } from "../../../offscreens/service/network/fetchOffscreenService";
 import {fetchOptionsWithBodyFormData, fetchOptionWithBodyData} from "./requestFetchOffscreenService.test.data";
 import FormDataUtils from "../../../../all/background_page/utils/format/formDataUtils";
+import {v4 as uuidv4} from "uuid";
+import HandleOffscreenResponseService from "../offscreen/handleOffscreenResponseService";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -79,54 +81,25 @@ describe("RequestFetchOffscreenService", () => {
     });
   });
 
-  describe("::createIfNotExistOffscreenDocument", () => {
-    it("should create the offscreen document if it does not exist yet ", async() => {
-      expect.assertions(2);
-      jest.spyOn(chrome.runtime, "getContexts").mockImplementationOnce(() => []);
-      await RequestFetchOffscreenService.createIfNotExistOffscreenDocument();
-
-      const expectedGetContextsData = {
-        contextTypes: ["OFFSCREEN_DOCUMENT"],
-        documentUrls: ["chrome-extension://didegimhafipceonhjepacocaffmoppf/offscreens/fetch.html"]
-      };
-      const expectedCreateDocumentData = {
-        url: "offscreens/fetch.html",
-        reasons: ["WORKERS"],
-        justification: "Used to perform fetch to services such as the passbolt API serving invalid certificate."
-      };
-      expect(chrome.runtime.getContexts).toHaveBeenCalledWith(expectedGetContextsData);
-      expect(chrome.offscreen.createDocument).toHaveBeenCalledWith(expectedCreateDocumentData);
-    });
-
-    it("should not create the offscreen document if it already exist ", async() => {
-      expect.assertions(1);
-      jest.spyOn(chrome.runtime, "getContexts").mockImplementationOnce(() => ["shallow-offscreen-document-mock"]);
-      await RequestFetchOffscreenService.createIfNotExistOffscreenDocument();
-      expect(chrome.offscreen.createDocument).not.toHaveBeenCalled();
-    });
-  });
-
   describe("::buildOffscreenData", () => {
     it("should build data to send to the offscreen document", async() => {
       expect.assertions(1);
-      const id = crypto.randomUUID();
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionWithBodyData();
-      const offscreenData = await RequestFetchOffscreenService.buildOffscreenData(id, resource, options);
+      const offscreenData = await RequestFetchOffscreenService.buildOffscreenData(resource, options);
       options.body = {
         data: options.body,
         dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON
       };
       // Ensure body remains a form data after serialization.
-      expect(offscreenData).toEqual({id, resource, options});
+      expect(offscreenData).toEqual({resource, options});
     });
 
     it("should ensure given fetch options body will not be altered", async() => {
       expect.assertions(2);
-      const id = crypto.randomUUID();
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const fetchOptions = fetchOptionsWithBodyFormData();
-      const offscreenData = await RequestFetchOffscreenService.buildOffscreenData(id, resource, fetchOptions);
+      const offscreenData = await RequestFetchOffscreenService.buildOffscreenData(resource, fetchOptions);
       // Ensure body remains a form data after serialization.
       expect(offscreenData.options.body.data).toBeInstanceOf(Array);
       expect(offscreenData.options.body.dataType).toStrictEqual(FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA);
@@ -134,14 +107,12 @@ describe("RequestFetchOffscreenService", () => {
 
     it("should transform FormData body into serialized encoded url parameters", async() => {
       expect.assertions(1);
-      const id = crypto.randomUUID();
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
 
-      const offscreenData = await RequestFetchOffscreenService.buildOffscreenData(id, resource, options);
+      const offscreenData = await RequestFetchOffscreenService.buildOffscreenData(resource, options);
       // eslint-disable-next-line object-shorthand
       const expectedOffscreenMessageData = {
-        id,
         resource,
         options: {
           ...options,
@@ -161,21 +132,27 @@ describe("RequestFetchOffscreenService", () => {
   describe("::sendOffscreenMessage", () => {
     it("should send a message to the offscreen document", async() => {
       expect.assertions(1);
+      const id = uuidv4();
       const data = {prop1: "value1"};
-      await RequestFetchOffscreenService.sendOffscreenMessage(data);
       const target = SEND_MESSAGE_TARGET_FETCH_OFFSCREEN;
-      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({target, data});
+
+      await RequestFetchOffscreenService.sendOffscreenMessage(id, data);
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({id, target, data});
     });
   });
 
   describe("::fetchOffscreen", () => {
     it("should send a message to the offscreen document and stack the response callback handlers", async() => {
       expect.assertions(4);
+
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
+
       jest.spyOn(chrome.runtime, "sendMessage").mockImplementationOnce(message => {
-        expect(Validator.isUUID(message.data.id)).toBe(true);
+        expect(Validator.isUUID(message.id)).toBe(true);
         const expectedMessageData = {
+          id: message.id,
           target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN,
           data: {
             ...message.data,
@@ -195,7 +172,7 @@ describe("RequestFetchOffscreenService", () => {
           },
         };
         expect(message).toEqual(expectedMessageData);
-        RequestFetchOffscreenService.offscreenRequestsPromisesCallbacks[message.data.id].resolve();
+        HandleOffscreenResponseService._offscreenResponsePromisesCallbacks[message.id].resolve();
       });
       const requestPromise = RequestFetchOffscreenService.fetchOffscreen(resource, options);
       expect(requestPromise).toBeInstanceOf(Promise);

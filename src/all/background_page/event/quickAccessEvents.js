@@ -13,6 +13,8 @@ import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/
 import AutofillController from "../controller/autofill/AutofillController";
 import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
+import CopyToClipboardController from "../controller/clipboard/copyToClipboardController";
+import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
 
 /**
  * Listens to the quickaccess application events
@@ -157,6 +159,36 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.metadata.get-or-find-metadata-types-settings', async requestId => {
     const controller = new GetOrFindMetadataTypesController(worker, requestId, apiClientOptions, account);
     await controller._exec();
+  });
+
+  /*
+   * ==================================================================================
+   *  Clipboard events.
+   * ==================================================================================
+   */
+
+  /**
+   * Copies the given content into the clipboard and clear any clipboard flush alarms.
+   *
+   * @listens assbolt.clipboard.copy
+   * @param {string} requestId The request identifier
+   * @param {string} text the content to copy
+   */
+  worker.port.on('passbolt.clipboard.copy', async(requestId, text) => {
+    const clipboardController = new CopyToClipboardController(worker, requestId);
+    await clipboardController._exec(text);
+  });
+
+  /**
+   * Copies temporarily the given content into the clipboard and set a clipboard flush alarm.
+   *
+   * @listens assbolt.clipboard.copy-temporarily
+   * @param {string} requestId The request identifier
+   * @param {string} text the content to copy
+   */
+  worker.port.on('passbolt.clipboard.copy-temporarily', async(requestId, text) => {
+    const clipboardController = new CopyTemporarilyToClipboardController(worker, requestId);
+    await clipboardController._exec(text);
   });
 };
 

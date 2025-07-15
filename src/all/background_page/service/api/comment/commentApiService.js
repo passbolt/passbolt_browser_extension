@@ -12,12 +12,13 @@
  * @since         3.0.0
  */
 import CommentEntity from "../../../model/entity/comment/commentEntity";
+import {assertNonEmptyString} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
 
 const COMMENT_SERVICE_RESOURCE_NAME = 'comments';
 
-class CommentService extends AbstractService {
+class CommentApiService extends AbstractService {
   /**
    * Constructor
    *
@@ -25,7 +26,7 @@ class CommentService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, CommentService.RESOURCE_NAME);
+    super(apiClientOptions, CommentApiService.RESOURCE_NAME);
   }
 
   /**
@@ -61,7 +62,7 @@ class CommentService extends AbstractService {
     this.assertValidId(foreignId);
     this.assertValidForeignModel(foreignModel);
 
-    contains = contains ? this.formatContainOptions(contains, CommentService.getSupportedContainOptions()) : null;
+    contains = contains ? this.formatContainOptions(contains, CommentApiService.getSupportedContainOptions()) : null;
     const urlOptions = {...contains};
 
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, urlOptions || {});
@@ -122,13 +123,11 @@ class CommentService extends AbstractService {
    * @public
    */
   assertValidForeignModel(foreignModel) {
-    if (!foreignModel || typeof foreignModel !== 'string') {
-      throw new TypeError(`Comment foreign model should be a valid string.`);
-    }
+    assertNonEmptyString(foreignModel, `Comment foreign model should be a valid string.`);
     if (!CommentEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
       throw new TypeError(`Comment foreign model ${foreignModel} in not in the list of supported models.`);
     }
   }
 }
 
-export default CommentService;
+export default CommentApiService;

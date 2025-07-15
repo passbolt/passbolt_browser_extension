@@ -22,7 +22,7 @@ describe("GetExtensionVersionController", () => {
       const version = await controller.exec();
 
       expect.assertions(1);
-      await expect(version).toEqual("v3.6.0");
+      expect(version).toEqual("5.3.0");
     });
   });
 });

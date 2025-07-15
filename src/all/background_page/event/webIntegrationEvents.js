@@ -12,6 +12,7 @@
  */
 import WebIntegrationController from "../controller/webIntegration/webIntegrationController";
 import RemovePortController from "../controller/port/removePortController";
+import CancelClipboardContentFlushController from "../controller/clipboard/cancelClipboardContentFlushController";
 
 /**
  * Listens the web integration events
@@ -32,6 +33,16 @@ const listen = function(worker) {
   worker.port.on('passbolt.port.disconnect', async applicationName => {
     const removePortController = new RemovePortController(worker);
     await removePortController._exec(applicationName);
+  });
+
+  /*
+   * Whenever a cut or a copy event happens on a web page to ensure the clipboard flush alarm is not triggered
+   * @listens passbolt.clipboard.cancel-content-flush
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.clipboard.cancel-content-flush', async requestId => {
+    const clipboardController = new CancelClipboardContentFlushController(worker, requestId);
+    await clipboardController._exec();
   });
 };
 

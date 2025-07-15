@@ -11,9 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import ActionLogsCollection from "../entity/actionLog/actionLogsCollection";
-import ActionLogService from "../../service/api/actionLog/actionLogService";
+import {assertUuid, assertNonEmptyString, assertNumber} from "../../utils/assertions";
+import AbstractActionLogEntity from "../entity/actionLog/abstractActionLogEntity";
+import ActionLogApiService from "../../service/api/actionLog/actionLogApiService";
 
-class ActionLogModel {
+class FindActionLogService {
   /**
    * Constructor
    *
@@ -21,7 +23,7 @@ class ActionLogModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.actionLogService = new ActionLogService(apiClientOptions);
+    this.actionLogApiService = new ActionLogApiService(apiClientOptions);
   }
 
   /*
@@ -42,9 +44,27 @@ class ActionLogModel {
    * @public
    */
   async findAllFor(foreignModel, foreignId, page, limit) {
-    const actionLogsDto = await this.actionLogService.findAllFor(foreignModel, foreignId, page, limit);
+    this.assertValidForeignModel(foreignModel);
+    assertUuid(foreignId);
+    assertNumber(page);
+    assertNumber(limit);
+    const actionLogsDto = await this.actionLogApiService.findAllFor(foreignModel, foreignId, page, limit);
     return new ActionLogsCollection(actionLogsDto);
+  }
+
+  /**
+   * Assert a foreign model name is supported by the API
+   *
+   * @param {string} foreignModel for example 'Resource'
+   * @throw {TypeError} if the name is not a valid string or is not supported
+   * @public
+   */
+  assertValidForeignModel(foreignModel) {
+    assertNonEmptyString(foreignModel, 'ActionLog foreign model should be a valid string.');
+    if (!AbstractActionLogEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
+      throw new TypeError(`ActionLog foreign model ${foreignModel} is not in the list of supported models.`);
+    }
   }
 }
 
-export default ActionLogModel;
+export default FindActionLogService;

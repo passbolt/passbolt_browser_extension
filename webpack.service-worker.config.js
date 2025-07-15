@@ -13,6 +13,7 @@ const config = {
       browser: path.resolve(__dirname, './src/all/common/polyfill/browserPolyfill.js'),
       // Inject custom api client fetch to MV3 extension as workaround of the invalid certificate issue.
       customApiClientFetch: path.resolve(__dirname, './src/chrome-mv3/polyfill/fetchOffscreenPolyfill.js'),
+      customNavigatorClipboard: path.resolve(__dirname, './src/chrome-mv3/polyfill/clipboardOffscreenPolyfill.js'),
     })
   ],
   module: {

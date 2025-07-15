@@ -12,10 +12,8 @@
  * @since         2.13.0
  */
 import PermissionEntity from "./permissionEntity";
-import permissionEntity from "./permissionEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import PermissionsCollection from "./permissionsCollection";
-import permissionsCollection from "./permissionsCollection";
 import {
   defaultPermissionDto,
   minimumPermissionDto,
@@ -30,6 +28,8 @@ import {
 import {
   defaultPermissionsDtos
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionCollection.test.data";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 
 describe("PermissionsCollection", () => {
   it("schema must validate", () => {
@@ -77,9 +77,9 @@ describe("PermissionsCollection", () => {
     it("works if valid complete entities are provided", () => {
       expect.assertions(19);
       const acoForeignKey = crypto.randomUUID();
-      const entity1 = new permissionEntity(defaultPermissionDto({aco_foreign_key: acoForeignKey}));
-      const entity2 = new permissionEntity(defaultPermissionDto({aco_foreign_key: acoForeignKey}));
-      const entity3 = new permissionEntity(defaultPermissionDto({aco_foreign_key: acoForeignKey}));
+      const entity1 = new PermissionEntity(defaultPermissionDto({aco_foreign_key: acoForeignKey}));
+      const entity2 = new PermissionEntity(defaultPermissionDto({aco_foreign_key: acoForeignKey}));
+      const entity3 = new PermissionEntity(defaultPermissionDto({aco_foreign_key: acoForeignKey}));
       const entities = [entity1, entity2, entity3];
       const collection = new PermissionsCollection(entities);
       expect(collection.items).toHaveLength(3);
@@ -165,7 +165,7 @@ describe("PermissionsCollection", () => {
       const dto3 = ownerPermissionDto({aco_foreign_key: acoForeignKey});
 
       expect.assertions(3);
-      const collection = new permissionsCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
+      const collection = new PermissionsCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
       expect(collection.items).toHaveLength(2);
       expect(collection.items[0].id).toEqual(dto1.id);
       expect(collection.items[1].id).toEqual(dto3.id);
@@ -323,7 +323,7 @@ describe("PermissionsCollection", () => {
       const collection = new PermissionsCollection([dto1, dto2]);
 
       // same same
-      collection.addOrReplace(new permissionEntity(dto3));
+      collection.addOrReplace(new PermissionEntity(dto3));
       expect(collection.permissions.length).toBe(2);
       expect(collection.permissions[1].type).toBe(1);
 
@@ -523,6 +523,138 @@ describe("PermissionsCollection", () => {
       expect(resultSet.toDto()).toEqual([]);
       resultSet = PermissionsCollection.diff(ownerSet, ownerSet, false);
       expect(resultSet.toDto()).toEqual([]);
+    });
+  });
+
+  describe("::sortPermissionsByAroAndName", () => {
+    it("should order users by their name", () => {
+      expect.assertions(3);
+
+      const userA = defaultUserDto();
+      userA.profile.first_name = "user A";
+      const userB = defaultUserDto();
+      userB.profile.first_name = "user B";
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "User", user: userA}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "User", user: userB}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(-1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionA)).toStrictEqual(0);
+    });
+
+    it("should consider equal permisions with users having the same name", () => {
+      expect.assertions(1);
+
+      const userA = defaultUserDto();
+      userA.profile.first_name = "user";
+      const userB = defaultUserDto();
+      userB.profile.first_name = "user";
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "User", user: userA}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "User", user: userB}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(0);
+    });
+
+    it("should put user without definition after users with definition", () => {
+      expect.assertions(2);
+
+      const userB = defaultUserDto();
+      userB.profile.first_name = "user B";
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "User", user: null}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "User", user: userB}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(-1);
+    });
+
+    it("both undfined users should be considered equal", () => {
+      expect.assertions(1);
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "User", user: null}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "User", user: null}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(0);
+    });
+
+    it("should order groups by their name", () => {
+      expect.assertions(3);
+
+      const groupA = defaultGroupDto({name: "Group A"});
+      const groupB = defaultGroupDto({name: "Group B"});
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "Group", group: groupA}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "Group", group: groupB}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(-1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionA)).toStrictEqual(0);
+    });
+
+    it("should consider equal permisions with groups having the same name", () => {
+      expect.assertions(1);
+
+      const groupA = defaultGroupDto({name: "Group"});
+      const groupB = defaultGroupDto({name: "Group"});
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "Group", group: groupA}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "Group", group: groupB}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(0);
+    });
+
+    it("should put group without definition after groups with definition", () => {
+      expect.assertions(2);
+
+      const groupB = defaultGroupDto({name: "Group B"});
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "Group", group: null}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "Group", group: groupB}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(-1);
+    });
+
+    it("should put group after users", () => {
+      expect.assertions(2);
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "Group", group: defaultGroupDto()}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "User", user: defaultUserDto()}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(-1);
+    });
+
+    it("should put undefined group after users", () => {
+      expect.assertions(2);
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "Group", group: null}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "User", user: defaultUserDto()}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(-1);
+    });
+
+    it("should put undefined users after group", () => {
+      expect.assertions(2);
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "Group", group: defaultGroupDto()}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "User", user: null}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(-1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(1);
+    });
+
+    it("should put undefined group after undefined user", () => {
+      expect.assertions(2);
+
+      const permissionA = new PermissionEntity(defaultPermissionDto({aro: "Group", group: null}));
+      const permissionB = new PermissionEntity(defaultPermissionDto({aro: "User", user: null}));
+
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionA, permissionB)).toStrictEqual(1);
+      expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(-1);
     });
   });
 });

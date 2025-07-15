@@ -90,8 +90,7 @@ class UpdatedPermissionsCollection extends EntityCollection {
       return;
     }
     const length = this.updatedPermissions.length;
-    let i = 0;
-    for (; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       const existingUpdatedPermission = this.updatedPermissions[i];
       if (existingUpdatedPermission.id && existingUpdatedPermission.id === updatedPermission.id) {
         throw new EntityCollectionError(i, UpdatedPermissionsCollection.RULE_UNIQUE_ID, `Updated permission id ${updatedPermission.id} already exists.`);
@@ -122,6 +121,76 @@ class UpdatedPermissionsCollection extends EntityCollection {
     this.assertUniqueId(updatedPermissionEntity);
 
     super.push(updatedPermissionEntity);
+  }
+
+  /**
+   * Sort the current collection by grantee type and their names.
+   * This method is mutatative
+   */
+  sort() {
+    this._items.sort(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName);
+  }
+
+  /**
+   * Delegate function to use as a callback to sort permissions.
+   * Permissions are sorted this way:
+   * - Defined users first
+   * - Defined groups second
+   * - Unknown users third
+   * - Unknown groups fourth
+   * - Unknown grantee type fifth
+   * Users are sorted by their `${user.first_name} ${user.last_name}`
+   * Groups are sorted by their `${group.name}`
+   *
+   * @param {PermissionEntity} permissionA
+   * @param {PermissionEntity} permissionB
+   * @returns {number} -1 if permissionA comes first, 1 if permissionB comes first, 0 it they are "equals"
+   * @static
+   * @private
+   */
+  static sortPermissionsByGranteeTypeAndName(permissionA, permissionB) {
+    //compare AROs, if they are different, aro User is coming first in the list
+    const isADefinedUserPermission = Boolean(permissionA.user);
+    const isBDefinedUserPermission = Boolean(permissionB.user);
+
+    if (isADefinedUserPermission && isBDefinedUserPermission) {
+      //both users are defined, we need to order by their full name.
+      const userAName = permissionA.user.profile.name;
+      const userBName = permissionB.user.profile.name;
+
+      return userAName.localeCompare(userBName);
+    }
+
+    if (isADefinedUserPermission) {
+      // permissionA is a user, permissionB is either an undefined user, a group, an undefined group. So permissionA comes first.
+      return -1;
+    } else if (isBDefinedUserPermission) {
+      // permissionB is a user, permissionA is either an undefined user, a group, an undefined group. So permissionB comes first.
+      return 1;
+    }
+
+    //here both permissionA and permissionB are for group permission. But their group could be undefined though
+    const isADefinedGroupPermission = Boolean(permissionA.group);
+    const isBDefinedGroupPermission = Boolean(permissionB.group);
+
+    if (isADefinedGroupPermission && isBDefinedGroupPermission) {
+      // both permission are for defined group, we need to order them by their group name
+      const groupAName = permissionA.group.name;
+      const groupBName = permissionB.group.name;
+
+      return groupAName.localeCompare(groupBName);
+    }
+
+    if (isADefinedGroupPermission) {
+      // permissionA is for a defined group and permissionB is for an undefined group. permissionA comes first
+      return -1;
+    } else if (isBDefinedGroupPermission) {
+      // permissionB is for a defined group and permissionA is for an undefined group. permissionB comes first
+      return 1;
+    }
+
+    // both permissions are for unknown grantee type. They are considered "equals"
+    return 0;
   }
 
   /*

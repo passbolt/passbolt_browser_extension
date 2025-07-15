@@ -42,7 +42,8 @@ jest.mock("webextension-polyfill", () => {
       getURL: jest.fn(path => `chrome-extension://didegimhafipceonhjepacocaffmoppf/${path}`),
       // Force extension version
       getManifest: jest.fn(() => ({
-        version: "v3.6.0"
+        version: "5.3.0",
+        manifest_version: 3,
       })),
       // Runtime primitives not mocked by jest-webextension-mock v3.8.9
       OnInstalledReason: {

@@ -10,14 +10,14 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import ActionLogModel from "../model/actionLog/actionLogModel";
+import FindAllForActionLogController from "./findAllForActionLogController";
 
 /**
  * Listens to the action logs events
  * @param {Worker} worker The worker
  * @param {ApiClientOptions} apiClientOptions The api client options
  */
-const listen = function(worker, apiClientOptions) {
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Find all action logs for a given instance
    *
@@ -25,16 +25,9 @@ const listen = function(worker, apiClientOptions) {
    * @param requestId {uuid} The request identifier
    * @param options {object} The options to apply to the find
    */
-  worker.port.on('passbolt.actionlogs.find-all-for', async(requestId, foreignModel, foreignId, options) => {
-    try {
-      const actionLogModel = new ActionLogModel(apiClientOptions);
-      const {limit, page} = options;
-      const actionLogs = await actionLogModel.findAllFor(foreignModel, foreignId, page, limit);
-      worker.port.emit(requestId, 'SUCCESS', actionLogs);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.actionlogs.find-all-for', async(requestId, foreignModel, foreignId, {page, limit}) => {
+    const controller = new FindAllForActionLogController(worker, requestId, apiClientOptions, account);
+    await controller._exec(foreignModel, foreignId, {page, limit});
   });
 };
 

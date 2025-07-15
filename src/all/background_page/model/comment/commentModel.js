@@ -13,7 +13,7 @@
  */
 import CommentEntity from "../entity/comment/commentEntity";
 import CommentsCollection from "../entity/comment/commentsCollection";
-import CommentService from "../../service/api/comment/commentService";
+import CommentApiService from "../../service/api/comment/commentApiService";
 
 class CommentModel {
   /**
@@ -23,7 +23,7 @@ class CommentModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.commentService = new CommentService(apiClientOptions);
+    this.commentApiService = new CommentApiService(apiClientOptions);
   }
 
   /**
@@ -35,7 +35,7 @@ class CommentModel {
    */
   async findAllByResourceId(resourceId) {
     const foreignKey = 'Resource';
-    const commentsDtos = await this.commentService.findAll(foreignKey, resourceId, {creator: true, modifier: false});
+    const commentsDtos = await this.commentApiService.findAll(foreignKey, resourceId, {creator: true, modifier: false});
     return new CommentsCollection(commentsDtos);
   }
 
@@ -46,7 +46,7 @@ class CommentModel {
    * @returns {Promise<CommentEntity>}
    */
   async create(commentEntity) {
-    const commentDto = await this.commentService.create(commentEntity.toDto({creator: false, modifier: false}));
+    const commentDto = await this.commentApiService.create(commentEntity.toDto({creator: false, modifier: false}));
     return new CommentEntity(commentDto);
   }
 
@@ -57,7 +57,7 @@ class CommentModel {
    * @returns {Promise<void>}
    */
   async delete(commentId) {
-    await this.commentService.delete(commentId);
+    await this.commentApiService.delete(commentId);
   }
 }
 

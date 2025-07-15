@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.7.0
  */
-import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
 import FetchOffscreenService from './fetchOffscreenService';
 import each from "jest-each";
@@ -19,97 +18,119 @@ import {defaultFetchMessage, defaultFetchResponse} from "./fetchOffscreenService
 
 beforeEach(() => {
   enableFetchMocks();
-  fetch.resetMocks();
   jest.clearAllMocks();
   // Flush runtime memory cache.
   FetchOffscreenService.pollingIntervalId = null;
   FetchOffscreenService.pendingRequestsCount = 0;
+
+  jest.spyOn(chrome.runtime, "sendMessage").mockImplementation(() => {});
 });
 
 describe("FetchOffscreenService", () => {
+  describe("::handleSuccessResponse", () => {
+    it("should send a message through the chrome.runtime", async() => {
+      expect.assertions(1);
+
+      const message = defaultFetchMessage();
+      const fetchResponse = {
+        headers: new Array([]),
+        status: 200,
+        statusText: "OK",
+        text: async() => "",
+        ok: true,
+        url: message.data.resource,
+        redirected: false,
+      };
+
+      const result = await FetchOffscreenService.handleSuccessResponse(fetchResponse);
+
+      const expectedResult = {
+        target: "service-worker-fetch-offscreen-response-handler",
+        type: "success",
+        data: await FetchOffscreenService.serializeResponse(fetchResponse),
+      };
+
+      expect(result).toStrictEqual(expectedResult);
+    });
+  });
+
+  describe("::handleErrorResponse", () => {
+    it("should send an error message through the chrome.runtime", async() => {
+      expect.assertions(1);
+
+      const error = new Error("Something went wrong");
+      error.name = "A fake error name";
+
+      const result = await FetchOffscreenService.handleErrorResponse(error);
+
+      const expectedResult = {
+        target: "service-worker-fetch-offscreen-response-handler",
+        type: "error",
+        data: {
+          name: error.name,
+          message: error.message
+        }
+      };
+
+      expect(result).toStrictEqual(expectedResult);
+    });
+  });
+
   describe("::handleFetchRequest", () => {
-    it("should not proceed message if the message doesn't have a target", async() => {
-      expect.assertions(1);
-      const spyOnFetch = jest.spyOn(self, "fetch");
-      await FetchOffscreenService.handleFetchRequest({});
-
-      expect(spyOnFetch).not.toHaveBeenCalled();
-    });
-
-    it("should not proceed message if targetting another process", async() => {
-      expect.assertions(1);
-      const spyOnFetch = jest.spyOn(self, "fetch");
-      await FetchOffscreenService.handleFetchRequest({target: "wrong-target"});
-      expect(spyOnFetch).not.toHaveBeenCalled();
-    });
-
     it("should increase and decrease the pending request count", async() => {
       expect.assertions(5);
       const message = defaultFetchMessage();
-      const spyOnFetch = jest.spyOn(self, "fetch").mockImplementation(async() => ({header: {}, body: {}}));
-      const spyOnIncreaseRequestCount = jest.spyOn(FetchOffscreenService, "increaseAwaitingRequests");
-      const spyOnDecreaseRequestCount = jest.spyOn(FetchOffscreenService, "decreaseAwaitingRequests");
-      await FetchOffscreenService.handleFetchRequest(message);
+      jest.spyOn(self, "fetch").mockImplementation(async() => ({header: {}, body: {}}));
+      jest.spyOn(FetchOffscreenService, "increaseAwaitingRequests");
+      jest.spyOn(FetchOffscreenService, "decreaseAwaitingRequests");
 
-      expect(spyOnFetch).toHaveBeenCalledTimes(1);
-      expect(spyOnFetch).toHaveBeenCalledWith(message.data.resource, message.data.options);
-      expect(spyOnIncreaseRequestCount).toHaveBeenCalledTimes(1);
-      expect(spyOnDecreaseRequestCount).toHaveBeenCalledTimes(1);
+      await FetchOffscreenService.handleFetchRequest(message.data);
+
+      expect(self.fetch).toHaveBeenCalledTimes(1);
+      expect(self.fetch).toHaveBeenCalledWith(message.data.resource, message.data.options);
+      expect(FetchOffscreenService.increaseAwaitingRequests).toHaveBeenCalledTimes(1);
+      expect(FetchOffscreenService.decreaseAwaitingRequests).toHaveBeenCalledTimes(1);
       expect(FetchOffscreenService.pendingRequestsCount).toStrictEqual(0);
     });
 
     it("should handle a successful response", async() => {
       expect.assertions(3);
       const message = defaultFetchMessage();
-      const expectedResponse = {header: {}, body: {}};
-      const spyOnFetch = jest.spyOn(self, "fetch").mockImplementation(async() => expectedResponse);
-      const spyOnSuccessResponse = jest.spyOn(FetchOffscreenService, "handleSuccessResponse");
-      const spyOnErrorResponse = jest.spyOn(FetchOffscreenService, "handleErrorResponse");
-      await FetchOffscreenService.handleFetchRequest(message);
+      const expectedResponse = {headers: new Array([]), body: {}};
 
-      expect(spyOnFetch).toHaveBeenCalledTimes(1);
-      expect(spyOnSuccessResponse).toHaveBeenCalledWith(message.data.id, expectedResponse);
-      expect(spyOnErrorResponse).not.toHaveBeenCalledWith();
+      jest.spyOn(self, "fetch").mockImplementation(async() => expectedResponse);
+      jest.spyOn(FetchOffscreenService, "handleSuccessResponse").mockImplementation(() => {});
+      jest.spyOn(FetchOffscreenService, "handleErrorResponse").mockImplementation(() => {});
+
+      await FetchOffscreenService.handleFetchRequest(message.data);
+
+      expect(self.fetch).toHaveBeenCalledTimes(1);
+      expect(FetchOffscreenService.handleSuccessResponse).toHaveBeenCalledWith(expectedResponse);
+      expect(FetchOffscreenService.handleErrorResponse).not.toHaveBeenCalled();
     });
 
     it("should handle a erroneous response", async() => {
       expect.assertions(3);
       const message = defaultFetchMessage();
       const expectedError = new Error("Something went wrong!");
-      const spyOnFetch = jest.spyOn(self, "fetch").mockImplementation(async() => { throw expectedError; });
-      const spyOnSuccessResponse = jest.spyOn(FetchOffscreenService, "handleSuccessResponse");
-      const spyOnErrorResponse = jest.spyOn(FetchOffscreenService, "handleErrorResponse");
-      await FetchOffscreenService.handleFetchRequest(message);
 
-      expect(spyOnFetch).toHaveBeenCalledTimes(1);
-      expect(spyOnSuccessResponse).not.toHaveBeenCalledWith();
-      expect(spyOnErrorResponse).toHaveBeenCalledWith(message.data.id, expectedError);
+      jest.spyOn(self, "fetch").mockImplementation(async() => { throw expectedError; });
+      jest.spyOn(FetchOffscreenService, "handleSuccessResponse").mockImplementation(() => {});
+      jest.spyOn(FetchOffscreenService, "handleErrorResponse").mockImplementation(() => {});
+
+      await FetchOffscreenService.handleFetchRequest(message.data);
+
+      expect(self.fetch).toHaveBeenCalledTimes(1);
+      expect(FetchOffscreenService.handleSuccessResponse).not.toHaveBeenCalledWith();
+      expect(FetchOffscreenService.handleErrorResponse).toHaveBeenCalledWith(expectedError);
     });
   });
 
   describe("::validateMessageData", () => {
-    it("should validate if the message data respects the format", async() => {
+    it("should validate if the message data respects the format", () => {
       const message = defaultFetchMessage();
-      const validation = await FetchOffscreenService.validateMessageData(message.data);
-      expect(validation).toBeTruthy();
-      expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
-    });
-
-    each([
-      {scenario: "undefined", id: undefined},
-      {scenario: "null", id: null},
-      {scenario: "invalid string", id: "invalid"},
-      {scenario: "boolean", id: true},
-      {scenario: "object", id: {data: crypto.randomUUID()}},
-    ]).describe("should fail if message id is not valid", _props => {
-      it(`should trow if message id: ${_props.scenario}`, async() => {
-        const message = defaultFetchMessage();
-        message.data.id = _props.id;
-        const spyOnErrorResponse = jest.spyOn(FetchOffscreenService, "handleErrorResponse");
-        const validation = await FetchOffscreenService.validateMessageData(message.data);
-        expect(validation).toBeFalsy();
-        expect(spyOnErrorResponse).toHaveBeenCalledWith(message.data.id, expect.any(Error));
-      });
+      const validation = FetchOffscreenService.validateMessageData(message.data.resource, message.data.options);
+      expect(validation).toBeNull();
     });
 
     each([
@@ -122,10 +143,13 @@ describe("FetchOffscreenService", () => {
       it(`should fail if message resource: ${_props.scenario}`, async() => {
         const message = defaultFetchMessage();
         message.data.resource = _props.resource;
-        const spyOnErrorResponse = jest.spyOn(FetchOffscreenService, "handleErrorResponse");
-        const validation = await FetchOffscreenService.validateMessageData(message.data);
+
+        jest.spyOn(FetchOffscreenService, "handleErrorResponse").mockImplementation(() => {});
+
+        const validation = await FetchOffscreenService.validateMessageData(message.data.resource, message.data.options);
+
         expect(validation).toBeFalsy();
-        expect(spyOnErrorResponse).toHaveBeenCalledWith(message.data.id, expect.any(Error));
+        expect(FetchOffscreenService.handleErrorResponse).toHaveBeenCalledWith(expect.any(Error));
       });
     });
 
@@ -139,68 +163,14 @@ describe("FetchOffscreenService", () => {
       it(`should fail if message options: ${_props.scenario}`, async() => {
         const message = defaultFetchMessage();
         message.data.options = _props.options;
-        const spyOnErrorResponse = jest.spyOn(FetchOffscreenService, "handleErrorResponse");
-        const validation = await FetchOffscreenService.validateMessageData(message.data);
+
+        jest.spyOn(FetchOffscreenService, "handleErrorResponse").mockImplementation(() => {});
+
+        const validation = await FetchOffscreenService.validateMessageData(message.data.resource, message.data.options);
+
         expect(validation).toBeFalsy();
-        expect(spyOnErrorResponse).toHaveBeenCalledWith(message.data.id, expect.any(Error));
+        expect(FetchOffscreenService.handleErrorResponse).toHaveBeenCalledWith(expect.any(Error));
       });
-    });
-  });
-
-  describe("::handleSuccessResponse", () => {
-    it("should send a message through the chrome.runtime", async() => {
-      expect.assertions(2);
-
-      const message = defaultFetchMessage();
-
-      const fetchResponse = {
-        headers: new Array([]),
-        status: 200,
-        statusText: "OK",
-        text: async() => "",
-        ok: true,
-        url: message.data.resource,
-        redirected: false,
-      };
-      await FetchOffscreenService.handleSuccessResponse(message.data.id, fetchResponse);
-
-      const expectedCall = {
-        target: "service-worker-fetch-offscreen-response-handler",
-        id: message.data.id,
-        type: "success",
-        data: await FetchOffscreenService.serializeResponse(fetchResponse),
-      };
-
-      expect(chrome.runtime.sendMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith(expectedCall);
-    });
-  });
-
-  describe("::handleErrorResponse", () => {
-    it("should send an error message through the chrome.runtime", async() => {
-      expect.assertions(2);
-
-      const dataFetch = {
-        id: uuid(),
-      };
-
-      const error = new Error("Something went wrong");
-      error.name = "A fake error name";
-      const spyOnChromeRuntime = jest.spyOn(chrome.runtime, "sendMessage");
-      await FetchOffscreenService.handleErrorResponse(dataFetch.id, error);
-
-      const expectedCall = {
-        target: "service-worker-fetch-offscreen-response-handler",
-        id: dataFetch.id,
-        type: "error",
-        data: {
-          name: error.name,
-          message: error.message
-        }
-      };
-
-      expect(spyOnChromeRuntime).toHaveBeenCalledTimes(1);
-      expect(spyOnChromeRuntime).toHaveBeenCalledWith(expectedCall);
     });
   });
 

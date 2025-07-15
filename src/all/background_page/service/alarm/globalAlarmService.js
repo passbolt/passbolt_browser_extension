@@ -13,6 +13,7 @@
  */
 
 import StartLoopAuthSessionCheckService from "../auth/startLoopAuthSessionCheckService";
+import CopyToClipboardService from "../clipboard/copyToClipboardService";
 import KeepSessionAliveService from "../session_storage/keepSessionAliveService";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 
@@ -20,6 +21,7 @@ const topLevelAlarmMapping = {
   [StartLoopAuthSessionCheckService.ALARM_NAME]: StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm,
   [PassphraseStorageService.ALARM_NAME]: PassphraseStorageService.handleFlushEvent,
   [KeepSessionAliveService.ALARM_NAME]: KeepSessionAliveService.handleKeepSessionAlive,
+  [CopyToClipboardService.ALARM_NAME]: CopyToClipboardService.handleClipboardTemporaryContentFlushEvent,
 };
 
 /**

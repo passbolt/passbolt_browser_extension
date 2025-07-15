@@ -19,6 +19,7 @@ import "./mocks/mockTextEncoder";
 import "./mocks/mockCryptoKey";
 import "./matchers/extendExpect";
 import MockNavigatorLocks from './mocks/mockNavigatorLocks';
+import MockNavigatorClipboard from './mocks/mockNavigatorClipboard';
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
 import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
@@ -48,6 +49,9 @@ if (!global.navigator) {
 }
 if (!global.navigator.locks) {
   global.navigator.locks = new MockNavigatorLocks();
+}
+if (!global.navigator.clipboard) {
+  global.navigator.clipboard = new MockNavigatorClipboard();
 }
 
 /*

@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.7.0
  */
-
-import Validator from "validator";
 import FormDataUtils from "../../../../all/background_page/utils/format/formDataUtils";
 
 export const SEND_MESSAGE_TARGET_FETCH_OFFSCREEN = "fetch-offscreen";
@@ -43,94 +41,88 @@ export default class FetchOffscreenService {
 
   /**
    * Handle fetch request.
-   * @param {object} message Browser runtime.onMessage listener message.
-   * @returns {Promise<void>}
+   * @param {string} id the request id.
+   * @param {{resource: string, options: object}} data the fetch parameters
+   * @returns {Promise<object>}
    */
-  static async handleFetchRequest(message) {
-    // Return early if this message isn't meant for the offscreen document.
-    if (message.target !== SEND_MESSAGE_TARGET_FETCH_OFFSCREEN) {
-      console.debug("FetchOffscreenService received message not specific to offscreen.");
-      return;
+  static async handleFetchRequest({resource, options}) {
+    const validationErrors = FetchOffscreenService.validateMessageData(resource, options);
+    if (validationErrors) {
+      return validationErrors;
     }
 
-    if (!(await FetchOffscreenService.validateMessageData(message.data))) {
-      return;
-    }
-    const {id, resource, options} = message?.data || {};
     // Update the body to fit the data type to send (JSON or FORM DATA)
-    options.body = options.body.dataType === FETCH_OFFSCREEN_DATA_TYPE_JSON ? options.body.data : FormDataUtils.arrayToFormData(options.body.data);
+    options.body = options.body?.dataType === FETCH_OFFSCREEN_DATA_TYPE_JSON ? options.body.data : FormDataUtils.arrayToFormData(options.body.data);
     await FetchOffscreenService.increaseAwaitingRequests();
     try {
       const response = await fetch(resource, options);
-      await FetchOffscreenService.handleSuccessResponse(id, response);
+      return await FetchOffscreenService.handleSuccessResponse(response);
     } catch (error) {
-      await FetchOffscreenService.handleErrorResponse(id, error);
+      console.log(error);
+      return FetchOffscreenService.handleErrorResponse(error);
+    } finally {
+      await FetchOffscreenService.decreaseAwaitingRequests();
     }
-    await FetchOffscreenService.decreaseAwaitingRequests();
   }
 
   /**
    * Validate message data.
-   * @param {object} messageData The message data
-   * @returns {Promise<boolean>}
+   * @param {string} resource
+   * @param {object} options
+   * @returns {object|null}
    */
-  static async validateMessageData(messageData = {}) {
+  static validateMessageData(resource, options) {
     let error;
-
-    if (!messageData.id || typeof messageData.id !== "string" || !Validator.isUUID(messageData.id)) {
-      error = new Error("FetchOffscreenService: message.id should be a valid uuid.");
-    } else if (typeof messageData.resource !== "string") {
+    if (typeof resource !== "string") {
       error = new Error("FetchOffscreenService: message.resource should be a valid valid.");
-    } else if (typeof messageData.options === "undefined" || !(messageData.options instanceof Object)) {
+    } else if (typeof options === "undefined" || !(options instanceof Object)) {
       error = new Error("FetchOffscreenService: message.options should be an object.");
     }
 
     if (error) {
-      await FetchOffscreenService.handleErrorResponse(messageData.id, error);
-      return false;
+      return FetchOffscreenService.handleErrorResponse(error);
     }
 
-    return true;
+    return null;
   }
 
   /**
    * Handle fetch success, and send response to the service worker.
-   * @param {string} id The fetch offscreen request id
    * @param {Response} response The fetch response
    * @returns {Promise<void>}
+   * @private
    */
-  static async handleSuccessResponse(id, response) {
-    await chrome.runtime.sendMessage({
-      target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER,
-      id: id,
+  static async handleSuccessResponse(response) {
+    return {
+      data: await FetchOffscreenService.serializeResponse(response),
       type: FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS,
-      data: await FetchOffscreenService.serializeResponse(response)
-    });
+      target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER,
+    };
   }
 
   /**
    * Handle fetch error, and communicate it the service worker.
-   * @param {string} id The fetch offscreen request id
    * @param {Error} error The fetch error
-   * @returns {Promise<void>}
+   * @returns {object}
+   * @private
    */
-  static async handleErrorResponse(id, error) {
+  static handleErrorResponse(error) {
     console.error(error);
-    await chrome.runtime.sendMessage({
-      target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER,
-      id: id,
-      type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR,
+    return {
       data: {
         name: error?.name,
         message: error?.message || "FetchOffscreenService: an unexpected error occurred"
-      }
-    });
+      },
+      type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR,
+      target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER,
+    };
   }
 
   /**
    * Serialize the fetch response to return to the service worker.
    * @param {Response} response The response to serialize
    * @returns {Promise<object>}
+   * @private
    */
   static async serializeResponse(response) {
     return {

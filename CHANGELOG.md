@@ -4,6 +4,33 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.3.2] - 2025-07-17
+### Added
+- PB-25265 Flush clipboard strategy
+- PB-43095 Display the metadata issue in the HealthCheck served by the UI
+- PB-43403 Search resources should take into account available custom fields information in the web application
+
+### Improved
+- PB-43474 As LU I should be able to clear the search field with a button
+
+### Fixed
+- PB-43916 Fix hitting the key enter on the search fields
+- PB-43996 Users should access encrypted metadata section of the administration guide on the help site when clicking on the documentation CTA from the sidebar
+
+### Maintenance
+- PB-43491 The resource activities should use a service worker service to request the service worker
+- PB-43496 The user should be notified if an error occurs while displaying additional resource activities
+- PB-43501 Cover ActionLogService API service and rename class as per naming convention
+- PB-43502 Move logic of ActionLogModel into FindActionLogService
+- PB-43506 Move logic of event passbolt.actionlogs.find-all-for into its dedicated Controller
+- PB-43738 Create DeleteUserService to call the userService deleteDryRun
+- PB-43739 Create DeleteDryRunUserController to call the DeleteUserService
+- PB-43750 An unexpected error should be displayed on delete user
+- PB-43904 Add a service to request or send data CommentsServiceWorkerService
+- PB-43907 Add tests for commentService API service and rename the service class as per naming convention
+- PB-43938 Create a GetOrFindMetadataKeysSettingsController to retrieve the metadata keys settings
+- PB-43940 Create a MetadataKeysSettingsLocalStorageContextProvider to retrieve the metadata keys settings
+
 ## [5.3.0] - 2025-06-09
 
 ### Added
@@ -2278,7 +2305,9 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.2.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.3.2...HEAD
+[5.3.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.3.0...v5.3.2
+[5.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.2.0...v5.3.0
 [5.2.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.1...v5.2.0
 [5.1.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.1.0...v5.1.1
 [5.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.0.1...v5.1.0

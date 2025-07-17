@@ -15,7 +15,7 @@ import Log from "../../model/log";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import Lock from "../../utils/lock";
-import {assertType, assertUuid} from "../../utils/assertions";
+import {assertArrayUUID, assertType, assertUuid} from "../../utils/assertions";
 import PasswordExpiryResourceEntity from "../../model/entity/passwordExpiry/passwordExpiryResourceEntity";
 
 const lock = new Lock();
@@ -272,6 +272,30 @@ class ResourceLocalStorage {
       lock.release();
     }
   }
+
+  /**
+   * Delete multiple resources in local storage by Id
+   * @param {Array<string>} resourceIds
+   */
+  static async deleteResources(resourceIds) {
+    assertArrayUUID(resourceIds);
+    await lock.acquire();
+    try {
+      const resources = await ResourceLocalStorage.get() || [];
+
+      if (resources.length > 0 && resourceIds.length > 0) {
+        const setOfResourceIds = new Set(resourceIds);
+
+        const filteredResources = resources.filter(resource => !setOfResourceIds.has(resource.id));
+
+        await browser.storage.local.set({resources: filteredResources});
+        ResourceLocalStorage._cachedData = filteredResources;
+      }
+    } finally {
+      lock.release();
+    }
+  }
+
 
   /*
    * =================================================

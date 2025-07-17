@@ -17,7 +17,7 @@ import DeleteCommentController from "./deleteCommentController";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {enableFetchMocks} from "jest-fetch-mock";
-import CommentModel from "../../model/comment/commentModel";
+import CommentService from "../../model/comment/commentService";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
 const mockedWorker = {
@@ -47,7 +47,7 @@ describe("DeleteCommentController", () => {
 
       expect(controller.worker).toBe(mockedWorker);
       expect(controller.requestId).toBe(requestId);
-      expect(controller.commentModel).toEqual(expect.objectContaining(new CommentModel(apiClientOption)));
+      expect(controller.commentService).toEqual(expect.objectContaining(new CommentService(apiClientOption)));
     });
   });
   describe("DeleteCommentController::exec", () => {
@@ -55,7 +55,7 @@ describe("DeleteCommentController", () => {
       fetchCommentsMock();
 
       const controller = new DeleteCommentController(mockedWorker, null, defaultApiClientOptions());
-      const spy = jest.spyOn(controller.commentModel, "delete");
+      const spy = jest.spyOn(controller.commentService, "delete");
       await controller.exec(id);
 
       expect.assertions(2);

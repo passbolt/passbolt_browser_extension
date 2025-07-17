@@ -12,7 +12,7 @@
  * @since         3.8.0
  */
 
-import CommentModel from "../../model/comment/commentModel";
+import CommentService from "../../model/comment/commentService";
 import Validator from "validator";
 
 class GetCommentsByRessourceController {
@@ -25,7 +25,7 @@ class GetCommentsByRessourceController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.commentModel =  new CommentModel(apiClientOptions);
+    this.commentService =  new CommentService(apiClientOptions);
   }
 
   /**
@@ -60,7 +60,7 @@ class GetCommentsByRessourceController {
       throw new TypeError("The resource id should be a valid uuid.");
     }
 
-    return this.commentModel.findAllByResourceId(resourceId);
+    return this.commentService.findAllByResourceId(resourceId);
   }
 }
 

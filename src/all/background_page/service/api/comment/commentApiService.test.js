@@ -25,7 +25,7 @@ import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/
 import CommentEntity from "../../../model/entity/comment/commentEntity";
 import {mockApiResponseError} from "../../../../../../test/mocks/mockApiResponse";
 
-describe.only("ActionLogService", () => {
+describe("ActionLogService", () => {
   let apiClientOptions, account;
   beforeEach(async() => {
     enableFetchMocks();

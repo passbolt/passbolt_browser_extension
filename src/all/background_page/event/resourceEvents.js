@@ -4,7 +4,6 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import ResourceModel from "../model/resource/resourceModel";
 import ResourceCreateController from "../controller/resource/resourceCreateController";
 import ResourceUpdateController from "../controller/resource/resourceUpdateController";
 import Log from "../model/log";
@@ -23,6 +22,7 @@ import MoveResourcesController from "../controller/move/moveResourcesController"
 import ResetResourceGridUserSettingController
   from "../controller/resourceGridSetting/resetResourceGridUserSettingController";
 import UpdateResourceLocalStorageByFolderParentIdController from "../controller/resource/updateResourceLocalStorageByFolderParentIdController";
+import DeleteResourceService from "../service/resource/delete/deleteResourceService";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -84,8 +84,8 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.delete-all', async(requestId, resourcesIds) => {
     try {
       // TODO DeleteResourcesController with progress dialog if resourceIds > 1
-      const resourceModel = new ResourceModel(apiClientOptions, account);
-      await resourceModel.bulkDelete(resourcesIds);
+      const deleteResourceService = new DeleteResourceService(worker, account, apiClientOptions);
+      await deleteResourceService.deleteResources(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

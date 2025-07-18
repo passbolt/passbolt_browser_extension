@@ -16,18 +16,17 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import i18n from "../../../sdk/i18n";
 import {assertArrayUUID} from "../../../utils/assertions";
 import ExecuteConcurrentlyService from "../../execute/executeConcurrentlyService";
-import ProgressService from "../../progress/progressService";
-
 class DeleteResourceService {
   /**
    * Constructor
    * @param {AccountEntity} account The user account
    * @param {ApiClientOptions} apiClientOptions The api client options
+   * @param {ProgressService} progressService
    */
-  constructor(worker, account, apiClientOptions) {
+  constructor(account, apiClientOptions, progressService) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
-    this.progressService = new ProgressService(worker, i18n.t("Delete Resources"));
+    this.progressService = progressService;
   }
 
   /**
@@ -41,10 +40,6 @@ class DeleteResourceService {
      * 1. Delete the Resources
      * 2. Update the local storage
      */
-    const goals = 2;
-    this.progressService.start(goals, i18n.t('Deleting Resource(s)'));
-    this.progressService.title = i18n.t("Delete {{count}} resource(s)", {count: resourceIds.length});
-
     this.progressService.finishStep(i18n.t("Deleting Resource(s)"), true);
     let deleteCounter = 0;
     const deleteCallBacks = resourceId => {
@@ -58,7 +53,6 @@ class DeleteResourceService {
 
     this.progressService.finishStep(i18n.t("Updating resources local storage"), true);
     await ResourceLocalStorage.deleteResources(resourceIds);
-    this.progressService.close();
   }
 }
 

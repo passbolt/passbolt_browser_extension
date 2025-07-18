@@ -18,6 +18,7 @@ import {defaultAccountDto} from "../../../model/entity/account/accountEntity.tes
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import DeleteResourceService from "./deleteResourceService";
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
+import ProgressService from "../../progress/progressService";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -36,7 +37,7 @@ describe("DeleteResourceService", () => {
         emit: jest.fn()
       }
     };
-    deleteResourceService = new DeleteResourceService(worker, account, apiClientOptions);
+    deleteResourceService = new DeleteResourceService(account, apiClientOptions, new ProgressService(worker, ""));
     jest.spyOn(ResourceLocalStorage, "deleteResources");
   });
 

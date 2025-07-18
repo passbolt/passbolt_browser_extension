@@ -22,7 +22,7 @@ import MoveResourcesController from "../controller/move/moveResourcesController"
 import ResetResourceGridUserSettingController
   from "../controller/resourceGridSetting/resetResourceGridUserSettingController";
 import UpdateResourceLocalStorageByFolderParentIdController from "../controller/resource/updateResourceLocalStorageByFolderParentIdController";
-import DeleteResourceService from "../service/resource/delete/deleteResourceService";
+import ResourceDeleteController from "../controller/resource/resourceDeleteController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -79,18 +79,11 @@ const listen = function(worker, apiClientOptions, account) {
    *
    * @listens passbolt.resources.delete-all
    * @param requestId {uuid} The request identifier
-   * @param resourcesIds {array} The resources ids to delete
+   * @param resourcesIds {array} The resources ids to del ete
    */
   worker.port.on('passbolt.resources.delete-all', async(requestId, resourcesIds) => {
-    try {
-      // TODO DeleteResourcesController with progress dialog if resourceIds > 1
-      const deleteResourceService = new DeleteResourceService(worker, account, apiClientOptions);
-      await deleteResourceService.deleteResources(resourcesIds);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new ResourceDeleteController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourcesIds);
   });
 
   /*

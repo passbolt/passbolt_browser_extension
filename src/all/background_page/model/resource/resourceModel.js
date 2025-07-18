@@ -19,9 +19,7 @@ import ResourceEntity from "../entity/resource/resourceEntity";
 import PermissionChangesCollection from "../entity/permission/change/permissionChangesCollection";
 import ResourceService from "../../service/api/resource/resourceService";
 import PlaintextEntity from "../entity/plaintext/plaintextEntity";
-import splitBySize from "../../utils/array/splitBySize";
 
-const BULK_OPERATION_SIZE = 5;
 const MAX_LENGTH_PLAINTEXT = 4096;
 
 class ResourceModel {
@@ -197,72 +195,6 @@ class ResourceModel {
    */
   async updateCollection(resourcesCollection) {
     await ResourceLocalStorage.updateResourcesCollection(resourcesCollection);
-  }
-
-  /**
-   * Delete a resource using Passbolt API and remove the resource from the local storage
-   *
-   * @param {string} resourceId The resource id
-   * @returns {Promise<void>}
-   */
-  async delete(resourceId) {
-    await this.resourceService.delete(resourceId);
-    await ResourceLocalStorage.delete(resourceId);
-  }
-
-  /*
-   * ==============================================================
-   *  Bulk operations
-   * ==============================================================
-   */
-
-  /**
-   * Delete a bulk of resources
-   * @param {Array<string>} resourcesIds collection The list of uuids to delete
-   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<array<*>>}
-   */
-  async bulkDelete(resourcesIds, callbacks) {
-    let result = [];
-
-    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
-    const chunks = splitBySize(resourcesIds, BULK_OPERATION_SIZE);
-    for (const chunkIndex in chunks) {
-      const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async(resourceId, mapIndex) => {
-        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
-        return this._bulkDelete_deleteResource(resourceId, collectionIndex, callbacks);
-      });
-
-      const bulkPromises = await Promise.allSettled(promises);
-      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
-      result = [...result, ...intermediateResult];
-    }
-
-    return result;
-  }
-
-  /**
-   * Delete a resource for the bulkDelete function.
-   * @param {string} resourceId The resource to delete
-   * @param {int} collectionIndex The index of the resource in the initial collection
-   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<ResourceEntity|Error>}
-   * @private
-   */
-  async _bulkDelete_deleteResource(resourceId, collectionIndex, callbacks) {
-    callbacks = callbacks || {};
-    const successCallback = callbacks.successCallback || (() => {});
-    const errorCallback = callbacks.errorCallback || (() => {});
-
-    try {
-      await this.delete(resourceId);
-      successCallback(collectionIndex);
-    } catch (error) {
-      console.error(error);
-      errorCallback(error, collectionIndex);
-      throw error;
-    }
   }
 
   /*

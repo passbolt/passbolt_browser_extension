@@ -109,25 +109,6 @@ describe("ResponseFetchOffscreenService", () => {
     });
   });
 
-  describe("::consumeRequestPromiseCallbacksOrFail", () => {
-    it("should consume the response handler associated to the given id", () => {
-      expect.assertions(3);
-      const id = crypto.randomUUID();
-      const callbacks = defaultCallbacks();
-      RequestFetchOffscreenService.offscreenRequestsPromisesCallbacks[id] = callbacks;
-      const consumedCallbacks = ResponseFetchOffscreenService.consumeRequestPromiseCallbacksOrFail(id);
-      expect(consumedCallbacks).not.toBeNull();
-      expect(consumedCallbacks).toEqual(callbacks);
-      expect(Object.keys(RequestFetchOffscreenService.offscreenRequestsPromisesCallbacks).length).toEqual(0);
-    });
-
-    it("should throw if no associated callbacks found for the given id", () => {
-      expect.assertions(1);
-      const id = crypto.randomUUID();
-      expect(() => ResponseFetchOffscreenService.consumeRequestPromiseCallbacksOrFail(id)).toThrow();
-    });
-  });
-
   describe("::buildFetchResponse", () => {
     it("should build the fetch response object based on the offscreen message data", async() => {
       expect.assertions(8);
@@ -149,9 +130,9 @@ describe("ResponseFetchOffscreenService", () => {
       expect.assertions(1);
       const id = crypto.randomUUID();
       const callbacks = defaultCallbacks();
-      RequestFetchOffscreenService.offscreenRequestsPromisesCallbacks[id] = callbacks;
       const message = defaultResponseMessage({id});
-      ResponseFetchOffscreenService.handleFetchResponse(message);
+
+      ResponseFetchOffscreenService.handleFetchResponse(message, callbacks);
       expect(callbacks.resolve).toHaveBeenCalledWith(expect.any(Response));
     });
 
@@ -159,23 +140,10 @@ describe("ResponseFetchOffscreenService", () => {
       expect.assertions(1);
       const id = crypto.randomUUID();
       const callbacks = defaultCallbacks();
-      RequestFetchOffscreenService.offscreenRequestsPromisesCallbacks[id] = callbacks;
-      // eslint-disable-next-line object-shorthand
-      const message = defaultResponseMessage({id, type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR});
-      ResponseFetchOffscreenService.handleFetchResponse(message);
-      expect(callbacks.reject).toHaveBeenCalledWith(expect.any(Error));
-    });
+      const message = defaultResponseMessage({id: id, type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR});
 
-    it("should ignore message having the wrong target", () => {
-      expect.assertions(2);
-      const id = crypto.randomUUID();
-      const callbacks = defaultCallbacks();
-      RequestFetchOffscreenService.offscreenRequestsPromisesCallbacks[id] = callbacks;
-      // eslint-disable-next-line object-shorthand
-      const message = defaultResponseMessage({id, target: "other-target"});
-      ResponseFetchOffscreenService.handleFetchResponse(message);
-      expect(callbacks.resolve).not.toHaveBeenCalled();
-      expect(callbacks.reject).not.toHaveBeenCalled();
+      ResponseFetchOffscreenService.handleFetchResponse(message, callbacks);
+      expect(callbacks.reject).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 });

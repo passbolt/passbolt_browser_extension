@@ -39,7 +39,6 @@ import {LocaleEvents} from "../event/localeEvents";
 import {MobileEvents} from "../event/mobileEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import {MfaEvents} from "../event/mfaEvents";
-import {ClipboardEvents} from "../event/clipboardEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
@@ -87,7 +86,6 @@ class App extends Pagemod {
       MobileEvents,
       PownedPasswordEvents,
       MfaEvents,
-      ClipboardEvents,
       RememberMeEvents,
       PermissionEvents,
       AccountEvents

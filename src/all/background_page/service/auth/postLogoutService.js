@@ -19,6 +19,7 @@ import resourceInProgressCacheService from "../cache/resourceInProgressCache.ser
 import OnExtensionUpdateAvailableService from "../extension/onExtensionUpdateAvailableService";
 import InformCallToActionPagemod from "../../pagemod/informCallToActionPagemod";
 import WorkerService from "../worker/workerService";
+import CopyToClipboardService from "../clipboard/copyToClipboardService";
 class PostLogoutService {
   /**
    * Execute all processes after a logout
@@ -27,6 +28,7 @@ class PostLogoutService {
   static async exec() {
     await PostLogoutService.sendLogoutEventForWorkers();
     await LocalStorageService.flush();
+    await (new CopyToClipboardService()).flushTemporaryContentIfAny();
     await StartLoopAuthSessionCheckService.clearAlarm();
     toolbarService.handleUserLoggedOut();
     resourceInProgressCacheService.reset();

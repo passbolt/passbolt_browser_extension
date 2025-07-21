@@ -17,7 +17,6 @@ import {FETCH_OFFSCREEN_DATA_TYPE_JSON, SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} fro
 export const defaultFetchMessage = message => ({
   target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN,
   data: {
-    id: crypto.randomUUID(),
     resource: "https://www.passbolt.test/settings.json?api-version=v2",
     options: {
       credentials: "include",

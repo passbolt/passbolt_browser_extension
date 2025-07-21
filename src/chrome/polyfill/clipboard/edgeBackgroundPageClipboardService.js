@@ -9,9 +9,23 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.7.0
+ * @since         5.3.2
  */
 
-import FetchOffscreenService from "./service/network/fetchOffscreenService";
-
-chrome.runtime.onMessage.addListener(FetchOffscreenService.handleFetchRequest);
+/**
+ * The service aims to create metadata key.
+ */
+export default class EdgeBackgroundPageClipboardService {
+  /**
+   * @inheritDoc navigator.clipboard.writeText
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText
+   */
+  static async writeText(data) {
+    const textarea = document.createElement("textarea");
+    document.body.appendChild(textarea);
+    textarea.value = data;
+    textarea.select();
+    document.execCommand("cut");
+    document.body.removeChild(textarea);
+  }
+}

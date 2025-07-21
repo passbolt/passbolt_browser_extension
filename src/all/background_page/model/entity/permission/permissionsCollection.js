@@ -348,6 +348,84 @@ class PermissionsCollection extends EntityV2Collection {
     return permissions;
   }
 
+  /**
+   * Sort the current collection by aro and names.
+   * This method is mutatative
+   */
+  sort() {
+    this._items.sort(PermissionsCollection.sortPermissionsByAroAndName);
+  }
+
+  /**
+   * Delegate function to use as a callback to sort permissions.
+   * Permissions are sorted this way:
+   * - Defined users first
+   * - Defined groups second
+   * - Unknown users third
+   * - Unknown groups fourth
+   * Users are sorted by their `${user.first_name} ${user.last_name}`
+   * Groups are sorted by their `${group.name}`
+   *
+   * @param {PermissionEntity} permissionA
+   * @param {PermissionEntity} permissionB
+   * @returns {number} -1 if permissionA comes first, 1 if permissionB comes first, 0 it they are "equals"
+   * @static
+   * @private
+   */
+  static sortPermissionsByAroAndName(permissionA, permissionB) {
+    //compare AROs, if they are different, aro User is coming first in the list
+    const isADefinedUserPermission = permissionA.aro === PermissionEntity.ARO_USER && Boolean(permissionA.user);
+    const isBDefinedUserPermission = permissionB.aro === PermissionEntity.ARO_USER && Boolean(permissionB.user);
+
+    if (isADefinedUserPermission && isBDefinedUserPermission) {
+      //both users are defined, we need to order by their full name.
+      const userAName = permissionA.user.profile.name;
+      const userBName = permissionB.user.profile.name;
+
+      return userAName.localeCompare(userBName);
+    }
+
+    if (isADefinedUserPermission) {
+      // permissionA is a user, permissionB is either an undefined user, a group, an undefined group. So permissionA comes first.
+      return -1;
+    } else if (isBDefinedUserPermission) {
+      // permissionB is a user, permissionA is either an undefined user, a group, an undefined group. So permissionB comes first.
+      return 1;
+    }
+
+    //here both permissionA and permissionB are for group permission. But their group could be undefined though
+    const isADefinedGroupPermission = permissionA.aro === PermissionEntity.ARO_GROUP && Boolean(permissionA.group);
+    const isBDefinedGroupPermission = permissionB.aro === PermissionEntity.ARO_GROUP && Boolean(permissionB.group);
+
+    if (isADefinedGroupPermission && isBDefinedGroupPermission) {
+      // both permission are for defined group, we need to order them by their group name
+      const groupAName = permissionA.group.name;
+      const groupBName = permissionB.group.name;
+
+      return groupAName.localeCompare(groupBName);
+    }
+
+    if (isADefinedGroupPermission) {
+      // permissionA is for a defined group and permissionB is for an undefined group. permissionA comes first
+      return -1;
+    } else if (isBDefinedGroupPermission) {
+      // permissionB is for a defined group and permissionA is for an undefined group. permissionB comes first
+      return 1;
+    }
+
+    // both permissions are for undefined group or user
+    const isAUserPermission = permissionA.aro === PermissionEntity.ARO_USER;
+    const isBUserPermission = permissionB.aro === PermissionEntity.ARO_USER;
+    if ((isAUserPermission && isBUserPermission) || (!isAUserPermission && !isBUserPermission)) {
+      //they are both permissions for undefined user or both for undefined group. they are consider "equals"
+      return 0;
+    }
+
+    return isAUserPermission
+      ? -1 // permissionA is for an undefined user and permissionB for an undefined group. permissionA comes first
+      : 1; // permissionB is for an undefined user and permissionA for an undefined group. permissionB comes first
+  }
+
   /*
    * ==================================================
    * Static getters

@@ -67,6 +67,7 @@ import FindMetadataMigrateResourcesController from "../controller/migrateMetadat
 import MigrateMetadataResourcesController from "../controller/migrateMetadata/migrateMetadataResourcesController";
 import DownloadOrganizationGeneratedKey from "../controller/accountRecovery/downloadOrganizationGenerateKeyController";
 import ShareMetadataKeyPrivateController from "../controller/metadata/shareMetadataKeyPrivateController";
+import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getOrFindMetadataKeysSettingsController";
 import CopyToClipboardController from "../controller/clipboard/copyToClipboardController";
 import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
 
@@ -313,6 +314,17 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.metadata.find-metadata-keys-settings', async requestId => {
     const controller = new FindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Get or find metadata keys settings.
+   *
+   * @listens passbolt.metadata.get-or-find-metadata-keys-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.get-or-find-metadata-keys-settings', async requestId => {
+    const controller = new GetOrFindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 

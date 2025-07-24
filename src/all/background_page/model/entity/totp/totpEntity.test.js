@@ -158,7 +158,7 @@ describe("Totp entity", () => {
       const externalResourceDto = defaultExternalResourceDto({
         "name": "pro.passbolt.local",
         "username": "admin@passbolt.com",
-        "uri": "pro.passbolt.local",
+        "uris": ["pro.passbolt.local"],
       });
       const externalResourceEntity = new ExternalResourceEntity(externalResourceDto);
       const url = entity.createUrlFromExternalResource(externalResourceEntity);

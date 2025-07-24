@@ -49,10 +49,11 @@ describe("ExternalResourceEntity", () => {
       assertEntityProperty.notRequired(ExternalResourceEntity, "username");
     });
 
-    it("validates uri property", () => {
-      assertEntityProperty.string(ExternalResourceEntity, "uri");
-      assertEntityProperty.maxLength(ExternalResourceEntity, "uri", 1024);
-      assertEntityProperty.notRequired(ExternalResourceEntity, "uri");
+    it("validates uris property", () => {
+      assertEntityProperty.array(ExternalResourceEntity, "uris");
+      assertEntityProperty.assertArrayItemString(ExternalResourceEntity, "uris");
+      assertEntityProperty.arrayStringMaxLength(ExternalResourceEntity, "uris", ExternalResourceEntity.URI_MAX_LENGTH);
+      assertEntityProperty.notRequired(ExternalResourceEntity, "uris");
     });
 
     it("validates description property", () => {
@@ -139,7 +140,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.id).toBeNull();
       expect(entity.name).toEqual("Password 1");
       expect(entity.username).toBeNull();
-      expect(entity.uri).toBeNull();
+      expect(entity.uris).toEqual([]);
       expect(entity.description).toBeNull();
       expect(entity.secretClear).toEqual(dto.secret_clear);
       expect(entity.folderParentId).toBeNull();
@@ -156,7 +157,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.id).toStrictEqual(dto.id);
       expect(entity.name).toStrictEqual(dto.name);
       expect(entity.username).toStrictEqual(dto.username);
-      expect(entity.uri).toStrictEqual(dto.uri);
+      expect(entity.uris).toStrictEqual(dto.uris);
       expect(entity.description).toStrictEqual(dto.description);
       expect(entity.secretClear).toStrictEqual(dto.secret_clear);
       expect(entity.folderParentId).toStrictEqual(dto.folder_parent_id);
@@ -227,7 +228,7 @@ describe("ExternalResourceEntity", () => {
         id: entity.id,
         name: entity.metadata.name,
         username: entity.metadata.username,
-        uri: entity.metadata.uris[0],
+        uris: entity.metadata.uris,
         description: entity.metadata.description,
         secrets: secrets,
         folder_parent_id: entity.folderParentId,
@@ -268,7 +269,7 @@ describe("ExternalResourceEntity", () => {
           object_type: "PASSBOLT_RESOURCE_METADATA",
           name: dto.name,
           username: dto.username,
-          uris: [dto.uri],
+          uris: dto.uris,
           description: dto.description,
           resource_type_id: dto.resource_type_id,
         },
@@ -298,7 +299,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.id).toStrictEqual(dto.id);
       expect(entity.name).toStrictEqual(dto.name);
       expect(entity.username).toStrictEqual(dto.username);
-      expect(entity.uri).toStrictEqual(dto.uri);
+      expect(entity.uris).toStrictEqual(dto.uris);
       expect(entity.description).toStrictEqual(dto.description);
       expect(entity.secretClear).toStrictEqual(dto.secret_clear);
       expect(entity.folderParentId).toStrictEqual(dto.folder_parent_id);
@@ -317,7 +318,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.id).toBeNull();
       expect(entity.name).toStrictEqual(dto.name);
       expect(entity.username).toBeNull();
-      expect(entity.uri).toBeNull();
+      expect(entity.uris).toEqual([]);
       expect(entity.description).toBeNull();
       expect(entity.secretClear).toStrictEqual(dto.secret_clear);
       expect(entity.folderParentId).toBeNull();

@@ -24,7 +24,7 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
     return {
       "name": "Title",
       "username": "Username",
-      "uri": "Url",
+      "uris": "Url",
       "secret_clear": "Password",
       "description": "Notes",
       "folder_parent_path": "Type"
@@ -43,7 +43,9 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
     const externalResourceDto = {};
 
     for (const propertyName in this.mapping) {
-      if (data[this.mapping[propertyName]]) {
+      if (propertyName === "uris") {
+        externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+      } else if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }
     }
@@ -59,7 +61,7 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
       }
       if (!resourceType) {
         //Fallback default content type not supported
-        resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, scores);
+        resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, metadataTypesSettings);
         importEntity.importResourcesErrors.push(new ImportError("Imported with default content type", externalResourceDto, new Error("No resource type associated to this row.")));
       }
     }

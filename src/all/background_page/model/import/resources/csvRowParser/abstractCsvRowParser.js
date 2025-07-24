@@ -50,7 +50,7 @@ class AbstractCsvRowParser {
     }
 
     // Check how many optional properties the row parser match
-    const optionalFields = ["username", "uri", "description", "folder_parent_path"];
+    const optionalFields = ["username", "uris", "description", "folder_parent_path"];
     const countOptionalFieldsReducer = (count, fieldName) => (csvHasField(fieldName) ? ++count : count);
     const countOptionalFields = optionalFields.reduce(countOptionalFieldsReducer, 0);
 

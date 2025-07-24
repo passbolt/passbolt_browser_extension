@@ -66,7 +66,7 @@ describe("CsvDashlaneRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.title,
       username: data.username,
-      uri: data.url,
+      uris: [data.url],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.password,
       description: data.note,
@@ -101,7 +101,7 @@ describe("CsvDashlaneRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.title,
       username: data.username,
-      uri: data.url,
+      uris: [data.url],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.password,
       description: data.note,
@@ -113,3 +113,4 @@ describe("CsvDashlaneRowParser", () => {
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
 });
+

@@ -64,7 +64,7 @@ describe("CsvKdbxRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.Title,
       username: data.Username,
-      uri: data.URL,
+      uris: [data.URL],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.Password,
       description: data.Notes,
@@ -101,7 +101,7 @@ describe("CsvKdbxRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.Title,
       username: data.Username,
-      uri: data.URL,
+      uris: [data.URL],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.Password,
       description: data.Notes,
@@ -138,7 +138,7 @@ describe("CsvKdbxRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.Title,
       username: data.Username,
-      uri: data.URL,
+      uris: [data.URL],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.Password,
       description: data.Notes,
@@ -181,7 +181,7 @@ describe("CsvKdbxRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.Title,
       username: data.Username,
-      uri: data.URL,
+      uris: [data.URL],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.Password,
       description: data.Notes,

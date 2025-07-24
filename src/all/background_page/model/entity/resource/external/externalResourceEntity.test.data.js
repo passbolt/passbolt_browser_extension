@@ -29,7 +29,7 @@ export const defaultExternalResourceDto = (data = {}) => {
     id: resourceid,
     name: "external resource dto",
     username: "ada@passbolt.com",
-    uri: "https://passbolt.local",
+    uris: ["https://passbolt.local"],
     description: "This is the description of the resource",
     secrets: secretCollection,
     folder_parent_id: uuidv4(),
@@ -49,7 +49,7 @@ export const defaultExternalResourceImportDto = (data = {}) => {
   return {
     name: "external resource dto",
     username: "ada@passbolt.com",
-    uri: "https://passbolt.local",
+    uris: ["https://passbolt.local"],
     description: "This is the description of the resource",
     secrets: secretCollection,
     folder_parent_id: uuidv4(),
@@ -62,14 +62,13 @@ export const defaultExternalResourceImportDto = (data = {}) => {
   };
 };
 
-
 export const defaultExternalResourceImportMinimalDto = (data = {}) => {
   const defaultData = minimalExternalResourceDto({
     id: uuidv4(),
     name: "",
     secret_clear: "",
     username: "",
-    uri: "",
+    uris: [],
     description: "",
     resource_type_id: uuidv4(),
     folder_parent_path: "private/data",

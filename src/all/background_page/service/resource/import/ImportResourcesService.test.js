@@ -154,7 +154,7 @@ describe("ImportResourcesService", () => {
           name: 'Password 1',
           resource_type_id: expectedResourceType.id,
           folder_parent_path: "import-ref",
-          uri: "https://url1.com",
+          uris: ["https://url1.com"],
           username: "Username 1",
         }));
 
@@ -163,7 +163,7 @@ describe("ImportResourcesService", () => {
           name: 'Password 2',
           resource_type_id: expectedResourceType.id,
           folder_parent_path: "import-ref",
-          uri: "https://url1.com",
+          uris: ["https://url1.com"],
           username: "Username 2",
           folder_parent_path_expected: "/Folder",
         }));
@@ -201,7 +201,7 @@ describe("ImportResourcesService", () => {
           name: 'Password 1',
           resource_type_id: expectedResourceType.id,
           folder_parent_path: "import-ref",
-          uri: "https://url1.com",
+          uris: ["https://url1.com"],
           username: "Username 1",
           folder_parent_path_expected: "/Folder 1",
         }));
@@ -237,7 +237,7 @@ describe("ImportResourcesService", () => {
           name: 'Password 1',
           resource_type_id: expectedResourceType.id,
           folder_parent_path: "import-ref",
-          uri: "https://url1.com",
+          uris: ["https://url1.com"],
           username: "Username 1",
           folder_parent_path_expected: "",
         }));
@@ -273,7 +273,7 @@ describe("ImportResourcesService", () => {
           name: 'Password 1',
           resource_type_id: expectedResourceType.id,
           folder_parent_path: "import-ref/Folder 1",
-          uri: "https://url1.com",
+          uris: ["https://url1.com"],
           username: "Username 1",
           folder_parent_path_expected: "",
         }));

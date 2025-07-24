@@ -30,7 +30,7 @@ describe("ResourcesKdbxExporter", () => {
       id: `7f077753-0835-4054-92ee-556660ea04a${num}`,
       name: `Password ${num}`,
       username: `username${num}`,
-      uri: `https://url${num}.com`,
+      uris: [`https://url${num}.com`, `https://alturl${num}.com`, `https://extraurl${num}.com`],
       description: `Description ${num}`,
       secret_clear: `Secret ${num}`,
       folder_parent_path: '',
@@ -65,7 +65,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should export resources and folders for keepass windows", async() => {
-    expect.assertions(20);
+    expect.assertions(23);
 
     const now = new Date();
     now.setMilliseconds(0);
@@ -121,6 +121,10 @@ describe("ResourcesKdbxExporter", () => {
     expect(digits).toEqual("6");
     expect(period).toEqual("30");
 
+    expect(password1.fields.get('URL')).toEqual("https://url1.com");
+    expect(password1.fields.get('KP2A_URL')).toEqual("https://alturl1.com");
+    expect(password1.fields.get('KP2A_URL_2')).toEqual("https://extraurl1.com");
+
     expect(password4.fields.get('Title')).toEqual("Password 4");
     expect(password4.times.expires).toStrictEqual(true);
     expect(password4.times.expiryTime).toStrictEqual(new Date(now));
@@ -167,7 +171,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should export resources and folders for other keepass", async() => {
-    expect.assertions(17);
+    expect.assertions(20);
 
     const now = new Date();
     now.setMilliseconds(0);
@@ -216,6 +220,10 @@ describe("ResourcesKdbxExporter", () => {
     expect(password1.fields.get('Password').getText()).toEqual("Secret 1");
     const totp = password1.fields.get('otp').getText();
     expect(totp).toEqual("otpauth://totp/Password%201%3Ausername1?secret=DAV3DS4ERAAF5QGH&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30");
+
+    expect(password1.fields.get('URL')).toEqual("https://url1.com");
+    expect(password1.fields.get('KP2A_URL')).toEqual("https://alturl1.com");
+    expect(password1.fields.get('KP2A_URL_2')).toEqual("https://extraurl1.com");
 
     expect(password4.fields.get('Title')).toEqual("Password 4");
     expect(password4.times.expires).toStrictEqual(true);

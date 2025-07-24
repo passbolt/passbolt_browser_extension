@@ -5,7 +5,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 import BrowserTabService from "../service/ui/browserTab.service";
-import ResourceInProgressCacheService from "../service/cache/resourceInProgressCache.service";
 import i18n from "../sdk/i18n";
 import FindMeController from "../controller/rbac/findMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
@@ -15,6 +14,8 @@ import GetOrFindPasswordExpirySettingsController from "../controller/passwordExp
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 import CopyToClipboardController from "../controller/clipboard/copyToClipboardController";
 import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
+import PrepareResourceController from "../controller/quickaccess/prepareResourceController";
+import ConsumeInProgressCreationResourceController from "../controller/quickaccess/consumeInProgressCreationResourceController";
 
 /**
  * Listens to the quickaccess application events
@@ -57,21 +58,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param tabId {string} The tab id
    */
   worker.port.on('passbolt.quickaccess.prepare-resource', async(requestId, tabId) => {
-    try {
-      const resourceInProgress = await ResourceInProgressCacheService.consume();
-      if (resourceInProgress === null) {
-        // Retrieve resource name and uri from tab.
-        const tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();
-        const name = tab.title;
-        const uri = tab.url;
-        worker.port.emit(requestId, 'SUCCESS', {name: name, uri: uri});
-      } else {
-        worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
-      }
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new PrepareResourceController(worker, requestId);
+    await controller._exec(tabId);
   });
 
   /*
@@ -81,13 +69,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.quickaccess.prepare-autosave', async requestId => {
-    try {
-      const resourceInProgress = await ResourceInProgressCacheService.consume() || {};
-      worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new ConsumeInProgressCreationResourceController(worker, requestId);
+    await controller._exec();
   });
 
   /*

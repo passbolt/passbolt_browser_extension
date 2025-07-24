@@ -88,13 +88,13 @@ class InformMenuController {
     const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
     const {username, password: secret_clear} = await webIntegrationWorker.port.request('passbolt.web-integration.get-credentials');
 
-    // Retrieve resource name and uri from tab.
+    // Retrieve resource name and uris from tab.
     const tab = await BrowserTabService.getCurrent();
     const name = tab.title;
-    const uri = tab.url.substr(0, ResourceMetadataEntity.URI_MAX_LENGTH);
+    const uris = [tab.url.substr(0, ResourceMetadataEntity.URI_MAX_LENGTH)];
 
     // Store the resource to save in cache.
-    const resourceDto = {name: name, username: username, uri: uri, secret_clear: secret_clear};
+    const resourceDto = {name: name, username: username, uris: uris, secret_clear: secret_clear};
     const resource = new ExternalResourceEntity(resourceDto);
     await ResourceInProgressCacheService.set(resource);
 

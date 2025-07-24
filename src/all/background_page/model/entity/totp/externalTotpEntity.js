@@ -74,8 +74,8 @@ class ExternalTotpEntity extends TotpEntity {
     const url = new URL(`otpauth://totp/${encodeURIComponent(name)}`);
     url.searchParams.append("secret", this.secretKey);
     // Add issuer in the TOTP url if any
-    if (externalResourceEntity.uri?.length > 0) {
-      url.searchParams.append("issuer", encodeURIComponent(externalResourceEntity.uri));
+    if (externalResourceEntity.uris?.length > 0) {
+      url.searchParams.append("issuer", encodeURIComponent(externalResourceEntity.uris[0]));
     }
     url.searchParams.append("algorithm", this.algorithm);
     url.searchParams.append("digits", this.digits.toString());

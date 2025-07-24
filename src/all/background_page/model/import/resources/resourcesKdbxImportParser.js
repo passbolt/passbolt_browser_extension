@@ -126,13 +126,33 @@ class ResourcesKdbxImportParser {
   parseResource(kdbxEntry) {
     const externalResourceDto = {
       name: kdbxEntry.fields.get('Title') ? kdbxEntry.fields.get('Title').trim() : "",
-      uri: kdbxEntry.fields.get('URL') ? kdbxEntry.fields.get('URL').trim() : "",
       username: kdbxEntry.fields.get('UserName') ? kdbxEntry.fields.get('UserName').trim() : "",
       description: kdbxEntry.fields.get('Notes') ? kdbxEntry.fields.get('Notes').trim() : "",
       folder_parent_path: this.getKdbxEntryPath(kdbxEntry),
       secret_clear: '', // By default a secret can be null
       expired: kdbxEntry.times.expires ? kdbxEntry.times.expiryTime?.toISOString() : null,
     };
+
+    const uri = kdbxEntry.fields.get('URL') ? kdbxEntry.fields.get('URL').trim() : "";
+    const additionalUris = [uri];
+
+    let additionalEntriesUris = [...kdbxEntry.fields.entries()]
+      .filter(([key]) => key.startsWith('KP2A_URL'))
+      .map(([, value]) => (value));
+
+    if (additionalEntriesUris.length > 31) {
+      this.importEntity.importResourcesErrors.push(new ImportError(
+        "Resource has more than 32 URIs, only the first 32 will be imported",
+        externalResourceDto
+      ));
+    }
+    additionalEntriesUris = additionalEntriesUris.slice(0, 31);
+
+    for (const additionalUri of additionalEntriesUris) {
+      additionalUris.push(additionalUri.trim());
+    }
+
+    externalResourceDto.uris = additionalUris;
 
     if (typeof kdbxEntry.fields.get('Password') === 'object') {
       externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();

@@ -24,7 +24,7 @@ class CsvBitWardenRowParser extends AbstractCsvRowParser {
     return {
       "name": "name",
       "username": "login_username",
-      "uri": "login_uri",
+      "uris": "login_uri",
       "secret_clear": "login_password",
       "description": "notes",
       "folder_parent_path": "folder"
@@ -42,7 +42,9 @@ class CsvBitWardenRowParser extends AbstractCsvRowParser {
   static parse(data, importEntity, resourceTypesCollection, metadataTypesSettings) {
     const externalResourceDto = {};
     for (const propertyName in this.mapping) {
-      if (data[this.mapping[propertyName]]) {
+      if (propertyName === "uris") {
+        externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+      } else if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }
     }

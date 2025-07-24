@@ -23,7 +23,7 @@ class CsvChromiumRowParser extends AbstractCsvRowParser {
   static get mapping() {
     return {
       "name": "name",
-      "uri": "url",
+      "uris": "url",
       "username": "username",
       "secret_clear": "password",
     };
@@ -40,7 +40,9 @@ class CsvChromiumRowParser extends AbstractCsvRowParser {
   static parse(data, importEntity, resourceTypesCollection, metadataTypesSettings) {
     const externalResourceDto = {};
     for (const propertyName in this.mapping) {
-      if (data[this.mapping[propertyName]]) {
+      if (propertyName === "uris") {
+        externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+      } else if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }
     }

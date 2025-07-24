@@ -18,7 +18,7 @@ describe("CsvMozillaPlatformRowComposer", () => {
     const dto = {
       "name": "https://url1.com",
       "username": "Username 1",
-      "uri": "https://url1.com",
+      "uris": ["https://url1.com"],
       "secret_clear": "Secret 1",
       "description": "Description 1",
       "folder_parent_path": "Folder 1"
@@ -27,7 +27,7 @@ describe("CsvMozillaPlatformRowComposer", () => {
     const csvRow = CsvMozillaPlatformRowComposer.compose(externalResourceEntity);
     expect(csvRow).toBeInstanceOf(Object);
     expect(csvRow.username).toEqual(externalResourceEntity.username);
-    expect(csvRow.url).toEqual(externalResourceEntity.uri);
+    expect(csvRow.url).toEqual(externalResourceEntity.uris[0]);
     expect(csvRow.password).toEqual(externalResourceEntity.secretClear);
     expect(csvRow.httpRealm).toEqual("");
     expect(csvRow.formActionOrigin).toEqual("");

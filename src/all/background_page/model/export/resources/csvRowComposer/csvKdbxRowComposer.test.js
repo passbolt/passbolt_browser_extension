@@ -20,7 +20,7 @@ describe("CsvKdbxComposer", () => {
     const dto = {
       "name": "Password 1",
       "username": "Username 1",
-      "uri": "https://url1.com",
+      "uris": ["https://url1.com"],
       "secret_clear": "Secret 1",
       "description": "Description 1",
       "folder_parent_path": "Folder 1",
@@ -31,7 +31,7 @@ describe("CsvKdbxComposer", () => {
     expect(csvRow).toBeInstanceOf(Object);
     expect(csvRow.Title).toEqual(externalResourceEntity.name);
     expect(csvRow.Username).toEqual(externalResourceEntity.username);
-    expect(csvRow.URL).toEqual(externalResourceEntity.uri);
+    expect(csvRow.URL).toEqual(externalResourceEntity.uris[0]);
     expect(csvRow.Password).toEqual(externalResourceEntity.secretClear);
     expect(csvRow.Notes).toEqual(externalResourceEntity.description);
     expect(csvRow.Group).toEqual(externalResourceEntity.folderParentPath);
@@ -43,7 +43,8 @@ describe("CsvKdbxComposer", () => {
     const dto = {
       "name": "Password 1",
       "username": "Username 1",
-      "uri": "https://url1.com",
+
+      "uris": ["https://url1.com"],
       "secret_clear": "Secret 1",
       "description": "Description 1",
       "folder_parent_path": "Folder 1",
@@ -54,7 +55,8 @@ describe("CsvKdbxComposer", () => {
     expect(csvRow).toBeInstanceOf(Object);
     expect(csvRow.Title).toEqual(externalResourceEntity.name);
     expect(csvRow.Username).toEqual(externalResourceEntity.username);
-    expect(csvRow.URL).toEqual(externalResourceEntity.uri);
+
+    expect(csvRow.URL).toEqual(externalResourceEntity.uris[0]);
     expect(csvRow.Password).toEqual(externalResourceEntity.secretClear);
     expect(csvRow.Notes).toEqual(externalResourceEntity.description);
     expect(csvRow.Group).toEqual(externalResourceEntity.folderParentPath);

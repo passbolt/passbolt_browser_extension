@@ -67,7 +67,7 @@ describe("CsvBitWardenRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.login_username,
-      uri: data.login_uri,
+      uris: [data.login_uri],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.login_password,
       description: data.notes,
@@ -103,7 +103,7 @@ describe("CsvBitWardenRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.login_username,
-      uri: data.login_uri,
+      uris: [data.login_uri],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.login_password,
       description: data.notes,

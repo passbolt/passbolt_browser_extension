@@ -17,7 +17,7 @@ describe("CsvBitWardenRowComposer", () => {
     const dto = {
       "name": "Password 1",
       "username": "Username 1",
-      "uris": ["https://url1.com"],
+      "uris": ["https://url1.com", "https://url2.com", "https://url3.com"],
       "secret_clear": "Secret 1",
       "description": "Description 1",
       "folder_parent_path": "Folder 1"
@@ -27,7 +27,7 @@ describe("CsvBitWardenRowComposer", () => {
     expect(csvRow).toBeInstanceOf(Object);
     expect(csvRow.name).toEqual(externalResourceEntity.name);
     expect(csvRow.login_username).toEqual(externalResourceEntity.username);
-    expect(csvRow.login_uri).toEqual(externalResourceEntity.uris[0]);
+    expect(csvRow.login_uri).toEqual(externalResourceEntity.uris.join(","));
     expect(csvRow.login_password).toEqual(externalResourceEntity.secretClear);
     expect(csvRow.notes).toEqual(externalResourceEntity.description);
     expect(csvRow.folder).toEqual(externalResourceEntity.folderParentPath);

@@ -43,7 +43,7 @@ class CsvBitWardenRowParser extends AbstractCsvRowParser {
     const externalResourceDto = {};
     for (const propertyName in this.mapping) {
       if (propertyName === "uris") {
-        externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+        externalResourceDto[propertyName] = data[this.mapping[propertyName]] ? data[this.mapping[propertyName]].split(",") : [];
       } else if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }

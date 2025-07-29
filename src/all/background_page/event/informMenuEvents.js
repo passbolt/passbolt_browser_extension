@@ -14,6 +14,7 @@ import InformMenuController from "../controller/InformMenuController/InformMenuC
 import GetLocaleController from "../controller/locale/getLocaleController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import AutofillController from "../controller/autofill/AutofillController";
+import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 
 /**
  * Listens the inform menu events
@@ -64,6 +65,18 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.in-form-menu.close', async requestId => {
     const informMenuController = new InformMenuController(worker, apiClientOptions, account);
     await informMenuController.close(requestId);
+  });
+
+  /*
+   * Find the logged in user
+   *
+   * @listens passbolt.users.find-logged-in-user
+   * @param requestId {uuid} The request identifier
+   * @param refreshCache {bool} (Optional) Default false. Should request the API and refresh the cache.
+   */
+  worker.port.on('passbolt.users.find-logged-in-user', async(requestId, refreshCache = false) => {
+    const controller = new GetOrFindLoggedInUserController(worker, requestId, apiClientOptions, account);
+    await controller._exec(refreshCache);
   });
 
   /*

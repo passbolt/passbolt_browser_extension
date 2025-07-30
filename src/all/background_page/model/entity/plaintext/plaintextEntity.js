@@ -76,6 +76,15 @@ class PlaintextEntity extends EntityV2 {
   get totp() {
     return this._props.totp || null;
   }
+
+  /**
+   * Return custom fields prop if any
+   *
+   * @returns {object|null} custom fields
+   */
+  get customFields() {
+    return this._props.custom_fields || null;
+  }
 }
 
 export default PlaintextEntity;

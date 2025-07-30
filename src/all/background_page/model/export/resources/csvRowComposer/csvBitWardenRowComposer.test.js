@@ -12,6 +12,7 @@
  */
 import CsvBitWardenRowComposer from "./csvBitWardenRowComposer";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
+import {defaultTotpDto} from "../../../entity/totp/totpDto.test.data";
 describe("CsvBitWardenRowComposer", () => {
   it("can compose bitwarden csv row", () => {
     const dto = {
@@ -20,7 +21,8 @@ describe("CsvBitWardenRowComposer", () => {
       "uris": ["https://url1.com", "https://url2.com", "https://url3.com"],
       "secret_clear": "Secret 1",
       "description": "Description 1",
-      "folder_parent_path": "Folder 1"
+      "folder_parent_path": "Folder 1",
+      "totp": defaultTotpDto(),
     };
     const externalResourceEntity = new ExternalResourceEntity(dto);
     const csvRow = CsvBitWardenRowComposer.compose(externalResourceEntity);
@@ -31,5 +33,6 @@ describe("CsvBitWardenRowComposer", () => {
     expect(csvRow.login_password).toEqual(externalResourceEntity.secretClear);
     expect(csvRow.notes).toEqual(externalResourceEntity.description);
     expect(csvRow.folder).toEqual(externalResourceEntity.folderParentPath);
+    expect(csvRow.login_totp).toEqual("otpauth://totp/Password%201%3AUsername%201?secret=DAV3DS4ERAAF5QGH&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30");
   });
 });

@@ -20,6 +20,7 @@ import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEn
 import fs from "fs";
 import {defaultTotpDto} from "../../entity/totp/totpDto.test.data";
 import {defaultIconDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/iconEntity.test.data";
+import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
 
 global.kdbxweb = kdbxweb;
 kdbxweb.CryptoEngine.argon2 = argon2;
@@ -35,6 +36,7 @@ describe("ResourcesKdbxExporter", () => {
       secret_clear: `Secret ${num}`,
       folder_parent_path: '',
       totp: defaultTotpDto(),
+      custom_fields: defaultCustomFieldsCollection(),
       expired: null,
     }, data);
   }
@@ -65,7 +67,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should export resources and folders for keepass windows", async() => {
-    expect.assertions(23);
+    expect.assertions(25);
 
     const now = new Date();
     now.setMilliseconds(0);
@@ -125,6 +127,12 @@ describe("ResourcesKdbxExporter", () => {
     expect(password1.fields.get('KP2A_URL')).toEqual("https://alturl1.com");
     expect(password1.fields.get('KP2A_URL_2')).toEqual("https://extraurl1.com");
 
+    const customFields1 = password3.fields.get('Key 0').getText();
+    const customFields2 = password3.fields.get('Key 1').getText();
+
+    expect(customFields1).toEqual("Value 0");
+    expect(customFields2).toEqual("Value 1");
+
     expect(password4.fields.get('Title')).toEqual("Password 4");
     expect(password4.times.expires).toStrictEqual(true);
     expect(password4.times.expiryTime).toStrictEqual(new Date(now));
@@ -171,7 +179,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should export resources and folders for other keepass", async() => {
-    expect.assertions(20);
+    expect.assertions(22);
 
     const now = new Date();
     now.setMilliseconds(0);
@@ -224,6 +232,11 @@ describe("ResourcesKdbxExporter", () => {
     expect(password1.fields.get('URL')).toEqual("https://url1.com");
     expect(password1.fields.get('KP2A_URL')).toEqual("https://alturl1.com");
     expect(password1.fields.get('KP2A_URL_2')).toEqual("https://extraurl1.com");
+    const customFields1 = password3.fields.get('Key 0').getText();
+    const customFields2 = password3.fields.get('Key 1').getText();
+
+    expect(customFields1).toEqual("Value 0");
+    expect(customFields2).toEqual("Value 1");
 
     expect(password4.fields.get('Title')).toEqual("Password 4");
     expect(password4.times.expires).toStrictEqual(true);

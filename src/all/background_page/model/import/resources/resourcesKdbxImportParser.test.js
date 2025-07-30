@@ -411,6 +411,55 @@ describe("ResourcesKdbxImportParser", () => {
     expect(importEntity.importResources.items[0].uris).toHaveLength(32);
     expect(importEntity.importResourcesErrors).toHaveLength(1);
   });
+
+  it("should import custom fields", async() => {
+    expect.assertions(4);
+
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV6Dto());
+
+    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-custom-fields-with-uris.kdbx", {encoding: 'base64'});
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "kdbx",
+      "file": file,
+      "options": {
+        "credentials": {
+          "password": "passbolt"
+        }
+      }
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
+    await parser.parseImport();
+
+    // Assert resources
+    expect(importEntity.importResources.items).toHaveLength(1);
+    expect(importEntity.importResources.items[0].customFields).toHaveLength(3);
+    expect(importEntity.importResources.items[0].uris).toHaveLength(3);
+    expect(importEntity.importResourcesErrors).toHaveLength(0);
+  });
+
+  it("should not import custom fields  if the default is v4", async() => {
+    expect.assertions(2);
+    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-custom-fields-with-uris.kdbx", {encoding: 'base64'});
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "kdbx",
+      "file": file,
+      "options": {
+        "credentials": {
+          "password": "passbolt"
+        }
+      }
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection, metadataTypesSettings);
+    await parser.parseImport();
+
+    // Assert resources
+    expect(importEntity.importResources.items).toHaveLength(1);
+    expect(importEntity.importResources.items[0].customFields).toBeNull();
+  });
   it("should not import the icon if the default is v4", async() => {
     expect.assertions(3);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-with-color-and-icon.kdbx", {encoding: 'base64'});

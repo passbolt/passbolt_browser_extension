@@ -46,6 +46,8 @@ import {defaultDecryptedSharedMetadataKeysDtos} from "passbolt-styleguide/src/sh
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import EncryptMetadataService from "../../metadata/encryptMetadataService";
 import {defaultMetadataKeysSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
+import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
+import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -88,7 +90,6 @@ describe("ExportResourcesService", () => {
         {format: FORMAT_CSV_LASTPASS, expected: lastpassCsvFile},
         {format: FORMAT_CSV_1PASSWORD, expected: onePasswordCsvFile},
         {format: FORMAT_CSV_CHROMIUM, expected: chromiumCsvFile},
-        {format: FORMAT_CSV_BITWARDEN, expected: bitwardenCsvFile},
         {format: FORMAT_CSV_MOZILLA, expected: mozillaCsvFile},
         {format: FORMAT_CSV_SAFARI, expected: safariCsvFile},
         {format: FORMAT_CSV_DASHLANE, expected: dashlaneCsvFile},
@@ -136,6 +137,7 @@ describe("ExportResourcesService", () => {
         });
       });
       each([
+        {format: FORMAT_CSV_BITWARDEN, expected: bitwardenCsvFile},
         {format: FORMAT_CSV_KDBX, expected: KdbxCsvFile},
       ]).describe("Should export the csv file with password, description and totp.", test => {
         each([
@@ -320,6 +322,51 @@ describe("ExportResourcesService", () => {
       expect(service.progressService.updateGoals).toHaveBeenCalledWith(3);
       expect(service.progressService.finishStep).toHaveBeenCalledTimes(2);
       expect(service.progressService.finishStep).toHaveBeenCalledWith("Decrypting 1/1");
+    });
+  });
+
+  describe("::buildCustomFieldWithSecretDto", () => {
+    it("Should build custom fields with secret", () => {
+      expect.assertions(4);
+
+      const customFieldsCollection = defaultCustomFieldsCollection();
+
+      const plaintextSecret = {
+        customFields: [
+          {id: customFieldsCollection[0].id, secret_value: "Secret Value 1"},
+          {id: customFieldsCollection[1].id, secret_value: "Secret Value 2"}
+        ]
+      };
+
+      const exportResourceEntity = {
+        customFields: new CustomFieldsCollection(customFieldsCollection)
+      };
+
+      const result = service.buildCustomFieldWithSecretDto(exportResourceEntity, plaintextSecret);
+
+      expect(result).toBeInstanceOf(CustomFieldsCollection);
+      expect(result.items).toHaveLength(2);
+      expect(result.items[0].value).toEqual("Secret Value 1");
+      expect(result.items[1].value).toEqual("Secret Value 2");
+    });
+
+    it("Should handle missing custom fields", () => {
+      expect.assertions(2);
+
+      const exportResourceEntity = {
+        customFields: {
+          items: []
+        }
+      };
+
+      const plaintextSecret = {
+        customFields: []
+      };
+
+      const result = service.buildCustomFieldWithSecretDto(exportResourceEntity, plaintextSecret);
+
+      expect(result).toBeInstanceOf(CustomFieldsCollection);
+      expect(result.items).toHaveLength(0);
     });
   });
 });

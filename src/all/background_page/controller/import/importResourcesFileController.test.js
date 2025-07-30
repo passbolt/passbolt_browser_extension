@@ -488,18 +488,6 @@ describe("ImportResourcesFileController", () => {
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
         {
-          scenario: "bitwarden",
-          file: bitwardenCsvFile,
-          metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
-          resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
-        },
-        {
-          scenario: "bitwarden",
-          file: bitwardenCsvFile,
-          metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
-          resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
-        },
-        {
           scenario: "lastpass", file: lastpassCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
           resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
@@ -571,6 +559,18 @@ describe("ImportResourcesFileController", () => {
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG
         },
+        {
+          scenario: "bitwarden",
+          file: bitwardenCsvFile,
+          metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
+          resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG
+        },
+        {
+          scenario: "bitwarden",
+          file: bitwardenCsvFile,
+          metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
+          resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG
+        },
       ]).describe("Should parse keypass with description, folder and totp", test => {
         beforeEach(() => {
           jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
@@ -588,7 +588,7 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,

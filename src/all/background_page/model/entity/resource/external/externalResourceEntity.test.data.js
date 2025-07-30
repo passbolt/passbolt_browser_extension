@@ -15,6 +15,7 @@
 import {v4 as uuidv4} from "uuid";
 import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
 import {defaultTotpDto} from "../../totp/totpDto.test.data";
+import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
 
 export const minimalExternalResourceDto = (data = {}) => ({
   name: "Minimal External Resource",
@@ -38,6 +39,7 @@ export const defaultExternalResourceDto = (data = {}) => {
     totp: defaultTotpDto(),
     folder_parent_path: "private/data",
     expired: null,
+    custom_fields: defaultCustomFieldsCollection(),
     ...data,
   };
 };

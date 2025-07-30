@@ -28,7 +28,7 @@ export const defaultKDBXCSVData = (lineCount = 1) => {
   const lines = [];
 
   for (let i = 1; i <= lineCount; i++) {
-    const line = `Password ${i},Username ${i},https://url${i}.com,Secret ${i},Description ${i},Folder ${i},otpauth://totp/Password%20${i}%3AUsername%20${i}?secret=THISISASECRET&issuer=https%253A%252F%252Furl${i}.com&algorithm=SHA1&digits=6&period=30`;
+    const line = `Password ${i},Username ${i},https://url${i}.com,Password ${i},Description ${i},Folder ${i},otpauth://totp/Password%20${i}%3AUsername%20${i}?secret=THISISASECRET&issuer=https%253A%252F%252Furl${i}.com&algorithm=SHA1&digits=6&period=30`;
     lines.push(line);
   }
 
@@ -114,8 +114,8 @@ export const onePasswordCsvFile = [
 ].join("\r\n");
 
 export const bitwardenCsvFile = [
-  '"name","login_username","login_uri","login_password","notes","folder"',
-  '"Password 1","Username 1","https://url1.com","Password 1","Description 1","Folder 1"',
+  '"name","login_username","login_uri","login_password","notes","folder","login_totp"',
+  '"Password 1","Username 1","https://url1.com","Password 1","Description 1","Folder 1","otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"',
 ].join("\r\n");
 
 export const lastpassCsvFile = [

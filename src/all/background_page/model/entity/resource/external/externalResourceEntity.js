@@ -19,6 +19,7 @@ import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/enti
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {assertType} from "../../../../utils/assertions";
 import IconEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
+import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
 
 const DEFAULT_RESOURCE_NAME = '(no name)';
 const RESOURCE_URI_MAX_LENGTH = 1024;
@@ -55,6 +56,18 @@ class ExternalResourceEntity extends EntityV2 {
       delete this._props.icon;
     }
   }
+
+
+  /**
+   *  @inheritDoc
+   * @returns {{custom_fields: CustomFieldsCollection}}
+   */
+  static get associations() {
+    return {
+      custom_fields: CustomFieldsCollection,
+    };
+  }
+
 
   /**
    * @inheritdoc
@@ -117,6 +130,10 @@ class ExternalResourceEntity extends EntityV2 {
         },
         "expired": resourceEntitySchema.properties.expired,
         "icon": IconEntity.getSchema(),
+        "custom_fields": {
+          ...CustomFieldsCollection.getSchema(),
+          "nullable": true,
+        },
       }
     };
   }
@@ -144,6 +161,10 @@ class ExternalResourceEntity extends EntityV2 {
 
     if (this._icon) {
       result.icon = this._icon.toDto();
+    }
+
+    if (this._customFields) {
+      result.custom_fields = this._customFields.toDto();
     }
 
     return result;
@@ -175,6 +196,7 @@ class ExternalResourceEntity extends EntityV2 {
       resource_type_id: resourceEntityDto.resource_type_id,
       folder_parent_path: externalFolderParent?.path || "",
       expired: resourceEntityDto.expired || null,
+      custom_fields: resourceEntityDto.metadata.custom_fields || [],
     };
 
     if (resourceEntityDto.metadata.icon) {
@@ -206,6 +228,7 @@ class ExternalResourceEntity extends EntityV2 {
         uris: this.uris,
         description: this.description,
         resource_type_id: this.resourceTypeId,
+        custom_fields: this.customFields?.toMetadataDto()
       },
       secrets: this._secrets.toDto(),
       folder_parent_id: this.folderParentId,
@@ -445,11 +468,30 @@ class ExternalResourceEntity extends EntityV2 {
     return this._icon || null;
   }
 
+  /**
+   * Get the custom fields collection
+   * @returns {CustomFieldsCollection|null}
+   */
+  get customFields() {
+    return this._customFields || null;
+  }
+
+  /**
+   * Set the custom fields
+   * @param {CustomFieldsCollection} customFields the custom fields collection to us
+   * @returns {void}
+   */
+  set customFields(customFields) {
+    assertType(customFields, CustomFieldsCollection);
+    this._customFields = customFields;
+  }
+
   /*
    * ==================================================
    * Static properties getters
    * ==================================================
    */
+
   /**
    * ExternalResourceEntity.DEFAULT_RESOURCE_NAME
    * @returns {string}

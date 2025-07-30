@@ -147,9 +147,26 @@ class ImportResourcesService {
       importResourcesFile.secretClear = "";
       importResourcesFile.description = "";
       importResourcesFile.totp = null;
+      if (importResourcesFile.customFields) {
+        dto.custom_fields = this.buildCustomFieldSecretDto(importResourcesFile);
+      }
       return dto;
     }
     return importResourcesFile.secretClear;
+  }
+
+  /**
+   * Build the custom field secret DTO.
+   * @param {ExternalResourceEntity} importResourcesFile The resource to import
+   * @returns {Object}
+   * @private
+   */
+  buildCustomFieldSecretDto(importResourcesFile) {
+    const customFieldsDto = [];
+    importResourcesFile.customFields?.items?.forEach(customField => {
+      customFieldsDto.push(customField.toSecretDto());
+    });
+    return customFieldsDto;
   }
 
   /**

@@ -16,6 +16,7 @@ import CopyToClipboardController from "../controller/clipboard/copyToClipboardCo
 import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
 import PrepareResourceController from "../controller/quickaccess/prepareResourceController";
 import ConsumeInProgressCreationResourceController from "../controller/quickaccess/consumeInProgressCreationResourceController";
+import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getOrFindMetadataKeysSettingsController";
 
 /**
  * Listens to the quickaccess application events
@@ -141,6 +142,17 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.metadata.get-or-find-metadata-types-settings', async requestId => {
     const controller = new GetOrFindMetadataTypesController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Get or find metadata keys settings.
+   *
+   * @listens passbolt.metadata.get-or-find-metadata-keys-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.get-or-find-metadata-keys-settings', async requestId => {
+    const controller = new GetOrFindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 

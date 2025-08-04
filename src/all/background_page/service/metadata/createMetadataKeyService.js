@@ -49,7 +49,7 @@ export default class CreateMetadataKeyService {
    * Note: the service does not handle yet the zero knowledge, the key will be encrypted for the API.
    * @param {ExternalGpgKeyPairEntity} metadataKeyPair The metadata key pair.
    * @param {string} passphrase The user passphrase.
-   * @return {MetadataKeyEntity}
+   * @returns {Promise<MetadataKeyEntity>}
    * @throws {TypeError} if metadataKeyPair argument is not of the expected type
    * @throws {TypeError} if passphrase argument is not a string
    */

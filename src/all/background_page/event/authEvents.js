@@ -22,6 +22,7 @@ import AuthLogoutController from "../controller/auth/authLogoutController";
 import GetServerKeyController from "../controller/auth/getServerKeyController";
 import ReplaceServerKeyController from "../controller/auth/replaceServerKeyController";
 import ReloadTabController from "../controller/tab/reloadTabController";
+import RedirectPostLoginController from "../controller/auth/redirectPostLoginController";
 
 /**
  * Listens to the authentication events
@@ -129,14 +130,9 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.post-login-redirect
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.post-login-redirect', requestId => {
-    let url = account.domain;
-    const redirectTo = (new URL(worker.tab.url)).searchParams.get('redirect');
-    if (/^\/[A-Za-z0-9\-\/]*$/.test(redirectTo)) {
-      url = `${url}${redirectTo}`;
-    }
-    chrome.tabs.update(worker.tab.id, {url: url});
-    worker.port.emit(requestId, 'SUCCESS');
+  worker.port.on('passbolt.auth.post-login-redirect', async requestId => {
+    const controller = new RedirectPostLoginController(worker, requestId, account);
+    await controller._exec();
   });
 
   /*

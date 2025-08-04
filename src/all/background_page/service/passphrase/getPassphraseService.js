@@ -38,6 +38,19 @@ export default class GetPassphraseService {
   }
 
   /**
+   * Read the user master password from the storage.
+   * @return {Promise<string>}
+   * @throw Error if the passphrase is not available.
+   */
+  async getFromStorageOrFail() {
+    const passphrase = await PassphraseStorageService.get();
+    if (!passphrase) {
+      throw new Error("No passphrase found in the session storage.");
+    }
+    return passphrase;
+  }
+
+  /**
    * Request the user passphrase.
    *
    * @param {Worker} worker The worker from which the request comes from.

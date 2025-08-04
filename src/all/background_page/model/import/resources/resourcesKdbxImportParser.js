@@ -227,11 +227,12 @@ class ResourcesKdbxImportParser {
       const customFields = [];
       kdbxEntry.fields.forEach((value, key) => {
         if (!KDBX_SUPPORTED_FIELDS.includes(key) && !key.startsWith('KP2A_URL')) {
+          const customFieldValue = typeof value === 'string' ? value : value.getText();
           customFields.push({
             id: uuidv4(),
             type: CUSTOM_FIELD_TYPE.TEXT,
             metadata_key: key,
-            secret_value: value
+            secret_value: customFieldValue
           });
         }
       });

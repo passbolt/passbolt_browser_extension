@@ -71,6 +71,8 @@ import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getO
 import CopyToClipboardController from "../controller/clipboard/copyToClipboardController";
 import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
 import FindMetadataGettingStartedSettingsController from "../controller/metadata/findMetadataGettingStartedSettingsController";
+import EnableEncryptedMetadataForExistingInstanceController from "../controller/metadata/enableEncryptedMetadataForExistingInstanceController";
+import KeepCleartextMetadataForExistingInstanceController from "../controller/metadata/keepCleartextMetadataForExistingInstanceController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -457,6 +459,28 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.metadata.find-getting-started-settings', async requestId => {
     const controller = new FindMetadataGettingStartedSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  /*
+   * Configure metadata to enable encrypted metadata for existing instances.
+   *
+   * @listens passbolt.metadata.enable-encrypted-metadata-for-existing-instance
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.enable-encrypted-metadata-for-existing-instance', async requestId => {
+    const controller = new EnableEncryptedMetadataForExistingInstanceController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Configure metadata to keep legacy cleartext metadata for existing instances
+   *
+   * @listens passbolt.metadata.keep-cleartext-metadata-for-existing-instance
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.keep-cleartext-metadata-for-existing-instance', async requestId => {
+    const controller = new KeepCleartextMetadataForExistingInstanceController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 

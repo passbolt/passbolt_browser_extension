@@ -34,9 +34,9 @@ export default class ConfigureMetadataSettingsService {
   }
 
   /**
-   * Save the metadata keys settings to the API and update local storage with the latest version.
+   * Enables metadata encryption with confuguration that matches a new instance.
    * @param {string} passphrase
-   * @return {Promise<MetadataKeysSettingsEntity>}
+   * @return {Promise<void>}
    * @throws {TypeError} if the `passphrase` is not a valid string
    */
   async enableEncryptedMetadataForNewInstance(passphrase) {
@@ -49,6 +49,36 @@ export default class ConfigureMetadataSettingsService {
     await this.saveMetadaSettingsService.saveKeysSettings(metadataKeySettings);
 
     const metadataTypeSettings = MetadataTypesSettingsEntity.createFromV5Default();
+    await this.saveMetadaSettingsService.saveTypesSettings(metadataTypeSettings);
+  }
+
+  /**
+   * Enables metadata encryption with confuguration that matches an existing instance.
+   * @param {string} passphrase
+   * @return {Promise<void>}
+   * @throws {TypeError} if the `passphrase` is not a valid string
+   */
+  async enableEncryptedMetadataForExistingInstance(passphrase) {
+    assertString(passphrase);
+
+    const gpgKeyPairEntity = await this.generateMetadataKeyService.generateKey(passphrase);
+    await this.createMetadataKeyService.create(gpgKeyPairEntity, passphrase);
+
+    const metadataKeySettings = MetadataKeysSettingsEntity.createFromDefault();
+    await this.saveMetadaSettingsService.saveKeysSettings(metadataKeySettings);
+
+    const metadataTypeSettings = MetadataTypesSettingsEntity.createFromV5Default({
+      allow_v4_v5_upgrade: true,
+    });
+    await this.saveMetadaSettingsService.saveTypesSettings(metadataTypeSettings);
+  }
+
+  /**
+   * Configure metadata settings to keep legacy metadata in cleartext.
+   * @return {Promise<void>}
+   */
+  async keepCleartextMetadataForExistingInstance() {
+    const metadataTypeSettings = MetadataTypesSettingsEntity.createFromV4Default();
     await this.saveMetadaSettingsService.saveTypesSettings(metadataTypeSettings);
   }
 }

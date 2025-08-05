@@ -44,7 +44,7 @@ class SetupService extends AbstractService {
    */
   async complete(userId, completeDto) {
     this.assertValidId(userId);
-    const url = new URL(`${this.apiClient.baseUrl}/complete/${userId}`);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/complete/${userId}`, {});
     const bodyString = this.apiClient.buildBody(completeDto);
     return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
   }
@@ -58,7 +58,7 @@ class SetupService extends AbstractService {
    */
   async completeRecover(userId, completeDto) {
     this.assertValidId(userId);
-    const url = new URL(`${this.apiClient.baseUrl}/recover/complete/${userId}`);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover/complete/${userId}`, {});
     const bodyString = this.apiClient.buildBody(completeDto);
     return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
   }

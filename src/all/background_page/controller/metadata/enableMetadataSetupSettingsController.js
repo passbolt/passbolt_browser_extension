@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.4.0
  */
-import EnableEncryptedMetadataService from "../../service/metadata/enableEncryptedMetadataService";
+import ConfigureMetadataSettingsService from "../../service/metadata/configureMetadataSettingsService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 
 export default class EnableMetadataSetupSettingsController {
@@ -25,7 +25,7 @@ export default class EnableMetadataSetupSettingsController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.enableEncryptedMetadataService = new EnableEncryptedMetadataService(account, apiClientOptions);
+    this.configureMetadataSettingsService = new ConfigureMetadataSettingsService(account, apiClientOptions);
     this.getPassphraseService = new GetPassphraseService(account);
   }
 
@@ -49,6 +49,6 @@ export default class EnableMetadataSetupSettingsController {
    */
   async exec() {
     const passphrase = await this.getPassphraseService.getFromStorageOrFail();
-    return await this.enableEncryptedMetadataService.enableMetadataEncryption(passphrase);
+    return await this.configureMetadataSettingsService.enableEncryptedMetadataForNewInstance(passphrase);
   }
 }

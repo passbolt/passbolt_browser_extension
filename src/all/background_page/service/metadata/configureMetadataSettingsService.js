@@ -21,7 +21,7 @@ import {assertString} from "../../utils/assertions";
 /**
  * The service aims to orchestrate the enablement of the metadata encryption.
  */
-export default class EnableEncryptedMetadataService {
+export default class ConfigureMetadataSettingsService {
   /**
    * @constructor
    * @param {AccountEntity} account The user account
@@ -39,7 +39,7 @@ export default class EnableEncryptedMetadataService {
    * @return {Promise<MetadataKeysSettingsEntity>}
    * @throws {TypeError} if the `passphrase` is not a valid string
    */
-  async enableMetadataEncryption(passphrase) {
+  async enableEncryptedMetadataForNewInstance(passphrase) {
     assertString(passphrase);
 
     const gpgKeyPairEntity = await this.generateMetadataKeyService.generateKey(passphrase);

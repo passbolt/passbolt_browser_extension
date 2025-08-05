@@ -29,13 +29,13 @@ describe("EnableMetadataSetupSettingsController", () => {
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const controller = new EnableMetadataSetupSettingsController(null, null, apiClientOptions, account);
       jest.spyOn(controller.getPassphraseService, "getFromStorageOrFail");
-      jest.spyOn(controller.enableEncryptedMetadataService, "enableMetadataEncryption").mockImplementation(() => {});
+      jest.spyOn(controller.configureMetadataSettingsService, "enableEncryptedMetadataForNewInstance").mockImplementation(() => {});
 
       await controller.exec();
 
       expect(controller.getPassphraseService.getFromStorageOrFail).toHaveBeenCalledTimes(1);
-      expect(controller.enableEncryptedMetadataService.enableMetadataEncryption).toHaveBeenCalledTimes(1);
-      expect(controller.enableEncryptedMetadataService.enableMetadataEncryption).toHaveBeenCalledWith(passphrase);
+      expect(controller.configureMetadataSettingsService.enableEncryptedMetadataForNewInstance).toHaveBeenCalledTimes(1);
+      expect(controller.configureMetadataSettingsService.enableEncryptedMetadataForNewInstance).toHaveBeenCalledWith(passphrase);
     });
 
     it("should throw an error if the passphrase is not available in the session storage", async() => {
@@ -56,7 +56,7 @@ describe("EnableMetadataSetupSettingsController", () => {
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const controller = new EnableMetadataSetupSettingsController(null, null, apiClientOptions, account);
-      jest.spyOn(controller.enableEncryptedMetadataService, "enableMetadataEncryption").mockImplementation(() => { throw new Error("Something went wrong!"); });
+      jest.spyOn(controller.configureMetadataSettingsService, "enableEncryptedMetadataForNewInstance").mockImplementation(() => { throw new Error("Something went wrong!"); });
 
       await expect(() => controller.exec()).rejects.toThrowError("Something went wrong!");
     });

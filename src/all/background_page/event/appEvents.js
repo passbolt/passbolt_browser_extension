@@ -70,6 +70,7 @@ import ShareMetadataKeyPrivateController from "../controller/metadata/shareMetad
 import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getOrFindMetadataKeysSettingsController";
 import CopyToClipboardController from "../controller/clipboard/copyToClipboardController";
 import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
+import FindMetadataGettingStartedSettingsController from "../controller/metadata/findMetadataGettingStartedSettingsController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -448,6 +449,16 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec(userId);
   });
 
+  /*
+   * Find metadata getting started settings.
+   *
+   * @listens passbolt.metadata.find-getting-started-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-getting-started-settings', async requestId => {
+    const controller = new FindMetadataGettingStartedSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
 
   /*
    * ==================================================================================

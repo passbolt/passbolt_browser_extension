@@ -12,9 +12,8 @@
  * @since         5.4.0
  */
 import ConfigureMetadataSettingsService from "../../service/metadata/configureMetadataSettingsService";
-import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 
-export default class EnableMetadataSetupSettingsController {
+export default class KeepCleartextMetadataForExistingInstanceController {
   /**
    * @constructor
    * @param {Worker} worker
@@ -26,7 +25,6 @@ export default class EnableMetadataSetupSettingsController {
     this.worker = worker;
     this.requestId = requestId;
     this.configureMetadataSettingsService = new ConfigureMetadataSettingsService(account, apiClientOptions);
-    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -44,11 +42,10 @@ export default class EnableMetadataSetupSettingsController {
   }
 
   /**
-   * Run the process to enable metadata encryption
+   * Run the process to keep legacy metadata in cleartext
    * @returns {Promise<void>}
    */
   async exec() {
-    const passphrase = await this.getPassphraseService.getFromStorageOrFail();
-    return await this.configureMetadataSettingsService.enableEncryptedMetadataForNewInstance(passphrase);
+    return await this.configureMetadataSettingsService.keepCleartextMetadataForExistingInstance();
   }
 }

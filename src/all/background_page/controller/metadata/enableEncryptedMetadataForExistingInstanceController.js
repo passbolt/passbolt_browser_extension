@@ -14,7 +14,7 @@
 import ConfigureMetadataSettingsService from "../../service/metadata/configureMetadataSettingsService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 
-export default class EnableMetadataSetupSettingsController {
+export default class EnableEncryptedMetadataForExistingInstanceController {
   /**
    * @constructor
    * @param {Worker} worker
@@ -48,7 +48,7 @@ export default class EnableMetadataSetupSettingsController {
    * @returns {Promise<void>}
    */
   async exec() {
-    const passphrase = await this.getPassphraseService.getFromStorageOrFail();
-    return await this.configureMetadataSettingsService.enableEncryptedMetadataForNewInstance(passphrase);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    return await this.configureMetadataSettingsService.enableEncryptedMetadataForExistingInstance(passphrase);
   }
 }

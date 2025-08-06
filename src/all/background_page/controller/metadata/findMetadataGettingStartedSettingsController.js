@@ -11,22 +11,19 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.4.0
  */
-import ConfigureMetadataSettingsService from "../../service/metadata/configureMetadataSettingsService";
-import GetPassphraseService from "../../service/passphrase/getPassphraseService";
+import FindMetadataGettingStartedSettingsService from "passbolt-styleguide/src/shared/services/metadata/findMetadataGettingStartedSettingsService";
 
-export default class EnableMetadataSetupSettingsController {
+export default class FindMetadataGettingStartedSettingsController {
   /**
    * @constructor
    * @param {Worker} worker
    * @param {string} requestId
    * @param {ApiClientOptions} apiClientOptions the api client options
-   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.configureMetadataSettingsService = new ConfigureMetadataSettingsService(account, apiClientOptions);
-    this.getPassphraseService = new GetPassphraseService(account);
+    this.findMetadataGettingStartedSettingsService = new FindMetadataGettingStartedSettingsService(apiClientOptions);
   }
 
   /**
@@ -44,11 +41,10 @@ export default class EnableMetadataSetupSettingsController {
   }
 
   /**
-   * Run the process to enable metadata encryption
-   * @returns {Promise<void>}
+   * Find the metadata getting started settings.
+   * @returns {Promise<MetadataGettingStartedSettingsEntity>}
    */
   async exec() {
-    const passphrase = await this.getPassphraseService.getFromStorageOrFail();
-    return await this.configureMetadataSettingsService.enableEncryptedMetadataForNewInstance(passphrase);
+    return await this.findMetadataGettingStartedSettingsService.findGettingStartedSettings();
   }
 }

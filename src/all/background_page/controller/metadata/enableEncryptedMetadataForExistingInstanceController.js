@@ -48,7 +48,7 @@ export default class EnableEncryptedMetadataForExistingInstanceController {
    * @returns {Promise<void>}
    */
   async exec() {
-    const passphrase = await this.getPassphraseService.getPassphrase();
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     return await this.configureMetadataSettingsService.enableEncryptedMetadataForExistingInstance(passphrase);
   }
 }

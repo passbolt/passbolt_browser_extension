@@ -17,6 +17,7 @@ import GenerateMetadataKeyService from "./generateMetadataKeyService";
 import CreateMetadataKeyService from "./createMetadataKeyService";
 import SaveMetadataSettingsService from "./saveMetadataSettingsService";
 import {assertString} from "../../utils/assertions";
+import FindMetadataGettingStartedSettingsService from "passbolt-styleguide/src/shared/services/metadata/findMetadataGettingStartedSettingsService";
 
 /**
  * The service aims to orchestrate the enablement of the metadata encryption.
@@ -31,6 +32,7 @@ export default class ConfigureMetadataSettingsService {
     this.generateMetadataKeyService = new GenerateMetadataKeyService(account);
     this.createMetadataKeyService = new CreateMetadataKeyService(account, apiClientOptions);
     this.saveMetadaSettingsService = new SaveMetadataSettingsService(account, apiClientOptions);
+    this.findMetadataGettingStartedSettingsService = new FindMetadataGettingStartedSettingsService(apiClientOptions);
   }
 
   /**
@@ -59,6 +61,7 @@ export default class ConfigureMetadataSettingsService {
    * @throws {TypeError} if the `passphrase` is not a valid string
    */
   async enableEncryptedMetadataForExistingInstance(passphrase) {
+    await this.assertProcessIsEnabled();
     assertString(passphrase);
 
     const gpgKeyPairEntity = await this.generateMetadataKeyService.generateKey(passphrase);
@@ -78,7 +81,20 @@ export default class ConfigureMetadataSettingsService {
    * @return {Promise<void>}
    */
   async keepCleartextMetadataForExistingInstance() {
+    await this.assertProcessIsEnabled();
     const metadataTypeSettings = MetadataTypesSettingsEntity.createFromV4Default();
     await this.saveMetadaSettingsService.saveTypesSettings(metadataTypeSettings);
+  }
+
+  /**
+   * Asserts that the process can be run before proceeding.
+   * @returns {Promise<void>}
+   * @throws {Error}
+   */
+  async assertProcessIsEnabled() {
+    const gettingStartedEntity = await this.findMetadataGettingStartedSettingsService.findGettingStartedSettings();
+    if (!gettingStartedEntity.enabled) {
+      throw new Error("The metadata encryption strategy has been already chosen.");
+    }
   }
 }

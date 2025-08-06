@@ -18,6 +18,8 @@ import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/e
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 import ExternalGpgKeyPairEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import MetadataGettingStartedSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataGettingStartedSettingsEntity";
+import {defaultMetadataGettingStartedSettingsDto, enableMetadataGettingStartedSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataGettingStartedSettingsEntity.test.data";
 
 describe("ConfigureMetadataSettingsService", () => {
   describe("::enableEncryptedMetadataForNewInstance", () => {
@@ -126,6 +128,7 @@ describe("ConfigureMetadataSettingsService", () => {
       jest.spyOn(orchestrator.createMetadataKeyService, "create").mockImplementation(() => {});
       jest.spyOn(orchestrator.saveMetadaSettingsService, "saveKeysSettings").mockImplementation(() => {});
       jest.spyOn(orchestrator.saveMetadaSettingsService, "saveTypesSettings").mockImplementation(() => {});
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
       await orchestrator.enableEncryptedMetadataForExistingInstance(passphrase);
 
@@ -151,6 +154,7 @@ describe("ConfigureMetadataSettingsService", () => {
 
       const orchestrator = new ConfigureMetadataSettingsService(account, apiClientOptions);
       jest.spyOn(orchestrator.createMetadataKeyService, "create").mockImplementation(() => { throw new Error("unexpected error"); });
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
       await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
     });
@@ -164,6 +168,7 @@ describe("ConfigureMetadataSettingsService", () => {
 
       const orchestrator = new ConfigureMetadataSettingsService(account, apiClientOptions);
       jest.spyOn(orchestrator.createMetadataKeyService, "create").mockImplementation(() => { throw new Error("unexpected error"); });
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
       await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
     });
@@ -178,6 +183,7 @@ describe("ConfigureMetadataSettingsService", () => {
       const orchestrator = new ConfigureMetadataSettingsService(account, apiClientOptions);
       jest.spyOn(orchestrator.createMetadataKeyService, "create").mockImplementation(() => {});
       jest.spyOn(orchestrator.saveMetadaSettingsService, "saveKeysSettings").mockImplementation(() => { throw new Error("unexpected error"); });
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
       await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
     });
@@ -193,6 +199,20 @@ describe("ConfigureMetadataSettingsService", () => {
       jest.spyOn(orchestrator.createMetadataKeyService, "create").mockImplementation(() => {});
       jest.spyOn(orchestrator.saveMetadaSettingsService, "saveKeysSettings").mockImplementation(() => {});
       jest.spyOn(orchestrator.saveMetadaSettingsService, "saveTypesSettings").mockImplementation(() => { throw new Error("unexpected error"); });
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
+
+      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
+    });
+
+    it("should not proceed if a strategy has already been defined", async() => {
+      expect.assertions(1);
+
+      const passphrase = "ada@passbolt.com";
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+
+      const orchestrator = new ConfigureMetadataSettingsService(account, apiClientOptions);
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(defaultMetadataGettingStartedSettingsDto()));
 
       await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
     });
@@ -209,6 +229,7 @@ describe("ConfigureMetadataSettingsService", () => {
 
       const orchestrator = new ConfigureMetadataSettingsService(account, apiClientOptions);
       jest.spyOn(orchestrator.saveMetadaSettingsService, "saveTypesSettings").mockImplementation(() => {});
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
       await orchestrator.keepCleartextMetadataForExistingInstance();
 
@@ -224,6 +245,19 @@ describe("ConfigureMetadataSettingsService", () => {
 
       const orchestrator = new ConfigureMetadataSettingsService(account, apiClientOptions);
       jest.spyOn(orchestrator.saveMetadaSettingsService, "saveTypesSettings").mockImplementation(() => { throw new Error("unexpected error"); });
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
+
+      await expect(() => orchestrator.keepCleartextMetadataForExistingInstance()).rejects.toThrowError();
+    });
+
+    it("should not intercept errors if anything goes wrong and let the caller manage it: errors from saving the types settings", async() => {
+      expect.assertions(1);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+
+      const orchestrator = new ConfigureMetadataSettingsService(account, apiClientOptions);
+      jest.spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings").mockImplementation(() => new MetadataGettingStartedSettingsEntity(defaultMetadataGettingStartedSettingsDto()));
 
       await expect(() => orchestrator.keepCleartextMetadataForExistingInstance()).rejects.toThrowError();
     });

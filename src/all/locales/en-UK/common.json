@@ -26,6 +26,7 @@
   "Done": "Done",
   "Done!": "Done!",
   "Encrypting {{counter}}/{{total}}": "Encrypting {{counter}}/{{total}}",
+  "Encrypting {{total}} metadata": "Encrypting {{total}} metadata",
   "Encrypting Metadata": "Encrypting Metadata",
   "Encrypting secret": "Encrypting secret",
   "Encrypting Secret": "Encrypting Secret",

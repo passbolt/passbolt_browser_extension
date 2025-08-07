@@ -100,6 +100,22 @@ describe("VerifyOrTrustMetadataKeyService", () => {
       expect(service.confirmMetadataKeyContentCodeService.requestConfirm).not.toHaveBeenCalled();
     });
 
+    it("does nothing if the user does not have a metadata private key shared with the active metadata key returned by the server.", async() => {
+      expect.assertions(2);
+
+      const metadataKeyDto = defaultMetadataKeyDto();
+      const metadataKeysCollection = new MetadataKeysCollection([metadataKeyDto]);
+
+      jest.spyOn(service.getOrFindMetadataKeysService.findAndUpdateMetadataKeysService.findMetadataKeysService, "findAll").mockReturnValue(metadataKeysCollection);
+      jest.spyOn(service.trustMetadataKeyService, "trust").mockImplementationOnce(jest.fn);
+      jest.spyOn(service.confirmMetadataKeyContentCodeService, "requestConfirm").mockImplementationOnce(jest.fn);
+
+      await service.verifyTrustedOrTrustNewMetadataKey(pgpKeys.ada.passphrase);
+
+      expect(service.trustMetadataKeyService.trust).not.toHaveBeenCalled();
+      expect(service.confirmMetadataKeyContentCodeService.requestConfirm).not.toHaveBeenCalled();
+    });
+
     it("throws if the active metadata key is not the one already trusted, and the user does not trust it.", async() => {
       expect.assertions(2);
 

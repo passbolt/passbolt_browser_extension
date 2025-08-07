@@ -16,9 +16,6 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindAndUpdateMetadataKeysSessionStorageService from "./findAndUpdateMetadataKeysSessionStorageService";
-import {
-  defaultMetadataKeysDtos
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
@@ -49,13 +46,15 @@ describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
   describe("::findAndUpdateAll", () => {
     it("should throw an error if the user passphrase is not set and is required", async() => {
       expect.assertions(1);
-      const metadataKeysDto = defaultMetadataKeysDtos(1, {}, {withMetadataPrivateKeys: true});
+      const id = uuidv4();
+      const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
+      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
       jest.spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll").mockImplementation(() => metadataKeysDto);
 
       await expect(() => findAndUpdateKeysSessionStorageService.findAndUpdateAll()).rejects.toThrow(UserPassphraseRequiredError);
     });
 
-    it("retrieves the metadata keys from the API and store them into the session storage using the passphrase from the session storage.", async() => {
+    it("retrieves the metadata keys from the API and store them into the session storage and decrypt them using the passphrase from the session storage.", async() => {
       expect.assertions(7);
 
       const id = uuidv4();
@@ -96,7 +95,6 @@ describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
 
       expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
-
 
     it("overrides session storage with a second update call.", async() => {
       expect.assertions(2);

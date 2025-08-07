@@ -43,7 +43,9 @@ class CsvKdbxRowComposer extends AbstractRowComposer {
     const row = {};
     const externalResourceDto = externalResourceEntity.toDto();
     for (const propertyName in this.mapping) {
-      if (propertyName === "totp" && externalResourceEntity.totp) {
+      if (propertyName === "uris" && externalResourceEntity.uris) {
+        row[this.mapping[propertyName]] = externalResourceDto.uris?.length > 0 ? externalResourceDto.uris[0] : "";
+      } else if (propertyName === "totp" && externalResourceEntity.totp) {
         const totp = externalResourceEntity.totp;
         const totpUrl = totp.createUrlFromExternalResource(externalResourceEntity);
         row[this.mapping[propertyName]] = totpUrl.toString();

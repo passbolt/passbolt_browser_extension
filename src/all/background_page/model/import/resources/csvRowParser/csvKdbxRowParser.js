@@ -25,7 +25,7 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
     return {
       "name": "Title",
       "username": "Username",
-      "uri": "URL",
+      "uris": "URL",
       "secret_clear": "Password",
       "description": "Notes",
       "folder_parent_path": "Group",
@@ -46,13 +46,16 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
 
     for (const propertyName in this.mapping) {
       if (data[this.mapping[propertyName]]) {
-        if (propertyName.toLowerCase() === "totp") {
+        if (propertyName === "uris") {
+          externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+        } else if (propertyName.toLowerCase() === "totp") {
           externalResourceDto.totp = this.parseTotp(data[this.mapping[propertyName]]);
         } else {
           externalResourceDto[propertyName] = data[this.mapping[propertyName]];
         }
       }
     }
+
     resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
     const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
     let resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
@@ -63,7 +66,6 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
         importEntity.importResourcesErrors.push(new ImportError("Resource partially imported", externalResourceDto, new Error("We used the closest resource type supported.")));
       }
       if (!resourceType) {
-        //Fallback default content type not supported
         resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, metadataTypesSettings);
         importEntity.importResourcesErrors.push(new ImportError("Imported with default content type", externalResourceDto, new Error("No resource type associated to this row.")));
       }

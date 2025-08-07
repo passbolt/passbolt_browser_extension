@@ -53,6 +53,10 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
     this._permissionsAdded = new UpdatedPermissionsCollection(permissionsAddedDto, {clone: false});
     this._permissionsUpdated = new UpdatedPermissionsCollection(permissionsUpdatedDto, {clone: false});
     this._permissionsRemoved = new UpdatedPermissionsCollection(permissionsRemovedDto, {clone: false});
+
+    this._permissionsAdded.sort();
+    this._permissionsUpdated.sort();
+    this._permissionsRemoved.sort();
   }
 
   /**

@@ -600,4 +600,58 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage._cachedData).toBeNull();
     });
   });
+
+  describe("::deleteResources", () => {
+    it("Should throw if no data passed as parameter", async() => {
+      expect.assertions(1);
+      const promise = ResourceLocalStorage.deleteResources();
+      await expect(promise).rejects.toThrow("The given parameter is not a valid array of uuid");
+    });
+
+    it("Should throw if the resourceIds parameter is not a valid entry", async() => {
+      expect.assertions(1);
+      const promise = ResourceLocalStorage.deleteResources(42);
+      await expect(promise).rejects.toThrow("he given parameter is not a valid array of uuid");
+    });
+
+    it("Should do nothing if the resource is not found in the local storage", async() => {
+      expect.assertions(2);
+      const resourceDto = defaultResourceDto();
+      const resourcesDtos = [resourceDto];
+      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await ResourceLocalStorage.deleteResources([uuidv4()]);
+      const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
+    });
+
+    it("Should update the resources", async() => {
+      expect.assertions(3);
+      const resourceDto1 = defaultResourceDto();
+      const resourceDto2 = defaultResourceDto();
+      const resourceDto3 = defaultResourceDto();
+      const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3];
+      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await ResourceLocalStorage.deleteResources([resourceDto1.id, resourceDto2.id]);
+      const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resourceDto3);
+    });
+
+    it("Should update cache after deleting the resources", async() => {
+      expect.assertions(5);
+      const resourceDto1 = defaultResourceDto();
+      const resourceDto2 = defaultResourceDto();
+      const resourceDto3 = defaultResourceDto();
+      const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3];
+      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
+      await ResourceLocalStorage.deleteResources([resourceDto1.id, resourceDto2.id]);
+      expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
+      expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
+      expect(ResourceLocalStorage._cachedData).toHaveLength(1);
+      expect(ResourceLocalStorage._cachedData[0]).toEqual(resourceDto3);
+    });
+  });
 });

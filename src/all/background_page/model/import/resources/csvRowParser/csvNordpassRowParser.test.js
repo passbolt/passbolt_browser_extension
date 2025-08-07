@@ -66,7 +66,7 @@ describe("CsvNordpassRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.username,
-      uri: data.url,
+      uris: [data.url],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.password,
       description: data.note,
@@ -102,7 +102,7 @@ describe("CsvNordpassRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.username,
-      uri: data.url,
+      uris: [data.url],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.password,
       description: data.note,

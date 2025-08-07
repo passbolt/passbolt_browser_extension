@@ -28,7 +28,7 @@ class CsvDashlaneRowParser extends AbstractCsvRowParser {
       "name": "title",
       "secret_clear": "password",
       "description": "note",
-      "uri": "url",
+      "uris": "url",
       "category": "category",
       "otpSecret": "otpSecret"
     };
@@ -46,7 +46,9 @@ class CsvDashlaneRowParser extends AbstractCsvRowParser {
     const externalResourceDto = {};
 
     for (const propertyName in this.mapping) {
-      if (data[this.mapping[propertyName]]) {
+      if (propertyName === "uris") {
+        externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+      } else if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }
     }

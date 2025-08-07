@@ -108,6 +108,10 @@ export const anonymousOrganizationSettings = (data = {}) => {
             }, {
               "locale": "uk-UA",
               "label": "Українська (beta)"
+            },
+            {
+              "locale": "cs-CZ",
+              "label": "Čeština (beta)"
             }
           ]
         },

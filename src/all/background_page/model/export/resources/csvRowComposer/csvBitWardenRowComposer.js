@@ -43,7 +43,15 @@ class CsvBitWardenRowComposer extends AbstractRowComposer {
     const row = {};
     const externalResourceDto = externalResourceEntity.toDto();
     for (const propertyName in this.mapping) {
-      row[this.mapping[propertyName]] = externalResourceDto[propertyName] || "";
+      if (propertyName === "uris") {
+        row[this.mapping[propertyName]] = externalResourceDto.uris?.length > 0 ? externalResourceDto.uris.join(",") : "";
+      } else if (propertyName === "totp" && externalResourceEntity.totp) {
+        const totp = externalResourceEntity.totp;
+        const totpUrl = totp.createUrlFromExternalResource(externalResourceEntity);
+        row[this.mapping[propertyName]] = totpUrl.toString();
+      } else {
+        row[this.mapping[propertyName]] = externalResourceDto[propertyName] || "";
+      }
     }
     return row;
   }

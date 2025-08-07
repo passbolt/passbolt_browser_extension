@@ -94,7 +94,8 @@ class ResourcesKdbxExporter {
     if (externalResourceEntity.totp) {
       this.setTotpField(kdbxEntry, externalResourceEntity);
     }
-    kdbxEntry.fields.set('URL', externalResourceEntity.uri);
+    this.setUrisFields(kdbxEntry, externalResourceEntity);
+    this.setCustomFields(kdbxEntry, externalResourceEntity);
     kdbxEntry.fields.set('Notes', externalResourceEntity.description);
 
     if (externalResourceEntity.expired) {
@@ -106,6 +107,48 @@ class ResourcesKdbxExporter {
       kdbxEntry.times.expires = false;
     }
 
+    this.setIconField(kdbxEntry, externalResourceEntity);
+  }
+
+  /**
+   * Set the custom fields according to the kdbx format
+   * @param {kdbxweb.KdbxEntry} kdbxEntry
+   * @param {ExternalResourceEntity} externalResourceEntity
+   * @returns {void}
+   */
+  setCustomFields(kdbxEntry, externalResourceEntity) {
+    if (externalResourceEntity.customFields) {
+      externalResourceEntity.customFields.items.forEach(customField => {
+        kdbxEntry.fields.set(customField.key, kdbxweb.ProtectedValue.fromString(customField.value));
+      });
+    }
+  }
+
+  /**
+   * Set the URL fields according to the kdbx format
+   * @param {kdbxweb.KdbxEntry} kdbxEntry
+   * @param {ExternalResourceEntity} externalResourceEntity
+   * @returns {void}
+   */
+  setUrisFields(kdbxEntry, externalResourceEntity) {
+    if (externalResourceEntity.uris && externalResourceEntity.uris.length > 0) {
+      kdbxEntry.fields.set('URL', externalResourceEntity.uris[0]);
+      if (externalResourceEntity.uris.length > 1) {
+        kdbxEntry.fields.set('KP2A_URL', externalResourceEntity.uris[1]);
+        for (let i = 2; i < externalResourceEntity.uris.length; i++) {
+          kdbxEntry.fields.set(`KP2A_URL_${i}`, externalResourceEntity.uris[i]);
+        }
+      }
+    }
+  }
+
+  /**
+   * Set the icon fields according to the kdbx format
+   * @param {kdbxweb.KdbxEntry} kdbxEntry
+   * @param {ExternalResourceEntity} externalResourceEntity
+   * @returns {void}
+   */
+  setIconField(kdbxEntry, externalResourceEntity) {
     if (!externalResourceEntity.icon) {
       return;
     }
@@ -131,7 +174,6 @@ class ResourcesKdbxExporter {
     switch (this.exportEntity.format) {
       case ExportResourcesFileEntity.FORMAT_KDBX: {
         kdbxEntry.fields.set('TimeOtp-Secret-Base32', kdbxweb.ProtectedValue.fromString(totp.secretKey));
-        // Adapt algorithm to match keepass windows
         const algorithm = `HMAC-${totp.algorithm.substring(0, 3)}-${totp.algorithm.substring(3)}`;
         kdbxEntry.fields.set('TimeOtp-Algorithm', algorithm);
         kdbxEntry.fields.set('TimeOtp-Length', totp.digits.toString());

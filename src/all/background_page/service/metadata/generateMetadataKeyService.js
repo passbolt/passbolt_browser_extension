@@ -29,7 +29,7 @@ class GenerateMetadataKeyService {
   /**
    * Generate metadata key.
    * @param {string} passphrase The user passphrase.
-   * @return {ExternalGpgKeyPairEntity}
+   * @return {Promise<ExternalGpgKeyPairEntity>}
    */
   async generateKey(passphrase) {
     assertString(passphrase);

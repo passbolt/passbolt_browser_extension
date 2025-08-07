@@ -65,7 +65,7 @@ describe("ResourceUpdateLocalStorageController", () => {
     });
 
     it("requests the user passphrase whenever the decryption of the metadata requires it and try to load the data again", async() => {
-      expect.assertions(1);
+      expect.assertions(4);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [defaultResourceDto(
         {
@@ -79,10 +79,14 @@ describe("ResourceUpdateLocalStorageController", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
       jest.spyOn(GetPassphraseService.prototype, "requestPassphrase").mockImplementation(() => pgpKeys.ada.passphrase);
       jest.spyOn(PassphraseStorageService, "set").mockImplementation(() => {});
+      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateAll");
 
       await controller._exec();
 
       expect(PassphraseStorageService.set).toHaveBeenCalledWith(pgpKeys.ada.passphrase, 60);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(2);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenNthCalledWith(1, {"updatePeriodThreshold": 10000});
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenNthCalledWith(2, {}, pgpKeys.ada.passphrase);
     });
   });
 });

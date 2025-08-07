@@ -80,18 +80,8 @@ class SignInSetupController {
       await PassphraseStorageService.set(temporaryAccount.passphrase, 60);
     }
     await PostLoginService.exec();
-    await this.redirectToApp(temporaryAccount.account.domain);
     // Clear all data in the temporary account session storage
     await AccountTemporarySessionStorageService.remove();
-  }
-
-  /**
-   * Redirect the user to the application
-   * @param {string} url The url
-   * @returns {Promise<void>}
-   */
-  async redirectToApp(url) {
-    browser.tabs.update(this.worker.tab.id, {url});
   }
 }
 

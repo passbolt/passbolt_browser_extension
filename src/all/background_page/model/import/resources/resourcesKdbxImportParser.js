@@ -17,6 +17,11 @@ import * as kdbxweb from 'kdbxweb';
 import ExternalTotpEntity from "../../entity/totp/externalTotpEntity";
 import ResourcesTypeImportParser from "./resourcesTypeImportParser";
 import {ICON_TYPE_KEEPASS_ICON_SET} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
+import {CUSTOM_FIELD_TYPE} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldEntity";
+import {v4 as uuidv4} from "uuid";
+
+const KDBX_SUPPORTED_FIELDS = ['Title', 'URL', 'UserName', 'Notes', 'otp', 'TimeOtp-Secret-Base32', 'TimeOtp-Algorithm', 'TimeOtp-Length', 'TimeOtp-Period', 'Password'];
+
 
 class ResourcesKdbxImportParser {
   /**
@@ -126,7 +131,6 @@ class ResourcesKdbxImportParser {
   parseResource(kdbxEntry) {
     const externalResourceDto = {
       name: kdbxEntry.fields.get('Title') ? kdbxEntry.fields.get('Title').trim() : "",
-      uri: kdbxEntry.fields.get('URL') ? kdbxEntry.fields.get('URL').trim() : "",
       username: kdbxEntry.fields.get('UserName') ? kdbxEntry.fields.get('UserName').trim() : "",
       description: kdbxEntry.fields.get('Notes') ? kdbxEntry.fields.get('Notes').trim() : "",
       folder_parent_path: this.getKdbxEntryPath(kdbxEntry),
@@ -137,44 +141,14 @@ class ResourcesKdbxImportParser {
     if (typeof kdbxEntry.fields.get('Password') === 'object') {
       externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();
     }
-
     try {
-      const totp = this.getTotp(kdbxEntry);
-      if (totp) {
-        externalResourceDto.totp = totp;
-      }
+      this.parseUris(kdbxEntry, externalResourceDto);
+      this.parseTotp(kdbxEntry, externalResourceDto);
 
-      this.resourceTypesCollection.filterByResourceTypeVersion(this.metadataTypesSettings.defaultResourceTypes);
+      const resourceType = this.getResourceType(externalResourceDto);
 
-      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, this.resourceTypesCollection);
-
-      let resourceType = ResourcesTypeImportParser.findMatchingResourceType(this.resourceTypesCollection, scores);
-
-      if (!resourceType) {
-        resourceType = ResourcesTypeImportParser.findPartialResourceType(this.resourceTypesCollection, scores);
-        if (resourceType) {
-          this.importEntity.importResourcesErrors.push(new ImportError("Resource partially imported", externalResourceDto));
-        }
-        if (!resourceType) {
-          //Fallback default content type not supported
-          resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(this.resourceTypesCollection, this.metadataTypesSettings);
-          this.importEntity.importResourcesErrors.push(new ImportError("Content type not supported but imported with default resource type", externalResourceDto));
-        }
-      }
-
-      if ((kdbxEntry.bgColor || kdbxEntry.icon) && resourceType.isV5()) {
-        externalResourceDto.icon = {};
-
-        if (kdbxEntry.icon) {
-          externalResourceDto.icon.type = ICON_TYPE_KEEPASS_ICON_SET;
-          externalResourceDto.icon.value = kdbxEntry.icon;
-        }
-
-        if (kdbxEntry.bgColor) {
-          externalResourceDto.icon.background_color = kdbxEntry.bgColor;
-        }
-      }
-
+      this.parseIcon(kdbxEntry, externalResourceDto, resourceType);
+      this.parseCustomFields(kdbxEntry, externalResourceDto, resourceType);
       //resourceType should never be empty to not block end user
       externalResourceDto.resource_type_id = resourceType.id;
 
@@ -189,20 +163,129 @@ class ResourcesKdbxImportParser {
   }
 
   /**
-   * Get the totp
-   * @param {kdbxweb.KdbxEntry} kdbxEntry
-   * @return {*}
+   * Parse URIs from a kdbx entry
+   * @param {KdbxEntry} kdbxEntry The kdbx entry
+   * @param {ExternalResourceDto} externalResourceDto The external resource dto
+   * @private
+   * @return {void}
    */
-  getTotp(kdbxEntry) {
+  parseUris(kdbxEntry, externalResourceDto) {
+    const uri = kdbxEntry.fields.get('URL') ? kdbxEntry.fields.get('URL').trim() : "";
+    const additionalUris = [uri];
+
+    let additionalEntriesUris = [...kdbxEntry.fields.entries()]
+      .filter(([key]) => key.startsWith('KP2A_URL'))
+      .map(([, value]) => (value));
+
+    if (additionalEntriesUris.length > 31) {
+      this.importEntity.importResourcesErrors.push(new ImportError(
+        "Resource has more than 32 URIs, only the first 32 will be imported",
+        externalResourceDto
+      ));
+    }
+    additionalEntriesUris = additionalEntriesUris.slice(0, 31);
+
+    for (const additionalUri of additionalEntriesUris) {
+      additionalUris.push(additionalUri.trim());
+    }
+
+    externalResourceDto.uris = additionalUris;
+  }
+  /**
+   * Parse the icon of the kdbx entry
+   * @param {kdbxweb.KdbxEntry} kdbxEntry
+   * @param {ExternalResourceDto} externalResourceDto
+   * @param {ResourceTypeEntity} resourceType
+   * @private
+   * @returns {void}
+   */
+  parseIcon(kdbxEntry, externalResourceDto, resourceType) {
+    if ((kdbxEntry.bgColor || kdbxEntry.icon) && resourceType.isV5()) {
+      externalResourceDto.icon = {};
+
+      if (kdbxEntry.icon) {
+        externalResourceDto.icon.type = ICON_TYPE_KEEPASS_ICON_SET;
+        externalResourceDto.icon.value = kdbxEntry.icon;
+      }
+
+      if (kdbxEntry.bgColor) {
+        externalResourceDto.icon.background_color = kdbxEntry.bgColor;
+      }
+    }
+  }
+
+  /**
+   * Parse the custom fields of the kdbx entry
+   * @param {kdbxEntry} kdbxEntry
+   * @param {ExternalResourceDto} externalResourceDto
+   * @param {ResourceTypeEntity} resourceType
+   * @private
+   * @returns {void}
+   */
+  parseCustomFields(kdbxEntry, externalResourceDto, resourceType) {
+    if (resourceType.isV5()) {
+      const customFields = [];
+      kdbxEntry.fields.forEach((value, key) => {
+        if (!KDBX_SUPPORTED_FIELDS.includes(key) && !key.startsWith('KP2A_URL')) {
+          const customFieldValue = typeof value === 'string' ? value : value.getText();
+          customFields.push({
+            id: uuidv4(),
+            type: CUSTOM_FIELD_TYPE.TEXT,
+            metadata_key: key,
+            secret_value: customFieldValue
+          });
+        }
+      });
+      if (customFields.length > 0) {
+        externalResourceDto.custom_fields = customFields;
+      }
+    }
+  }
+
+  /**
+   * parse the totp of the kdbx entry
+   * @param {kdbxweb.KdbxEntry} kdbxEntry
+   * @param {ExternalResourceDto} externalResourceDto
+   * @private
+   * @returns {void}
+   */
+  parseTotp(kdbxEntry, externalResourceDto) {
     if (kdbxEntry.fields.get('otp')) {
       const totpUrl = typeof kdbxEntry.fields.get('otp') === 'object' ? kdbxEntry.fields.get('otp').getText() : kdbxEntry.fields.get('otp');
       const totpUrlDecoded = new URL(decodeURIComponent(totpUrl));
       const totp = ExternalTotpEntity.createTotpFromUrl(totpUrlDecoded);
-      return totp.toDto();
+      externalResourceDto.totp = totp.toDto();
     } else if (typeof kdbxEntry.fields.get('TimeOtp-Secret-Base32') === 'object') {
       const totp = ExternalTotpEntity.createTotpFromKdbxWindows(kdbxEntry.fields);
-      return totp.toDto();
+      externalResourceDto.totp = totp.toDto();
     }
+  }
+
+  /**
+   * Get the resource type
+   * @param {ExternalResourceDto} externalResourceDto
+   * @return {ResourceTypeDto}
+   */
+  getResourceType(externalResourceDto) {
+    this.resourceTypesCollection.filterByResourceTypeVersion(this.metadataTypesSettings.defaultResourceTypes);
+
+    const scores = ResourcesTypeImportParser.getScores(externalResourceDto, this.resourceTypesCollection);
+
+    let resourceType = ResourcesTypeImportParser.findMatchingResourceType(this.resourceTypesCollection, scores);
+
+    if (resourceType) {
+      return resourceType;
+    }
+
+    resourceType = ResourcesTypeImportParser.findPartialResourceType(this.resourceTypesCollection, scores);
+    if (resourceType) {
+      this.importEntity.importResourcesErrors.push(new ImportError("Resource partially imported", externalResourceDto));
+    } else {
+      //Fallback default content type not supported
+      resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(this.resourceTypesCollection, this.metadataTypesSettings);
+      this.importEntity.importResourcesErrors.push(new ImportError("Content type not supported but imported with default resource type", externalResourceDto));
+    }
+    return resourceType;
   }
 
   /**

@@ -25,6 +25,7 @@ export function withAzureSsoSettings(data = {}) {
       client_secret_expiry: "2022-11-02 00:00:00",
       email_claim: "email",
       prompt: "login",
+      login_hint: true,
     },
   };
 

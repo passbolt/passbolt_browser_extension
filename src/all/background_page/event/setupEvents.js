@@ -30,6 +30,12 @@ import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurit
 import GetAccountRecoveryOrganizationPolicyController from "../controller/setup/getAccountRecoveryOrganizationPolicyController";
 import GetUserPassphrasePoliciesController from "../controller/setup/getUserPassphrasePoliciesController";
 import ReloadTabController from "../controller/tab/reloadTabController";
+import FindMetadataSetupSettingsController from "../controller/metadata/findMetadataSetupSettingsController";
+import EnableMetadataSetupSettingsController from "../controller/metadata/enableMetadataSetupSettingsController";
+import RedirectPostLoginController from "../controller/auth/redirectPostLoginController";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
+import RedirectToAdminWorkspaceController from "../controller/auth/redirectToAdminWorkspaceController";
+import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 
 const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.setup.is-first-install', async requestId => {
@@ -119,6 +125,55 @@ const listen = function(worker, apiClientOptions, account) {
 
   worker.port.on('passbolt.tab.reload', async requestId => {
     const controller = new ReloadTabController(worker, requestId);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.metadata.find-setup-settings', async requestId => {
+    const controller = new FindMetadataSetupSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.metadata.enable', async requestId => {
+    /*
+     * The global account at this stage is an `AccountSetupEntity` that is tempered as this process is run after the sign-in
+     * So, to addresse the enablement of the metadata in the Setup app, we need to get a `AccountEntity` instead.
+     * That's why, we use `GetActiveAccountService.get()` to find an account.
+     */
+    const account = await GetActiveAccountService.get();
+    const controller = new EnableMetadataSetupSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Redirect the user post login.
+   *
+   * @listens passbolt.auth.post-login-redirect
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.post-login-redirect', async requestId => {
+    const controller = new RedirectPostLoginController(worker, requestId, account);
+    await controller._exec();
+  });
+
+  /*
+   * Redirect the user to the administration workspace.
+   *
+   * @listens passbolt.auth.post-login-redirect-to-admin-workspace
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on("passbolt.auth.post-login-redirect-to-admin-workspace", async requestId => {
+    const controller = new RedirectToAdminWorkspaceController(worker, requestId, account);
+    await controller._exec();
+  });
+
+  /*
+   * Find the logged in user
+   *
+   * @listens passbolt.users.find-logged-in-user
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.users.find-logged-in-user', async requestId => {
+    const controller = new GetOrFindLoggedInUserController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 };

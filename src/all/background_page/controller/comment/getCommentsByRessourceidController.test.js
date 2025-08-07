@@ -48,7 +48,7 @@ describe("GetCommentsByRessourceController", () => {
 
       expect(controller.worker).toBe(mockedWorker);
       expect(controller.requestId).toBe(requestId);
-      expect(controller.commentModel).toBeDefined();
+      expect(controller.commentService).toBeDefined();
     });
   });
   describe("GetCommentsByRessourceController::exec", () => {
@@ -58,7 +58,7 @@ describe("GetCommentsByRessourceController", () => {
       fetchCommentsMock();
       const resourceId = uuidv4();
       const controller = new GetCommentsByRessourceController(null, null, defaultApiClientOptions());
-      const spy = jest.spyOn(controller.commentModel, "findAllByResourceId");
+      const spy = jest.spyOn(controller.commentService, "findAllByResourceId");
       const commentsCollectionDto = await controller.exec(resourceId);
 
       expect(commentsCollectionDto.items.length).toBe(4);

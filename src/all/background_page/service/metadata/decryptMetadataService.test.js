@@ -31,7 +31,6 @@ import {
 import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection";
 import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 import {defaultSessionKeyDto} from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeyEntity.test.data";
-import SessionKeyEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeyEntity";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
@@ -396,37 +395,7 @@ describe("DecryptMetadataService", () => {
       await expect(service.decryptAllFromForeignModels(collection, pgpKeys.ada.passphrase, {ignoreDecryptionError: true})).resolves.toBeUndefined();
     });
 
-    it("should remove the invalid session keys from the collection", async() => {
-      expect.assertions(3);
-
-      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
-      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
-      const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(10, {
-        metadata_key_id: metadataKeysDtos[0].id
-      });
-      const collection = new ResourcesCollection(collectionDto);
-      const sessionsKeysForeignIds = collection.items.map(resource => ({foreign_id: resource.id}));
-      const sessionKeysCount = collection.length;
-      const sessionKeysDtos = sharedResourcesSessionKeys(sessionsKeysForeignIds, {count: sessionKeysCount});
-
-      //invalid session key
-      sessionKeysDtos[3] = defaultSessionKeyDto({...sessionKeysDtos[3], session_key: "9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC"});
-      const invalidSessionKeyEntity = new SessionKeyEntity(sessionKeysDtos[3]);
-
-      const sessionKeys = new SessionKeysCollection(sessionKeysDtos);
-
-      jest.spyOn(sessionKeys, "remove");
-      jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
-      jest.spyOn(service.getOrFindSessionKeysService, "getOrFindAllByForeignModelAndForeignIds").mockImplementation(() => sessionKeys);
-
-      await service.decryptAllFromForeignModels(collection);
-
-      expect(sessionKeys.remove).toHaveBeenCalledTimes(1);
-      expect(sessionKeys.remove).toHaveBeenCalledWith(invalidSessionKeyEntity);
-      expect(sessionKeys.length).toStrictEqual(sessionKeysCount - 1);
-    });
-
-    it("should not update the session storage with the session keys", async() => {
+    it("should not update the session storage with the session keys when discovering a new session key if not specifically requested", async() => {
       expect.assertions(1);
 
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
@@ -451,8 +420,8 @@ describe("DecryptMetadataService", () => {
       expect(service.saveSessionKeysService.save).not.toHaveBeenCalled();
     });
 
-    it("should update the session storage with the session keys if the option `updateSessionKeys` is passed", async() => {
-      expect.assertions(2);
+    it("should update the session storage with the session keys when a new session key is discovered if the option `updateSessionKeys` is passed", async() => {
+      expect.assertions(3);
 
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
@@ -461,11 +430,13 @@ describe("DecryptMetadataService", () => {
       });
       const collection = new ResourcesCollection(collectionDto);
 
-
       const sessionsKeysForeignIds = collection.items.map(resource => ({foreign_id: resource.id}));
       const sessionKeysDtos = sharedResourcesSessionKeys(sessionsKeysForeignIds, {count: collection.length});
-      sessionKeysDtos[3] = defaultSessionKeyDto({...sessionKeysDtos[3], session_key: "9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC"});
+      const sessionKeyDiscovered = sessionKeysDtos[3];
+      sessionKeysDtos.splice(3, 1);
       const sessionKeys = new SessionKeysCollection(sessionKeysDtos);
+      sessionKeyDiscovered.modified = collection.resources[3].modified;
+      const expectedSessionKeysDto = [...sessionKeysDtos, sessionKeyDiscovered];
 
       jest.spyOn(service.saveSessionKeysService, "save");
       jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
@@ -473,8 +444,44 @@ describe("DecryptMetadataService", () => {
 
       await service.decryptAllFromForeignModels(collection, null, {updateSessionKeys: true});
 
+      const [[savedSessionKeys, passphraseArg]] = service.saveSessionKeysService.save.mock.calls;
       expect(service.saveSessionKeysService.save).toHaveBeenCalledTimes(1);
-      expect(service.saveSessionKeysService.save).toHaveBeenCalledWith(sessionKeys, null);
+      expect(savedSessionKeys.toDto()).toEqual(expectedSessionKeysDto);
+      expect(passphraseArg).toBe(null);
+    });
+
+    it("should remove invalid session key and add newly discovered to the list of session keys to save", async() => {
+      expect.assertions(3);
+
+      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const collectionDto = defaultSharedResourcesWithEncryptedMetadataDtos(10, {
+        metadata_key_id: metadataKeysDtos[0].id
+      });
+      const collection = new ResourcesCollection(collectionDto);
+
+      const sessionsKeysForeignIds = collection.items.map(resource => ({foreign_id: resource.id}));
+      const sessionKeysDtos = sharedResourcesSessionKeys(sessionsKeysForeignIds, {count: collection.length});
+      const sessionKeyDiscovered = sessionKeysDtos[3]; // Copy the working session key.
+      sessionKeysDtos[3] = JSON.parse(JSON.stringify(sessionKeysDtos[3]));
+      sessionKeysDtos[3].session_key = "9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC"; // Replace session key with a non working one
+      const sessionKeys = new SessionKeysCollection(sessionKeysDtos);
+      // Expected sessions keys arry.
+      sessionKeyDiscovered.modified = collection.resources[3].modified;
+      const expectedSessionKeysDto = JSON.parse(JSON.stringify(sessionKeysDtos));
+      expectedSessionKeysDto.splice(3, 1);
+      expectedSessionKeysDto.push(sessionKeyDiscovered);
+
+      jest.spyOn(service.saveSessionKeysService, "save");
+      jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest.spyOn(service.getOrFindSessionKeysService, "getOrFindAllByForeignModelAndForeignIds").mockImplementation(() => sessionKeys);
+
+      await service.decryptAllFromForeignModels(collection, null, {updateSessionKeys: true});
+
+      const [[savedSessionKeys, passphraseArg]] = service.saveSessionKeysService.save.mock.calls;
+      expect(service.saveSessionKeysService.save).toHaveBeenCalledTimes(1);
+      expect(savedSessionKeys.toDto()).toEqual(expectedSessionKeysDto);
+      expect(passphraseArg).toBe(null);
     });
   });
 

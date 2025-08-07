@@ -14,6 +14,7 @@ import ExternalResourceEntity from "../../../entity/resource/external/externalRe
 import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
 import ImportError from "../../../../error/importError";
+import ExternalTotpEntity from "../../../entity/totp/externalTotpEntity";
 
 class CsvBitWardenRowParser extends AbstractCsvRowParser {
   /**
@@ -24,10 +25,11 @@ class CsvBitWardenRowParser extends AbstractCsvRowParser {
     return {
       "name": "name",
       "username": "login_username",
-      "uri": "login_uri",
+      "uris": "login_uri",
       "secret_clear": "login_password",
       "description": "notes",
-      "folder_parent_path": "folder"
+      "folder_parent_path": "folder",
+      "totp": "login_totp"
     };
   }
 
@@ -43,7 +45,13 @@ class CsvBitWardenRowParser extends AbstractCsvRowParser {
     const externalResourceDto = {};
     for (const propertyName in this.mapping) {
       if (data[this.mapping[propertyName]]) {
-        externalResourceDto[propertyName] = data[this.mapping[propertyName]];
+        if (propertyName === "uris") {
+          externalResourceDto[propertyName] = data[this.mapping[propertyName]] ? data[this.mapping[propertyName]].split(",") : [];
+        } else if (propertyName.toLowerCase() === "totp") {
+          externalResourceDto.totp = this.parseTotp(data[this.mapping[propertyName]]);
+        } else {
+          externalResourceDto[propertyName] = data[this.mapping[propertyName]];
+        }
       }
     }
     resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
@@ -65,6 +73,17 @@ class CsvBitWardenRowParser extends AbstractCsvRowParser {
     externalResourceDto.resource_type_id = resourceType.id;
 
     return new ExternalResourceEntity(externalResourceDto);
+  }
+
+  /**
+   * Parse the TOTP
+   * @param {string} totpUrl
+   * @return {{secret_key: *, period: *, digits: *, algorithm: *}}
+   */
+  static parseTotp(totpUrl) {
+    const totpUrlDecoded = new URL(decodeURIComponent(totpUrl));
+    const totp = ExternalTotpEntity.createTotpFromUrl(totpUrlDecoded);
+    return totp.toDto();
   }
 }
 

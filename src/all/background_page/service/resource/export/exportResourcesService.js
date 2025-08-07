@@ -12,6 +12,7 @@
  * @since         4.10.1
  */
 
+import CustomFieldEntity from "passbolt-styleguide/src/shared/models/entity/customField/customFieldEntity";
 import ExternalFoldersCollection from "../../../model/entity/folder/external/externalFoldersCollection";
 import ExternalResourcesCollection from "../../../model/entity/resource/external/externalResourcesCollection";
 import ExternalTotpEntity from "../../../model/entity/totp/externalTotpEntity";
@@ -23,6 +24,7 @@ import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import DecryptAndParseResourceSecretService from "../../secret/decryptAndParseResourceSecretService";
 import FindResourcesService from "../findResourcesService";
+import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
 
 /**
  * The service aim to export the resources to a file.
@@ -99,7 +101,27 @@ class ExportResourcesService {
       if (plaintextSecret.totp) {
         exportResourceEntity.totp = new ExternalTotpEntity(plaintextSecret.totp);
       }
+      if (plaintextSecret.customFields) {
+        exportResourceEntity.customFields = this.buildCustomFieldWithSecretDto(exportResourceEntity, plaintextSecret);
+      }
     }
+  }
+
+  /**
+   * Build custom fields with secret
+   * @param {ExternalResourceEntity} exportResourcesFileEntity The export object
+   * @param {Object} plaintextSecret The plaintext secret
+   * @returns {CustomFieldsCollection}
+   */
+  buildCustomFieldWithSecretDto(exportResourceEntity, plaintextSecret) {
+    const customFieldsDto = [];
+    exportResourceEntity.customFields?.items?.forEach(customField => {
+      const customFieldDto = customField.toDto();
+      const secret = plaintextSecret.customFields.find(customFieldSecret => customFieldSecret.id === customFieldDto.id);
+      customFieldDto.secret_value = secret?.secret_value;
+      customFieldsDto.push(new CustomFieldEntity(customFieldDto));
+    });
+    return new CustomFieldsCollection(customFieldsDto);
   }
 
   /**

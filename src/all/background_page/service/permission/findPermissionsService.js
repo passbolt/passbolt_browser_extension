@@ -38,7 +38,9 @@ class FindPermissionsService {
   async findAllByAcoForeignKeyForDisplay(resourceId) {
     assertUuid(resourceId, `Service error. The id '${resourceId}' is not a valid uuid.`);
     const permissionsCollectionDto = await this.permissionService.findAllByAcoForeignKey(resourceId, FindPermissionsService.DEFAULT_CONTAIN);
-    return new PermissionsCollection(permissionsCollectionDto);
+    const collection = new PermissionsCollection(permissionsCollectionDto);
+    collection.sort();
+    return collection;
   }
 
   /**

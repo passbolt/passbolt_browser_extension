@@ -15,6 +15,7 @@
 import {v4 as uuidv4} from "uuid";
 import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
 import {defaultTotpDto} from "../../totp/totpDto.test.data";
+import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
 
 export const minimalExternalResourceDto = (data = {}) => ({
   name: "Minimal External Resource",
@@ -29,7 +30,7 @@ export const defaultExternalResourceDto = (data = {}) => {
     id: resourceid,
     name: "external resource dto",
     username: "ada@passbolt.com",
-    uri: "https://passbolt.local",
+    uris: ["https://passbolt.local"],
     description: "This is the description of the resource",
     secrets: secretCollection,
     folder_parent_id: uuidv4(),
@@ -38,6 +39,7 @@ export const defaultExternalResourceDto = (data = {}) => {
     totp: defaultTotpDto(),
     folder_parent_path: "private/data",
     expired: null,
+    custom_fields: defaultCustomFieldsCollection(),
     ...data,
   };
 };
@@ -49,7 +51,7 @@ export const defaultExternalResourceImportDto = (data = {}) => {
   return {
     name: "external resource dto",
     username: "ada@passbolt.com",
-    uri: "https://passbolt.local",
+    uris: ["https://passbolt.local"],
     description: "This is the description of the resource",
     secrets: secretCollection,
     folder_parent_id: uuidv4(),
@@ -62,14 +64,13 @@ export const defaultExternalResourceImportDto = (data = {}) => {
   };
 };
 
-
 export const defaultExternalResourceImportMinimalDto = (data = {}) => {
   const defaultData = minimalExternalResourceDto({
     id: uuidv4(),
     name: "",
     secret_clear: "",
     username: "",
-    uri: "",
+    uris: [],
     description: "",
     resource_type_id: uuidv4(),
     folder_parent_path: "private/data",

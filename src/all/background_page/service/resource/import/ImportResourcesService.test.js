@@ -383,7 +383,7 @@ describe("ImportResourcesService", () => {
     });
 
     it("Should inform the user about the progress", async() => {
-      expect.assertions(8);
+      expect.assertions(9);
 
       jest.spyOn(importResourcesService.progressService, "updateGoals");
       jest.spyOn(importResourcesService.progressService, "finishStep");
@@ -392,10 +392,11 @@ describe("ImportResourcesService", () => {
       await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
       expect(importResourcesService.progressService.updateGoals).toHaveBeenCalledTimes(1);
-      expect(importResourcesService.progressService.updateGoals).toHaveBeenCalledWith(5);
-      expect(importResourcesService.progressService.finishStep).toHaveBeenCalledTimes(5);
+      expect(importResourcesService.progressService.updateGoals).toHaveBeenCalledWith(6);
+      expect(importResourcesService.progressService.finishStep).toHaveBeenCalledTimes(6);
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Encrypting 1/2");
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Encrypting 2/2");
+      expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Encrypting 2 metadata");
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Importing passwords 1/2");
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Importing passwords 2/2");
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith(null, true);
@@ -435,7 +436,7 @@ describe("ImportResourcesService", () => {
     });
 
     it("Should inform the user about the progress - <folder>", async() => {
-      expect.assertions(8);
+      expect.assertions(9);
 
       jest.spyOn(importResourcesService.progressService, "updateGoals");
 
@@ -448,9 +449,10 @@ describe("ImportResourcesService", () => {
       await importResourcesService.parseFile(importResourceFileCSV);
       await importResourcesService.importFile(importResourceFileCSV, passphrase);
 
-      expect(importResourcesService.progressService.finishStep).toHaveBeenCalledTimes(7);
+      expect(importResourcesService.progressService.finishStep).toHaveBeenCalledTimes(8);
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Encrypting 1/2");
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Encrypting 2/2");
+      expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Encrypting 2 metadata");
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Importing passwords 1/2");
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Importing passwords 2/2");
       expect(importResourcesService.progressService.finishStep).toHaveBeenCalledWith("Importing folders 1/2");

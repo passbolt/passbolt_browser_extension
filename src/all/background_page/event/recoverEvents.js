@@ -31,6 +31,7 @@ import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurit
 import HasRecoverUserEnabledAccountRecoveryController from "../controller/recover/hasRecoverUserEnabledAccountRecoveryController";
 import GetUserPassphrasePoliciesController from "../controller/setup/getUserPassphrasePoliciesController";
 import ReloadTabController from "../controller/tab/reloadTabController";
+import RedirectPostLoginController from "../controller/auth/redirectPostLoginController";
 
 
 const listen = (worker, apiClientOptions, account) => {
@@ -126,6 +127,17 @@ const listen = (worker, apiClientOptions, account) => {
 
   worker.port.on('passbolt.tab.reload', async requestId => {
     const controller = new ReloadTabController(worker, requestId);
+    await controller._exec();
+  });
+
+  /*
+   * Redirect the user post login.
+   *
+   * @listens passbolt.auth.post-login-redirect
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.post-login-redirect', async requestId => {
+    const controller = new RedirectPostLoginController(worker, requestId, account);
     await controller._exec();
   });
 };

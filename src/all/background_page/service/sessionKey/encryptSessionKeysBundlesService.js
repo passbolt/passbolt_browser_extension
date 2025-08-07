@@ -12,7 +12,6 @@
  * @since         4.10.1
  */
 import PassphraseStorageService from '../session_storage/passphraseStorageService';
-import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
 import {assertString, assertType} from '../../utils/assertions';
 import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
@@ -45,27 +44,12 @@ class EncryptSessionKeysBundlesService {
       throw new TypeError("The session key bundle should be decrypted.");
     }
 
-    passphrase = passphrase || await this.getPassphraseFromSessionStorageOrFail();
+    passphrase = passphrase || await PassphraseStorageService.getOrFail();
 
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
     const message = JSON.stringify(sessionKeysBundle.data.toDto());
     sessionKeysBundle.data = await EncryptMessageService.encrypt(message, userPublicKey, [userDecryptedPrivateKey]);
-  }
-
-  /**
-   * Retrieve the user passphrase from the session storage or fail.
-   *
-   * @returns {Promise<string>}
-   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
-   * @private
-   */
-  async getPassphraseFromSessionStorageOrFail() {
-    const passphrase = await PassphraseStorageService.get();
-    if (!passphrase) {
-      throw new UserPassphraseRequiredError();
-    }
-    return passphrase;
   }
 }
 

@@ -13,7 +13,6 @@
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import PassphraseStorageService from '../session_storage/passphraseStorageService';
-import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
 import SessionKeysBundleDataEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleDataEntity";
 import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
@@ -49,7 +48,7 @@ class DecryptSessionKeysBundlesService {
     }
     const message = await OpenpgpAssertion.readMessageOrFail(sessionKeysBundleEntity.data);
 
-    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+    passphrase = passphrase || await PassphraseStorageService.getOrFail();
 
     const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     const decryptedMessage = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey);
@@ -73,28 +72,13 @@ class DecryptSessionKeysBundlesService {
   async decryptAll(sessionKeysBundlesCollection, passphrase = null) {
     assertType(sessionKeysBundlesCollection, SessionKeysBundlesCollection, "The given collection is not of the type SessionKeysBundlesCollection");
 
-    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+    passphrase = passphrase || await PassphraseStorageService.getOrFail();
 
     const items = sessionKeysBundlesCollection.items;
     for (let i = 0; i < items.length; i++) {
       const sessionKeysBundleEntity = items[i];
       await this.decryptOne(sessionKeysBundleEntity, passphrase);
     }
-  }
-
-  /**
-   * Retrieve the user passphrase from the local storage or fail.
-   *
-   * @returns {Promise<string>}
-   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
-   * @private
-   */
-  async getPassphraseFromLocalStorageOrFail() {
-    const passphrase = await PassphraseStorageService.get();
-    if (!passphrase) {
-      throw new UserPassphraseRequiredError();
-    }
-    return passphrase;
   }
 }
 

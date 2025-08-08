@@ -17,7 +17,6 @@ import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/enti
 import MetadataPrivateKeyDataEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyDataEntity";
 import MetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeysCollection";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
-import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import {assertType} from '../../utils/assertions';
 import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
 import DecryptMessageService from '../crypto/decryptMessageService';
@@ -53,7 +52,7 @@ class DecryptMetadataPrivateKeysService {
 
     const message = await OpenpgpAssertion.readMessageOrFail(metadataPrivateKeyEntity.data);
 
-    passphrase = passphrase || await this.getPassphraseFromSessionStorageOrFail();
+    passphrase = passphrase || await PassphraseStorageService.getOrFail();
 
     const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
@@ -88,7 +87,7 @@ class DecryptMetadataPrivateKeysService {
   async decryptAll(metadataPrivateKeysCollection, passphrase = null) {
     assertType(metadataPrivateKeysCollection, MetadataPrivateKeysCollection, "The given collection is not of the type MetadataPrivateKeysCollection");
 
-    passphrase = passphrase || await this.getPassphraseFromSessionStorageOrFail();
+    passphrase = passphrase || await PassphraseStorageService.getOrFail();
 
     const items = metadataPrivateKeysCollection.items;
     for (let i = 0; i < items.length; i++) {
@@ -119,24 +118,9 @@ class DecryptMetadataPrivateKeysService {
       if (!metadataPrivateKeysCollection || !metadataPrivateKeysCollection.length || !metadataKeysCollection?.hasEncryptedKeys()) {
         continue;
       }
-      passphrase = passphrase || await this.getPassphraseFromSessionStorageOrFail();
+      passphrase = passphrase || await PassphraseStorageService.getOrFail();
       await this.decryptAll(metadataPrivateKeysCollection, passphrase);
     }
-  }
-
-  /**
-   * Retrieve the user passphrase from the session storage or fail.
-   *
-   * @returns {Promise<string>}
-   * @throws {UserPassphraseRequiredError} if the `passphrase` cannot be retrieved.
-   * @private
-   */
-  async getPassphraseFromSessionStorageOrFail() {
-    const passphrase = await PassphraseStorageService.get();
-    if (!passphrase) {
-      throw new UserPassphraseRequiredError();
-    }
-    return passphrase;
   }
 
   /**

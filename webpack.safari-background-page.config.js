@@ -4,7 +4,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 const config = {
   entry: {
-    'index': path.resolve(__dirname, './src/all/background_page/index.js'),
+    'index': path.resolve(__dirname, './src/safari/background_page/index.js'),
   },
   mode: 'production',
   plugins: [

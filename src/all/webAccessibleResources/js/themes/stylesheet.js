@@ -52,9 +52,8 @@
       }
 
       const cssFile = cssInfoTag.dataset.file;
-      const baseUrl = window.location.origin;
 
-      this.getLinkTag().setAttribute("href", `${baseUrl}/webAccessibleResources/css/themes/${this.theme}/${cssFile}`);
+      this.getLinkTag().setAttribute("href", `/webAccessibleResources/css/themes/${this.theme}/${cssFile}`);
     }
 
     /**

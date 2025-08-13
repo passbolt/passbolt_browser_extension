@@ -79,7 +79,7 @@ class ImportResourcesService {
     const resourceToImportDto = importResourcesFile.importResources.toResourceCollectionImportDto();
     const resourcesCollection = new ResourcesCollection(resourceToImportDto);
     const clearTextMetadataResourcesCollection = new ResourcesCollection(resourceToImportDto);
-    await this.encryptMetadataService.encryptAllFromForeignModels(resourcesCollection, passphrase);
+    await this.encryptMetadata(resourcesCollection, passphrase);
     await this.bulkImportResources(importResourcesFile, resourcesCollection, clearTextMetadataResourcesCollection);
     importResourcesFile.mustTag && await this.bulkTagResources(importResourcesFile);
     await this.progressService.finishStep(null, true);
@@ -101,8 +101,22 @@ class ImportResourcesService {
     const progressGoal = 1 // Initialization
       + (importResourcesFile.mustImportFolders ? importResourcesFile.importFolders.items.length : 0) // #folders create API calls
       + importResourcesFile.importResources.items.length * 2 // #resource to encrypt + #resource create API calls
+      + 1 // #resource metadata encryption
       + (importResourcesFile.mustTag ? importResourcesFile.importResources.items.length : 0); // #resources tag API calls
     this.progressService.updateGoals(progressGoal);
+  }
+
+
+  /**
+   * Encrypts the metadata of resources in a collection using the provided passphrase.
+   *
+   * @param {ResourcesCollection} resourcesCollection - The collection of resources to be encrypted.
+   * @param {string} passphrase - The passphrase used for encryption.
+   * @returns {Promise<void>} A promise that resolves when the encryption process is complete.
+   */
+  async encryptMetadata(resourcesCollection, passphrase) {
+    await this.progressService.finishStep(i18n.t('Encrypting {{total}} metadata', {total: resourcesCollection.items.length}));
+    await this.encryptMetadataService.encryptAllFromForeignModels(resourcesCollection, passphrase);
   }
 
   /**
@@ -115,14 +129,14 @@ class ImportResourcesService {
    */
   async encryptSecrets(importResourcesFile, userId, privateKey) {
     let i = 0;
+    const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+    const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
     for (const importResourcesEntity of importResourcesFile.importResources) {
       i++;
       await this.progressService.finishStep(i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importResourcesFile.importResources.items.length}));
       // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
       const secretDto = this.buildSecretDto(importResourcesEntity);
       const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourcesEntity.resourceTypeId, secretDto);
-      const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
-      const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
       const data = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, [privateKey]);
       const secret = new SecretEntity({data: data});
       importResourcesEntity.secrets = new ResourceSecretsCollection([secret]);
@@ -147,9 +161,26 @@ class ImportResourcesService {
       importResourcesFile.secretClear = "";
       importResourcesFile.description = "";
       importResourcesFile.totp = null;
+      if (importResourcesFile.customFields) {
+        dto.custom_fields = this.buildCustomFieldSecretDto(importResourcesFile);
+      }
       return dto;
     }
     return importResourcesFile.secretClear;
+  }
+
+  /**
+   * Build the custom field secret DTO.
+   * @param {ExternalResourceEntity} importResourcesFile The resource to import
+   * @returns {Object}
+   * @private
+   */
+  buildCustomFieldSecretDto(importResourcesFile) {
+    const customFieldsDto = [];
+    importResourcesFile.customFields?.items?.forEach(customField => {
+      customFieldsDto.push(customField.toSecretDto());
+    });
+    return customFieldsDto;
   }
 
   /**

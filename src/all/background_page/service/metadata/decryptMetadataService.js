@@ -87,12 +87,13 @@ class DecryptMetadataService {
 
     try {
       sessionKeys = await this.getOrFindSessionKeysService.getOrFindAllByForeignModelAndForeignIds("Resource", collection.ids, passphrase);
-      for (const sessionKey of sessionKeys) {
+      for (let i = sessionKeys.items.length - 1; i >= 0; i--) {
+        const sessionKey = sessionKeys.items[i];
         try {
           const entity = collection.getFirst("id", sessionKey.foreignId);
           await this.decryptMetadataWithSessionKey(entity, sessionKey.sessionKey);
         } catch (error) {
-          sessionKeys.remove(sessionKey);
+          sessionKeys.items.splice(i, 1);
           console.debug(`Metadata of the entity "${sessionKey.foreignModel}:${sessionKey.foreignId}" cannot be decrypted with session key.`, {cause: error});
         }
       }
@@ -267,7 +268,8 @@ class DecryptMetadataService {
     return {
       foreign_model: "Resource",
       foreign_id: entity.id,
-      session_key: sessionKeyString
+      session_key: sessionKeyString,
+      modified: entity.modified
     };
   }
 

@@ -19,8 +19,11 @@ import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/enti
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {assertType} from "../../../../utils/assertions";
 import IconEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
+import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
 
 const DEFAULT_RESOURCE_NAME = '(no name)';
+const RESOURCE_URI_MAX_LENGTH = 1024;
+const RESOURCE_URIS_MAX_ITEMS = 32;
 
 class ExternalResourceEntity extends EntityV2 {
   /**
@@ -53,6 +56,18 @@ class ExternalResourceEntity extends EntityV2 {
       delete this._props.icon;
     }
   }
+
+
+  /**
+   *  @inheritDoc
+   * @returns {{custom_fields: CustomFieldsCollection}}
+   */
+  static get associations() {
+    return {
+      custom_fields: CustomFieldsCollection,
+    };
+  }
+
 
   /**
    * @inheritdoc
@@ -91,9 +106,13 @@ class ExternalResourceEntity extends EntityV2 {
         "id": resourceEntitySchema.properties.id,
         "name": metadataEntitySchema.properties.name,
         "username": metadataEntitySchema.properties.username,
-        "uri": {
-          "type": "string",
-          "maxLength": ResourceMetadataEntity.URI_MAX_LENGTH,
+        "uris": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": RESOURCE_URI_MAX_LENGTH
+          },
+          "maxItems": RESOURCE_URIS_MAX_ITEMS
         },
         "description": metadataEntitySchema.properties.description,
         "secrets": resourceEntitySchema.properties.secrets,
@@ -111,6 +130,10 @@ class ExternalResourceEntity extends EntityV2 {
         },
         "expired": resourceEntitySchema.properties.expired,
         "icon": IconEntity.getSchema(),
+        "custom_fields": {
+          ...CustomFieldsCollection.getSchema(),
+          "nullable": true,
+        },
       }
     };
   }
@@ -140,6 +163,10 @@ class ExternalResourceEntity extends EntityV2 {
       result.icon = this._icon.toDto();
     }
 
+    if (this._customFields) {
+      result.custom_fields = this._customFields.toDto();
+    }
+
     return result;
   }
 
@@ -162,13 +189,14 @@ class ExternalResourceEntity extends EntityV2 {
       id: resourceEntityDto.id,
       name: resourceEntityDto.metadata.name,
       username: resourceEntityDto.metadata.username,
-      uri: resourceEntityDto.metadata.uris?.[0] || "",
+      uris: resourceEntityDto.metadata.uris || [],
       description: resourceEntityDto.metadata.description || null,
       secrets: resourceEntityDto.secrets || [],
       folder_parent_id: externalFolderParent?.id || null,
       resource_type_id: resourceEntityDto.resource_type_id,
       folder_parent_path: externalFolderParent?.path || "",
       expired: resourceEntityDto.expired || null,
+      custom_fields: resourceEntityDto.metadata.custom_fields || [],
     };
 
     if (resourceEntityDto.metadata.icon) {
@@ -177,6 +205,15 @@ class ExternalResourceEntity extends EntityV2 {
 
     return data;
   }
+
+  /**
+   * ResourceMetadataEntity.URI_MAX_LENGTH
+   * @returns {number}
+   */
+  static get URI_MAX_LENGTH() {
+    return RESOURCE_URI_MAX_LENGTH;
+  }
+
 
   /**
    * Returns a Resource DTO in v5 format.
@@ -188,9 +225,10 @@ class ExternalResourceEntity extends EntityV2 {
         object_type: ResourceMetadataEntity.METADATA_OBJECT_TYPE,
         name: this.name,
         username: this.username,
-        uris: [this.uri || ""],
+        uris: this.uris,
         description: this.description,
         resource_type_id: this.resourceTypeId,
+        custom_fields: this.customFields?.toMetadataDto()
       },
       secrets: this._secrets.toDto(),
       folder_parent_id: this.folderParentId,
@@ -237,11 +275,11 @@ class ExternalResourceEntity extends EntityV2 {
   }
 
   /**
-   * Get resource uri
+   * Get resource uris
    * @returns {string|null}
    */
-  get uri() {
-    return this._props.uri || null;
+  get uris() {
+    return this._props.uris || [];
   }
 
   /**
@@ -430,11 +468,30 @@ class ExternalResourceEntity extends EntityV2 {
     return this._icon || null;
   }
 
+  /**
+   * Get the custom fields collection
+   * @returns {CustomFieldsCollection|null}
+   */
+  get customFields() {
+    return this._customFields || null;
+  }
+
+  /**
+   * Set the custom fields
+   * @param {CustomFieldsCollection} customFields the custom fields collection to us
+   * @returns {void}
+   */
+  set customFields(customFields) {
+    assertType(customFields, CustomFieldsCollection);
+    this._customFields = customFields;
+  }
+
   /*
    * ==================================================
    * Static properties getters
    * ==================================================
    */
+
   /**
    * ExternalResourceEntity.DEFAULT_RESOURCE_NAME
    * @returns {string}

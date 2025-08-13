@@ -18,7 +18,7 @@ import {
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import BinaryConvert from "../../../../utils/format/binaryConvert";
 import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
 
@@ -49,7 +49,7 @@ describe("CsvBitWardenRowParser", () => {
     const data = {
       "name": "Password 1",
       "login_username": "Username 1",
-      "login_uri": "https://url1.com",
+      "login_uri": "https://url1.com,https://url2.com,https://url3.com",
       "login_password": "Secret 1",
       "notes": "Description 1",
       "folder": "Folder 1"
@@ -67,7 +67,7 @@ describe("CsvBitWardenRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.login_username,
-      uri: data.login_uri,
+      uris: data.login_uri.split(","),
       resource_type_id: expectedResourceType.id,
       secret_clear: data.login_password,
       description: data.notes,
@@ -103,11 +103,99 @@ describe("CsvBitWardenRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.login_username,
-      uri: data.login_uri,
+      uris: [data.login_uri],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.login_password,
       description: data.notes,
       folder_parent_path: data.folder,
+    });
+
+    const externalResourceEntity = CsvBitWardenRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type v5-default-with-totp with all properties from csv row", () => {
+    expect.assertions(2);
+
+    const data = {
+      "name": "Password 1",
+      "login_username": "Username 1",
+      "login_uri": "https://url1.com",
+      "login_password": "Secret 1",
+      "notes": "Description 1",
+      "folder": "Folder 1",
+      "login_totp": "otpauth://totp/test.com%20%3A%20admin%40passbolt.com:admin%40passbolt.com?secret=TJSNMLGTCYOEMXZG&period=30&digits=6&issuer=test.com%20%3A%20admin%40passbolt.com"
+    };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType => resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.login_username,
+      uris: [data.login_uri],
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.login_password,
+      description: data.notes,
+      folder_parent_path: data.folder,
+      totp: {
+        period: 30,
+        digits: 6,
+        algorithm: "SHA1",
+        secret_key: "TJSNMLGTCYOEMXZG"
+      }
+    });
+
+    const externalResourceEntity = CsvBitWardenRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type password-description-totp with all properties from csv row", () => {
+    expect.assertions(2);
+
+    const data = {
+      "name": "Password 1",
+      "login_username": "Username 1",
+      "login_uri": "https://url1.com",
+      "login_password": "Secret 1",
+      "notes": "Description 1",
+      "folder": "Folder 1",
+      "login_totp": "otpauth://totp/test.com%20%3A%20admin%40passbolt.com:admin%40passbolt.com?secret=TJSNMLGTCYOEMXZG&period=30&digits=6&issuer=test.com%20%3A%20admin%40passbolt.com"
+    };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType => resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.login_username,
+      uris: [data.login_uri],
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.login_password,
+      description: data.notes,
+      folder_parent_path: data.folder,
+      totp: {
+        period: 30,
+        digits: 6,
+        algorithm: "SHA1",
+        secret_key: "TJSNMLGTCYOEMXZG"
+      }
     });
 
     const externalResourceEntity = CsvBitWardenRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);

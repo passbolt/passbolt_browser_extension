@@ -12,7 +12,7 @@
  */
 import AbstractActionLogEntity from "./abstractActionLogEntity";
 import DefaultActionLogEntity from "./defaultActionLogEntity";
-import PermissionsUpdatedActionLog from "./permissionsUpdatedActionLogEntity";
+import PermissionsUpdatedActionLogEntity from "./permissionsUpdatedActionLogEntity";
 import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
@@ -65,8 +65,8 @@ class ActionLogsCollection extends EntityCollection {
    * @returns {AbstractActionLogEntity|null}
    */
   constructActionLogEntityFromDto(actionLogDto, options = {}) {
-    if (PermissionsUpdatedActionLog.ALLOWED_TYPES.includes(actionLogDto.type)) {
-      return new PermissionsUpdatedActionLog(actionLogDto, options);
+    if (PermissionsUpdatedActionLogEntity.ALLOWED_TYPES.includes(actionLogDto.type)) {
+      return new PermissionsUpdatedActionLogEntity(actionLogDto, options);
     } else {
       return new DefaultActionLogEntity(actionLogDto, options);
     }

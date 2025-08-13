@@ -68,6 +68,7 @@ class FindAcoPermissionsForDisplayController {
     } else if (acoType === PermissionEntity.ACO_FOLDER) {
       // TODO: Should be adapted when API V5 can return permissions with folder id to use the same service than resources
       const folderEntity = await this.findFolderService.findByIdWithPermissions(acoId);
+      folderEntity.permissions.sort();
       return folderEntity.permissions;
     }
   }

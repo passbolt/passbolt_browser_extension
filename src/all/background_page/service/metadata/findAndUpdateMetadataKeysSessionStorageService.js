@@ -14,6 +14,7 @@
 import FindMetadataKeysService from "./findMetadataKeysService";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
+import DecryptMetadataPrivateKeysService from "./decryptMetadataPrivateKeysService";
 
 const FIND_AND_UPDATE_METADATA_KEYS_SS_LOCK_PREFIX = "FIND_AND_UPDATE_METADATA_KEYS_SS_LOCK-";
 
@@ -28,8 +29,9 @@ export default class FindAndUpdateMetadataKeysSessionStorageService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
-    this.findMetadataKeysService = new FindMetadataKeysService(apiClientOptions, account);
+    this.findMetadataKeysService = new FindMetadataKeysService(apiClientOptions);
     this.metadataKeysSessionStorage = new MetadataKeysSessionStorage(account);
+    this.decryptMetadataPrivateKeysService = new DecryptMetadataPrivateKeysService(account);
   }
 
   /**
@@ -51,7 +53,8 @@ export default class FindAndUpdateMetadataKeysSessionStorageService {
       }
 
       // Lock is granted, retrieve the metadata keys and update the session storage.
-      const metadataKeys = await this.findMetadataKeysService.findAllForSessionStorage(passphrase);
+      const metadataKeys = await this.findMetadataKeysService.findAllForSessionStorage();
+      await this.decryptMetadataPrivateKeysService.decryptAllFromMetadataKeysCollection(metadataKeys, passphrase);
       await this.metadataKeysSessionStorage.set(metadataKeys);
       return metadataKeys;
     });

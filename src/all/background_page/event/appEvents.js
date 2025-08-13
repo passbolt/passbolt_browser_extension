@@ -67,8 +67,12 @@ import FindMetadataMigrateResourcesController from "../controller/migrateMetadat
 import MigrateMetadataResourcesController from "../controller/migrateMetadata/migrateMetadataResourcesController";
 import DownloadOrganizationGeneratedKey from "../controller/accountRecovery/downloadOrganizationGenerateKeyController";
 import ShareMetadataKeyPrivateController from "../controller/metadata/shareMetadataKeyPrivateController";
+import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getOrFindMetadataKeysSettingsController";
 import CopyToClipboardController from "../controller/clipboard/copyToClipboardController";
 import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
+import FindMetadataGettingStartedSettingsController from "../controller/metadata/findMetadataGettingStartedSettingsController";
+import EnableEncryptedMetadataForExistingInstanceController from "../controller/metadata/enableEncryptedMetadataForExistingInstanceController";
+import KeepCleartextMetadataForExistingInstanceController from "../controller/metadata/keepCleartextMetadataForExistingInstanceController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -317,6 +321,17 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   /*
+   * Get or find metadata keys settings.
+   *
+   * @listens passbolt.metadata.get-or-find-metadata-keys-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.get-or-find-metadata-keys-settings', async requestId => {
+    const controller = new GetOrFindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
    * Generate metadata key.
    *
    * @listens passbolt.metadata.generate-metadata-key
@@ -436,6 +451,38 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec(userId);
   });
 
+  /*
+   * Find metadata getting started settings.
+   *
+   * @listens passbolt.metadata.find-getting-started-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.find-getting-started-settings', async requestId => {
+    const controller = new FindMetadataGettingStartedSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  /*
+   * Configure metadata to enable encrypted metadata for existing instances.
+   *
+   * @listens passbolt.metadata.enable-encrypted-metadata-for-existing-instance
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.enable-encrypted-metadata-for-existing-instance', async requestId => {
+    const controller = new EnableEncryptedMetadataForExistingInstanceController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Configure metadata to keep legacy cleartext metadata for existing instances
+   *
+   * @listens passbolt.metadata.keep-cleartext-metadata-for-existing-instance
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.keep-cleartext-metadata-for-existing-instance', async requestId => {
+    const controller = new KeepCleartextMetadataForExistingInstanceController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
 
   /*
    * ==================================================================================

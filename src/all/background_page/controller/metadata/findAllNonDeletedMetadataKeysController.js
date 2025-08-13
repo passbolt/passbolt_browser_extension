@@ -20,12 +20,11 @@ class FindAllNonDeletedMetadataKeysController {
    * @param {Worker} worker
    * @param {string} requestId
    * @param {ApiClientOptions} apiClientOptions the api client options
-   * @param {AccountEntity} account the user account
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findMetadataKeysService = new FindMetadataKeysService(apiClientOptions, account);
+    this.findMetadataKeysService = new FindMetadataKeysService(apiClientOptions);
   }
 
   /**

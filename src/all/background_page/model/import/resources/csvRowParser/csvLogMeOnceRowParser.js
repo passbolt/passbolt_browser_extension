@@ -23,7 +23,7 @@ class CsvLogMeOnceRowParser extends AbstractCsvRowParser {
   static get mapping() {
     return {
       "name": "name",
-      "uri": "url",
+      "uris": "url",
       "description": "note",
       "folder_parent_path": "group",
       "username": "username",
@@ -44,10 +44,13 @@ class CsvLogMeOnceRowParser extends AbstractCsvRowParser {
     const externalResourceDto = {};
 
     for (const propertyName in this.mapping) {
-      if (data[this.mapping[propertyName]]) {
+      if (propertyName === "uris") {
+        externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+      } else if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }
     }
+
     resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
     const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
     let resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);

@@ -65,7 +65,7 @@ describe("Csv1PasswordRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.Title,
       username: data.Username,
-      uri: data.Url,
+      uris: [data.Url],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.Password,
       description: data.Notes,
@@ -77,6 +77,7 @@ describe("Csv1PasswordRowParser", () => {
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
   });
+
   it("parses resource of type default-v5 with all properties from csv row", () => {
     expect.assertions(2);
 
@@ -101,7 +102,7 @@ describe("Csv1PasswordRowParser", () => {
     const expectedEntity = new ExternalResourceEntity({
       name: data.Title,
       username: data.Username,
-      uri: data.Url,
+      uris: [data.Url],
       resource_type_id: expectedResourceType.id,
       secret_clear: data.Password,
       description: data.Notes,

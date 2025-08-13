@@ -23,6 +23,9 @@ import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEnt
 import {v4 as uuid} from "uuid";
 import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
+import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
+import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 
 describe("ExternalResourceEntity", () => {
   describe("::getSchema", () => {
@@ -49,10 +52,11 @@ describe("ExternalResourceEntity", () => {
       assertEntityProperty.notRequired(ExternalResourceEntity, "username");
     });
 
-    it("validates uri property", () => {
-      assertEntityProperty.string(ExternalResourceEntity, "uri");
-      assertEntityProperty.maxLength(ExternalResourceEntity, "uri", 1024);
-      assertEntityProperty.notRequired(ExternalResourceEntity, "uri");
+    it("validates uris property", () => {
+      assertEntityProperty.array(ExternalResourceEntity, "uris");
+      assertEntityProperty.assertArrayItemString(ExternalResourceEntity, "uris");
+      assertEntityProperty.arrayStringMaxLength(ExternalResourceEntity, "uris", ExternalResourceEntity.URI_MAX_LENGTH);
+      assertEntityProperty.notRequired(ExternalResourceEntity, "uris");
     });
 
     it("validates description property", () => {
@@ -119,6 +123,25 @@ describe("ExternalResourceEntity", () => {
       assertEntityProperty.nullable(ResourceEntity, "expired");
       assertEntityProperty.notRequired(ResourceEntity, "expired");
     });
+
+    it("validates customFields property", () => {
+      const dto = defaultExternalResourceDto();
+      const invalidCustomFields = [{
+        metadata_key: "key-0",
+        secret_value: "secret-0",
+      }];
+
+      const successScenario = [
+        {scenario: "valid customFields collection", value: dto.custom_fields},
+      ];
+
+      const failingScenario = [
+        {scenario: "invalid id: string", value: invalidCustomFields},
+      ];
+      assertEntityProperty.assertAssociation(ExternalResourceEntity, "custom_fields", dto, successScenario, failingScenario);
+      assertEntityProperty.notRequired(ExternalResourceEntity, "custom_fields");
+      assertEntityProperty.nullable(ExternalResourceEntity, "custom_fields");
+    });
   });
 
   describe("::constructor", () => {
@@ -139,7 +162,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.id).toBeNull();
       expect(entity.name).toEqual("Password 1");
       expect(entity.username).toBeNull();
-      expect(entity.uri).toBeNull();
+      expect(entity.uris).toEqual([]);
       expect(entity.description).toBeNull();
       expect(entity.secretClear).toEqual(dto.secret_clear);
       expect(entity.folderParentId).toBeNull();
@@ -148,21 +171,23 @@ describe("ExternalResourceEntity", () => {
     });
 
     it("constructor works if valid fields DTO is provided", () => {
-      expect.assertions(12);
+      expect.assertions(13);
 
       const dto = defaultExternalResourceDto();
       const entity = new ExternalResourceEntity(dto);
+
       expect(entity.toDto()).toStrictEqual(dto);
       expect(entity.id).toStrictEqual(dto.id);
       expect(entity.name).toStrictEqual(dto.name);
       expect(entity.username).toStrictEqual(dto.username);
-      expect(entity.uri).toStrictEqual(dto.uri);
+      expect(entity.uris).toStrictEqual(dto.uris);
       expect(entity.description).toStrictEqual(dto.description);
       expect(entity.secretClear).toStrictEqual(dto.secret_clear);
       expect(entity.folderParentId).toStrictEqual(dto.folder_parent_id);
       expect(entity.folderParentPath).toStrictEqual(dto.folder_parent_path);
       expect(entity.totp.toDto()).toStrictEqual(dto.totp);
       expect(entity.secrets.toDto()).toStrictEqual(dto.secrets);
+      expect(entity.customFields.toDto()).toStrictEqual(dto.custom_fields);
       entity.totp = new ExternalTotpEntity(defaultTotpDto({secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"}));
       expect(entity.totp.secret_key !== dto.totp.secret_key).toBeTruthy();
     });
@@ -180,11 +205,12 @@ describe("ExternalResourceEntity", () => {
     });
 
     it("constructor build resource with default values", () => {
-      expect.assertions(2);
+      expect.assertions(3);
 
       const entity = new ExternalResourceEntity();
       expect(entity.name).toEqual(ExternalResourceEntity.DEFAULT_RESOURCE_NAME);
       expect(entity.folderParentPath).toEqual("");
+      expect(entity.customFields).toBeNull();
     });
 
     it("constructor sanitize folder_parent_path", () => {
@@ -227,13 +253,14 @@ describe("ExternalResourceEntity", () => {
         id: entity.id,
         name: entity.metadata.name,
         username: entity.metadata.username,
-        uri: entity.metadata.uris[0],
+        uris: entity.metadata.uris,
         description: entity.metadata.description,
         secrets: secrets,
         folder_parent_id: entity.folderParentId,
         resource_type_id: entity.metadata.resourceTypeId,
         folder_parent_path: "",
         expired: null,
+        custom_fields: [],
       });
     });
 
@@ -250,6 +277,23 @@ describe("ExternalResourceEntity", () => {
       const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(entity.toDto({secrets: true, metadata: true}));
       expect(() => new ExternalResourceEntity(resultDto)).not.toThrow();
     });
+
+    it("should build a dto from the DTO of a resource entity with customFields", () => {
+      expect.assertions(1);
+      const customFields = defaultCustomFieldsCollection();
+      const secrets = defaultResourcesSecretsDtos(1);
+      const resourceDto = defaultResourceDto({
+        id: secrets[0].resource_id,
+        secrets: secrets,
+        metadata: defaultResourceMetadataDto({
+          custom_fields: customFields
+        }),
+      });
+      const entity = new ResourceEntity(resourceDto);
+
+      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(entity.toDto({secrets: true, metadata: true}));
+      expect(resultDto.custom_fields).toStrictEqual(customFields);
+    });
   });
 
   describe("::toResourceEntityImportDto", () => {
@@ -258,7 +302,8 @@ describe("ExternalResourceEntity", () => {
 
       const dto = defaultExternalResourceDto();
       const entity = new ExternalResourceEntity(dto);
-
+      const customFieldsCollection = new CustomFieldsCollection(dto.custom_fields);
+      // @tod
       const resourceEntityDto = entity.toResourceEntityImportDto();
       expect(resourceEntityDto).toStrictEqual({
         resource_type_id: dto.resource_type_id,
@@ -268,9 +313,10 @@ describe("ExternalResourceEntity", () => {
           object_type: "PASSBOLT_RESOURCE_METADATA",
           name: dto.name,
           username: dto.username,
-          uris: [dto.uri],
+          uris: dto.uris,
           description: dto.description,
           resource_type_id: dto.resource_type_id,
+          custom_fields: customFieldsCollection.toMetadataDto(),
         },
         secrets: dto.secrets,
         personal: true,
@@ -290,7 +336,7 @@ describe("ExternalResourceEntity", () => {
 
   describe("::getters", () => {
     it("should provide the right values when everything is set", () => {
-      expect.assertions(11);
+      expect.assertions(12);
 
       const dto = defaultExternalResourceDto();
       const entity = new ExternalResourceEntity(dto);
@@ -298,7 +344,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.id).toStrictEqual(dto.id);
       expect(entity.name).toStrictEqual(dto.name);
       expect(entity.username).toStrictEqual(dto.username);
-      expect(entity.uri).toStrictEqual(dto.uri);
+      expect(entity.uris).toStrictEqual(dto.uris);
       expect(entity.description).toStrictEqual(dto.description);
       expect(entity.secretClear).toStrictEqual(dto.secret_clear);
       expect(entity.folderParentId).toStrictEqual(dto.folder_parent_id);
@@ -306,10 +352,11 @@ describe("ExternalResourceEntity", () => {
       expect(entity.resourceTypeId).toStrictEqual(dto.resource_type_id);
       expect(entity.expired).toStrictEqual(dto.expired);
       expect(entity.path).toStrictEqual(`${dto.folder_parent_path}/${dto.name}`);
+      expect(entity.customFields.toDto()).toStrictEqual(dto.custom_fields);
     });
 
     it("should provide the default values with minimal dto", () => {
-      expect.assertions(11);
+      expect.assertions(12);
 
       const dto = minimalExternalResourceDto();
       const entity = new ExternalResourceEntity(dto);
@@ -317,7 +364,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.id).toBeNull();
       expect(entity.name).toStrictEqual(dto.name);
       expect(entity.username).toBeNull();
-      expect(entity.uri).toBeNull();
+      expect(entity.uris).toEqual([]);
       expect(entity.description).toBeNull();
       expect(entity.secretClear).toStrictEqual(dto.secret_clear);
       expect(entity.folderParentId).toBeNull();
@@ -325,6 +372,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.resourceTypeId).toBeNull();
       expect(entity.expired).toBeNull();
       expect(entity.path).toStrictEqual(dto.name);
+      expect(entity.customFields).toBeNull();
     });
   });
 
@@ -340,7 +388,8 @@ describe("ExternalResourceEntity", () => {
         folder_parent_path: "Root/Folder/SubFolder",
         secret_clear: "this is a secret",
         secrets: new ResourceSecretsCollection(defaultResourcesSecretsDtos()),
-        totp: new ExternalTotpEntity(defaultTotpDto())
+        totp: new ExternalTotpEntity(defaultTotpDto()),
+        customFields: new CustomFieldsCollection(defaultCustomFieldsCollection())
       };
 
       entity.id = expectedData.id;
@@ -410,6 +459,13 @@ describe("ExternalResourceEntity", () => {
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
       expect(() => { entity.secrets = defaultResourcesSecretsDtos(); }).toThrow(TypeError);
+    });
+
+    it("should validate customFields when using the setter", () => {
+      expect.assertions(1);
+
+      const entity = new ExternalResourceEntity(minimalExternalResourceDto());
+      expect(() => { entity.customFields = defaultCustomFieldsCollection(); }).toThrow(TypeError);
     });
   });
 });

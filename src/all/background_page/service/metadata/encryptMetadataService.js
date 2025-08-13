@@ -12,7 +12,6 @@
  * @since         4.10.0
  */
 import PassphraseStorageService from '../session_storage/passphraseStorageService';
-import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
@@ -70,7 +69,7 @@ class EncryptMetadataService {
     // Prevent future issue if an encrypted metadata is stored without object_type, this will fail the decryption validation of the entity
     this.assertValidMetadataObjectType(entity);
 
-    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+    passphrase = passphrase || await PassphraseStorageService.getOrFail();
     const userPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     const serializedMetadata = JSON.stringify(entity.metadata.toDto(entity.metadata.constructor.DEFAULT_CONTAIN));
 
@@ -116,7 +115,7 @@ class EncryptMetadataService {
     }
 
     const canUsePersonalKeys = await this.allowUsageOfPersonalKeys();
-    passphrase = passphrase || await this.getPassphraseFromLocalStorageOrFail();
+    passphrase = passphrase || await PassphraseStorageService.getOrFail();
 
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
 
@@ -220,21 +219,6 @@ class EncryptMetadataService {
     const metadataPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
     const metadataKeyId = metadataKeyEntity.id;
     return {metadataKeyId, metadataPublicKey, metadataPrivateKey};
-  }
-
-  /**
-   * Retrieve the user passphrase from the local storage or fail.
-   *
-   * @returns {Promise<string>}
-   * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
-   * @private
-   */
-  async getPassphraseFromLocalStorageOrFail() {
-    const passphrase = await PassphraseStorageService.get();
-    if (!passphrase) {
-      throw new UserPassphraseRequiredError();
-    }
-    return passphrase;
   }
 
   /**

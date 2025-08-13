@@ -315,7 +315,7 @@ describe("ResourcesCsvImportParser", () => {
     return Object.assign({
       name: `Password ${num}`,
       username: `username${num}`,
-      uri: `https://url${num}.com`,
+      uris: [`https://url${num}.com`],
       description: `Description ${num}`,
       secret_clear: `Secret ${num}`,
       folder_parent_path: ``,

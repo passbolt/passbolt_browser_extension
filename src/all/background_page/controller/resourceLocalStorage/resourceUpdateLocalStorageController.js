@@ -68,7 +68,7 @@ class ResourceUpdateLocalStorageController {
       }
       const passphrase =  await this.getPassphraseService.getPassphrase(this.worker);
       await PassphraseStorageService.set(passphrase, 60);
-      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll({}, passphrase);
     }
   }
 }

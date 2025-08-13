@@ -40,7 +40,7 @@ class WebIntegrationController {
     const url = new URL(resourceToSave.url);
     const resourceDto = {
       name: resourceToSave.name,
-      uri: `${url.protocol}//${url.host}${url.pathname}`,
+      uris: [`${url.protocol}//${url.host}${url.pathname}`],
       username: resourceToSave.username,
       secret_clear: resourceToSave.password
     };

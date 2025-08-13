@@ -219,7 +219,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[0].id,
             name: 'Password 1',
             username: 'username1',
-            uri: 'https://url1.com',
+            uris: ['https://url1.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[0].folderParentPath,
             folder_parent_path_expected: "/Root/Folder 1/Folder 2",
@@ -229,7 +229,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[1].id,
             name: 'Password 2',
             username: 'username2',
-            uri: 'https://url2.com',
+            uris: ['https://url2.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[1].folderParentPath,
             folder_parent_path_expected: "/Root/Folder 1",
@@ -239,7 +239,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[2].id,
             name: 'Password 4',
             username: 'username4',
-            uri: 'https://url4.com',
+            uris: ['https://url4.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[2].folderParentPath,
             folder_parent_path_expected: "/Root/Folder 2/Folder 1",
@@ -249,7 +249,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[3].id,
             name: 'Password 3',
             username: 'username3',
-            uri: 'https://url3.com',
+            uris: ['https://url3.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[3].folderParentPath,
             folder_parent_path_expected: "/Root/Folder 3/Folder 4",
@@ -292,7 +292,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[0].id,
             name: 'Password 1',
             username: 'username1',
-            uri: 'https://url1.com',
+            uris: ['https://url1.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[0].folderParentPath,
             folder_parent_path_expected: "/Root",
@@ -329,7 +329,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[0].id,
             name: 'Password 1',
             username: 'username1',
-            uri: 'https://url1.com',
+            uris: ['https://url1.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[0].folderParentPath,
             folder_parent_path_expected: "/Root",
@@ -393,7 +393,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[0].id,
             name: 'Password 1',
             username: 'Username 1',
-            uri: 'https://url1.com',
+            uris: ['https://url1.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[0].folderParentPath,
             folder_parent_path_expected: ""
@@ -464,7 +464,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[0].id,
             name: 'Password 1',
             username: 'Username 1',
-            uri: 'https://url1.com',
+            uris: ['https://url1.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[0].folderParentPath,
           }));
@@ -484,18 +484,6 @@ describe("ImportResourcesFileController", () => {
         {
           scenario: "1Password",
           file: onePasswordCsvFile,
-          metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
-          resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
-        },
-        {
-          scenario: "bitwarden",
-          file: bitwardenCsvFile,
-          metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
-          resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG
-        },
-        {
-          scenario: "bitwarden",
-          file: bitwardenCsvFile,
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
@@ -545,7 +533,7 @@ describe("ImportResourcesFileController", () => {
             id: importedResources[0].id,
             name: 'Password 1',
             username: 'Username 1',
-            uri: 'https://url1.com',
+            uris: ['https://url1.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[0].folderParentPath,
             folder_parent_path_expected: "/Folder 1"
@@ -571,6 +559,18 @@ describe("ImportResourcesFileController", () => {
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG
         },
+        {
+          scenario: "bitwarden",
+          file: bitwardenCsvFile,
+          metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
+          resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG
+        },
+        {
+          scenario: "bitwarden",
+          file: bitwardenCsvFile,
+          metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
+          resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG
+        },
       ]).describe("Should parse keypass with description, folder and totp", test => {
         beforeEach(() => {
           jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
@@ -588,13 +588,13 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,
             name: 'Password 1',
             username: 'Username 1',
-            uri: 'https://url1.com',
+            uris: ['https://url1.com'],
             resource_type_id: expectedResourceType.id,
             folder_parent_path: importedResources[0].folderParentPath,
             folder_parent_path_expected: "/Folder 1"

@@ -16,7 +16,7 @@ import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEn
 import UserModel from "../../model/user/userModel";
 import {assertString, assertUuid} from "../../utils/assertions";
 import MetadataPrivateKeyApiService from "../api/metadata/metadataPrivateKeyApiService";
-import ShareMetadataPrivateKeysCollection from "../../model/entity/metadata/shareMetadataPrivateKeysCollection";
+import ShareMetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 import EncryptMetadataPrivateKeysService from "./encryptMetadataPrivateKeysService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";

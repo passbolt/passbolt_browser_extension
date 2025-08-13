@@ -5,14 +5,14 @@
 	  /_/    \__,_/____/____/_.___/\____/_/\__/
 
 	Open source password manager for teams
-	(c) 2021 Passbolt SA
+	(c) 2025 Passbolt SA
 	https://www.passbolt.com
 
 ## License
 
 Passbolt - Open source password manager for teams
 
-(c) 2022 Passbolt SA
+(c) 2025 Passbolt SA
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
 Public License (AGPL) as published by the Free Software Foundation version 3.

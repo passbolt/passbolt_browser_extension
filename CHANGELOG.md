@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.4.1] - 2025-08-14
+- PB-44638 Password expiry should not be removed when password is not updated
+- PB-44668 The create menu import operation should be actionable when encrypted metadata plugin is not available
+
 ## [5.4.0] - 2025-08-13
 ### Added
 - PB-44201: E2EE The organisation settings offer now a simplified way to activate metadata encryption and the new resource types
@@ -2356,7 +2360,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.1...HEAD
+[5.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.0...v5.4.1
 [5.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.3.3...v5.4.0
 [5.3.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.3.0...v5.3.2
 [5.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.2.0...v5.3.0

@@ -55,12 +55,12 @@ describe("PortManager", () => {
       delete port.sender.tab;
       // mock functions
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
-      jest.spyOn(browser.action, "getPopup").mockImplementationOnce(() => popupUrl);
+      jest.spyOn(browser.runtime, "getURL").mockImplementationOnce(() => popupUrl);
       jest.spyOn(PagemodManager, "attachEventToPort");
       // process
       await PortManager.onPortConnect(port);
       // expectations
-      expect(browser.action.getPopup).toHaveBeenCalled();
+      expect(browser.runtime.getURL).toHaveBeenCalled();
       expect(PortManager._ports[port.name]).toBeDefined();
       expect(PortManager._ports[port.name]._port).toBe(port);
       expect(PagemodManager.attachEventToPort).toHaveBeenCalledWith(PortManager._ports[port.name], "QuickAccess");
@@ -92,11 +92,7 @@ describe("PortManager", () => {
       });
       delete port.sender.tab;
       // mock functions
-      jest
-        .spyOn(browser.action, "getPopup")
-        .mockImplementationOnce(
-          () => "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess",
-        );
+      jest.spyOn(browser.runtime, "getURL").mockImplementationOnce(() => "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess");
       jest.spyOn(PagemodManager, "attachEventToPort");
       // process
       try {
@@ -104,7 +100,7 @@ describe("PortManager", () => {
       } catch (error) {
         // expectations
         expect(error.message).toStrictEqual("The worker id should be a valid uuid.");
-        expect(browser.action.getPopup).toHaveBeenCalled();
+        expect(browser.runtime.getURL).toHaveBeenCalled();
         expect(PortManager._ports[port.name]).not.toBeDefined();
         expect(PagemodManager.attachEventToPort).not.toHaveBeenCalled();
       }

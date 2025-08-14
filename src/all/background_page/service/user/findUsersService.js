@@ -75,4 +75,15 @@ export default class FindUsersService {
     const filters = {"is-active": true};
     return this.findAll({}, filters);
   }
+
+  /**
+   * Retrieve all active users with missing keys property.
+   * @returns {Promise<UsersCollection>}
+   * @throws {CollectionValidationError} if the data returned by the API does not validate.
+   */
+  async findAllActiveWithMissingKeys() {
+    const contains = {"missing_metadata_key_ids": true};
+    const filters = {"is-active": true};
+    return this.findAll(contains, filters);
+  }
 }

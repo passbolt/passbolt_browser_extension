@@ -17,9 +17,8 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
-import UpdateMetadataSettingsPrivateKeysService from "./updateMetadataSettingsPrivateKeysService";
+import CreateMetadataPrivateKeysForServerAndUsersService from "./createMetadataPrivateKeysForServerAndUsersService";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import UsersCollection from "../../model/entity/user/usersCollection";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import Keyring from "../../model/keyring";
 import {enableFetchMocks} from "jest-fetch-mock";
@@ -27,13 +26,14 @@ import UserLocalStorage from "../local_storage/userLocalStorage";
 import {defaultMetadataKeysSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import {defaultMetadataKeyDto, metadataKeyWithSignedMetadataPrivateKeyDataDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 import {v4 as uuidv4} from "uuid";
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import {decryptedMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 import ShareMetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
 import MetadataKeysSettingsEntity
   from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import UsersCollection from "../../model/entity/user/usersCollection";
 
-describe("UpdateMetadataSettingsPrivateKeysService", () => {
+describe("CreateMetadataPrivateKeysForServerAndUsersService", () => {
   let account, apiClientOptions, service, keyring;
   beforeEach(async() => {
     jest.clearAllMocks();
@@ -44,7 +44,7 @@ describe("UpdateMetadataSettingsPrivateKeysService", () => {
     }));
     await MockExtension.withConfiguredAccount();
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-    service = new UpdateMetadataSettingsPrivateKeysService(account, apiClientOptions);
+    service = new CreateMetadataPrivateKeysForServerAndUsersService(account, apiClientOptions);
     keyring = new Keyring();
     await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
     await keyring.importPublic(pgpKeys.betty.public, pgpKeys.betty.userId);
@@ -52,30 +52,30 @@ describe("UpdateMetadataSettingsPrivateKeysService", () => {
     await UserLocalStorage.flush();
   });
 
-  describe('::updateKeys', () => {
+  describe('::createPrivateKeys', () => {
     it("should assert metadata key settings parameter.", async() => {
       expect.assertions(1);
 
-      await expect(() => service.updateKeys({})).rejects.toThrow("The parameter 'metadataKeysSettings' should be a MetadataKeysSettingsEntity");
+      await expect(() => service.createPrivateKeys({})).rejects.toThrow("The parameter 'metadataKeysSettings' should be a MetadataKeysSettingsEntity");
     });
 
     it("should assert passphrase parameter.", async() => {
       expect.assertions(1);
 
-      await expect(() => service.updateKeys(new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto()), 2)).rejects.toThrow('The parameter "passphrase" should be a string.');
+      await expect(() => service.createPrivateKeys(new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto()), 2)).rejects.toThrow('The parameter "passphrase" should be a string.');
     });
 
     it("should throw if user is not an administrator.", async() => {
       expect.assertions(1);
 
       account = new AccountEntity(defaultAccountDto());
-      service = new UpdateMetadataSettingsPrivateKeysService(account, apiClientOptions);
+      service = new CreateMetadataPrivateKeysForServerAndUsersService(account, apiClientOptions);
 
-      await expect(() => service.updateKeys(new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto()), pgpKeys.ada.passphrase)).rejects.toThrow('This action can only be performed by an administrator.');
+      await expect(() => service.createPrivateKeys(new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto()), pgpKeys.ada.passphrase)).rejects.toThrow('This action can only be performed by an administrator.');
     });
 
     it("should build metadata private keys for users having missing keys and for the server and sign the missing data keys signed by the current administrator", async() => {
-      expect.assertions(2);
+      expect.assertions(7);
       const metadataKeyId = uuidv4();
       const metadataPrivateKeyNotSigned = decryptedMetadataPrivateKeyDto({
         metadata_key_id: metadataKeyId,
@@ -102,19 +102,27 @@ describe("UpdateMetadataSettingsPrivateKeysService", () => {
       expectedMetadataPrivateKeys.push(metadataKeys.items[0].metadataPrivateKeys.items[0].cloneForSharing(null));
       expectedMetadataPrivateKeys.push(metadataKeys.items[1].metadataPrivateKeys.items[0].cloneForSharing(null));
 
-      jest.spyOn(service.findMetadataKeysService, "findAllForSessionStorage").mockImplementationOnce(() => metadataKeys);
+      jest.spyOn(service.findAndUpdateMetadataKeysSessionStorageService, "findAndUpdateAll").mockImplementationOnce(() => metadataKeys);
       jest.spyOn(service.findUsersService, "findAllActiveWithMissingKeys").mockImplementationOnce(() => usersCollection);
-      jest.spyOn(service.encryptMetadataPrivateKeysService, "encryptOne").mockImplementation(metadataPrivateKey => {
-        const expectedMetadataPrivateKey = expectedMetadataPrivateKeys.find(expectedMetadataPrivateKey => metadataPrivateKey.metadataKeyId === expectedMetadataPrivateKey.metadataKeyId);
-        expectedMetadataPrivateKey.data = metadataPrivateKey.data;
+      jest.spyOn(service.metadataPrivateKeyApiService, "create").mockImplementation(metadataPrivateKeyCollection => {
+        for (const metadataPrivateKey of metadataPrivateKeyCollection) {
+          const expectedMetadataPrivateKey = expectedMetadataPrivateKeys.find(expectedMetadataPrivateKey => metadataPrivateKey.metadataKeyId === expectedMetadataPrivateKey.metadataKeyId);
+          expectedMetadataPrivateKey.data = metadataPrivateKey.data;
+        }
       });
+      jest.spyOn(service.encryptMetadataPrivateKeysService, "encryptOne");
 
       const settings = new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto());
 
-      await service.updateKeys(settings, pgpKeys.ada.passphrase);
+      await service.createPrivateKeys(settings, pgpKeys.ada.passphrase);
 
       expect(service.encryptMetadataPrivateKeysService.encryptOne).toHaveBeenCalledTimes(4);
-      expect(settings.metadataPrivateKeys).toStrictEqual(new ShareMetadataPrivateKeysCollection(expectedMetadataPrivateKeys));
+      expect(service.metadataPrivateKeyApiService.create).toHaveBeenCalledWith(new ShareMetadataPrivateKeysCollection([expectedMetadataPrivateKeys[0], expectedMetadataPrivateKeys[1]]));
+      expect(settings.metadataPrivateKeys.hasDecryptedPrivateKeys()).toBeFalsy();
+      expect(settings.metadataPrivateKeys.items[0].metadataKeyId).toStrictEqual(expectedMetadataPrivateKeys[2].metadataKeyId);
+      expect(settings.metadataPrivateKeys.items[0].userId).toStrictEqual(null);
+      expect(settings.metadataPrivateKeys.items[1].metadataKeyId).toStrictEqual(expectedMetadataPrivateKeys[1].metadataKeyId);
+      expect(settings.metadataPrivateKeys.items[1].userId).toStrictEqual(null);
     });
   });
 });

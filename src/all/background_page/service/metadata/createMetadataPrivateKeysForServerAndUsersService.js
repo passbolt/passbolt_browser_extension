@@ -21,12 +21,14 @@ import MetadataKeysSettingsEntity
 import Keyring from "../../model/keyring";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import ShareMetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
-import FindMetadataKeysService from "./findMetadataKeysService";
+import MetadataPrivateKeyApiService from "../api/metadata/metadataPrivateKeyApiService";
+import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
+import FindAndUpdateMetadataKeysSessionStorageService from "./findAndUpdateMetadataKeysSessionStorageService";
 
 /**
  * The service aims to update metadata private keys to go back from a zero-knowledge to a user friendly-mode.
  */
-export default class UpdateMetadataSettingsPrivateKeysService {
+export default class CreateMetadataPrivateKeysForServerAndUsersService {
   /**
    * @constructor
    * @param {AccountEntity} account The user account
@@ -37,7 +39,9 @@ export default class UpdateMetadataSettingsPrivateKeysService {
     this.keyring = new Keyring();
     this.findUsersService = new FindUsersService(account, apiClientOptions);
     this.encryptMetadataPrivateKeysService = new EncryptMetadataPrivateKeysService(account);
-    this.findMetadataKeysService = new FindMetadataKeysService(apiClientOptions, account);
+    this.findAndUpdateMetadataKeysSessionStorageService = new FindAndUpdateMetadataKeysSessionStorageService(account, apiClientOptions);
+    this.metadataKeysSessionStorage = new MetadataKeysSessionStorage(account);
+    this.metadataPrivateKeyApiService = new MetadataPrivateKeyApiService(apiClientOptions);
   }
 
   /**
@@ -49,7 +53,7 @@ export default class UpdateMetadataSettingsPrivateKeysService {
    * @throws {TypeError} if metadataKeysSettings argument is not of the expected type
    * @throws {TypeError} if passphrase argument is not a string
    */
-  async updateKeys(metadataKeysSettings, passphrase) {
+  async createPrivateKeys(metadataKeysSettings, passphrase) {
     assertType(metadataKeysSettings, MetadataKeysSettingsEntity, "The parameter 'metadataKeysSettings' should be a MetadataKeysSettingsEntity");
     assertString(passphrase, 'The parameter "passphrase" should be a string.');
 
@@ -60,14 +64,16 @@ export default class UpdateMetadataSettingsPrivateKeysService {
     await this.keyring.sync();
     const shareMetadataPrivateKeysCollection = await this._getMetadataPrivateKeys(passphrase);
     const decryptedUserPrivateKey = await this._getDecryptedPrivateKey(passphrase);
-    const metadataPrivateKeysDto = await this._buildMetadataKeyForUsers(shareMetadataPrivateKeysCollection, decryptedUserPrivateKey);
+    const metadataPrivateKeysUserDto = await this._buildMetadataKeyForUsers(shareMetadataPrivateKeysCollection, decryptedUserPrivateKey);
 
     if (!metadataKeysSettings.zeroKnowledgeKeyShare) {
       const metadataPrivateKeyServer = await this._buildMetadataKeyForServer(shareMetadataPrivateKeysCollection, decryptedUserPrivateKey);
-      metadataPrivateKeysDto.push(...metadataPrivateKeyServer);
+      metadataKeysSettings.metadataPrivateKeys = new ShareMetadataPrivateKeysCollection(metadataPrivateKeyServer);
     }
 
-    metadataKeysSettings.metadataPrivateKeys = new ShareMetadataPrivateKeysCollection(metadataPrivateKeysDto);
+    if (metadataPrivateKeysUserDto.length > 0) {
+      await this.metadataPrivateKeyApiService.create(new ShareMetadataPrivateKeysCollection(metadataPrivateKeysUserDto));
+    }
   }
 
   /**
@@ -77,7 +83,7 @@ export default class UpdateMetadataSettingsPrivateKeysService {
    * @private
    */
   async _getMetadataPrivateKeys(passphrase) {
-    const metadataKeysCollection = await this.findMetadataKeysService.findAllForSessionStorage(passphrase);
+    const metadataKeysCollection = await this.findAndUpdateMetadataKeysSessionStorageService.findAndUpdateAll(passphrase);
     const shareMetadataPrivateKeysCollection = new ShareMetadataPrivateKeysCollection([]);
     for (const metadataKeyEntity of metadataKeysCollection) {
       shareMetadataPrivateKeysCollection.pushMany(metadataKeyEntity.metadataPrivateKeys.toDto());
@@ -119,7 +125,6 @@ export default class UpdateMetadataSettingsPrivateKeysService {
         metadataPrivateKeysDto.push(clonedSharedMetadataPrivateKey);
       }
     }
-
     return metadataPrivateKeysDto;
   }
 

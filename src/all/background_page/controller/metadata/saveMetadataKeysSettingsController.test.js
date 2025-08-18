@@ -71,7 +71,7 @@ describe("SaveMetadataKeysController", () => {
       jest.spyOn(controller.saveMetadaSettingsService.metadataKeysSettingsApiService, "save")
         .mockImplementation(settings => settings.toDto());
       // spy on update metadata keys service
-      jest.spyOn(controller.updateMetadataKeysService, "updateKeys").mockImplementationOnce(jest.fn());
+      jest.spyOn(controller.createMetadataPrivateKeysForServerAndUsersService, "createPrivateKeys").mockImplementationOnce(jest.fn());
       // spy on local storage service
       jest.spyOn(controller.saveMetadaSettingsService.metadataKeysSettingsLocalStorage, "set");
       // mock passphrase
@@ -80,7 +80,7 @@ describe("SaveMetadataKeysController", () => {
       const savedMetadataKeysSettings = await controller.exec(metadataKeysSettingsDto);
 
       expect(savedMetadataKeysSettings).toBeInstanceOf(MetadataKeysSettingsEntity);
-      expect(controller.updateMetadataKeysService.updateKeys).toHaveBeenCalledWith(new MetadataKeysSettingsEntity(metadataKeysSettingsDto), pgpKeys.ada.passphrase);
+      expect(controller.createMetadataPrivateKeysForServerAndUsersService.createPrivateKeys).toHaveBeenCalledWith(new MetadataKeysSettingsEntity(metadataKeysSettingsDto), pgpKeys.ada.passphrase);
       expect(controller.saveMetadaSettingsService.metadataKeysSettingsApiService.save)
         .toHaveBeenCalledWith(new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
       expect(controller.saveMetadaSettingsService.metadataKeysSettingsLocalStorage.set)

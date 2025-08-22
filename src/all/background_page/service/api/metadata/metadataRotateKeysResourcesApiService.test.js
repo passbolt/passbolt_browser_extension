@@ -22,6 +22,7 @@ import MetadataRotateKeysResourcesApiService from "./metadataRotateKeysResources
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
+import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 
 describe("MetadataRotateKeysResourcesApiService", () => {
   let apiClientOptions, account;
@@ -62,6 +63,35 @@ describe("MetadataRotateKeysResourcesApiService", () => {
       const service = new MetadataRotateKeysResourcesApiService(apiClientOptions);
 
       await expect(() => service.findAll()).rejects.toThrow(PassboltServiceUnavailableError);
+    });
+  });
+
+  describe('::rotate', () => {
+    it("Rotate metadata of resources collection on the API.", async() => {
+      expect.assertions(3);
+
+      const dto = defaultSharedResourcesWithEncryptedMetadataDtos();
+      const resourcesCollection = new ResourcesCollection(dto);
+      let reqPayload;
+      fetch.doMockOnceIf(/metadata\/rotate-key\/resources/, async req => {
+        expect(req.method).toEqual("POST");
+        reqPayload = await req.json();
+        return mockApiResponse(reqPayload);
+      });
+
+      const service = new MetadataRotateKeysResourcesApiService(apiClientOptions);
+      const resultDto = await service.rotate(resourcesCollection);
+
+      expect(resultDto).toEqual(expect.objectContaining(dto));
+      expect(reqPayload).toEqual(expect.objectContaining(dto));
+    });
+
+    it("throws an invalid parameter error if the resources collection parameter is not valid", async() => {
+      expect.assertions(1);
+
+      const service = new MetadataRotateKeysResourcesApiService(apiClientOptions);
+
+      await expect(() => service.rotate(42)).rejects.toThrow(TypeError);
     });
   });
 });

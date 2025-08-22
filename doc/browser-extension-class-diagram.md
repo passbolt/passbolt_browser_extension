@@ -341,6 +341,7 @@ classDiagram
 
         class MetadataRotateKeysResourcesApiService {
             +findAll() Promise~array~
+            +rotate(ResourceCollection resourcesCollection) Promise~array~
         }
 
         class MetadataPrivateKeyApiService {

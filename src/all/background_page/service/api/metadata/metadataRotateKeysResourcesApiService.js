@@ -13,6 +13,8 @@
  */
 
 import AbstractService from "../abstract/abstractService";
+import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
+import {assertType} from "../../../utils/assertions";
 
 const METADATA_ROTATE_KEYS_RESOURCES_API_SERVICE_RESOURCE_NAME = "metadata/rotate-key/resources";
 
@@ -38,6 +40,21 @@ class MetadataRotateKeysResourcesApiService extends AbstractService {
       return [];
     }
 
+    return response.body;
+  }
+
+  /**
+   * Rotate metadata of resources collection Passbolt API
+   *
+   * @param {ResourcesCollection} resourceCollection The resource collection to rotate
+   * @returns {Promise<*>} Response body
+   * @throws {TypeError} if the `resourceCollection` argument is not of type ResourcesCollection
+   * @public
+   */
+  async rotate(resourceCollection) {
+    assertType(resourceCollection, ResourcesCollection);
+    const data = resourceCollection.toDto();
+    const response = await this.apiClient.create(data);
     return response.body;
   }
 }

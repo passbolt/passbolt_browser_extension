@@ -339,6 +339,10 @@ classDiagram
             +delete(string uuid) Promise~*void*~
         }
 
+        class MetadataRotateKeysResourcesApiService {
+            +findAll() Promise~array~
+        }
+
         class MetadataPrivateKeyApiService {
             +update(MetadataPrivateKeyEntity metadataPrivateKey) Promise~string~
             +create(ShareMetadataPrivateKeysCollection metadataPrivateKeysCollection) Promise~void~

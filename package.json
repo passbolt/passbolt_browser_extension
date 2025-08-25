@@ -28,7 +28,7 @@
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
     "validator": "^13.7.0",
     "webextension-polyfill": "^0.10.0",
-    "xregexp": "~5.1.0"
+    "xregexp": "~5.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.23.2",

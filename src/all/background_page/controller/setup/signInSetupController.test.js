@@ -30,6 +30,7 @@ import PassphraseStorageService from "../../service/session_storage/passphraseSt
 import PostLoginService from "../../service/auth/postLoginService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -76,7 +77,7 @@ describe("SignInSetupController", () => {
     }, 10000);
 
     it("Should ask for SSO kits generation.", async() => {
-      expect.assertions(6);
+      expect.assertions(7);
       const organizationSettings = anonymousOrganizationSettings();
       organizationSettings.passbolt.plugins.sso = {
         enabled: true
@@ -87,6 +88,7 @@ describe("SignInSetupController", () => {
       jest.spyOn(PassphraseStorageService, "set").mockImplementation(async() => {});
       jest.spyOn(PostLoginService, "exec").mockImplementation(async() => {});
       jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
+      jest.spyOn(OrganizationSettingsModel, "flushCache");
 
       SsoDataStorage.setMockedData(null);
 
@@ -107,6 +109,8 @@ describe("SignInSetupController", () => {
       expect(GenerateSsoKitService.generate).toHaveBeenCalledWith("ada@passbolt.com", "azure");
       expect(GenerateSsoKitService.generate).toHaveBeenCalledTimes(1);
       expect(AccountTemporarySessionStorageService.remove).toHaveBeenCalledTimes(1);
+      // The organization setting cache has been flushed
+      expect(OrganizationSettingsModel.flushCache).toHaveBeenCalledTimes(1);
     }, 10000);
 
     it("Should raise an error if no account has been found.", async() => {

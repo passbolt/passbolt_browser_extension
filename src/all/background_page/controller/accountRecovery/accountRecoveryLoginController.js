@@ -25,6 +25,7 @@ import AccountTemporarySessionStorageService from "../../service/sessionStorage/
 import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 class AccountRecoveryLoginController {
   /**
@@ -123,6 +124,8 @@ class AccountRecoveryLoginController {
     await AccountLocalStorage.deleteByUserIdAndType(temporaryAccount.account.userId, AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY);
     // Remove account temporary when an account recovery process is finished
     await AccountTemporarySessionStorageService.remove();
+    // Clear cache in the organization settings
+    await OrganizationSettingsModel.flushCache();
   }
 
   /**

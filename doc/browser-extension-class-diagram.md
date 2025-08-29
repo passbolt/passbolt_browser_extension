@@ -336,6 +336,7 @@ classDiagram
         class MetadataKeysApiService {
             +findAll(object contains) Promise~array~
             +create(MetadataKeyEntity metadataKey) Promise~*string*~
+            +delete(string uuid) Promise~*void*~
         }
 
         class MetadataPrivateKeyApiService {

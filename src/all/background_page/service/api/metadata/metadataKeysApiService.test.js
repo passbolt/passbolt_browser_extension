@@ -23,6 +23,7 @@ import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/
 import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 import MetadataKeysApiService from "./metadataKeysApiService";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
+import {v4 as uuidv4} from "uuid";
 
 describe("MetadataKeysApiService", () => {
   let apiClientOptions, account;
@@ -94,6 +95,52 @@ describe("MetadataKeysApiService", () => {
       const service = new MetadataKeysApiService(apiClientOptions);
 
       await expect(() => service.create(42)).rejects.toThrow(TypeError);
+    });
+  });
+
+  describe('::delete', () => {
+    it("should expired the metadata key with the given id from the API", async() => {
+      expect.assertions(2);
+      const expectedId = uuidv4();
+      fetch.doMockOnceIf(new RegExp(`/metadata\/keys\/${expectedId}\.json`), async req => {
+        expect(req.method).toEqual("DELETE");
+        return mockApiResponse({});
+      });
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      await expect(service.delete(expectedId)).resolves.not.toThrow();
+    });
+
+    it("should throw an error if the metadata key is not a valid id", async() => {
+      expect.assertions(1);
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      const promise = service.delete("not a uuid");
+      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+    });
+
+    it("should throw an error if the API returns an error response", async() => {
+      expect.assertions(2);
+
+      const expectedId = uuidv4();
+      fetch.doMockOnceIf(/metadata\/keys/, () => mockApiResponseError(500, "Something went wrong!"));
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      const promise = service.delete(expectedId);
+      await expect(promise).rejects.toThrow(PassboltApiFetchError);
+      await expect(promise).rejects.toThrowError("Something went wrong!");
+    });
+
+    it("should throw an error if the API returns an error response", async() => {
+      expect.assertions(2);
+
+      const expectedId = uuidv4();
+      fetch.doMockOnceIf(/metadata\/keys/, () => { throw new Error("Service unavailable"); });
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      const promise = service.delete(expectedId);
+      await expect(promise).rejects.toThrow(PassboltServiceUnavailableError);
+      await expect(promise).rejects.toThrowError("Unable to reach the server, an unexpected error occurred");
     });
   });
 });

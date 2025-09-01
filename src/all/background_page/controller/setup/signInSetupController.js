@@ -20,7 +20,6 @@ import PostLoginService from "../../service/auth/postLoginService";
 import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 class SignInSetupController {
   /**
@@ -83,8 +82,6 @@ class SignInSetupController {
     await PostLoginService.exec();
     // Clear all data in the temporary account session storage
     await AccountTemporarySessionStorageService.remove();
-    // Clear cache in the organization settings
-    await OrganizationSettingsModel.flushCache();
   }
 }
 

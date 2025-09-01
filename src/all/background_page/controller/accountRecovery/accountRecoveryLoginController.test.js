@@ -34,7 +34,6 @@ import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accou
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 beforeEach(async() => {
   enableFetchMocks();
@@ -75,9 +74,8 @@ describe("AccountRecoveryLoginController", () => {
         jest.spyOn(browser.tabs, "update");
         jest.spyOn(AccountTemporarySessionStorageService, "remove");
         jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
-        jest.spyOn(OrganizationSettingsModel, "flushCache");
 
-        expect.assertions(7);
+        expect.assertions(6);
 
         await controller.exec(test.passphrase, test.rememberMe);
         expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, test.passphrase);
@@ -92,8 +90,6 @@ describe("AccountRecoveryLoginController", () => {
         expect(AccountTemporarySessionStorageService.remove).toHaveBeenCalledTimes(1);
         // The account recovery should been removed from the account local storage.
         expect(await AccountLocalStorage.get()).toHaveLength(0);
-        // The organization setting cache has been flushed
-        expect(OrganizationSettingsModel.flushCache).toHaveBeenCalledTimes(1);
       });
     });
 

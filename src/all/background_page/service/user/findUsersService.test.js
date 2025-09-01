@@ -219,4 +219,19 @@ describe("FindResourcesService", () => {
       expect(users).toBeInstanceOf(UsersCollection);
     });
   });
+
+  describe("::findAllActive", () => {
+    it("requests the API with the is-active filter.", async() => {
+      expect.assertions(2);
+      const usersDto = defaultUsersDtos();
+      jest.spyOn(findUsersService.userApiService, "findAll").mockReturnValue(usersDto);
+
+      const users = await findUsersService.findAllActiveWithMissingKeys();
+
+      const expectedContains = {...defaultFindAllContains, "missing_metadata_key_ids": true};
+      const expectedFilters = {"is-active": true};
+      expect(findUsersService.userApiService.findAll).toHaveBeenCalledWith(expectedContains, expectedFilters);
+      expect(users).toBeInstanceOf(UsersCollection);
+    });
+  });
 });

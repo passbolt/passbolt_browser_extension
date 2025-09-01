@@ -14,6 +14,8 @@
 import SaveMetadataSettingsService from "../../service/metadata/saveMetadataSettingsService";
 import MetadataKeysSettingsEntity
   from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import FindMetadataSettingsService from "../../service/metadata/findMetadataSettingsService";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 
 class SaveMetadataKeysSettingsController {
   /**
@@ -27,6 +29,8 @@ class SaveMetadataKeysSettingsController {
     this.worker = worker;
     this.requestId = requestId;
     this.saveMetadaSettingsService = new SaveMetadataSettingsService(account, apiClientOptions);
+    this.findMetadataSettingsService = new FindMetadataSettingsService(apiClientOptions);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -50,8 +54,9 @@ class SaveMetadataKeysSettingsController {
    * @throws {EntityValidationError} If the settings dto does not validate against MetadataKeysSettingsEntity
    */
   async exec(dto) {
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     const settings = new MetadataKeysSettingsEntity(dto);
-    return this.saveMetadaSettingsService.saveKeysSettings(settings);
+    return this.saveMetadaSettingsService.saveKeysSettings(settings, passphrase);
   }
 }
 

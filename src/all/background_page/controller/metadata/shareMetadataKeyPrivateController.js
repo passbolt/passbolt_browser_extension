@@ -57,7 +57,7 @@ class ShareMetadataKeyPrivateController {
 
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
-    await this.shareMetadataKeyPrivateService.shareMissing(userId, passphrase);
+    await this.shareMetadataKeyPrivateService.shareOneMissing(userId, passphrase);
   }
 }
 

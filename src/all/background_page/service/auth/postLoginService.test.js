@@ -23,6 +23,7 @@ import PostLoginService from "./postLoginService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 import InformCallToActionPagemod from "../../pagemod/informCallToActionPagemod";
 import toolbarService from "../toolbar/toolbarService";
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 beforeEach(async() => {
   jest.clearAllMocks();
@@ -32,7 +33,7 @@ beforeEach(async() => {
 describe("PostLoginService", () => {
   describe("PostLoinService::postLogin", () => {
     it("Should send message to awake port and send post logout event", async() => {
-      expect.assertions(4);
+      expect.assertions(5);
       // data mocked
       const worker = readWorker();
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
@@ -48,6 +49,7 @@ describe("PostLoginService", () => {
       jest.spyOn(informCtaPortWrapper, "emit");
       jest.spyOn(toolbarService, "handleUserLoggedIn").mockImplementation(async() => {});
       jest.spyOn(StartLoopAuthSessionCheckService, "exec").mockImplementation(async() => {});
+      jest.spyOn(OrganizationSettingsModel, "flushCache");
 
       // execution
       await PostLoginService.exec();
@@ -60,6 +62,8 @@ describe("PostLoginService", () => {
       expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(workerCta, "passbolt.port.connect", workerCta.id);
       expect(informCtaPortWrapper.emit).toHaveBeenCalledWith('passbolt.auth.after-login');
       expect(informCtaPortWrapper.emit).toHaveBeenCalledTimes(1);
+      // The organization setting cache has been flushed
+      expect(OrganizationSettingsModel.flushCache).toHaveBeenCalledTimes(1);
     });
 
     it("Should not send messages if no workers needs to receive post logout event", async() => {

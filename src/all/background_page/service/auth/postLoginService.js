@@ -16,6 +16,7 @@ import toolbarService from "../toolbar/toolbarService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 import InformCallToActionPagemod from "../../pagemod/informCallToActionPagemod";
 import WorkerService from "../worker/workerService";
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 class PostLoginService {
   /**
@@ -23,6 +24,8 @@ class PostLoginService {
    * @returns {Promise<void>}
    */
   static async exec() {
+    // Clear cache in the organization settings
+    await OrganizationSettingsModel.flushCache();
     await PostLoginService.sendLoginEventForWorkers();
     await StartLoopAuthSessionCheckService.exec();
     toolbarService.handleUserLoggedIn();

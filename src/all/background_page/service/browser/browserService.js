@@ -16,7 +16,20 @@
  * The service aims to help get browser information.
  */
 export default class BrowserService {
+  /**
+   * Returns true if the current browser is Firefox
+   * @returns {boolean}
+   */
   static isFirefox() {
     return browser.runtime.getURL("/").startsWith("moz-extension://");
+  }
+
+  /**
+   * Returns true if the current browser is a chrome browser with MV3.
+   * @returns {boolean}
+   */
+  static isChromeAndMv3() {
+    return browser.runtime.getManifest().manifest_version === 3
+      && browser.runtime.getURL("/").startsWith("chrome-extension://");
   }
 }

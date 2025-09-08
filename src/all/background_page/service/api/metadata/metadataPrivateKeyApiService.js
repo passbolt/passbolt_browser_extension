@@ -15,7 +15,7 @@
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
 import AbstractService from "../abstract/abstractService";
 import {assertType} from "../../../utils/assertions";
-import ShareMetadataPrivateKeysCollection from "../../../model/entity/metadata/shareMetadataPrivateKeysCollection";
+import ShareMetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
 
 const METADATA_PRIVATE_KEY_API_SERVICE_RESOURCE_NAME = "metadata/keys/private";
 

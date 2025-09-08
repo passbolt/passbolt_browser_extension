@@ -73,6 +73,10 @@ import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTe
 import FindMetadataGettingStartedSettingsController from "../controller/metadata/findMetadataGettingStartedSettingsController";
 import EnableEncryptedMetadataForExistingInstanceController from "../controller/metadata/enableEncryptedMetadataForExistingInstanceController";
 import KeepCleartextMetadataForExistingInstanceController from "../controller/metadata/keepCleartextMetadataForExistingInstanceController";
+import FindScimSettingsController from "../controller/scimSettings/findScimSettingsController";
+import CreateScimSettingsController from "../controller/scimSettings/createScimSettingsController";
+import UpdateScimSettingsController from "../controller/scimSettings/updateScimSettingsController";
+import DisableScimSettingsController from "../controller/scimSettings/disableScimSettingsController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -512,6 +516,71 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.clipboard.copy-temporarily', async(requestId, text) => {
     const clipboardController = new CopyTemporarilyToClipboardController(worker, requestId);
     await clipboardController._exec(text);
+  });
+
+
+  /*
+   * ==================================================================================
+   *  SCIM events.
+   * ==================================================================================
+   */
+  /**
+   * Find SCIM settings
+   *
+   * @listens passbolt.scim.find-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.scim.find-settings', async requestId => {
+    const controller = new FindScimSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  /**
+   * Find SCIM settings
+   *
+   * @listens passbolt.scim.find-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.scim.find-settings', async requestId => {
+    const controller = new FindScimSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  /**
+   * Create SCIM settings
+   *
+   * @listens passbolt.scim.create-settings
+   * @param requestId {uuid} The request identifier
+   * @param data {Object} The SCIM settings data
+   */
+  worker.port.on('passbolt.scim.create-settings', async(requestId, data) => {
+    const controller = new CreateScimSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec(data);
+  });
+
+  /**
+   * Update SCIM settings
+   *
+   * @listens passbolt.scim.update-settings
+   * @param requestId {uuid} The request identifier
+   * @param id {string} The SCIM settings ID
+   * @param data {Object} The SCIM settings data
+   */
+  worker.port.on('passbolt.scim.update-settings', async(requestId, id, data) => {
+    const controller = new UpdateScimSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec(id, data);
+  });
+
+  /**
+   * Disable SCIM settings
+   *
+   * @listens passbolt.scim.disable-settings
+   * @param requestId {uuid} The request identifier
+   * @param id {string} The SCIM settings ID
+   */
+  worker.port.on('passbolt.scim.disable-settings', async(requestId, id) => {
+    const controller = new DisableScimSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec(id);
   });
 };
 export const AppEvents = {listen};

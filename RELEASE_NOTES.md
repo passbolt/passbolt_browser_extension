@@ -1,6 +1,6 @@
 Release song: https://youtu.be/L3Wo8jcNrkQ?si=HiNK6kSFC-aMFMJe
 
-Passbolt 5.5.0-RC.0 is a feature release candidate that lets administrators run encrypted metadata in zero-knowledge mode and adds SCIM provisioning (beta) for easier user management.
+Passbolt 5.5.0 is a feature release candidate that lets administrators run encrypted metadata in zero-knowledge mode and adds SCIM provisioning (beta) for easier user management.
 
 # Zero-knowledge
 Zero-knowledge for encrypted metadata is intended for organisations that prioritise maximum privacy and can do without server-side auditability. In this mode, the server never receives the shared metadata private key and therefore cannot access any resource metadata.

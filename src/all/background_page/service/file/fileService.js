@@ -17,7 +17,7 @@ import ScriptExecution from "../../sdk/scriptExecution";
 /**
  * File service
  */
-class FileService {
+export default class FileService {
   /**
    * Save file on disk using download
    *
@@ -63,5 +63,3 @@ class FileService {
     });
   }
 }
-
-export default FileService;

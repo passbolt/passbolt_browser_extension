@@ -11,7 +11,8 @@ const config = {
     new webpack.ProvidePlugin({
       // Inject browser polyfill as a global API, and adapt it depending on the environment (MV2/MV3/Windows app).
       browser: path.resolve(__dirname, './src/safari/common/polyfill/safariBrowserPolyfill.js'),
-    })
+    }),
+    new webpack.NormalModuleReplacementPlugin(/service\/file\/fileService$/, "../../../../safari/background_page/service/file/fileService"),
   ],
   module: {
     rules: [

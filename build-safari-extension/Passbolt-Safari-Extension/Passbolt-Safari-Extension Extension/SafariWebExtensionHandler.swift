@@ -22,37 +22,53 @@
 //
 
 import SafariServices
-import os.log
 
-class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
-
+final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
     func beginRequest(with context: NSExtensionContext) {
-        let request = context.inputItems.first as? NSExtensionItem
-
-        let profile: UUID?
-        if #available(iOS 17.0, macOS 14.0, *) {
-            profile = request?.userInfo?[SFExtensionProfileKey] as? UUID
-        } else {
-            profile = request?.userInfo?["profile"] as? UUID
+        guard
+            let item = context.inputItems.first as? NSExtensionItem,
+            let payload = item.userInfo?[SFExtensionMessageKey] as? [String: Any]
+        else {
+            return respond(context, error: "Bad or missing message")
+        }
+        
+        guard let action = payload["action"] as? String else {
+            return respond(context, error: "No action is provided, cannot excute request")
+        }
+        
+        if action == "save-file" {
+            return runSaveFile(context, payload)
         }
 
-        let message: Any?
-        if #available(iOS 15.0, macOS 11.0, *) {
-            message = request?.userInfo?[SFExtensionMessageKey]
-        } else {
-            message = request?.userInfo?["message"]
-        }
-
-        os_log(.default, "Received message from browser.runtime.sendNativeMessage: %@ (profile: %@)", String(describing: message), profile?.uuidString ?? "none")
-
-        let response = NSExtensionItem()
-        if #available(iOS 15.0, macOS 11.0, *) {
-            response.userInfo = [ SFExtensionMessageKey: [ "echo": message ] ]
-        } else {
-            response.userInfo = [ "message": [ "echo": message ] ]
-        }
-
-        context.completeRequest(returningItems: [ response ], completionHandler: nil)
+        return respond(context, error: "Unsupported action: \(action)");
     }
+    
+    private func runSaveFile(_ context: NSExtensionContext, _ payload: [String: Any]) {
+        do {
+            let destinationPath = try SaveFileService.saveFile(payload)
+            respond(context, extra: ["path": destinationPath])
+        } catch {
+            respond(context, error: error.localizedDescription)
+        }
+    }
+    
+    private func respond(_ context: NSExtensionContext, error: String? = nil, extra: [String: Any] = [:]) {
+        var body: [String: Any] = [:]
+    
+        if let error {
+            body["ok"] = false
+            body["error"] = error
+        } else {
+            body["ok"] = true
+        }
 
+        for (k, v) in extra {
+            body[k] = v
+        }
+
+        let reply = NSExtensionItem()
+        reply.userInfo = [ SFExtensionMessageKey: body ]
+
+        context.completeRequest(returningItems: [reply], completionHandler: nil)
+    }
 }

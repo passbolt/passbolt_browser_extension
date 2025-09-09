@@ -36,7 +36,8 @@
     "clipboardWrite",
     "*://*/*",
     "alarms",
-    "cookies"
+    "cookies",
+    "nativeMessaging"
   ],
   "web_accessible_resources": [
     "webAccessibleResources/*"

@@ -102,6 +102,14 @@
 		9789628F2E27D39300F48BDD /* index.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = index.min.js; path = ../../../build/all/index.min.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9734E9092E702E4C00B76743 /* services */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = services;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		978962382E27D39200F48BDD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -213,6 +221,7 @@
 		978962862E27D39300F48BDD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9734E9092E702E4C00B76743 /* services */,
 				978962872E27D39300F48BDD /* locales */,
 				978962882E27D39300F48BDD /* webAccessibleResources */,
 				978962892E27D39300F48BDD /* contentScripts */,
@@ -302,6 +311,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9734E9092E702E4C00B76743 /* services */,
 			);
 			name = "Passbolt-Safari-Extension Extension";
 			packageProductDependencies = (

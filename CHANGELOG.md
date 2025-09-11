@@ -4,7 +4,35 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [5.4.1] - 2025-08-14
+## [5.5.0] - 2025-09-10
+### Added
+- PB-43921 - Increase directory sync report dialog size
+- PB-44816 Pro teasing - WP1.1 Create DisplaySubscriptionKeyTeasing component
+- PB-44817 Pro teasing - WP1.2 Create DisplayPasswordPoliciesAdministrationTeasing
+- PB-44818 Pro teasing - WP1.3 Create DisplayAdministrationUserPassphrasePoliciesTeasing
+- PB-44819 Pro teasing - WP1.4 Create ManageAccountRecoveryAdministrationSettingsTeasing
+- PB-44820 Pro teasing - WP1.5 Create ManageSsoSettingsTeasing
+- PB-44821 Pro teasing - WP1.6 Create DisplayMfaPolicyAdministrationTeasing
+- PB-44822 Pro teasing - WP1.7 Create DisplayUserDirectoryAdministrationTeasing
+- PB-44823 Pro teasing - WP1.8 Create DisplayScimAdministrationTeasing
+- PB-44826 Pro teasing - WP2.1 Add teasing property and new route on AdministrationHomePage
+- PB-44827 Pro teasing - WP2.2 Update the DisplayAdministrationMenu to display teasing Icon on PRO menu for CE
+- PB-44393 ZK - WP5.1 As an administrator I should be able to enable zero knowledge mode
+- PB-44646 ZK - WP5.3 Add share metadata private keys to MetadataKeysSettingsEntity
+- PB-44641 ZK - WP5.4 Create UpdateMetadataSettingsPrivateKeyService to to be able to disabled zero knowledge mode
+- PB-44631 ZK - WP5.5 Update SaveMetadataKeysSettingsController to be able to disabled zero knowledge mode
+- PB-44757 ZK - WP5.6 As an administrator with missing metadata keys I should not be able to change metadata settings
+- PB-44630 - SCIM administration screen
+
+### Fixed
+- PB-44638 - Password expiry should not be removed when password is not updated
+- PB-44604 - Fix regular expression on public key metadata validation
+- PB-44707 - Fix service worker not restarting after browser extension update on Chrome
+- PB-45060 - Fix custom fields json schema properties type
+- PB-44933 - Fix setup a new user should have missing key set
+
+### Maintenance
+- PB-44594 - Upgrade xregexp to 5.1.2
 - PB-44638 Password expiry should not be removed when password is not updated
 - PB-44668 The create menu import operation should be actionable when encrypted metadata plugin is not available
 

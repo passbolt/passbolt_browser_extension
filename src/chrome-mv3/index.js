@@ -21,6 +21,21 @@ import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarm
 import OnStartUpService from "../all/background_page/service/extension/onStartUpService";
 import ToolbarService from "../all/background_page/service/toolbar/toolbarService";
 import HandleOffscreenResponseService from "./serviceWorker/service/offscreen/handleOffscreenResponseService";
+import ServiceWorkerReloadService from "../all/background_page/service/serviceWorkerReloadService/serviceWorkerReloadService";
+
+/**
+ * Chrome specific: reloads the extension when necessary after a reload due to an extension update.
+ * It comes from a known issue: https://issues.chromium.org/issues/40805401
+ * The bug appears in the following conditions:
+ * - the user is logged in
+ * - the browser checks for an update on the extension and there is an update available
+ * - the update is blocked by our script to avoid other issue as the user is logged in
+ * - the user is then logged out due to a session expiration
+ * - a sign in dialog appears and when clicking sign in, the service worker did not restart properly and the account recovery page is shown
+ *
+ * By calling this script, another reload happens if the previous conditions are met and this solves the issue.
+ */
+ServiceWorkerReloadService.reloadIfNecessary();
 
 /**
  * Load all system requirement

@@ -49,7 +49,7 @@ class MetadataKeysSettingsApiService extends AbstractService {
    */
   async save(settings) {
     assertType(settings, MetadataKeysSettingsEntity);
-    const response = await this.apiClient.create(settings.toDto());
+    const response = await this.apiClient.create(settings.toDto(MetadataKeysSettingsEntity.ALL_CONTAIN_OPTIONS));
     return response.body;
   }
 }

@@ -21,13 +21,17 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataKeysSettingsEntity
   from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 
 describe("SaveMetadataKeysController", () => {
   describe("::exec", () => {
     let controller, account, apiClientOptions;
 
     beforeEach(async() => {
-      account = new AccountEntity(defaultAccountDto());
+      account = new AccountEntity(defaultAccountDto({
+        role_name: RoleEntity.ROLE_ADMIN
+      }));
       apiClientOptions = defaultApiClientOptions();
       controller = new SaveMetadataKeysController(null, null, apiClientOptions, account);
       // flush account related storage before each.
@@ -41,6 +45,10 @@ describe("SaveMetadataKeysController", () => {
       // mock metadata keys settings api service.
       jest.spyOn(controller.saveMetadaSettingsService.metadataKeysSettingsApiService, "save")
         .mockImplementation(settings => settings.toDto());
+      jest.spyOn(controller.saveMetadaSettingsService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+        .mockImplementation(() => defaultMetadataKeysSettingsDto());
+      // mock passphrase
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementationOnce(() => pgpKeys.ada.passphrase);
       // spy on local storage service
       jest.spyOn(controller.saveMetadaSettingsService.metadataKeysSettingsLocalStorage, "set");
 
@@ -53,8 +61,33 @@ describe("SaveMetadataKeysController", () => {
         .toHaveBeenCalledWith(new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
     });
 
+    it("saves metadata keys settings and update the local storage with it when go back from zero knowledge to user friendly mode.", async() => {
+      expect.assertions(3);
+
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
+      // mock metadata keys settings api service.
+      jest.spyOn(controller.saveMetadaSettingsService.metadataKeysSettingsApiService, "save")
+        .mockImplementation(settings => settings.toDto());
+      jest.spyOn(controller.saveMetadaSettingsService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+        .mockImplementation(() => defaultMetadataKeysSettingsDto());
+      // spy on local storage service
+      jest.spyOn(controller.saveMetadaSettingsService.metadataKeysSettingsLocalStorage, "set");
+      // mock passphrase
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementationOnce(() => pgpKeys.ada.passphrase);
+
+      const savedMetadataKeysSettings = await controller.exec(metadataKeysSettingsDto);
+
+      expect(savedMetadataKeysSettings).toBeInstanceOf(MetadataKeysSettingsEntity);
+      expect(controller.saveMetadaSettingsService.metadataKeysSettingsApiService.save)
+        .toHaveBeenCalledWith(new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
+      expect(controller.saveMetadaSettingsService.metadataKeysSettingsLocalStorage.set)
+        .toHaveBeenCalledWith(new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
+    });
+
     it("throws if the parameters are not valid.", async() => {
       expect.assertions(1);
+      // mock passphrase
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementationOnce(() => pgpKeys.ada.passphrase);
       await expect(() => controller.exec("invalid metadata keys settings entity", {}))
         .toThrowEntityValidationError("allow_usage_of_personal_keys", "required");
     });

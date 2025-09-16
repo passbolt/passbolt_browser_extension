@@ -269,6 +269,10 @@ classDiagram
             +verifyTrustedOrTrustNewMetadataKey(string passphrase) Promise~void~
         }
 
+        class RotateResourcesMetadataKeyService {
+            +rotate(string passphrase) Promise~void~
+        }
+
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Metadata Keys services
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

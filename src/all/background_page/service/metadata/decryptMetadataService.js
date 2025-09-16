@@ -148,7 +148,7 @@ class DecryptMetadataService {
     for (const entity of filteredCollection) {
       try {
         const metadataDecryptedPrivateKey = metadataOpenPgpPrivateKeys[entity.metadataKeyId]
-          || (metadataOpenPgpPrivateKeys[entity.metadataKeyId] = await this.getAndReadMetadataPrivateKey(entity, metadataKeys, options));
+          || (metadataOpenPgpPrivateKeys[entity.metadataKeyId] = await this.getAndReadMetadataPrivateKey(entity, metadataKeys));
 
         const openpgpMessage = await this.decryptMetadataWithGpgKey(entity, metadataDecryptedPrivateKey);
         sessionKeysDtos.push(this.extractSessionKeyDtoForEntity(entity, openpgpMessage));

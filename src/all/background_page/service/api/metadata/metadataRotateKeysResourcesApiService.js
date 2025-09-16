@@ -17,6 +17,7 @@ import ResourcesCollection from "../../../model/entity/resource/resourcesCollect
 import {assertType} from "../../../utils/assertions";
 
 const METADATA_ROTATE_KEYS_RESOURCES_API_SERVICE_RESOURCE_NAME = "metadata/rotate-key/resources";
+import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
 class MetadataRotateKeysResourcesApiService extends AbstractService {
   /**
@@ -31,7 +32,7 @@ class MetadataRotateKeysResourcesApiService extends AbstractService {
 
   /**
    * Retrieve the resources that are using an expired key that needs to/can be rotated from the API.
-   * @returns {Promise<Array>}
+   * @returns {Promise<PassboltResponseEntity>}
    * @public
    */
   async findAll() {
@@ -40,14 +41,14 @@ class MetadataRotateKeysResourcesApiService extends AbstractService {
       return [];
     }
 
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 
   /**
    * Rotate metadata of resources collection Passbolt API
    *
    * @param {ResourcesCollection} resourceCollection The resource collection to rotate
-   * @returns {Promise<*>} Response body
+   * @returns {Promise<PassboltResponseEntity>} Response body
    * @throws {TypeError} if the `resourceCollection` argument is not of type ResourcesCollection
    * @public
    */
@@ -55,7 +56,7 @@ class MetadataRotateKeysResourcesApiService extends AbstractService {
     assertType(resourceCollection, ResourcesCollection);
     const data = resourceCollection.toDto();
     const response = await this.apiClient.create(data);
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 }
 

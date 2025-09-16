@@ -43,8 +43,8 @@ describe("MetadataRotateKeysResourcesApiService", () => {
       const service = new MetadataRotateKeysResourcesApiService(apiClientOptions);
       const resultDto = await service.findAll();
 
-      expect(resultDto).toBeInstanceOf(Array);
-      expect(resultDto).toHaveLength(apiResourcesCollection.length);
+      expect(resultDto.body).toBeInstanceOf(Array);
+      expect(resultDto.body).toHaveLength(apiResourcesCollection.length);
     });
 
     it("throws API error if the API encountered an issue", async() => {
@@ -82,7 +82,7 @@ describe("MetadataRotateKeysResourcesApiService", () => {
       const service = new MetadataRotateKeysResourcesApiService(apiClientOptions);
       const resultDto = await service.rotate(resourcesCollection);
 
-      expect(resultDto).toEqual(expect.objectContaining(dto));
+      expect(resultDto.body).toEqual(expect.objectContaining(dto));
       expect(reqPayload).toEqual(expect.objectContaining(dto));
     });
 

@@ -16,7 +16,7 @@ import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entit
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
 import BinaryConvert from "../../../../utils/format/binaryConvert";
 
@@ -107,6 +107,94 @@ describe("CsvLastPassRowParser", () => {
       secret_clear: data.password,
       description: data.extra,
       folder_parent_path: data.grouping,
+    });
+
+    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource with TOTP secret key from LastPass CSV", () => {
+    expect.assertions(2);
+
+    const data = {
+      "name": "Test site",
+      "username": "user1",
+      "url": "https://sitename",
+      "password": "password1",
+      "totp": "TMMNBXF73KLJGMZF",
+      "extra": "",
+      "grouping": "(none)",
+      "fav": "0"
+    };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.username,
+      uris: [data.url],
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.password,
+      folder_parent_path: data.grouping,
+      totp: {
+        secret_key: "TMMNBXF73KLJGMZF",
+        algorithm: "SHA1",
+        digits: 6,
+        period: 30
+      }
+    });
+
+    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource with TOTP secret key for v5 default with TOTP", () => {
+    expect.assertions(2);
+
+    const data = {
+      "name": "Test site",
+      "username": "user1",
+      "url": "https://sitename",
+      "password": "password1",
+      "totp": "TMMNBXF73KLJGMZF",
+      "extra": "",
+      "grouping": "(none)",
+      "fav": "0"
+    };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.username,
+      uris: [data.url],
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.password,
+      folder_parent_path: data.grouping,
+      totp: {
+        secret_key: "TMMNBXF73KLJGMZF",
+        algorithm: "SHA1",
+        digits: 6,
+        period: 30
+      }
     });
 
     const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);

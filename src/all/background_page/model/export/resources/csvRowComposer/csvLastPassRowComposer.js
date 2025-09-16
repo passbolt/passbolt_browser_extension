@@ -45,6 +45,9 @@ class CsvLastPassRowComposer extends AbstractRowComposer {
     for (const propertyName in this.mapping) {
       if (propertyName === "uris") {
         row[this.mapping[propertyName]] = externalResourceDto.uris?.length > 0 ? externalResourceDto.uris[0] : "";
+      } else if (propertyName === "totp" && externalResourceEntity.totp) {
+        const totp = externalResourceEntity.totp;
+        row[this.mapping[propertyName]] = totp.secretKey;
       } else {
         row[this.mapping[propertyName]] = externalResourceDto[propertyName] || "";
       }

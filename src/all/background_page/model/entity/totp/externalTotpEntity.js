@@ -56,11 +56,6 @@ class ExternalTotpEntity extends TotpEntity {
     return this._props.algorithm;
   }
 
-  /*
-   * ==================================================
-   * Methods
-   * ==================================================
-   */
   /**
    * Create TOTP URL from an external resource entity
    * @param {ExternalResourceEntity} resource
@@ -83,11 +78,6 @@ class ExternalTotpEntity extends TotpEntity {
     return url;
   }
 
-  /*
-   * ==================================================
-   * Build rules
-   * ==================================================
-   */
   /**
    * Create TOTP from URL
    * @param url {URL}
@@ -116,6 +106,23 @@ class ExternalTotpEntity extends TotpEntity {
       period: parseInt(fields.get('TimeOtp-Period'), 10) || 30
     };
     return new ExternalTotpEntity(totp);
+  }
+
+  /**
+   * Create TOTP from lastpass CSV.
+   * Lastpass seems to export a base-32 secret only as shown on their import sample:
+   * https://support.lastpass.com/s/document-item?language=en_US&bundleId=lastpass&topicId=LastPass/lastpass_technical_whitepaper.html&_LANG=enus
+   * @param secretKey {string} The secret key from last pass.
+   * @return {ExternalTotpEntity}
+   */
+  static createTotpFromLastpassCSV(secretKey) {
+    const dto = {
+      secret_key: secretKey,
+      algorithm: DEFAULT_ALGORITHM, // Default algorithm
+      digits: 6, // Default digits
+      period: 30 // Default period
+    };
+    return new ExternalTotpEntity(dto);
   }
 }
 

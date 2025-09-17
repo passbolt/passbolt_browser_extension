@@ -218,6 +218,11 @@ classDiagram
             +exec() Promise~void~
         }
 
+        class RotateResourcesMetadataKeyController {
+            event "passbolt.metadata.rotate-resources-metadata"
+            +exec() Promise~void~
+        }
+
         class ShareMetadataKeyPrivateController {
             event "passbolt.metadata.share-missing-metadata-private-keys-with-user"
             +exec(uuid userId) Promise~void~

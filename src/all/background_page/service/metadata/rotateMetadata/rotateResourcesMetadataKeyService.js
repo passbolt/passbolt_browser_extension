@@ -88,6 +88,7 @@ export default class RotateResourcesMetadataKeyService {
     this.progressService.finishStep(i18n.t('Retrieving resources'));
     let passboltResponseEntity = await this.metadataRotateKeysResourcesApiService.findAll();
     const totalPagesCount = passboltResponseEntity.header.pagination.pageCount;
+    this.progressService.updateGoals(totalPagesCount + 3); // total pages + start + retrieving + done
     let resourcesCollection = new ResourcesCollection(passboltResponseEntity.body);
 
     while (resourcesCollection.length > 0) {

@@ -77,6 +77,7 @@ import FindScimSettingsController from "../controller/scimSettings/findScimSetti
 import CreateScimSettingsController from "../controller/scimSettings/createScimSettingsController";
 import UpdateScimSettingsController from "../controller/scimSettings/updateScimSettingsController";
 import DisableScimSettingsController from "../controller/scimSettings/disableScimSettingsController";
+import RotateResourcesMetadataKeyController from "../controller/rotateMetadata/rotateResourcesMetadataKeyController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -441,6 +442,17 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.metadata.migrate-resources-metadata', async(requestId, migrateMetdataDto, paginationDetails) => {
     const controller = new MigrateMetadataResourcesController(worker, requestId, apiClientOptions, account);
     await controller._exec(migrateMetdataDto, paginationDetails);
+  });
+
+  /*
+   * Rotate metadata.
+   *
+   * @listens passbolt.metadata.rotate-resources-metadata-key
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.rotate-resources-metadata', async requestId => {
+    const controller = new RotateResourcesMetadataKeyController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
   });
 
   /*

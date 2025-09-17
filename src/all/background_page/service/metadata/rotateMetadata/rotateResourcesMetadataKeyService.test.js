@@ -77,7 +77,7 @@ describe("RotateResourcesMetadataKeyService", () => {
       const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
       let rotateCallCount = 0;
 
-      expect.assertions(13 + firstBatchToRotate.length + nextBatchToRotate.length);
+      expect.assertions(14 + firstBatchToRotate.length + nextBatchToRotate.length);
       const service = new RotateResourcesMetadataKeyService(account, defaultApiClientOptions(), progressService);
 
       // Spy initialization
@@ -115,6 +115,7 @@ describe("RotateResourcesMetadataKeyService", () => {
       }
 
       expect(progressService.finishStep).toHaveBeenCalledTimes(3);
+      expect(progressService.updateGoals).toHaveBeenNthCalledWith(1, 5); // total page (2) + Start + Retrieving resources + Done
       expect(progressService.updateStepMessage).not.toHaveBeenCalled();
       expect(progressService.finishStep).toHaveBeenCalledWith(('Retrieving resources'));
       expect(progressService.finishStep).toHaveBeenCalledWith(('Rotating resources metadata page 1/2'));

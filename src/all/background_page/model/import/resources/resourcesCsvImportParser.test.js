@@ -31,7 +31,7 @@ import CsvMozillaPlatformRowParser from "./csvRowParser/csvMozillaPlatformRowPar
 import CsvNordpassRowParser from "./csvRowParser/csvNordpassRowParser";
 import CsvLogMeOnceRowParser from "./csvRowParser/csvLogMeOnceRowParser";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {resourceTypesCollectionDto, resourceTypesCollectionWithoutNoteDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import each from "jest-each";
@@ -299,6 +299,7 @@ describe("ResourcesCsvImportParser", () => {
         "file_type": "csv",
         "file": btoa(BinaryConvert.toBinary(csv))
       };
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionWithoutNoteDto());
       const importEntity = new ImportResourcesFileEntity(importDto);
       const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, test.metadataTypesSettings);
 

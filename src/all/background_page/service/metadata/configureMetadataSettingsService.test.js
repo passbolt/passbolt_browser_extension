@@ -48,7 +48,7 @@ describe("ConfigureMetadataSettingsService", () => {
       expect(orchestrator.createMetadataKeyService.create).toHaveBeenCalledWith(expect.any(ExternalGpgKeyPairEntity), passphrase);
 
       expect(orchestrator.saveMetadaSettingsService.saveKeysSettings).toHaveBeenCalledTimes(1);
-      expect(orchestrator.saveMetadaSettingsService.saveKeysSettings).toHaveBeenCalledWith(expectedKeySettings);
+      expect(orchestrator.saveMetadaSettingsService.saveKeysSettings).toHaveBeenCalledWith(expectedKeySettings, passphrase);
 
       expect(orchestrator.saveMetadaSettingsService.saveTypesSettings).toHaveBeenCalledTimes(1);
       expect(orchestrator.saveMetadaSettingsService.saveTypesSettings).toHaveBeenCalledWith(expectedTypeSettings);
@@ -139,7 +139,7 @@ describe("ConfigureMetadataSettingsService", () => {
       expect(orchestrator.createMetadataKeyService.create).toHaveBeenCalledWith(expect.any(ExternalGpgKeyPairEntity), passphrase);
 
       expect(orchestrator.saveMetadaSettingsService.saveKeysSettings).toHaveBeenCalledTimes(1);
-      expect(orchestrator.saveMetadaSettingsService.saveKeysSettings).toHaveBeenCalledWith(expectedKeySettings);
+      expect(orchestrator.saveMetadaSettingsService.saveKeysSettings).toHaveBeenCalledWith(expectedKeySettings, passphrase);
 
       expect(orchestrator.saveMetadaSettingsService.saveTypesSettings).toHaveBeenCalledTimes(1);
       expect(orchestrator.saveMetadaSettingsService.saveTypesSettings).toHaveBeenCalledWith(expectedTypeSettings);

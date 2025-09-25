@@ -65,7 +65,7 @@
     "lockfile-lint": "^4.14.1",
     "text-encoding-utf-8": "^1.0.2",
     "uuid": "^8.3.2",
-    "web-ext": "^8.0.0",
+    "web-ext": "^8.10.0",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
   },

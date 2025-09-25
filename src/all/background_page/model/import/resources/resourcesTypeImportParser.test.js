@@ -101,7 +101,7 @@ describe("ResourcesTypeImportParser", () => {
   describe(`External resource dto with password and notes fields`, () => {
     const externalResourceDto = defaultExternalResourceImportMinimalDto({
       secret_clear: "Password",
-      description: "Description"
+      unknown_prop: "Description"
     });
 
     each([

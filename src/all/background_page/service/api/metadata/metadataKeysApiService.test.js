@@ -24,6 +24,9 @@ import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entit
 import MetadataKeysApiService from "./metadataKeysApiService";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 import {v4 as uuidv4} from "uuid";
+import RevokeGpgKeyService from "../../crypto/revokeGpgKeyService";
+import {decryptedMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
+import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
 
 describe("MetadataKeysApiService", () => {
   let apiClientOptions, account;
@@ -99,7 +102,7 @@ describe("MetadataKeysApiService", () => {
   });
 
   describe('::delete', () => {
-    it("should expired the metadata key with the given id from the API", async() => {
+    it("should delete the metadata key with the given id from the API", async() => {
       expect.assertions(2);
       const expectedId = uuidv4();
       fetch.doMockOnceIf(new RegExp(`/metadata\/keys\/${expectedId}\.json`), async req => {
@@ -139,6 +142,72 @@ describe("MetadataKeysApiService", () => {
 
       const service = new MetadataKeysApiService(apiClientOptions);
       const promise = service.delete(expectedId);
+      await expect(promise).rejects.toThrow(PassboltServiceUnavailableError);
+      await expect(promise).rejects.toThrowError("Unable to reach the server, an unexpected error occurred");
+    });
+  });
+
+  describe('::update', () => {
+    it("should update and expired the metadata key with the given id from the API", async() => {
+      expect.assertions(1);
+      const expectedId = uuidv4();
+      const metadataPrivateKeysDto = [decryptedMetadataPrivateKeyDto({metadata_key_id: expectedId, user_id: account.userId})];
+      const metadataKeyDto = defaultMetadataKeyDto({id: expectedId, metadata_private_keys: metadataPrivateKeysDto});
+      const metadataKey = new MetadataKeyEntity(metadataKeyDto);
+      const metadataPrivateKeyToRevoke = metadataKey.metadataPrivateKeys.items[0];
+      const privateKeyToRevoke = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyToRevoke.data.armoredKey);
+      const publicKeyRevoked = await RevokeGpgKeyService.revoke(privateKeyToRevoke);
+      const metadataKeyUpdated = new MetadataKeyEntity({
+        fingerprint: metadataKey.fingerprint,
+        armored_key: publicKeyRevoked.armor(),
+        expired: new Date().toISOString()
+      });
+      fetch.doMockOnceIf(/metadata\/keys/, () => mockApiResponse({}));
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      await expect(service.update(expectedId, metadataKeyUpdated)).resolves.not.toThrow();
+    });
+
+    it("should throw an error if the metadata key is not a valid id", async() => {
+      expect.assertions(1);
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      const promise = service.update("not a uuid");
+      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+    });
+
+    it("should throw an error if the metadata data is empty", async() => {
+      expect.assertions(1);
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      const promise = service.update(uuidv4(), null);
+      await expect(promise).rejects.toThrow(TypeError);
+    });
+
+    it("should throw an error if the API returns an error response", async() => {
+      expect.assertions(2);
+
+      const expectedId = uuidv4();
+      const metadataKeyDto = defaultMetadataKeyDto({id: expectedId});
+      const metadataKey = new MetadataKeyEntity(metadataKeyDto);
+      fetch.doMockOnceIf(/metadata\/keys/, () => mockApiResponseError(500, "Something went wrong!"));
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      const promise = service.update(expectedId, metadataKey);
+      await expect(promise).rejects.toThrow(PassboltApiFetchError);
+      await expect(promise).rejects.toThrowError("Something went wrong!");
+    });
+
+    it("should throw an error if the API returns an error response", async() => {
+      expect.assertions(2);
+
+      const expectedId = uuidv4();
+      const metadataKeyDto = defaultMetadataKeyDto({id: expectedId});
+      const metadataKey = new MetadataKeyEntity(metadataKeyDto);
+      fetch.doMockOnceIf(/metadata\/keys/, () => { throw new Error("Service unavailable"); });
+
+      const service = new MetadataKeysApiService(apiClientOptions);
+      const promise = service.update(expectedId, metadataKey);
       await expect(promise).rejects.toThrow(PassboltServiceUnavailableError);
       await expect(promise).rejects.toThrowError("Unable to reach the server, an unexpected error occurred");
     });

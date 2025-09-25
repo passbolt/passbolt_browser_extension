@@ -237,6 +237,14 @@ classDiagram
             +decryptAllFromForeignModels(Collection collection, ?string passphrase, ?object options) Promise
         }
 
+        class ExpireMetadataKeyService {
+            +expire(string uuid) Promise
+        }
+
+        class UpdateMetadataKeyPrivateService {
+            +update(MetadataPrivateKeyEntity entity) Promise
+        }
+
         class DecryptMetadataPrivateKeysService {
             +decryptOne(MetadataPrivateKeyEntity entity, ?string passphrase) Promise
             +decryptAll(MetadataPrivateKeyCollection collection, ?string passphrase) Promise
@@ -346,6 +354,7 @@ classDiagram
             +findAll(object contains) Promise~array~
             +create(MetadataKeyEntity metadataKey) Promise~*string*~
             +delete(string uuid) Promise~*void*~
+            +update(string uuid, MetadataKeyEntity metadataKey) Promise~*void*~
         }
 
         class MetadataRotateKeysResourcesApiService {
@@ -1139,7 +1148,8 @@ classDiagram
     CreateMetadataKeyService*--EncryptMetadataPrivateKeysService
     CreateMetadataKeyService*--FindUsersService
     CreateMetadataKeyService*--GetOrFindMetadataSettingsService
-    CreateMetadataKeyService*--MetadataKeyApiService
+    CreateMetadataKeyService*--MetadataKeysApiService
+    ExpireMetadataKeyService*--MetadataKeysApiService
     FindMetadataMigrateResourcesService*--MigrateMetadataResourcesApiService
     MigrateMetadataResourcesService*--MigrateMetadataResourcesApiService
     MigrateMetadataResourcesService*--EncryptMetadataService
@@ -1162,7 +1172,7 @@ classDiagram
     FindAndUpdateMetadataSettingsService*--FindMetadataSettingsService
     FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     FindMetadataKeysService*--DecryptMetadataPrivateKeysService
-    FindMetadataKeysService*--MetadataKeyApiService
+    FindMetadataKeysService*--MetadataKeysApiService
     FindMetadataSettingsService*--MetadataKeysSettingsApiService
     FindMetadataSettingsService*--MetadataTypesSettingsApiService
     FindResourcesService*--DecryptMetadataService
@@ -1176,7 +1186,7 @@ classDiagram
     SaveMetadataSettingsService*--MetadataKeysSettingsLocalStorage
     GetMetadataTrustedKeyService*--TrustedMetadataKeyLocalStorage
 %% Metadata models relationships.
-    style MetadataKeyApiService fill:#DEE5D4
+    style MetadataKeysApiService fill:#DEE5D4
     style MetadataKeysSettingsLocalStorage fill:#DEE5D4
     style MetadataKeysSessionStorageService fill:#DEE5D4
     style MetadataKeysSettingsApiService fill:#DEE5D4

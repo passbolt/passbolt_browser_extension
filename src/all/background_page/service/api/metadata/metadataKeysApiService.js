@@ -102,6 +102,19 @@ class MetadataKeysApiService extends AbstractService {
     const response = await this.apiClient.delete(metadataKeyId);
     return response.body;
   }
+
+  /**
+   * Update a metadata key
+   * @param {string} metadataKeyId The metadata key id
+   * @param {MetadataKeyEntity} metadataKey The metadata key to update
+   * @return {Promise<*>}
+   */
+  async update(metadataKeyId, metadataKey) {
+    assertUuid(metadataKeyId);
+    assertType(metadataKey, MetadataKeyEntity);
+    const response = await this.apiClient.update(metadataKeyId, metadataKey.toDto());
+    return response.body;
+  }
 }
 
 export default MetadataKeysApiService;

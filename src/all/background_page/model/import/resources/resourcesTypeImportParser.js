@@ -102,11 +102,12 @@ class ResourcesTypeImportParser {
         .map(([key]) => key === 'secret_clear' ? 'password' : key);
 
       // Exception to be removed with v5: we need to include password in the resource
-      if ((resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG || resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG) && resourceProperties.includes("totp") &&  resourceProperties.includes("description")) {
+      if ((resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG || resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG) && resourceProperties.includes("totp") && resourceProperties.includes("description")) {
         resourceProperties.push("password");
       }
-      const secretsFields = Object.keys(resourceType.definition.secret.properties);
-      const secretsRequiredFields = resourceType.definition.secret.required;
+
+      const secretsFields = Object.keys(resourceType.definition.secret.properties).filter(prop => prop !== "object_type");
+      const secretsRequiredFields = resourceType.definition.secret.required.filter(prop => prop !== "object_type");
       const score = resourceProperties.filter(value => secretsFields.includes(value));
       const missingRequiredFields = secretsRequiredFields.filter(secretsField => !score.includes(secretsField)).length;
 
@@ -114,7 +115,6 @@ class ResourcesTypeImportParser {
         slug: resourceType.slug,
         value: score.length,
         missingRequiredFields: missingRequiredFields,
-        match: score.length === secretsFields.length,
       });
     }
 

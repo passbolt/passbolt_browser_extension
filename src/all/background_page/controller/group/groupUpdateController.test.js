@@ -27,7 +27,7 @@ const {users} = require("passbolt-styleguide/src/shared/models/entity/user/userE
 
 const {updateGroupNameDto, add2UsersToGroupDto, add2UsersToGroupDryRunResponse} = require("./groupUpdateController.test.data");
 const {defaultGroupDto} = require("passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data");
-const {defaultDyRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
+const {defaultDryRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
 
 jest.mock("../../service/progress/progressService");
 jest.mock("../../service/passphrase/getPassphraseService");
@@ -56,14 +56,14 @@ describe("GroupsUpdateController", () => {
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
       // 1st API call is for the dry-run to verify which secrets needs to be computed (no secret to update)
-      fetch.doMockOnce(() => mockApiResponse(defaultDyRunResponse()));
+      fetch.doMockOnce(() => mockApiResponse(defaultDryRunResponse()));
 
       // 2nd API call is for the update of the groups
       fetch.doMockOnce(async req => {
         const {id, name, groups_users, secrets} = JSON.parse(await req.text());
 
         expect(name).toBe(dto.name);
-        expect(groups_users.length).toBe(0);
+        expect(groups_users).toBeUndefined();
         expect(secrets).toBeUndefined();
         return mockApiResponse({id, name});
       });
@@ -87,7 +87,7 @@ describe("GroupsUpdateController", () => {
      *  - Resource 3 for admin
      */
     it("Add 2 users in a group with 1 secret being unknown for both users and 2 other secrets known by only one user each", async() => {
-      expect.assertions(12);
+      expect.assertions(20);
 
       const getResourceId = (data, index) => data['dry-run'].Secrets[index].Secret[0].resource_id;
       const findSecret = (secrets, userId, resource1Id) => {
@@ -126,44 +126,63 @@ describe("GroupsUpdateController", () => {
       // 2nd API call is for the keyring sync
       fetch.doMockOnce(() => mockApiResponse({}));
 
-      // 3rd API call is for the update of the groups
+      // 1st operation is group name update operation
       fetch.doMockOnce(async req => {
         const {id, name, groups_users, secrets} = JSON.parse(await req.text());
 
-        // name shouldn't have change in this scenario
+        expect(id).toBe(localGroup.id);
         expect(name).toBe(localGroup.name);
+        expect(groups_users).toBeUndefined();
+        expect(secrets).toBeUndefined();
 
-        // we have added 2 new users in the group (admin and betty)
-        const usersIds = groups_users.map(groups_user => groups_user.user_id);
-        expect(groups_users.length).toBe(2);
-        expect(usersIds).toEqual(expect.arrayContaining([users.admin.id, users.betty.id]));
+        return mockApiResponse({id, name, groups_users, secrets});
+      });
 
-        //we should have 4 encrypted resources
-        expect(secrets.length).toBe(4);
-        const bettyResource1 = findSecret(secrets, users.betty.id, resource1Id);
-        const bettyResource2 = findSecret(secrets, users.betty.id, resource2Id);
-        const adminResource1 = findSecret(secrets, users.admin.id, resource1Id);
-        const adminResource3 = findSecret(secrets, users.admin.id, resource3Id);
+      // 2st operation is an addition of a group manager in the group
+      fetch.doMockOnce(async req => {
+        const {id, name, groups_users, secrets} = JSON.parse(await req.text());
 
-        expect(bettyResource1).not.toBeUndefined();
-        expect(bettyResource2).not.toBeUndefined();
-        expect(adminResource1).not.toBeUndefined();
-        expect(adminResource3).not.toBeUndefined();
+        expect(id).toBe(localGroup.id);
+        expect(name).toBe(localGroup.name);
+        expect(groups_users).toHaveLength(1);
 
-        // we should have the new resources encrypted for the correct users and they should be able to decrypt them.
-        const bettyPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
-        const bettyResource1Data = await OpenpgpAssertion.readMessageOrFail(bettyResource1.data);
-        const bettyResource2Data = await OpenpgpAssertion.readMessageOrFail(bettyResource2.data);
+        const userAdded = groups_users[0];
+        expect(userAdded.user_id).toStrictEqual(users.admin.id);
+        expect(userAdded.is_admin).toStrictEqual(false);
+
+        expect(secrets).toHaveLength(2);
+        const adminPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
+        const adminResource1 = findSecret(secrets, userAdded.user_id, resource1Id);
+        const adminResource3 = findSecret(secrets, userAdded.user_id, resource3Id);
         const adminResource1Data = await OpenpgpAssertion.readMessageOrFail(adminResource1.data);
         const adminResource3Data = await OpenpgpAssertion.readMessageOrFail(adminResource3.data);
+        expect(await DecryptMessageService.decrypt(adminResource1Data, adminPrivateKey)).toBe("resource1-password");
+        expect(await DecryptMessageService.decrypt(adminResource3Data, adminPrivateKey)).toBe("resource3-password");
+        return mockApiResponse({id, name, groups_users, secrets});
+      });
+
+      // 3rd operation is an addition of a user in the group
+      fetch.doMockOnce(async req => {
+        const {id, name, groups_users, secrets} = JSON.parse(await req.text());
+
+        expect(id).toBe(localGroup.id);
+        expect(name).toBe(localGroup.name);
+        expect(groups_users).toHaveLength(1);
+
+        const userAdded = groups_users[0];
+        expect(userAdded.user_id).toStrictEqual(users.betty.id);
+        expect(userAdded.is_admin).toStrictEqual(false);
+
+        expect(secrets).toHaveLength(2);
+        const bettyPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+        const bettyResource1 = findSecret(secrets, users.betty.id, resource1Id);
+        const bettyResource2 = findSecret(secrets, users.betty.id, resource2Id);
+        const bettyResource1Data = await OpenpgpAssertion.readMessageOrFail(bettyResource1.data);
+        const bettyResource2Data = await OpenpgpAssertion.readMessageOrFail(bettyResource2.data);
         expect(await DecryptMessageService.decrypt(bettyResource1Data, bettyPrivateKey)).toBe("resource1-password");
         expect(await DecryptMessageService.decrypt(bettyResource2Data, bettyPrivateKey)).toBe("resource2-password");
 
-        const adminPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
-        expect(await DecryptMessageService.decrypt(adminResource1Data, adminPrivateKey)).toBe("resource1-password");
-        expect(await DecryptMessageService.decrypt(adminResource3Data, adminPrivateKey)).toBe("resource3-password");
-
-        return mockApiResponse({id: id, name: name});
+        return mockApiResponse({id, name, groups_users, secrets});
       });
 
       await controller.exec(dto);

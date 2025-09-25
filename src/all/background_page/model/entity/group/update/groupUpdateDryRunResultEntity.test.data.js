@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-export const defaultDyRunResponse = (data = {}) => {
+export const defaultDryRunResponse = (data = {}) => {
   const defaultData = {
     SecretsNeeded: [],
     Secrets: []

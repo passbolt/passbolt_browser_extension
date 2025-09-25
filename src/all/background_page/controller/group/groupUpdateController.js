@@ -12,7 +12,6 @@
  */
 import Keyring from "../../model/keyring";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import GroupModel from "../../model/group/groupModel";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import GroupUpdateService from "../../service/group/groupUpdateService";
@@ -30,7 +29,6 @@ class GroupsUpdateController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.groupModel = new GroupModel(apiClientOptions);
     this.keyring = new Keyring();
 
     this.getPassphraseService = new GetPassphraseService(account);

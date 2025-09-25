@@ -30,6 +30,7 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import {plaintextSecretPasswordAndDescriptionDto} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 import GroupLocalStorage from "../local_storage/groupLocalStorage";
+import {defaultProgressService} from "../progress/progressService.test.data";
 
 beforeEach(() => {
   jest.resetAllMocks();
@@ -37,17 +38,11 @@ beforeEach(() => {
 
 describe("GroupUpdateService", () => {
   it("should update the group without cryptographic operations if only the name changed", async() => {
-    expect.assertions(12);
+    expect.assertions(16);
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
-    const progressService = {
-      start: jest.fn(),
-      finishStep: jest.fn(),
-      close: jest.fn(),
-      goals: 10,
-      updateGoals: jest.fn(),
-    };
+    const progressService = defaultProgressService({goals: 10});
 
     const existingEntityDto = defaultGroupDto({
       name: "old name",
@@ -94,11 +89,16 @@ describe("GroupUpdateService", () => {
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);
-    expect(progressService.start).toHaveBeenCalledWith(10, "Initialize");
-    expect(progressService.updateGoals).toHaveBeenCalledWith(10);
-    expect(progressService.finishStep).toHaveBeenCalledTimes(4);
-    expect(progressService.finishStep).toHaveBeenCalledWith(null, true);
+    expect(progressService.start).toHaveBeenCalledWith(6, "Initialize");
+    expect(progressService.updateGoals).not.toHaveBeenCalled();
+
+    expect(progressService.finishStep).toHaveBeenCalledTimes(3);
+    expect(progressService.finishSteps).toHaveBeenCalledTimes(1);
+    expect(progressService.finishSteps).toHaveBeenCalledWith(2);
+    expect(progressService.finishStep).toHaveBeenCalledWith("Group update feasibility check", true);
     expect(progressService.finishStep).toHaveBeenCalledWith("Updating group", true);
+    expect(progressService.finishStep).toHaveBeenCalledWith("Done", true);
+    expect(progressService.updateStepMessage).toHaveBeenCalledWith("Updating group metadata");
   });
 
   it("should update the group without cryptographic operations if only the permission changed", async() => {
@@ -106,13 +106,7 @@ describe("GroupUpdateService", () => {
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
-    const progressService = {
-      start: jest.fn(),
-      finishStep: jest.fn(),
-      close: jest.fn(),
-      goals: 10,
-      updateGoals: jest.fn(),
-    };
+    const progressService = defaultProgressService({goals: 10});
 
     const existingEntityDto = defaultGroupDto({
       name: "old name",
@@ -175,13 +169,7 @@ describe("GroupUpdateService", () => {
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
-    const progressService = {
-      start: jest.fn(),
-      finishStep: jest.fn(),
-      close: jest.fn(),
-      goals: 10,
-      updateGoals: jest.fn(),
-    };
+    const progressService = defaultProgressService({goals: 10});
 
     const existingEntityDto = defaultGroupDto({
       name: "old name",
@@ -238,17 +226,11 @@ describe("GroupUpdateService", () => {
   });
 
   it("should update the group and encrypt secrets for the new users", async() => {
-    expect.assertions(26);
+    expect.assertions(30);
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
-    const progressService = {
-      start: jest.fn(),
-      finishStep: jest.fn(),
-      close: jest.fn(),
-      goals: 10,
-      updateGoals: jest.fn(),
-    };
+    const progressService = defaultProgressService({goals: 10});
 
     const existingEntityDto = defaultGroupDto({}, {withGroupsUsers: 1});
     const updateGroupEntity = new GroupEntity({...existingEntityDto});
@@ -332,15 +314,19 @@ describe("GroupUpdateService", () => {
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);
-    expect(progressService.start).toHaveBeenCalledWith(10, "Initialize");
-    expect(progressService.updateGoals).toHaveBeenCalledWith(12);
+    expect(progressService.start).toHaveBeenCalledWith(6, "Initialize");
+    expect(progressService.updateGoals).not.toHaveBeenCalled();
 
-    expect(progressService.finishStep).toHaveBeenCalledTimes(7);
-    expect(progressService.finishStep).toHaveBeenCalledWith(null, true);
-    expect(progressService.finishStep).toHaveBeenCalledWith('Synchronizing keyring', true);
+    expect(progressService.finishStep).toHaveBeenCalledTimes(5);
+    expect(progressService.finishStep).toHaveBeenCalledWith("Group update feasibility check", true);
+    expect(progressService.finishStep).toHaveBeenCalledWith("Encrypt required secrets for new users", true);
+    expect(progressService.finishStep).toHaveBeenCalledWith("Synchronizing keyring", true);
     expect(progressService.finishStep).toHaveBeenCalledWith("Updating group", true);
-    expect(progressService.finishStep).toHaveBeenCalledWith('Decrypting 1/1');
-    expect(progressService.finishStep).toHaveBeenCalledWith('Encrypting 1/1');
+    expect(progressService.finishStep).toHaveBeenCalledWith("Done", true);
+    expect(progressService.updateStepMessage).toHaveBeenCalledWith('Decrypting 1/1');
+    expect(progressService.updateStepMessage).toHaveBeenCalledWith('Encrypting 1/1');
+    expect(progressService.updateStepMessage).toHaveBeenCalledWith("Updating group metadata");
+    expect(progressService.updateStepMessage).toHaveBeenCalledWith("Updating group member 1/1");
   });
 
   it("should throw an error if the given dto is not valid as a GroupEntity", async() => {

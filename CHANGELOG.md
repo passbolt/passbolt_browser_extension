@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.5.1] - 2025-09-15
+### Fixed
+- PB-45290 Fix password missing crash on metadata activation in first admin setup
+
 ## [5.5.0] - 2025-09-10
 ### Added
 - PB-43921 - Increase directory sync report dialog size
@@ -2388,8 +2392,10 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.1...HEAD
-[5.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.0...v5.4.1
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.5.1...HEAD
+[5.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.5.0...v5.5.1
+[5.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.1...v5.5.0
+[5.4.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.0...v5.4.1
 [5.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.3.3...v5.4.0
 [5.3.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.3.0...v5.3.2
 [5.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.2.0...v5.3.0

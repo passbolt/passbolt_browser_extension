@@ -48,7 +48,7 @@ export default class ConfigureMetadataSettingsService {
     await this.createMetadataKeyService.create(gpgKeyPairEntity, passphrase);
 
     const metadataKeySettings = MetadataKeysSettingsEntity.createFromDefault();
-    await this.saveMetadaSettingsService.saveKeysSettings(metadataKeySettings);
+    await this.saveMetadaSettingsService.saveKeysSettings(metadataKeySettings, passphrase);
 
     const metadataTypeSettings = MetadataTypesSettingsEntity.createFromV5Default();
     await this.saveMetadaSettingsService.saveTypesSettings(metadataTypeSettings);
@@ -68,7 +68,7 @@ export default class ConfigureMetadataSettingsService {
     await this.createMetadataKeyService.create(gpgKeyPairEntity, passphrase);
 
     const metadataKeySettings = MetadataKeysSettingsEntity.createFromDefault();
-    await this.saveMetadaSettingsService.saveKeysSettings(metadataKeySettings);
+    await this.saveMetadaSettingsService.saveKeysSettings(metadataKeySettings, passphrase);
 
     const metadataTypeSettings = MetadataTypesSettingsEntity.createFromV5Default({
       allow_v4_v5_upgrade: true,

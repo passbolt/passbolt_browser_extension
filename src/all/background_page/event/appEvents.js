@@ -77,7 +77,8 @@ import FindScimSettingsController from "../controller/scimSettings/findScimSetti
 import CreateScimSettingsController from "../controller/scimSettings/createScimSettingsController";
 import UpdateScimSettingsController from "../controller/scimSettings/updateScimSettingsController";
 import DisableScimSettingsController from "../controller/scimSettings/disableScimSettingsController";
-import RotateResourcesMetadataKeyController from "../controller/rotateMetadata/rotateResourcesMetadataKeyController";
+import RotateMetadataKeyController from "../controller/rotateMetadata/rotateMetadataKeyController";
+import ResumeRotateMetadataKeyController from "../controller/rotateMetadata/resumeRotateMetadataKeyController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -450,9 +451,20 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.rotate-resources-metadata-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.rotate-resources-metadata', async requestId => {
-    const controller = new RotateResourcesMetadataKeyController(worker, requestId, apiClientOptions, account);
-    await controller._exec();
+  worker.port.on('passbolt.metadata.rotate-metadata-key', async(requestId, metadataKeyPairDto, metadataKeyId) => {
+    const controller = new RotateMetadataKeyController(worker, requestId, apiClientOptions, account);
+    await controller._exec(metadataKeyPairDto, metadataKeyId);
+  });
+
+  /*
+   * Resume rotation metadata.
+   *
+   * @listens passbolt.metadata.resume-rotate-resources-metadata-key
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.resume-rotate-metadata-key', async(requestId, metadataKey) => {
+    const controller = new ResumeRotateMetadataKeyController(worker, requestId, apiClientOptions, account);
+    await controller._exec(metadataKey);
   });
 
   /*

@@ -115,7 +115,7 @@ describe("RotateResourcesMetadataKeyService", () => {
       }
 
       expect(progressService.finishStep).toHaveBeenCalledTimes(3);
-      expect(progressService.updateGoals).toHaveBeenNthCalledWith(1, 5); // total page (2) + Start + Retrieving resources + Done
+      expect(progressService.updateGoals).toHaveBeenNthCalledWith(1, 4); // total page (2) + previous goals (2)
       expect(progressService.updateStepMessage).not.toHaveBeenCalled();
       expect(progressService.finishStep).toHaveBeenCalledWith(('Retrieving resources'));
       expect(progressService.finishStep).toHaveBeenCalledWith(('Rotating resources metadata page 1/2'));

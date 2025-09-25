@@ -37,10 +37,6 @@ class MetadataRotateKeysResourcesApiService extends AbstractService {
    */
   async findAll() {
     const response = await this.apiClient.findAll();
-    if (!response.body || !response.body.length) {
-      return [];
-    }
-
     return new PassboltResponseEntity(response);
   }
 

@@ -183,6 +183,11 @@ classDiagram
             +exec() Promise~MetadataKeyEntity~
         }
 
+        class RotateMetadataKeyController {
+            event "passbolt.metadata.rotate-metadata-key"
+            +exec(string metadataKeyId) Promise~void~
+        }
+
         class FindAllNonDeletedMetadataKeysController {
             event "passbolt.metadata.find-all-non-deleted-metadata-keys"
             +exec() Promise~MetadataKeysCollection~
@@ -239,6 +244,15 @@ classDiagram
 
         class ExpireMetadataKeyService {
             +expire(string uuid) Promise
+        }
+
+        class DeleteMetadataKeyService {
+            +delete(string uuid) Promise
+        }
+
+        class RotateMetadataKeyService {
+            +rotate(ExternalGpgKeyPairEntity entity, string uuid, string passphrase) Promise
+            +resumeRotate(MetdataKeyEntity entity, string passphrase) Promise
         }
 
         class UpdateMetadataKeyPrivateService {
@@ -1131,6 +1145,10 @@ classDiagram
     CreateMetadataKeyController*--CreateMetadataKeyService
     FindAllNonDeletedMetadataKeysController*--FindMetadataKeysService
     GenerateMetadataPrivateKeyController*--GenerateMetadataKeyService
+%%    RotateMetadataKeyController*--GetPassphraseService
+    RotateMetadataKeyController*--RotateMetadataKeyService
+%%    ResumeRotateMetadataKeyController*--GetPassphraseService
+    ResumeRotateMetadataKeyController*--RotateMetadataKeyService
 %%    GenerateMetadataPrivateKeyController*--GetPassphraseService
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
     SaveMetadataKeysSettingsController*--SaveMetadataSettingsService
@@ -1138,6 +1156,7 @@ classDiagram
     ShareMetadataKeyPrivateController*--GetPassphraseService
     ShareMetadataKeyPrivateController*--VerifyOrTrustMetadataKeyService
     style CreateMetadataKeyController fill:#D2E0FB
+    style RotateMetadataKeyController fill:#D2E0FB
     style FindAllNonDeletedMetadataKeysController fill:#D2E0FB
     style GenerateMetadataPrivateKeyController fill:#D2E0FB
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
@@ -1150,6 +1169,12 @@ classDiagram
     CreateMetadataKeyService*--GetOrFindMetadataSettingsService
     CreateMetadataKeyService*--MetadataKeysApiService
     ExpireMetadataKeyService*--MetadataKeysApiService
+    RotateResourcesMetadataKeyService*--MetadataRotateKeysResourcesApiService
+    DeleteMetadataKeyService*--MetadataKeysApiService
+    RotateMetadataKeyService*--CreateMetadataKeyService
+    RotateMetadataKeyService*--ExpireMetadataKeyService
+    RotateMetadataKeyService*--RotateResourcesMetadataKeyService
+    RotateMetadataKeyService*--DeleteMetadataKeyService
     FindMetadataMigrateResourcesService*--MigrateMetadataResourcesApiService
     MigrateMetadataResourcesService*--MigrateMetadataResourcesApiService
     MigrateMetadataResourcesService*--EncryptMetadataService

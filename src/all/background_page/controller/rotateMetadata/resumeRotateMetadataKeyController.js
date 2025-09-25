@@ -15,9 +15,10 @@
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import ProgressService from "../../service/progress/progressService";
 import i18n from "../../sdk/i18n";
-import RotateResourcesMetadataKeyService from "../../service/metadata/rotateMetadata/rotateResourcesMetadataKeyService";
+import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
+import RotateMetadataKeyService from "../../service/metadata/rotateMetadata/rotateMetadataKeyService";
 
-export default class RotateResourcesMetadataKeyController {
+export default class ResumeRotateMetadataKeyController {
   /**
    * @constructor
    * @param {Worker} worker
@@ -28,8 +29,8 @@ export default class RotateResourcesMetadataKeyController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.progressService = new ProgressService(worker, "Rotating metadata");
-    this.rotateResourcesMetadataKeyService = new RotateResourcesMetadataKeyService(account, apiClientOptions, this.progressService);
+    this.progressService = new ProgressService(worker, i18n.t("Rotating metadata key"));
+    this.rotateMetadataKeyService = new RotateMetadataKeyService(account, apiClientOptions, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
   }
 
@@ -49,16 +50,17 @@ export default class RotateResourcesMetadataKeyController {
 
   /**
    * Run the metadata rotation process.
+   * @param {object} metadataKey The metadata key to expire and delete.
    * @returns {Promise<void>}
    */
-  async exec() {
-    const replayOptions = {count: 0};
+  async exec(metadataKey) {
+    const metadataKeyEntity = new MetadataKeyEntity(metadataKey);
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
-    // Start with a goal high enough to update it in the service as the number of resources page is unknown yet.
-    this.progressService.start(10, i18n.t("Rotating metadata"));
-
     try {
-      await this.rotateResourcesMetadataKeyService.rotate(passphrase, replayOptions);
+      // Start with known goal that will be updated in the service as the number of resources page is unknown yet.
+      this.progressService.start(4, i18n.t("Resume rotating metadata key"));
+      // Rotate the metadata key
+      await this.rotateMetadataKeyService.resumeRotate(metadataKeyEntity, passphrase);
       this.progressService.finishStep(i18n.t("Done"));
     } finally {
       this.progressService.close();

@@ -16,27 +16,38 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
-import RotateResourcesMetadataKeyController from "./rotateResourcesMetadataKeyController";
+import RotateMetadataKeyController from "./rotateMetadataKeyController";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import {v4 as uuidv4} from "uuid";
+import ExternalGpgKeyPairEntity
+  from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 
-describe("RotateResourcesMetadataKeyController", () => {
+describe("RotateMetadataKeyController", () => {
   describe("::exec", () => {
-    it("Rotate the resources metadata.", async() => {
+    it("Rotate the metadata key.", async() => {
       expect.assertions(4);
 
       const passphrase = "ada@passbolt.com";
       const worker = {port: new MockPort()};
-      const controller = new RotateResourcesMetadataKeyController(worker, null, defaultApiClientOptions(), new AccountEntity(defaultAccountDto()));
+      const controller = new RotateMetadataKeyController(worker, null, defaultApiClientOptions(), new AccountEntity(defaultAccountDto()));
 
-      jest.spyOn(controller.rotateResourcesMetadataKeyService, "rotate").mockReturnValue();
+      jest.spyOn(controller.rotateMetadataKeyService, "rotate").mockReturnValue();
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockReturnValue(passphrase);
       jest.spyOn(controller.progressService, "start");
       jest.spyOn(controller.progressService, "close");
 
-      await controller.exec();
+      const metadataKeyPairDto = {
+        private_key: {armored_key: pgpKeys.eddsa_ed25519.private},
+        public_key: {armored_key: pgpKeys.eddsa_ed25519.public},
+      };
+
+      const metadataKeyId = uuidv4();
+
+      await controller.exec(metadataKeyPairDto, metadataKeyId);
 
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
-      expect(controller.rotateResourcesMetadataKeyService.rotate).toHaveBeenNthCalledWith(1, passphrase, {count: 0});
-      expect(controller.progressService.start).toHaveBeenNthCalledWith(1, 10, "Rotating metadata");
+      expect(controller.rotateMetadataKeyService.rotate).toHaveBeenNthCalledWith(1,  new ExternalGpgKeyPairEntity(metadataKeyPairDto), metadataKeyId, passphrase);
+      expect(controller.progressService.start).toHaveBeenNthCalledWith(1, 5, "Rotating metadata key");
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
     });
   });

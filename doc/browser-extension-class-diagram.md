@@ -183,6 +183,11 @@ classDiagram
             +exec() Promise~MetadataKeyEntity~
         }
 
+        class RotateMetadataKeyController {
+            event "passbolt.metadata.rotate-metadata-key"
+            +exec(string metadataKeyId) Promise~void~
+        }
+
         class FindAllNonDeletedMetadataKeysController {
             event "passbolt.metadata.find-all-non-deleted-metadata-keys"
             +exec() Promise~MetadataKeysCollection~
@@ -218,6 +223,11 @@ classDiagram
             +exec() Promise~void~
         }
 
+        class RotateResourcesMetadataKeyController {
+            event "passbolt.metadata.rotate-resources-metadata"
+            +exec() Promise~void~
+        }
+
         class ShareMetadataKeyPrivateController {
             event "passbolt.metadata.share-missing-metadata-private-keys-with-user"
             +exec(uuid userId) Promise~void~
@@ -230,6 +240,23 @@ classDiagram
         class DecryptMetadataService {
             +decryptOneFromForeignModel(Entity entity, ?string passphrase) Promise
             +decryptAllFromForeignModels(Collection collection, ?string passphrase, ?object options) Promise
+        }
+
+        class ExpireMetadataKeyService {
+            +expire(string uuid) Promise
+        }
+
+        class DeleteMetadataKeyService {
+            +delete(string uuid) Promise
+        }
+
+        class RotateMetadataKeyService {
+            +rotate(ExternalGpgKeyPairEntity entity, string uuid, string passphrase) Promise
+            +resumeRotate(MetdataKeyEntity entity, string passphrase) Promise
+        }
+
+        class UpdateMetadataKeyPrivateService {
+            +update(MetadataPrivateKeyEntity entity) Promise
         }
 
         class DecryptMetadataPrivateKeysService {
@@ -267,6 +294,10 @@ classDiagram
 
         class VerifyOrTrustMetadataKeyService {
             +verifyTrustedOrTrustNewMetadataKey(string passphrase) Promise~void~
+        }
+
+        class RotateResourcesMetadataKeyService {
+            +rotate(string passphrase) Promise~void~
         }
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -336,6 +367,13 @@ classDiagram
         class MetadataKeysApiService {
             +findAll(object contains) Promise~array~
             +create(MetadataKeyEntity metadataKey) Promise~*string*~
+            +delete(string uuid) Promise~*void*~
+            +update(string uuid, MetadataKeyEntity metadataKey) Promise~*void*~
+        }
+
+        class MetadataRotateKeysResourcesApiService {
+            +findAll() Promise~array~
+            +rotate(ResourceCollection resourcesCollection) Promise~array~
         }
 
         class MetadataPrivateKeyApiService {
@@ -1107,6 +1145,10 @@ classDiagram
     CreateMetadataKeyController*--CreateMetadataKeyService
     FindAllNonDeletedMetadataKeysController*--FindMetadataKeysService
     GenerateMetadataPrivateKeyController*--GenerateMetadataKeyService
+%%    RotateMetadataKeyController*--GetPassphraseService
+    RotateMetadataKeyController*--RotateMetadataKeyService
+%%    ResumeRotateMetadataKeyController*--GetPassphraseService
+    ResumeRotateMetadataKeyController*--RotateMetadataKeyService
 %%    GenerateMetadataPrivateKeyController*--GetPassphraseService
     GetOrFindMetadataTypesSettingsController*--GetOrFindMetadataSettingsService
     SaveMetadataKeysSettingsController*--SaveMetadataSettingsService
@@ -1114,6 +1156,7 @@ classDiagram
     ShareMetadataKeyPrivateController*--GetPassphraseService
     ShareMetadataKeyPrivateController*--VerifyOrTrustMetadataKeyService
     style CreateMetadataKeyController fill:#D2E0FB
+    style RotateMetadataKeyController fill:#D2E0FB
     style FindAllNonDeletedMetadataKeysController fill:#D2E0FB
     style GenerateMetadataPrivateKeyController fill:#D2E0FB
     style GetOrFindMetadataTypesSettingsController fill:#D2E0FB
@@ -1124,7 +1167,14 @@ classDiagram
     CreateMetadataKeyService*--EncryptMetadataPrivateKeysService
     CreateMetadataKeyService*--FindUsersService
     CreateMetadataKeyService*--GetOrFindMetadataSettingsService
-    CreateMetadataKeyService*--MetadataKeyApiService
+    CreateMetadataKeyService*--MetadataKeysApiService
+    ExpireMetadataKeyService*--MetadataKeysApiService
+    RotateResourcesMetadataKeyService*--MetadataRotateKeysResourcesApiService
+    DeleteMetadataKeyService*--MetadataKeysApiService
+    RotateMetadataKeyService*--CreateMetadataKeyService
+    RotateMetadataKeyService*--ExpireMetadataKeyService
+    RotateMetadataKeyService*--RotateResourcesMetadataKeyService
+    RotateMetadataKeyService*--DeleteMetadataKeyService
     FindMetadataMigrateResourcesService*--MigrateMetadataResourcesApiService
     MigrateMetadataResourcesService*--MigrateMetadataResourcesApiService
     MigrateMetadataResourcesService*--EncryptMetadataService
@@ -1147,7 +1197,7 @@ classDiagram
     FindAndUpdateMetadataSettingsService*--FindMetadataSettingsService
     FindAndUpdateMetadataSettingsService*--MetadataTypesSettingsLocalStorage
     FindMetadataKeysService*--DecryptMetadataPrivateKeysService
-    FindMetadataKeysService*--MetadataKeyApiService
+    FindMetadataKeysService*--MetadataKeysApiService
     FindMetadataSettingsService*--MetadataKeysSettingsApiService
     FindMetadataSettingsService*--MetadataTypesSettingsApiService
     FindResourcesService*--DecryptMetadataService
@@ -1161,7 +1211,7 @@ classDiagram
     SaveMetadataSettingsService*--MetadataKeysSettingsLocalStorage
     GetMetadataTrustedKeyService*--TrustedMetadataKeyLocalStorage
 %% Metadata models relationships.
-    style MetadataKeyApiService fill:#DEE5D4
+    style MetadataKeysApiService fill:#DEE5D4
     style MetadataKeysSettingsLocalStorage fill:#DEE5D4
     style MetadataKeysSessionStorageService fill:#DEE5D4
     style MetadataKeysSettingsApiService fill:#DEE5D4

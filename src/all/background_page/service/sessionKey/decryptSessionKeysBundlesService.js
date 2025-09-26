@@ -19,6 +19,7 @@ import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/
 import {assertType} from '../../utils/assertions';
 import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
 import DecryptMessageService from '../crypto/decryptMessageService';
+import Logger from "passbolt-styleguide/src/shared/utils/logger";
 
 class DecryptSessionKeysBundlesService {
   /**
@@ -46,16 +47,19 @@ class DecryptSessionKeysBundlesService {
     if (sessionKeysBundleEntity.isDecrypted) {
       return;
     }
-    const message = await OpenpgpAssertion.readMessageOrFail(sessionKeysBundleEntity.data);
 
     passphrase = passphrase || await PassphraseStorageService.getOrFail();
-
     const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    const decryptedMessage = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey);
-    const decryptedMetadataPrivateKeyDto = JSON.parse(decryptedMessage);
-    const sessionKeysBundleDataEntity = new SessionKeysBundleDataEntity(decryptedMetadataPrivateKeyDto);
 
-    sessionKeysBundleEntity.data = sessionKeysBundleDataEntity;
+    try {
+      const message = await OpenpgpAssertion.readMessageOrFail(sessionKeysBundleEntity.data);
+      const decryptedMessage = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey);
+      const decryptedSessionKeysBundleDto = JSON.parse(decryptedMessage);
+      sessionKeysBundleEntity.data = new SessionKeysBundleDataEntity(decryptedSessionKeysBundleDto);
+    } catch (error) {
+      const errorMessage = `Unable to decrypt the metadata session key bundle (${sessionKeysBundleEntity?.id}) using the user key.`;
+      this.handleError(new Error(errorMessage, {cause: error}));
+    }
   }
 
   /**
@@ -79,6 +83,17 @@ class DecryptSessionKeysBundlesService {
       const sessionKeysBundleEntity = items[i];
       await this.decryptOne(sessionKeysBundleEntity, passphrase);
     }
+  }
+
+  /**
+   * Handles errors.
+   *
+   * @param {Error} error The error to handle
+   * @private
+   */
+  handleError(error) {
+    Logger.error(error);
+    throw error;
   }
 }
 

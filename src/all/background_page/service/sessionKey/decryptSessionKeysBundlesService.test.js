@@ -90,11 +90,12 @@ describe("DecryptSessionKeysBundlesService", () => {
       //bypassing entity checks for the unit test
       sessionKeysBundleEntity._props.data = "Test";
 
-      const expectedError = new Error("The message should be a valid openpgp message.");
+      const expectedCauseError = new Error("The message should be a valid openpgp message.");
+      const expectedError = new Error(`Unable to decrypt the metadata session key bundle (${sessionKeysBundleEntity.id}) using the user key.`, {cause: expectedCauseError});
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptSessionKeysBundlesService(account);
-      await expect(() => service.decryptOne(sessionKeysBundleEntity, "test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptOne(sessionKeysBundleEntity, pgpKeys.ada.passphrase)).rejects.toThrowError(expectedError);
     });
 
     it("should throw an error if the passphrase is not available", async() => {
@@ -168,11 +169,13 @@ describe("DecryptSessionKeysBundlesService", () => {
       //bypassing entity checks for the unit test
       collection._items[0]._props.data = "Test";
 
-      const expectedError = new Error("The message should be a valid openpgp message.");
+      const expectedErrorMessage = `Unable to decrypt the metadata session key bundle (${dto?.id}) using the user key.`;
+      const expectedCauseError = new Error("The message should be a valid openpgp message.");
+      const expectedError = new Error(expectedErrorMessage, {cause: expectedCauseError});
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptSessionKeysBundlesService(account);
-      await expect(() => service.decryptAll(collection, "test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAll(collection, pgpKeys.ada.passphrase)).rejects.toThrowError(expectedError);
     });
 
     it("should throw an error if the passphrase is not available", async() => {

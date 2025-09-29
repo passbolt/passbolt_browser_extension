@@ -54,8 +54,6 @@ describe("GroupUpdatesCollections", () => {
       const collection = new GroupUpdatesCollection([dto]);
       expect(collection).toHaveLength(1);
 
-      console.log(dto, collection.items[0].groupsUsers.items);
-
       const item = collection.items[0];
       expect(item.id).toStrictEqual(dto.id);
       expect(item.name).toStrictEqual(dto.name);

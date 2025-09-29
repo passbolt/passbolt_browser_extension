@@ -112,22 +112,6 @@ class GroupModel {
   }
 
   /**
-   * Update a group using Passbolt API and add result to local storage
-   *
-   * @param {GroupUpdateEntity} groupUpdateEntity
-   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
-   * @returns {Promise<GroupEntity>}
-   * @public
-   */
-  async update(groupUpdateEntity, ignoreInvalidEntity) {
-    const data = groupUpdateEntity.toDto();
-    const groupDto = await this.groupService.update(groupUpdateEntity.id, data);
-    const updatedGroupEntity = new GroupEntity(groupDto, {ignoreInvalidEntity: ignoreInvalidEntity});
-    await GroupLocalStorage.updateGroup(updatedGroupEntity);
-    return updatedGroupEntity;
-  }
-
-  /**
    * Check if a group can be deleted
    *
    * A group can not be deleted if:

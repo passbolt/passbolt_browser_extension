@@ -32,7 +32,7 @@ describe("RedirectToAdminWorkspaceController", () => {
       };
       const account = new AccountEntity(defaultAccountDto());
       const expectedUrl = `${account.domain}/app/administration`;
-      console.log(expectedUrl);
+
       const controller = new RedirectToAdminWorkspaceController(worker, null, account);
       jest.spyOn(chrome.tabs, "update").mockImplementation(() => {});
 

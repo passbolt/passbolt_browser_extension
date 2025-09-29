@@ -70,16 +70,9 @@
     "webpack-cli": "^5.1.4"
   },
   "overrides": {
-    "image-size": "^2.0.2",
+    "addons-linter": "^8.0.0",
     "i18next-parser": {
-      "cheerio": {
-        "undici": "6.21.2"
-      }
-    },
-    "jest-environment-jsdom": {
-      "jsdom": {
-        "form-data": "4.0.4"
-      }
+      "cheerio": "1.1.2"
     },
     "brace-expansion": "^1.1.12",
     "browserslist": "4.26.2"

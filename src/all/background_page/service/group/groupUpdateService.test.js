@@ -23,12 +23,17 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
-import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data";
+import {createGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data";
 import {defaultResourcesSecretsDtos} from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection.test.data";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import {plaintextSecretPasswordAndDescriptionDto} from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
+import GroupLocalStorage from "../local_storage/groupLocalStorage";
+
+beforeEach(() => {
+  jest.resetAllMocks();
+});
 
 describe("GroupUpdateService", () => {
   it("should update the group without cryptographic operations if only the name changed", async() => {
@@ -67,11 +72,12 @@ describe("GroupUpdateService", () => {
 
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
-    const spyOnGroupModelUpdate = jest.spyOn(service.groupModel, "update");
+    const spyOnGroupServiceUpdate = jest.spyOn(service.groupService, "update");
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
-    spyOnGroupModelUpdate.mockImplementation(async() => {});
+    spyOnGroupServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
+    jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
 
     await service.exec(updateGroupEntity, "");
 
@@ -81,8 +87,10 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupModelDryRun).toHaveBeenCalledTimes(1);
     expect(spyOnGroupModelDryRun).toHaveBeenCalledWith(diffGroupUpdateEntity);
 
-    expect(spyOnGroupModelUpdate).toHaveBeenCalledTimes(1);
-    expect(spyOnGroupModelUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity, true);
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledTimes(1);
+    const expectedDiffGropuUpdateEntityDto = diffGroupUpdateEntity.toDto();
+    delete expectedDiffGropuUpdateEntityDto.groups_users;
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto);
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);
@@ -94,7 +102,7 @@ describe("GroupUpdateService", () => {
   });
 
   it("should update the group without cryptographic operations if only the permission changed", async() => {
-    expect.assertions(6);
+    expect.assertions(7);
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
@@ -137,11 +145,12 @@ describe("GroupUpdateService", () => {
 
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
-    const spyOnGroupModelUpdate = jest.spyOn(service.groupModel, "update");
+    const spyOnGroupServiceUpdate = jest.spyOn(service.groupService, "update");
+    jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
-    spyOnGroupModelUpdate.mockImplementation(async() => {});
+    spyOnGroupServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
 
     await service.exec(updateGroupEntity, "");
 
@@ -151,12 +160,18 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupModelDryRun).toHaveBeenCalledTimes(1);
     expect(spyOnGroupModelDryRun).toHaveBeenCalledWith(diffGroupUpdateEntity);
 
-    expect(spyOnGroupModelUpdate).toHaveBeenCalledTimes(1);
-    expect(spyOnGroupModelUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity, true);
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledTimes(2);
+    const expectedDiffGropuUpdateEntityDto1 = diffGroupUpdateEntity.toDto();
+    delete expectedDiffGropuUpdateEntityDto1.groups_users;
+
+    const expectedDiffGropuUpdateEntityDto2 = diffGroupUpdateEntity.toDto();
+
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto1);
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto2);
   });
 
   it("should update the group without cryptographic operations if users have only been removed", async() => {
-    expect.assertions(6);
+    expect.assertions(7);
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
@@ -197,11 +212,12 @@ describe("GroupUpdateService", () => {
 
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
-    const spyOnGroupModelUpdate = jest.spyOn(service.groupModel, "update");
+    const spyOnGroupServiceUpdate = jest.spyOn(service.groupService, "update");
+    jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
-    spyOnGroupModelUpdate.mockImplementation(async() => {});
+    spyOnGroupServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
 
     await service.exec(updateGroupEntity, "");
 
@@ -211,12 +227,18 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupModelDryRun).toHaveBeenCalledTimes(1);
     expect(spyOnGroupModelDryRun).toHaveBeenCalledWith(diffGroupUpdateEntity);
 
-    expect(spyOnGroupModelUpdate).toHaveBeenCalledTimes(1);
-    expect(spyOnGroupModelUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity, true);
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledTimes(2);
+    const expectedDiffGropuUpdateEntityDto1 = diffGroupUpdateEntity.toDto();
+    delete expectedDiffGropuUpdateEntityDto1.groups_users;
+
+    const expectedDiffGropuUpdateEntityDto2 = diffGroupUpdateEntity.toDto();
+
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto1);
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto2);
   });
 
   it("should update the group and encrypt secrets for the new users", async() => {
-    expect.assertions(23);
+    expect.assertions(26);
 
     const apiClientOptions = defaultApiClientOptions();
     const account = new AccountEntity(defaultAccountDto());
@@ -231,7 +253,7 @@ describe("GroupUpdateService", () => {
     const existingEntityDto = defaultGroupDto({}, {withGroupsUsers: 1});
     const updateGroupEntity = new GroupEntity({...existingEntityDto});
 
-    const newUser = new GroupUserEntity(defaultGroupUser({group_id: existingEntityDto.id}));
+    const newUser = new GroupUserEntity(createGroupUser({group_id: existingEntityDto.id}));
     updateGroupEntity._groups_users._items = [...updateGroupEntity._groups_users.items, newUser];
 
     const mixGroupUpdateDto = {
@@ -248,7 +270,7 @@ describe("GroupUpdateService", () => {
     const originalDecryptedSecret = plaintextSecretPasswordAndDescriptionDto();
     secrets[0].data = await EncryptMessageService.encrypt(JSON.stringify(originalDecryptedSecret), adaPublicKey);
     const needed_secrets = [{
-      user_id: newUser.id,
+      user_id: newUser._props.user_id,
       resource_id: secrets[0].resource_id,
     }];
     const groupUpdateDryRunResultDto = {needed_secrets, secrets};
@@ -258,26 +280,37 @@ describe("GroupUpdateService", () => {
 
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
-    const spyOnGroupModelUpdate = jest.spyOn(service.groupModel, "update");
+    const spyOnGroupServiceUpdate = jest.spyOn(service.groupService, "update");
     const spyOnKeyringSync = jest.spyOn(Keyring.prototype, "sync");
     const spyOnKeyringFindPublic = jest.spyOn(Keyring.prototype, "findPublic");
+    jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnKeyringSync.mockImplementation(async() => {});
     spyOnKeyringFindPublic.mockImplementation(() => ({armoredKey: pgpKeys.betty.public}));
 
-    spyOnGroupModelUpdate.mockImplementation(async groupUpdateEntity => {
-      expect(groupUpdateEntity.id).toStrictEqual(diffGroupUpdateEntity.id);
-      expect(groupUpdateEntity.name).toStrictEqual(diffGroupUpdateEntity.name);
-      expect(groupUpdateEntity.groupsUsers).toStrictEqual(diffGroupUpdateEntity.groupsUsers);
-      expect(groupUpdateEntity.secrets).toHaveLength(1);
+    spyOnGroupServiceUpdate.mockImplementation(async(groupUpdateId, groupUpdateDto) => {
+      if (!groupUpdateDto.groups_users) {
+        //it's the first step and  a group name update only operation
+        expect(groupUpdateDto.id).toStrictEqual(diffGroupUpdateEntity.id);
+        expect(groupUpdateDto.name).toStrictEqual(diffGroupUpdateEntity.name);
+        return groupUpdateDto; // ignoring first step
+      }
 
-      const secret = groupUpdateEntity.secrets._items[0];
-      expect(secret._props.resource_id).toStrictEqual(secrets[0].resource_id);
-      expect(secret._props.user_id).toStrictEqual(newUser.id);
+      expect(groupUpdateId).toStrictEqual(diffGroupUpdateEntity.id);
+      expect(groupUpdateDto.id).toStrictEqual(diffGroupUpdateEntity.id);
+      expect(groupUpdateDto.name).toStrictEqual(diffGroupUpdateEntity.name);
+      expect(groupUpdateDto.groups_users).toStrictEqual(diffGroupUpdateEntity.groupsUsers.toDto());
+      expect(groupUpdateDto.secrets).toHaveLength(1);
 
-      const decryptedData = await DecryptMessageService.decrypt(await OpenpgpAssertion.readMessageOrFail(secret._props.data), await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted));
+      const secret = groupUpdateDto.secrets[0];
+      expect(secret.resource_id).toStrictEqual(secrets[0].resource_id);
+      expect(secret.user_id).toStrictEqual(newUser._props.user_id);
+
+      const decryptedData = await DecryptMessageService.decrypt(await OpenpgpAssertion.readMessageOrFail(secret.data), await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted));
       expect(JSON.parse(decryptedData)).toStrictEqual(originalDecryptedSecret);
+
+      return groupUpdateDto;
     });
 
     spyOnGroupModelDryRun.mockImplementation(async groupUpdateEntity => {
@@ -288,14 +321,14 @@ describe("GroupUpdateService", () => {
     await service.exec(updateGroupEntity, "ada@passbolt.com");
 
     expect(spyOnKeyringSync).toHaveBeenCalledTimes(1);
-    expect(spyOnKeyringFindPublic).toHaveBeenCalledWith(newUser.id);
+    expect(spyOnKeyringFindPublic).toHaveBeenCalledWith(newUser._props.user_id);
 
     expect(spyOnGroupModelGetById).toHaveBeenCalledTimes(1);
     expect(spyOnGroupModelGetById).toHaveBeenCalledWith(updateGroupEntity.id);
 
     expect(spyOnGroupModelDryRun).toHaveBeenCalledTimes(1);
 
-    expect(spyOnGroupModelUpdate).toHaveBeenCalledTimes(1);
+    expect(spyOnGroupServiceUpdate).toHaveBeenCalledTimes(2);
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);

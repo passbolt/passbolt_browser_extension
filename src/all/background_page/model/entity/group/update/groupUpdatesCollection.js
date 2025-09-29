@@ -44,7 +44,7 @@ export default class GroupUpdatesCollection extends EntityV2Collection {
     assertType(groupUpdateEntity, GroupUpdateEntity);
 
     const {id, name} = groupUpdateEntity;
-    const allUsersSecrets = groupUpdateEntity.secrets.toDto();
+    const allUsersSecrets = groupUpdateEntity.secrets?.toDto() || [];
     const groupsUsers = groupUpdateEntity.groupsUsers;
 
     const addMemeberOperationsDto = [];

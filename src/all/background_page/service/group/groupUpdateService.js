@@ -23,6 +23,9 @@ import SecretEntity from "../../model/entity/secret/secretEntity";
 import GroupUpdateSecretsCollection from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {assertString, assertType} from "../../utils/assertions";
+import GroupUpdatesCollection from "../../model/entity/group/update/groupUpdatesCollection";
+import GroupLocalStorage from "../local_storage/groupLocalStorage";
+import GroupService from "../api/group/groupService";
 
 const INITIAL_PROGRESS_GOAL = 10;
 
@@ -38,6 +41,7 @@ class GroupUpdateService {
     this.account = account;
     this.progressService = progressService;
     this.groupModel = new GroupModel(apiClientOptions);
+    this.groupService = new GroupService(apiClientOptions);
     this.decryptPrivateKeyService = new DecryptPrivateKeyService();
   }
 
@@ -153,7 +157,14 @@ class GroupUpdateService {
    */
   async updateGroup(groupUpdateEntity) {
     this.progressService.finishStep(i18n.t("Updating group"), true);
-    await this.groupModel.update(groupUpdateEntity, true);
+
+    const groupUpdateSingleOperationList = GroupUpdatesCollection.createFromGroupUpdateEntity(groupUpdateEntity);
+    for (let i = 0; i < groupUpdateSingleOperationList.length; i++) {
+      const groupUpdateOperation = groupUpdateSingleOperationList.items[i];
+      const groupDto = await this.groupService.update(groupUpdateOperation.id, groupUpdateOperation.toDto());
+      const updatedGroupEntity = new GroupEntity(groupDto, {ignoreInvalidEntity: true});
+      await GroupLocalStorage.updateGroup(updatedGroupEntity);
+    }
   }
 
   /**

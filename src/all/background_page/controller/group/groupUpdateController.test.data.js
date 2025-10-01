@@ -17,7 +17,7 @@ import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/grou
 import {createGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {defaultDyRunResponse} from "../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data";
+import {defaultDryRunResponse} from "../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 export const updateGroupNameDto = (data = {}) => {
@@ -66,5 +66,5 @@ export const add2UsersToGroupDryRunResponse = async(data = {}) => {
     Secrets: secrets
   }, data);
 
-  return defaultDyRunResponse(defaultData);
+  return defaultDryRunResponse(defaultData);
 };

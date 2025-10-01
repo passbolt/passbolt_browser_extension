@@ -166,4 +166,44 @@ describe("Totp entity", () => {
       expect(url.href).toStrictEqual(urlExpected.href);
     });
   });
+
+  describe("::createTotpFromLastpassCSV", () => {
+    it("createTotpFromLastpassCSV should import totp secret from lastpass", () => {
+      expect.assertions(1);
+      const secretKey = "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA";
+      const entity = ExternalTotpEntity.createTotpFromLastpassCSV(secretKey);
+      const expectedDto = {
+        secret_key: secretKey,
+        algorithm: "SHA1", // Default algorithm
+        digits: 6, // Default digits
+        period: 30 // Default period
+      };
+      expect(entity.toDto()).toStrictEqual(expectedDto);
+    });
+
+    it("createTotpFromLastpassCSV should import totp secret from lastpass and make it upper case", () => {
+      expect.assertions(1);
+      const secretKey = "ofl3vf3ou4bzp45d4zme6ktf654jrssO4q2eo6fjfgpkhrhysvja";
+      const entity = ExternalTotpEntity.createTotpFromLastpassCSV(secretKey);
+      const expectedDto = {
+        secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA",
+        algorithm: "SHA1", // Default algorithm
+        digits: 6, // Default digits
+        period: 30 // Default period
+      };
+      expect(entity.toDto()).toStrictEqual(expectedDto);
+    });
+
+    it("should throw if the secret key is not a valid string", () => {
+      expect.assertions(1);
+      const secretKey = 42;
+      expect(() => ExternalTotpEntity.createTotpFromLastpassCSV(secretKey)).toThrow(EntityValidationError);
+    });
+
+    it("should throw if the secret key is not a valid base 32", () => {
+      expect.assertions(1);
+      const secretKey = 'otpauth://totp/pro.passbolt.local%3Aadmin%40passbolt.com?secret=DAV3DS4ERAAF5QGH&issuer=pro.passbolt.local&algorithm=SHA1&digits=6&period=30';
+      expect(() => ExternalTotpEntity.createTotpFromLastpassCSV(secretKey)).toThrow(EntityValidationError);
+    });
+  });
 });

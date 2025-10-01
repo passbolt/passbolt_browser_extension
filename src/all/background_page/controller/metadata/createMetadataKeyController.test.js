@@ -18,7 +18,6 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import CreateMetadataKeyController from "./createMetadataKeyController";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import metadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 import ExternalGpgKeyPairEntity
@@ -44,7 +43,7 @@ describe("CreateMetadataKeyController", () => {
       };
 
       jest.spyOn(controller.createMetadataKeyService, "create")
-        .mockReturnValue(new metadataKeyEntity(defaultMetadataKeyDto()));
+        .mockReturnValue(new MetadataKeyEntity(defaultMetadataKeyDto()));
       jest.spyOn(controller.getPassphraseService, "getPassphrase")
         .mockResolvedValue(pgpKeys.ada.passphrase);
 

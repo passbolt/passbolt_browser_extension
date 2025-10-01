@@ -15,6 +15,7 @@
 export const defaultProgressService = (data = {}) => ({
   start: jest.fn(),
   finishStep: jest.fn(),
+  finishSteps: jest.fn(),
   close: jest.fn(),
   goals: 2,
   updateGoals: jest.fn(),

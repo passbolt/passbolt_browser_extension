@@ -62,9 +62,9 @@ describe("AccountKitEntity", () => {
       expect(schema.properties.security_token).toEqual(abstractAccountEntitySchema.properties.security_token);
     });
 
-    it("it should not validate the server private key if the key is higher than 10000", () => {
+    it("it should not validate the server private key if the key is higher than 50000", () => {
       expect.assertions(2);
-      const dto = defaultAccountDto({server_public_armored_key: 'a'.repeat(10001)});
+      const dto = defaultAccountDto({server_public_armored_key: 'a'.repeat(50001)});
       try {
         new AccountKitEntity(dto);
       } catch (error) {
@@ -73,9 +73,9 @@ describe("AccountKitEntity", () => {
       }
     });
 
-    it("it should not validate the user private key if the key is higher than 10000", () => {
+    it("it should not validate the user private key if the key is higher than 50000", () => {
       expect.assertions(2);
-      const dto = defaultAccountDto({user_private_armored_key: 'a'.repeat(10001)});
+      const dto = defaultAccountDto({user_private_armored_key: 'a'.repeat(50001)});
       try {
         new AccountKitEntity(dto);
       } catch (error) {

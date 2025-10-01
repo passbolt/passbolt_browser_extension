@@ -4,13 +4,62 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.6.0] - 2025-10-08
+### Added
+- PB-39068 WP5-5.6 - Implement a Service RotateResourcesMetadataKeyService that proceed with the rotation of the key
+- PB-39069 WP5-5.8 - Implement a new method in MetadataKeysServiceWorkerService to call for  to expire a key
+- PB-39071 WP5-5.1 - Implement a new method in MetadataKeysApiService to expire a shared metadata key
+- PB-39072 WP5-5.4 - Implement a new Service UpdateMetadataKeysService to process with the expiration of a key
+- PB-39073 WP5-5.2 - Implement a new API service MetadataRotateKeysResourcesApiService to retrieve the first page of data to rotate
+- PB-39074 WP5-5.3 - Implement a new method in MetadataKeysApiService to register the rotated data on the API
+- PB-39075 WP5-5.7 - Implement a Controller RotateResourcesMetadataKeyController to run the rotation process
+- PB-39076 WP5-5.9 - Implement a new method in MetadataKeysServiceWorkerService to call passbolt.metadata.rotate-resources-metadata for  with the new Key
+- PB-39078 WP5-5.10 - Implement the ConfirmMetadataRotationDialog
+- PB-39094 WP5-6.2 - Display the rotate key button when multiple metadata key are active
+- PB-43253 Workspace resizable sidebars
+- PB-44582 lastpass example csv import with totp success
+- PB-45385 SN - WP1.1 Create the entity SecretDataV5StandaloneNoteEntity
+- PB-45389 SN - WP1.3 Update ResourceFormEntity to include secret SecretDataV5StandaloneNoteEntity
+- PB-45400 SN - WP2.1 Add new resource type in DisplayContentTypesAllowedContentTypesAdministration
+- PB-45404 SN - WP2.2 Add new resource type in DisplayResourcesWorkspaceMainMenu
+- PB-45406 SN - WP2.3 Update passbolt default resource type icons to include the new resource type icon
+- PB-45408 SN - WP2.4 Update DisplayResourcesListDetails to handle the correct subtitle for standalone note and add the same for standalone custom fields
+- PB-45412 SN - WP3.1 Apply a minimum height to the resource workspace ‘others’ dialog used to create other resource types
+- PB-45413 SN - WP3.3 Increase the height of the notes textarea to use the maximum available space in the resource creation dialog
+- PB-45414 SN - WP3.3 Add “hide” button when the note is decrypted to hide it again
+- PB-45417 SN - WP2.5 Update the “other” dialog to add the standalone note in the content type list in v5
+- PB-45424 SN - WP3.4 Ensure Import/Export is working as expected with standalone notes
+- PB-45464 GMUO - WP1.1 Create new collection ‘GroupUpdateCollection’
+- PB-45465 GMUO - WP1.2 Migrate group update logic to optimise the request on the API
+- PB-45466 GMUO - WP1.3 Adapt group update progress bar mechanism
+- PB-45476 WP5-6.3 - Create events with controller to rotate and resume rotation of a metadata key
+
+### Fixed
+- PB-43218 Date field icons should not be replaced with the copy icon in the SSO settings and expiry resource dialogs
+- PB-45239 Folders are not displayed in the correct order (GITHUB #568)
+- PB-45329 add TOTP toString handling similar to other csv exports
+- PB-45402 Add missing icon property to resource types schema definition
+- PB-45450 Fix account kit export with big private armored keys
+- PB-45458 Remove Organisation Settings max-width
+
+### Maintenance
+- PB-44253 Upgrade vulnerable library form-data
+- PB-44593 Upgrade i18next to v24x
+- PB-45182 Major upgrade for copy-anything (Medium)
+- PB-45183 Minor upgrade for browserslist (Low)
+- PB-45184 3rd party Github Actions should be pinned (Medium)
+- PB-45401 Enforce the requirement of the property object_type for custom fields
+- PB-45484 Fix low security vulnerability dependency with web-ext to 8.10.0
+- PB-45583 Review and clean up npm overridden dependencies
+- PB-45601 Update the "Upgrade to Passbolt Pro" buttons URL
+
 ## [5.5.1] - 2025-09-15
 ### Fixed
 - PB-45290 Fix password missing crash on metadata activation in first admin setup
 
 ## [5.5.0] - 2025-09-10
 ### Added
-- PB-43921 - Increase directory sync report dialog size
+- PB-43921 Increase directory sync report dialog size
 - PB-44816 Pro teasing - WP1.1 Create DisplaySubscriptionKeyTeasing component
 - PB-44817 Pro teasing - WP1.2 Create DisplayPasswordPoliciesAdministrationTeasing
 - PB-44818 Pro teasing - WP1.3 Create DisplayAdministrationUserPassphrasePoliciesTeasing
@@ -26,67 +75,67 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-44641 ZK - WP5.4 Create UpdateMetadataSettingsPrivateKeyService to to be able to disabled zero knowledge mode
 - PB-44631 ZK - WP5.5 Update SaveMetadataKeysSettingsController to be able to disabled zero knowledge mode
 - PB-44757 ZK - WP5.6 As an administrator with missing metadata keys I should not be able to change metadata settings
-- PB-44630 - SCIM administration screen
+- PB-44630 SCIM administration screen
 
 ### Fixed
-- PB-44638 - Password expiry should not be removed when password is not updated
-- PB-44604 - Fix regular expression on public key metadata validation
-- PB-44707 - Fix service worker not restarting after browser extension update on Chrome
-- PB-45060 - Fix custom fields json schema properties type
-- PB-44933 - Fix setup a new user should have missing key set
+- PB-44638 Password expiry should not be removed when password is not updated
+- PB-44604 Fix regular expression on public key metadata validation
+- PB-44707 Fix service worker not restarting after browser extension update on Chrome
+- PB-45060 Fix custom fields json schema properties type
+- PB-44933 Fix setup a new user should have missing key set
 
 ### Maintenance
-- PB-44594 - Upgrade xregexp to 5.1.2
+- PB-44594 Upgrade xregexp to 5.1.2
 - PB-44638 Password expiry should not be removed when password is not updated
 - PB-44668 The create menu import operation should be actionable when encrypted metadata plugin is not available
 
 ## [5.4.0] - 2025-08-13
 ### Added
-- PB-44201: E2EE The organisation settings offer now a simplified way to activate metadata encryption and the new resource types
-- PB-42205: E2EE encrypted metadata and new resource types are activated by default after the first administrator setup
-- PB-43255: Add support for multiple uri import export on kdbx files
-- PB-43110: ZK - WP4.2 As a signed-in user I should not be allowed to upgrade resources with missing key situation
-- PB-43712: Translate the application in Czech
-- PB-43939: ZK - WP3.2 Add an app event to get or find the metadata keys settings
-- PB-43980: Add support for custom field import export on kdbx files
-- PB-44080: ZK - WP4.1 Create a dialog explaining the missing key situation
-- PB-44081: ZK - WP4.3 As a signed-in user I should not be allowed to create resources with missing key situation in the resource workspace
-- PB-44090: ZK - WP4.4 As a signed-in user I should not be allowed to edit resources with missing key situation
-- PB-44091: ZK - WP4.5 As a signed-in user I should not be allowed to share resources with missing key situation
-- PB-44094: ZK - WP4.6 As a signed-in user I should not be allowed to import resources with missing key situation
-- PB-44095: ZK - WP4.7 As a signed-in user I should not be allowed to move resources with missing key situation
-- PB-44096: ZK - WP4.8 As a signed-in user I should not be allowed to move folders with missing key situation
-- PB-44097: ZK - WP4.9 Display a page explaining the missing key situation on the quick app
-- PB-44098: ZK - WP4.10 As a signed-in user I should not be allowed to create resources with missing key situation in the quick app
-- PB-44099: ZK - WP4.11 As a signed-in user I should not be allowed to generate password on the inform menu
-- PB-44206: ZK - WP4.14 As administrators I cannot trigger the encrypted metadata migration if I have missing metadata keys
-- PB-44211: ZK - WP3.5 Add MetadataKeysSettingsLocalStorageContextProvider to the App and the quick-app and the inform menu
-- PB-44212: CU - WP5.2 Update ExternalResourceEntity buildDtoFromResourceEntityDto to support custom fields
-- PB-44286: ZK - WP3.6 Add a quick app and inform menu event to get the metadata keys settings
-- PB-44295: ZK - WP4.15 As a signed-in user with missing keys I should not be able to create resource if metadata shared key is enforced on the inform menu
-- PB-44296: ZK - WP4.16 As a signed-in user I should not be allowed to move shared folders into personal folders with missing key situation
-- PB-44327: Display sub-folders in breadcrumbs
-- PB-44374: Extend notes v5 max length to 50_000
+- PB-44201 E2EE The organisation settings offer now a simplified way to activate metadata encryption and the new resource types
+- PB-42205 E2EE encrypted metadata and new resource types are activated by default after the first administrator setup
+- PB-43255 Add support for multiple uri import export on kdbx files
+- PB-43110 ZK - WP4.2 As a signed-in user I should not be allowed to upgrade resources with missing key situation
+- PB-43712 Translate the application in Czech
+- PB-43939 ZK - WP3.2 Add an app event to get or find the metadata keys settings
+- PB-43980 Add support for custom field import export on kdbx files
+- PB-44080 ZK - WP4.1 Create a dialog explaining the missing key situation
+- PB-44081 ZK - WP4.3 As a signed-in user I should not be allowed to create resources with missing key situation in the resource workspace
+- PB-44090 ZK - WP4.4 As a signed-in user I should not be allowed to edit resources with missing key situation
+- PB-44091 ZK - WP4.5 As a signed-in user I should not be allowed to share resources with missing key situation
+- PB-44094 ZK - WP4.6 As a signed-in user I should not be allowed to import resources with missing key situation
+- PB-44095 ZK - WP4.7 As a signed-in user I should not be allowed to move resources with missing key situation
+- PB-44096 ZK - WP4.8 As a signed-in user I should not be allowed to move folders with missing key situation
+- PB-44097 ZK - WP4.9 Display a page explaining the missing key situation on the quick app
+- PB-44098 ZK - WP4.10 As a signed-in user I should not be allowed to create resources with missing key situation in the quick app
+- PB-44099 ZK - WP4.11 As a signed-in user I should not be allowed to generate password on the inform menu
+- PB-44206 ZK - WP4.14 As administrators I cannot trigger the encrypted metadata migration if I have missing metadata keys
+- PB-44211 ZK - WP3.5 Add MetadataKeysSettingsLocalStorageContextProvider to the App and the quick-app and the inform menu
+- PB-44212 CU - WP5.2 Update ExternalResourceEntity buildDtoFromResourceEntityDto to support custom fields
+- PB-44286 ZK - WP3.6 Add a quick app and inform menu event to get the metadata keys settings
+- PB-44295 ZK - WP4.15 As a signed-in user with missing keys I should not be able to create resource if metadata shared key is enforced on the inform menu
+- PB-44296 ZK - WP4.16 As a signed-in user I should not be allowed to move shared folders into personal folders with missing key situation
+- PB-44327 Display sub-folders in breadcrumbs
+- PB-44374 Extend notes v5 max length to 50_000
 
 ### Fixed
-- PB-43296: Displaying resource activities should not crash the application when a resource activity does not have related user or group
-- PB-43652: The sentence to change the passphrase in the user settings workspace should have a space after.
-- PB-43657: Resources loading became noticeably slower after migrating to encrypted
-- PB-43667: Cancelling the user passphrase request should not trigger an error when sharing missing metadata key
-- PB-43676: Cancelling the user passphrase should not freeze the create resource dialog
-- PB-43719: After importing resources from Bitwarden the URIs are not separated correctly
-- PB-43784: Display the progression of the encryption of metadata in the import dialog
-- PB-43906: User should be notified of any errors while loading comments
-- PB-44079: Update/Create a method in resourceLocalStorage.js to bulk delete resources
-- PB-44161: As a user I should not see the resource description and note warning message if only one of them is concerned
-- PB-44273: Activities are not loaded when new resource is clicked after load more activities of a previous resource
+- PB-43296 Displaying resource activities should not crash the application when a resource activity does not have related user or group
+- PB-43652 The sentence to change the passphrase in the user settings workspace should have a space after.
+- PB-43657 Resources loading became noticeably slower after migrating to encrypted
+- PB-43667 Cancelling the user passphrase request should not trigger an error when sharing missing metadata key
+- PB-43676 Cancelling the user passphrase should not freeze the create resource dialog
+- PB-43719 After importing resources from Bitwarden the URIs are not separated correctly
+- PB-43784 Display the progression of the encryption of metadata in the import dialog
+- PB-43906 User should be notified of any errors while loading comments
+- PB-44079 Update/Create a method in resourceLocalStorage.js to bulk delete resources
+- PB-44161 As a user I should not see the resource description and note warning message if only one of them is concerned
+- PB-44273 Activities are not loaded when new resource is clicked after load more activities of a previous resource
 
 ### Maintenance
-- PB-43585: Azure SSO login_hint settings can now be configured
-- PB-43908: Move logic of commentModel file to a service and update assertions in controllers
-- PB-44076: Create a Controller to handle Resource Delete
-- PB-44077: Create a dedicated Service to handle resource deletion
-- PB-44396: the endpoint complete/recover.json is now used instead of the legacy endpoint
+- PB-43585 Azure SSO login_hint settings can now be configured
+- PB-43908 Move logic of commentModel file to a service and update assertions in controllers
+- PB-44076 Create a Controller to handle Resource Delete
+- PB-44077 Create a dedicated Service to handle resource deletion
+- PB-44396 the endpoint complete/recover.json is now used instead of the legacy endpoint
 
 ### Security
 - PB-43730: Upgrade vulnerable library brace-expansion
@@ -2392,7 +2441,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.5.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.6.0...HEAD
+[5.6.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.5.1...v5.6.0
 [5.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.5.0...v5.5.1
 [5.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.1...v5.5.0
 [5.4.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.0...v5.4.1

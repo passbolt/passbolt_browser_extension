@@ -21,6 +21,7 @@ import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/e
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import each from "jest-each";
 import {defaultTotpDto} from "../../entity/totp/totpDto.test.data";
+import {resourceTypeTotpDto, resourceTypeV5TotpDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 
 describe("ResourcesTypeImportParser", () => {
   describe("External resource dto with password field", () => {
@@ -158,7 +159,7 @@ describe("ResourcesTypeImportParser", () => {
     ]).describe("No resource type found scenario", test => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
-        const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionWithoutPassword());
+        const resourceTypesCollection = new ResourceTypesCollection([resourceTypeTotpDto(), resourceTypeV5TotpDto()]);
         resourceTypesCollection.filterByResourceTypeVersion(test.metadataTypesSettings.defaultResourceTypes);
 
         const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);

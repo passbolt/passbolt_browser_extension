@@ -20,6 +20,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import {assertType} from "../../../../utils/assertions";
 import IconEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
+import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
 const DEFAULT_RESOURCE_NAME = '(no name)';
 const RESOURCE_URI_MAX_LENGTH = 1024;
@@ -242,6 +243,47 @@ class ExternalResourceEntity extends EntityV2 {
     }
 
     return data;
+  }
+
+  /**
+   * Return a secret DTO.
+   * The method will inject the object_type if the associated resource type is v5.
+   * @param {ResourceTypeEntity} resourceType The  associated resource type
+   * return {Object}
+   */
+  toSecretDto(resourceType) {
+    // todo comment fallback
+    if (!this.resourceTypeId) {
+      return this.secretClear;
+    }
+
+    const dto = {};
+
+    // Extract password if present.
+    if (this.secretClear) {
+      dto.password = this.secretClear;
+    }
+
+    // Extract description if present.
+    if (this.description) {
+      dto.description = this.description;
+    }
+
+    // Extract totp dto if present.
+    if (this.totp) {
+      dto.totp = this.totp.toDto();
+    }
+
+    // Extract custom fields dto if present.
+    if (this.customFields) {
+      dto.custom_fields = this.customFields.toSecretDto();
+    }
+
+    if (resourceType.isV5()) {
+      dto.object_type = SECRET_DATA_OBJECT_TYPE
+    }
+
+    return dto;
   }
 
   /*
@@ -478,12 +520,35 @@ class ExternalResourceEntity extends EntityV2 {
 
   /**
    * Set the custom fields
-   * @param {CustomFieldsCollection} customFields the custom fields collection to us
+   * @param {CustomFieldsCollection|null} customFields the custom fields collection to us
    * @returns {void}
    */
   set customFields(customFields) {
+    if (customFields === null) {
+      this._customFields = null;
+      return;
+    }
     assertType(customFields, CustomFieldsCollection);
     this._customFields = customFields;
+  }
+
+  /**
+   * Reset all secret props.
+   *
+   * Note: Used when importing resources to keep only one version of the secrets, either encrypted in the secrets
+   * collection, either decrypted as props.
+   *
+   * Note 2: The whole custom fields props is reset, to re-evaluate when the custom field keys or values will also
+   * be available in the metadata.
+   */
+  resetSecretProps(resourceType) {
+    this.secretClear = "";
+    // todo dcouemnt password string reason
+    if (resourceType) {
+      this.description = "";
+      this.totp = null;
+      this.customFields = null;
+    }
   }
 
   /*

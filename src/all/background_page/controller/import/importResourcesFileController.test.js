@@ -97,6 +97,7 @@ describe("ImportResourcesFileController", () => {
       jest.spyOn(GetOrFindMetadataKeysService.prototype, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => defaultMetadataKeysSettingsDto());
     });
+
     describe("Should assert the fileType param.", () => {
       beforeEach(() => {
         jest.spyOn(FindMetadataSettingsService.prototype, "findTypesSettings")
@@ -175,6 +176,7 @@ describe("ImportResourcesFileController", () => {
         });
       });
     });
+
     describe("Should parse kdbx file and import resources.", () => {
       each([
         {
@@ -192,6 +194,7 @@ describe("ImportResourcesFileController", () => {
           jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
             .mockImplementationOnce(() => new MetadataTypesSettingsEntity(test.metadataTypesSettings));
         });
+
         it(`should import non encrypted kdbx - <${test.scenario}>`, async() => {
           expect.assertions(10);
 
@@ -210,10 +213,18 @@ describe("ImportResourcesFileController", () => {
           const secret3 = await decryptSecret(importedResources[2].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
           const secret4 = await decryptSecret(importedResources[3].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
-          expect(secret2).toEqual("{\"password\":\"Secret 2\",\"description\":\"Description 2\"}");
-          expect(secret3).toEqual("{\"password\":\"Secret 4\",\"description\":\"Description 4\"}");
-          expect(secret4).toEqual("{\"password\":\"Secret 3\",\"description\":\"Description 3\"}");
+          if (test.scenario === "default v4") {
+            expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
+            expect(secret2).toEqual("{\"password\":\"Secret 2\",\"description\":\"Description 2\"}");
+            expect(secret3).toEqual("{\"password\":\"Secret 4\",\"description\":\"Description 4\"}");
+            expect(secret4).toEqual("{\"password\":\"Secret 3\",\"description\":\"Description 3\"}");
+          } else if (test.scenario === "default v5") {
+            expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
+            expect(secret2).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Secret 2\",\"description\":\"Description 2\"}");
+            expect(secret3).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Secret 4\",\"description\":\"Description 4\"}");
+            expect(secret4).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Secret 3\",\"description\":\"Description 3\"}");
+          }
+
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,
@@ -267,6 +278,7 @@ describe("ImportResourcesFileController", () => {
           expect(importedResources[2].toDto()).toEqual(externalEntity3.toDto());
           expect(importedResources[3].toDto()).toEqual(externalEntity4.toDto());
         });
+
         it(`should import encrypted with password kdbx - <${test.scenario}>`, async() => {
           expect.assertions(4);
 
@@ -286,7 +298,12 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
+          // @todo Sorry for the patch, the scenario need a deeper refactoring.
+          if (test.scenario === "default v4") {
+            expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
+          } else if (test.scenario === "default v5") {
+            expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
+          }
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,
@@ -304,6 +321,7 @@ describe("ImportResourcesFileController", () => {
 
           expect(importedResources[0].toDto()).toEqual(externalEntity1.toDto());
         });
+
         it(`should import encrypted with keyfile kdbx - <${test.scenario}>`, async() => {
           expect.assertions(4);
 
@@ -405,6 +423,7 @@ describe("ImportResourcesFileController", () => {
           expect(importedResources[0].toDto()).toEqual(externalEntity1.toDto());
         });
       });
+
       each([
         {
           scenario: "dashlane",
@@ -475,6 +494,7 @@ describe("ImportResourcesFileController", () => {
           expect(importedResources[0].toDto()).toEqual(externalEntity1.toDto());
         });
       });
+
       each([
         {
           scenario: "1Password", file: onePasswordCsvFile,

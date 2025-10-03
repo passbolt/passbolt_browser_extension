@@ -189,7 +189,7 @@ describe("ImportResourcesFileController", () => {
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG
         },
-      ]).describe("should parse minimal csv", test => {
+      ]).describe("should parse minimal kbdx", test => {
         beforeEach(() => {
           jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
             .mockImplementationOnce(() => new MetadataTypesSettingsEntity(test.metadataTypesSettings));
@@ -340,8 +340,12 @@ describe("ImportResourcesFileController", () => {
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
-
-          expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
+          // @todo Sorry for the patch, the scenario need a deeper refactoring.
+          if (test.scenario === "default v4") {
+            expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
+          } else if (test.scenario === "default v5") {
+            expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
+          }
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,
@@ -405,7 +409,11 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"\"}");
+          if (test.resourceType !== RESOURCE_TYPE_V5_DEFAULT_SLUG) {
+            expect(secret1).toEqual("{\"password\":\"Password 1\"}");
+          } else {
+            expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Password 1\"}");
+          }
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,
@@ -477,7 +485,11 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+          if (test.resourceType !== RESOURCE_TYPE_V5_DEFAULT_SLUG) {
+            expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+          } else {
+            expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+          }
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,
@@ -547,7 +559,11 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+          if (test.resourceType !== RESOURCE_TYPE_V5_DEFAULT_SLUG) {
+            expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+          } else {
+            expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+          }
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,
@@ -608,7 +624,11 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+          if (test.resourceType !== RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG) {
+            expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+          } else {
+            expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+          }
 
           const externalEntity1 = new ExternalResourceEntity(defaultExternalResourceImportMinimalDto({
             id: importedResources[0].id,

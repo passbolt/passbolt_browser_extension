@@ -56,8 +56,6 @@ import each from "jest-each";
 import GetOrFindMetadataSettingsService from "../../metadata/getOrFindMetadataSettingsService";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
-import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
-import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -143,8 +141,13 @@ describe("ImportResourcesService", () => {
 
         const secret1 =  await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
         const secret2 =  await decryptSecret(result.importResources.items[1].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
-        expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
-        expect(secret2).toEqual("{\"password\":\"Password 2\",\"description\":\"Description 2\"}");
+        if (test.metadataTypesSettings.default_resource_types === "v4") {
+          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+          expect(secret2).toEqual("{\"password\":\"Password 2\",\"description\":\"Description 2\"}");
+        } else {
+          expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Password 1\",\"description\":\"Description 1\"}");
+          expect(secret2).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Password 2\",\"description\":\"Description 2\"}");
+        }
 
         //Remove encrypted secrets checked previously
         delete importedResources[0]._secrets;
@@ -192,8 +195,11 @@ describe("ImportResourcesService", () => {
 
         const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-        expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
-
+        if (test.metadataTypesSettings.default_resource_types === "v4") {
+          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+        } else {
+          expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+        }
         //Remove encrypted secrets checked previously
         delete importedResources[0]._secrets;
 
@@ -209,6 +215,7 @@ describe("ImportResourcesService", () => {
 
         expect(importedResources[0].toDto()).toEqual(externalEntity.toDto());
       });
+
       it(`Should parse the file with totp - <${test.scenario}>`, async() => {
         expect.assertions(4);
 
@@ -228,7 +235,11 @@ describe("ImportResourcesService", () => {
 
         const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-        expect(secret1).toEqual("{\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+        if (test.metadataTypesSettings.default_resource_types === "v4") {
+          expect(secret1).toEqual("{\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+        } else {
+          expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+        }
 
         //Remove encrypted secrets checked previously
         delete importedResources[0]._secrets;
@@ -245,6 +256,7 @@ describe("ImportResourcesService", () => {
 
         expect(importedResources[0].toDto()).toEqual(externalEntity.toDto());
       });
+
       it(`Should parse the file with totp and description - <${test.scenario}>`, async() => {
         expect.assertions(4);
 
@@ -264,7 +276,11 @@ describe("ImportResourcesService", () => {
 
         const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-        expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+        if (test.metadataTypesSettings.default_resource_types === "v4") {
+          expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+        } else {
+          expect(secret1).toEqual("{\"object_type\":\"PASSBOLT_SECRET_DATA\",\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
+        }
 
         //Remove encrypted secrets checked previously
         delete importedResources[0]._secrets;
@@ -281,6 +297,7 @@ describe("ImportResourcesService", () => {
 
         expect(importedResources[0].toDto()).toEqual(externalEntity.toDto());
       });
+
       it("Should throw an error if the resource type cannot be found", async() => {
         expect.assertions(4);
 
@@ -539,45 +556,6 @@ describe("ImportResourcesService", () => {
       expect(error.sourceError).toBeInstanceOf(EntityValidationError);
       expect(error.sourceError.details).toHaveProperty("name");
       expect(result.importFolders.items[0].name).toEqual("import-ref");
-    });
-  });
-
-  describe("::buildCustomFieldSecretDto", () => {
-    it("Should build the custom field secret DTO", () => {
-      expect.assertions(1);
-
-      const customFieldsDto = defaultCustomFieldsCollection();
-      const importResourcesFile = {
-        customFields: new CustomFieldsCollection(customFieldsDto)
-      };
-      const result = importResourcesService.buildCustomFieldSecretDto(importResourcesFile);
-
-      expect(result).toEqual([
-        {id: customFieldsDto[0].id, type: "text", secret_value: customFieldsDto[0].secret_value},
-        {id: customFieldsDto[1].id, type: "text", secret_value: customFieldsDto[1].secret_value}
-      ]);
-    });
-
-    it("Should return an empty array if no custom fields", () => {
-      expect.assertions(1);
-
-      const importResourcesFile = {
-        customFields: null
-      };
-      const result = importResourcesService.buildCustomFieldSecretDto(importResourcesFile);
-
-      expect(result).toEqual([]);
-    });
-
-    it("Should handle empty custom fields collection", () => {
-      expect.assertions(1);
-
-      const importResourcesFile = {
-        customFields: new CustomFieldsCollection([])
-      };
-      const result = importResourcesService.buildCustomFieldSecretDto(importResourcesFile);
-
-      expect(result).toEqual([]);
     });
   });
 });

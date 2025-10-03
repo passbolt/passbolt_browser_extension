@@ -252,16 +252,16 @@ class ExternalResourceEntity extends EntityV2 {
    * return {Object}
    */
   toSecretDto(resourceType) {
-    // todo comment fallback
+    // if no resource type id is set, it means that the resource type is a password string.
     if (!this.resourceTypeId) {
       return this.secretClear;
     }
 
     const dto = {};
 
-    // Extract password if present.
-    if (this.secretClear) {
-      dto.password = this.secretClear;
+    // Extract password if present or is defined in the resource type.
+    if (this.secretClear || resourceType.hasPassword()) {
+      dto.password = this.secretClear || ""; // empty string is required to avoid crash at validation on certain resource type
     }
 
     // Extract description if present.
@@ -280,7 +280,7 @@ class ExternalResourceEntity extends EntityV2 {
     }
 
     if (resourceType.isV5()) {
-      dto.object_type = SECRET_DATA_OBJECT_TYPE
+      dto.object_type = SECRET_DATA_OBJECT_TYPE;
     }
 
     return dto;
@@ -538,8 +538,7 @@ class ExternalResourceEntity extends EntityV2 {
    * Note: Used when importing resources to keep only one version of the secrets, either encrypted in the secrets
    * collection, either decrypted as props.
    *
-   * Note 2: The whole custom fields props is reset, to re-evaluate when the custom field keys or values will also
-   * be available in the metadata.
+   * @todo: The custom fields secret should be reset but this is not possible to do now without a refactoring.
    */
   resetSecretProps(resourceType) {
     this.secretClear = "";
@@ -547,7 +546,7 @@ class ExternalResourceEntity extends EntityV2 {
     if (resourceType) {
       this.description = "";
       this.totp = null;
-      this.customFields = null;
+      // this.customFields = null;
     }
   }
 

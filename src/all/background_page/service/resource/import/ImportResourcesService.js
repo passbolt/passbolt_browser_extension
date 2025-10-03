@@ -131,7 +131,7 @@ class ImportResourcesService {
     let i = 0;
     const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
-    const resourceTypes = await this.resourceTypeModel.getOrFindAll()
+    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     for (const importResourceEntity of importResourcesFile.importResources) {
       i++;
       await this.progressService.finishStep(i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importResourcesFile.importResources.items.length}));
@@ -145,46 +145,6 @@ class ImportResourcesService {
       importResourceEntity.secrets = new ResourceSecretsCollection([secret]);
     }
   }
-
-  // /**
-  //  * Build the secret DTO.
-  //  * @param {ExternalResourceEntity} importResourcesFile The resource to import
-  //  * @returns {string|{password: string, description: *}}
-  //  * @private
-  //  */
-  // buildSecretDto(importResourcesFile) {
-  //   // @todo sloppy. If the resources types are present, we consider that by default the description should be encrypted.
-  //   if (importResourcesFile.resourceTypeId) {
-  //     const dto = {
-  //       password: importResourcesFile.secretClear || "",
-  //       description: importResourcesFile.description || "",
-  //       totp: importResourcesFile.totp || ""
-  //     };
-  //     // @todo sloppy. We remove the clear secret fields here, but it should be done at a parsing level.
-  //     importResourcesFile.secretClear = "";
-  //     importResourcesFile.description = "";
-  //     importResourcesFile.totp = null;
-  //     if (importResourcesFile.customFields) {
-  //       dto.custom_fields = this.buildCustomFieldSecretDto(importResourcesFile);
-  //     }
-  //     return dto;
-  //   }
-  //   return importResourcesFile.secretClear;
-  // }
-
-  // /**
-  //  * Build the custom field secret DTO.
-  //  * @param {ExternalResourceEntity} importResourcesFile The resource to import
-  //  * @returns {Object}
-  //  * @private
-  //  */
-  // buildCustomFieldSecretDto(importResourcesFile) {
-  //   const customFieldsDto = [];
-  //   importResourcesFile.customFields?.items?.forEach(customField => {
-  //     customFieldsDto.push(customField.toSecretDto());
-  //   });
-  //   return customFieldsDto;
-  // }
 
   /**
    * Import the folders.

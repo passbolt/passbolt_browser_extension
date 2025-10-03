@@ -19,6 +19,7 @@ import ResourcesTypeImportParser from "./resourcesTypeImportParser";
 import {ICON_TYPE_KEEPASS_ICON_SET} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 import {CUSTOM_FIELD_TYPE} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldEntity";
 import {v4 as uuidv4} from "uuid";
+import {RESOURCE_TYPE_VERSION_5} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 const KDBX_SUPPORTED_FIELDS = ['Title', 'URL', 'UserName', 'Notes', 'otp', 'TimeOtp-Secret-Base32', 'TimeOtp-Algorithm', 'TimeOtp-Length', 'TimeOtp-Period', 'Password'];
 
@@ -145,10 +146,13 @@ class ResourcesKdbxImportParser {
       this.parseUris(kdbxEntry, externalResourceDto);
       this.parseTotp(kdbxEntry, externalResourceDto);
 
+      if (this.metadataTypesSettings.defaultResourceTypes === RESOURCE_TYPE_VERSION_5) {
+        this.parseCustomFields(kdbxEntry, externalResourceDto);
+        this.parseIcon(kdbxEntry, externalResourceDto);
+      }
+
       const resourceType = this.getResourceType(externalResourceDto);
 
-      this.parseIcon(kdbxEntry, externalResourceDto, resourceType);
-      this.parseCustomFields(kdbxEntry, externalResourceDto, resourceType);
       //resourceType should never be empty to not block end user
       externalResourceDto.resource_type_id = resourceType.id;
 
@@ -191,16 +195,16 @@ class ResourcesKdbxImportParser {
 
     externalResourceDto.uris = additionalUris;
   }
+
   /**
    * Parse the icon of the kdbx entry
    * @param {kdbxweb.KdbxEntry} kdbxEntry
    * @param {ExternalResourceDto} externalResourceDto
-   * @param {ResourceTypeEntity} resourceType
    * @private
    * @returns {void}
    */
-  parseIcon(kdbxEntry, externalResourceDto, resourceType) {
-    if ((kdbxEntry.bgColor || kdbxEntry.icon) && resourceType.isV5()) {
+  parseIcon(kdbxEntry, externalResourceDto) {
+    if ((kdbxEntry.bgColor || kdbxEntry.icon)) {
       externalResourceDto.icon = {};
 
       if (kdbxEntry.icon) {
@@ -218,27 +222,25 @@ class ResourcesKdbxImportParser {
    * Parse the custom fields of the kdbx entry
    * @param {kdbxEntry} kdbxEntry
    * @param {ExternalResourceDto} externalResourceDto
-   * @param {ResourceTypeEntity} resourceType
    * @private
    * @returns {void}
    */
-  parseCustomFields(kdbxEntry, externalResourceDto, resourceType) {
-    if (resourceType.isV5()) {
-      const customFields = [];
-      kdbxEntry.fields.forEach((value, key) => {
-        if (!KDBX_SUPPORTED_FIELDS.includes(key) && !key.startsWith('KP2A_URL')) {
-          const customFieldValue = typeof value === 'string' ? value : value.getText();
-          customFields.push({
-            id: uuidv4(),
-            type: CUSTOM_FIELD_TYPE.TEXT,
-            metadata_key: key,
-            secret_value: customFieldValue
-          });
-        }
-      });
-      if (customFields.length > 0) {
-        externalResourceDto.custom_fields = customFields;
+  parseCustomFields(kdbxEntry, externalResourceDto) {
+    const customFields = [];
+    kdbxEntry.fields.forEach((value, key) => {
+      if (!KDBX_SUPPORTED_FIELDS.includes(key) && !key.startsWith('KP2A_URL')) {
+        const customFieldValue = typeof value === 'string' ? value : value.getText();
+        customFields.push({
+          id: uuidv4(),
+          type: CUSTOM_FIELD_TYPE.TEXT,
+          metadata_key: key,
+          secret_value: customFieldValue
+        });
       }
+    });
+
+    if (customFields.length > 0) {
+      externalResourceDto.custom_fields = customFields;
     }
   }
 
@@ -270,7 +272,6 @@ class ResourcesKdbxImportParser {
     this.resourceTypesCollection.filterByResourceTypeVersion(this.metadataTypesSettings.defaultResourceTypes);
 
     const scores = ResourcesTypeImportParser.getScores(externalResourceDto, this.resourceTypesCollection);
-
     let resourceType = ResourcesTypeImportParser.findMatchingResourceType(this.resourceTypesCollection, scores);
 
     if (resourceType) {

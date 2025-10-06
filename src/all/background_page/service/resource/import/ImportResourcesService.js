@@ -131,56 +131,18 @@ class ImportResourcesService {
     let i = 0;
     const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
-    for (const importResourcesEntity of importResourcesFile.importResources) {
+    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    for (const importResourceEntity of importResourcesFile.importResources) {
       i++;
       await this.progressService.finishStep(i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importResourcesFile.importResources.items.length}));
-      // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
-      const secretDto = this.buildSecretDto(importResourcesEntity);
-      const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourcesEntity.resourceTypeId, secretDto);
+      const resourceType = importResourceEntity.resourceTypeId ? resourceTypes.getFirstById(importResourceEntity.resourceTypeId) : null;
+      const secretDto = importResourceEntity.toSecretDto(resourceType);
+      importResourceEntity.resetSecretProps(resourceType); //
+      const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
       const data = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, [privateKey]);
       const secret = new SecretEntity({data: data});
-      importResourcesEntity.secrets = new ResourceSecretsCollection([secret]);
+      importResourceEntity.secrets = new ResourceSecretsCollection([secret]);
     }
-  }
-
-  /**
-   * Build the secret DTO.
-   * @param {ExternalResourceEntity} importResourcesFile The resource to import
-   * @returns {string|{password: string, description: *}}
-   * @private
-   */
-  buildSecretDto(importResourcesFile) {
-    // @todo sloppy. If the resources types are present, we consider that by default the description should be encrypted.
-    if (importResourcesFile.resourceTypeId) {
-      const dto = {
-        password: importResourcesFile.secretClear || "",
-        description: importResourcesFile.description || "",
-        totp: importResourcesFile.totp || ""
-      };
-      // @todo sloppy. We remove the clear secret fields here, but it should be done at a parsing level.
-      importResourcesFile.secretClear = "";
-      importResourcesFile.description = "";
-      importResourcesFile.totp = null;
-      if (importResourcesFile.customFields) {
-        dto.custom_fields = this.buildCustomFieldSecretDto(importResourcesFile);
-      }
-      return dto;
-    }
-    return importResourcesFile.secretClear;
-  }
-
-  /**
-   * Build the custom field secret DTO.
-   * @param {ExternalResourceEntity} importResourcesFile The resource to import
-   * @returns {Object}
-   * @private
-   */
-  buildCustomFieldSecretDto(importResourcesFile) {
-    const customFieldsDto = [];
-    importResourcesFile.customFields?.items?.forEach(customField => {
-      customFieldsDto.push(customField.toSecretDto());
-    });
-    return customFieldsDto;
   }
 
   /**

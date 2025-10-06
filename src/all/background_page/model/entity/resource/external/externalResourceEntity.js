@@ -526,7 +526,7 @@ class ExternalResourceEntity extends EntityV2 {
    * @returns {void}
    */
   set customFields(customFields) {
-    if (customFields === null) {
+    if (!customFields) {
       this._customFields = null;
       return;
     }

@@ -41,6 +41,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-45402 Add missing icon property to resource types schema definition
 - PB-45450 Fix account kit export with big private armored keys
 - PB-45458 Remove Organisation Settings max-width
+- PB-45733 Fix quickaccess resource creation with encrypted metadata
 
 ### Maintenance
 - PB-44253 Upgrade vulnerable library form-data

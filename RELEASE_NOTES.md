@@ -1,27 +1,24 @@
 Release song: https://www.youtube.com/watch?v=bu50DtPF1Ac
 
-Passbolt 5.6.0 is a feature release that brings standalone notes, shared metadata key rotation and resizable sidebars. This release comes as usual with security reinforcement by updating 3rd party libraries and other bug fixes.
+Passbolt 5.6.0 introduces standalone notes, shared metadata key rotation, and resizable sidebars. As usual, this version also brings important security hardening through dependency updates as well as a series of bug fixes and maintenance improvements.
 
 ## Standalone notes
 
-This new resource type allows user to create notes without any other attached elements (i.e. password). Import and export are updated to take into account this new resource type.
-Thus, imported resource with only a description will be set as standalone note.
+It is now possible to create notes as a standalone resource type, without attaching them to credentials or other elements. Import and export processes have been updated to recognize and support this new type. Any imported resources that contain only a description will now be created as standalone notes.
 
 ## Shared metadata key rotation
 
-Now shared metadata key can be rotated. This marks one of the final steps in the metadata encryption requirements. Administrators can, at anytime, rotate this key through the organisation settings while maintaining the Passbolt instance in a working state.
+Administrators can now rotate the shared metadata key at any time from the organization settings. This improvement marks one of the final steps in meeting metadata encryption requirements. The rotation process can be performed while the instance remains operational, so availability is not disrupted.
 
-## Resiable sidebars
+## Resizable sidebars
 
-On the resource workspance and the user workspace, the 2 sidebars are now resisable. This brings more customisation for users and helps readability (i.e for long folder names or folders in deep folder tree).
-After resizing a sidebar, a simple double click on the handle brings the sidebar to its default width.
+Both main workspace and Users & Groups workspace now feature sidebars that can be resized. This allows users to improve readability when working with long folder names or deeply nested folder structures. After resizing, a double-click on the sidebar handle resets it to its default width.
 
-## Miscellaneous
+## Miscellaneous Improvements
 
-Different bug fixes and maintainence update are into the party:
-- export of account kit is compatible with bigger private keys
-- group membership update process is updated to reduce request size and avoid some size limitations
-- folders name sort includes now natural number counting
+The export of account kits is now compatible with larger private keys. The group membership update process has been optimized to reduce request payload size and to avoid certain size limitations. Sorting of folder names has also been improved with natural number ordering, meaning for example that “folder2” now correctly appears before “folder10.”
+
+Many thanks to everyone who shared feedback, reported issues, and helped refine these features.
 
 ### Added
 - PB-39068 WP5-5.6 - Implement a Service RotateResourcesMetadataKeyService that proceed with the rotation of the key
@@ -59,6 +56,7 @@ Different bug fixes and maintainence update are into the party:
 - PB-45402 Add missing icon property to resource types schema definition
 - PB-45450 Fix account kit export with big private armored keys
 - PB-45458 Remove Organisation Settings max-width
+- PB-45733 Fix quickaccess resource creation with encrypted metadata
 
 ### Maintenance
 - PB-44253 Upgrade vulnerable library form-data

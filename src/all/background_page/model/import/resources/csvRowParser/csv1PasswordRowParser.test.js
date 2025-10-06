@@ -16,9 +16,10 @@ import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import BinaryConvert from "../../../../utils/format/binaryConvert";
 import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
+import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
 describe("Csv1PasswordRowParser", () => {
   it("can parse 1password csv", () => {
@@ -113,5 +114,43 @@ describe("Csv1PasswordRowParser", () => {
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+
+  it("parses resource of type standalone v5 notes with all properties from csv row", () => {
+    expect.assertions(3);
+
+    const data = {
+      "Title": "Password 1",
+      "Username": "Username 1",
+      "Url": "https://url1.com",
+      "Password": "",
+      "Notes": "Description 1",
+      "Type": ""
+    };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.Title,
+      username: data.Username,
+      uris: [data.Url],
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.Password,
+      description: data.Notes,
+      folder_parent_path: data.Type,
+    });
+
+    const externalResourceEntity = Csv1PasswordRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+    expect(externalResourceEntity.toSecretDto(expectedResourceType)).toEqual({description: 'Description 1', object_type: SECRET_DATA_OBJECT_TYPE});
   });
 });

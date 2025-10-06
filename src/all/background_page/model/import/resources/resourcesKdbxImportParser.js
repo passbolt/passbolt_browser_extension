@@ -146,6 +146,14 @@ class ResourcesKdbxImportParser {
       this.parseUris(kdbxEntry, externalResourceDto);
       this.parseTotp(kdbxEntry, externalResourceDto);
 
+      /*
+       * Parse v5 additional properties only if v5 is the default version for creation.
+       * This aligns with the default creation behavior in the UI, whether from the create menu
+       * or quick access, which both use the default version.
+       *
+       * Note: Parsing these fields could be performed regardless of the resource content,
+       * and the responsibility for parsing and handling the data could be separated.
+       */
       if (this.metadataTypesSettings.defaultResourceTypes === RESOURCE_TYPE_VERSION_5) {
         this.parseCustomFields(kdbxEntry, externalResourceDto);
         this.parseIcon(kdbxEntry, externalResourceDto);

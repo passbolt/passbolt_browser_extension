@@ -276,6 +276,7 @@ describe("ImportResourcesService", () => {
 
         const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
+        // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
         if (test.metadataTypesSettings.default_resource_types === "v4") {
           expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
         } else {
@@ -373,6 +374,7 @@ describe("ImportResourcesService", () => {
         expect(createdCollection).toEqual(expectedCollection);
       });
     });
+
     it(`Should not encrypt the metadata - <v4>`, async() => {
       expect.assertions(4);
       jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")

@@ -213,6 +213,7 @@ describe("ImportResourcesFileController", () => {
           const secret3 = await decryptSecret(importedResources[2].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
           const secret4 = await decryptSecret(importedResources[3].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
+          // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
           if (test.scenario === "default v4") {
             expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
             expect(secret2).toEqual("{\"password\":\"Secret 2\",\"description\":\"Description 2\"}");
@@ -298,7 +299,7 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
-          // @todo Sorry for the patch, the scenario need a deeper refactoring.
+          // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
           if (test.scenario === "default v4") {
             expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
           } else if (test.scenario === "default v5") {
@@ -340,7 +341,8 @@ describe("ImportResourcesFileController", () => {
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
-          // @todo Sorry for the patch, the scenario need a deeper refactoring.
+
+          // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
           if (test.scenario === "default v4") {
             expect(secret1).toEqual("{\"password\":\"Secret 1\",\"description\":\"Description 1\"}");
           } else if (test.scenario === "default v5") {
@@ -409,6 +411,7 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
+          // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
           if (test.resourceType !== RESOURCE_TYPE_V5_DEFAULT_SLUG) {
             expect(secret1).toEqual("{\"password\":\"Password 1\"}");
           } else {
@@ -485,6 +488,7 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
+          // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
           if (test.resourceType !== RESOURCE_TYPE_V5_DEFAULT_SLUG) {
             expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
           } else {
@@ -559,6 +563,7 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
+          // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
           if (test.resourceType !== RESOURCE_TYPE_V5_DEFAULT_SLUG) {
             expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
           } else {
@@ -624,6 +629,7 @@ describe("ImportResourcesFileController", () => {
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
           const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
+          // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
           if (test.resourceType !== RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG) {
             expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
           } else {

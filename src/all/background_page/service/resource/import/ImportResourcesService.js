@@ -135,7 +135,6 @@ class ImportResourcesService {
     for (const importResourceEntity of importResourcesFile.importResources) {
       i++;
       await this.progressService.finishStep(i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importResourcesFile.importResources.items.length}));
-      // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
       const resourceType = importResourceEntity.resourceTypeId ? resourceTypes.getFirstById(importResourceEntity.resourceTypeId) : null;
       const secretDto = importResourceEntity.toSecretDto(resourceType);
       importResourceEntity.resetSecretProps(resourceType); //

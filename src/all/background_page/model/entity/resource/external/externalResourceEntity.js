@@ -247,35 +247,37 @@ class ExternalResourceEntity extends EntityV2 {
 
   /**
    * Return a secret DTO.
+   *
    * The method will inject the object_type if the associated resource type is v5.
-   * @param {ResourceTypeEntity} resourceType The  associated resource type
-   * return {Object}
+   * @param {ResourceTypeEntity|null} [resourceType] The resource type to build the secret dto for. If not provided
+   *   it considers the resource to be a password string.
+   * return {Object|string} The secret dto, or a string in case of password string resource type.
    */
-  toSecretDto(resourceType) {
+  toSecretDto(resourceType = null) {
     // if no resource type id is set, it means that the resource type is a password string.
-    if (!this.resourceTypeId) {
+    if (!resourceType || resourceType.isPasswordString()) {
       return this.secretClear;
     }
 
     const dto = {};
 
     // Extract password if present or is defined in the resource type.
-    if (this.secretClear || resourceType.hasPassword()) {
+    if (typeof this.secretClear === 'string' && resourceType.hasPassword()) {
       dto.password = this.secretClear || ""; // empty string is required to avoid crash at validation on certain resource type
     }
 
     // Extract description if present.
-    if (this.description) {
+    if (this.description && resourceType.hasSecretDescription()) {
       dto.description = this.description;
     }
 
     // Extract totp dto if present.
-    if (this.totp) {
+    if (this.totp && resourceType.hasTotp()) {
       dto.totp = this.totp.toDto();
     }
 
     // Extract custom fields dto if present.
-    if (this.customFields) {
+    if (this.customFields && resourceType.hasCustomFields()) {
       dto.custom_fields = this.customFields.toSecretDto();
     }
 
@@ -542,11 +544,14 @@ class ExternalResourceEntity extends EntityV2 {
    */
   resetSecretProps(resourceType) {
     this.secretClear = "";
-    // todo dcouemnt password string reason
-    if (resourceType) {
+    this.totp = null;
+    // this.customFields = null;
+
+    /*
+     * In the case the resource is a password string, the description will be stored in the metadata.
+     */
+    if (resourceType && !resourceType?.isPasswordString()) {
       this.description = "";
-      this.totp = null;
-      // this.customFields = null;
     }
   }
 

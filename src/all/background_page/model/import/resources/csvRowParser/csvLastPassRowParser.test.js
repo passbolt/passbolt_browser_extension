@@ -16,9 +16,10 @@ import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entit
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG, RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
 import BinaryConvert from "../../../../utils/format/binaryConvert";
+import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
 describe("CsvLastPassRowParser", () => {
   it("can parse LastPass csv", () => {
@@ -201,5 +202,44 @@ describe("CsvLastPassRowParser", () => {
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+  it("parses resource of type standalone v5 notes with all properties from csv row", () => {
+    expect.assertions(3);
+
+    const data = {
+      "name": "Test site",
+      "username": "user1",
+      "url": "https://sitename",
+      "password": "",
+      "totp": "",
+      "extra": "notes",
+      "grouping": "(none)",
+      "fav": "0"
+    };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.username,
+      uris: [data.url],
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.password,
+      folder_parent_path: data.grouping,
+      description: "notes",
+    });
+
+    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+    expect(externalResourceEntity.toSecretDto(expectedResourceType)).toEqual({description: 'notes', object_type: SECRET_DATA_OBJECT_TYPE});
   });
 });

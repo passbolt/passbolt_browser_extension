@@ -137,7 +137,7 @@ describe("UpdateResourceTypesService", () => {
     });
 
     it("should call for the right service with the right arguments.", async() => {
-      expect.assertions(11);
+      expect.assertions(13);
       const resourceTypesDto = resourceTypesCollectionDto();
       for (let i = 0; i < resourceTypesDto.length; i += 2) {
         resourceTypesDto[i].deleted = "2025-02-24T09:00:00+00:00";
@@ -153,7 +153,7 @@ describe("UpdateResourceTypesService", () => {
       await service.updateAllDeletedStatus(resourcesTypesCollection);
 
       expect(service.resourceTypeService.delete).toHaveBeenCalledTimes(5);
-      expect(service.resourceTypeService.undelete).toHaveBeenCalledTimes(4);
+      expect(service.resourceTypeService.undelete).toHaveBeenCalledTimes(5);
 
       expect(service.resourceTypeService.delete).toHaveBeenCalledWith(resourceTypesDto[0].id);
       expect(service.resourceTypeService.undelete).toHaveBeenCalledWith(resourceTypesDto[1].id);
@@ -163,6 +163,8 @@ describe("UpdateResourceTypesService", () => {
       expect(service.resourceTypeService.undelete).toHaveBeenCalledWith(resourceTypesDto[5].id);
       expect(service.resourceTypeService.delete).toHaveBeenCalledWith(resourceTypesDto[6].id);
       expect(service.resourceTypeService.undelete).toHaveBeenCalledWith(resourceTypesDto[7].id);
+      expect(service.resourceTypeService.delete).toHaveBeenCalledWith(resourceTypesDto[8].id);
+      expect(service.resourceTypeService.undelete).toHaveBeenCalledWith(resourceTypesDto[9].id);
 
       expect(service.resourceTypeModel.updateLocalStorage).toHaveBeenCalledTimes(1);
     });

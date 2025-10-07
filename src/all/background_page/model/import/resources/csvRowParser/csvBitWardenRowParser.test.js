@@ -18,9 +18,10 @@ import {
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG, RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import BinaryConvert from "../../../../utils/format/binaryConvert";
 import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
+import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
 describe("CsvBitWardenRowParser", () => {
   it("can parse BitWarden csv", () => {
@@ -202,5 +203,44 @@ describe("CsvBitWardenRowParser", () => {
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type standalone v5 notes with all properties from csv row", () => {
+    expect.assertions(3);
+
+    const data = {
+      "name": "Password 1",
+      "login_username": "Username 1",
+      "login_uri": "https://url1.com",
+      "login_password": "",
+      "notes": "Description 1",
+      "folder": "Folder 1",
+      "login_totp": ""
+    };
+
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "csv",
+      "file": btoa(BinaryConvert.toBinary(data))
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG);
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.name,
+      username: data.login_username,
+      uris: [data.login_uri],
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.login_password,
+      description: data.notes,
+      folder_parent_path: data.folder,
+    });
+
+    const externalResourceEntity = CsvBitWardenRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+    expect(externalResourceEntity.toSecretDto(expectedResourceType)).toEqual({description: 'Description 1', object_type: SECRET_DATA_OBJECT_TYPE});
   });
 });

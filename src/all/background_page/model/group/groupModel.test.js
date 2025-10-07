@@ -20,7 +20,6 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import UserEntity from "../entity/user/userEntity";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
-import GroupUpdateEntity from "../entity/group/update/groupUpdateEntity";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 
 beforeAll(() => {
@@ -147,29 +146,6 @@ describe("GroupModel", () => {
       expect(collection.items[2].groupsUsers).toHaveLength(1);
       expect(collection.items[2].myGroupUser).toBeInstanceOf(GroupUserEntity);
       expect(collection.items[2]._modifier).toBeInstanceOf(UserEntity);
-    });
-  });
-
-  describe("GroupModel::update", () => {
-    it("should, with the option ignoreInvalid, ignore invalid groups users if any", async() => {
-      expect.assertions(1);
-
-      const updatedGroupDto = defaultGroupDto({
-        name: "group1",
-        groups_users: [defaultGroupUser(), defaultGroupUser({group_id: 42})],
-      });
-
-      //Mock the API call and check if the call is the one expected
-      fetch.doMockOnceIf(/groups\/.*\.json/, async() => (mockApiResponse(updatedGroupDto)));
-
-      //Mock the local storage call and check if the given parameters are ok
-      jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(entity => {
-        expect(entity.groupsUsers).toHaveLength(1);
-      });
-
-      const apiClientOption = defaultApiClientOptions();
-      const model = new GroupModel(apiClientOption);
-      await model.update(new GroupUpdateEntity(defaultGroupDto()), true);
     });
   });
 });

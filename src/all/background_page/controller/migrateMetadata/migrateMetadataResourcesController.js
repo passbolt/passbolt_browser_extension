@@ -31,7 +31,7 @@ export default class MigrateMetadataResourcesController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.progressService = new ProgressService(worker, "Migrating metadata");
+    this.progressService = new ProgressService(worker, i18n.t("Migrating metadata"));
     this.migrateMetadataResourcesService = new MigrateMetadataResourcesService(apiClientOptions, account, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
   }

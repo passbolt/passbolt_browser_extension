@@ -25,6 +25,7 @@ import SaveSessionKeysService from "../sessionKey/saveSessionKeysService";
 import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
+import Logger from "passbolt-styleguide/src/shared/utils/logger";
 
 class DecryptMetadataService {
   /**
@@ -94,11 +95,13 @@ class DecryptMetadataService {
           await this.decryptMetadataWithSessionKey(entity, sessionKey.sessionKey);
         } catch (error) {
           sessionKeys.items.splice(i, 1);
-          console.debug(`Metadata of the entity "${sessionKey.foreignModel}:${sessionKey.foreignId}" cannot be decrypted with session key.`, {cause: error});
+          const errorMessage = `Unable to decrypt the metadata of the entity ${sessionKey?.foreignModel}:${sessionKey?.foreignId} with the session key.`;
+          Logger.error(new Error(errorMessage, {cause: error}));
         }
       }
     } catch (error) {
-      console.warn("An unexpected error occurred when decrypting the metadata with the session keys.", {cause: error});
+      const errorMessage = "Unable to decrypt the metadata of the entities using the session key.";
+      Logger.error(new Error(errorMessage, {cause: error}));
     }
 
     return sessionKeys;
@@ -148,7 +151,7 @@ class DecryptMetadataService {
     for (const entity of filteredCollection) {
       try {
         const metadataDecryptedPrivateKey = metadataOpenPgpPrivateKeys[entity.metadataKeyId]
-          || (metadataOpenPgpPrivateKeys[entity.metadataKeyId] = await this.getAndReadMetadataPrivateKey(entity, metadataKeys, options));
+          || (metadataOpenPgpPrivateKeys[entity.metadataKeyId] = await this.getAndReadMetadataPrivateKey(entity, metadataKeys));
 
         const openpgpMessage = await this.decryptMetadataWithGpgKey(entity, metadataDecryptedPrivateKey);
         sessionKeysDtos.push(this.extractSessionKeyDtoForEntity(entity, openpgpMessage));
@@ -319,7 +322,7 @@ class DecryptMetadataService {
     if (!options.ignoreDecryptionError) {
       throw error;
     }
-    console.error(error);
+    Logger.error(error);
   }
 
   /**
@@ -344,8 +347,9 @@ class DecryptMetadataService {
 
       sessionKeys.pushMany(newSessionKeys, {ignoreInvalidEntity: true});
       await this.saveSessionKeysService.save(sessionKeys, passphrase);
-    } catch (error) {
-      console.warn("Unable to save the metadata session keys.", {cause: error});
+    } catch (causeError) {
+      const error = new Error("Unable to save the metadata session keys.", {cause: causeError});
+      Logger.error(error);
     }
   }
 }

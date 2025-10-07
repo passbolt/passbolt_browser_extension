@@ -47,7 +47,7 @@ export default class ShareMetadataKeyPrivateService {
   /**
    * Share missing metadata keys with an expected user.
    * @param {string} userId The user id.
-   * @param {passphrase} passphrase The logged user passphrase.
+   * @param {string} passphrase The logged user passphrase.
    * @return {Promise<void>}
    * @throws {Error} if the userId parameter is not uuid
    * @throws {Error} if the passphrase parameter is not a string

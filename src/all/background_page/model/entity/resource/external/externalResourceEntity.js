@@ -20,6 +20,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import {assertType} from "../../../../utils/assertions";
 import IconEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
+import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
 const DEFAULT_RESOURCE_NAME = '(no name)';
 const RESOURCE_URI_MAX_LENGTH = 1024;
@@ -242,6 +243,49 @@ class ExternalResourceEntity extends EntityV2 {
     }
 
     return data;
+  }
+
+  /**
+   * Return a secret DTO.
+   *
+   * The method will inject the object_type if the associated resource type is v5.
+   * @param {ResourceTypeEntity|null} [resourceType] The resource type to build the secret dto for. If not provided
+   *   it considers the resource to be a password string.
+   * return {Object|string} The secret dto, or a string in case of password string resource type.
+   */
+  toSecretDto(resourceType = null) {
+    // if no resource type id is set, it means that the resource type is a password string.
+    if (!resourceType || resourceType.isPasswordString()) {
+      return this.secretClear;
+    }
+
+    const dto = {};
+
+    // Extract password if present or is defined in the resource type.
+    if (typeof this.secretClear === 'string' && resourceType.hasPassword()) {
+      dto.password = this.secretClear || ""; // empty string is required to avoid crash at validation on certain resource type
+    }
+
+    // Extract description if present.
+    if (this.description && resourceType.hasSecretDescription()) {
+      dto.description = this.description;
+    }
+
+    // Extract totp dto if present.
+    if (this.totp && resourceType.hasTotp()) {
+      dto.totp = this.totp.toDto();
+    }
+
+    // Extract custom fields dto if present.
+    if (this.customFields && resourceType.hasCustomFields()) {
+      dto.custom_fields = this.customFields.toSecretDto();
+    }
+
+    if (resourceType.isV5()) {
+      dto.object_type = SECRET_DATA_OBJECT_TYPE;
+    }
+
+    return dto;
   }
 
   /*
@@ -478,12 +522,37 @@ class ExternalResourceEntity extends EntityV2 {
 
   /**
    * Set the custom fields
-   * @param {CustomFieldsCollection} customFields the custom fields collection to us
+   * @param {CustomFieldsCollection|null} customFields the custom fields collection to us
    * @returns {void}
    */
   set customFields(customFields) {
+    if (!customFields) {
+      this._customFields = null;
+      return;
+    }
     assertType(customFields, CustomFieldsCollection);
     this._customFields = customFields;
+  }
+
+  /**
+   * Reset all secret props.
+   *
+   * Note: Used when importing resources to keep only one version of the secrets, either encrypted in the secrets
+   * collection, either decrypted as props.
+   *
+   * @todo: The custom fields secret should be reset but this is not possible to do now without a refactoring.
+   */
+  resetSecretProps(resourceType) {
+    this.secretClear = "";
+    this.totp = null;
+    // this.customFields = null;
+
+    /*
+     * In the case the resource is a password string, the description will be stored in the metadata.
+     */
+    if (resourceType && !resourceType?.isPasswordString()) {
+      this.description = "";
+    }
   }
 
   /*

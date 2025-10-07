@@ -14,6 +14,7 @@ import ExternalResourceEntity from "../../../entity/resource/external/externalRe
 import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
 import ImportError from "../../../../error/importError";
+import ExternalTotpEntity from "../../../entity/totp/externalTotpEntity";
 
 class CsvLastPassRowParser extends AbstractCsvRowParser {
   /**
@@ -45,10 +46,14 @@ class CsvLastPassRowParser extends AbstractCsvRowParser {
     const externalResourceDto = {};
 
     for (const propertyName in this.mapping) {
-      if (propertyName === "uris") {
-        externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
-      } else if (data[this.mapping[propertyName]]) {
-        externalResourceDto[propertyName] = data[this.mapping[propertyName]];
+      if (data[this.mapping[propertyName]]) {
+        if (propertyName === "uris") {
+          externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+        } else if (propertyName.toLowerCase() === "totp") {
+          externalResourceDto.totp = this.parseTotp(data[this.mapping[propertyName]]);
+        } else {
+          externalResourceDto[propertyName] = data[this.mapping[propertyName]];
+        }
       }
     }
 
@@ -71,6 +76,16 @@ class CsvLastPassRowParser extends AbstractCsvRowParser {
     externalResourceDto.resource_type_id = resourceType.id;
 
     return new ExternalResourceEntity(externalResourceDto);
+  }
+
+  /**
+   * Parse the TOTP
+   * @param {string} totpValue The TOTP value from LastPass should be a base 32 secret key.
+   * @return {{secret_key: *, period: *, digits: *, algorithm: *}}
+   */
+  static parseTotp(totpValue) {
+    const totp = ExternalTotpEntity.createTotpFromLastpassCSV(totpValue);
+    return totp.toDto();
   }
 }
 

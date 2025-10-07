@@ -1,6 +1,6 @@
 {
   "name": "passbolt-browser-extension",
-  "version": "5.5.1",
+  "version": "5.6.0",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2025 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -14,7 +14,7 @@
     "await-lock": "^2.1.0",
     "downloadjs": "^1.4.7",
     "eckey-utils": "^0.7.14",
-    "i18next": "^23.7.16",
+    "i18next": "23.15.2",
     "i18next-http-backend": "^2.4.2",
     "ip-regex": "^5.0.0",
     "jssha": "~3.3.1",
@@ -22,7 +22,7 @@
     "locutus": "~2.0.9",
     "openpgp": "^6.1.1",
     "papaparse": "^5.5.2",
-    "passbolt-styleguide": "^v5.5.2",
+    "passbolt-styleguide": "^5.6.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
@@ -65,18 +65,17 @@
     "lockfile-lint": "^4.14.1",
     "text-encoding-utf-8": "^1.0.2",
     "uuid": "^8.3.2",
-    "web-ext": "^8.0.0",
+    "web-ext": "^8.10.0",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
   },
   "overrides": {
-    "image-size": "^2.0.2",
+    "addons-linter": "^8.0.0",
     "i18next-parser": {
-      "cheerio": {
-        "undici": "6.21.2"
-      }
+      "cheerio": "1.1.2"
     },
-    "brace-expansion": "^1.1.12"
+    "brace-expansion": "^1.1.12",
+    "browserslist": "4.26.2"
   },
   "scripts": {
     "build": "npx grunt build",

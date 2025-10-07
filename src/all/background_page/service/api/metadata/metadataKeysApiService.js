@@ -12,7 +12,7 @@
  * @since         v4.10.0
  */
 
-import {assertType} from "../../../utils/assertions";
+import {assertType, assertUuid} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 
@@ -86,6 +86,33 @@ class MetadataKeysApiService extends AbstractService {
       return [];
     }
 
+    return response.body;
+  }
+
+  /**
+   * Soft delete a metadata key using Passbolt API
+   *
+   * @param {string} metadataKeyId uuid
+   * @returns {Promise<*>} Response body
+   * @throws {TypeError} if metadataKeyId is not a valid uuid
+   * @public
+   */
+  async delete(metadataKeyId) {
+    assertUuid(metadataKeyId);
+    const response = await this.apiClient.delete(metadataKeyId);
+    return response.body;
+  }
+
+  /**
+   * Update a metadata key
+   * @param {string} metadataKeyId The metadata key id
+   * @param {MetadataKeyEntity} metadataKey The metadata key to update
+   * @return {Promise<*>}
+   */
+  async update(metadataKeyId, metadataKey) {
+    assertUuid(metadataKeyId);
+    assertType(metadataKey, MetadataKeyEntity);
+    const response = await this.apiClient.update(metadataKeyId, metadataKey.toDto());
     return response.body;
   }
 }

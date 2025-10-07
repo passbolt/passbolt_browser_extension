@@ -26,6 +26,21 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
 import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
 import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
+import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {
+  RESOURCE_TYPE_PASSWORD_STRING_SLUG,
+  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+  RESOURCE_TYPE_TOTP_SLUG,
+  RESOURCE_TYPE_V5_DEFAULT_SLUG,
+  RESOURCE_TYPE_V5_PASSWORD_STRING_SLUG,
+  RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
+  RESOURCE_TYPE_V5_TOTP_SLUG,
+  RESOURCE_TYPE_V5_CUSTOM_FIELDS_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition.js";
+import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
 describe("ExternalResourceEntity", () => {
   describe("::getSchema", () => {
@@ -334,6 +349,230 @@ describe("ExternalResourceEntity", () => {
     });
   });
 
+  describe("::toSecretDto", () => {
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+    it("builds a secret dto for a password string resource type (when not resource type is provided).", () => {
+      expect.assertions(1);
+
+      const dto = minimalExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+
+      const secretDto = entity.toSecretDto();
+      expect(secretDto).toStrictEqual(dto.secret_clear);
+    });
+
+    it("builds a secret dto for a password string resource type.", () => {
+      expect.assertions(1);
+
+      const dto = minimalExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_PASSWORD_STRING_SLUG);
+
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(secretDto).toStrictEqual(dto.secret_clear);
+    });
+
+    it("builds a secret dto for a v4 password with encrypted description.", () => {
+      expect.assertions(5);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
+
+      // Variation with populated description
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(2);
+      expect(secretDto.password).toStrictEqual(dto.secret_clear);
+      expect(secretDto.description).toStrictEqual(dto.description);
+
+      // Variation with no description
+      const dto2 = defaultExternalResourceDto();
+      delete dto2.description;
+      const entity2 = new ExternalResourceEntity(dto2);
+      const secret2Dto = entity2.toSecretDto(resourceType);
+      expect(Object.keys(secret2Dto).length).toStrictEqual(1);
+      expect(secret2Dto.password).toStrictEqual(dto2.secret_clear);
+    });
+
+    it("builds a secret dto for a v4 password with totp.", () => {
+      expect.assertions(7);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
+
+      // Variation with populated description
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(3);
+      expect(secretDto.password).toStrictEqual(dto.secret_clear);
+      expect(secretDto.description).toStrictEqual(dto.description);
+      expect(secretDto.totp).toStrictEqual(dto.totp);
+
+      // Variation with no description
+      const dto2 = defaultExternalResourceDto();
+      delete dto2.description;
+      const entity2 = new ExternalResourceEntity(dto2);
+      const secret2Dto = entity2.toSecretDto(resourceType);
+      expect(Object.keys(secret2Dto).length).toStrictEqual(2);
+      expect(secret2Dto.password).toStrictEqual(dto2.secret_clear);
+      expect(secret2Dto.totp).toStrictEqual(dto2.totp);
+    });
+
+    it("builds a secret dto for a v4 totp.", () => {
+      expect.assertions(2);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_TOTP_SLUG);
+
+      // Variation with populated description
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(1);
+      expect(secretDto.totp).toStrictEqual(dto.totp);
+    });
+
+    it("builds a secret dto for a v5 password string resource type.", () => {
+      expect.assertions(1);
+
+      const dto = minimalExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_PASSWORD_STRING_SLUG);
+
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(secretDto).toStrictEqual(dto.secret_clear);
+    });
+
+    it("builds a secret dto for a v5 password with encrypted description.", () => {
+      expect.assertions(12);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+
+      // Variation with populated description & custom fields
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(4);
+      expect(secretDto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secretDto.password).toStrictEqual(dto.secret_clear);
+      expect(secretDto.description).toStrictEqual(dto.description);
+      const expectedCustomFieldsDto = JSON.parse(JSON.stringify(dto.custom_fields));
+      // Remove metadata information from expected custom fields dto.
+      delete expectedCustomFieldsDto[0].metadata_key;
+      delete expectedCustomFieldsDto[1].metadata_key;
+      expect(secretDto.custom_fields).toStrictEqual(expectedCustomFieldsDto);
+
+      // Variation with populated description & empty custom fields
+      const dto2 = defaultExternalResourceDto();
+      delete dto2.custom_fields;
+      const entity2 = new ExternalResourceEntity(dto2);
+      const secret2Dto = entity2.toSecretDto(resourceType);
+      expect(Object.keys(secret2Dto).length).toStrictEqual(3);
+      expect(secret2Dto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secret2Dto.password).toStrictEqual(dto2.secret_clear);
+      expect(secret2Dto.description).toStrictEqual(dto2.description);
+
+      // Variation with empty description & empty custom fields
+      const dto3 = defaultExternalResourceDto();
+      delete dto3.custom_fields;
+      delete dto3.description;
+      const entity3 = new ExternalResourceEntity(dto3);
+      const secret3Dto = entity3.toSecretDto(resourceType);
+      expect(Object.keys(secret3Dto).length).toStrictEqual(2);
+      expect(secret3Dto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secret3Dto.password).toStrictEqual(dto3.secret_clear);
+    });
+
+    it("builds a secret dto for a v5 password with totp.", () => {
+      expect.assertions(15);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
+
+      // Variation with populated description & custom fields
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(5);
+      expect(secretDto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secretDto.password).toStrictEqual(dto.secret_clear);
+      expect(secretDto.totp).toStrictEqual(dto.totp);
+      expect(secretDto.description).toStrictEqual(dto.description);
+      const expectedCustomFieldsDto = JSON.parse(JSON.stringify(dto.custom_fields));
+      // Remove metadata information from expected custom fields dto.
+      delete expectedCustomFieldsDto[0].metadata_key;
+      delete expectedCustomFieldsDto[1].metadata_key;
+      expect(secretDto.custom_fields).toStrictEqual(expectedCustomFieldsDto);
+
+      // Variation with populated description & empty custom fields
+      const dto2 = defaultExternalResourceDto();
+      delete dto2.custom_fields;
+      const entity2 = new ExternalResourceEntity(dto2);
+      const secret2Dto = entity2.toSecretDto(resourceType);
+      expect(Object.keys(secret2Dto).length).toStrictEqual(4);
+      expect(secret2Dto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secret2Dto.password).toStrictEqual(dto2.secret_clear);
+      expect(secret2Dto.totp).toStrictEqual(dto.totp);
+      expect(secret2Dto.description).toStrictEqual(dto2.description);
+
+      // Variation with empty description & empty custom fields
+      const dto3 = defaultExternalResourceDto();
+      delete dto3.custom_fields;
+      delete dto3.description;
+      const entity3 = new ExternalResourceEntity(dto3);
+      const secret3Dto = entity3.toSecretDto(resourceType);
+      expect(Object.keys(secret3Dto).length).toStrictEqual(3);
+      expect(secret3Dto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secret3Dto.password).toStrictEqual(dto3.secret_clear);
+      expect(secret3Dto.totp).toStrictEqual(dto.totp);
+    });
+
+    it("builds a secret dto for a v5 totp.", () => {
+      expect.assertions(3);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_TOTP_SLUG);
+
+      // Variation with populated description
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(2);
+      expect(secretDto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secretDto.totp).toStrictEqual(dto.totp);
+    });
+
+    it("builds a secret dto for a v5 custom fields.", () => {
+      expect.assertions(3);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_CUSTOM_FIELDS_SLUG);
+
+      // Variation with populated description
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(2);
+      expect(secretDto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      const expectedCustomFieldsDto = JSON.parse(JSON.stringify(dto.custom_fields));
+      // Remove metadata information from expected custom fields dto.
+      delete expectedCustomFieldsDto[0].metadata_key;
+      delete expectedCustomFieldsDto[1].metadata_key;
+      expect(secretDto.custom_fields).toStrictEqual(expectedCustomFieldsDto);
+    });
+
+    it("builds a secret dto for a v5 note.", () => {
+      expect.assertions(3);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG);
+
+      // Variation with populated description
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(2);
+      expect(secretDto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secretDto.description).toStrictEqual(dto.description);
+    });
+  });
+
   describe("::getters", () => {
     it("should provide the right values when everything is set", () => {
       expect.assertions(12);
@@ -466,6 +705,77 @@ describe("ExternalResourceEntity", () => {
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
       expect(() => { entity.customFields = defaultCustomFieldsCollection(); }).toThrow(TypeError);
+    });
+  });
+
+  describe("::resetSecretProps", () => {
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+    it("resets secrets for a password string resource type (when resource type is not given).", () => {
+      expect.assertions(2);
+
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+
+      entity.resetSecretProps();
+      expect(entity.secretClear).toStrictEqual("");
+      expect(entity.description).toStrictEqual(dto.description);
+    });
+
+    it("resets secrets for a v4 password string resource type.", () => {
+      expect.assertions(2);
+
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_PASSWORD_STRING_SLUG);
+      entity.resetSecretProps(resourceType);
+      expect(entity.secretClear).toStrictEqual("");
+      expect(entity.description).toStrictEqual(dto.description);
+    });
+
+    it("resets secrets for a v5 password string resource type.", () => {
+      expect.assertions(2);
+
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_PASSWORD_STRING_SLUG);
+      entity.resetSecretProps(resourceType);
+      expect(entity.secretClear).toStrictEqual("");
+      expect(entity.description).toStrictEqual(dto.description);
+    });
+
+    it("resets secret notes.", () => {
+      expect.assertions(2);
+
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+      entity.resetSecretProps(resourceType);
+      expect(entity.secretClear).toStrictEqual("");
+      expect(entity.description).toBeNull();
+    });
+
+    it("resets secret totp.", () => {
+      expect.assertions(1);
+
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_TOTP_SLUG);
+      entity.resetSecretProps(resourceType);
+      expect(entity.totp).toBeNull();
+    });
+
+    /**
+     * Skip for now, the reset should reset only secret custom fields part.
+     */
+    it.skip("resets secret custom fields.", () => {
+      expect.assertions(1);
+
+      const dto = defaultExternalResourceDto();
+      const entity = new ExternalResourceEntity(dto);
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_CUSTOM_FIELDS_SLUG);
+      entity.resetSecretProps(resourceType);
+      // expect(entity.customFields).toBeNull();
     });
   });
 });

@@ -463,7 +463,7 @@ describe("ResourcesKdbxImportParser", () => {
     expect(importEntity.importResources.items).toHaveLength(1);
     expect(importEntity.importResources.items[0].customFields).toHaveLength(1);
     expect(importEntity.importResources.items[0].uris).toHaveLength(1);
-    expect(importEntity.importResourcesErrors).toHaveLength(1);
+    expect(importEntity.importResourcesErrors).toHaveLength(0);
   });
 
   it("should not import custom fields  if the default is v4", async() => {

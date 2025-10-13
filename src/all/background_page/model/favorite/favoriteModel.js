@@ -12,7 +12,7 @@
  * @since         3.0.0
  */
 import ResourceModel from "../../model/resource/resourceModel";
-import FavoriteService from "../../service/api/favorite/favoriteService";
+import FavoriteApiService from "../../service/api/favorite/favoriteApiService";
 import FavoriteEntity from "../entity/favorite/favoriteEntity";
 
 
@@ -25,7 +25,7 @@ class FavoriteModel {
    * @public
    */
   constructor(apiClientOptions, account) {
-    this.favoriteService = new FavoriteService(apiClientOptions);
+    this.favoriteApiService = new FavoriteApiService(apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
   }
 
@@ -37,7 +37,7 @@ class FavoriteModel {
    */
   async addResourceToFavorite(resourceId) {
     const foreignKey = 'Resource';
-    const favoriteDto = await this.favoriteService.create(foreignKey, resourceId);
+    const favoriteDto = await this.favoriteApiService.create(foreignKey, resourceId);
     const favoriteEntity = new FavoriteEntity(favoriteDto);
     await this.resourceModel.updateFavoriteLocally(resourceId, favoriteEntity);
     return favoriteEntity;
@@ -54,7 +54,7 @@ class FavoriteModel {
     if (!resourceEntity.favorite) {
       return; // already deleted or not finished added...
     }
-    await this.favoriteService.delete(resourceEntity.favorite.id);
+    await this.favoriteApiService.delete(resourceEntity.favorite.id);
     await this.resourceModel.updateFavoriteLocally(resourceId, null);
   }
 }

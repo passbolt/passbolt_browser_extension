@@ -80,7 +80,7 @@ class FavoriteService extends AbstractService {
       throw new TypeError(`Favorite foreign model should be a valid string.`);
     }
     if (!FavoriteEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
-      throw new TypeError(`Favorite foreign model ${foreignModel} in not in the list of supported models.`);
+      throw new TypeError(`Favorite foreign model '${foreignModel}' is not in the list of supported models.`);
     }
   }
 }

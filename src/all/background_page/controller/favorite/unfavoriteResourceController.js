@@ -26,9 +26,7 @@ class UnfavoriteResourceController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.apiClientOptions = apiClientOptions;
-    this.account = account;
-    this.favoriteResourceService =  new FavoriteResourceService(this.apiClientOptions, this.account);
+    this.favoriteResourceService =  new FavoriteResourceService(apiClientOptions, account);
   }
 
   /**
@@ -47,7 +45,7 @@ class UnfavoriteResourceController {
 
   /**
    * Unmark a resource as favorite.
-   * @param resourceId {uuid} The resource id
+   * @param {uuid} resourceId  The resource id
    * @returns {Promise<void>}
    */
   async exec(resourceId) {

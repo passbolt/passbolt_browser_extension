@@ -20,15 +20,13 @@ class FavoriteResourceController {
    * @constructor
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {AccountEntity} account the user account
    * @param {ApiClientOptions} apiClientOptions The api client options
+   * @param {AccountEntity} account the user account
    */
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.apiClientOptions = apiClientOptions;
-    this.account = account;
-    this.favoriteResourceService =  new FavoriteResourceService(this.apiClientOptions, this.account);
+    this.favoriteResourceService =  new FavoriteResourceService(apiClientOptions, account);
   }
 
   /**
@@ -47,7 +45,7 @@ class FavoriteResourceController {
 
   /**
    * Mark a resource as favorite.
-   * @param resourceId {uuid} The resource id
+   * @param {uuid} resourceId The resource id
    * @returns {Promise<FavoriteEntity>}
    */
   async exec(resourceId) {

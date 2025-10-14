@@ -76,6 +76,7 @@ class SsoLoginUrlEntity extends Entity {
     try {
       url = new URL(value);
     } catch (error) {
+      console.error(error);
       throw new Error('The url should be a valid url.');
     }
 

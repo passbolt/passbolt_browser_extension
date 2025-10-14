@@ -37,6 +37,7 @@ class ParseAccountRecoveryUrlService {
     try {
       new URL(domain);
     } catch (error) {
+      console.error(error);
       throw new Error('Cannot parse account recovery url. The domain is not valid.');
     }
 
@@ -53,6 +54,7 @@ class ParseAccountRecoveryUrlService {
       this.parse(url);
       return true;
     } catch (error) {
+      console.error(error);
       return false;
     }
   }

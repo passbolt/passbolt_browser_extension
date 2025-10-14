@@ -36,6 +36,7 @@ const readKeyOrFail = async armoredKey => {
   try {
     return await openpgp.readKey({armoredKey: armoredKey});
   } catch (error) {
+    console.error(error);
     throw new Error(i18n.t("The key should be a valid openpgp armored key string."));
   }
 };
@@ -119,6 +120,7 @@ const readMessageOrFail = async message => {
   try {
     return await openpgp.readMessage({armoredMessage: message});
   } catch (error) {
+    console.error(error);
     throw new Error(i18n.t("The message should be a valid openpgp message."));
   }
 };
@@ -138,6 +140,7 @@ const readClearMessageOrFail = async cleartextMessage => {
   try {
     return await openpgp.readCleartextMessage({cleartextMessage});
   } catch (error) {
+    console.error(error);
     throw new Error(i18n.t("The message should be a valid openpgp message."));
   }
 };

@@ -155,6 +155,7 @@ class FoldersCollection extends EntityV2Collection {
       try {
         outputCollection.pushMany(children);
       } catch (error) {
+        console.error(error);
         /*
          * children are already in collection
          * skip...
@@ -248,7 +249,7 @@ class FoldersCollection extends EntityV2Collection {
     for (const folder of foldersCollection) {
       try {
         this.push(folder);
-      } catch (error) {}
+      } catch {}
     }
     return this;
   }

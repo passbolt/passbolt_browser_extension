@@ -44,6 +44,7 @@ const checkAndProcessIfUserAuthenticated = async() => {
     const checkAuthStatusService = new CheckAuthStatusService();
     authStatus = await checkAuthStatusService.checkAuthStatus(true);
   } catch (error) {
+    console.error(error);
     // Service is unavailable, do nothing...
     Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
     return;

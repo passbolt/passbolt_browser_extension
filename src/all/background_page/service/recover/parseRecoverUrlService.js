@@ -36,6 +36,7 @@ class ParseRecoverUrlService {
     try {
       new URL(domain);
     } catch (error) {
+      console.error(error);
       throw new Error('The domain is not valid.');
     }
 
@@ -61,6 +62,7 @@ class ParseRecoverUrlService {
       this.parse(url);
       return true;
     } catch (error) {
+      console.error(error);
       return false;
     }
   }

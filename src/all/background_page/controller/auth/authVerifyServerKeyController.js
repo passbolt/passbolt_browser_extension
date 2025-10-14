@@ -100,6 +100,7 @@ class AuthVerifyServerKeyController {
           error = new KeyIsExpiredError(i18n.t('The server key is expired.'));
         }
       } catch (e) {
+        console.error(e);
         // Cannot ask for old server key, maybe server is misconfigured
         error = new Error(i18n.t('Server internal error. Check with your administrator.'));
       }
@@ -117,6 +118,7 @@ class AuthVerifyServerKeyController {
     try {
       await OpenpgpAssertion.readKeyOrFail(this.account.serverPublicArmoredKey);
     } catch (error) {
+      console.error(error);
       return false;
     }
     return true;

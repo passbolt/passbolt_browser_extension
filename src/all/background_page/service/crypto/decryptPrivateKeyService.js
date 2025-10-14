@@ -37,6 +37,7 @@ class DecryptPrivateKeyService {
         passphrase: passphrase
       }));
     } catch (error) {
+      console.error(error);
       throw new InvalidMasterPasswordError();
     }
   }

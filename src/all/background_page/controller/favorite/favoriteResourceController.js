@@ -13,6 +13,7 @@
  */
 
 import FavoriteResourceService from "../../service/favorite/favoriteResourceService";
+import {assertUuid} from "../../utils/assertions";
 
 class FavoriteResourceController {
   /**
@@ -27,6 +28,7 @@ class FavoriteResourceController {
     this.requestId = requestId;
     this.apiClientOptions = apiClientOptions;
     this.account = account;
+    this.favoriteResourceService =  new FavoriteResourceService(this.apiClientOptions, this.account);
   }
 
   /**
@@ -49,8 +51,8 @@ class FavoriteResourceController {
    * @returns {Promise<FavoriteEntity>}
    */
   async exec(resourceId) {
-    const favoriteResourceService =  new FavoriteResourceService(this.apiClientOptions, this.account);
-    return await favoriteResourceService.addResourceToFavorite(resourceId);
+    assertUuid(resourceId);
+    return await this.favoriteResourceService.addResourceToFavorite(resourceId);
   }
 }
 

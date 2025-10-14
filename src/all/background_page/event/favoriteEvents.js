@@ -4,7 +4,8 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import FavoriteModel from "../model/favorite/favoriteModel";
+
+import FavoriteResourceService from "../service/favorite/favoriteResourceService";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -16,8 +17,8 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.favorite.add', async(requestId, resourceId) => {
     try {
-      const favoriteModel = new FavoriteModel(apiClientOptions, account);
-      const favoriteEntity = await favoriteModel.addResourceToFavorite(resourceId);
+      const favoriteResourceService =  new FavoriteResourceService(apiClientOptions, account);
+      const favoriteEntity = await favoriteResourceService.addResourceToFavorite(resourceId);
       worker.port.emit(requestId, 'SUCCESS', favoriteEntity);
     } catch (error) {
       console.error(error);
@@ -34,8 +35,8 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.favorite.delete', async(requestId, resourceId) => {
     try {
-      const favoriteModel = new FavoriteModel(apiClientOptions, account);
-      await favoriteModel.removeResourceFromFavorite(resourceId);
+      const favoriteResourceService =  new FavoriteResourceService(apiClientOptions, account);
+      await favoriteResourceService.removeResourceFromFavorite(resourceId);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

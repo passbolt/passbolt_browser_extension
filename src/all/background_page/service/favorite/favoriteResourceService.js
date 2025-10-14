@@ -9,14 +9,17 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.0.0
+ * @since         5.7.0
  */
+
+import FavoriteEntity from "../../model/entity/favorite/favoriteEntity";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import ResourceModel from "../../model/resource/resourceModel";
 import FavoriteApiService from "../../service/api/favorite/favoriteApiService";
-import FavoriteEntity from "../entity/favorite/favoriteEntity";
+import {assertType, assertUuid} from "../../utils/assertions";
+import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 
-
-class FavoriteModel {
+export default class FavoriteResourceService {
   /**
    * Constructor
    *
@@ -36,10 +39,11 @@ class FavoriteModel {
    * @returns {Promise<FavoriteEntity>}
    */
   async addResourceToFavorite(resourceId) {
+    assertUuid(resourceId);
     const foreignKey = 'Resource';
     const favoriteDto = await this.favoriteApiService.create(foreignKey, resourceId);
     const favoriteEntity = new FavoriteEntity(favoriteDto);
-    await this.resourceModel.updateFavoriteLocally(resourceId, favoriteEntity);
+    await this.updateFavoriteLocally(resourceId, favoriteEntity);
     return favoriteEntity;
   }
 
@@ -50,13 +54,30 @@ class FavoriteModel {
    * @returns {Promise<void>}
    */
   async removeResourceFromFavorite(resourceId) {
+    assertUuid(resourceId);
     const resourceEntity = await this.resourceModel.getById(resourceId);
     if (!resourceEntity.favorite) {
       return; // already deleted or not finished added...
     }
     await this.favoriteApiService.delete(resourceEntity.favorite.id);
-    await this.resourceModel.updateFavoriteLocally(resourceId, null);
+    await this.updateFavoriteLocally(resourceId, null);
+  }
+
+  /**
+   * Update a favorite association of a resource in local storage
+   * Doesn't udpate the favorite remotely
+   *
+   * @param {string} resourceId
+   * @param {FavoriteEntity|null} favoriteEntity or null
+   * @return {Promise<void>}
+   * @private
+   */
+  async updateFavoriteLocally(resourceId, favoriteEntity) {
+    assertUuid(resourceId);
+    assertType(favoriteEntity, FavoriteEntity);
+    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
+    const resourceEntity = new ResourceEntity(resourceDto);
+    resourceEntity.favorite = favoriteEntity;
+    await ResourceLocalStorage.updateResource(resourceEntity);
   }
 }
-
-export default FavoriteModel;

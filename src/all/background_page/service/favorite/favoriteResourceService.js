@@ -74,7 +74,9 @@ export default class FavoriteResourceService {
    */
   async updateFavoriteLocally(resourceId, favoriteEntity) {
     assertUuid(resourceId);
-    assertType(favoriteEntity, FavoriteEntity);
+    if (favoriteEntity) {
+      assertType(favoriteEntity, FavoriteEntity);
+    }
     const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
     const resourceEntity = new ResourceEntity(resourceDto);
     resourceEntity.favorite = favoriteEntity;

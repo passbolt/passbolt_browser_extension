@@ -37,7 +37,6 @@ export default class FavoriteResourceService {
    *
    * @param {string} resourceId uuid
    * @returns {Promise<FavoriteEntity>}
-   * @public
    */
   async addResourceToFavorite(resourceId) {
     assertUuid(resourceId);
@@ -53,7 +52,6 @@ export default class FavoriteResourceService {
    *
    * @param {string} resourceId uuid
    * @returns {Promise<void>}
-   * @public
    */
   async removeResourceFromFavorite(resourceId) {
     assertUuid(resourceId);

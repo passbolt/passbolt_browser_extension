@@ -280,6 +280,7 @@ class EncryptMetadataService {
     try {
       EntitySchema.validateProp("object_type", entity.metadata.objectType, entity.metadata.constructor.getSchema().properties.object_type);
     } catch (error) {
+      console.error(error);
       const validationError = new EntityValidationError();
       validationError.addError('metadata.object_type', 'required-v5', `The resource metadata object_type is required and must be set to '${entity.metadata.constructor.METADATA_OBJECT_TYPE}' for the the entity (${entity?.id}).`);
       throw validationError;

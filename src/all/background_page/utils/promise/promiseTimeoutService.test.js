@@ -89,6 +89,7 @@ describe("PromiseTimeoutService", () => {
       try {
         await PromiseTimeoutService.exec(promise);
       } catch (error) {
+        console.error(error);
         // expectations
         expect(global.clearTimeout).toHaveBeenCalledTimes(0);
       }

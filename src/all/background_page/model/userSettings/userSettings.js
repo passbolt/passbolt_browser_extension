@@ -27,7 +27,8 @@ class UserSettings {
     try {
       this.getSecurityToken();
       this.getDomain();
-    } catch (e) {
+    } catch (error) {
+      console.error(error);
       return false;
     }
     return true;

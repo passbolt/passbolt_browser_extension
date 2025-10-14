@@ -43,6 +43,7 @@ class AppInitController {
     try {
       await user.settings.sync();
     } catch (error) {
+      console.error(error);
       // @deprecated with v4. The /account/settings entry point exist since v3.0 in CE.
       user.settings.setDefaults();
     }

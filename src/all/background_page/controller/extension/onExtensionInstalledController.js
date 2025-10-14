@@ -91,6 +91,7 @@ class OnExtensionInstalledController {
       // use the cached data as the worker could wake up every 30 secondes.
       authStatus = await checkAuthStatusService.checkAuthStatus(false);
     } catch (error) {
+      console.error(error);
       // Service is unavailable, do nothing...
       Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
       return;
@@ -130,6 +131,7 @@ class OnExtensionInstalledController {
       // use the cached data as the worker could wake up every 30 secondes.
       authStatus = await checkAuthStatusService.checkAuthStatus(false);
     } catch (error) {
+      console.error(error);
       // Service is unavailable, do nothing...
       Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
       return;

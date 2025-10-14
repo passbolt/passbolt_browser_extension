@@ -223,7 +223,8 @@ const User = (function() {
       }
 
       return user;
-    } catch (e) {
+    } catch (error) {
+      console.error(error);
       throw new Error('The user is not set');
     }
   };
@@ -257,7 +258,8 @@ const User = (function() {
 
       try {
         this.__validate(varName, this._user[varName]);
-      } catch (e) {
+      } catch (error) {
+        console.error(error);
         this._user[varName] = {};
         throw new Error('The user is not set');
       }
@@ -274,7 +276,8 @@ const User = (function() {
   this.isValid = function() {
     try {
       this.get();
-    } catch (e) {
+    } catch (error) {
+      console.error(error);
       return false;
     }
     return this.settings.isValid();

@@ -59,7 +59,8 @@ class DownloadUserPrivateKeyController {
     let privateKey;
     try {
       privateKey = this.keyring.findPrivate().armoredKey;
-    } catch (e) {
+    } catch (error) {
+      console.error(error);
       throw new GpgKeyError(i18n.t("Private key not found."));
     }
 

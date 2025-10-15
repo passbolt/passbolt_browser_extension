@@ -79,6 +79,8 @@ import UpdateScimSettingsController from "../controller/scimSettings/updateScimS
 import DisableScimSettingsController from "../controller/scimSettings/disableScimSettingsController";
 import RotateMetadataKeyController from "../controller/rotateMetadata/rotateMetadataKeyController";
 import ResumeRotateMetadataKeyController from "../controller/rotateMetadata/resumeRotateMetadataKeyController";
+import FavoriteResourceController from "../controller/favorite/favoriteResourceController";
+import UnfavoriteResourceController from "../controller/favorite/unfavoriteResourceController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -605,6 +607,34 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.scim.disable-settings', async(requestId, id) => {
     const controller = new DisableScimSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(id);
+  });
+
+  /*
+   * ==================================================================================
+   *  Favorite events.
+   * ==================================================================================
+   */
+  /**
+   * Mark a resource as favorite
+   *
+   * @listens passbolt.favorite.add
+   * @param requestId {uuid} The request identifier
+   * @param resourceId {uuid} The resource id
+   */
+  worker.port.on('passbolt.favorite.add', async(requestId, resourceId) => {
+    const controller = new FavoriteResourceController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourceId);
+  });
+  /**
+   * Unmark a resource as favorite
+   *
+   * @listens passbolt.favorite.delete
+   * @param requestId {uuid} The request identifier
+   * @param resourceId {uuid} The resource id
+   */
+  worker.port.on('passbolt.favorite.delete', async(requestId, resourceId) => {
+    const controller = new UnfavoriteResourceController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourceId);
   });
 };
 export const AppEvents = {listen};

@@ -15,7 +15,7 @@ import GroupLocalStorage from "../../service/local_storage/groupLocalStorage";
 import GroupsCollection from "../entity/group/groupsCollection";
 import DeleteDryRunError from "../../error/deleteDryRunError";
 import GroupEntity from "../entity/group/groupEntity";
-import GroupService from "../../service/api/group/groupService";
+import GroupApiService from "../../service/api/group/groupApiService";
 import GroupUpdateDryRunResultEntity from "../entity/group/update/groupUpdateDryRunResultEntity";
 import GroupDeleteTransferEntity from "../entity/group/transfer/groupDeleteTransferEntity";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
@@ -28,7 +28,7 @@ class GroupModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.groupService = new GroupService(apiClientOptions);
+    this.groupApiService = new GroupApiService(apiClientOptions);
   }
 
   /**
@@ -79,7 +79,7 @@ class GroupModel {
    * @returns {Promise<GroupsCollection>}
    */
   async findAll(contains, filters, orders, ignoreInvalidEntity) {
-    const groupsDto = await this.groupService.findAll(contains, filters, orders);
+    const groupsDto = await this.groupApiService.findAll(contains, filters, orders);
     return new GroupsCollection(groupsDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
   }
 
@@ -92,7 +92,7 @@ class GroupModel {
    */
   async create(groupEntity) {
     const data = groupEntity.toDto({groups_users: true});
-    const groupDto = await this.groupService.create(data);
+    const groupDto = await this.groupApiService.create(data);
     const newGroupEntity = new GroupEntity(groupDto);
     await GroupLocalStorage.addGroup(newGroupEntity);
     return newGroupEntity;
@@ -107,7 +107,7 @@ class GroupModel {
    */
   async updateDryRun(groupUpdateEntity) {
     const data = groupUpdateEntity.toDto();
-    const groupUpdateDryRunResultDto = await this.groupService.updateDryRun(groupUpdateEntity.id, data);
+    const groupUpdateDryRunResultDto = await this.groupApiService.updateDryRun(groupUpdateEntity.id, data);
     return new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto);
   }
 
@@ -128,7 +128,7 @@ class GroupModel {
   async deleteDryRun(groupId, transfer) {
     try {
       const deleteData = (transfer && transfer instanceof GroupDeleteTransferEntity) ? transfer.toDto() : {};
-      await this.groupService.delete(groupId, deleteData, true);
+      await this.groupApiService.delete(groupId, deleteData, true);
     } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data.code === 400 && error.data.body.errors) {
         /*
@@ -152,7 +152,7 @@ class GroupModel {
   async delete(groupId, transfer) {
     try {
       const deleteData = (transfer && transfer instanceof GroupDeleteTransferEntity) ? transfer.toDto() : {};
-      await this.groupService.delete(groupId, deleteData);
+      await this.groupApiService.delete(groupId, deleteData);
     } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data.code === 400 && error.data.body.errors) {
         /*

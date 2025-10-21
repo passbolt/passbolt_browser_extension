@@ -67,11 +67,11 @@ describe("GroupUpdateService", () => {
 
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
-    const spyOnGroupServiceUpdate = jest.spyOn(service.groupService, "update");
+    const spyOnGroupApiServiceUpdate = jest.spyOn(service.groupApiService, "update");
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
-    spyOnGroupServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
+    spyOnGroupApiServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
     jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
 
     await service.exec(updateGroupEntity, "");
@@ -82,10 +82,10 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupModelDryRun).toHaveBeenCalledTimes(1);
     expect(spyOnGroupModelDryRun).toHaveBeenCalledWith(diffGroupUpdateEntity);
 
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledTimes(1);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledTimes(1);
     const expectedDiffGropuUpdateEntityDto = diffGroupUpdateEntity.toDto();
     delete expectedDiffGropuUpdateEntityDto.groups_users;
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto);
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);
@@ -139,12 +139,12 @@ describe("GroupUpdateService", () => {
 
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
-    const spyOnGroupServiceUpdate = jest.spyOn(service.groupService, "update");
+    const spyOnGroupApiServiceUpdate = jest.spyOn(service.groupApiService, "update");
     jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
-    spyOnGroupServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
+    spyOnGroupApiServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
 
     await service.exec(updateGroupEntity, "");
 
@@ -154,14 +154,14 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupModelDryRun).toHaveBeenCalledTimes(1);
     expect(spyOnGroupModelDryRun).toHaveBeenCalledWith(diffGroupUpdateEntity);
 
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledTimes(2);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledTimes(2);
     const expectedDiffGropuUpdateEntityDto1 = diffGroupUpdateEntity.toDto();
     delete expectedDiffGropuUpdateEntityDto1.groups_users;
 
     const expectedDiffGropuUpdateEntityDto2 = diffGroupUpdateEntity.toDto();
 
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto1);
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto2);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto1);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto2);
   });
 
   it("should update the group without cryptographic operations if users have only been removed", async() => {
@@ -200,12 +200,12 @@ describe("GroupUpdateService", () => {
 
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
-    const spyOnGroupServiceUpdate = jest.spyOn(service.groupService, "update");
+    const spyOnGroupApiServiceUpdate = jest.spyOn(service.groupApiService, "update");
     jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
-    spyOnGroupServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
+    spyOnGroupApiServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
 
     await service.exec(updateGroupEntity, "");
 
@@ -215,14 +215,14 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupModelDryRun).toHaveBeenCalledTimes(1);
     expect(spyOnGroupModelDryRun).toHaveBeenCalledWith(diffGroupUpdateEntity);
 
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledTimes(2);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledTimes(2);
     const expectedDiffGropuUpdateEntityDto1 = diffGroupUpdateEntity.toDto();
     delete expectedDiffGropuUpdateEntityDto1.groups_users;
 
     const expectedDiffGropuUpdateEntityDto2 = diffGroupUpdateEntity.toDto();
 
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto1);
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto2);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto1);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto2);
   });
 
   it("should update the group and encrypt secrets for the new users", async() => {
@@ -262,7 +262,7 @@ describe("GroupUpdateService", () => {
 
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
-    const spyOnGroupServiceUpdate = jest.spyOn(service.groupService, "update");
+    const spyOnGroupApiServiceUpdate = jest.spyOn(service.groupApiService, "update");
     const spyOnKeyringSync = jest.spyOn(Keyring.prototype, "sync");
     const spyOnKeyringFindPublic = jest.spyOn(Keyring.prototype, "findPublic");
     jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
@@ -271,7 +271,7 @@ describe("GroupUpdateService", () => {
     spyOnKeyringSync.mockImplementation(async() => {});
     spyOnKeyringFindPublic.mockImplementation(() => ({armoredKey: pgpKeys.betty.public}));
 
-    spyOnGroupServiceUpdate.mockImplementation(async(groupUpdateId, groupUpdateDto) => {
+    spyOnGroupApiServiceUpdate.mockImplementation(async(groupUpdateId, groupUpdateDto) => {
       if (!groupUpdateDto.groups_users) {
         //it's the first step and  a group name update only operation
         expect(groupUpdateDto.id).toStrictEqual(diffGroupUpdateEntity.id);
@@ -310,7 +310,7 @@ describe("GroupUpdateService", () => {
 
     expect(spyOnGroupModelDryRun).toHaveBeenCalledTimes(1);
 
-    expect(spyOnGroupServiceUpdate).toHaveBeenCalledTimes(2);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledTimes(2);
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);

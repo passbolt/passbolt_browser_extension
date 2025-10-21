@@ -25,7 +25,7 @@ import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {assertString, assertType} from "../../utils/assertions";
 import GroupUpdatesCollection from "../../model/entity/group/update/groupUpdatesCollection";
 import GroupLocalStorage from "../local_storage/groupLocalStorage";
-import GroupService from "../api/group/groupService";
+import GroupApiService from "../api/group/groupApiService";
 
 /**
  * Progress goals are:
@@ -50,7 +50,7 @@ class GroupUpdateService {
     this.account = account;
     this.progressService = progressService;
     this.groupModel = new GroupModel(apiClientOptions);
-    this.groupService = new GroupService(apiClientOptions);
+    this.groupApiService = new GroupApiService(apiClientOptions);
     this.decryptPrivateKeyService = new DecryptPrivateKeyService();
   }
 
@@ -176,7 +176,7 @@ class GroupUpdateService {
 
       this.progressService.updateStepMessage(progressMessage);
       const groupUpdateOperation = groupUpdateSingleOperationList.items[i];
-      const groupDto = await this.groupService.update(groupUpdateOperation.id, groupUpdateOperation.toDto());
+      const groupDto = await this.groupApiService.update(groupUpdateOperation.id, groupUpdateOperation.toDto());
       const updatedGroupEntity = new GroupEntity(groupDto, {ignoreInvalidEntity: true});
       await GroupLocalStorage.updateGroup(updatedGroupEntity);
     }

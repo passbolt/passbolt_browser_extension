@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import GroupService from "./groupService";
+import GroupApiService from "./groupApiService";
 
 describe("Group entity", () => {
   it('remap legacy contains', () => {
@@ -33,7 +33,7 @@ describe("Group entity", () => {
         {user_id: 'uuid3', is_admin: false},
       ]
     };
-    const sut = GroupService.remapV2DataToV1(v2); // crassette
+    const sut = GroupApiService.remapV2DataToV1(v2); // crassette
     expect(sut).toEqual(v1);
   });
 
@@ -46,9 +46,9 @@ describe("Group entity", () => {
       'modifier': true,
       'group_user': true
     };
-    expect(GroupService.remapLegacyContain(v2)).toEqual(v1);
+    expect(GroupApiService.remapLegacyContain(v2)).toEqual(v1);
     v2 = {groups_users: {user: {profile: true}}};
     v1 = {group_user: {user: {profile: true}}};
-    expect(GroupService.remapLegacyContain(v2)).toEqual(v1);
+    expect(GroupApiService.remapLegacyContain(v2)).toEqual(v1);
   });
 });

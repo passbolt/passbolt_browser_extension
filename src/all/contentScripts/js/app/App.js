@@ -32,7 +32,10 @@ async function main() {
   const storage = browser.storage;
   const browserExtensionUrl = chrome.runtime.getURL("/");
   const domContainer = document.createElement("div");
+
   document.body.appendChild(domContainer);
+  // TODO: update to createRoot for react 18 when ready
+  /* eslint-disable react/no-deprecated */
   ReactDOM.render(<ExtBootstrapApp port={port} storage={storage} browserExtensionUrl={browserExtensionUrl}/>, domContainer);
 }
 

@@ -30,7 +30,10 @@ async function main() {
   messageEventHandler.listen("passbolt.port.connect", ConnectPortController, port);
   const storage = browser.storage;
   const domContainer = document.createElement("div");
+
   document.body.appendChild(domContainer);
+  // TODO: update to createRoot for react 18 when ready
+  /* eslint-disable react/no-deprecated */
   ReactDOM.render(React.createElement(ExtApp, {port: port, storage: storage}), domContainer);
 }
 

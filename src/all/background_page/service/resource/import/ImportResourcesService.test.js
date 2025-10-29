@@ -124,7 +124,7 @@ describe("ImportResourcesService", () => {
           .mockImplementationOnce(() => new MetadataTypesSettingsEntity(test.metadataTypesSettings));
       });
       it(`Should parse the file with password and description - <${test.scenario}>`, async() => {
-        expect.assertions(7);
+        expect.assertions(8);
 
         const expectedSlug = test.metadataTypesSettings.default_resource_types === "v4" ? RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG : RESOURCE_TYPE_V5_DEFAULT_SLUG;
         const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
@@ -136,6 +136,7 @@ describe("ImportResourcesService", () => {
 
         expect(result.importResources.items.length).toEqual(2);
         expect(result.importResourcesErrors.length).toEqual(0);
+        expect(result.importResourcesWarnings.length).toEqual(0);
 
         const importedResources = result.importResources.items;
 
@@ -177,7 +178,7 @@ describe("ImportResourcesService", () => {
       });
 
       it(`Should parse the file with password, description and totp - <${test.scenario}>`, async() => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         const expectedSlug = test.metadataTypesSettings.default_resource_types === "v4" ? RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG : RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG;
         const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
@@ -192,6 +193,7 @@ describe("ImportResourcesService", () => {
 
         expect(importResourceFileCSV.importResources.items.length).toEqual(1);
         expect(result.importResourcesErrors.length).toEqual(0);
+        expect(result.importResourcesWarnings.length).toEqual(0);
 
         const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
@@ -217,7 +219,7 @@ describe("ImportResourcesService", () => {
       });
 
       it(`Should parse the file with totp - <${test.scenario}>`, async() => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         const expectedSlug = test.metadataTypesSettings.default_resource_types === "v4" ? RESOURCE_TYPE_TOTP_SLUG : RESOURCE_TYPE_V5_TOTP_SLUG;
         const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
@@ -232,6 +234,7 @@ describe("ImportResourcesService", () => {
 
         expect(importResourceFileCSV.importResources.items.length).toEqual(1);
         expect(result.importResourcesErrors.length).toEqual(0);
+        expect(result.importResourcesWarnings.length).toEqual(0);
 
         const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
@@ -258,7 +261,7 @@ describe("ImportResourcesService", () => {
       });
 
       it(`Should parse the file with totp and description - <${test.scenario}>`, async() => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         const expectedSlug = test.metadataTypesSettings.default_resource_types === "v4" ? RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG : RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG;
         const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
@@ -273,6 +276,7 @@ describe("ImportResourcesService", () => {
 
         expect(importResourceFileCSV.importResources.items.length).toEqual(1);
         expect(result.importResourcesErrors.length).toEqual(0);
+        expect(result.importResourcesWarnings.length).toEqual(0);
 
         const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
@@ -300,7 +304,7 @@ describe("ImportResourcesService", () => {
       });
 
       it("Should throw an error if the resource type cannot be found", async() => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => []);
 
@@ -314,6 +318,7 @@ describe("ImportResourcesService", () => {
 
         expect(importResourceFileCSV.importResources.items.length).toEqual(0);
         expect(result.importResourcesErrors.length).toEqual(1);
+        expect(result.importResourcesWarnings.length).toEqual(0);
         expect(error.sourceError).toBeInstanceOf(Error);
         expect(error.sourceError.message).toEqual("No resource type associated to this row.");
       });
@@ -422,7 +427,7 @@ describe("ImportResourcesService", () => {
     });
 
     it("Should parse the file - <folder>", async() => {
-      expect.assertions(6);
+      expect.assertions(7);
 
       importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
         options: {
@@ -450,6 +455,7 @@ describe("ImportResourcesService", () => {
       expect(result.importResourcesErrors.length).toEqual(0);
       expect(result.importFolders.items.length).toEqual(2);
       expect(result.importFoldersErrors.length).toEqual(0);
+      expect(result.importResourcesWarnings.length).toEqual(0);
       expect(result.importFolders.items[0].toDto()).toEqual(externalFolderEntity1.toDto());
       expect(result.importFolders.items[1].toDto()).toEqual(externalFolderEntity2.toDto());
     });
@@ -480,7 +486,7 @@ describe("ImportResourcesService", () => {
     });
 
     it("Should parse the file - <tag>", async() => {
-      expect.assertions(4);
+      expect.assertions(5);
 
       importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
         options: {
@@ -497,12 +503,13 @@ describe("ImportResourcesService", () => {
 
       expect(result.importResources.items.length).toEqual(2);
       expect(result.importResourcesErrors.length).toEqual(0);
+      expect(result.importResourcesWarnings.length).toEqual(0);
       expect(resourceCollectionStored1.tags[0].slug).toEqual("import-ref");
       expect(resourceCollectionStored2.tags[0].slug).toEqual("import-ref");
     });
 
     it("Should init the error found during import without blocking import", async() => {
-      expect.assertions(8);
+      expect.assertions(9);
 
       importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
         file: btoa(BinaryConvert.toBinary([
@@ -517,6 +524,7 @@ describe("ImportResourcesService", () => {
 
       expect(result.importResources.items.length).toEqual(1);
       expect(result.importResourcesErrors.length).toEqual(1);
+      expect(result.importResourcesWarnings.length).toEqual(0);
 
       const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
       const error = importResourceFileCSV.importResourcesErrors[0];
@@ -531,7 +539,7 @@ describe("ImportResourcesService", () => {
     });
 
     it("Should init the error found during import without blocking import - <folder>", async() => {
-      expect.assertions(8);
+      expect.assertions(9);
 
       importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
         file: btoa(BinaryConvert.toBinary([
@@ -551,6 +559,7 @@ describe("ImportResourcesService", () => {
       expect(result.importResourcesErrors.length).toEqual(0);
       expect(result.importFolders.length).toEqual(1);
       expect(result.importFoldersErrors.length).toEqual(1);
+      expect(result.importResourcesWarnings.length).toEqual(0);
 
       const error = importResourceFileCSV.importFoldersErrors[0];
 

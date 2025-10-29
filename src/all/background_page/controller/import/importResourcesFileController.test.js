@@ -196,7 +196,7 @@ describe("ImportResourcesFileController", () => {
         });
 
         it(`should import non encrypted kdbx - <${test.scenario}>`, async() => {
-          expect.assertions(10);
+          expect.assertions(11);
 
           const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx", {encoding: 'base64'});
 
@@ -204,6 +204,7 @@ describe("ImportResourcesFileController", () => {
 
           expect(result.importResources.items.length).toEqual(4);
           expect(result.importResourcesErrors.length).toEqual(0);
+          expect(result.importResourcesWarnings.length).toEqual(0);
 
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
@@ -281,7 +282,7 @@ describe("ImportResourcesFileController", () => {
         });
 
         it(`should import encrypted with password kdbx - <${test.scenario}>`, async() => {
-          expect.assertions(4);
+          expect.assertions(5);
 
           const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
           const options = {
@@ -294,6 +295,7 @@ describe("ImportResourcesFileController", () => {
 
           expect(result.importResources.items[0].secrets.items.length).toEqual(1);
           expect(result.importResourcesErrors.length).toEqual(0);
+          expect(result.importResourcesWarnings.length).toEqual(0);
 
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
@@ -324,7 +326,7 @@ describe("ImportResourcesFileController", () => {
         });
 
         it(`should import encrypted with keyfile kdbx - <${test.scenario}>`, async() => {
-          expect.assertions(4);
+          expect.assertions(5);
 
           const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-keyfile.kdbx", {encoding: 'base64'});
           const options = {
@@ -337,6 +339,7 @@ describe("ImportResourcesFileController", () => {
 
           expect(result.importResources.items[0].secrets.items.length).toEqual(1);
           expect(result.importResourcesErrors.length).toEqual(0);
+          expect(result.importResourcesWarnings.length).toEqual(0);
 
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
@@ -400,12 +403,13 @@ describe("ImportResourcesFileController", () => {
             .mockImplementationOnce(() => new MetadataTypesSettingsEntity(test.metadataTypesSettings));
         });
         it(`should parse ${test.scenario} csv file - <default ${test.metadataTypesSettings.default_resource_types}>`, async() => {
-          expect.assertions(4);
+          expect.assertions(5);
 
           const result = await controller.exec("csv", btoa(BinaryConvert.toBinary(chromiumCsvFile)));
 
           expect(result.importResources.items[0].secrets.items.length).toEqual(1);
           expect(result.importResourcesErrors.length).toEqual(0);
+          expect(result.importResourcesWarnings.length).toEqual(0);
 
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
@@ -477,12 +481,13 @@ describe("ImportResourcesFileController", () => {
             .mockImplementationOnce(() => new MetadataTypesSettingsEntity(test.metadataTypesSettings));
         });
         it(`should parse ${test.scenario} csv file - <default ${test.metadataTypesSettings.default_resource_types}>`, async() => {
-          expect.assertions(4);
+          expect.assertions(5);
 
           const result = await controller.exec("csv", btoa(BinaryConvert.toBinary(test.file)));
 
           expect(result.importResources.items[0].secrets.items.length).toEqual(1);
           expect(result.importResourcesErrors.length).toEqual(0);
+          expect(result.importResourcesWarnings.length).toEqual(0);
 
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
@@ -552,12 +557,13 @@ describe("ImportResourcesFileController", () => {
             .mockImplementationOnce(() => new MetadataTypesSettingsEntity(test.metadataTypesSettings));
         });
         it(`should parse ${test.scenario} csv file - <default ${test.metadataTypesSettings.default_resource_types}>`, async() => {
-          expect.assertions(4);
+          expect.assertions(5);
 
           const result = await controller.exec("csv", btoa(BinaryConvert.toBinary(test.file)));
 
           expect(result.importResources.items[0].secrets.items.length).toEqual(1);
           expect(result.importResourcesErrors.length).toEqual(0);
+          expect(result.importResourcesWarnings.length).toEqual(0);
 
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);
@@ -618,12 +624,13 @@ describe("ImportResourcesFileController", () => {
             .mockImplementationOnce(() => new MetadataTypesSettingsEntity(test.metadataTypesSettings));
         });
         it(`should parse ${test.scenario} csv file - <default ${test.metadataTypesSettings.default_resource_types}`, async() => {
-          expect.assertions(4);
+          expect.assertions(5);
 
           const result = await controller.exec("csv", btoa(BinaryConvert.toBinary(test.file)));
 
           expect(result.importResources.items[0].secrets.items.length).toEqual(1);
           expect(result.importResourcesErrors.length).toEqual(0);
+          expect(result.importResourcesWarnings.length).toEqual(0);
 
           const importedResources = result.importResources.items;
           const expectedResourceType = collection.find(resourceType =>  resourceType.slug === test.resourceType);

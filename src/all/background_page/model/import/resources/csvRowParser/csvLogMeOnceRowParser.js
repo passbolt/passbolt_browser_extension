@@ -58,12 +58,12 @@ class CsvLogMeOnceRowParser extends AbstractCsvRowParser {
     if (!resourceType) {
       resourceType = ResourcesTypeImportParser.findPartialResourceType(resourceTypesCollection, scores);
       if (resourceType) {
-        importEntity.importResourcesErrors.push(new ImportError("Resource partially imported", externalResourceDto, new Error("We used the closest resource type supported.")));
+        importEntity.importResourcesWarnings.push(new ImportError("Resource partially imported", externalResourceDto, new Error("We used the closest resource type supported.")));
       }
       if (!resourceType) {
         //Fallback default content type not supported
         resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, metadataTypesSettings);
-        importEntity.importResourcesErrors.push(new ImportError("Imported with default content type", externalResourceDto, new Error("No resource type associated to this row.")));
+        importEntity.importResourcesWarnings.push(new ImportError("Imported with default content type", externalResourceDto, new Error("No resource type associated to this row.")));
       }
     }
 

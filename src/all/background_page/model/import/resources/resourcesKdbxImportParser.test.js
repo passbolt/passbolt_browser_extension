@@ -387,7 +387,7 @@ describe("ResourcesKdbxImportParser", () => {
   });
 
   it("should import max 32 multiple uris", async() => {
-    expect.assertions(3);
+    expect.assertions(4);
 
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV6Dto());
 
@@ -409,11 +409,12 @@ describe("ResourcesKdbxImportParser", () => {
     // Assert resources
     expect(importEntity.importResources.items).toHaveLength(1);
     expect(importEntity.importResources.items[0].uris).toHaveLength(32);
-    expect(importEntity.importResourcesErrors).toHaveLength(1);
+    expect(importEntity.importResourcesErrors).toHaveLength(0);
+    expect(importEntity.importResourcesWarnings).toHaveLength(1);
   });
 
   it("should import custom fields", async() => {
-    expect.assertions(4);
+    expect.assertions(5);
 
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV6Dto());
 
@@ -437,10 +438,11 @@ describe("ResourcesKdbxImportParser", () => {
     expect(importEntity.importResources.items[0].customFields).toHaveLength(3);
     expect(importEntity.importResources.items[0].uris).toHaveLength(3);
     expect(importEntity.importResourcesErrors).toHaveLength(0);
+    expect(importEntity.importResourcesWarnings).toHaveLength(0);
   });
 
   it("should import custom fields with protected values", async() => {
-    expect.assertions(4);
+    expect.assertions(5);
 
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV6Dto());
 
@@ -464,6 +466,7 @@ describe("ResourcesKdbxImportParser", () => {
     expect(importEntity.importResources.items[0].customFields).toHaveLength(1);
     expect(importEntity.importResources.items[0].uris).toHaveLength(1);
     expect(importEntity.importResourcesErrors).toHaveLength(0);
+    expect(importEntity.importResourcesWarnings).toHaveLength(0);
   });
 
   it("should not import custom fields  if the default is v4", async() => {

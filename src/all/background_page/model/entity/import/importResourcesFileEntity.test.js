@@ -182,7 +182,7 @@ describe("ImportResourcesFileEntity entity", () => {
 
   describe("::getters", () => {
     it("should provide the right values when everything is set from constructor with all options", () => {
-      expect.assertions(13);
+      expect.assertions(14);
 
       const dto = importResourceFileWithAllOptionsDto();
       const entity = new ImportResourcesFileEntity(dto);
@@ -200,6 +200,7 @@ describe("ImportResourcesFileEntity entity", () => {
       expect(entity.importFolders).toStrictEqual(new ExternalFoldersCollection([]));
       expect(entity.importResourcesErrors).toStrictEqual([]);
       expect(entity.importFoldersErrors).toStrictEqual([]);
+      expect(entity.importResourcesWarnings).toStrictEqual([]);
     });
 
     it("should provide the right values when everything is set from constructor with no options", () => {
@@ -277,6 +278,60 @@ describe("ImportResourcesFileEntity entity", () => {
     });
   });
 
+  describe("::removeWarningsForResource", () => {
+    it("should remove warnings for a specific resource", () => {
+      expect.assertions(3);
+
+      const entity = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
+      const resourceDto1 = {name: "Resource 1", username: "user1"};
+      const resourceDto2 = {name: "Resource 2", username: "user2"};
+      const resourceDto3 = {name: "Resource 3", username: "user3"};
+
+      const warning1 = new ImportError("Warning 1", resourceDto1);
+      const warning2 = new ImportError("Warning 2", resourceDto2);
+      const warning3 = new ImportError("Warning 3", resourceDto1);
+      const warning4 = new ImportError("Warning 4", resourceDto3);
+
+      entity.importResourcesWarnings.push(warning1, warning2, warning3, warning4);
+
+      expect(entity.importResourcesWarnings.length).toBe(4);
+
+      entity.removeWarningsForResource(resourceDto1);
+
+      expect(entity.importResourcesWarnings.length).toBe(2);
+      expect(entity.importResourcesWarnings).toEqual([warning2, warning4]);
+    });
+
+    it("should not remove any warnings if resource does not match", () => {
+      expect.assertions(2);
+
+      const entity = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
+      const resourceDto1 = {name: "Resource 1", username: "user1"};
+      const resourceDto2 = {name: "Resource 2", username: "user2"};
+
+      const warning1 = new ImportError("Warning 1", resourceDto1);
+
+      entity.importResourcesWarnings.push(warning1);
+
+      expect(entity.importResourcesWarnings.length).toBe(1);
+
+      entity.removeWarningsForResource(resourceDto2);
+
+      expect(entity.importResourcesWarnings.length).toBe(1);
+    });
+
+    it("should handle empty warnings array", () => {
+      expect.assertions(1);
+
+      const entity = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
+      const resourceDto = {name: "Resource 1", username: "user1"};
+
+      entity.removeWarningsForResource(resourceDto);
+
+      expect(entity.importResourcesWarnings.length).toBe(0);
+    });
+  });
+
   describe("::toDto", () => {
     it("Should format the data as expected", () => {
       expect.assertions(1);
@@ -290,6 +345,9 @@ describe("ImportResourcesFileEntity entity", () => {
         errors: {
           resources: [],
           folders: [],
+        },
+        warnings: {
+          resources: [],
         },
         options: {
           folders: true,
@@ -327,6 +385,9 @@ describe("ImportResourcesFileEntity entity", () => {
       const importResourcesError = new ImportError("An error occured while importing a resource");
       entity.importResourcesErrors.push(importResourcesError);
 
+      const importResourcesWarning = new ImportError("Partially imported");
+      entity.importResourcesWarnings.push(importResourcesWarning);
+
       const expectedResult = {
         created: {
           resourcesCount: resourcesCollection.length,
@@ -335,6 +396,9 @@ describe("ImportResourcesFileEntity entity", () => {
         errors: {
           resources: [importResourcesError.toJSON()],
           folders: [importFoldersError.toJSON()],
+        },
+        warnings: {
+          resources: [importResourcesWarning.toJSON()],
         },
         options: {
           folders: true,
@@ -365,6 +429,9 @@ describe("ImportResourcesFileEntity entity", () => {
         errors: {
           resources: [],
           folders: [],
+        },
+        warnings: {
+          resources: [],
         },
         options: {
           folders: true,

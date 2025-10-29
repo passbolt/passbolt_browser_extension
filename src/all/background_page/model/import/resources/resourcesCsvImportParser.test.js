@@ -269,7 +269,7 @@ describe("ResourcesCsvImportParser", () => {
     });
 
     it(`should parse empty row and add import error <${test.scenario}>`, async() => {
-      expect.assertions(4);
+      expect.assertions(5);
 
       const csv = "Title,Username,URL,Password,Notes,Group\n" +
           ",,,,,\n";
@@ -284,13 +284,14 @@ describe("ResourcesCsvImportParser", () => {
       await importer.parseImport();
 
       expect(importEntity.importResources.items).toHaveLength(1);
-      expect(importEntity.importResourcesErrors).toHaveLength(1);
-      expect(importEntity.importResourcesErrors[0]).toBeInstanceOf(ImportError);
-      expect(importEntity.importResourcesErrors[0].sourceError).toEqual(new Error("No resource type associated to this row."));
+      expect(importEntity.importResourcesErrors).toHaveLength(0);
+      expect(importEntity.importResourcesWarnings).toHaveLength(1);
+      expect(importEntity.importResourcesWarnings[0]).toBeInstanceOf(ImportError);
+      expect(importEntity.importResourcesWarnings[0].sourceError).toEqual(new Error("No resource type associated to this row."));
     });
 
     it(`should parse partial matching row and add import error <${test.scenario}>`, async() => {
-      expect.assertions(4);
+      expect.assertions(5);
 
       const csv = "Title,Username,URL,Password,Notes,Group\n" +
           ",,,,Notes,\n";
@@ -306,9 +307,10 @@ describe("ResourcesCsvImportParser", () => {
       await importer.parseImport();
 
       expect(importEntity.importResources.items).toHaveLength(1);
-      expect(importEntity.importResourcesErrors).toHaveLength(1);
-      expect(importEntity.importResourcesErrors[0]).toBeInstanceOf(ImportError);
-      expect(importEntity.importResourcesErrors[0].sourceError).toEqual(new Error("We used the closest resource type supported."));
+      expect(importEntity.importResourcesErrors).toHaveLength(0);
+      expect(importEntity.importResourcesWarnings).toHaveLength(1);
+      expect(importEntity.importResourcesWarnings[0]).toBeInstanceOf(ImportError);
+      expect(importEntity.importResourcesWarnings[0].sourceError).toEqual(new Error("We used the closest resource type supported."));
     });
   });
 

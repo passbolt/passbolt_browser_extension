@@ -51,6 +51,7 @@ jest.mock("webextension-polyfill", () => {
         UPDATE: "update"
       },
       reload: jest.fn(),
+      sendNativeMessage: jest.fn(),
     },
     storage: {
       ...originalBrowser.storage,

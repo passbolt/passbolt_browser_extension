@@ -101,6 +101,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		97065BA52EB38D56000F81C0 /* controllers */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = controllers;
+			sourceTree = "<group>";
+		};
 		9734E9092E702E4C00B76743 /* services */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = services;
@@ -219,6 +224,7 @@
 		978962862E27D39300F48BDD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				97065BA52EB38D56000F81C0 /* controllers */,
 				9734E9092E702E4C00B76743 /* services */,
 				978962872E27D39300F48BDD /* locales */,
 				978962882E27D39300F48BDD /* webAccessibleResources */,
@@ -310,6 +316,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				97065BA52EB38D56000F81C0 /* controllers */,
 				9734E9092E702E4C00B76743 /* services */,
 			);
 			name = "Passbolt-Safari-Extension Extension";

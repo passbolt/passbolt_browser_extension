@@ -29,7 +29,7 @@ export class SendNativeMessageService {
     const resp = await chrome.runtime.sendNativeMessage(SAFARI_APP_ID, message);
 
     if (!resp.success) {
-      throw new Error(resp.error || "Safari file saving failed");
+      throw new Error(resp.error || "Safari native application execution failed");
     }
 
     return resp;

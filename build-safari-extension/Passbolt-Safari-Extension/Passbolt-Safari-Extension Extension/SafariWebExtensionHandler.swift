@@ -23,55 +23,45 @@
 
 import SafariServices
 
+@available(macOSApplicationExtension 12.0, *)
+let routes: [String: AbstractController.Type] = [
+    "save-file": SaveFileController.self,
+    "fetch": FetchController.self,
+]
+
 // Entry point of the Application part of the Safari extension.
 // It is mainly used to handle request from the extension
 @available(macOSApplicationExtension 12.0, *)
 final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
+
+    let errorController = ErrorController()
+
+    // Handles request coming form the extension using `chrome.runtime.sendNativeMessage`
     func beginRequest(with context: NSExtensionContext) {
         guard
             let item = context.inputItems.first as? NSExtensionItem,
             let payload = item.userInfo?[SFExtensionMessageKey] as? [String: Any]
         else {
-            return respond(context, error: "Bad or missing message")
+            errorController.run(context, ["error": "Bad or missing message"]);
+            return;
         }
 
         guard let action = payload["action"] as? String else {
-            return respond(context, error: "No action is provided, cannot excute request")
+            errorController.run(context, ["error": "No action is provided, cannot excute request"]);
+            return;
         }
 
-        if action == "save-file" {
-            return runSaveFile(context, payload)
+        if let controllerType = routes[action] {
+            do {
+                let controller = controllerType.init()
+                try controller.run(context, payload)
+            } catch {
+                errorController.run(context, ["error": error.localizedDescription]);
+            }
+            return
         }
 
-        return respond(context, error: "Unsupported action: \(action)");
-    }
-
-    private func runSaveFile(_ context: NSExtensionContext, _ payload: [String: Any]) {
-        do {
-            let destinationPath = try SaveFileService.saveFile(payload)
-            respond(context, extra: ["path": destinationPath])
-        } catch {
-            respond(context, error: error.localizedDescription)
-        }
-    }
-
-    private func respond(_ context: NSExtensionContext, error: String? = nil, extra: [String: Any] = [:]) {
-        var body: [String: Any] = [:]
-
-        if let error {
-            body["ok"] = false
-            body["error"] = error
-        } else {
-            body["ok"] = true
-        }
-
-        for (k, v) in extra {
-            body[k] = v
-        }
-
-        let reply = NSExtensionItem()
-        reply.userInfo = [ SFExtensionMessageKey: body ]
-
-        context.completeRequest(returningItems: [reply], completionHandler: nil)
+        errorController.run(context, ["error": "Unsupported action: \(action)"]);
+        return;
     }
 }

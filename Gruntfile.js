@@ -55,7 +55,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle']);
   grunt.registerTask('bundle-chromium-mv2', ['copy:manifest_chromium_mv2', 'bundle']);
   grunt.registerTask('bundle-chromium-mv3', ['copy:manifest_chromium_mv3', 'bundle-mv3']);
-  grunt.registerTask('bundle-safari', ['copy:manifest_safari', 'bundle-mv3']);
+  grunt.registerTask('bundle-safari', ['copy:manifest_safari', 'bundle']);
 
   grunt.registerTask('build', ['build-firefox-prod', 'build-chromium-mv2-prod', 'build-chromium-mv3-prod']);
 

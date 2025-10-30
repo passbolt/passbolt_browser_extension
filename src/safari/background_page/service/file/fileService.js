@@ -12,7 +12,7 @@
  * @since         5.6.0
  */
 
-const SAFARI_APP_ID = "com.passbolt.Passbolt-Safari-Extension";
+import {SendNativeMessageService} from "../nativeMessage/sendNativeMessageService";
 
 /**
  * File service
@@ -33,21 +33,15 @@ export default class FileService {
 
     content = new Blob([content], {type: mimeType});
     const base64Data = await this.blobToDataURL(content);
-    const action = "save-file";
-    const message = {action, filename, mimeType, base64Data};
 
-    const resp = await chrome.runtime.sendNativeMessage(SAFARI_APP_ID, message);
-
-    if (!resp.ok) {
-      throw new Error(resp.error || "Safari file saving failed");
-    }
+    return await SendNativeMessageService.sendNativeMessage("save-file", {filename, mimeType, base64Data});
   }
 
   /**
-   * Blob to Data Url.
+   * Blob to base64 string
+   * @param {Blob} blob
+   * @return {Promise<string>}
    * @private
-   * @param blob
-   * @return {Promise}
    */
   static blobToDataURL(blob) {
     return new Promise(resolve => {

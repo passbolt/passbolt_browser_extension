@@ -27,7 +27,7 @@ describe("FileService", () => {
 
       // function mocked
       chrome.runtime.sendNativeMessage = jest.fn();
-      chrome.runtime.sendNativeMessage.mockImplementation(() => ({ok: true}));
+      chrome.runtime.sendNativeMessage.mockImplementation(() => ({success: true}));
 
       // process
       await FileService.saveFile("filename", "Text", null, null);

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		977E15742E7AE6FD00445DD3 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 977E15732E7AE6FD00445DD3 /* index.html */; };
+		977E15772E7AE71F00445DD3 /* vendors.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 977E15762E7AE71F00445DD3 /* vendors.min.js */; };
+		977E15782E7AE71F00445DD3 /* index.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 977E15752E7AE71F00445DD3 /* index.min.js */; };
 		9789623F2E27D39200F48BDD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9789623E2E27D39200F48BDD /* AppDelegate.swift */; };
 		978962432E27D39200F48BDD /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 978962412E27D39200F48BDD /* Main.html */; };
 		978962452E27D39200F48BDD /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 978962442E27D39200F48BDD /* Icon.png */; };
@@ -23,12 +26,8 @@
 		978962902E27D39300F48BDD /* locales in Resources */ = {isa = PBXBuildFile; fileRef = 978962872E27D39300F48BDD /* locales */; };
 		978962912E27D39300F48BDD /* webAccessibleResources in Resources */ = {isa = PBXBuildFile; fileRef = 978962882E27D39300F48BDD /* webAccessibleResources */; };
 		978962922E27D39300F48BDD /* contentScripts in Resources */ = {isa = PBXBuildFile; fileRef = 978962892E27D39300F48BDD /* contentScripts */; };
-		978962932E27D39300F48BDD /* serviceWorker in Resources */ = {isa = PBXBuildFile; fileRef = 9789628A2E27D39300F48BDD /* serviceWorker */; };
 		978962942E27D39300F48BDD /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 9789628B2E27D39300F48BDD /* manifest.json */; };
-		978962952E27D39300F48BDD /* offscreens in Resources */ = {isa = PBXBuildFile; fileRef = 9789628C2E27D39300F48BDD /* offscreens */; };
 		978962962E27D39300F48BDD /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = 9789628D2E27D39300F48BDD /* _locales */; };
-		978962972E27D39300F48BDD /* vendors.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 9789628E2E27D39300F48BDD /* vendors.min.js */; };
-		978962982E27D39300F48BDD /* index.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 9789628F2E27D39300F48BDD /* index.min.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +69,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		977E15732E7AE6FD00445DD3 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = index.html; path = "/Users/steph/projects/safari/passbolt-browser-extension/build/all/index.html"; sourceTree = "<absolute>"; };
+		977E15752E7AE71F00445DD3 /* index.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = index.min.js; path = "/Users/steph/projects/safari/passbolt-browser-extension/build/all/index.min.js"; sourceTree = "<absolute>"; };
+		977E15762E7AE71F00445DD3 /* vendors.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = vendors.min.js; path = "/Users/steph/projects/safari/passbolt-browser-extension/build/all/vendors.min.js"; sourceTree = "<absolute>"; };
 		9789623B2E27D39200F48BDD /* Passbolt-Safari-Extension.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Passbolt-Safari-Extension.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9789623E2E27D39200F48BDD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		978962422E27D39200F48BDD /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
@@ -94,12 +96,8 @@
 		978962872E27D39300F48BDD /* locales */ = {isa = PBXFileReference; lastKnownFileType = folder; name = locales; path = ../../../build/all/locales; sourceTree = "<group>"; };
 		978962882E27D39300F48BDD /* webAccessibleResources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = webAccessibleResources; path = ../../../build/all/webAccessibleResources; sourceTree = "<group>"; };
 		978962892E27D39300F48BDD /* contentScripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = contentScripts; path = ../../../build/all/contentScripts; sourceTree = "<group>"; };
-		9789628A2E27D39300F48BDD /* serviceWorker */ = {isa = PBXFileReference; lastKnownFileType = folder; name = serviceWorker; path = ../../../build/all/serviceWorker; sourceTree = "<group>"; };
 		9789628B2E27D39300F48BDD /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../build/all/manifest.json; sourceTree = "<group>"; };
-		9789628C2E27D39300F48BDD /* offscreens */ = {isa = PBXFileReference; lastKnownFileType = folder; name = offscreens; path = ../../../build/all/offscreens; sourceTree = "<group>"; };
 		9789628D2E27D39300F48BDD /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; name = _locales; path = ../../../build/all/_locales; sourceTree = "<group>"; };
-		9789628E2E27D39300F48BDD /* vendors.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = vendors.min.js; path = ../../../build/all/vendors.min.js; sourceTree = "<group>"; };
-		9789628F2E27D39300F48BDD /* index.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = index.min.js; path = ../../../build/all/index.min.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -225,12 +223,11 @@
 				978962872E27D39300F48BDD /* locales */,
 				978962882E27D39300F48BDD /* webAccessibleResources */,
 				978962892E27D39300F48BDD /* contentScripts */,
-				9789628A2E27D39300F48BDD /* serviceWorker */,
 				9789628B2E27D39300F48BDD /* manifest.json */,
-				9789628C2E27D39300F48BDD /* offscreens */,
 				9789628D2E27D39300F48BDD /* _locales */,
-				9789628E2E27D39300F48BDD /* vendors.min.js */,
-				9789628F2E27D39300F48BDD /* index.min.js */,
+				977E15732E7AE6FD00445DD3 /* index.html */,
+				977E15752E7AE71F00445DD3 /* index.min.js */,
+				977E15762E7AE71F00445DD3 /* vendors.min.js */,
 			);
 			name = Resources;
 			path = "Passbolt-Safari-Extension Extension";
@@ -330,7 +327,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1610;
-				LastUpgradeCheck = 1610;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					9789623A2E27D39200F48BDD = {
 						CreatedOnToolsVersion = 16.1;
@@ -402,13 +399,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				978962932E27D39300F48BDD /* serviceWorker in Resources */,
 				978962922E27D39300F48BDD /* contentScripts in Resources */,
 				978962942E27D39300F48BDD /* manifest.json in Resources */,
 				978962902E27D39300F48BDD /* locales in Resources */,
-				978962972E27D39300F48BDD /* vendors.min.js in Resources */,
-				978962982E27D39300F48BDD /* index.min.js in Resources */,
-				978962952E27D39300F48BDD /* offscreens in Resources */,
+				977E15772E7AE71F00445DD3 /* vendors.min.js in Resources */,
+				977E15782E7AE71F00445DD3 /* index.min.js in Resources */,
+				977E15742E7AE6FD00445DD3 /* index.html in Resources */,
 				978962962E27D39300F48BDD /* _locales in Resources */,
 				978962912E27D39300F48BDD /* webAccessibleResources in Resources */,
 			);
@@ -525,6 +521,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -549,6 +546,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -588,6 +586,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -605,6 +604,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -615,7 +615,12 @@
 				CODE_SIGN_ENTITLEMENTS = "Passbolt-Safari-Extension Extension/Passbolt_Safari_Extension_Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Passbolt-Safari-Extension Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Passbolt-Safari-Extension Extension";
@@ -625,7 +630,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -645,7 +650,12 @@
 				CODE_SIGN_ENTITLEMENTS = "Passbolt-Safari-Extension Extension/Passbolt_Safari_Extension_Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Passbolt-Safari-Extension Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Passbolt-Safari-Extension Extension";
@@ -655,7 +665,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -678,7 +688,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Passbolt-Safari-Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Passbolt-Safari-Extension";
@@ -689,7 +703,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -713,7 +727,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Passbolt-Safari-Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Passbolt-Safari-Extension";
@@ -724,7 +742,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -745,8 +763,9 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.passbolt.Passbolt-Safari-ExtensionTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -762,8 +781,9 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.passbolt.Passbolt-Safari-ExtensionTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -778,6 +798,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.passbolt.Passbolt-Safari-ExtensionUITests";
@@ -793,6 +814,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.passbolt.Passbolt-Safari-ExtensionUITests";

@@ -23,6 +23,9 @@
 
 import SafariServices
 
+// Entry point of the Application part of the Safari extension.
+// It is mainly used to handle request from the extension
+@available(macOSApplicationExtension 12.0, *)
 final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
     func beginRequest(with context: NSExtensionContext) {
         guard
@@ -31,18 +34,18 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         else {
             return respond(context, error: "Bad or missing message")
         }
-        
+
         guard let action = payload["action"] as? String else {
             return respond(context, error: "No action is provided, cannot excute request")
         }
-        
+
         if action == "save-file" {
             return runSaveFile(context, payload)
         }
 
         return respond(context, error: "Unsupported action: \(action)");
     }
-    
+
     private func runSaveFile(_ context: NSExtensionContext, _ payload: [String: Any]) {
         do {
             let destinationPath = try SaveFileService.saveFile(payload)
@@ -51,10 +54,10 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             respond(context, error: error.localizedDescription)
         }
     }
-    
+
     private func respond(_ context: NSExtensionContext, error: String? = nil, extra: [String: Any] = [:]) {
         var body: [String: Any] = [:]
-    
+
         if let error {
             body["ok"] = false
             body["error"] = error

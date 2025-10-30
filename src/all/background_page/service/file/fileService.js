@@ -35,7 +35,10 @@ export default class FileService {
     content = new Blob([content], { type: mimeType });
     const dataUrl = await this.blobToDataURL(content);
 
-    if (chrome.downloads) {
+    if (typeof(customFileService) !== "undefined") {
+      // eslint-disable-next-line no-undef
+      return customFileService.saveFile(filename, content, mimeType);
+    } else if (chrome.downloads) {
       const scriptExecution = new ScriptExecution(tabId);
       // With MV3 API, it's not possible anymore to use the function URL.createObjectURL or URL.revokeObjectURL
       const url = await scriptExecution.injectBase64UrlToCreateObjectURL(dataUrl);

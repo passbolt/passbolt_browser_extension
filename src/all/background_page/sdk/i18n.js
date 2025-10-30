@@ -23,18 +23,27 @@ class I18n {
   /**
    * Initialize I18n
    * @param {string} locale The locale. i.e. en-UK
-   * @param {array<string>} supportedLocales The supported locales. i.e. ['en-UK', 'fr-FR']
+   * @param {array<string>} locales The supported locales. i.e. ['en-UK', 'fr-FR']
    */
-  static init(locale, supportedLocales) {
+  static init(locale, locales) {
     _i18next = i18next.createInstance();
     _i18next.use(HttpApi)
       .init({
         lng: locale,
         load: 'currentOnly',
         backend: {
-          loadPath: '/locales/{{lng}}/{{ns}}.json'
+          loadPath: (lngs, namespaces) => {
+            const lng = lngs[0];
+            const ns = namespaces[0];
+            //i18next is doing a fallback on en-GB we are redirecting to our en-UK folder
+            const actualLng = lng === 'en-GB' ? 'en-UK' : lng;
+            const basePath = '/locales/{{lng}}/{{ns}}.json';
+            return basePath
+              .replace('{{lng}}', actualLng)
+              .replace('{{ns}}', ns);
+          }
         },
-        supportedLngs: supportedLocales,
+        supportedLngs: I18n.supportedLocales(locales),
         fallbackLng: false,
         ns: ['common'],
         defaultNS: 'common',
@@ -43,6 +52,19 @@ class I18n {
         debug: false,
       });
   }
+
+  /**
+   * Add fallback locales for i18next compatibility
+   * @param {array<string>} locales The supported locales. i.e. ['en-UK', 'fr-FR']
+   * @returns {array<string>} The locales with fallback locales added
+   */
+  static supportedLocales(locales) {
+    if (locales.includes('en-UK')) {
+      locales.push('en-GB'); //Need to add the locale to support i18next fallback as en-UK is not supported
+    }
+    return locales;
+  }
+
 
   /**
    * Initialize the library with the default locale.

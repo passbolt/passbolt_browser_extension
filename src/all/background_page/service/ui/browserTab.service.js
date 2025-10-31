@@ -13,6 +13,7 @@
  */
 
 import {assertNumber} from "../../utils/assertions";
+import Validator from "validator";
 
 class BrowserTabService {
   /**
@@ -62,6 +63,27 @@ class BrowserTabService {
   static async closeTab(id) {
     assertNumber(id);
     await browser.tabs.remove(id);
+  }
+
+  /**
+   * Opens a new tab on the given URL
+   * @param {string} url
+   * @return {Promise<void>}
+   */
+  static async openTab(url) {
+    const validationOption = {
+      require_tld: false,
+      require_host: true,
+      require_protocol: true,
+      require_valid_protocol: true,
+      protocols: ["https", "http"],
+    };
+
+    if (!Validator.isURL(url, validationOption)) {
+      throw new Error("Cannot open tab due to an invalid URL");
+    }
+
+    await browser.tabs.create({url});
   }
 }
 

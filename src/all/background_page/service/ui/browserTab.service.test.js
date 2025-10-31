@@ -126,4 +126,29 @@ describe("BrowserTabService", () => {
       await expect(() => BrowserTabService.closeTab(tab.id)).rejects.toThrowError();
     });
   });
+
+  describe("BrowserTabService::openTab", () => {
+    it("Should open a new tab given a URL", async() => {
+      expect.assertions(1);
+      // mock data
+      const url = "https://www.passbolt.com";
+      // mock functions
+      jest.spyOn(browser.tabs, 'create');
+      // process
+      await BrowserTabService.openTab(url);
+      // expectations
+      expect(browser.tabs.create).toHaveBeenCalledWith({url});
+    });
+
+    it("Should throw an error if the URL is not valid", async() => {
+      expect.assertions(4);
+      // mock functions
+      jest.spyOn(browser.tabs, 'create');
+
+      await expect(() => BrowserTabService.openTab(null)).rejects.toThrowError();
+      await expect(() => BrowserTabService.openTab("url")).rejects.toThrowError();
+      await expect(() => BrowserTabService.openTab("ftp://www.passbolt.com")).rejects.toThrowError();
+      await expect(() => BrowserTabService.openTab("javascript:void(0")).rejects.toThrowError();
+    });
+  });
 });

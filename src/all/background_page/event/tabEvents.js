@@ -7,6 +7,7 @@
 import i18n from "../sdk/i18n";
 import CloseActiveTabController from "../controller/tab/closeActiveTabController";
 import BrowserTabService from "../service/ui/browserTab.service";
+import OpenTabController from "../controller/tab/openTabController";
 
 const listen = function (worker) {
   /*
@@ -36,5 +37,16 @@ const listen = function (worker) {
     const controller = new CloseActiveTabController(worker, requestId);
     await controller._exec();
   });
+
+  /**
+   * Opens a new tab given a URL.
+   * @param {string} requestId
+   * @listens passbolt.tabs.open
+   */
+  worker.port.on('passbolt.tabs.open', async(requestId, url) => {
+    const controller = new OpenTabController(worker, requestId);
+    await controller._exec(url);
+  });
 };
+
 export const TabEvents = { listen };

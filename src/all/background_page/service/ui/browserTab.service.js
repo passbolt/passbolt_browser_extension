@@ -12,6 +12,8 @@
  * @since         3.4.0
  */
 
+import {assertNumber} from "../../utils/assertions";
+
 class BrowserTabService {
   /**
    * Get the current tab
@@ -44,11 +46,22 @@ class BrowserTabService {
 
   /**
    * Reload the tab
-   * @param id The id of the tab
+   * @param {int} id The id of the tab
    * @return {Promise<void>}
    */
   static async reloadTab(id) {
+    assertNumber(id);
     await browser.tabs.reload(id);
+  }
+
+  /**
+   * Closes the tab given its id
+   * @param {int} id The id of the tab
+   * @return {Promise<void>}
+   */
+  static async closeTab(id) {
+    assertNumber(id);
+    await browser.tabs.remove(id);
   }
 }
 

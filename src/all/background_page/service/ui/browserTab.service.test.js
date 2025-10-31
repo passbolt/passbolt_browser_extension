@@ -95,5 +95,35 @@ describe("BrowserTabService", () => {
       // expectations
       expect(browser.tabs.reload).toHaveBeenCalledWith(tab.id);
     });
+
+    it("Should assert its parameter", async() => {
+      expect.assertions(1);
+      // mock data
+      const tab = {id: "1"};
+      // process
+      await expect(() => BrowserTabService.reloadTab(tab.id)).rejects.toThrowError();
+    });
+  });
+
+  describe("BrowserTabService::closeTab", () => {
+    it("Should close the tab by id", async() => {
+      expect.assertions(1);
+      // mock data
+      const tab = {id: 1};
+      // mock functions
+      jest.spyOn(browser.tabs, 'remove');
+      // process
+      await BrowserTabService.closeTab(tab.id);
+      // expectations
+      expect(browser.tabs.remove).toHaveBeenCalledWith(tab.id);
+    });
+
+    it("Should assert its parameter", async() => {
+      expect.assertions(1);
+      // mock data
+      const tab = {id: "1"};
+      // process
+      await expect(() => BrowserTabService.closeTab(tab.id)).rejects.toThrowError();
+    });
   });
 });

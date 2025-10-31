@@ -5,6 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 import i18n from "../sdk/i18n";
+import CloseActiveTabController from "../controller/tab/closeActiveTabController";
 import BrowserTabService from "../service/ui/browserTab.service";
 
 const listen = function (worker) {
@@ -24,6 +25,16 @@ const listen = function (worker) {
       return;
     }
     worker.port.emit(requestId, "SUCCESS", tab.url);
+  });
+
+  /**
+   * Closes the current active tab.
+   * @param {string} requestId
+   * @listens passbolt.active-tab.close
+   */
+  worker.port.on('passbolt.active-tab.close', async requestId => {
+    const controller = new CloseActiveTabController(worker, requestId);
+    await controller._exec();
   });
 };
 export const TabEvents = { listen };

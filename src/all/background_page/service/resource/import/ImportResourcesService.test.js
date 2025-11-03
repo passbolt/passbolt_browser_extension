@@ -56,10 +56,14 @@ import each from "jest-each";
 import GetOrFindMetadataSettingsService from "../../metadata/getOrFindMetadataSettingsService";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
+import {defaultPasswordExpirySettingsDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
+import PasswordExpirySettingsService from "../../api/passwordExpiry/passwordExpirySettingsService";
+import {defaultCeOrganizationSettings, defaultProOrganizationSettings} from "../../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import OrganizationSettingsService from "../../api/organizationSettings/organizationSettingsService";
 
 jest.mock("../../../service/progress/progressService");
 
-beforeEach(async() =>  {
+beforeEach(async() => {
   await MockExtension.withConfiguredAccount();
   jest.clearAllMocks();
 });
@@ -99,12 +103,14 @@ describe("ImportResourcesService", () => {
   });
 
   describe("::importFile", () => {
-    beforeEach(async() =>  {
+    beforeEach(async() => {
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => defaultResourceDto());
       jest.spyOn(FolderService.prototype, "create").mockImplementation(() => defaultFolderDto());
       jest.spyOn(TagService.prototype, "updateResourceTags").mockImplementation(() => [defaultTagDto({slug: "import-ref"})]);
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({armored_key: pgpKeys.metadataKey.public});
       metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      const collection = resourceTypesCollectionDto();
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => collection);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
       jest.spyOn(GetOrFindMetadataKeysService.prototype, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => defaultMetadataKeysSettingsDto());
@@ -127,7 +133,7 @@ describe("ImportResourcesService", () => {
         expect.assertions(8);
 
         const expectedSlug = test.metadataTypesSettings.default_resource_types === "v4" ? RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG : RESOURCE_TYPE_V5_DEFAULT_SLUG;
-        const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
+        const expectedResourceType = collection.find(resourceType => resourceType.slug === expectedSlug);
 
         expect(importResourceFileCSV.importResources.items.length).toEqual(0);
 
@@ -140,8 +146,8 @@ describe("ImportResourcesService", () => {
 
         const importedResources = result.importResources.items;
 
-        const secret1 =  await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
-        const secret2 =  await decryptSecret(result.importResources.items[1].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+        const secret1 = await decryptSecret(result.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+        const secret2 = await decryptSecret(result.importResources.items[1].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
         if (test.metadataTypesSettings.default_resource_types === "v4") {
           expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\"}");
           expect(secret2).toEqual("{\"password\":\"Password 2\",\"description\":\"Description 2\"}");
@@ -181,7 +187,7 @@ describe("ImportResourcesService", () => {
         expect.assertions(5);
 
         const expectedSlug = test.metadataTypesSettings.default_resource_types === "v4" ? RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG : RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG;
-        const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
+        const expectedResourceType = collection.find(resourceType => resourceType.slug === expectedSlug);
 
         importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
           file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData()))
@@ -195,7 +201,7 @@ describe("ImportResourcesService", () => {
         expect(result.importResourcesErrors.length).toEqual(0);
         expect(result.importResourcesWarnings.length).toEqual(0);
 
-        const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+        const secret1 = await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
         if (test.metadataTypesSettings.default_resource_types === "v4") {
           expect(secret1).toEqual("{\"password\":\"Password 1\",\"description\":\"Description 1\",\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
@@ -222,7 +228,7 @@ describe("ImportResourcesService", () => {
         expect.assertions(5);
 
         const expectedSlug = test.metadataTypesSettings.default_resource_types === "v4" ? RESOURCE_TYPE_TOTP_SLUG : RESOURCE_TYPE_V5_TOTP_SLUG;
-        const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
+        const expectedResourceType = collection.find(resourceType => resourceType.slug === expectedSlug);
 
         importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
           file: btoa(BinaryConvert.toBinary(KdbxCsvFileTotpData))
@@ -236,7 +242,7 @@ describe("ImportResourcesService", () => {
         expect(result.importResourcesErrors.length).toEqual(0);
         expect(result.importResourcesWarnings.length).toEqual(0);
 
-        const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+        const secret1 = await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
         if (test.metadataTypesSettings.default_resource_types === "v4") {
           expect(secret1).toEqual("{\"totp\":{\"secret_key\":\"THISISASECRET\",\"period\":30,\"digits\":6,\"algorithm\":\"SHA1\"}}");
@@ -264,7 +270,7 @@ describe("ImportResourcesService", () => {
         expect.assertions(5);
 
         const expectedSlug = test.metadataTypesSettings.default_resource_types === "v4" ? RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG : RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG;
-        const expectedResourceType = collection.find(resourceType =>  resourceType.slug === expectedSlug);
+        const expectedResourceType = collection.find(resourceType => resourceType.slug === expectedSlug);
 
         importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto({
           file: btoa(BinaryConvert.toBinary(defaultKDBXCSVData()))
@@ -278,7 +284,7 @@ describe("ImportResourcesService", () => {
         expect(result.importResourcesErrors.length).toEqual(0);
         expect(result.importResourcesWarnings.length).toEqual(0);
 
-        const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+        const secret1 = await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
 
         // @todo Testing v4 & v5 scenarios will require a more important refactoring of the test.
         if (test.metadataTypesSettings.default_resource_types === "v4") {
@@ -526,7 +532,7 @@ describe("ImportResourcesService", () => {
       expect(result.importResourcesErrors.length).toEqual(1);
       expect(result.importResourcesWarnings.length).toEqual(0);
 
-      const secret1 =  await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
+      const secret1 = await decryptSecret(importResourceFileCSV.importResources.items[0].secrets.items[0].data, pgpKeys.ada.private, pgpKeys.ada.passphrase);
       const error = importResourceFileCSV.importResourcesErrors[0];
 
       expect(error).toBeInstanceOf(ImportError);
@@ -567,6 +573,169 @@ describe("ImportResourcesService", () => {
       expect(error.sourceError).toBeInstanceOf(EntityValidationError);
       expect(error.sourceError.details).toHaveProperty("name");
       expect(result.importFolders.items[0].name).toEqual("import-ref");
+    });
+
+    describe("Password Expiry on Import", () => {
+      describe("PRO Edition", () => {
+        beforeEach(() => {
+          const collection = resourceTypesCollectionDto();
+          jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => collection);
+          jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
+            .mockImplementationOnce(() => new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()));
+        });
+
+        it("Should set expiry date when password expiry feature is enabled with default period", async() => {
+          expect.assertions(3);
+
+          jest.spyOn(OrganizationSettingsService.prototype, "find")
+            .mockImplementation(() => defaultProOrganizationSettings());
+
+          jest.spyOn(PasswordExpirySettingsService.prototype, "find")
+            .mockImplementation(() => defaultPasswordExpirySettingsDtoFromApi({
+              default_expiry_period: 90,
+            }));
+
+          await importResourcesService.parseFile(importResourceFileCSV);
+          await importResourcesService.importFile(importResourceFileCSV, passphrase);
+
+          const createCalls = ResourceService.prototype.create.mock.calls;
+
+          expect(createCalls.length).toEqual(2);
+
+          const createdCollection = new ResourcesCollection([
+            createCalls[0][0],
+            createCalls[1][0],
+          ]);
+
+          expect(createdCollection.items[0]._props.expired).not.toBeNull();
+          expect(createdCollection.items[1]._props.expired).not.toBeNull();
+        });
+
+        describe("Should not set expiry date when", () => {
+          it("password expiry plugin is disabled", async() => {
+            expect.assertions(3);
+
+            const organizationSettings = defaultProOrganizationSettings();
+            organizationSettings.passbolt.plugins.passwordExpiry.enabled = false;
+
+            jest.spyOn(OrganizationSettingsService.prototype, "find")
+              .mockImplementation(() => organizationSettings);
+
+            jest.spyOn(PasswordExpirySettingsService.prototype, "find")
+              .mockImplementation(() => defaultPasswordExpirySettingsDtoFromApi({
+                default_expiry_period: 90,
+              }));
+
+            await importResourcesService.parseFile(importResourceFileCSV);
+            await importResourcesService.importFile(importResourceFileCSV, passphrase);
+
+            const createCalls = ResourceService.prototype.create.mock.calls;
+
+            expect(createCalls.length).toEqual(2);
+
+            const createdCollection = new ResourcesCollection([
+              createCalls[0][0],
+              createCalls[1][0],
+            ]);
+
+            expect(createdCollection.items[0]._props.expired).toBeNull();
+            expect(createdCollection.items[1]._props.expired).toBeNull();
+          });
+
+          it("password expiry policies feature is disabled", async() => {
+            expect.assertions(3);
+
+            const organizationSettings = defaultProOrganizationSettings();
+            organizationSettings.passbolt.plugins.passwordExpiryPolicies.enabled = false;
+
+            jest.spyOn(OrganizationSettingsService.prototype, "find")
+              .mockImplementation(() => organizationSettings);
+
+            jest.spyOn(PasswordExpirySettingsService.prototype, "find")
+              .mockImplementation(() => defaultPasswordExpirySettingsDtoFromApi({
+                default_expiry_period: 90,
+              }));
+
+            await importResourcesService.parseFile(importResourceFileCSV);
+            await importResourcesService.importFile(importResourceFileCSV, passphrase);
+
+            const createCalls = ResourceService.prototype.create.mock.calls;
+
+            expect(createCalls.length).toEqual(2);
+
+            const createdCollection = new ResourcesCollection([
+              createCalls[0][0],
+              createCalls[1][0],
+            ]);
+
+            expect(createdCollection.items[0]._props.expired).toBeNull();
+            expect(createdCollection.items[1]._props.expired).toBeNull();
+          });
+
+          it("default expiry period is not set", async() => {
+            expect.assertions(3);
+
+            jest.spyOn(OrganizationSettingsService.prototype, "find")
+              .mockImplementation(() => defaultProOrganizationSettings());
+
+            jest.spyOn(PasswordExpirySettingsService.prototype, "find")
+              .mockImplementation(() => defaultPasswordExpirySettingsDtoFromApi());
+
+            await importResourcesService.parseFile(importResourceFileCSV);
+            await importResourcesService.importFile(importResourceFileCSV, passphrase);
+
+            const createCalls = ResourceService.prototype.create.mock.calls;
+
+            expect(createCalls.length).toEqual(2);
+
+            const createdCollection = new ResourcesCollection([
+              createCalls[0][0],
+              createCalls[1][0],
+            ]);
+
+            expect(createdCollection.items[0]._props.expired).toBeNull();
+            expect(createdCollection.items[1]._props.expired).toBeNull();
+          });
+        });
+      });
+
+      describe("CE Edition", () => {
+        beforeEach(() => {
+          jest.spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
+            .mockImplementationOnce(() => new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()));
+        });
+
+        it("Should not set expiry date even when password expiry plugin is enabled", async() => {
+          expect.assertions(3);
+
+          const organizationSettings = defaultCeOrganizationSettings();
+          organizationSettings.passbolt.plugins.passwordExpiry = {
+            "version": "1.0.0",
+            "enabled": true
+          };
+
+          jest.spyOn(OrganizationSettingsService.prototype, "find")
+            .mockImplementation(() => organizationSettings);
+
+          jest.spyOn(PasswordExpirySettingsService.prototype, "find")
+            .mockImplementation(() => defaultPasswordExpirySettingsDtoFromApi());
+
+          await importResourcesService.parseFile(importResourceFileCSV);
+          await importResourcesService.importFile(importResourceFileCSV, passphrase);
+
+          const createCalls = ResourceService.prototype.create.mock.calls;
+
+          expect(createCalls.length).toEqual(2);
+
+          const createdCollection = new ResourcesCollection([
+            createCalls[0][0],
+            createCalls[1][0],
+          ]);
+
+          expect(createdCollection.items[0]._props.expired).toBeNull();
+          expect(createdCollection.items[1]._props.expired).toBeNull();
+        });
+      });
     });
   });
 });

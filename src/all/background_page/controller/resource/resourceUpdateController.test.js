@@ -26,6 +26,7 @@ import ResourceTypeService from "../../service/api/resourceType/resourceTypeServ
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import PermissionService from "../../service/api/permission/permissionService";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 jest.mock("../../service/progress/progressService");
@@ -50,6 +51,7 @@ describe("ResourceUpdateController", () => {
     controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
     fetch.doMockOnce(() => mockApiResponse(defaultResourceV4Dto()));
     jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+    jest.spyOn(PermissionService.prototype, "findAllByAcoForeignKey").mockImplementation(() => []);
   });
   describe("ResourceUpdateController::_exec", () => {
     it("Should call the resourceUpdateService and emit a success message when only metadata have benn updated", async() => {

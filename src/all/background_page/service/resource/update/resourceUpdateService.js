@@ -25,6 +25,7 @@ import EncryptMessageService from "../../crypto/encryptMessageService";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
 import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
+import FindPermissionsService from "../../permission/findPermissionsService";
 
 class ResourceUpdateService {
   /**
@@ -38,6 +39,7 @@ class ResourceUpdateService {
     this.resourceService = new ResourceService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.progressService = progressService;
+    this.findPermissionsService = new FindPermissionsService(account, apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions);
     this.encryptMetadataKeysService = new EncryptMetadataKeysService(apiClientOptions, this.account);
     this.userModel = new UserModel(apiClientOptions);
@@ -45,10 +47,10 @@ class ResourceUpdateService {
   }
 
   /**
-   * Create a resource.
+   * Update a resource.
    *
    * @param {object} resourceDto The resource data
-   * @param {string|object} plaintextDto The secret to encrypt
+   * @param {string|object|null} plaintextDto The secret to encrypt, or null to keep the existing secret
    * @param {string} passphrase The user passphrase
    * @return {Promise<ResourceEntity>} resourceEntity
    */
@@ -56,10 +58,12 @@ class ResourceUpdateService {
     const resourceEntity = new ResourceEntity(resourceDto);
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
     const resourceTypeEntity = resourceTypesCollection.getFirstById(resourceEntity.resourceTypeId);
+    const permissionsCollection =  await this.findPermissionsService.findAllByAcoForeignKey(resourceEntity.id);
+
     // Get users ids of those who have access to the resource
     const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
-    // Set personal property
-    resourceEntity.personal = usersIds.length === 1;
+    // Set personal property only if resource is not shared with user and group
+    resourceEntity.personal = usersIds.length === 1 && !permissionsCollection.hasGroupPermission;
     // Set goals
     const goals = this.calculateGoals(plaintextDto, resourceTypeEntity, usersIds.length);
     this.progressService.updateGoals(goals);

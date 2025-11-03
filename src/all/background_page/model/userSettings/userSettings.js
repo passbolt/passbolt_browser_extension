@@ -115,7 +115,15 @@ class UserSettings {
     if ((typeof domain === 'undefined' || domain === '')) {
       throw new Error('A domain cannot be empty');
     }
-    if (!Validator.isURL(domain, {require_tld: false})) {
+    const validatorOptions = {
+      protocols: ['http', 'https'],
+      require_protocol: true,
+      require_tld: false,
+      allow_fragments: false,
+      allow_query_components: false,
+      disallow_auth: true,
+    };
+    if (!Validator.isURL(domain, validatorOptions)) {
       throw new Error('The trusted domain url is not valid.');
     }
   }

@@ -105,4 +105,55 @@ describe("User settings validation security token", () => {
     expect(global.customApiClientFetch).toHaveBeenCalled();
     delete global.customApiClientFetch;
   });
+
+  describe("::validateDomain", () => {
+    it("should refuse any non compliant URL", () => {
+      const wrongUrls = [
+        "ftp://www.passbolt.com",
+        "http://www.passbolt.com/#test",
+        "http://www.passbolt.com/?test=1",
+        "http://www.passbolt.com/?test",
+        "htp://www.passbolt.com",
+        "htps://www.passbolt.com",
+        "https://username:password@www.passbolt.com",
+        "javascript:void(0)",
+        "setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+      ];
+      expect.assertions(wrongUrls.length);
+
+      const service = new UserSettings();
+      for (let i = 0; i < wrongUrls.length; i++) {
+        expect(() => service.validateDomain(wrongUrls[i])).toThrowError();
+      }
+    });
+
+    it("should accept any compliant URL", () => {
+      const validUrls = [
+        "http://www.passbolt.com",
+        "https://www.passbolt.com",
+        "http://passbolt.com",
+        "https://passbolt.com",
+        "https://passbolt.dev",
+        "https://passbolt.dev:4443",
+        "https://passbolt",
+        "https://127.0.0.1",
+        "https://127.0.0.1/acme",
+        "https://127.0.0.1:4443",
+        "https://127.0.0.1:4443/acme",
+        "https://[0:0:0:0:0:0:0:1]",
+        "https://[0:0:0:0:0:0:0:1]:4443",
+        "https://[0:0:0:0:0:0:0:1]/acme",
+        "https://[0:0:0:0:0:0:0:1]:4443/acme",
+        "https://clould.passbolt.dev/acme",
+        "https://clould.passbolt.dev/acme",
+        "https://passbolt.dev/setup/install",
+      ];
+      expect.assertions(validUrls.length);
+
+      const service = new UserSettings();
+      for (let i = 0; i < validUrls.length; i++) {
+        expect(() => service.validateDomain(validUrls[i])).not.toThrowError();
+      }
+    });
+  });
 });

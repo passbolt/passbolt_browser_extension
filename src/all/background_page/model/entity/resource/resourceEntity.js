@@ -683,6 +683,15 @@ class ResourceEntity extends EntityV2 {
     this._props.personal = personal;
   }
 
+  /**
+   * Set resource personal
+   * @param {string|null} expiryDate
+   */
+  set expired(expiryDate) {
+    EntitySchema.validateProp("expired", expiryDate, ResourceEntity.getSchema().properties.expired);
+    this._props.expired = expiryDate;
+  }
+
   /*
    * ==================================================
    * Build rules

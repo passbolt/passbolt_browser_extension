@@ -255,6 +255,25 @@ class ResourcesCollection extends EntityV2Collection {
     }
   }
 
+  /**
+   * Sets the expiry date on all resources in the collection.
+   * @param {string|null} expiryDate
+   * @param {ResourceTypesCollection} resourceTypes
+   * @returns {void}
+   */
+  setExpiryDateIfUnset(expiryDate, resourceTypes) {
+    resourceTypes.filterByPasswordResourceTypes();
+    if (!resourceTypes.length) {
+      return;
+    }
+
+    this.resources.forEach(resource => {
+      if (!resource._props.expired && resourceTypes.getFirstById(resource.resourceTypeId)) {
+        resource.expired = expiryDate;
+      }
+    });
+  }
+
   /*
    * ==================================================
    * Association management

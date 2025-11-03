@@ -20,16 +20,18 @@ import {
   TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
   TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
   TEST_RESOURCE_TYPE_PASSWORD_STRING,
-  TEST_RESOURCE_TYPE_TOTP
+  TEST_RESOURCE_TYPE_TOTP,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import {defaultResourceDtosCollection, defaultResourcesDtos, resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
-  resourceTypesCollectionDto
+  resourceTypesCollectionDto,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
   defaultResourceDto,
-  defaultResourceV4Dto
+  defaultResourceV4Dto,
+  resourceStandaloneTotpDto,
+  resourceWithTotpDto
 } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import ResourceEntity, {METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY} from "./resourceEntity";
 import {defaultTagDto} from "../tag/tagEntity.test.data";
@@ -478,6 +480,104 @@ describe("ResourcesCollection", () => {
       const collection = new ResourcesCollection([]);
 
       expect(() => collection.updateWithCollection("test")).toThrow();
+    });
+  });
+  describe("::setExpiryDateIfUnset", () => {
+    it("should set expiry date on resources that don't have one", () => {
+      expect.assertions(3);
+
+      const resource1 = defaultResourceDto();
+      const resource2 = defaultResourceDto();
+      const resource3 = defaultResourceDto();
+      const collection = new ResourcesCollection([resource1, resource2, resource3]);
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+      const expiryDate = "2025-12-31T23:59:59Z";
+      collection.setExpiryDateIfUnset(expiryDate, resourcesTypes);
+
+      expect(collection.items[0]._props.expired).toEqual(expiryDate);
+      expect(collection.items[1]._props.expired).toEqual(expiryDate);
+      expect(collection.items[2]._props.expired).toEqual(expiryDate);
+    });
+
+    it("should not override existing expiry dates", () => {
+      expect.assertions(3);
+
+      const existingExpiryDate = "2025-06-30T23:59:59Z";
+      const resource1 = defaultResourceDto({expired: existingExpiryDate});
+      const resource2 = defaultResourceDto();
+      const resource3 = defaultResourceDto({expired: existingExpiryDate});
+      const collection = new ResourcesCollection([resource1, resource2, resource3]);
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+      const newExpiryDate = "2025-12-31T23:59:59Z";
+      collection.setExpiryDateIfUnset(newExpiryDate, resourcesTypes);
+
+      expect(collection.items[0]._props.expired).toEqual(existingExpiryDate);
+      expect(collection.items[1]._props.expired).toEqual(newExpiryDate);
+      expect(collection.items[2]._props.expired).toEqual(existingExpiryDate);
+    });
+
+    it("should work with empty collection", () => {
+      expect.assertions(1);
+
+      const collection = new ResourcesCollection([]);
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+      const expiryDate = "2025-12-31T23:59:59Z";
+
+      expect(() => collection.setExpiryDateIfUnset(expiryDate, resourcesTypes)).not.toThrow();
+    });
+
+    it("should handle null expiry date", () => {
+      expect.assertions(3);
+
+      const resource1 = defaultResourceDto();
+      const resource2 = defaultResourceDto();
+      const resource3 = defaultResourceDto();
+      const collection = new ResourcesCollection([resource1, resource2, resource3]);
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+      collection.setExpiryDateIfUnset(null, resourcesTypes);
+
+      expect(collection.items[0]._props.expired).toBeNull();
+      expect(collection.items[1]._props.expired).toBeNull();
+      expect(collection.items[2]._props.expired).toBeNull();
+    });
+
+    it("should do nothing when resourceTypes is empty after filtering", () => {
+      expect.assertions(3);
+
+      const resource1 = defaultResourceDto();
+      const resource2 = defaultResourceDto();
+      const resource3 = defaultResourceDto();
+      const collection = new ResourcesCollection([resource1, resource2, resource3]);
+      const resourcesTypes = new ResourceTypesCollection([]);
+
+      const expiryDate = "2025-12-31T23:59:59Z";
+      collection.setExpiryDateIfUnset(expiryDate, resourcesTypes);
+
+      expect(collection.items[0]._props.expired).toBeNull();
+      expect(collection.items[1]._props.expired).toBeNull();
+      expect(collection.items[2]._props.expired).toBeNull();
+    });
+
+    it("should only set expiry on resources matching the filtered resource types", () => {
+      expect.assertions(3);
+
+      const standaloneTotpResourceType = resourceStandaloneTotpDto();
+      const totpResourceType = resourceWithTotpDto();
+      const ResourceType = defaultResourceDto();
+
+      const collection = new ResourcesCollection([totpResourceType, standaloneTotpResourceType, ResourceType]);
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+
+      const expiryDate = "2025-12-31T23:59:59Z";
+      collection.setExpiryDateIfUnset(expiryDate, resourcesTypes);
+
+      expect(collection.items[0]._props.expired).toEqual(expiryDate);
+      expect(collection.items[1]._props.expired).toBeNull();
+      expect(collection.items[2]._props.expired).toEqual(expiryDate);
     });
   });
 });

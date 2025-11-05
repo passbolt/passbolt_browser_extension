@@ -12,7 +12,7 @@
  * @since         5.6.0
  */
 
-const SAFARI_APP_ID = "com.passbolt.Passbolt-Safari-Extension";
+const SAFARI_APP_ID = "com.passbolt.safari";
 
 /**
  * Send Native Message service for Safari
@@ -26,6 +26,7 @@ export class SendNativeMessageService {
    */
   static async sendNativeMessage(action, args) {
     const message = {action, ...args};
+    //@note: SAFARI_APP_ID is actually ignored when used by Safari. It is sill set here to respect `sendNativeMessage` standard.
     const resp = await chrome.runtime.sendNativeMessage(SAFARI_APP_ID, message);
 
     if (!resp.success) {

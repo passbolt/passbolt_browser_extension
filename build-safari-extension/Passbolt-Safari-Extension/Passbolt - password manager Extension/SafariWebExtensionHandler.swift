@@ -20,7 +20,6 @@
 // @link          https://www.passbolt.com Passbolt (tm)
 // @since         v1.0
 //
-
 import SafariServices
 
 @available(macOSApplicationExtension 12.0, *)
@@ -33,8 +32,7 @@ let routes: [String: AbstractController.Type] = [
 // It is mainly used to handle request from the extension
 @available(macOSApplicationExtension 12.0, *)
 final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
-
-    let errorController = ErrorController()
+    private let errorController = ErrorController()
 
     // Handles request coming form the extension using `chrome.runtime.sendNativeMessage`
     func beginRequest(with context: NSExtensionContext) {

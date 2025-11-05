@@ -29,7 +29,7 @@ describe("SendNativeMessageService", () => {
 
       expect(result).toStrictEqual({success: true});
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.Passbolt-Safari-Extension", expectedMessage);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedMessage);
     });
 
     it("should throw an error if the messaing went wrong", async() => {

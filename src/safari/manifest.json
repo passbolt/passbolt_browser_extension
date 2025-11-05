@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "__MSG_appName__",
+  "name": "Passbolt - password manager",
   "short_name": "passbolt",
   "version": "5.9.0",
-  "description": "__MSG_appDescription__",
+  "description": "Passbolt extension for the open source password manager.",
   "default_locale": "en",
   "icons": {
     "16": "webAccessibleResources/img/icons/icon-16.png",

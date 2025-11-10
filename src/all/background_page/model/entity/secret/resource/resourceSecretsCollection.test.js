@@ -15,7 +15,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ResourceSecretsCollection from "./resourceSecretsCollection";
 import {minimalDto, readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
-import SecretEntity from "../secretEntity";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import {defaultResourcesSecretsDtos} from "./resourceSecretsCollection.test.data";
 
 describe("ResourceSecretsCollection", () => {

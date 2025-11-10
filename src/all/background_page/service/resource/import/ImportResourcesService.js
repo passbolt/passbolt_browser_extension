@@ -16,7 +16,7 @@ import ImportError from "../../../error/importError";
 import ExternalFoldersCollection from "../../../model/entity/folder/external/externalFoldersCollection";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
-import SecretEntity from "../../../model/entity/secret/secretEntity";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import TagsCollection from "../../../model/entity/tag/tagsCollection";
 import FolderModel from "../../../model/folder/folderModel";
 import ResourcesImportParser from "../../../model/import/resourcesImportParser";

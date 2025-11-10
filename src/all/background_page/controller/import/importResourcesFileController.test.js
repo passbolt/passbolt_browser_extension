@@ -157,11 +157,11 @@ describe("ImportResourcesFileController", () => {
         {scenario: "null", file: null},
         {scenario: "undefined", file: undefined},
         {scenario: "string", file: "not a base 64"},
-        {scenario: "number", file: 1},
+        {scenario: "Number", file: 1},
         {scenario: "Object", file: {}},
         {scenario: "Array", file: []},
-        {scenario: "boolean", file: true},
-        {scenario: "function", file: () => { }},
+        {scenario: "Boolean", file: true},
+        {scenario: "Function", file: () => { }},
       ]).describe("Should reject other file.", test => {
         it(`Should reject ${test.scenario} file`, async() => {
           expect.assertions(1);

@@ -15,6 +15,7 @@
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+import i18n from "../../sdk/i18n";
 
 
 class GetUserKeyInfoController {
@@ -60,7 +61,7 @@ class GetUserKeyInfoController {
 
       if (!keyInfo) {
         //@todo maybe send a KeyringError instead
-        throw new Error('User key not found');
+        throw new Error(i18n.t('User key not found'));
       }
     }
     const key = await OpenpgpAssertion.readKeyOrFail(keyInfo.armoredKey);

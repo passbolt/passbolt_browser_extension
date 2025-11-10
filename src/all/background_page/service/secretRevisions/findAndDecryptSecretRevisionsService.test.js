@@ -48,8 +48,11 @@ describe("FindAndDecryptSecretRevisionsService", () => {
         secret: true,
         creator: true,
         "creator.profile": true,
-        owner_accessors: true,
-        "owner_accessors.profile": true,
+        /*
+         *  Not supported yet
+         *  owner_accessors: true,
+         * "owner_accessors.profile": true,
+         */
       };
       const resource_id = uuidv4();
       const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());

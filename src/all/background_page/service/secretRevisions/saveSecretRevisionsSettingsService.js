@@ -32,7 +32,7 @@ export default class SaveSecretRevisionsSettingsService {
    */
   async saveSettings(secretRevisionSettingsEntity) {
     assertType(secretRevisionSettingsEntity, SecretRevisionsSettingsEntity);
-    const httpResponse = await this.secretRevisionsSettingsApiService.save(secretRevisionSettingsEntity);
-    return new SecretRevisionsSettingsEntity(httpResponse.body);
+    const apiResponse = await this.secretRevisionsSettingsApiService.save(secretRevisionSettingsEntity);
+    return new SecretRevisionsSettingsEntity(apiResponse.body);
   }
 }

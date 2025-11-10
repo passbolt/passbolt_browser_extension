@@ -105,7 +105,7 @@ describe("ShareResourceService", () => {
       // Mock resources permissions retrieval.
       jest.spyOn(service.findResourcesService, "findAllByIdsWithPermissions").mockImplementation(() => new ResourcesCollection([]));
       // Mock the share request.
-      // eslint-disable-next-line one-var
+
       let shareRequestData;
       jest.spyOn(service.shareService, "shareFolder").mockImplementation((folderId, data) => {
         shareRequestData = data;
@@ -172,7 +172,7 @@ describe("ShareResourceService", () => {
       // Mock resources permissions retrieval.
       jest.spyOn(service.findResourcesService, "findAllByIdsWithPermissions").mockImplementation(() => new ResourcesCollection([]));
       // Mock the share request.
-      // eslint-disable-next-line one-var
+
       let shareRequest1Data, shareRequest2Data;
       jest.spyOn(service.shareService, "shareFolder").mockImplementation((folderId, data) => {
         switch (folderId) {
@@ -256,7 +256,7 @@ describe("ShareResourceService", () => {
       ];
       jest.spyOn(service.findResourcesService, "findAllByIdsWithPermissions").mockImplementation(() => new ResourcesCollection(findAllByIdsWithPermissionsResources));
       // Mock the share request.
-      // eslint-disable-next-line one-var
+
       let shareFolderRequest1Data, shareFolderRequest2Data;
       jest.spyOn(service.shareService, "shareFolder").mockImplementation((folderId, data) => {
         switch (folderId) {

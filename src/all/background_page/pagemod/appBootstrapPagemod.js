@@ -12,7 +12,6 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {AppBootstrapEvents} from "../event/appBootstrapEvents";
 import ParseAppUrlService from "../service/app/parseAppUrlService";
 import {PortEvents} from "../event/portEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
@@ -48,7 +47,7 @@ class AppBootstrap extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [AppBootstrapEvents, PortEvents];
+    return [PortEvents];
   }
 
   /**

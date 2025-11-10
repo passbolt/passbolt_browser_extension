@@ -42,7 +42,8 @@ class PownedPasswordService {
     let response;
     try {
       response = await fetch(url);
-    } catch (e) {
+    } catch (error) {
+      console.error(error);
       throw new ExternalServiceUnavailableError("pwnedpasswords API service is not available");
     }
 

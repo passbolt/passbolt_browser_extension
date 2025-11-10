@@ -299,21 +299,6 @@ class ResourceModel {
     return false;
   }
 
-  /**
-   * Update a favorite association of a resource in local storage
-   * Doesn't udpate the favorite remotely, use favoriteModel for this instead
-   *
-   * @param {string} resourceId
-   * @param {FavoriteEntity|null} favoriteEntity or null
-   * @return {Promise<void>}
-   */
-  async updateFavoriteLocally(resourceId, favoriteEntity) {
-    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
-    const resourceEntity = new ResourceEntity(resourceDto);
-    resourceEntity.favorite = favoriteEntity;
-    await ResourceLocalStorage.updateResource(resourceEntity);
-  }
-
   /*
    * ==============================================================
    *  Assertions

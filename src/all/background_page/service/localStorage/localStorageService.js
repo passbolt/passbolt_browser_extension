@@ -52,7 +52,6 @@ class LocalStorageService {
     FolderLocalStorage.flush();
     AuthStatusLocalStorage.flush();
     UserLocalStorage.flush();
-    GroupLocalStorage.flush();
     RolesLocalStorage.flush();
     PasswordGeneratorLocalStorage.flush();
     PostponeUserSettingInvitationService.reset();
@@ -76,6 +75,7 @@ class LocalStorageService {
     (new MetadataTypesSettingsLocalStorage(account)).flush();
     (new MetadataKeysSessionStorage(account)).flush();
     (new SessionKeysBundlesSessionStorageService(account)).flush();
+    (new GroupLocalStorage(account)).flush();
     UserMeSessionStorageService.remove(account);
   }
 }

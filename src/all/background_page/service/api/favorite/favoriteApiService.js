@@ -14,9 +14,9 @@
 import AbstractService from "../abstract/abstractService";
 import FavoriteEntity from "../../../model/entity/favorite/favoriteEntity";
 
-const FAVORITE_SERVICE_RESOURCE_NAME = 'favorites';
+const FAVORITE_API_SERVICE_RESOURCE_NAME = 'favorites';
 
-class FavoriteService extends AbstractService {
+class FavoriteApiService extends AbstractService {
   /**
    * Constructor
    *
@@ -24,7 +24,7 @@ class FavoriteService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, FavoriteService.RESOURCE_NAME);
+    super(apiClientOptions, FavoriteApiService.RESOURCE_NAME);
   }
 
   /**
@@ -34,7 +34,7 @@ class FavoriteService extends AbstractService {
    * @public
    */
   static get RESOURCE_NAME() {
-    return FAVORITE_SERVICE_RESOURCE_NAME;
+    return FAVORITE_API_SERVICE_RESOURCE_NAME;
   }
 
   /**
@@ -80,9 +80,9 @@ class FavoriteService extends AbstractService {
       throw new TypeError(`Favorite foreign model should be a valid string.`);
     }
     if (!FavoriteEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
-      throw new TypeError(`Favorite foreign model ${foreignModel} in not in the list of supported models.`);
+      throw new TypeError(`Favorite foreign model '${foreignModel}' is not in the list of supported models.`);
     }
   }
 }
 
-export default FavoriteService;
+export default FavoriteApiService;

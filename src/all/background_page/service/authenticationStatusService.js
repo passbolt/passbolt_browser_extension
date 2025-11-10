@@ -43,6 +43,7 @@ class AuthenticationStatusService {
       //Get response on json format
       responseJson = await response.json();
     } catch (error) {
+      console.error(error);
       // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
       throw new PassboltBadResponseError();
     }

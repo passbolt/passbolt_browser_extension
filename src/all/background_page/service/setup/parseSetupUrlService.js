@@ -38,6 +38,7 @@ class ParseSetupUrlService {
     try {
       new URL(domain);
     } catch (error) {
+      console.error(error);
       throw new Error('Cannot parse setup url. The domain is not valid.');
     }
 
@@ -54,6 +55,7 @@ class ParseSetupUrlService {
       this.parse(url);
       return true;
     } catch (error) {
+      console.error(error);
       return false;
     }
   }

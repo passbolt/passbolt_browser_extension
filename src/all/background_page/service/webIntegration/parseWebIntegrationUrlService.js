@@ -36,6 +36,7 @@ class ParseWebIntegrationUrlService {
       new URL(url);
       return this.regex.test(url);
     } catch (error) {
+      console.error(error);
       return false;
     }
   }

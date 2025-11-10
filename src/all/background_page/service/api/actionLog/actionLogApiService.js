@@ -107,7 +107,7 @@ class ActionLogService extends AbstractService {
   assertValidForeignModel(foreignModel) {
     assertNonEmptyString(foreignModel, 'ActionLog foreign model should be a valid string.');
     if (!AbstractActionLogEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
-      throw new TypeError(`ActionLog foreign model ${foreignModel} in not in the list of supported models.`);
+      throw new TypeError(`ActionLog foreign model '${foreignModel}' is not in the list of supported models.`);
     }
   }
 }

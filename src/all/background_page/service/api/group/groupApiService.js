@@ -15,7 +15,7 @@ import AbstractService from "../abstract/abstractService";
 
 const GROUP_SERVICE_RESOURCE_NAME = 'groups';
 
-class GroupService extends AbstractService {
+class GroupApiService extends AbstractService {
   /**
    * Constructor
    *
@@ -23,7 +23,7 @@ class GroupService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, GroupService.RESOURCE_NAME);
+    super(apiClientOptions, GroupApiService.RESOURCE_NAME);
   }
 
   /**
@@ -108,10 +108,10 @@ class GroupService extends AbstractService {
    * @public
    */
   async findAll(contains, filters, orders) {
-    const legacyContain = GroupService.remapLegacyContain(contains);// crassette
-    contains = legacyContain ? this.formatContainOptions(legacyContain, GroupService.getSupportedContainOptions()) : null;
-    filters = filters ? this.formatFilterOptions(filters, GroupService.getSupportedFiltersOptions()) : null;
-    orders = orders ? this.formatOrderOptions(orders, GroupService.getSupportedFiltersOptions()) : null;
+    const legacyContain = GroupApiService.remapLegacyContain(contains);// crassette
+    contains = legacyContain ? this.formatContainOptions(legacyContain, GroupApiService.getSupportedContainOptions()) : null;
+    filters = filters ? this.formatFilterOptions(filters, GroupApiService.getSupportedFiltersOptions()) : null;
+    orders = orders ? this.formatOrderOptions(orders, GroupApiService.getSupportedFiltersOptions()) : null;
     const options = {...contains, ...filters, ...orders};
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
@@ -129,7 +129,7 @@ class GroupService extends AbstractService {
    */
   async create(data) {
     this.assertNonEmptyData(data);
-    data = GroupService.remapV2DataToV1(data); // crassette
+    data = GroupApiService.remapV2DataToV1(data); // crassette
     const response = await this.apiClient.create(data);
     return response.body;
   }
@@ -269,4 +269,4 @@ class GroupService extends AbstractService {
   }
 }
 
-export default GroupService;
+export default GroupApiService;

@@ -164,6 +164,14 @@ class PermissionsCollection extends EntityV2Collection {
     return this._items;
   }
 
+  /**
+   * Check if the collection contains at least one group permission
+   * @returns {boolean} True if the collection contains at least one group permission, false otherwise
+   */
+  get hasGroupPermission() {
+    return this._items.some(permission => permission.aro === PermissionEntity.ARO_GROUP);
+  }
+
   /*
    * ==================================================
    * Finders

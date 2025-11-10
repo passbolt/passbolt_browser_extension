@@ -179,6 +179,7 @@ class ToolbarService {
       const authStatus = await checkAuthStatusService.checkAuthStatus(false);
       return authStatus.isAuthenticated;
     } catch (error) {
+      console.error(error);
       // Service is unavailable, do nothing...
       Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
       // The user is not authenticated

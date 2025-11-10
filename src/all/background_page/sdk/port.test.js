@@ -151,6 +151,7 @@ describe("Port", () => {
       try {
         await promise;
       } catch (error) {
+        console.error(error);
         expect(Object.keys(portServiceWorker._disconnectListeners).length).toBe(0);
       }
     });

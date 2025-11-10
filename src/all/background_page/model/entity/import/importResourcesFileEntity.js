@@ -45,6 +45,7 @@ class ImportResourcesFileEntity extends EntityV2 {
     this._import_folders = new ExternalFoldersCollection([]);
     this._import_resources_errors = [];
     this._import_folders_errors = [];
+    this._import_resources_warnings = [];
   }
 
   /**
@@ -123,6 +124,9 @@ class ImportResourcesFileEntity extends EntityV2 {
       errors: {
         resources: this.importResourcesErrors.map(importResourceError => importResourceError.toJSON()),
         folders: this.importFoldersErrors.map(importFolderError => importFolderError.toJSON())
+      },
+      warnings: {
+        resources: this.importResourcesWarnings.map(importResourcesWarning => importResourcesWarning.toJSON()),
       },
       options: {
         folders: this.mustImportFolders,
@@ -203,6 +207,21 @@ class ImportResourcesFileEntity extends EntityV2 {
    */
   get keyfile() {
     return this._props.options?.credentials?.keyfile ?? null;
+  }
+
+  /*
+   * ==================================================
+   * Dynamic properties setters
+   * ==================================================
+   */
+
+  /**
+   * Remove warnings for a specific resource
+   * @param {Object} externalResourceDto The resource DTO
+   */
+  removeWarningsForResource(externalResourceDto) {
+    this._import_resources_warnings =
+      this._import_resources_warnings.filter(warning => warning.data !== externalResourceDto);
   }
 
   /*
@@ -291,6 +310,14 @@ class ImportResourcesFileEntity extends EntityV2 {
    */
   get importResourcesErrors() {
     return this._import_resources_errors;
+  }
+
+  /**
+   * Get the list of resources warnings
+   * @returns {array<ImportError>}
+   */
+  get importResourcesWarnings() {
+    return this._import_resources_warnings;
   }
 
   /**

@@ -72,7 +72,7 @@ describe("GroupUpdateService", () => {
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
     spyOnGroupApiServiceUpdate.mockImplementation(async(_, groupDto) => groupDto);
-    jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
+    jest.spyOn(GroupLocalStorage.prototype, "updateGroup").mockImplementation(() => {});
 
     await service.exec(updateGroupEntity, "");
 
@@ -140,7 +140,7 @@ describe("GroupUpdateService", () => {
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
     const spyOnGroupApiServiceUpdate = jest.spyOn(service.groupApiService, "update");
-    jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
+    jest.spyOn(GroupLocalStorage.prototype, "updateGroup").mockImplementation(() => {});
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
@@ -201,7 +201,7 @@ describe("GroupUpdateService", () => {
     const spyOnGroupModelGetById = jest.spyOn(service.groupModel, "getById");
     const spyOnGroupModelDryRun = jest.spyOn(service.groupModel, "updateDryRun");
     const spyOnGroupApiServiceUpdate = jest.spyOn(service.groupApiService, "update");
-    jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
+    jest.spyOn(GroupLocalStorage.prototype, "updateGroup").mockImplementation(() => {});
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnGroupModelDryRun.mockImplementation(async() => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
@@ -265,7 +265,7 @@ describe("GroupUpdateService", () => {
     const spyOnGroupApiServiceUpdate = jest.spyOn(service.groupApiService, "update");
     const spyOnKeyringSync = jest.spyOn(Keyring.prototype, "sync");
     const spyOnKeyringFindPublic = jest.spyOn(Keyring.prototype, "findPublic");
-    jest.spyOn(GroupLocalStorage, "updateGroup").mockImplementation(() => {});
+    jest.spyOn(GroupLocalStorage.prototype, "updateGroup").mockImplementation(() => {});
 
     spyOnGroupModelGetById.mockImplementation(async() => new GroupEntity(existingEntityDto));
     spyOnKeyringSync.mockImplementation(async() => {});

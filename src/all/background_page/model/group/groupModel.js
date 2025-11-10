@@ -12,36 +12,25 @@
  * @since         3.0.0
  */
 import GroupLocalStorage from "../../service/local_storage/groupLocalStorage";
-import GroupsCollection from "../entity/group/groupsCollection";
 import DeleteDryRunError from "../../error/deleteDryRunError";
 import GroupEntity from "../entity/group/groupEntity";
 import GroupApiService from "../../service/api/group/groupApiService";
 import GroupUpdateDryRunResultEntity from "../entity/group/update/groupUpdateDryRunResultEntity";
 import GroupDeleteTransferEntity from "../entity/group/transfer/groupDeleteTransferEntity";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import FindGroupsService from "../../service/group/findGroupsService";
 
 class GroupModel {
   /**
    * Constructor
-   *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} account The user account
    * @public
    */
-  constructor(apiClientOptions) {
+  constructor(apiClientOptions, account) {
     this.groupApiService = new GroupApiService(apiClientOptions);
-  }
-
-  /**
-   * Update the groups local storage with the latest API
-   *
-   * @return {Promise<GroupsCollection>}
-   * @public
-   */
-  async updateLocalStorage() {
-    const contains = {groups_users: true, my_group_user: true, modifier: false};
-    const groupsCollection = await this.findAll(contains, null, null, true);
-    await GroupLocalStorage.set(groupsCollection);
-    return groupsCollection;
+    this.findGroupsService = new FindGroupsService(apiClientOptions);
+    this.groupLocalStorage = new GroupLocalStorage(account);
   }
 
   /*
@@ -57,7 +46,7 @@ class GroupModel {
    * @return {Promise<GroupEntity>}
    */
   async getById(groupId) {
-    const localGroup = await GroupLocalStorage.getGroupById(groupId);
+    const localGroup = await this.groupLocalStorage.getGroupById(groupId);
     if (localGroup) {
       return new GroupEntity(localGroup);
     }
@@ -70,20 +59,6 @@ class GroupModel {
    */
 
   /**
-   * Find all groups
-   *
-   * @param {Object} [contains] optional
-   * @param {Object} [filters] optional
-   * @param {Object} [orders] optional
-   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
-   * @returns {Promise<GroupsCollection>}
-   */
-  async findAll(contains, filters, orders, ignoreInvalidEntity) {
-    const groupsDto = await this.groupApiService.findAll(contains, filters, orders);
-    return new GroupsCollection(groupsDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
-  }
-
-  /**
    * Create a group using Passbolt API and add result to local storage
    *
    * @param {GroupEntity} groupEntity
@@ -94,7 +69,7 @@ class GroupModel {
     const data = groupEntity.toDto({groups_users: true});
     const groupDto = await this.groupApiService.create(data);
     const newGroupEntity = new GroupEntity(groupDto);
-    await GroupLocalStorage.addGroup(newGroupEntity);
+    await this.groupLocalStorage.addGroup(newGroupEntity);
     return newGroupEntity;
   }
 
@@ -165,7 +140,7 @@ class GroupModel {
     }
 
     // Update local storage
-    await GroupLocalStorage.delete(groupId);
+    await this.groupLocalStorage.delete(groupId);
   }
 }
 

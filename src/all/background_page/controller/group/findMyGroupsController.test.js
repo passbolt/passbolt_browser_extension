@@ -15,21 +15,29 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultGroupsDtos} from "../../model/entity/group/groupsCollection.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import FindGroupsCurrentUserIsMemberOfController from "./findGroupsCurrentUserIsMemberOfController";
+import FindMyGroupsController from "./findMyGroupsController";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GroupsCollection from "../../model/entity/group/groupsCollection";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import FindGroupsService from "../../service/group/findGroupsService";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 
-beforeEach(() => {
-  enableFetchMocks();
-  jest.resetModules();
-});
+describe("FindMyGroupsController", () => {
+  let controller;
 
-describe("FindGroupsCurrentUserIsMemberOfController", () => {
-  describe("FindGroupsCurrentUserIsMemberOfController::exec", () => {
-    it("Should return the groups the current user is member of", async() => {
-      expect.assertions(2);
+  beforeEach(() => {
+    enableFetchMocks();
+    jest.resetModules();
+    const account = new AccountEntity(defaultAccountDto());
+    const apiClientOptions = defaultApiClientOptions();
+    controller = new FindMyGroupsController(null, null, apiClientOptions, account);
+  });
+
+  describe("FindMyGroupsController::exec", () => {
+    it("Should return groups the current user is member of", async() => {
+      expect.assertions(3);
       const userInfo = pgpKeys.ada;
       await MockExtension.withConfiguredAccount(userInfo);
 
@@ -43,12 +51,11 @@ describe("FindGroupsCurrentUserIsMemberOfController", () => {
         return await mockApiResponse(usersGroups);
       });
 
-      const apiClientOptions = defaultApiClientOptions();
-      apiClientOptions.setResourceName('groups');
-      const controller = new FindGroupsCurrentUserIsMemberOfController(null, null, apiClientOptions);
+      jest.spyOn(FindGroupsService.prototype, "findMyGroups");
       const result = await controller.exec();
 
       expect(result).toStrictEqual(new GroupsCollection(usersGroups));
+      expect(FindGroupsService.prototype.findMyGroups).toHaveBeenCalled();
     });
   });
 });

@@ -19,6 +19,7 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import GroupLocalStorage from "../../service/local_storage/groupLocalStorage";
 
 const {enableFetchMocks} = require("jest-fetch-mock");
 const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
@@ -49,10 +50,12 @@ describe("GroupsUpdateController", () => {
       const dto = updateGroupNameDto({id: localGroup.id, groups_users: localGroup.groups_users});
       await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
 
-      browser.storage.local.set({groups: [localGroup]});
+      const account = new AccountEntity(defaultAccountDto());
+      const storageKey = GroupLocalStorage.getStorageKey(account.id);
+      browser.storage.local.set({[storageKey]: [localGroup]});
 
       const clientOptions = defaultApiClientOptions();
-      const controller = new GroupsUpdateController(null, null, clientOptions);
+      const controller = new GroupsUpdateController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
       // 1st API call is for the dry-run to verify which secrets needs to be computed (no secret to update)
@@ -108,9 +111,10 @@ describe("GroupsUpdateController", () => {
       await keyring.importPublic(pgpKeys.betty.public, users.betty.id);
       await keyring.importPublic(pgpKeys.ada.public, users.ada.id);
 
-      browser.storage.local.set({groups: [localGroup]});
-
       const account = new AccountEntity(defaultAccountDto());
+      const storageKey = GroupLocalStorage.getStorageKey(account.id);
+      browser.storage.local.set({[storageKey]: [localGroup]});
+
       const clientOptions = defaultApiClientOptions();
       const controller = new GroupsUpdateController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);

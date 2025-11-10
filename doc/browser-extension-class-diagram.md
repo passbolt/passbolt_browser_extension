@@ -1097,6 +1097,70 @@ classDiagram
         }
     }
 
+    namespace groupsNS {
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Groups controllers
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class FindMyGroupsController {
+            event "passbolt.groups.find-my-groups"
+            +exec() Promise~GroupsCollection~
+        }
+
+        class UpdateAllGroupsLocalStorageController {
+            event "passbolt.groups.update-local-storage"
+            +exec() Promise~GroupsCollection~
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Groups services
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class FindGroupsService {
+            +findAll(object contains, object filters, object orders, boolean ignoreInvalidEntity) Promise~GroupsCollection~
+            +findMyGroups() Promise~GroupsCollection~
+            +findAllForLocalStorage() Promise~GroupsCollection~
+        }
+
+        class FindAndUpdateGroupsLocalStorageService {
+            +findAll() Promise~GroupsCollection~
+        }
+
+        class GroupApiService {
+            +get(string uuid) Promise~Object~
+            +findAll(object contains, object filters, object orders) Promise
+            +create(object data) Promise
+            +update(string groupId, object groupData) Promise
+            +updateDryRun(string groupId, string groupData) Promise
+            +delete(string groupId, object transfer, boolean dryRun) Promise
+        }
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Groups models
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        class GroupLocalStorage {
+            +flush() Promise~void~
+            +get() Promise~Group~
+            +set(GroupsCollection groupsCollection) Promise~void~
+            +getGroupById(string uuid) Promise~Group~
+            +addGroup(GroupEntity groupEntity) Promise~void~
+            +updateGroup(GroupEntity groupEntity) Promise~void~
+            +delete(string uuid) Promise~void~
+        }
+
+        class GroupEntity {
+            -uuid props.id
+            -string props.name
+            -string props.created
+            -string props.modified
+            -string props.createdBy
+            -string props.modifiedBy
+            -object props.groups_users
+            -object props.my_group_user
+        }
+    }
+
 %% Resource controllers relationships
     CreateResourceController*--CreateResourceService
 %%    CreateResourceController*--GetPassphraseService
@@ -1289,4 +1353,14 @@ classDiagram
     AccountRecoveryGenerateOrganizationKeyController*--GenerateGpgKeyPairOptionsEntity
 %% GpgKey services relationships
     FindUserKeyPoliciesSettingsService*--UserKeyPoliciesSettingsApiService
+
+%% Groups controllers relationships
+    FindMyGroupsController*--FindGroupsService
+    UpdateAllGroupsLocalStorageController*--FindAndUpdateGroupsLocalStorageService
+%% Groups services relationships
+    FindGroupsService*--GroupApiService
+    FindAndUpdateGroupsLocalStorageService*--FindGroupsService
+    FindAndUpdateGroupsLocalStorageService*--GroupLocalStorage
+
+    GroupLocalStorage*--GroupEntity
 ```

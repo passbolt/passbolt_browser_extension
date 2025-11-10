@@ -27,6 +27,7 @@ import ResourceLocalStorage from "../src/all/background_page/service/local_stora
 import FolderLocalStorage from "../src/all/background_page/service/local_storage/folderLocalStorage";
 import mockedI18n from "./overrides/i18n";
 import I18n from "../src/all/background_page/sdk/i18n";
+import GroupLocalStorage from "../src/all/background_page/service/local_storage/groupLocalStorage";
 
 //mocking i18n avoids some errors like `Error: connect ECONNREFUSED 127.0.0.1:80` in the console while running tests
 jest.mock('../src/all/background_page/sdk/i18n');
@@ -74,6 +75,7 @@ beforeEach(async() => {
   OrganizationSettingsModel.flushCache();
   ResourceLocalStorage.flush();
   FolderLocalStorage.flush();
+  GroupLocalStorage._runtimeCachedData = {};
   Config.flush();
   const keyring = new Keyring();
   keyring.flush(Keyring.PUBLIC);

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.9.0
  */
-import GroupModel from "../../model/group/groupModel";
-import User from "../../model/user";
 
-class FindGroupsCurrentUserIsMemberOfController {
+import FindGroupsService from "../../service/group/findGroupsService";
+
+class FindMyGroupsController {
   /**
    * Constructor
    * @param {Worker} worker
@@ -24,7 +24,7 @@ class FindGroupsCurrentUserIsMemberOfController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.groupModel = new GroupModel(apiClientOptions);
+    this.findGroupsService = new FindGroupsService(apiClientOptions);
   }
 
   /**
@@ -46,12 +46,8 @@ class FindGroupsCurrentUserIsMemberOfController {
    * @return {Promise<GroupsCollection>}
    */
   async exec() {
-    const userId = User.getInstance().get().id;
-    const filters = {
-      "has-users": userId,
-    };
-    return await this.groupModel.findAll(null, filters);
+    return await this.findGroupsService.findMyGroups();
   }
 }
 
-export default FindGroupsCurrentUserIsMemberOfController;
+export default FindMyGroupsController;

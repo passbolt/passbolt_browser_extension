@@ -15,7 +15,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import GroupUpdateSecretsCollection from "./groupUpdateSecretsCollection";
 import {minimalDto, readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
-import SecretEntity from "../secretEntity";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import {v4 as uuid} from "uuid";
 import {defaultResourcesSecretsDtos} from "./groupUpdateSecretsCollection.test.data";
 

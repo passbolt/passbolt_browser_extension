@@ -19,7 +19,7 @@ import GroupModel from "../../model/group/groupModel";
 import GroupEntity from "../../model/entity/group/groupEntity";
 import GroupUpdateEntity from "../../model/entity/group/update/groupUpdateEntity";
 import i18n from "../../sdk/i18n";
-import SecretEntity from "../../model/entity/secret/secretEntity";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import GroupUpdateSecretsCollection from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {assertString, assertType} from "../../utils/assertions";

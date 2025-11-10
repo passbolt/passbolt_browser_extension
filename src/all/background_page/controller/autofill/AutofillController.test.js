@@ -28,7 +28,7 @@ import {mockPort} from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
 import QuickAccessPagemod from "../../pagemod/quickAccessPagemod";
 import {minimalDto} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
-import SecretEntity from "../../model/entity/secret/secretEntity";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 
 describe("AutofillController", () => {
   const account = new AccountEntity(defaultAccountDto());

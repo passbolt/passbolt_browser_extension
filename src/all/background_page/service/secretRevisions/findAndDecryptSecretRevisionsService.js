@@ -47,8 +47,11 @@ export default class FindAndDecryptSecretRevisionsService {
       secret: true,
       creator: true,
       "creator.profile": true,
-      owner_accessors: true,
-      "owner_accessors.profile": true,
+      /*
+       *  Not supported yet
+       *  owner_accessors: true,
+       * "owner_accessors.profile": true,
+       */
     };
 
     const resourceSecretRevisions = await this.findSecretRevisionsService.findAllByResourceId(resourceId, contains);

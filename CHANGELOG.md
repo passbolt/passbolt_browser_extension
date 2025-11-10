@@ -4,6 +4,50 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.7.0] - 2025-11-12
+- PB-17712 - when importing kdbx files, the focus should be put in the passphrase field
+- PB-18497 - Add loading spinner when submitting imported GPG key during account extension association (activation/recover)
+- PB-30373 - Remove unused event passbolt.app-bootstrap.navigate-to-logout
+- PB-33599 - EPIC - Secret history
+- PB-36183 - Display UTC date in tooltip for relative “X days ago” timestamps
+- PB-42032 - Fix: update passphrase help section link goes to the former help site
+- PB-43950 - Add padding between fields and their description on the Users Directory administration page
+- PB-44434 - As an administrator I can see new E2EE healthchecks in the UI
+- PB-44420 - Allow administrators to download the Users Directory sync report for follow-up actions
+- PB-44603 - Help link in administration internationalization page should target the contribute page of the help site
+- PB-44949 - GITHUB#240 Inform menu crash on suggested resource icon
+- PB-45099 - Update: Regular expression on private key metadata validation
+- PB-45100 - Update: Regular expression on GPG Message validation
+- PB-45249 - Add “Attention required” filter in the “Users & groups” workspace to filter users by attention required
+- PB-45263 - Enforce password expiry on imported resources when a password policy requires it
+- PB-45585 - Fix SCIM styleguide related unit tests error
+- PB-45588 - Extend metadata description textarea in resource creation dialog to use full available height
+- PB-45589 - Refactor resource favorite capability to use...
+- PB-45590 - Migrate favorite logic from FavoriteModel to FavoriteResourceService and remove legacy model
+- PB-45591 - Route passbolt.favorite.add/delete events through controllers instead of calling services directly
+- PB-45593 - Add test coverage for FavoriteService API and rename class to align with Passbolt standard
+- PB-45678 - Upgrade ESLint dependencies across both repositories
+- PB-45699 - User without groups is not display correctly on the right sidebar
+- PB-45723 - The in-form CTA is not visible since v5.5 for some web application
+- PB-45797 - Fix typos in BExt
+- PB-45835 - Migrate group (partially) related code to new architecture
+- PB-45842 - Add link to SCIM admin guide in the product"
+- PB-45894 - Rename leftSideBar and rightSideBar classes to respect naming convention
+- PB-45917 - I can autofill my username in the login form of cryptpad in French
+- PB-45963 - Replace find-all with find-my-groups Port Requests
+- PB-45965 - Rename groupService to groupApiService
+- PB-45992 - Keep selection of resources when collapsing the Workspace section
+- PB-46013 - Fix: Empty Full Report textarea displayed in Users Directory dialogs when there are no resources to synchronize
+- PB-46065 - Prevent re-encryption of metadata with personal user key when a resource is shared with a group
+- PB-46118 - Fix: Import unexpected error handling on import
+- PB-46127 - Analyse i18next non-canonical impact on front-end and API
+- PB-46190 - Update themeEntity to remove preview unused field
+- PB-46191 - Update UserSettings validateDomain to make sure the issue cannot be exploited
+- PB-46385 - Fix auto-fill on OVH with custom selector field on username
+- PB-46372 - As LU, I should see the content share dialog within the boundaries of the dialog.
+- PB-46427 - Add remove from group button in User & Group Workspace page
+- PB-46508 - Fix secret revision fingerprint for deleted user
+
 ## [5.6.0] - 2025-10-08
 ### Added
 - PB-39068 WP5-5.6 - Implement a Service RotateResourcesMetadataKeyService that proceed with the rotation of the key
@@ -2442,7 +2486,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.6.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.7.0...HEAD
+[5.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.6.0...5.7.0
 [5.6.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.5.1...v5.6.0
 [5.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.5.0...v5.5.1
 [5.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.4.1...v5.5.0

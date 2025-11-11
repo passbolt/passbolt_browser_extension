@@ -1,70 +1,72 @@
-Release song: https://www.youtube.com/watch?v=bu50DtPF1Ac
+Release song: https://www.youtube.com/watch?v=fMnh5Tn8aeM
 
-Passbolt 5.6.0 introduces standalone notes, shared metadata key rotation, and resizable sidebars. As usual, this version also brings important security hardening through dependency updates as well as a series of bug fixes and maintenance improvements.
+Passbolt 5.7.0 introduces secret history, a highly demanded feature that gives users visibility and control over previous versions of their secrets. This release also includes several usability improvements requested and bug fixes reported by the community.
 
-## Standalone notes
+## Secret history
 
-It is now possible to create notes as a standalone resource type, without attaching them to credentials or other elements. Import and export processes have been updated to recognize and support this new type. Any imported resources that contain only a description will now be created as standalone notes.
+It is now possible to access previous revisions of a secret directly from Passbolt.
 
-## Shared metadata key rotation
+Secret history helps reduce the impact of human error and offers a safer way to manage evolving secrets. For instance, this enables users to undo an accidental update on the spot. Note that the feature is disabled by default and requires an administrator to enable it from the administration workspace.
 
-Administrators can now rotate the shared metadata key at any time from the organization settings. This improvement marks one of the final steps in meeting metadata encryption requirements. The rotation process can be performed while the instance remains operational, so availability is not disrupted.
+## User and group workspace improvements
 
-## Resizable sidebars
+A new “Remove from group” action has been added to the user and group workspaces. This addition eliminates the confusion between permanently deleting a user and simply removing them from a specific group.
 
-Both main workspace and Users & Groups workspace now feature sidebars that can be resized. This allows users to improve readability when working with long folder names or deeply nested folder structures. After resizing, a double-click on the sidebar handle resets it to its default width.
+Moreover, administrators can now instantly filter users that require attention via the “Attention Required” filter in the workspace. For instance: identifying users with a pending account recovery request to review, or missing metadata keys.
 
-## Miscellaneous Improvements
+## Import report
 
-The export of account kits is now compatible with larger private keys. The group membership update process has been optimized to reduce request payload size and to avoid certain size limitations. Sorting of folder names has also been improved with natural number ordering, meaning for example that “folder2” now correctly appears before “folder10.”
+The application now displays a summary dialog after an import, offering accurate and actionable information. The report precisely categorises alerts into successes, warnings and errors, providing end users with additional logs.
 
-Many thanks to everyone who shared feedback, reported issues, and helped refine these features.
+## Miscellaneous improvements
+As usual this release is packed with improvements and bug fixes reported by the community. Notably, the reliability of autofill has been improved across a wider range of websites. If you find that autofill does not work on a particular website, feel free to open a bug report including the website details to help us identify the custom selector. For more, check out the changelog below.
+
+Many thanks to everyone who provided feedback, reported issues, and helped refine these new features.
 
 ### Added
-- PB-39068 WP5-5.6 - Implement a Service RotateResourcesMetadataKeyService that proceed with the rotation of the key
-- PB-39069 WP5-5.8 - Implement a new method in MetadataKeysServiceWorkerService to call for  to expire a key
-- PB-39071 WP5-5.1 - Implement a new method in MetadataKeysApiService to expire a shared metadata key
-- PB-39072 WP5-5.4 - Implement a new Service UpdateMetadataKeysService to process with the expiration of a key
-- PB-39073 WP5-5.2 - Implement a new API service MetadataRotateKeysResourcesApiService to retrieve the first page of data to rotate
-- PB-39074 WP5-5.3 - Implement a new method in MetadataKeysApiService to register the rotated data on the API
-- PB-39075 WP5-5.7 - Implement a Controller RotateResourcesMetadataKeyController to run the rotation process
-- PB-39076 WP5-5.9 - Implement a new method in MetadataKeysServiceWorkerService to call passbolt.metadata.rotate-resources-metadata for  with the new Key
-- PB-39078 WP5-5.10 - Implement the ConfirmMetadataRotationDialog
-- PB-39094 WP5-6.2 - Display the rotate key button when multiple metadata key are active
-- PB-43253 Workspace resizable sidebars
-- PB-44582 lastpass example csv import with totp success
-- PB-45385 SN - WP1.1 Create the entity SecretDataV5StandaloneNoteEntity
-- PB-45389 SN - WP1.3 Update ResourceFormEntity to include secret SecretDataV5StandaloneNoteEntity
-- PB-45400 SN - WP2.1 Add new resource type in DisplayContentTypesAllowedContentTypesAdministration
-- PB-45404 SN - WP2.2 Add new resource type in DisplayResourcesWorkspaceMainMenu
-- PB-45406 SN - WP2.3 Update passbolt default resource type icons to include the new resource type icon
-- PB-45408 SN - WP2.4 Update DisplayResourcesListDetails to handle the correct subtitle for standalone note and add the same for standalone custom fields
-- PB-45412 SN - WP3.1 Apply a minimum height to the resource workspace ‘others’ dialog used to create other resource types
-- PB-45413 SN - WP3.3 Increase the height of the notes textarea to use the maximum available space in the resource creation dialog
-- PB-45414 SN - WP3.3 Add “hide” button when the note is decrypted to hide it again
-- PB-45417 SN - WP2.5 Update the “other” dialog to add the standalone note in the content type list in v5
-- PB-45424 SN - WP3.4 Ensure Import/Export is working as expected with standalone notes
-- PB-45464 GMUO - WP1.1 Create new collection ‘GroupUpdateCollection’
-- PB-45465 GMUO - WP1.2 Migrate group update logic to optimise the request on the API
-- PB-45466 GMUO - WP1.3 Adapt group update progress bar mechanism
-- PB-45476 WP5-6.3 - Create events with controller to rotate and resume rotation of a metadata key
+- PB-17712 Focus should be put in the passphrase field when importing keepass file protected by passphrase
+- PB-33599 Allow users to access previous revisions of a resource’s secret
+- PB-33599 Allow administrators to configure how many secret revisions are retained
+- PB-44420 Allow administrators to download the Users Directory sync report for follow-up actions
+- PB-44434 As an administrator I can see encrypted metadata healthchecks from the administration workspace
+- PB-45249 Add “Attention required” filter in the “Users & groups” workspace to filter users by attention required
+- PB-45842 Add link to SCIM admin guide in the product
+- PB-46427 Add remove from group button in User & Group Workspace page
 
 ### Fixed
-- PB-43218 Date field icons should not be replaced with the copy icon in the SSO settings and expiry resource dialogs
-- PB-45239 Folders are not displayed in the correct order (GITHUB #568)
-- PB-45329 add TOTP toString handling similar to other csv exports
-- PB-45402 Add missing icon property to resource types schema definition
-- PB-45450 Fix account kit export with big private armored keys
-- PB-45458 Remove Organisation Settings max-width
-- PB-45733 Fix quickaccess resource creation with encrypted metadata
+- PB-18497 Add loading spinner when submitting imported GPG key during account extension association (activation/recover)
+- PB-36183 Display UTC date in tooltip for relative “X days ago” timestamps
+- PB-42032 Fix: update passphrase help section link goes to the former help site
+- PB-43950 Add padding between fields and their description on the Users Directory administration page
+- PB-44603 Help link in administration internationalization page should target the contribute page of the help site
+- PB-44949 GITHUB#240 Inform menu crash on suggested resource icon
+- PB-45263 Enforce password expiry on imported resources when a password policy requires it
+- PB-45588 Extend metadata description textarea in resource creation dialog to use full available height
+- PB-45699 User without groups is not display correctly on the right sidebar
+- PB-45723 The in-form CTA is not visible since v5.5 for some web application
+- PB-45797 Fix typos in BExt
+- PB-45917 I can autofill my username in the login form of cryptpad in French
+- PB-45992 Keep selection of resources when collapsing the Workspace section
+- PB-46013 Empty Full Report textarea displayed in Users Directory dialogs when there are no resources to synchronize
+- PB-46065 Prevent re-encryption of metadata with personal user key when a resource is shared with a group
+- PB-46118 Import unexpected error handling on import
+- PB-46191 Update UserSettings validateDomain to make sure the issue cannot be exploited
+- PB-46372 As LU, I should see the content share dialog within the boundaries of the dialog
+- PB-46385 Fix auto-fill on OVH with custom selector field on username
 
 ### Maintenance
-- PB-44253 Upgrade vulnerable library form-data
-- PB-44593 Upgrade i18next to v24x
-- PB-45182 Major upgrade for copy-anything (Medium)
-- PB-45183 Minor upgrade for browserslist (Low)
-- PB-45184 3rd party Github Actions should be pinned (Medium)
-- PB-45401 Enforce the requirement of the property object_type for custom fields
-- PB-45484 Fix low security vulnerability dependency with web-ext to 8.10.0
-- PB-45583 Review and clean up npm overridden dependencies
-- PB-45601 Update the "Upgrade to Passbolt Pro" buttons URL
+- PB-30373 Remove unused event passbolt.app-bootstrap.navigate-to-logout
+- PB-45099 Update: Regular expression on private key metadata validation
+- PB-45100 Update: Regular expression on GPG Message validation
+- PB-45585 Fix SCIM styleguide related unit tests error
+- PB-45589 Refactor resource favorite capability to use FavoriteServiceWorkerService instead of direct port requests
+- PB-45590 Migrate favorite logic from FavoriteModel to FavoriteResourceService and remove legacy model
+- PB-45591 Route passbolt.favorite.add/delete events through controllers instead of calling services directly
+- PB-45593 Add test coverage for FavoriteService API and rename class to align with Passbolt standard
+- PB-45678 Upgrade ESLint dependencies across both repositories
+- PB-45835 Migrate group (partially) related code to new architecture
+- PB-45894 Rename leftSideBar and rightSideBar classes to respect naming convention
+- PB-45963 Replace find-all with find-my-groups Port Requests
+- PB-45965 Rename groupService to groupApiService
+- PB-46127 Update i18next dependency
+- PB-46190 Update themeEntity to remove preview unused field

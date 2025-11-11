@@ -138,6 +138,6 @@
   "Updating resources metadata": "Updating resources metadata",
   "Updating resources metadata {{counter}}/{{total}}": "Updating resources metadata {{counter}}/{{total}}",
   "Updating users' key...": "Updating users' key...",
-  "User key not found": "",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "You have already started the process on another tab."
 }

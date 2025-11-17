@@ -19,6 +19,7 @@ import GetActiveAccountService from "../account/getActiveAccountService";
 import CheckAuthStatusService from "../auth/checkAuthStatusService";
 import Log from "../../model/log";
 import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
+import User from "../../../../all/background_page/model/user";
 
 class ToolbarService {
   constructor() {
@@ -37,6 +38,7 @@ class ToolbarService {
     this.handleSuggestedResourcesOnUpdatedTab = this.handleSuggestedResourcesOnUpdatedTab.bind(this);
     this.handleSuggestedResourcesOnActivatedTab = this.handleSuggestedResourcesOnActivatedTab.bind(this);
     this.handleSuggestedResourcesOnFocusedWindow = this.handleSuggestedResourcesOnFocusedWindow.bind(this);
+    this.handleIconToolbarClicked = this.handleIconToolbarClicked.bind(this);
   }
 
   /**
@@ -106,6 +108,25 @@ class ToolbarService {
     } else {
       await this.updateSuggestedResourcesBadge();
     }
+  }
+
+  /**
+   * Handles click on the icon in the toolbar.
+   * The event is called by the browser only if no quickaccess popup URL is set (neither from the manifest nor in script).
+   * The popup is set when clicking the first and if an account is configured, otherwise this handler always triggers a tab open.
+   * note: Only used for Safari right now
+   */
+  handleIconToolbarClicked() {
+    const user = User.getInstance();
+    if (!user.isValid()) {
+      // if the user is not set, a tab on passbolt start page is opened
+      this.openPassboltTab();
+      return;
+    }
+
+    // if the user account is set, sets the popup to the expected URL and open it. The browser wiil not use that callback until it is restarted.
+    browser.browserAction.setPopup({popup: "webAccessibleResources/quickaccess.html?passbolt=quickaccess"});
+    browser.browserAction.openPopup();
   }
 
   /**

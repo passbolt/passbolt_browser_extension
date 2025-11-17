@@ -114,3 +114,8 @@ browser.tabs.onActivated.addListener(ToolbarService.handleSuggestedResourcesOnAc
  * Handle suggested resources on toolbar icon
  */
 browser.windows.onFocusChanged.addListener(ToolbarService.handleSuggestedResourcesOnFocusedWindow);
+
+/**
+ * Handle click on the toolbar icon
+ */
+browser.browserAction.onClicked.addListener(ToolbarService.handleIconToolbarClicked);

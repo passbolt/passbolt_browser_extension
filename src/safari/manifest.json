@@ -16,7 +16,7 @@
   "browser_action": {
     "default_icon": "webAccessibleResources/img/icons/icon-32.png",
     "default_title": "Passbolt Quickaccess",
-    "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
+    "default_popup": ""
   },
   "commands": {
     "passbolt-open": {

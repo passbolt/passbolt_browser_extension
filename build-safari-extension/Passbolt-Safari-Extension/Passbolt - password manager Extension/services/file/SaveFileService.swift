@@ -31,7 +31,6 @@ enum SaveFileServiceError: Error {
 }
 
 final class SaveFileService {
-    private static let downloadsSubfolder = "Passbolt"
     
     public static func saveFile(_ payload: [String: Any]) throws -> String {
         let filename = (payload["filename"] as? String) ?? "export.txt"
@@ -62,7 +61,7 @@ final class SaveFileService {
         guard let downloads = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
             return nil
         }
-        return downloads.appendingPathComponent(downloadsSubfolder, isDirectory: true)
+        return downloads
     }
 
     private static func uniqueURL(in dir: URL, suggestedName: String) -> URL {

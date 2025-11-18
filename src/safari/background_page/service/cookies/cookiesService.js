@@ -12,7 +12,12 @@
  * @since         5.7.0
  */
 
+import {assertString} from "../../../../all/background_page/utils/assertions";
+
 const CSRF_TOKEN_COOKIE_NAME = "csrfToken";
+const DEFAULT_COOKIE_VALUES = {
+  sameSite: "strict"
+};
 
 /**
  * Service to manage cookies for Safari needs
@@ -25,7 +30,7 @@ export class CookiesService {
   constructor(urlString) {
     const url = new URL(urlString);
     this.domain = url.host;
-    this.url = `${url.protocol}/${url.host}${url.pathname}`;
+    this.url = `${url.protocol}//${url.host}${url.pathname}`;
   }
 
   /**
@@ -42,6 +47,7 @@ export class CookiesService {
    * @param {string} setCookieHeaderValue
    */
   async updateCookiesWithSetCookieHeader(setCookieHeaderValue) {
+    assertString(setCookieHeaderValue);
     this
       .deserialisedCookie(setCookieHeaderValue)
       .forEach(cookie => chrome.cookies.set(cookie));
@@ -80,37 +86,101 @@ export class CookiesService {
    * @private
    */
   deserialisedCookie(cookieString) {
-    const cookieList = cookieString.split(",");
+    assertString(cookieString);
+    const cookieList = this.splitMultiCookieString(cookieString);
     const cookies = [];
     for (let j = 0; j < cookieList.length; j++) {
-      const currentCookieString = cookieList[j].trim();
-      const cookieParts = currentCookieString.split(";");
+      const cookieParts = cookieList[j].split(";");
+      const [name, ...value] = (cookieParts.shift()).split("=");
+
       const cookie = {
         domain: this.domain,
         url: this.url,
+        name: name.trim(),
+        value: value.join("=").trim()
       };
+
       for (let i = 0; i < cookieParts.length; i++) {
-        const part = cookieParts[i].trim();
-        if (part.toLowerCase() === "secure") {
-          cookie.secure = true;
-        } else if (part.toLowerCase() === "httponly") {
-          cookie.httpOnly = true;
-        } else if (part.startsWith("path")) {
-          cookie.path = part.substring(5);
-        } else if (part.startsWith("SameSite")) {
-          cookie.sameSite = part.substring(9).toLowerCase();
-        } else if (part.startsWith('Max-Age')) {
-          cookie.expirationDate = Date.now() + parseInt(part.substring(8), 10);
-        } else if (part.startsWith('Expires') && !cookie.expirationDate) {
-          cookie.expirationDate = Math.floor(new Date(part.substring(9)).getTime() / 1000);
-        } else { // name=value
-          const [name, value] = part.split("=");
-          cookie.name = name;
-          cookie.value = value;
+        let [key, ...value] = cookieParts[i].split("=");
+        key = key.trim().toLowerCase();
+        value = value?.join("=")?.trim();
+
+        switch (key) {
+          case ("secure"): {
+            cookie.secure = true;
+            break;
+          }
+          case ("httponly"): {
+            cookie.httpOnly = true;
+            break;
+          }
+          case ("path"): {
+            cookie.path = cookie.path ?? value;
+            break;
+          }
+          case ("samesite"): {
+            cookie.sameSite = cookie.sameSite ?? value;
+            break;
+          }
+          case ("max-age"): {
+            cookie.expirationDate = cookie.expirationDate ?? Date.now() + parseInt(value, 10) * 1000;
+            break;
+          }
+          case ("expires"): {
+            cookie.expirationDate = cookie.expirationDate ?? Math.floor(new Date(value).getTime() / 1000);
+            break;
+          }
         }
       }
-      cookies.push(cookie);
+      // the cookie API requires some defaults value for sameSite.
+      cookies.push(Object.assign(cookie, DEFAULT_COOKIE_VALUES));
     }
     return cookies;
+  }
+
+  /**
+   * A string with multiple cookies inside will separate cookies with ',', however the attribute `Expires` does have ',' in its value and needs specifc treatment.
+   * @param {string} multipleCookieString
+   * @returns {Array<string>}
+   * @private
+   */
+  splitMultiCookieString(multipleCookieString) {
+    const cookieStrings = [];
+    let cookieStringBuffer = "";
+    let isInExpiresAttribute = false;
+    let alreadyFoundCommaInDate = false;
+
+    for (let i = 0; i < multipleCookieString.length; i++) {
+      const currentChar = multipleCookieString[i];
+
+      /*
+       * here's the multi-cookie separator but it could also be the Expires date
+       * It could be also the cookie separator with the Expiry date as the last attribute where ',' has been read already
+       */
+      if ((currentChar === "," && !isInExpiresAttribute) || (currentChar === "," && isInExpiresAttribute && alreadyFoundCommaInDate)) {
+        // we were not currently in the Expires attribute, so it's a cookie separation
+        cookieStrings.push(cookieStringBuffer.trim());
+        cookieStringBuffer = "";
+        alreadyFoundCommaInDate = false;
+        continue;
+      } else if (currentChar === "," && isInExpiresAttribute && !alreadyFoundCommaInDate) {
+        alreadyFoundCommaInDate = true;
+      }
+
+      if (currentChar === ";") {
+        // it's the attribute separator, we could enter in the Expires attribute section
+        const parsingAttributes = multipleCookieString.substring(i + 1);
+        const attributeName = parsingAttributes.trim().toLowerCase();
+        isInExpiresAttribute = attributeName.startsWith("expires");
+      }
+
+      cookieStringBuffer += currentChar;
+    }
+
+    if (cookieStringBuffer !== "") {
+      cookieStrings.push(cookieStringBuffer.trim());
+    }
+
+    return cookieStrings;
   }
 }

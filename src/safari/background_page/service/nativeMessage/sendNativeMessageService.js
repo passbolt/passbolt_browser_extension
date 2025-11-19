@@ -20,11 +20,28 @@ const SAFARI_APP_ID = "com.passbolt.safari";
 export class SendNativeMessageService {
   /**
    * Send message to the Safari application part.
-   * @param {String} action
+   * @param {string} action
    * @param {object} args
    * @return {Promise<any>}
    */
   static async sendNativeMessage(action, args) {
+    /*
+     * @todo: find another approach for the lock, the `fetch` request are much slower when they are numerous.
+     * The reason for the lock is to ensure that there are not too many calls to the native applications
+     * At some point, without limitations, the native application is not started or shut down during its preocessing
+     * and as a result, the messaging is failing and some process does not work in the app.
+     */
+    return await navigator.locks.request(action, async() => SendNativeMessageService._exec(action, args));
+  }
+
+  /**
+   * The service executor.
+   * @param {string} action
+   * @param {object} args
+   * @return {Promise<any>}
+   * @private
+   */
+  static async _exec(action, args) {
     const message = {action, ...args};
     //@note: SAFARI_APP_ID is actually ignored when used by Safari. It is sill set here to respect `sendNativeMessage` standard.
     const resp = await chrome.runtime.sendNativeMessage(SAFARI_APP_ID, message);

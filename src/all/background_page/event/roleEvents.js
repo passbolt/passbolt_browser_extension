@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.6
  */
-import RoleModel from "../model/role/roleModel";
+
+import GetOrFindRolesService from "../service/role/getOrFindRolesService";
 
 /**
  * Listens the role events
@@ -27,8 +28,8 @@ const listen = function(worker, apiClientOptions) {
    */
   worker.port.on('passbolt.role.get-all', async requestId => {
     try {
-      const roleModel = new RoleModel(apiClientOptions);
-      const roles = await roleModel.getOrFindAll();
+      const getOrFindRolesService = new GetOrFindRolesService(apiClientOptions);
+      const roles = await getOrFindRolesService.getOrFindAll();
       worker.port.emit(requestId, 'SUCCESS', roles);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);

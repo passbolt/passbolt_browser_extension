@@ -12,7 +12,7 @@
  * @since         v3.0.0
  */
 import RolesLocalStorage from "../../service/local_storage/rolesLocalStorage";
-import RoleService from "../../service/api/role/roleService";
+import RoleApiService from "passbolt-styleguide/src/shared/services/api/role/roleApiService";
 import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";
 
 class RoleModel {
@@ -23,7 +23,7 @@ class RoleModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.roleService = new RoleService(apiClientOptions);
+    this.roleApiService = new RoleApiService(apiClientOptions);
   }
 
   /**
@@ -32,7 +32,8 @@ class RoleModel {
    * @return {RolesCollection}
    */
   async updateLocalStorage() {
-    const rolesDtos = await this.roleService.findAll();
+    const apiResponse = await this.roleApiService.findAll();
+    const rolesDtos = apiResponse.body;
     const rolesCollection = new RolesCollection(rolesDtos);
     await RolesLocalStorage.set(rolesCollection);
     return rolesCollection;

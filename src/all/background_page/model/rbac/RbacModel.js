@@ -13,8 +13,7 @@
  */
 import UserModel from "../user/userModel";
 import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection";
-import RbacService from "passbolt-styleguide/src/shared/services/api/rbac/rbacService";
-import RbacMeService from "passbolt-styleguide/src/shared/services/api/rbac/rbacMeService";
+import RbacApiService from "passbolt-styleguide/src/shared/services/api/rbac/rbacApiService";
 import RbacsLocalStorage from "../../service/local_storage/rbacLocalStorage";
 
 /**
@@ -30,8 +29,7 @@ class RbacModel {
    */
   constructor(apiClientOptions, account) {
     this.userModel = new UserModel(apiClientOptions, account);
-    this.rbacService = new RbacService(apiClientOptions);
-    this.rbacMeService = new RbacMeService(apiClientOptions);
+    this.rbacApiService = new RbacApiService(apiClientOptions);
     this.rbacsLocalStorage = new RbacsLocalStorage(account);
   }
 
@@ -41,7 +39,7 @@ class RbacModel {
    * @returns {Promise<RbacsCollection>}
    */
   async findAll(contains = {}) {
-    const collectionDto = await this.rbacService.findAll(contains);
+    const collectionDto = await this.rbacApiService.findAll(contains);
     return new RbacsCollection(collectionDto, true);
   }
 
@@ -52,8 +50,8 @@ class RbacModel {
    * @return {Promise<RbacsCollection>}
    */
   async updateLocalStorage(contains = {}) {
-    const collectionDto = await this.rbacMeService.findMe(contains);
-    const rbacsCollection = new RbacsCollection(collectionDto, true);
+    const response = await this.rbacApiService.findMe(contains);
+    const rbacsCollection = new RbacsCollection(response.body, true);
     this.rbacsLocalStorage.set(rbacsCollection);
     return rbacsCollection;
   }

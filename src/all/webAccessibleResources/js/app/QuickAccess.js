@@ -33,8 +33,10 @@ async function main() {
   const bootstrapRequestId = urlSearchParams.get("requestId");
   const openerTabId = urlSearchParams.get('tabId');
   const detached = urlSearchParams.get('uiMode') === "detached";
-
   const extQuickaccessProps = {port, storage, bootstrapFeature, bootstrapRequestId, openerTabId, detached};
+
+  // TODO: update to createRoot for react 18 when ready
+  /* eslint-disable react/no-deprecated */
   ReactDOM.render(React.createElement(ExtQuickAccess, extQuickaccessProps), domContainer);
 }
 

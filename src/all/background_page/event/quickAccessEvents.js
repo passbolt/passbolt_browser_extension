@@ -6,7 +6,7 @@
  */
 import BrowserTabService from "../service/ui/browserTab.service";
 import i18n from "../sdk/i18n";
-import FindMeController from "../controller/rbac/findMeController";
+import FindRbacMeController from "../controller/rbac/findRbacMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import AutofillController from "../controller/autofill/AutofillController";
@@ -108,7 +108,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
 
   worker.port.on('passbolt.rbacs.find-me', async(requestId, name) => {
-    const controller = new FindMeController(worker, requestId, apiClientOptions, account);
+    const controller = new FindRbacMeController(worker, requestId, apiClientOptions, account);
     await controller._exec(name);
   });
 

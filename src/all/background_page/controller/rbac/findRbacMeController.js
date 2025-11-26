@@ -14,7 +14,7 @@
 
 import GetOrFindRbacService from "../../service/rbac/getOrFindRbacService";
 
-class FindMeController {
+export default class FindRbacMeController {
   /**
    * Constructor
    * @param {Worker} worker
@@ -48,8 +48,6 @@ class FindMeController {
    * @return {Promise<RbacsCollection>}
    */
   async exec() {
-    return this.getOrFindRbacService.getOrFindMe({ui_action: true});
+    return this.getOrFindRbacService.getOrFindMe();
   }
 }
-
-export default FindMeController;

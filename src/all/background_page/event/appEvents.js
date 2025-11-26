@@ -38,7 +38,7 @@ import SaveSsoSettingsAsDraftController from "../controller/sso/saveSsoSettingsA
 import ActivateSsoSettingsController from "../controller/sso/activateSsoSettingsController";
 import DeleteSsoSettingsController from "../controller/sso/deleteSsoSettingsController";
 import GenerateSsoKitController from "../controller/auth/generateSsoKitController";
-import FindMeController from "../controller/rbac/findMeController";
+import FindRbacMeController from "../controller/rbac/findRbacMeController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import SavePasswordPoliciesController from "../controller/passwordPolicies/savePasswordPoliciesController";
 import FindPasswordPoliciesController from "../controller/passwordPolicies/findPasswordPoliciesController";
@@ -218,7 +218,7 @@ const listen = function(worker, apiClientOptions, account) {
 
   worker.port.on('passbolt.rbacs.find-me', async(requestId, name) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new FindMeController(worker, requestId, apiClientOptions, account);
+    const controller = new FindRbacMeController(worker, requestId, apiClientOptions, account);
     await controller._exec(name);
   });
 

@@ -12,7 +12,7 @@
  * @since         4.1.0
  */
 
-import RbacModel from "../../model/rbac/RbacModel";
+import GetOrFindRbacService from "../../service/rbac/getOrFindRbacService";
 
 class FindMeController {
   /**
@@ -26,7 +26,7 @@ class FindMeController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.rbacModel = new RbacModel(apiClientOptions, account);
+    this.getOrFindRbacService = new GetOrFindRbacService(apiClientOptions, account);
   }
 
   /**
@@ -48,7 +48,7 @@ class FindMeController {
    * @return {Promise<RbacsCollection>}
    */
   async exec() {
-    return this.rbacModel.getOrFindMe({ui_action: true});
+    return this.getOrFindRbacService.getOrFindMe({ui_action: true});
   }
 }
 

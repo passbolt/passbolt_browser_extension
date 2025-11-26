@@ -12,14 +12,15 @@
  * @since         3.0.6
  */
 
-import GetOrFindRolesService from "../service/role/getOrFindRolesService";
+import FindAllRoleController from "../controller/role/findAllRoleControler";
 
 /**
  * Listens the role events
  * @param {Worker} worker
  * @param {ApiClientOptions} apiClientOptions the api client options
+ * @param {AccountEntity} the currently signed in user account
  */
-const listen = function(worker, apiClientOptions) {
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Get the roles from the local storage.
    *
@@ -27,13 +28,8 @@ const listen = function(worker, apiClientOptions) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.role.get-all', async requestId => {
-    try {
-      const getOrFindRolesService = new GetOrFindRolesService(apiClientOptions);
-      const roles = await getOrFindRolesService.getOrFindAll();
-      worker.port.emit(requestId, 'SUCCESS', roles);
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new FindAllRoleController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
   });
 };
 

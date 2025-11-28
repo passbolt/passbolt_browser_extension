@@ -34,7 +34,7 @@ export default class FindAndUpdateRolesLocalStorageService {
   /**
    * Retrieve the metadata types settings from the API and store them in the local storage.
    * If the API does not already implement the metadata plugin, return the default v4 settings.
-   * @returns {Promise<MetadataTypesSettingsEntity>}
+   * @returns {Promise<RolesCollection>}
    */
   async findAndUpdateAll() {
     const lockKey = `${FIND_AND_UPDATE_ROLES_LS_LOCK_PREFIX}${this.account.id}`;

@@ -13,6 +13,7 @@
  */
 
 import FindAllRoleController from "../controller/role/findAllRoleControler";
+import RolesUpdateLocalStorageController from "../controller/role/rolesUpdateLocalStorageController";
 
 /**
  * Listens the role events
@@ -29,6 +30,17 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.role.get-all', async requestId => {
     const controller = new FindAllRoleController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Find roles from the API and udpates the local storage with it.
+   *
+   * @listens passbolt.role.update-local-storage
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.role.update-local-storage', async requestId => {
+    const controller = new RolesUpdateLocalStorageController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 };

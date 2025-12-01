@@ -44,6 +44,7 @@
     "@svgr/webpack": "^8.1.0",
     "babel-jest": "^29.6.2",
     "babel-loader": "^8.2.3",
+    "buffer": "^6.0.3",
     "crx": "^5.0.1",
     "eslint": "^9.37.0",
     "eslint-import-resolver-alias": "^1.1.2",

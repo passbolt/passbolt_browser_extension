@@ -36,18 +36,6 @@ class AccountSettingsService extends AbstractService {
   }
 
   /**
-   * Find all account settings
-   *
-   * @returns {Promise<*>} response body
-   * @throws {Error} if options are invalid or API error
-   * @public
-   */
-  async findAll() {
-    const response = this.apiClient.findAll();
-    return response.body;
-  }
-
-  /**
    * Find all themes
    *
    * @returns {Promise<*>} response body

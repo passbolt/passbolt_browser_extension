@@ -20,3 +20,16 @@ export const accountSettingsService_midgarThemeDto = (data = {}) => ({
   "property": "theme",
   ...data,
 });
+
+export const accountSettingsService_themesDto = () => ([
+  accountSettingsService_midgarThemeDto({value: "default"}),
+  accountSettingsService_midgarThemeDto({value: "midgar"}),
+  accountSettingsService_midgarThemeDto({value: "solarized_light"}),
+]);
+
+export const accountSettingsService_localeDto = (data = {}) => ({
+  "id": uuidv4(),
+  "value": "en-UK",
+  "property": "locale",
+  ...data,
+});

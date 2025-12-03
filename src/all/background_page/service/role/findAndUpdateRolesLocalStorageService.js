@@ -32,8 +32,7 @@ export default class FindAndUpdateRolesLocalStorageService {
   }
 
   /**
-   * Retrieve the metadata types settings from the API and store them in the local storage.
-   * If the API does not already implement the metadata plugin, return the default v4 settings.
+   * Retrieve the roles collection from the API and store them in the local storage.
    * @returns {Promise<RolesCollection>}
    */
   async findAndUpdateAll() {
@@ -48,7 +47,7 @@ export default class FindAndUpdateRolesLocalStorageService {
         );
       }
 
-      // Lock is granted, retrieve the metadata types settings and update the local storage.
+      // Lock is granted, retrieve the roles collection and update the local storage.
       const rolesCollection = await this.findRolesService.findAll();
 
       await RolesLocalStorage.set(rolesCollection);

@@ -43,7 +43,7 @@ export default class RolesUpdateLocalStorageController {
 
   /**
    * Update the roles local storage.
-   * @returns {Promise<Object>} updated resource
+   * @returns {Promise<void>}
    */
   async exec() {
     await this.findAndUpdateRolesLocalStorageService.findAndUpdateAll();

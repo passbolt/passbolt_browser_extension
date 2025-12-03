@@ -15,21 +15,19 @@ import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/r
 import RbacApiService from "passbolt-styleguide/src/shared/services/api/rbac/rbacApiService";
 
 /**
- * The service aims to find roles from the API.
+ * The service aims to find rbacs from the API.
  */
 export default class FindRbacService {
   /**
    * @constructor
-   * @param {AccountEntity} account The user account
    * @param {ApiClientOptions} apiClientOptions The api client options
    */
-  constructor(account, apiClientOptions) {
-    this.account = account;
+  constructor(apiClientOptions) {
     this.rbacApiService = new RbacApiService(apiClientOptions);
   }
 
   /**
-   * Find all rbacs relative to the current signed in user.
+   * Find all RBACs relative to the current signed-in user.
    * @returns {Promise<RbacsCollection>}
    */
   async findMe() {

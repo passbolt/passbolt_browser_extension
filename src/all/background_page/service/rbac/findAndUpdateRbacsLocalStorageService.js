@@ -28,7 +28,7 @@ export default class FindAndUpdateRbacLocalStorageService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
-    this.findRbacService = new FindRbacService(account, apiClientOptions);
+    this.findRbacService = new FindRbacService(apiClientOptions);
     this.rbacLocalStorage = new RbacsLocalStorage(account);
   }
 
@@ -44,11 +44,11 @@ export default class FindAndUpdateRbacLocalStorageService {
       // Lock not granted, an update is already in progress. Wait for its completion and return the value of the local storage.
       if (!lock) {
         return await navigator.locks.request(lockKey, {mode: "shared"}, async() =>
-          new RbacsCollection(await RbacsLocalStorage.get())
+          new RbacsCollection(await this.rbacLocalStorage.get())
         );
       }
 
-      // Lock is granted, retrieve the metadata types settings and update the local storage.
+      // Lock is granted, retrieve the current user's Rbac and update the local storage.
       const rbacsCollection = await this.findRbacService.findMe();
 
       await this.rbacLocalStorage.set(rbacsCollection);

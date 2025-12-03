@@ -52,8 +52,8 @@ class ResourceDeleteController {
    */
   async exec(resourceIds) {
     const steps = 2;
-    this.progressService.start(steps, i18n.t('Deleting Resource(s)'));
     this.progressService.title = i18n.t("Delete {{count}} resource(s)", {count: resourceIds.length});
+    this.progressService.start(steps, i18n.t('Deleting Resource(s)'));
 
     try {
       await this.resourceDeleteService.deleteResources(resourceIds);

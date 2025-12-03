@@ -172,7 +172,7 @@ describe("PasswordPoliciesModel", () => {
 
       try {
         await model.getOrFind();
-      } catch (e) {
+      } catch {
         expect(spyOnStorageGet).toHaveBeenCalledTimes(1);
         expect(spyOnApiFind).toHaveBeenCalledTimes(1);
       }

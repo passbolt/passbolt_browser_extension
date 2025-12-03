@@ -125,7 +125,7 @@ class CommentApiService extends AbstractService {
   assertValidForeignModel(foreignModel) {
     assertNonEmptyString(foreignModel, `Comment foreign model should be a valid string.`);
     if (!CommentEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
-      throw new TypeError(`Comment foreign model ${foreignModel} in not in the list of supported models.`);
+      throw new TypeError(`Comment foreign model '${foreignModel}' is not in the list of supported models.`);
     }
   }
 }

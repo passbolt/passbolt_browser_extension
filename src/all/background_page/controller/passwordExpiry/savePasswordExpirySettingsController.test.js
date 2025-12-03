@@ -23,16 +23,9 @@ import SavePasswordExpirySettingsController from "./savePasswordExpirySettingsCo
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
 import {defaultPasswordExpiryProSettingsDto, defaultPasswordExpirySettingsDto, defaultPasswordExpirySettingsDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
-import {defaultProOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
+import {defaultCeOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
 
-const mockedOrganisationSettings = new OrganizationSettingsEntity(defaultProOrganizationSettings());
-jest.mock('../../model/organizationSettings/organizationSettingsModel', () => ({
-  __esModule: true,
-  default: () => ({
-    getOrFind: () => mockedOrganisationSettings
-  }),
-}));
 
 describe("SavePasswordExpirySettingsController", () => {
   let account, apiClientOptions;
@@ -51,7 +44,10 @@ describe("SavePasswordExpirySettingsController", () => {
     const dtoToSave = defaultPasswordExpirySettingsDto();
     const expectedDto = defaultPasswordExpirySettingsDtoFromApi(dtoToSave);
     const expectedEntity = new PasswordExpirySettingsEntity(expectedDto);
+    const organizationSettings = defaultCeOrganizationSettings();
 
+    jest.spyOn(OrganizationSettingsService.prototype, "find")
+      .mockImplementation(() => organizationSettings);
     fetch.doMockOnceIf(/password-expiry\/settings\.json/, async request => {
       const body = JSON.parse(await request.text());
       expect(body).toStrictEqual(dtoToSave);

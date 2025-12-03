@@ -40,7 +40,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import NeededSecretsCollection from "../../model/entity/secret/needed/neededSecretsCollection";
-import SecretsCollection from "../../model/entity/secret/secretsCollection";
+import SecretsCollection from "passbolt-styleguide/src/shared/models/entity/secret/secretsCollection";
 
 export const PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL = 8;
 

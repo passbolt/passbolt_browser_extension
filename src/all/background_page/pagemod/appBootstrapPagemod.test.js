@@ -16,7 +16,6 @@ import AppBootstrap from "./appBootstrapPagemod";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
-import {AppBootstrapEvents} from "../event/appBootstrapEvents";
 import Pagemod from "./pagemod";
 import each from "jest-each";
 import {PortEvents} from "../event/portEvents";
@@ -28,7 +27,6 @@ const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
-jest.spyOn(AppBootstrapEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("AppBootstrap", () => {
@@ -50,7 +48,7 @@ describe("AppBootstrap", () => {
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(AppBootstrap.contentScriptFiles);
       expect(AppBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(AppBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/app.js']);
-      expect(AppBootstrap.events).toStrictEqual([AppBootstrapEvents, PortEvents]);
+      expect(AppBootstrap.events).toStrictEqual([PortEvents]);
       expect(AppBootstrap.mustReloadOnExtensionUpdate).toBeTruthy();
       expect(AppBootstrap.appName).toBe('AppBootstrap');
     });
@@ -103,7 +101,7 @@ describe("AppBootstrap", () => {
 
   describe("AppBootstrap::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(2);
+      expect.assertions(1);
       // data mocked
       const port = {
         on: () => jest.fn(),
@@ -118,7 +116,6 @@ describe("AppBootstrap", () => {
       // process
       await AppBootstrap.attachEvents(port);
       // expectations
-      expect(AppBootstrapEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: AppBootstrap.appName});
       expect(PortEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: AppBootstrap.appName});
     });
   });

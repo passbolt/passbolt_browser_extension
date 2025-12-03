@@ -130,6 +130,8 @@ class ResourcesCsvImportParser {
         const externalResourceEntity = RowParser.parse(row, this.importEntity, this.resourceTypesCollection, this.metadataTypesSettings);
         collection.push(externalResourceEntity);
       } catch (error) {
+        // Remove all warnings related to this resource before adding the error
+        this.importEntity.removeWarningsForResource(row);
         this.importEntity.importResourcesErrors.push(new ImportError("Cannot parse resource", row, error));
       }
     });

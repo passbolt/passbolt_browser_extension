@@ -255,7 +255,15 @@ export const defaultProOrganizationSettings = siteSettings => {
     "passwordPolicies": {
       "version": "1.0.0",
       "enabled": true
-    }
+    },
+    "passwordExpiry": {
+      "version": "1.0.0",
+      "enabled": true
+    },
+    "passwordExpiryPolicies": {
+      "version": "1.0.0",
+      "enabled": true
+    },
   });
 
   return Object.assign(defaultData, siteSettings);

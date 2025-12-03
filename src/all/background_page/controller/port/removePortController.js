@@ -92,6 +92,7 @@ class RemovePortController {
         // If the port is still connected do nothing
         port.emit('passbolt.port.check');
       } catch (error) {
+        console.error(error);
         console.debug('The port is not connected, remove references');
         PortManager.removePort(portId, {reason: "disconnected"});
         await WorkersSessionStorage.deleteById(portId);

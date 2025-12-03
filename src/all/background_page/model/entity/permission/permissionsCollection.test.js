@@ -657,4 +657,28 @@ describe("PermissionsCollection", () => {
       expect(PermissionsCollection.sortPermissionsByAroAndName(permissionB, permissionA)).toStrictEqual(-1);
     });
   });
+
+  describe("::hasGroupPermission", () => {
+    it("should return true when the collection contains at least one group permission", () => {
+      expect.assertions(1);
+
+      const acoForeignKey = crypto.randomUUID();
+      const userPermission = defaultPermissionDto({aco_foreign_key: acoForeignKey, aro: PermissionEntity.ARO_USER});
+      const groupPermission = defaultPermissionDto({aco_foreign_key: acoForeignKey, aro: PermissionEntity.ARO_GROUP});
+      const collection = new PermissionsCollection([userPermission, groupPermission]);
+
+      expect(collection.hasGroupPermission).toBe(true);
+    });
+
+    it("should return false when the collection does not contain any group permission", () => {
+      expect.assertions(1);
+
+      const acoForeignKey = crypto.randomUUID();
+      const userPermission1 = defaultPermissionDto({aco_foreign_key: acoForeignKey, aro: PermissionEntity.ARO_USER});
+      const userPermission2 = defaultPermissionDto({aco_foreign_key: acoForeignKey, aro: PermissionEntity.ARO_USER});
+      const collection = new PermissionsCollection([userPermission1, userPermission2]);
+
+      expect(collection.hasGroupPermission).toBe(false);
+    });
+  });
 });

@@ -170,6 +170,8 @@ class ResourcesKdbxImportParser {
 
       this.importEntity.importResources.push(externalResourceDto);
     } catch (error) {
+      // Remove all warnings related to this resource before adding the error
+      this.importEntity.removeWarningsForResource(externalResourceDto);
       this.importEntity.importResourcesErrors.push(new ImportError("Cannot parse resource", externalResourceDto, error));
     }
   }
@@ -190,7 +192,7 @@ class ResourcesKdbxImportParser {
       .map(([, value]) => (value));
 
     if (additionalEntriesUris.length > 31) {
-      this.importEntity.importResourcesErrors.push(new ImportError(
+      this.importEntity.importResourcesWarnings.push(new ImportError(
         "Resource has more than 32 URIs, only the first 32 will be imported",
         externalResourceDto
       ));
@@ -288,11 +290,11 @@ class ResourcesKdbxImportParser {
 
     resourceType = ResourcesTypeImportParser.findPartialResourceType(this.resourceTypesCollection, scores);
     if (resourceType) {
-      this.importEntity.importResourcesErrors.push(new ImportError("Resource partially imported", externalResourceDto));
+      this.importEntity.importResourcesWarnings.push(new ImportError("Resource partially imported", externalResourceDto));
     } else {
       //Fallback default content type not supported
       resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(this.resourceTypesCollection, this.metadataTypesSettings);
-      this.importEntity.importResourcesErrors.push(new ImportError("Content type not supported but imported with default resource type", externalResourceDto));
+      this.importEntity.importResourcesWarnings.push(new ImportError("Content type not supported but imported with default resource type", externalResourceDto));
     }
     return resourceType;
   }

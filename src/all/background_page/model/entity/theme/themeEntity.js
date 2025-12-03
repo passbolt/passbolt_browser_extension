@@ -11,24 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const ENTITY_NAME = 'Theme';
 
-class ThemeEntity extends Entity {
-  /**
-   * @inheritDoc
-   */
-  constructor(themeDto, options = {}) {
-    super(EntitySchema.validate(
-      ThemeEntity.ENTITY_NAME,
-      themeDto,
-      ThemeEntity.getSchema()
-    ), options);
-  }
-
+class ThemeEntity extends EntityV2 {
   /**
    * Get secret entity schema
    * @returns {Object} schema
@@ -39,7 +26,6 @@ class ThemeEntity extends Entity {
       "required": [
         "id",
         "name",
-        "preview"
       ],
       "properties": {
         "id": {
@@ -49,10 +35,6 @@ class ThemeEntity extends Entity {
         "name": {
           "type": "string",
           "pattern": /^[a-zA-Z0-9-_]*$/,
-        },
-        "preview": {
-          "type": "string",
-          "format": "x-url"
         }
       }
     };
@@ -65,7 +47,7 @@ class ThemeEntity extends Entity {
    */
   /**
    * Get theme id
-   * @returns {(string|null)} uuid
+   * @returns {string} uuid
    */
   get id() {
     return this._props.id;
@@ -73,20 +55,11 @@ class ThemeEntity extends Entity {
 
   /**
    * Get theme name
-   * @returns {string} admin or user
+   * @returns {string}
    */
   get name() {
     return this._props.name;
   }
-
-  /**
-   * Get theme preview
-   * @returns {string} uuid
-   */
-  get preview() {
-    return this._props.preview;
-  }
-
 
   /*
    * ==================================================

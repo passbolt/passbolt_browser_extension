@@ -16,7 +16,7 @@ import ImportError from "../../../error/importError";
 import ExternalFoldersCollection from "../../../model/entity/folder/external/externalFoldersCollection";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
-import SecretEntity from "../../../model/entity/secret/secretEntity";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import TagsCollection from "../../../model/entity/tag/tagsCollection";
 import FolderModel from "../../../model/folder/folderModel";
 import ResourcesImportParser from "../../../model/import/resourcesImportParser";
@@ -36,6 +36,8 @@ import EncryptMetadataService from "../../metadata/encryptMetadataService";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
+import PasswordExpirySettingsGetOrFindService from "../../passwordExpirySettings/passwordExpirySettingsGetOrFindService";
+import OrganizationSettingsModel from "../../../model/organizationSettings/organizationSettingsModel";
 
 /**
  * The service aim to import the resources from a file and save it to the API / localstorage.
@@ -61,6 +63,8 @@ class ImportResourcesService {
     this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
     this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
+    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.passwordExpirySettingsGetOrFindService = new PasswordExpirySettingsGetOrFindService(account, apiClientOptions);
     this.account = account;
   }
 
@@ -72,12 +76,20 @@ class ImportResourcesService {
    */
   async importFile(importResourcesFile, passphrase) {
     const userId = User.getInstance().get().id;
-
+    const organizationSettings = await this.organisationSettingsModel.getOrFind();
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     await this.encryptSecrets(importResourcesFile, userId, privateKey);
     importResourcesFile.mustImportFolders && await this.bulkImportFolders(importResourcesFile);
     const resourceToImportDto = importResourcesFile.importResources.toResourceCollectionImportDto();
     const resourcesCollection = new ResourcesCollection(resourceToImportDto);
+    const passwordExpirySettings = organizationSettings.isPluginEnabled("passwordExpiry") ? await this.passwordExpirySettingsGetOrFindService.exec() : null;
+    if (passwordExpirySettings?.isFeatureEnabled) {
+      const passwordExpiryDate = passwordExpirySettings.calculateDefaultResourceExpiryDate();
+      if (passwordExpiryDate) {
+        const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+        resourcesCollection.setExpiryDateIfUnset(passwordExpiryDate, resourceTypesCollection);
+      }
+    }
     const clearTextMetadataResourcesCollection = new ResourcesCollection(resourceToImportDto);
     await this.encryptMetadata(resourcesCollection, passphrase);
     await this.bulkImportResources(importResourcesFile, resourcesCollection, clearTextMetadataResourcesCollection);
@@ -105,7 +117,6 @@ class ImportResourcesService {
       + (importResourcesFile.mustTag ? importResourcesFile.importResources.items.length : 0); // #resources tag API calls
     this.progressService.updateGoals(progressGoal);
   }
-
 
   /**
    * Encrypts the metadata of resources in a collection using the provided passphrase.

@@ -29,12 +29,14 @@ describe("Locales", () => {
         try {
           expect(localeContent.appName.message.length).toBeLessThanOrEqual(extensionNameLength);
         } catch (error) {
+          console.error(error);
           throw new Error(`Extension name for locale "${locale}" should not be greater than ${extensionNameLength} characters`);
         }
 
         try {
           expect(localeContent.appDescription.message.length).toBeLessThanOrEqual(extensionDescriptionLength);
         } catch (error) {
+          console.error(error);
           throw new Error(`Extension description for locale "${locale}" should not be greater than ${extensionDescriptionLength} characters`);
         }
       }

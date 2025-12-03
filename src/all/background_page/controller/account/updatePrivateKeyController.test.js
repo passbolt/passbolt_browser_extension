@@ -231,7 +231,7 @@ describe("UpdatePrivateKeyController", () => {
       const oldPassphrase = pgpKeys.ada.passphrase;
       try {
         await controller.exec(oldPassphrase, newPassphrase);
-      } catch (_) { }
+      } catch { }
 
       expect(SsoDataStorage.save).not.toHaveBeenCalled();
       expect(PassphraseStorageService.flushPassphrase).not.toHaveBeenCalled();

@@ -40,6 +40,7 @@ class DecryptResponseDataService {
     try {
       privateKeyPasswordDecryptedDataDto = JSON.parse(privateKeyPasswordDecryptedDataSerialized);
     } catch (error) {
+      console.error(error);
       throw new Error("Unable to parse the decrypted response data.");
     }
 

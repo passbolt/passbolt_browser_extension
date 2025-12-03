@@ -13,7 +13,7 @@
  */
 import {assertUuid} from "../../utils/assertions";
 import SecretService from "../api/secret/secretService";
-import SecretEntity from "../../model/entity/secret/secretEntity";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 
 
 class FindSecretService {

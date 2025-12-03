@@ -436,4 +436,103 @@ describe("Resource entity", () => {
       expect(entityV5SharedKey.isMetadataKeyTypeUserKey()).toBeFalsy();
     });
   });
+
+  describe("ResourceEntity::expired", () => {
+    it("should set expired with valid ISO date string", () => {
+      expect.assertions(3);
+
+      const resourceDTO = defaultResourceDto();
+      const expiryDate = "2025-12-31T23:59:59Z";
+      const entityV5 = new ResourceEntity(resourceDTO);
+
+      expect(entityV5.expired).toBeUndefined();
+
+      entityV5.expired = expiryDate;
+      const expectedDto = {...resourceDTO, expired: expiryDate};
+
+      expect(entityV5._props.expired).toBeDefined();
+      expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
+    });
+
+    it("should set expired with null value", () => {
+      expect.assertions(3);
+
+      const expiryDate = "2025-12-31T23:59:59Z";
+      const resourceDTO = defaultResourceDto({expired: expiryDate});
+      const entityV5 = new ResourceEntity(resourceDTO);
+
+      expect(entityV5._props.expired).toEqual(expiryDate);
+
+      entityV5.expired = null;
+      const expectedDto = {...resourceDTO, expired: null};
+
+      expect(entityV5._props.expired).toBeNull();
+      expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
+    });
+
+    it("should update expired with different valid date", () => {
+      expect.assertions(3);
+
+      const initialDate = "2025-06-30T23:59:59Z";
+      const newDate = "2025-12-31T23:59:59Z";
+      const resourceDTO = defaultResourceDto({expired: initialDate});
+      const entityV5 = new ResourceEntity(resourceDTO);
+
+      expect(entityV5._props.expired).toEqual(initialDate);
+
+      entityV5.expired = newDate;
+      const expectedDto = {...resourceDTO, expired: newDate};
+
+      expect(entityV5._props.expired).toEqual(newDate);
+      expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
+    });
+
+    it("should fail to set expired with invalid date format", () => {
+      expect.assertions(1);
+
+      const resourceDTO = defaultResourceDto();
+      const invalidDate = "not-a-date";
+      const entityV5 = new ResourceEntity(resourceDTO);
+
+      try {
+        entityV5.expired = invalidDate;
+      } catch (error) {
+        expect(error.getError("expired", "format")).toEqual("The expired is not a valid date-time.");
+      }
+    });
+
+    it("should fail to set expired with invalid type", () => {
+      expect.assertions(1);
+
+      const resourceDTO = defaultResourceDto();
+      const invalidExpired = 123456789;
+      const entityV5 = new ResourceEntity(resourceDTO);
+
+      try {
+        entityV5.expired = invalidExpired;
+      } catch (error) {
+        expect(error.getError("expired", "type")).toEqual("The expired is not a valid string.");
+      }
+    });
+
+    it("should accept various valid ISO 8601 date formats", () => {
+      expect.assertions(6);
+
+      const dates = [
+        "2025-12-31T23:59:59.999Z",
+        "2025-12-31T23:59:59+00:00",
+        "2025-12-31T23:59:59-05:00",
+      ];
+
+      dates.forEach(date => {
+        const resourceDTO = defaultResourceDto();
+        const entityV5 = new ResourceEntity(resourceDTO);
+
+        entityV5.expired = date;
+
+        expect(entityV5._props.expired).toEqual(date);
+        expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual({...resourceDTO, expired: date});
+      });
+    });
+  });
 });

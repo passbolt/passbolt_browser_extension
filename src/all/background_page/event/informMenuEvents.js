@@ -16,6 +16,7 @@ import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/
 import AutofillController from "../controller/autofill/AutofillController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getOrFindMetadataKeysSettingsController";
+import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 
 /**
  * Listens the inform menu events
@@ -123,6 +124,17 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.metadata.get-or-find-metadata-keys-settings', async requestId => {
     const controller = new GetOrFindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Get or find metadata types settings.
+   *
+   * @listens passbolt.metadata.get-or-find-metadata-types-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.metadata.get-or-find-metadata-types-settings', async requestId => {
+    const controller = new GetOrFindMetadataTypesController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 };

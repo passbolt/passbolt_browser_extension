@@ -44,6 +44,21 @@ class FindPermissionsService {
   }
 
   /**
+   * Find all permissions for a resource without additional user/group data.
+   *
+   * @param {string} resourceId The resource id
+   * @throws {Error} if API call fails, service unreachable, etc.
+   * @throws {TypeError} if resource id is not an uuid
+   * @return {Promise<PermissionsCollection>} permissionsCollection
+   */
+  async findAllByAcoForeignKey(resourceId) {
+    assertUuid(resourceId, `Service error. The id '${resourceId}' is not a valid uuid.`);
+    const permissionsCollectionDto = await this.permissionService.findAllByAcoForeignKey(resourceId);
+    const collection = new PermissionsCollection(permissionsCollectionDto);
+    return collection;
+  }
+
+  /**
    * FindPermissionsService.DEFAULT_CONTAIN
    * @private
    * @returns {Object}

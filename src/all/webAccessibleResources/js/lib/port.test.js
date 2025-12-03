@@ -56,6 +56,7 @@ describe("Port", () => {
       try {
         await port.connect();
       } catch (error) {
+        console.error(error);
         expect(browser.runtime.connect).toHaveBeenCalledWith({name: portname});
         expect(port.onConnectErrorHandler.callback).toHaveBeenCalled();
       }

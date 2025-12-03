@@ -17,7 +17,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import PlaintextEntity from "../../model/entity/plaintext/plaintextEntity";
-import SecretEntity from "../../model/entity/secret/secretEntity";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import {
   resourceTypePasswordAndDescriptionDto,
   resourceTypePasswordStringDto

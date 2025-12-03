@@ -66,8 +66,8 @@ class MoveResourcesController {
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
-    this.progressService.start(PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL, i18n.t('Initializing ...'));
     this.progressService.title = i18n.t('Moving {{count}} resources', {count: resourcesIds.length});
+    this.progressService.start(PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL, i18n.t('Initializing ...'));
     try {
       await this.moveResourcesService.moveAll(resourcesIds, destinationFolderId, passphrase);
     } finally {

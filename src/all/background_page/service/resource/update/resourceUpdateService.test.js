@@ -50,6 +50,8 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data.js";
+import PermissionService from "../../api/permission/permissionService";
+import {ownerGroupPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -94,6 +96,7 @@ describe("ResourceUpdateService", () => {
       pgpKeys.admin.userId,
       pgpKeys.betty.userId
     ]);
+    jest.spyOn(PermissionService.prototype, "findAllByAcoForeignKey").mockImplementation(() => []);
     jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
   });
 
@@ -611,6 +614,54 @@ describe("ResourceUpdateService", () => {
       } catch (error) {
         expect(error.message).toEqual("Error encrypting message: Primary key is expired");
       }
+    });
+
+    it("Should set personal to true when resource has only 1 user and no groups", async() => {
+      expect.assertions(2);
+
+      const resourceDto = defaultResourceDto();
+      const entity = new ResourceEntity(resourceDto);
+      await ResourceLocalStorage.addResource(entity);
+
+      jest.spyOn(resourceUpdateService.userModel, "findAllIdsForResourceUpdate").mockImplementationOnce(() => [pgpKeys.ada.userId]);
+      jest.spyOn(PermissionService.prototype, "findAllByAcoForeignKey").mockImplementationOnce(() => []);
+
+      let resourceUpdated;
+      jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
+        resourceUpdated = resourceDtoToUpdate;
+        const resourceEntity = new ResourceEntity(resourceDto);
+        return resourceEntity.toV4Dto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
+
+      await resourceUpdateService.exec(resourceDto, null, pgpKeys.ada.passphrase);
+
+      expect(resourceUpdated.personal).toBe(true);
+      expect(resourceUpdateService.resourceService.update).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should set personal to false when resource has 1 user but is shared with groups", async() => {
+      expect.assertions(1);
+
+      const resourceDto = defaultResourceDto();
+      const entity = new ResourceEntity(resourceDto);
+      await ResourceLocalStorage.addResource(entity);
+
+      const groupPermission = ownerGroupPermissionDto({
+        aco_foreign_key: resourceDto.id,
+      });
+      jest.spyOn(resourceUpdateService.userModel, "findAllIdsForResourceUpdate").mockImplementationOnce(() => [pgpKeys.ada.userId]);
+      jest.spyOn(PermissionService.prototype, "findAllByAcoForeignKey").mockImplementationOnce(() => [groupPermission]);
+
+      let resourceUpdated;
+      jest.spyOn(resourceUpdateService.resourceService, "update").mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
+        resourceUpdated = resourceDtoToUpdate;
+        const resourceEntity = new ResourceEntity(resourceDto);
+        return resourceEntity.toV4Dto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
+
+      await resourceUpdateService.exec(resourceDto, null, pgpKeys.ada.passphrase);
+
+      expect(resourceUpdated.personal).toBe(false);
     });
   });
 });

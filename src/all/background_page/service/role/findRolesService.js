@@ -34,6 +34,9 @@ export default class FindRolesService {
    */
   async findAll() {
     const rolesDto = await this.roleApiService.findAll();
-    return new RolesCollection(rolesDto.body, {clone: false});
+    const rolesCollection = new RolesCollection(rolesDto.body, {clone: false});
+    rolesCollection.filterOutGuestRole();
+
+    return rolesCollection;
   }
 }

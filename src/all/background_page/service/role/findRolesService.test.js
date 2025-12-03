@@ -19,6 +19,8 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import {rolesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection.test.data";
 import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";
+import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
+import {TEST_ROLE_GUEST_ID, adminRoleDto} from "passbolt-styleguide/src/shared/models/entity/role/roleEntity.test.data";
 
 describe('FindRolesService', () => {
   beforeEach(async() => {
@@ -33,13 +35,14 @@ describe('FindRolesService', () => {
       const apiClientOptions = defaultApiClientOptions();
 
       const collectionDto = rolesCollectionDto;
+      const expectedCollectionDto = rolesCollectionDto.filter(r => r.name !== RoleEntity.ROLE_GUEST);
       const service = new FindRolesService(account, apiClientOptions);
       jest.spyOn(service.roleApiService, "findAll").mockImplementation(async() => new PassboltResponseEntity({header: {}, body: collectionDto}));
 
       const result = await service.findAll();
       expect(result).toBeInstanceOf(RolesCollection);
-      expect(result).toHaveLength(collectionDto.length);
-      expect(result.toDto()).toStrictEqual(collectionDto);
+      expect(result).toHaveLength(expectedCollectionDto.length);
+      expect(result.toDto()).toStrictEqual(expectedCollectionDto);
     });
 
     it("should let error be thrown from the api service", async() => {
@@ -60,13 +63,28 @@ describe('FindRolesService', () => {
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
 
-      const collectionDto = rolesCollectionDto;
-      collectionDto[1].id = collectionDto[0].id;
+      const collectionDto = [adminRoleDto(), adminRoleDto()];
 
       const service = new FindRolesService(account, apiClientOptions);
       jest.spyOn(service.roleApiService, "findAll").mockImplementation(async() => new PassboltResponseEntity({header: {}, body: collectionDto}));
 
       await expect(() => service.findAll()).rejects.toThrowError();
+    });
+
+    it("should not have the guest role in the resulting list", async() => {
+      expect.assertions(3);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = defaultApiClientOptions();
+
+      const collectionDto = rolesCollectionDto;
+      const service = new FindRolesService(account, apiClientOptions);
+      jest.spyOn(service.roleApiService, "findAll").mockImplementation(async() => new PassboltResponseEntity({header: {}, body: collectionDto}));
+
+      const result = await service.findAll();
+      expect(result).toBeInstanceOf(RolesCollection);
+      expect(result).toHaveLength(collectionDto.length - 1);
+      expect(result.getById(TEST_ROLE_GUEST_ID)).toBeNull();
     });
   });
 });

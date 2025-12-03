@@ -16,8 +16,7 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import AccountSettingsService from "./accountSettingsService";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../../test/mocks/mockApiResponse";
-import {defaultThemeCollectionDtos} from "../../../model/entity/theme/themesCollection.test.data";
-import {accountSettingsService_midgarThemeDto} from "./accountSettingsService.test.data";
+import {accountSettingsService_midgarThemeDto, accountSettingsService_themesDto, accountSettingsService_localeDto} from "./accountSettingsService.test.data";
 
 describe("accountSettingsService", () => {
   let service;
@@ -40,16 +39,27 @@ describe("accountSettingsService", () => {
     });
   });
 
-  describe("::findAll", () => {
-    it("should return $expectedFindAllThemes with ids and names", async() => {
-      expect.assertions(2);
+  describe("::findAllThemes", () => {
+    it("should return all available themes", async() => {
+      expect.assertions(1);
 
-      const expectedFindAllThemes = defaultThemeCollectionDtos();
-      fetch.doMockOnceIf(new RegExp('/settings/themes'), async() => await mockApiResponse(expectedFindAllThemes));
-      const receivedFindAllThemes = await service.findAllThemes();
+      const expectedThemes = accountSettingsService_themesDto();
+      fetch.doMockOnceIf(new RegExp('/settings/themes'), async() => await mockApiResponse(expectedThemes));
+      const result = await service.findAllThemes();
 
-      expect(receivedFindAllThemes.length).toBe(expectedFindAllThemes.length);
-      expect(receivedFindAllThemes).toStrictEqual(expectedFindAllThemes);
+      expect(result).toEqual(expectedThemes);
+    });
+  });
+
+  describe("::updateLocale", () => {
+    it("should update the locale value", async() => {
+      expect.assertions(1);
+
+      const expectedLocale = "en-UK";
+      fetch.doMockOnceIf(new RegExp('/settings/locales'), async() => await mockApiResponse(accountSettingsService_localeDto()));
+      const result = await service.updateLocale(expectedLocale);
+
+      expect(result.value).toBe(expectedLocale);
     });
   });
 });

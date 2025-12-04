@@ -21,6 +21,9 @@ import DecryptAndParseResourceSecretService from "../../service/secret/decryptAn
 import InformMenuPagemod from "../../pagemod/informMenuPagemod";
 import QuickAccessPagemod from "../../pagemod/quickAccessPagemod";
 import FindSecretService from "../../service/secret/findSecretService";
+import TotpService from "../../service/otp/totpService";
+import CopyToClipboardService from "../../service/clipboard/copyToClipboardService";
+import AutofillSettingLocalStorage from "../../service/local_storage/autofillSettingLocalStorage";
 
 class AutofillController {
   /**
@@ -33,6 +36,7 @@ class AutofillController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
+    this.account = account;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.findSecretService = new FindSecretService(account, apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
@@ -76,6 +80,8 @@ class AutofillController {
       const username = resource.metadata?.username || "";
       const password = plaintextSecret?.password;
       this.fillCredential(webIntegrationWorker, {username, password});
+      // Copy TOTP to clipboard if available
+      await this.copyTotpToClipboard(plaintextSecret?.totp);
     } finally {
       if (this.isInformMenuWorker) {
         webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
@@ -130,6 +136,32 @@ class AutofillController {
       // Get the url from the worker port to have the tab url for the quickaccess
       const url = webIntegrationWorker.port._port.sender.url;
       webIntegrationWorker.port.request('passbolt.quickaccess.fill-form', credential.username, credential.password, url);
+    }
+  }
+
+  /**
+   * Copy TOTP code to clipboard if the resource has TOTP configured and the setting is enabled.
+   * @private
+   * @param {Object|null} totp - The TOTP configuration from the decrypted secret
+   * @return {Promise<void>}
+   */
+  async copyTotpToClipboard(totp) {
+    if (!totp) {
+      return;
+    }
+    try {
+      // Check if the setting is enabled
+      const autofillSettingLocalStorage = new AutofillSettingLocalStorage(this.account);
+      const autofillSetting = await autofillSettingLocalStorage.get();
+      if (!autofillSetting.copyTotpOnAutofill) {
+        return;
+      }
+      const totpCode = TotpService.generate(totp);
+      const clipboardService = new CopyToClipboardService();
+      await clipboardService.copyTemporarily(totpCode);
+    } catch (error) {
+      // Log but don't fail the autofill operation if TOTP copy fails
+      console.error("Failed to copy TOTP to clipboard:", error);
     }
   }
 }

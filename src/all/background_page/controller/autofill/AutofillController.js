@@ -23,6 +23,7 @@ import QuickAccessPagemod from "../../pagemod/quickAccessPagemod";
 import FindSecretService from "../../service/secret/findSecretService";
 import TotpService from "../../service/otp/totpService";
 import CopyToClipboardService from "../../service/clipboard/copyToClipboardService";
+import AutofillSettingLocalStorage from "../../service/local_storage/autofillSettingLocalStorage";
 
 class AutofillController {
   /**
@@ -35,6 +36,7 @@ class AutofillController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
+    this.account = account;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.findSecretService = new FindSecretService(account, apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
@@ -138,7 +140,7 @@ class AutofillController {
   }
 
   /**
-   * Copy TOTP code to clipboard if the resource has TOTP configured.
+   * Copy TOTP code to clipboard if the resource has TOTP configured and the setting is enabled.
    * @private
    * @param {Object|null} totp - The TOTP configuration from the decrypted secret
    * @return {Promise<void>}
@@ -148,6 +150,12 @@ class AutofillController {
       return;
     }
     try {
+      // Check if the setting is enabled
+      const autofillSettingLocalStorage = new AutofillSettingLocalStorage(this.account);
+      const autofillSetting = await autofillSettingLocalStorage.get();
+      if (!autofillSetting.copyTotpOnAutofill) {
+        return;
+      }
       const totpCode = TotpService.generate(totp);
       const clipboardService = new CopyToClipboardService();
       await clipboardService.copyTemporarily(totpCode);

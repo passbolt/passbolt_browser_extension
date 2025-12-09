@@ -83,13 +83,7 @@ class ImportResourcesService {
     const resourceToImportDto = importResourcesFile.importResources.toResourceCollectionImportDto();
     const resourcesCollection = new ResourcesCollection(resourceToImportDto);
     const passwordExpirySettings = organizationSettings.isPluginEnabled("passwordExpiry") ? await this.passwordExpirySettingsGetOrFindService.exec() : null;
-    if (passwordExpirySettings?.isFeatureEnabled) {
-      const passwordExpiryDate = passwordExpirySettings.calculateDefaultResourceExpiryDate();
-      if (passwordExpiryDate) {
-        const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-        resourcesCollection.setExpiryDateIfUnset(passwordExpiryDate, resourceTypesCollection);
-      }
-    }
+    await this.applyDefaultExpiryDate(importResourcesFile, resourcesCollection, passwordExpirySettings);
     const clearTextMetadataResourcesCollection = new ResourcesCollection(resourceToImportDto);
     await this.encryptMetadata(resourcesCollection, passphrase);
     await this.bulkImportResources(importResourcesFile, resourcesCollection, clearTextMetadataResourcesCollection);
@@ -116,6 +110,30 @@ class ImportResourcesService {
       + 1 // #resource metadata encryption
       + (importResourcesFile.mustTag ? importResourcesFile.importResources.items.length : 0); // #resources tag API calls
     this.progressService.updateGoals(progressGoal);
+  }
+
+  /**
+   * Apply default expiry date to resources if password expiry settings are enabled
+   * For KDBX imports, skip this step as null expiry dates are intentional
+   * @param {ImportResourcesFileEntity} importResourcesFile The import resource file entity
+   * @param {ResourcesCollection} resourcesCollection The resources collection
+   * @param {PasswordExpirySettingsEntity|null} passwordExpirySettings The password expiry settings
+   * @returns {Promise<void>}
+   * @private
+   */
+  async applyDefaultExpiryDate(importResourcesFile, resourcesCollection, passwordExpirySettings) {
+    // For KDBX imports, null expiry dates are intentional (expires flag was false in KeePass)
+    if (importResourcesFile.fileType === 'kdbx') {
+      return;
+    }
+
+    if (passwordExpirySettings?.isFeatureEnabled) {
+      const passwordExpiryDate = passwordExpirySettings.calculateDefaultResourceExpiryDate();
+      if (passwordExpiryDate) {
+        const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+        resourcesCollection.setExpiryDateIfUnset(passwordExpiryDate, resourceTypesCollection);
+      }
+    }
   }
 
   /**

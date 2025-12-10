@@ -71,6 +71,21 @@ describe('FindRolesService', () => {
       await expect(() => service.findAll()).rejects.toThrowError();
     });
 
+    it("should ignore entities that are invalid an error if the data is invalid", async() => {
+      expect.assertions(1);
+
+      const account = new AccountEntity(defaultAccountDto());
+      const apiClientOptions = defaultApiClientOptions();
+
+      const collectionDto = [adminRoleDto(), adminRoleDto()];
+
+      const service = new FindRolesService(account, apiClientOptions);
+      jest.spyOn(service.roleApiService, "findAll").mockImplementation(async() => new PassboltResponseEntity({header: {}, body: collectionDto}));
+
+      const collection = await service.findAll({ignoreInvalidEntity: true});
+      expect(collection).toHaveLength(1);
+    });
+
     it("should not have the guest role in the resulting list", async() => {
       expect.assertions(3);
 

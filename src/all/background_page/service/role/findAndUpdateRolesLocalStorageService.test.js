@@ -22,7 +22,7 @@ import FindAndUpdateRolesLocalStorageService from "./findAndUpdateRolesLocalStor
 describe("FindAndUpdateRolesLocalStorageService", () => {
   describe("::findAndUpdateAll", () => {
     it("should call the API to retrieve the data and set the local storage", async() => {
-      expect.assertions(4);
+      expect.assertions(5);
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
       const rolesCollection = new RolesCollection(rolesCollectionDto);
@@ -35,6 +35,7 @@ describe("FindAndUpdateRolesLocalStorageService", () => {
 
       const resultCollection = await service.findAndUpdateAll();
       expect(service.findRolesService.findAll).toHaveBeenCalledTimes(1);
+      expect(service.findRolesService.findAll).toHaveBeenCalledWith({ignoreInvalidEntity: true});
       expect(resultCollection).toStrictEqual(rolesCollection);
 
       const localStorageStateAfter = await RolesLocalStorage.get();
@@ -42,7 +43,7 @@ describe("FindAndUpdateRolesLocalStorageService", () => {
     });
 
     it("should call the API only once if the API did not responded yet", async() => {
-      expect.assertions(2);
+      expect.assertions(3);
 
       let resolve;
       const promise = new Promise(_resolve => resolve = _resolve);
@@ -62,6 +63,7 @@ describe("FindAndUpdateRolesLocalStorageService", () => {
       const rolesCollectionLocalStorage = await RolesLocalStorage.get();
 
       expect(service.findRolesService.findAll).toHaveBeenCalledTimes(1);
+      expect(service.findRolesService.findAll).toHaveBeenCalledWith({ignoreInvalidEntity: true});
       expect(rolesCollectionLocalStorage).toEqual(rolesCollection.toDto());
     });
   });

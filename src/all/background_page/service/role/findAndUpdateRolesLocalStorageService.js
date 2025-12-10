@@ -48,7 +48,7 @@ export default class FindAndUpdateRolesLocalStorageService {
       }
 
       // Lock is granted, retrieve the roles collection and update the local storage.
-      const rolesCollection = await this.findRolesService.findAll();
+      const rolesCollection = await this.findRolesService.findAll({ignoreInvalidEntity: true});
 
       await RolesLocalStorage.set(rolesCollection);
       return rolesCollection;

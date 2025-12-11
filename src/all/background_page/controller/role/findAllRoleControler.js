@@ -1,22 +1,21 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         4.1.0
+ * @since         5.8.0
  */
+import GetOrFindRolesService from "../../service/role/getOrFindRolesService";
 
-import RbacModel from "../../model/rbac/RbacModel";
-
-class FindMeController {
+export default class FindAllRoleController {
   /**
-   * Constructor
+   * @constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions The
@@ -25,8 +24,7 @@ class FindMeController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
-    this.rbacModel = new RbacModel(apiClientOptions, account);
+    this.getOrFindRolesService = new GetOrFindRolesService(account, apiClientOptions);
   }
 
   /**
@@ -44,12 +42,10 @@ class FindMeController {
   }
 
   /**
-   * Find the current user rbacs
-   * @return {Promise<RbacsCollection>}
+   * Find all the available roles
+   * @return {Promise<RolesCollection>}
    */
   async exec() {
-    return this.rbacModel.getOrFindMe({ui_action: true});
+    return this.getOrFindRolesService.getOrFindAll();
   }
 }
-
-export default FindMeController;

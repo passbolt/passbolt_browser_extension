@@ -13,7 +13,7 @@
  */
 
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import FindMeController from "./findMeController";
+import FindRbacMeController from "./findRbacMeController";
 import {
   userSettingsRbacsCollectionData
 } from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection.test.data";
@@ -28,8 +28,8 @@ beforeEach(() => {
   enableFetchMocks();
 });
 
-describe("FindMeController", () => {
-  describe("FindMeController::exec", () => {
+describe("FindRbacMeController", () => {
+  describe("::exec", () => {
     it("Should retrieve the rbacs that apply to the user.", async() => {
       const account = new AccountEntity(defaultAccountDto());
 
@@ -37,7 +37,7 @@ describe("FindMeController", () => {
       const mockApiResult = userSettingsRbacsCollectionData();
       fetch.doMock(() => mockApiResponse(mockApiResult));
 
-      const controller = new FindMeController(null, null, defaultApiClientOptions(), account);
+      const controller = new FindRbacMeController(null, null, defaultApiClientOptions(), account);
       const rbacsCollection = await controller.exec();
 
       expect.assertions(2);

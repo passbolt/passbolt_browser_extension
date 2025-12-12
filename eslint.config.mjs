@@ -9,6 +9,7 @@ import noUnsanitizedPlugin from 'eslint-plugin-no-unsanitized';
 import jestPlugin from 'eslint-plugin-jest';
 import reactPlugin from 'eslint-plugin-react';
 import importPlugin from 'eslint-plugin-import';
+import pluginSecurity from 'eslint-plugin-security';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,6 +18,7 @@ export default [
   reactPlugin.configs.flat.recommended,          // React best practices
   reactPlugin.configs.flat['jsx-runtime'],       // JSX transform rules
   importPlugin.flatConfigs.recommended,          // import/export validations
+  pluginSecurity.configs.recommended,
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],
 
@@ -150,6 +152,11 @@ export default [
       'react/jsx-uses-react': 'error',  // Marks React as used when JSX is present
       'react/jsx-uses-vars': 'error',   // Marks JSX components as used
       'react/react-in-jsx-scope': 'error', // Ensures React is in scope for JSX
+      'security/detect-object-injection': 'off',
+      'security/detect-non-literal-regexp': 'off',
+      'security/detect-unsafe-regex': 'off',
+      'security/detect-non-literal-fs-filename': 'off',
+      'security/detect-possible-timing-attacks': 'off'
     },
   },
   /*

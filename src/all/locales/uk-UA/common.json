@@ -138,5 +138,6 @@
   "Updating resources metadata": "Оновлення метаданих ресурсів",
   "Updating resources metadata {{counter}}/{{total}}": "Оновлення метаданих ресурсів {{counter}}/{{total}}",
   "Updating users' key...": "Оновлення ключа користувача…",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "Ви вже запустили процес в іншій вкладці."
 }

@@ -138,5 +138,6 @@
   "Updating resources metadata": "Middelen-metadata bijwerken",
   "Updating resources metadata {{counter}}/{{total}}": "Middelen-metadata bijwerken {{counter}}/{{total}}",
   "Updating users' key...": "Gebruikerssleutel wordt bijgewerkt...",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "Je bent dit proces al in een ander tabblad gestart."
 }

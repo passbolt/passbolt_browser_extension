@@ -138,5 +138,6 @@
   "Updating resources metadata": "リソースのメタデータを更新中",
   "Updating resources metadata {{counter}}/{{total}}": "リソースのメタデータを更新しています {{counter}}/{{total}}",
   "Updating users' key...": "ユーザーの鍵を更新しています…",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "別のタブで既に処理を開始しています。"
 }

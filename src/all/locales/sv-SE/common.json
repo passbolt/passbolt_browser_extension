@@ -138,5 +138,6 @@
   "Updating resources metadata": "Uppdaterar resursernas metadata",
   "Updating resources metadata {{counter}}/{{total}}": "Uppdaterar resursernas metadata {{counter}}/{{total}}",
   "Updating users' key...": "Uppdaterar användarnas nyckel...",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "Du har redan startat processen på en annan flik."
 }

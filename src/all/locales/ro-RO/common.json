@@ -138,5 +138,6 @@
   "Updating resources metadata": "Actualizarea metadatelor resurselor",
   "Updating resources metadata {{counter}}/{{total}}": "Actualizarea metadatelor resurselor {{counter}}/{{total}}",
   "Updating users' key...": "Se actualizează cheia utilizatorilor...",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "Ați început deja procesul într-o altă filă."
 }

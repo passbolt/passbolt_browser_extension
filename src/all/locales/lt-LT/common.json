@@ -138,5 +138,6 @@
   "Updating resources metadata": "Atnaujinami išteklių metaduomenys",
   "Updating resources metadata {{counter}}/{{total}}": "Atnaujinami išteklių metaduomenys {{counter}}/{{total}}",
   "Updating users' key...": "Atnaujinamas naudotojų raktas...",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "Jūs jau pradėjote procesą kitame skirtuke."
 }

@@ -10,6 +10,7 @@ import jestPlugin from 'eslint-plugin-jest';
 import reactPlugin from 'eslint-plugin-react';
 import importPlugin from 'eslint-plugin-import';
 import pluginSecurity from 'eslint-plugin-security';
+import nodePlugin from 'eslint-plugin-n';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -19,6 +20,7 @@ export default [
   reactPlugin.configs.flat['jsx-runtime'],       // JSX transform rules
   importPlugin.flatConfigs.recommended,          // import/export validations
   pluginSecurity.configs.recommended,
+  nodePlugin.configs["flat/recommended-script"],
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],
 
@@ -156,7 +158,27 @@ export default [
       'security/detect-non-literal-regexp': 'off',
       'security/detect-unsafe-regex': 'off',
       'security/detect-non-literal-fs-filename': 'off',
-      'security/detect-possible-timing-attacks': 'off'
+      'security/detect-possible-timing-attacks': 'off',
+      "n/no-unpublished-import": ["error", {
+        "allowModules": [
+          "jest-fetch-mock",
+          "jest-useragent-mock",
+          "jest-each",
+          "@testing-library/dom",
+          "@testing-library/jest-dom",
+          "@testing-library/react",
+          "@testing-library/user-event",
+          "fetch-mock",
+          "@babel/core",
+          "@storybook/test",
+        ]
+      }],
+      "n/no-unpublished-require": ["error", {
+        "allowModules": ["jest-fetch-mock"]
+      }],
+      "n/no-extraneous-import": ["error", {
+        "allowModules": ["expect", "history"]
+      }],
     },
   },
   /*

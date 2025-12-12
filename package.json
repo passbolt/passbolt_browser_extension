@@ -22,7 +22,7 @@
     "locutus": "~2.0.9",
     "openpgp": "^6.1.1",
     "papaparse": "^5.5.2",
-    "passbolt-styleguide": "^5.8.0-alpha.1",
+    "passbolt-styleguide": "^5.8.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
@@ -69,7 +69,7 @@
     "jest-webextension-mock": "^3.8.9",
     "lockfile-lint": "^4.14.1",
     "text-encoding-utf-8": "^1.0.2",
-    "web-ext": "^8.10.0",
+    "web-ext": "^9.2.0",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
   },

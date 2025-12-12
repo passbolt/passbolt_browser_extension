@@ -138,5 +138,6 @@
   "Updating resources metadata": "Aktualizace metadat zdrojů",
   "Updating resources metadata {{counter}}/{{total}}": "Aktualizace metadat zdrojů {{counter}}/{{total}}",
   "Updating users' key...": "Aktualizuji klíč uživatele...",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "Tento proces jste již zahájili na jiné kartě."
 }

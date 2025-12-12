@@ -138,5 +138,6 @@
   "Updating resources metadata": "Aktualizowanie metadanych zasobów",
   "Updating resources metadata {{counter}}/{{total}}": "Aktualizowanie metadanych zasobów {{counter}}/{{total}}",
   "Updating users' key...": "Aktualizowanie klucza użytkowników...",
+  "User key not found": "User key not found",
   "You have already started the process on another tab.": "Ten proces już został przez Ciebie rozpoczęty w innej karcie."
 }

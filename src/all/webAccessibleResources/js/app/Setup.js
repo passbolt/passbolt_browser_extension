@@ -23,6 +23,9 @@ async function main() {
   await port.connect();
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
+
+  // TODO: update to createRoot for react 18 when ready
+  /* eslint-disable react/no-deprecated */
   ReactDOM.render(React.createElement(ExtAuthenticationSetup, {port: port}), domContainer);
 }
 

@@ -35,7 +35,7 @@ class RolesLocalStorage {
    * Set the roles local storage.
    *
    * @throws {Error} if operation failed
-   * @return {Promise} results object, containing every object in keys that was found in the storage area.
+   * @returns {Promise<Array<object>>} results object, containing every object in keys that was found in the storage area.
    * If storage is not set, undefined will be returned.
    */
   static async get() {
@@ -46,7 +46,7 @@ class RolesLocalStorage {
   /**
    * Set the roles in local storage.
    * @param {RolesCollection} rolesCollection The folders to insert in the local storage.
-   * @return {void}
+   * @returns {Promise<void>}
    */
   static async set(rolesCollection) {
     await lock.acquire();

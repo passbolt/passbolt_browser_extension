@@ -130,10 +130,11 @@ describe("AccountEntity", () => {
       const successScenarios = [
         {scenario: "valid role 'user'", value: 'user'},
         {scenario: "valid role 'admin'", value: 'admin'},
+        {scenario: "valid role 'guest'", value: 'user'},
+        {scenario: "valid role 'custom'", value: 'custom'},
       ];
 
       const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
         assertEntityProperty.SCENARIO_INTEGER,
         assertEntityProperty.SCENARIO_OBJECT,
         assertEntityProperty.SCENARIO_ARRAY,

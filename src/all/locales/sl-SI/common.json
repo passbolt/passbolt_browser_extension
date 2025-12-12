@@ -138,5 +138,6 @@
   "Updating resources metadata": "Posodabljanje metapodatkov virov",
   "Updating resources metadata {{counter}}/{{total}}": "Posodabljanje metapodatkov virov {{counter}}/{{total}}",
   "Updating users' key...": "Posodabljam ključe uporabnikov...",
+  "User key not found": "Uporabniškega ključa ni bilo mogoče najti",
   "You have already started the process on another tab.": "Postopek ste že začeli v drugem zavihku."
 }

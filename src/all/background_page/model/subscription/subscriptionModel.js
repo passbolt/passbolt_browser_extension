@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-import SubscriptionService from "../../service/api/subscription/subscriptionService";
+import SubscriptionApiService from "../../service/api/subscription/subscriptionApiService";
 import SubscriptionEntity from "../entity/subscription/subscriptionEntity";
 import PassboltSubscriptionError from "../../error/passboltSubscriptionError";
 
@@ -23,7 +23,7 @@ class SubscriptionModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.subscriptionService = new SubscriptionService(apiClientOptions);
+    this.subscriptionService = new SubscriptionApiService(apiClientOptions);
   }
 
   /*

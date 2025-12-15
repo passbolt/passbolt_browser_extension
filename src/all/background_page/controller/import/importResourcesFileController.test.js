@@ -53,6 +53,7 @@ import GetOrFindMetadataSettingsService from "../../service/metadata/getOrFindMe
 
 beforeEach(async() => {
   await MockExtension.withConfiguredAccount();
+  jest.clearAllMocks();
 });
 
 describe("ImportResourcesFileController", () => {

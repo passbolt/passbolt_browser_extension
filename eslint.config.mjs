@@ -11,6 +11,7 @@ import reactPlugin from 'eslint-plugin-react';
 import importPlugin from 'eslint-plugin-import';
 import pluginSecurity from 'eslint-plugin-security';
 import nodePlugin from 'eslint-plugin-n';
+import * as regexpPlugin from "eslint-plugin-regexp"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,6 +22,7 @@ export default [
   importPlugin.flatConfigs.recommended,          // import/export validations
   pluginSecurity.configs.recommended,
   nodePlugin.configs["flat/recommended-script"],
+  regexpPlugin.configs["flat/recommended"],
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],
 
@@ -179,6 +181,23 @@ export default [
       "n/no-extraneous-import": ["error", {
         "allowModules": ["expect", "history"]
       }],
+      'prefer-regex-literals': 'off',
+      'regexp/strict': 'off',
+      'regexp/no-useless-escape': 'off',
+      'regexp/no-dupe-characters-character-class': 'off',
+      'regexp/use-ignore-case': 'off',
+      'regexp/prefer-d': 'off',
+      'regexp/prefer-character-class': 'off',
+      'regexp/prefer-w': 'off',
+      'regexp/no-obscure-range': 'off',
+      'regexp/prefer-range': 'off',
+      'regexp/no-dupe-disjunctions': 'off',
+      'regexp/no-useless-assertions': 'off',
+      'regexp/optimal-quantifier-concatenation': 'off',
+      'regexp/no-unused-capturing-group': 'off',
+      'regexp/sort-flags': 'off',
+      'regexp/negation': 'off',
+      'regexp/no-useless-flag': 'off'
     },
   },
   /*

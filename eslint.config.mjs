@@ -11,7 +11,8 @@ import reactPlugin from 'eslint-plugin-react';
 import importPlugin from 'eslint-plugin-import';
 import pluginSecurity from 'eslint-plugin-security';
 import nodePlugin from 'eslint-plugin-n';
-import * as regexpPlugin from "eslint-plugin-regexp"
+import * as regexpPlugin from "eslint-plugin-regexp";
+import pluginPromise from 'eslint-plugin-promise';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,6 +24,7 @@ export default [
   pluginSecurity.configs.recommended,
   nodePlugin.configs["flat/recommended-script"],
   regexpPlugin.configs["flat/recommended"],
+  pluginPromise.configs['flat/recommended'],
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],
 
@@ -197,7 +199,9 @@ export default [
       'regexp/no-unused-capturing-group': 'off',
       'regexp/sort-flags': 'off',
       'regexp/negation': 'off',
-      'regexp/no-useless-flag': 'off'
+      'regexp/no-useless-flag': 'off',
+      'promise/param-names': 'off',
+      'promise/catch-or-return': 'off'
     },
   },
   /*

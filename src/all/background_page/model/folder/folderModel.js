@@ -245,7 +245,7 @@ class FolderModel {
     const folderDto = await FolderLocalStorage.getFolderById(folderId);
     const folderEntity = new FolderEntity(folderDto);
     folderEntity.folderParentId = folderParentId;
-    await this.moveService.move(folderEntity);
+    await this.moveService.moveFolder(folderId, folderParentId);
     // TODO update modified date
     await FolderLocalStorage.updateFolder(folderEntity);
 

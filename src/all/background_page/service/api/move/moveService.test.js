@@ -29,15 +29,45 @@ describe("MoveService", () => {
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
+  describe('::moveFolder', () => {
+    it("Move a folder on the API.", async() => {
+      expect.assertions(2);
+
+      const folderId = uuidv4();
+      const destinationFolderId = uuidv4();
+
+      fetch.doMockOnceIf(new RegExp(`/move\/folder\/${folderId}\.json`), async req => {
+        expect(req.method).toEqual("PUT");
+        const body = await req.json();
+        expect(body).toEqual({folder_parent_id: destinationFolderId});
+        return mockApiResponse({});
+      });
+
+      const service = new MoveService(apiClientOptions);
+      await service.moveFolder(folderId, destinationFolderId);
+    });
+
+    it("throws an invalid parameter error if the `id` or `destinationFolderId` parameter is not valid", async() => {
+      expect.assertions(2);
+
+      const service = new MoveService(apiClientOptions);
+
+      await expect(() => service.moveFolder(42)).rejects.toThrow("The parameter 'id' should be a UUID.");
+      await expect(() => service.moveFolder(uuidv4(), 42)).rejects.toThrow("The parameter 'destinationFolderId' should be a UUID or null.");
+    });
+  });
+
   describe('::moveResource', () => {
     it("Move a resource on the API.", async() => {
-      expect.assertions(1);
+      expect.assertions(2);
 
       const resourceId = uuidv4();
       const destinationFolderId = uuidv4();
 
       fetch.doMockOnceIf(new RegExp(`/move\/resource\/${resourceId}\.json`), async req => {
         expect(req.method).toEqual("PUT");
+        const body = await req.json();
+        expect(body).toEqual({folder_parent_id: destinationFolderId});
         return mockApiResponse({});
       });
 

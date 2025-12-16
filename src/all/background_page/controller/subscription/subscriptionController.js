@@ -16,33 +16,34 @@
  */
 import SubscriptionModel from "../../model/subscription/subscriptionModel";
 import UpdateSubscriptionEntity from "../../model/entity/subscription/update/updateSubscriptionEntity";
-
+import FindSubscriptionKeyService from '../../service/subscription/findSubscriptionKeyService';
 
 class SubscriptionController {
   /**
-   * SubscriptionController constructor
+   * @constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions
    */
-  constructor(worker, clientOptions) {
+  constructor(worker, apiClientOptions) {
     this.worker = worker;
 
-    // Models
-    this.subscriptionModel = new SubscriptionModel(clientOptions);
+    this.findSubscriptionService = new FindSubscriptionKeyService(apiClientOptions);
+
+    this.subscriptionModel = new SubscriptionModel(apiClientOptions);
   }
 
   /**
-   * Get the subscription
-   * @returns {Promise<SubscriptionEntity>} The subscription
+   * Get the subscription key
+   * @returns {Promise<SubscriptionEntity>} The subscription key
    */
   async getSubscription() {
-    return await this.subscriptionModel.find();
+    return await this.findSubscriptionService.find();
   }
 
   /**
-   * Update the subscription
-   * @param subscriptionKeyDto The new subscription key
-   * @returns {Promise<SubscriptionEntity>} The subscription
+   * Update the subscription key
+   * @param {SubscriptionEntity} subscriptionKeyDto The new subscription key
+   * @returns {Promise<SubscriptionEntity>} The updated subscription key
    */
   async updateSubscription(subscriptionKeyDto) {
     const updateSubscriptionEntity = new UpdateSubscriptionEntity(subscriptionKeyDto);

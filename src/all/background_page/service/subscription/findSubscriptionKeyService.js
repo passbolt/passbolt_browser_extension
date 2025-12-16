@@ -9,48 +9,41 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.2.0
+ * @since         5.9.0
  */
-import SubscriptionApiService from "../../service/api/subscription/subscriptionApiService";
-import SubscriptionEntity from "../entity/subscription/subscriptionEntity";
-import PassboltSubscriptionError from "../../error/passboltSubscriptionError";
+import SubscriptionEntity from '../../model/entity/subscription/subscriptionEntity';
+import PassboltSubscriptionError from '../../error/passboltSubscriptionError';
+import SubscriptionApiService from '../api/subscription/subscriptionApiService';
 
-class SubscriptionModel {
+
+export default class FindSubscriptionKeyService {
   /**
-   * Constructor
-   *
+   * @constructor
    * @param {ApiClientOptions} apiClientOptions
-   * @public
    */
   constructor(apiClientOptions) {
     this.subscriptionService = new SubscriptionApiService(apiClientOptions);
   }
 
-  /*
-   * ==============================================================
-   *  CRUD
-   * ==============================================================
-   */
-
   /**
-   * Update the subscription
-   *
-   * @param {UpdateSubscriptionEntity} updateSubscriptionEntity
-   * @returns {Promise<SubscriptionEntity>}
+   * Find the subscription key
+   * @returns {Promise<SubscriptionEntity>} The subscription key
+   * @throws {Error} Throws an error when encountering any network error
+   * @throws {PassboltSubscriptionError} Throws `PassboltSubscriptionError` when payment is required
    */
-  async update(updateSubscriptionEntity) {
+  async find() {
     try {
-      const subscriptionDto = await this.subscriptionService.update(updateSubscriptionEntity.toDto());
+      const subscriptionDto = await this.subscriptionService.find();
       return new SubscriptionEntity(subscriptionDto);
     } catch (error) {
-      const isPaymentRequired = error.data && error.data.code === 402;
+      const isPaymentRequired = error.data?.code === 402;
+
       if (isPaymentRequired) {
         const subscription = new SubscriptionEntity(error.data.body);
         throw new PassboltSubscriptionError(error.message, subscription);
       }
+
       throw error;
     }
   }
 }
-
-export default SubscriptionModel;

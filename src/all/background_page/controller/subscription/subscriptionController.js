@@ -14,9 +14,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import SubscriptionModel from "../../model/subscription/subscriptionModel";
-import UpdateSubscriptionEntity from "../../model/entity/subscription/update/updateSubscriptionEntity";
 import FindSubscriptionKeyService from '../../service/subscription/findSubscriptionKeyService';
+import UpdateSubscriptionKeyService from '../../service/subscription/updateSubscriptionKeyService';
+import UpdateSubscriptionEntity from '../../model/entity/subscription/update/updateSubscriptionEntity';
 
 class SubscriptionController {
   /**
@@ -28,13 +28,14 @@ class SubscriptionController {
     this.worker = worker;
 
     this.findSubscriptionService = new FindSubscriptionKeyService(apiClientOptions);
-
-    this.subscriptionModel = new SubscriptionModel(apiClientOptions);
+    this.updateSubscriptionService = new UpdateSubscriptionKeyService(apiClientOptions);
   }
 
   /**
    * Get the subscription key
    * @returns {Promise<SubscriptionEntity>} The subscription key
+   * @throws {Error} Throws an error when encountering any network error
+   * @throws {PassboltSubscriptionError} Throws `PassboltSubscriptionError` when payment is required
    */
   async getSubscription() {
     return await this.findSubscriptionService.find();
@@ -44,10 +45,12 @@ class SubscriptionController {
    * Update the subscription key
    * @param {SubscriptionEntity} subscriptionKeyDto The new subscription key
    * @returns {Promise<SubscriptionEntity>} The updated subscription key
+   * @throws {Error} Throws an error when encountering any network error
+   * @throws {PassboltSubscriptionError} Throws `PassboltSubscriptionError` when payment is required
    */
   async updateSubscription(subscriptionKeyDto) {
     const updateSubscriptionEntity = new UpdateSubscriptionEntity(subscriptionKeyDto);
-    return await this.subscriptionModel.update(updateSubscriptionEntity);
+    return await this.updateSubscriptionService.update(updateSubscriptionEntity);
   }
 }
 

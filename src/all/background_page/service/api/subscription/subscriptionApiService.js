@@ -41,7 +41,7 @@ class SubscriptionApiService extends AbstractService {
    * Get the subscription
    *
    * @throws {Error} if API call fails, service unreachable, etc.
-   * @returns {Promise<SubscriptionEntity>} subscriptionDto
+   * @returns {Promise<Object>} subscriptionDto
    */
   async find() {
     const response = await this.apiClient.get("key");
@@ -51,9 +51,9 @@ class SubscriptionApiService extends AbstractService {
   /**
    * Update the subscription
    *
-   * @param keyDto the new subscription key
+   * @param {SubscriptionEntity} keyDto the new subscription key entity
    * @throws {Error} if API call fails, service unreachable, etc.
-   * @returns {Promise<SubscriptionEntity>} subscriptionDto
+   * @returns {Promise<Object>} subscriptionDto
    */
   async update(keyDto) {
     const response = await this.apiClient.update("key", keyDto);

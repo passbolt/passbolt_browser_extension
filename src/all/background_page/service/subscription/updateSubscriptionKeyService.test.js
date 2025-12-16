@@ -1,0 +1,100 @@
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         5.9.0
+ */
+import {enableFetchMocks} from 'jest-fetch-mock';
+import PassboltApiFetchError from 'passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError';
+import SubscriptionEntity from '../../model/entity/subscription/subscriptionEntity';
+import PassboltSubscriptionError from '../../error/passboltSubscriptionError';
+import UpdateSubscriptionKeyService from './updateSubscriptionKeyService';
+import {API_CLIENT_OPTIONS, NEW_KEY, NEW_KEY_DTO, UPDATED_KEY_DTO} from './updateSubscriptionKeyService.test.data';
+
+beforeEach(() => {
+  enableFetchMocks();
+});
+
+describe('UpdateSubscriptionKeyService', () => {
+  /**
+   * @type {UpdateSubscriptionKeyService}
+   */
+  let service;
+
+  beforeEach(() => {
+    service = new UpdateSubscriptionKeyService(API_CLIENT_OPTIONS);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  describe('::update', () => {
+    it('should update the subscription key and return it', async() => {
+      expect.assertions(2);
+
+      jest.spyOn(service.subscriptionService, 'update').mockResolvedValue(UPDATED_KEY_DTO);
+
+      const subscriptionKey = await service.update(NEW_KEY_DTO);
+
+      expect(subscriptionKey).toBeInstanceOf(SubscriptionEntity);
+      expect(subscriptionKey._props.data).toEqual(NEW_KEY);
+    });
+
+    describe('Payment required error', () => {
+      it('should throw a PassboltSubscriptionError', async() => {
+        expect.assertions(2);
+
+        const errorMessage = 'an error occurred';
+        const error = new PassboltApiFetchError(errorMessage, {
+          code: 402,
+          body: UPDATED_KEY_DTO
+        });
+
+        jest.spyOn(service.subscriptionService, 'update').mockRejectedValue(error);
+
+        try {
+          await service.update(NEW_KEY_DTO);
+        } catch (error) {
+          expect(error).toBeInstanceOf(PassboltSubscriptionError);
+          expect(error.message).toEqual(errorMessage);
+        }
+      });
+
+      it('should throw a TypeError if the returned entity is missing required properties', async() => {
+        expect.assertions(2);
+
+        const errorMessage = 'an error occurred';
+        const error = new PassboltApiFetchError(errorMessage, {
+          code: 402,
+        });
+
+        jest.spyOn(service.subscriptionService, 'update').mockRejectedValue(error);
+
+        try {
+          await service.update(NEW_KEY_DTO);
+        } catch (error) {
+          expect(error).toBeInstanceOf(TypeError);
+          expect(error.message).toEqual('Could not validate entity Subscription. No data provided.');
+        }
+      });
+    });
+
+    it('should throw parent\'s error when payment is not required', async() => {
+      expect.assertions(1);
+
+      const error = new Error();
+
+      jest.spyOn(service.subscriptionService, 'update').mockRejectedValue(error);
+
+      await expect(service.update(NEW_KEY_DTO)).rejects.toEqual(error);
+    });
+  });
+});

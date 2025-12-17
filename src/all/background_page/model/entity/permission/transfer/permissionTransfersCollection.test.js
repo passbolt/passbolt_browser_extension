@@ -13,14 +13,17 @@
  */
 import PermissionTransfersCollection from "./permissionTransfersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultPermissionTransferDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransferEntity.test.data";
+import { defaultPermissionTransferDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransferEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultPermissionTransfersCollectionDtos} from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransfersCollection.test.data";
+import { defaultPermissionTransfersCollectionDtos } from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransfersCollection.test.data";
 
 describe("Permission transfer entity", () => {
   describe("::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(PermissionTransfersCollection.constructor.name, PermissionTransfersCollection.getSchema());
+      EntitySchema.validateSchema(
+        PermissionTransfersCollection.constructor.name,
+        PermissionTransfersCollection.getSchema(),
+      );
     });
 
     it("validates collection is an array", () => {
@@ -45,7 +48,7 @@ describe("Permission transfer entity", () => {
   });
 
   describe("PermissionTransfersCollection:pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const permissionTransfersCount = 10_000;
       const dtos = defaultPermissionTransfersCollectionDtos(permissionTransfersCount);
 

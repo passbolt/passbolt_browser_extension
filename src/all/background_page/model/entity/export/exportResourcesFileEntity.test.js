@@ -19,13 +19,13 @@ import {
   defaultKdbxExportResourceFileDto,
   defaultKeyFileCredentialOptions,
   defaultPasswordCredentialOptions,
-  kdbxWithKeyExportResourceFileDto
+  kdbxWithKeyExportResourceFileDto,
 } from "./exportResourcesFileEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
 import ExternalFoldersCollection from "../folder/external/externalFoldersCollection";
-import {defaultExternalResourceCollectionDto} from "../resource/external/externalResourcesCollection.test.data";
-import {defaultExternalFoldersCollectionDto} from "../folder/external/externalFoldersCollection.test.data";
+import { defaultExternalResourceCollectionDto } from "../resource/external/externalResourcesCollection.test.data";
+import { defaultExternalFoldersCollectionDto } from "../folder/external/externalFoldersCollection.test.data";
 
 describe("ExportResourcesFileEntity", () => {
   describe("::getSchema", () => {
@@ -54,14 +54,15 @@ describe("ExportResourcesFileEntity", () => {
     });
 
     it("validates resources_ids property", () => {
-      const successScenarios = [
-        assertEntityProperty.SCENARIO_ARRAY,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
-      ];
-      assertEntityProperty.assert(ExportResourcesFileEntity, "resources_ids", successScenarios, failingScenarios, "type");
+      const successScenarios = [assertEntityProperty.SCENARIO_ARRAY, assertEntityProperty.SCENARIO_NULL];
+      const failingScenarios = [assertEntityProperty.SCENARIO_STRING];
+      assertEntityProperty.assert(
+        ExportResourcesFileEntity,
+        "resources_ids",
+        successScenarios,
+        failingScenarios,
+        "type",
+      );
       assertEntityProperty.nullable(ExportResourcesFileEntity, "resources_ids");
       assertEntityProperty.notRequired(ExportResourcesFileEntity, "resources_ids");
       assertEntityProperty.assertArrayItemString(ExportResourcesFileEntity, "resources_ids");
@@ -69,13 +70,8 @@ describe("ExportResourcesFileEntity", () => {
     });
 
     it("validates folders_ids property", () => {
-      const successScenarios = [
-        assertEntityProperty.SCENARIO_ARRAY,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
-      ];
+      const successScenarios = [assertEntityProperty.SCENARIO_ARRAY, assertEntityProperty.SCENARIO_NULL];
+      const failingScenarios = [assertEntityProperty.SCENARIO_STRING];
       assertEntityProperty.assert(ExportResourcesFileEntity, "folders_ids", successScenarios, failingScenarios, "type");
       assertEntityProperty.nullable(ExportResourcesFileEntity, "folders_ids");
       assertEntityProperty.notRequired(ExportResourcesFileEntity, "folders_ids");
@@ -84,25 +80,29 @@ describe("ExportResourcesFileEntity", () => {
     });
 
     it("validates export_resources property", () => {
-      const successScenarios = [
-        assertEntityProperty.SCENARIO_ARRAY,
-      ];
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
-      ];
-      assertEntityProperty.assert(ExportResourcesFileEntity, "export_resources", successScenarios, failingScenarios, "type");
+      const successScenarios = [assertEntityProperty.SCENARIO_ARRAY];
+      const failingScenarios = [assertEntityProperty.SCENARIO_STRING];
+      assertEntityProperty.assert(
+        ExportResourcesFileEntity,
+        "export_resources",
+        successScenarios,
+        failingScenarios,
+        "type",
+      );
       assertEntityProperty.notNullable(ExportResourcesFileEntity, "export_resources");
       assertEntityProperty.notRequired(ExportResourcesFileEntity, "export_resources");
     });
 
     it("validates export_folders property", () => {
-      const successScenarios = [
-        assertEntityProperty.SCENARIO_ARRAY,
-      ];
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
-      ];
-      assertEntityProperty.assert(ExportResourcesFileEntity, "export_folders", successScenarios, failingScenarios, "type");
+      const successScenarios = [assertEntityProperty.SCENARIO_ARRAY];
+      const failingScenarios = [assertEntityProperty.SCENARIO_STRING];
+      assertEntityProperty.assert(
+        ExportResourcesFileEntity,
+        "export_folders",
+        successScenarios,
+        failingScenarios,
+        "type",
+      );
       assertEntityProperty.notNullable(ExportResourcesFileEntity, "export_folders");
       assertEntityProperty.notRequired(ExportResourcesFileEntity, "export_folders");
     });
@@ -111,27 +111,25 @@ describe("ExportResourcesFileEntity", () => {
       const baseDto = defaultKdbxExportResourceFileDto();
 
       const successScenarios = [
-        {scenario: "with an empty `options` field", value: defaultEmptyOptions()},
-        {scenario: "with `options` set with password credentials", value: defaultPasswordCredentialOptions()},
-        {scenario: "with `options` set with keyfile credentials", value: defaultKeyFileCredentialOptions()},
+        { scenario: "with an empty `options` field", value: defaultEmptyOptions() },
+        { scenario: "with `options` set with password credentials", value: defaultPasswordCredentialOptions() },
+        { scenario: "with `options` set with keyfile credentials", value: defaultKeyFileCredentialOptions() },
       ];
 
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_STRING,
-      ];
+      const failingScenarios = [assertEntityProperty.SCENARIO_STRING];
 
-      successScenarios.forEach(test => {
+      successScenarios.forEach((test) => {
         const dto = {
           ...baseDto,
-          options: test.value
+          options: test.value,
         };
         expect(() => new ExportResourcesFileEntity(dto)).not.toThrow();
       });
 
-      failingScenarios.forEach(test => {
+      failingScenarios.forEach((test) => {
         const dto = {
           ...baseDto,
-          options: test.value
+          options: test.value,
         };
         expect(() => new ExportResourcesFileEntity(dto)).toThrow(EntityValidationError);
       });
@@ -144,7 +142,7 @@ describe("ExportResourcesFileEntity", () => {
     it("constructor works if valid minimal DTO is provided", () => {
       expect.assertions(6);
 
-      const dto = defaultEmptyOptions({format: "kdbx"});
+      const dto = defaultEmptyOptions({ format: "kdbx" });
       const entity = new ExportResourcesFileEntity(dto);
 
       expect(entity._props.format).toStrictEqual(dto.format);
@@ -206,7 +204,7 @@ describe("ExportResourcesFileEntity", () => {
     it("should provide the default values with minimal dto", () => {
       expect.assertions(8);
 
-      const dto = defaultEmptyOptions({format: "kdbx"});
+      const dto = defaultEmptyOptions({ format: "kdbx" });
       const entity = new ExportResourcesFileEntity(dto);
 
       expect(entity.format).toStrictEqual("kdbx");
@@ -224,7 +222,7 @@ describe("ExportResourcesFileEntity", () => {
     it("should set the property as expected", () => {
       expect.assertions(2);
 
-      const dto = defaultEmptyOptions({format: "kdbx"});
+      const dto = defaultEmptyOptions({ format: "kdbx" });
       const entity = new ExportResourcesFileEntity(dto);
 
       const externalResourcesCollection = new ExternalResourcesCollection(defaultExternalResourceCollectionDto());
@@ -240,19 +238,19 @@ describe("ExportResourcesFileEntity", () => {
     it("should assert exportResources as ExternalResourcesCollection", () => {
       expect.assertions(1);
 
-      const dto = defaultEmptyOptions({format: "kdbx"});
+      const dto = defaultEmptyOptions({ format: "kdbx" });
       const entity = new ExportResourcesFileEntity(dto);
 
-      expect(() => entity.exportResources = "test").toThrow(TypeError);
+      expect(() => (entity.exportResources = "test")).toThrow(TypeError);
     });
 
     it("should assert exportFolder as ExternalFoldersCollection", () => {
       expect.assertions(1);
 
-      const dto = defaultEmptyOptions({format: "kdbx"});
+      const dto = defaultEmptyOptions({ format: "kdbx" });
       const entity = new ExportResourcesFileEntity(dto);
 
-      expect(() => entity.exportFolders = "test").toThrow(TypeError);
+      expect(() => (entity.exportFolders = "test")).toThrow(TypeError);
     });
   });
 });

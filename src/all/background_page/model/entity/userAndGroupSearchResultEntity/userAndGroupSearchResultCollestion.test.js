@@ -14,13 +14,16 @@
 import UserAndGroupSearchResultsCollection from "./userAndGroupSearchResultCollection";
 import UserAndGroupSearchResultEntity from "./userAndGroupSearchResultEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultGroupSearchResultDto, defaultUserSearchResultDto} from "./userAndGroupSearchResultEntity.test.data";
+import { defaultGroupSearchResultDto, defaultUserSearchResultDto } from "./userAndGroupSearchResultEntity.test.data";
 import expect from "expect";
-import {defaultUserAndGroupSearchResultsDtos} from "./userAndGroupSearchResultCollection.test.data";
+import { defaultUserAndGroupSearchResultsDtos } from "./userAndGroupSearchResultCollection.test.data";
 
 describe("UserAndGroupSearchResultCollection", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(UserAndGroupSearchResultsCollection.ENTITY_NAME, UserAndGroupSearchResultsCollection.getSchema());
+    EntitySchema.validateSchema(
+      UserAndGroupSearchResultsCollection.ENTITY_NAME,
+      UserAndGroupSearchResultsCollection.getSchema(),
+    );
   });
 
   describe("UserAndGroupSearchResultsCollection::constructor", () => {
@@ -29,10 +32,10 @@ describe("UserAndGroupSearchResultCollection", () => {
     });
 
     it("works if valid array of DTOs is provided", () => {
-      const dto1 = defaultGroupSearchResultDto({name: "Group 1", user_count: 2});
-      const dto2 = defaultGroupSearchResultDto({name: "Group 2", user_count: 5});
-      const dto3 = defaultUserSearchResultDto({username: "user1@passbolt.com"});
-      const dto4 = defaultUserSearchResultDto({username: "user2@passbolt.com"});
+      const dto1 = defaultGroupSearchResultDto({ name: "Group 1", user_count: 2 });
+      const dto2 = defaultGroupSearchResultDto({ name: "Group 2", user_count: 5 });
+      const dto3 = defaultUserSearchResultDto({ username: "user1@passbolt.com" });
+      const dto4 = defaultUserSearchResultDto({ username: "user2@passbolt.com" });
       const dtos = [dto1, dto2, dto3, dto4];
       const collection = new UserAndGroupSearchResultsCollection(dtos);
 
@@ -95,7 +98,7 @@ describe("UserAndGroupSearchResultCollection", () => {
   });
 
   describe(":pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const count = 10_000;
       const dtos = defaultUserAndGroupSearchResultsDtos(count);
 

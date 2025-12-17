@@ -13,25 +13,25 @@
  */
 
 describe("Scripting", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
   });
 
   describe("Scripting::executeScript", () => {
-    it("Should insert JS func with a result", async() => {
+    it("Should insert JS func with a result", async () => {
       expect.assertions(3);
       const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
 
       // data mocked
-      const func = test => test;
+      const func = (test) => test;
       const option = {
         func: func,
         args: ["Hello"],
         target: {
           tabId: 1,
-          frameIds: [0]
+          frameIds: [0],
         },
-        world: "ISOLATED"
+        world: "ISOLATED",
       };
       // mock function
       jest.spyOn(browser.tabs, "executeScript").mockImplementationOnce(() => {
@@ -45,25 +45,25 @@ describe("Scripting", () => {
       const funcArgs = JSON.stringify(["Hello"]);
       const functionCall = `;${func.name}.apply(window, ${funcArgs});`;
       const codeToInject = func.toString() + functionCall;
-      const info = {code: codeToInject, runAt: 'document_end', frameId: 0};
+      const info = { code: codeToInject, runAt: "document_end", frameId: 0 };
       expect(browser.tabs.executeScript).toHaveBeenCalledWith(1, info);
-      expect(result).toStrictEqual([{"result": "Hello"}]);
+      expect(result).toStrictEqual([{ result: "Hello" }]);
     });
 
-    it("Should insert JS void func", async() => {
+    it("Should insert JS void func", async () => {
       expect.assertions(3);
       const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
 
       // data mocked
-      const func = test => test;
+      const func = (test) => test;
       const option = {
         func: func,
         args: ["Hello"],
         target: {
           tabId: 1,
-          frameIds: [0]
+          frameIds: [0],
         },
-        world: "ISOLATED"
+        world: "ISOLATED",
       };
       // mock function
       jest.spyOn(browser.tabs, "executeScript").mockImplementationOnce(() => {
@@ -76,12 +76,12 @@ describe("Scripting", () => {
       const funcArgs = JSON.stringify(["Hello"]);
       const functionCall = `;${func.name}.apply(window, ${funcArgs});`;
       const codeToInject = func.toString() + functionCall;
-      const info = {code: codeToInject, runAt: 'document_end', frameId: 0};
+      const info = { code: codeToInject, runAt: "document_end", frameId: 0 };
       expect(browser.tabs.executeScript).toHaveBeenCalledWith(1, info);
       expect(result).toStrictEqual(undefined);
     });
 
-    it("Should insert JS file", async() => {
+    it("Should insert JS file", async () => {
       expect.assertions(2);
       const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
 
@@ -89,21 +89,21 @@ describe("Scripting", () => {
         files: ["filename.js", "filename2.js"],
         target: {
           tabId: 1,
-          frameIds: [0]
+          frameIds: [0],
         },
-        world: "ISOLATED"
+        world: "ISOLATED",
       };
 
       browser.scripting.executeScript(option);
 
       expect(mockedScriptingJS).toHaveBeenCalledWith(option);
-      const info = {file: option.files[0], runAt: 'document_end', frameId: 0};
+      const info = { file: option.files[0], runAt: "document_end", frameId: 0 };
       expect(browser.tabs.executeScript).toHaveBeenCalledWith(1, info, expect.anything());
     });
   });
 
   describe("Scripting::insertCSS", () => {
-    it("Should insert CSS file", async() => {
+    it("Should insert CSS file", async () => {
       expect.assertions(2);
       const mockedScriptingCSS = jest.spyOn(browser.scripting, "insertCSS");
 
@@ -111,14 +111,14 @@ describe("Scripting", () => {
         files: ["filename.css"],
         target: {
           tabId: 1,
-          frameIds: [0]
-        }
+          frameIds: [0],
+        },
       };
 
       browser.scripting.insertCSS(option);
 
       expect(mockedScriptingCSS).toHaveBeenCalledWith(option);
-      const info = {file: option.files[0], runAt: 'document_end', frameId: 0};
+      const info = { file: option.files[0], runAt: "document_end", frameId: 0 };
       expect(browser.tabs.insertCSS).toHaveBeenCalledWith(1, info, null);
     });
   });

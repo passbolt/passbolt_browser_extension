@@ -13,23 +13,25 @@
  */
 
 import FindRbacService from "./findRbacService";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection";
-import {defaultSettingsRbacsCollectionData} from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection.test.data";
+import { defaultSettingsRbacsCollectionData } from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection.test.data";
 
-describe('FindRbacService', () => {
-  beforeEach(async() => {
+describe("FindRbacService", () => {
+  beforeEach(async () => {
     jest.clearAllMocks();
   });
 
-  describe('::findMe', () => {
-    it("should find all rbac for the current logged in user", async() => {
+  describe("::findMe", () => {
+    it("should find all rbac for the current logged in user", async () => {
       expect.assertions(3);
 
       const collectionDto = defaultSettingsRbacsCollectionData;
       const service = new FindRbacService(defaultApiClientOptions());
-      jest.spyOn(service.rbacApiService, "findMe").mockImplementation(async() => new PassboltResponseEntity({header: {}, body: collectionDto}));
+      jest
+        .spyOn(service.rbacApiService, "findMe")
+        .mockImplementation(async () => new PassboltResponseEntity({ header: {}, body: collectionDto }));
 
       const result = await service.findMe();
       expect(result).toBeInstanceOf(RbacsCollection);
@@ -37,23 +39,27 @@ describe('FindRbacService', () => {
       expect(result.toDto()).toStrictEqual(collectionDto);
     });
 
-    it("should let error be thrown from the api service", async() => {
+    it("should let error be thrown from the api service", async () => {
       expect.assertions(1);
 
       const service = new FindRbacService(defaultApiClientOptions());
-      jest.spyOn(service.rbacApiService, "findMe").mockImplementation(async() => { throw new Error("Something went wrong"); });
+      jest.spyOn(service.rbacApiService, "findMe").mockImplementation(async () => {
+        throw new Error("Something went wrong");
+      });
 
       await expect(() => service.findMe()).rejects.toThrowError();
     });
 
-    it("should throw an error if the data is invalid", async() => {
+    it("should throw an error if the data is invalid", async () => {
       expect.assertions(1);
 
       const collectionDto = defaultSettingsRbacsCollectionData;
       delete collectionDto[0].id;
 
       const service = new FindRbacService(defaultApiClientOptions());
-      jest.spyOn(service.rbacApiService, "findMe").mockImplementation(async() => new PassboltResponseEntity({header: {}, body: collectionDto}));
+      jest
+        .spyOn(service.rbacApiService, "findMe")
+        .mockImplementation(async () => new PassboltResponseEntity({ header: {}, body: collectionDto }));
 
       await expect(() => service.findMe()).rejects.toThrowError();
     });

@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.4.0
  */
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import FindMetadataSetupSettingsService from "./findMetadataSetupSettingsService";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MetadataSetupSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataSetupSettingsEntity";
-import {enableMetadataSetupSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataSetupSettingsEntity.test.data";
-import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
+import { enableMetadataSetupSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataSetupSettingsEntity.test.data";
+import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe("FindMetadataSetupSettingsService", () => {
   describe("::findSetupSettings", () => {
-    it("retrieve the metadata setup settings.", async() => {
+    it("retrieve the metadata setup settings.", async () => {
       expect.assertions(2);
 
       const expectedSettings = enableMetadataSetupSettingsDto();
@@ -40,13 +40,15 @@ describe("FindMetadataSetupSettingsService", () => {
       expect(metadataSetupSettingsEntity.enableEncryptedMetadataOnInstall).toStrictEqual(true);
     });
 
-    it("should consider default disabled settings if the API sends back a 404", async() => {
+    it("should consider default disabled settings if the API sends back a 404", async () => {
       expect.assertions(2);
 
       const apiClientOptions = defaultApiClientOptions();
       const service = new FindMetadataSetupSettingsService(apiClientOptions);
 
-      fetch.doMockOnceIf(/\/metadata\/setup\/settings.json/, () => mockApiResponseError(404, "Endpoint does not exists"));
+      fetch.doMockOnceIf(/\/metadata\/setup\/settings.json/, () =>
+        mockApiResponseError(404, "Endpoint does not exists"),
+      );
 
       const metadataSetupSettingsEntity = await service.findSetupSettings();
 
@@ -54,7 +56,7 @@ describe("FindMetadataSetupSettingsService", () => {
       expect(metadataSetupSettingsEntity.enableEncryptedMetadataOnInstall).toStrictEqual(false);
     });
 
-    it("should not intercept the error from the API if something goes wrong and it is not a 404", async() => {
+    it("should not intercept the error from the API if something goes wrong and it is not a 404", async () => {
       expect.assertions(1);
 
       const apiClientOptions = defaultApiClientOptions();

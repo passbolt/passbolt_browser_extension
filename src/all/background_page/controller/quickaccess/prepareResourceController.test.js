@@ -13,17 +13,17 @@
  */
 import BrowserTabService from "../../service/ui/browserTab.service";
 import PrepareResourceController from "./prepareResourceController";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 
 describe("PrepareResourceController", () => {
   describe("::exec", () => {
-    it("should return the resource in cache and clear the cache", async() => {
+    it("should return the resource in cache and clear the cache", async () => {
       expect.assertions(2);
 
       const controller = new PrepareResourceController();
       const expectedResult = defaultResourceDto();
 
-      await browser.storage.session.set({"resourceInProgress": expectedResult});
+      await browser.storage.session.set({ resourceInProgress: expectedResult });
 
       const result = await controller.exec();
 
@@ -33,16 +33,16 @@ describe("PrepareResourceController", () => {
       expect(cache["resourceInProgress"]).toBeFalsy();
     });
 
-    it("should return the information from the tab if the cache is empty", async() => {
+    it("should return the information from the tab if the cache is empty", async () => {
       expect.assertions(2);
 
       const controller = new PrepareResourceController();
       const mockedTabInfo = {
         title: "page from test",
-        url: 'https://www.passbolt.com',
+        url: "https://www.passbolt.com",
       };
 
-      await browser.storage.session.set({"resourceInProgress": null});
+      await browser.storage.session.set({ resourceInProgress: null });
       jest.spyOn(BrowserTabService, "getCurrent").mockImplementation(() => mockedTabInfo);
 
       const result = await controller.exec();
@@ -51,17 +51,17 @@ describe("PrepareResourceController", () => {
       expect(result.uris).toStrictEqual([mockedTabInfo.url]);
     });
 
-    it("should return the information from the tab given a tabId if the cache is empty", async() => {
+    it("should return the information from the tab given a tabId if the cache is empty", async () => {
       expect.assertions(2);
 
       const controller = new PrepareResourceController();
       const mockedTabInfo = {
         title: "page from test",
-        url: 'https://www.passbolt.com',
+        url: "https://www.passbolt.com",
       };
       const tabId = 42;
 
-      await browser.storage.session.set({"resourceInProgress": null});
+      await browser.storage.session.set({ resourceInProgress: null });
       jest.spyOn(BrowserTabService, "getById").mockImplementation(() => mockedTabInfo);
 
       const result = await controller.exec(tabId);

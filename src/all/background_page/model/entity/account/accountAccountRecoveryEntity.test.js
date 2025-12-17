@@ -15,7 +15,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountAccountRecoveryEntity from "./accountAccountRecoveryEntity";
-import {defaultAccountAccountRecoveryDto} from "./accountAccountRecoveryEntity.test.data";
+import { defaultAccountAccountRecoveryDto } from "./accountAccountRecoveryEntity.test.data";
 
 describe("AccountAccountRecoveryEntity", () => {
   describe("AccountAccountRecoveryEntity:constructor", () => {
@@ -33,19 +33,19 @@ describe("AccountAccountRecoveryEntity", () => {
 
     it("it should validate the username by default", () => {
       expect.assertions(2);
-      const dto = defaultAccountAccountRecoveryDto({username: 'invalid-username'});
+      const dto = defaultAccountAccountRecoveryDto({ username: "invalid-username" });
       try {
         new AccountAccountRecoveryEntity(dto);
       } catch (error) {
         expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('username', 'custom')).toBeTruthy();
+        expect(error.hasError("username", "custom")).toBeTruthy();
       }
     });
 
     it("it should not validate the username if requested", () => {
       expect.assertions(2);
-      const dto = defaultAccountAccountRecoveryDto({username: 'invalid-username'});
-      const entity = new AccountAccountRecoveryEntity(dto, {validateUsername: false});
+      const dto = defaultAccountAccountRecoveryDto({ username: "invalid-username" });
+      const entity = new AccountAccountRecoveryEntity(dto, { validateUsername: false });
       expect(entity).toBeInstanceOf(AccountAccountRecoveryEntity);
       expect(entity.isUsernameValidated).toBeFalsy();
     });
@@ -55,15 +55,15 @@ describe("AccountAccountRecoveryEntity", () => {
     it("should return the expected properties.", () => {
       expect.assertions(2);
       const expectedKeys = [
-        'type',
-        'domain',
-        'user_id',
-        'user_key_fingerprint',
-        'user_public_armored_key',
-        'server_public_armored_key',
-        'username',
-        'first_name',
-        'last_name'
+        "type",
+        "domain",
+        "user_id",
+        "user_key_fingerprint",
+        "user_public_armored_key",
+        "server_public_armored_key",
+        "username",
+        "first_name",
+        "last_name",
       ];
 
       const dto = defaultAccountAccountRecoveryDto();
@@ -77,21 +77,21 @@ describe("AccountAccountRecoveryEntity", () => {
     it("it should return the user private key if requested", () => {
       expect.assertions(2);
       const expectedKeys = [
-        'type',
-        'domain',
-        'user_id',
-        'user_key_fingerprint',
-        'user_public_armored_key',
-        'server_public_armored_key',
-        'username',
-        'first_name',
-        'last_name',
-        'user_private_armored_key'
+        "type",
+        "domain",
+        "user_id",
+        "user_key_fingerprint",
+        "user_public_armored_key",
+        "server_public_armored_key",
+        "username",
+        "first_name",
+        "last_name",
+        "user_private_armored_key",
       ];
 
       const dto = defaultAccountAccountRecoveryDto();
       const entity = new AccountAccountRecoveryEntity(dto);
-      const resultDto = entity.toDto({user_private_armored_key: true});
+      const resultDto = entity.toDto({ user_private_armored_key: true });
       const keys = Object.keys(resultDto);
       expect(Object.keys(resultDto).length).toBe(10);
       expect(keys).toEqual(expectedKeys);
@@ -100,21 +100,21 @@ describe("AccountAccountRecoveryEntity", () => {
     it("it should return the user security token if requested", () => {
       expect.assertions(2);
       const expectedKeys = [
-        'type',
-        'domain',
-        'user_id',
-        'user_key_fingerprint',
-        'user_public_armored_key',
-        'server_public_armored_key',
-        'username',
-        'first_name',
-        'last_name',
-        'security_token'
+        "type",
+        "domain",
+        "user_id",
+        "user_key_fingerprint",
+        "user_public_armored_key",
+        "server_public_armored_key",
+        "username",
+        "first_name",
+        "last_name",
+        "security_token",
       ];
 
       const dto = defaultAccountAccountRecoveryDto();
       const entity = new AccountAccountRecoveryEntity(dto);
-      const resultDto = entity.toDto({security_token: true});
+      const resultDto = entity.toDto({ security_token: true });
       const keys = Object.keys(resultDto);
       expect(Object.keys(resultDto).length).toBe(10);
       expect(keys).toEqual(expectedKeys);

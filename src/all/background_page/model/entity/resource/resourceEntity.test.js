@@ -11,20 +11,19 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import ResourceEntity, {METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY} from "./resourceEntity";
+import ResourceEntity, { METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY } from "./resourceEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultResourceDto, defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import {
-  TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {
-  defaultResourceMetadataDto
-} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
+  defaultResourceDto,
+  defaultResourceV4Dto,
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
-import {v4 as uuidv4} from "uuid";
-import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import { v4 as uuidv4 } from "uuid";
+import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 import expect from "expect";
 import PermissionEntity from "../permission/permissionEntity";
 
@@ -94,7 +93,11 @@ describe("Resource entity", () => {
     it("validates metadata property anyOf", () => {
       const successScenario = [
         assertEntityProperty.SCENARIO_OBJECT,
-        {scenario: "an armored GPG message", value: "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n"},
+        {
+          scenario: "an armored GPG message",
+          value:
+            "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n",
+        },
         // @todo Entity schema validation should be strict and the following should not validate.
         assertEntityProperty.SCENARIO_ARRAY,
       ];
@@ -117,7 +120,15 @@ describe("Resource entity", () => {
   it("constructor works if valid DTO is provided", () => {
     expect.assertions(1);
 
-    const contain = {secrets: true, permissions: true, permission: true, tags: true, favorite: true, creator: true, modifier: true};
+    const contain = {
+      secrets: true,
+      permissions: true,
+      permission: true,
+      tags: true,
+      favorite: true,
+      creator: true,
+      modifier: true,
+    };
     const dto = defaultResourceDto({}, contain);
     const entity = new ResourceEntity(dto);
 
@@ -131,7 +142,7 @@ describe("Resource entity", () => {
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        resource_type_id: {required: "The resource_type_id is required."},
+        resource_type_id: { required: "The resource_type_id is required." },
       });
     }
   });
@@ -139,11 +150,11 @@ describe("Resource entity", () => {
   it("constructor returns validation error if dto required metadata fields are missing", () => {
     expect.assertions(2);
     try {
-      new ResourceEntity({resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION});
+      new ResourceEntity({ resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION });
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        name: {type: "The name is not a valid string."},
+        name: { type: "The name is not a valid string." },
       });
     }
   });
@@ -151,12 +162,12 @@ describe("Resource entity", () => {
   it("constructor returns validation error if dto required metadata fields are not a valid object", () => {
     expect.assertions(2);
     try {
-      new ResourceEntity({resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, metadata: []});
+      new ResourceEntity({ resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, metadata: [] });
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        name: {required: "The name is required."},
-        resource_type_id: {required: "The resource_type_id is required."},
+        name: { required: "The name is required." },
+        resource_type_id: { required: "The resource_type_id is required." },
       });
     }
   });
@@ -188,7 +199,7 @@ describe("Resource entity", () => {
       expect.assertions(5);
 
       const resourceDTO = defaultResourceV4Dto();
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
       const dtoV4 = entityV5.toV4Dto();
 
       expect(dtoV4.name).toEqual(entityV5.metadata.name);
@@ -203,13 +214,18 @@ describe("Resource entity", () => {
     it("Should fail if build rules is not valid", () => {
       expect.assertions(1);
 
-      const resourceDTO = defaultResourceDto({metadata: "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n"});
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const resourceDTO = defaultResourceDto({
+        metadata:
+          "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n",
+      });
+      const entityV5 = new ResourceEntity(resourceDTO);
       entityV5._metadata = new ResourceMetadataEntity(defaultResourceMetadataDto());
       try {
         entityV5.validateBuildRules();
       } catch (error) {
-        expect(error.getError("metadata", "only-one-defined")).toEqual("The property metadata and _metadata cannot be set at the same time");
+        expect(error.getError("metadata", "only-one-defined")).toEqual(
+          "The property metadata and _metadata cannot be set at the same time",
+        );
       }
     });
   });
@@ -219,13 +235,14 @@ describe("Resource entity", () => {
       expect.assertions(5);
 
       const resourceDTO = defaultResourceDto();
-      const metadataEncrypted = "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n";
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const metadataEncrypted =
+        "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n";
+      const entityV5 = new ResourceEntity(resourceDTO);
 
       expect(entityV5._metadata).toBeDefined();
 
       entityV5.metadata = metadataEncrypted;
-      const expectedDto = {...resourceDTO, metadata: metadataEncrypted};
+      const expectedDto = { ...resourceDTO, metadata: metadataEncrypted };
 
       expect(entityV5._props.metadata).toBeDefined();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -236,15 +253,16 @@ describe("Resource entity", () => {
     it("Should set metadata with metadata entity", () => {
       expect.assertions(5);
 
-      const metadataEncrypted = "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n";
-      const resourceDTO = defaultResourceDto({metadata: metadataEncrypted});
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const metadataEncrypted =
+        "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n";
+      const resourceDTO = defaultResourceDto({ metadata: metadataEncrypted });
+      const entityV5 = new ResourceEntity(resourceDTO);
       const metadataDecrypted = defaultResourceMetadataDto();
 
       expect(entityV5._props.metadata).toBeDefined();
 
       entityV5.metadata = new ResourceMetadataEntity(metadataDecrypted);
-      const expectedDto = {...resourceDTO, metadata: metadataDecrypted};
+      const expectedDto = { ...resourceDTO, metadata: metadataDecrypted };
 
       expect(entityV5._metadata).toBeDefined();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -257,7 +275,7 @@ describe("Resource entity", () => {
 
       const resourceDTO = defaultResourceDto();
       const metadataEncrypted = "string";
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
       try {
         entityV5.metadata = metadataEncrypted;
       } catch (error) {
@@ -270,7 +288,7 @@ describe("Resource entity", () => {
 
       const resourceDTO = defaultResourceDto();
       const metadata = 14;
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
       try {
         entityV5.metadata = metadata;
       } catch (error) {
@@ -283,12 +301,12 @@ describe("Resource entity", () => {
 
       const resourceDTO = defaultResourceDto();
       const metadata = {};
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
       /*
        * The thrown validation error is not attached to the associated property, to be updated when the validation schema will
        * support it.
        */
-      expect(() => entityV5.metadata = metadata).toThrowEntityValidationError("name", "required");
+      expect(() => (entityV5.metadata = metadata)).toThrowEntityValidationError("name", "required");
     });
   });
 
@@ -298,12 +316,12 @@ describe("Resource entity", () => {
 
       const resourceDTO = defaultResourceDto();
       const metadataKeyId = uuidv4();
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
 
       expect(entityV5.metadataKeyId).toBeNull();
 
       entityV5.metadataKeyId = metadataKeyId;
-      const expectedDto = {...resourceDTO, metadata_key_id: metadataKeyId};
+      const expectedDto = { ...resourceDTO, metadata_key_id: metadataKeyId };
 
       expect(entityV5._props.metadata_key_id).toBeDefined();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -314,7 +332,7 @@ describe("Resource entity", () => {
 
       const resourceDTO = defaultResourceDto();
       const metadataKeyId = "string";
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
       try {
         entityV5.metadataKeyId = metadataKeyId;
       } catch (error) {
@@ -327,7 +345,7 @@ describe("Resource entity", () => {
     it("Should return null if no permission is set", () => {
       expect.assertions(1);
 
-      const entity =  new ResourceEntity(defaultResourceDto());
+      const entity = new ResourceEntity(defaultResourceDto());
 
       expect(entity.soleOwnerId).toBeNull();
     });
@@ -335,8 +353,8 @@ describe("Resource entity", () => {
     it("Should return null if multiple permission is set", () => {
       expect.assertions(1);
 
-      const resourceDTO = defaultResourceDto({}, {withPermissions: {count: 2}});
-      const entity =  new ResourceEntity(resourceDTO);
+      const resourceDTO = defaultResourceDto({}, { withPermissions: { count: 2 } });
+      const entity = new ResourceEntity(resourceDTO);
 
       expect(entity.soleOwnerId).toBeNull();
     });
@@ -344,9 +362,9 @@ describe("Resource entity", () => {
     it("Should return the group id if it is the only permission set", () => {
       expect.assertions(1);
 
-      const resourceDTO = defaultResourceDto({}, {withPermissions: {count: 1}});
+      const resourceDTO = defaultResourceDto({}, { withPermissions: { count: 1 } });
       resourceDTO.permissions[0].aro = PermissionEntity.ARO_GROUP;
-      const entity =  new ResourceEntity(resourceDTO);
+      const entity = new ResourceEntity(resourceDTO);
 
       expect(entity.soleOwnerId).toStrictEqual(resourceDTO.permissions[0].aro_foreign_key);
     });
@@ -354,9 +372,9 @@ describe("Resource entity", () => {
     it("Should return the user id if it is the only permission set", () => {
       expect.assertions(1);
 
-      const resourceDTO = defaultResourceDto({}, {withPermissions: {count: 1}});
+      const resourceDTO = defaultResourceDto({}, { withPermissions: { count: 1 } });
       resourceDTO.permissions[0].aro = PermissionEntity.ARO_USER;
-      const entity =  new ResourceEntity(resourceDTO);
+      const entity = new ResourceEntity(resourceDTO);
 
       expect(entity.soleOwnerId).toStrictEqual(resourceDTO.permissions[0].aro_foreign_key);
     });
@@ -367,12 +385,12 @@ describe("Resource entity", () => {
       expect.assertions(3);
 
       const resourceDTO = defaultResourceDto();
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
 
       expect(entityV5.metadataKeyType).toBeNull();
 
       entityV5.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
-      const expectedDto = {...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_USER_KEY};
+      const expectedDto = { ...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_USER_KEY };
 
       expect(entityV5._props.metadata_key_type).toBeDefined();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -382,12 +400,12 @@ describe("Resource entity", () => {
       expect.assertions(3);
 
       const resourceDTO = defaultResourceDto();
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
 
       expect(entityV5.metadataKeyType).toBeNull();
 
       entityV5.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
-      const expectedDto = {...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY};
+      const expectedDto = { ...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY };
 
       expect(entityV5._props.metadata_key_type).toBeDefined();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -398,11 +416,13 @@ describe("Resource entity", () => {
 
       const resourceDTO = defaultResourceDto();
       const metadataKeyId = "string";
-      const entityV5 =  new ResourceEntity(resourceDTO);
+      const entityV5 = new ResourceEntity(resourceDTO);
       try {
         entityV5.metadataKeyType = metadataKeyId;
       } catch (error) {
-        expect(error.getError("metadata_key_type", "enum")).toEqual("The metadata_key_type value is not included in the supported list.");
+        expect(error.getError("metadata_key_type", "enum")).toEqual(
+          "The metadata_key_type value is not included in the supported list.",
+        );
       }
     });
   });
@@ -410,13 +430,13 @@ describe("Resource entity", () => {
   describe("::isMetadataDecrypted", () => {
     it("returns true if the metadata is decrypted", () => {
       expect.assertions(1);
-      const entity =  new ResourceEntity(defaultResourceDto());
+      const entity = new ResourceEntity(defaultResourceDto());
       expect(entity.isMetadataDecrypted()).toBeTruthy();
     });
 
     it("returns false if the metadata is encrypted", () => {
       expect.assertions();
-      const entity =  new ResourceEntity(defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[0]}));
+      const entity = new ResourceEntity(defaultResourceDto({ metadata: metadata.withSharedKey.encryptedMetadata[0] }));
       expect(entity.isMetadataDecrypted()).toBeFalsy();
     });
   });
@@ -424,15 +444,17 @@ describe("Resource entity", () => {
   describe("::isMetadataKeyTypeUserKey", () => {
     it("returns true if the metadata key type user_key", () => {
       expect.assertions(1);
-      const entity =  new ResourceEntity(defaultResourceDto({metadata_key_type: METADATA_KEY_TYPE_USER_KEY}));
+      const entity = new ResourceEntity(defaultResourceDto({ metadata_key_type: METADATA_KEY_TYPE_USER_KEY }));
       expect(entity.isMetadataKeyTypeUserKey()).toBeTruthy();
     });
 
     it("returns false if the metadata key type is not user_key", () => {
       expect.assertions();
-      const entityV4 =  new ResourceEntity(defaultResourceV4Dto());
+      const entityV4 = new ResourceEntity(defaultResourceV4Dto());
       expect(entityV4.isMetadataKeyTypeUserKey()).toBeFalsy();
-      const entityV5SharedKey =  new ResourceEntity(defaultResourceDto({metadata_key_type: METADATA_KEY_TYPE_METADATA_KEY}));
+      const entityV5SharedKey = new ResourceEntity(
+        defaultResourceDto({ metadata_key_type: METADATA_KEY_TYPE_METADATA_KEY }),
+      );
       expect(entityV5SharedKey.isMetadataKeyTypeUserKey()).toBeFalsy();
     });
   });
@@ -448,7 +470,7 @@ describe("Resource entity", () => {
       expect(entityV5.expired).toBeUndefined();
 
       entityV5.expired = expiryDate;
-      const expectedDto = {...resourceDTO, expired: expiryDate};
+      const expectedDto = { ...resourceDTO, expired: expiryDate };
 
       expect(entityV5._props.expired).toBeDefined();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -458,13 +480,13 @@ describe("Resource entity", () => {
       expect.assertions(3);
 
       const expiryDate = "2025-12-31T23:59:59Z";
-      const resourceDTO = defaultResourceDto({expired: expiryDate});
+      const resourceDTO = defaultResourceDto({ expired: expiryDate });
       const entityV5 = new ResourceEntity(resourceDTO);
 
       expect(entityV5._props.expired).toEqual(expiryDate);
 
       entityV5.expired = null;
-      const expectedDto = {...resourceDTO, expired: null};
+      const expectedDto = { ...resourceDTO, expired: null };
 
       expect(entityV5._props.expired).toBeNull();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -475,13 +497,13 @@ describe("Resource entity", () => {
 
       const initialDate = "2025-06-30T23:59:59Z";
       const newDate = "2025-12-31T23:59:59Z";
-      const resourceDTO = defaultResourceDto({expired: initialDate});
+      const resourceDTO = defaultResourceDto({ expired: initialDate });
       const entityV5 = new ResourceEntity(resourceDTO);
 
       expect(entityV5._props.expired).toEqual(initialDate);
 
       entityV5.expired = newDate;
-      const expectedDto = {...resourceDTO, expired: newDate};
+      const expectedDto = { ...resourceDTO, expired: newDate };
 
       expect(entityV5._props.expired).toEqual(newDate);
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -518,20 +540,16 @@ describe("Resource entity", () => {
     it("should accept various valid ISO 8601 date formats", () => {
       expect.assertions(6);
 
-      const dates = [
-        "2025-12-31T23:59:59.999Z",
-        "2025-12-31T23:59:59+00:00",
-        "2025-12-31T23:59:59-05:00",
-      ];
+      const dates = ["2025-12-31T23:59:59.999Z", "2025-12-31T23:59:59+00:00", "2025-12-31T23:59:59-05:00"];
 
-      dates.forEach(date => {
+      dates.forEach((date) => {
         const resourceDTO = defaultResourceDto();
         const entityV5 = new ResourceEntity(resourceDTO);
 
         entityV5.expired = date;
 
         expect(entityV5._props.expired).toEqual(date);
-        expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual({...resourceDTO, expired: date});
+        expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual({ ...resourceDTO, expired: date });
       });
     });
   });

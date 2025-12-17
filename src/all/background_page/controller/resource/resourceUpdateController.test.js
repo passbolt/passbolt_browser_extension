@@ -12,20 +12,21 @@
  * @since         4.9.4
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import ResourceUpdateController from "./resourceUpdateController";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultResourceDto, defaultResourceV4Dto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import {
+  defaultResourceDto,
+  defaultResourceV4Dto,
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
-import {
-  resourceTypesCollectionDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import PermissionService from "../../service/api/permission/permissionService";
 
 jest.mock("../../service/passphrase/getPassphraseService");
@@ -42,8 +43,8 @@ describe("ResourceUpdateController", () => {
   beforeEach(() => {
     worker = {
       port: {
-        emit: jest.fn()
-      }
+        emit: jest.fn(),
+      },
     };
     const account = new AccountEntity(defaultAccountDto());
     const apiClientOptions = defaultApiClientOptions();
@@ -54,7 +55,7 @@ describe("ResourceUpdateController", () => {
     jest.spyOn(PermissionService.prototype, "findAllByAcoForeignKey").mockImplementation(() => []);
   });
   describe("ResourceUpdateController::_exec", () => {
-    it("Should call the resourceUpdateService and emit a success message when only metadata have benn updated", async() => {
+    it("Should call the resourceUpdateService and emit a success message when only metadata have benn updated", async () => {
       expect.assertions(3);
 
       const resourceDTO = defaultResourceDto();
@@ -63,10 +64,10 @@ describe("ResourceUpdateController", () => {
 
       expect(controller.resourceUpdateService.exec).toHaveBeenCalledTimes(1);
       expect(controller.resourceUpdateService.exec).toHaveBeenCalledWith(resourceDTO, null, pgpKeys.ada.passphrase);
-      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'SUCCESS', resourceDTO);
+      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "SUCCESS", resourceDTO);
     });
 
-    it("Should call the resourceUpdateService and emit a success message", async() => {
+    it("Should call the resourceUpdateService and emit a success message", async () => {
       expect.assertions(3);
 
       const resourceDTO = defaultResourceDto();
@@ -75,48 +76,56 @@ describe("ResourceUpdateController", () => {
 
       expect(controller.resourceUpdateService.exec).toHaveBeenCalledTimes(1);
       expect(controller.resourceUpdateService.exec).toHaveBeenCalledWith(resourceDTO, secret, pgpKeys.ada.passphrase);
-      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'SUCCESS', resourceDTO);
+      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "SUCCESS", resourceDTO);
     });
 
-    it("Should call the resourceUpdateService and emit an error message", async() => {
+    it("Should call the resourceUpdateService and emit an error message", async () => {
       expect.assertions(1);
 
       const error = new Error();
-      jest.spyOn(controller.resourceUpdateService, "exec").mockImplementationOnce(() => { throw error; });
+      jest.spyOn(controller.resourceUpdateService, "exec").mockImplementationOnce(() => {
+        throw error;
+      });
       await controller._exec(defaultResourceDto(), null);
 
-      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'ERROR', error);
+      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "ERROR", error);
     });
   });
 
   describe("ResourceUpdateController::exec", () => {
-    it("Should call progress service without user goals", async() => {
+    it("Should call progress service without user goals", async () => {
       expect.assertions(2);
-      jest.spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey").mockImplementationOnce(jest.fn);
+      jest
+        .spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey")
+        .mockImplementationOnce(jest.fn);
       jest.spyOn(controller.resourceUpdateService, "exec").mockImplementationOnce(jest.fn);
       await controller.exec(defaultResourceDto(), null);
       expect(controller.progressService.start).toHaveBeenCalledTimes(1);
-      expect(controller.progressService.start).toHaveBeenCalledWith(1, 'Updating resource');
+      expect(controller.progressService.start).toHaveBeenCalledWith(1, "Updating resource");
     });
 
-    it("Should throw an error if the user passphrase cannot be retrieved", async() => {
+    it("Should throw an error if the user passphrase cannot be retrieved", async () => {
       expect.assertions(1);
 
-      controller.getPassphraseService.getPassphrase.mockImplementation(() => { throw new Error("Cannot retrieve key"); });
+      controller.getPassphraseService.getPassphrase.mockImplementation(() => {
+        throw new Error("Cannot retrieve key");
+      });
       const promise = controller.exec(defaultResourceDto(), secret);
       await expect(promise).rejects.toThrowError("Cannot retrieve key");
     });
 
-    it("Should close progressService when update succeed", async() => {
+    it("Should close progressService when update succeed", async () => {
       expect.assertions(2);
       jest.spyOn(ResourceLocalStorage, "updateResource").mockImplementationOnce(jest.fn);
-      jest.spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey").mockImplementationOnce(jest.fn);
+      jest
+        .spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey")
+        .mockImplementationOnce(jest.fn);
       await controller.exec(defaultResourceDto(), null);
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
       expect(controller.progressService.close).toHaveBeenCalled();
     });
 
-    it("Should close progressService when update failed", async() => {
+    it("Should close progressService when update failed", async () => {
       expect.assertions(2);
 
       jest.spyOn(EncryptMessageService, "encrypt").mockImplementation(() => Promise.reject("Cannot encrypt message"));

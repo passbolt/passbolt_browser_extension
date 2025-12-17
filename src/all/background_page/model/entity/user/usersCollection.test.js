@@ -13,10 +13,10 @@
  */
 import UsersCollection from "./usersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import UserEntity from "./userEntity";
-import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
-import {defaultUsersDtos} from "passbolt-styleguide/src/shared/models/entity/user/usersCollection.test.data";
+import { defaultGroupUser } from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
+import { defaultUsersDtos } from "passbolt-styleguide/src/shared/models/entity/user/usersCollection.test.data";
 
 describe("UsersCollection", () => {
   it("schema must validate", () => {
@@ -29,9 +29,9 @@ describe("UsersCollection", () => {
     });
 
     it("works if valid array of DTOs is provided", () => {
-      const dto1 = defaultUserDto({username: "user1@passbolt.com"});
-      const dto2 = defaultUserDto({username: "user2@passbolt.com"});
-      const dto3 = defaultUserDto({username: "user3@passbolt.com"});
+      const dto1 = defaultUserDto({ username: "user1@passbolt.com" });
+      const dto2 = defaultUserDto({ username: "user2@passbolt.com" });
+      const dto3 = defaultUserDto({ username: "user3@passbolt.com" });
       const dtos = [dto1, dto2, dto3];
       const collection = new UsersCollection(dtos);
 
@@ -90,17 +90,15 @@ describe("UsersCollection", () => {
 
     it("should throw if the collection schema does not validate", () => {
       expect.assertions(1);
-      expect(() => new UsersCollection({}))
-        .toThrowEntityValidationError("items");
+      expect(() => new UsersCollection({})).toThrowEntityValidationError("items");
     });
 
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = defaultUserDto();
-      const dto2 = defaultUserDto({username: 42});
+      const dto2 = defaultUserDto({ username: 42 });
 
       expect.assertions(1);
-      expect(() => new UsersCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("1.username.type");
+      expect(() => new UsersCollection([dto1, dto2])).toThrowCollectionValidationError("1.username.type");
     });
 
     /*
@@ -110,82 +108,76 @@ describe("UsersCollection", () => {
     it("should throw if one of data item does not validate the collection associated entity schema", () => {
       const dto1 = defaultUserDto();
       const dto2 = defaultUserDto({
-        groups_users: [
-          defaultGroupUser({group_id: 42, is_admin: true})
-        ]
+        groups_users: [defaultGroupUser({ group_id: 42, is_admin: true })],
       });
 
       expect.assertions(2);
       // Should not throw
-      expect(() => new UsersCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("1.0.group_id.type");
+      expect(() => new UsersCollection([dto1, dto2])).toThrowCollectionValidationError("1.0.group_id.type");
       // Should throw
-      expect(() => new UsersCollection([dto1, dto2]))
-        .not.toThrowCollectionValidationError("1.groups_users.0.group_id.type");
+      expect(() => new UsersCollection([dto1, dto2])).not.toThrowCollectionValidationError(
+        "1.groups_users.0.group_id.type",
+      );
     });
 
     it("should throw if one of data item does not validate the unique id build rule", () => {
-      const dto1 = defaultUserDto({username: "user1@passbolt.com"});
-      const dto2 = defaultUserDto({id: dto1.id, username: "user2@passbolt.com"});
-      const dto3 = defaultUserDto({username: "user3@passbolt.com"});
+      const dto1 = defaultUserDto({ username: "user1@passbolt.com" });
+      const dto2 = defaultUserDto({ id: dto1.id, username: "user2@passbolt.com" });
+      const dto3 = defaultUserDto({ username: "user3@passbolt.com" });
 
       expect.assertions(1);
-      expect(() => new UsersCollection([dto1, dto2, dto3]))
-        .toThrowCollectionValidationError("1.id.unique");
+      expect(() => new UsersCollection([dto1, dto2, dto3])).toThrowCollectionValidationError("1.id.unique");
     });
 
     it("should throw if one of data item does not validate the unique username build rule", () => {
-      const dto1 = defaultUserDto({username: "user1@passbolt.com"});
-      const dto2 = defaultUserDto({username: dto1.username});
-      const dto3 = defaultUserDto({username: "user3@passbolt.com"});
+      const dto1 = defaultUserDto({ username: "user1@passbolt.com" });
+      const dto2 = defaultUserDto({ username: dto1.username });
+      const dto3 = defaultUserDto({ username: "user3@passbolt.com" });
 
       expect.assertions(1);
-      expect(() => new UsersCollection([dto1, dto2, dto3]))
-        .toThrowCollectionValidationError("1.username.unique");
+      expect(() => new UsersCollection([dto1, dto2, dto3])).toThrowCollectionValidationError("1.username.unique");
     });
 
     it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
       const dto1 = defaultUserDto();
-      const dto2 = defaultUserDto({username: 42});
+      const dto2 = defaultUserDto({ username: 42 });
 
       expect.assertions(2);
-      const collection = new UsersCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      const collection = new UsersCollection([dto1, dto2], { ignoreInvalidEntity: true });
       expect(collection.items).toHaveLength(1);
       expect(collection.items[0].id).toEqual(dto1.id);
     });
 
     it("should, with enabling the ignore invalid option, ignore items which do not validate the unique id build rule", () => {
-      const dto1 = defaultUserDto({username: "user1@passbolt.com"});
-      const dto2 = defaultUserDto({id: dto1.id, username: "user2@passbolt.com"});
+      const dto1 = defaultUserDto({ username: "user1@passbolt.com" });
+      const dto2 = defaultUserDto({ id: dto1.id, username: "user2@passbolt.com" });
 
       expect.assertions(2);
-      const collection = new UsersCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      const collection = new UsersCollection([dto1, dto2], { ignoreInvalidEntity: true });
       expect(collection.items).toHaveLength(1);
       expect(collection.items[0].id).toEqual(dto1.id);
     });
 
     it("should, with enabling the ignore invalid option, ignore items which do not validate the unique username build rule", () => {
-      const dto1 = defaultUserDto({username: "user1@passbolt.com"});
-      const dto2 = defaultUserDto({username: dto1.username});
+      const dto1 = defaultUserDto({ username: "user1@passbolt.com" });
+      const dto2 = defaultUserDto({ username: dto1.username });
 
       expect.assertions(2);
-      const collection = new UsersCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      const collection = new UsersCollection([dto1, dto2], { ignoreInvalidEntity: true });
       expect(collection.items).toHaveLength(1);
       expect(collection.items[0].id).toEqual(dto1.id);
     });
 
     it("should, with enabling the ignore invalid option, ignore items associated groups users entities which do not validate the group users user_id schema validation", () => {
-      const dto1 = defaultUserDto({username: "user1@passbolt.com"}, {withGroupsUsers: true});
+      const dto1 = defaultUserDto({ username: "user1@passbolt.com" }, { withGroupsUsers: true });
       const dto2 = defaultUserDto({
         username: "user2@passbolt.com",
-        groups_users: [
-          defaultGroupUser({user_id: 42, is_admin: true})
-        ]
+        groups_users: [defaultGroupUser({ user_id: 42, is_admin: true })],
       });
-      const dto3 = defaultUserDto({username: "user3@passbolt.com"}, {withGroupsUsers: true});
+      const dto3 = defaultUserDto({ username: "user3@passbolt.com" }, { withGroupsUsers: true });
 
       expect.assertions(7);
-      const collection = new UsersCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
+      const collection = new UsersCollection([dto1, dto2, dto3], { ignoreInvalidEntity: true });
       expect(collection.items).toHaveLength(3);
       expect(collection.items[0].id).toEqual(dto1.id);
       expect(collection.items[0]._groups_users).toHaveLength(1);
@@ -197,7 +189,7 @@ describe("UsersCollection", () => {
   });
 
   describe("UsersCollection:pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const usersCount = 10_000;
       const groupsUsersPerGroupCount = 5;
       const dtos = defaultUsersDtos(usersCount, {
@@ -209,7 +201,7 @@ describe("UsersCollection", () => {
       });
 
       const start = performance.now();
-      const collection = new UsersCollection(dtos, {ignoreInvalidEntity: true});
+      const collection = new UsersCollection(dtos, { ignoreInvalidEntity: true });
       const time = performance.now() - start;
       expect(collection).toHaveLength(usersCount);
       expect(time).toBeLessThan(5_000);
@@ -218,9 +210,9 @@ describe("UsersCollection", () => {
 
   describe("UsersCollection:toDto", () => {
     it("should transform the collection items in dto format", () => {
-      const dto1 = defaultUserDto({username: "user1@passbolt.com"});
-      const dto2 = defaultUserDto({username: "user2@passbolt.com"});
-      const dto3 = defaultUserDto({username: "user3@passbolt.com"});
+      const dto1 = defaultUserDto({ username: "user1@passbolt.com" });
+      const dto2 = defaultUserDto({ username: "user2@passbolt.com" });
+      const dto3 = defaultUserDto({ username: "user3@passbolt.com" });
       const dtos = [dto1, dto2, dto3];
       const collection = new UsersCollection(dtos);
 

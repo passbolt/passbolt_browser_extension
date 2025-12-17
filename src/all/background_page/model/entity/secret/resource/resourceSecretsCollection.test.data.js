@@ -12,7 +12,7 @@
  * @since         4.8.0
  */
 
-import {readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
+import { readSecret } from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 
 /**
  * Build dtos.
@@ -23,9 +23,8 @@ export const defaultResourcesSecretsDtos = (count = 10) => {
   const dtos = [];
   const resourceId = crypto.randomUUID();
   for (let i = 0; i < count; i++) {
-    const groupDto = readSecret({resource_id: resourceId});
+    const groupDto = readSecret({ resource_id: resourceId });
     dtos.push(groupDto);
   }
   return dtos;
 };
-

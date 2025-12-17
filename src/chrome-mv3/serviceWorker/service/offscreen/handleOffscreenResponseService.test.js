@@ -12,11 +12,11 @@
  * @since         5.3.2
  */
 
-import {SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER} from "../../../offscreens/service/clipboard/writeClipobardOffscreenService";
-import {SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER} from "../../../offscreens/service/network/fetchOffscreenService";
-import {defaultCallbacks} from "../network/responseFetchOffscreenService.test.data";
+import { SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER } from "../../../offscreens/service/clipboard/writeClipobardOffscreenService";
+import { SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER } from "../../../offscreens/service/network/fetchOffscreenService";
+import { defaultCallbacks } from "../network/responseFetchOffscreenService.test.data";
 import HandleOffscreenResponseService from "./handleOffscreenResponseService";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -27,8 +27,15 @@ describe("HandleOffscreenResponseService", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    fetchFunction = jest.spyOn(HandleOffscreenResponseService.REPONSE_HANDLE_MAP, SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER).mockImplementation(() => {});
-    clipboardWriteFunction = jest.spyOn(HandleOffscreenResponseService.REPONSE_HANDLE_MAP, SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER).mockImplementation(() => {});
+    fetchFunction = jest
+      .spyOn(HandleOffscreenResponseService.REPONSE_HANDLE_MAP, SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER)
+      .mockImplementation(() => {});
+    clipboardWriteFunction = jest
+      .spyOn(
+        HandleOffscreenResponseService.REPONSE_HANDLE_MAP,
+        SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER,
+      )
+      .mockImplementation(() => {});
   });
 
   describe("::handleOffscreenResponse", () => {
@@ -37,7 +44,7 @@ describe("HandleOffscreenResponseService", () => {
 
       const message = {
         id: uuidv4(),
-        target: "service-worker-fetch-offscreen-response-handler"
+        target: "service-worker-fetch-offscreen-response-handler",
       };
       const promises = defaultCallbacks();
       HandleOffscreenResponseService.setResponseCallback(message.id, promises);
@@ -53,7 +60,7 @@ describe("HandleOffscreenResponseService", () => {
       expect.assertions(2);
 
       const message = {
-        target: "service-worker-fetch-offscreen-polling-handler"
+        target: "service-worker-fetch-offscreen-polling-handler",
       };
 
       HandleOffscreenResponseService.handleOffscreenResponse(message);
@@ -67,7 +74,7 @@ describe("HandleOffscreenResponseService", () => {
 
       const message = {
         id: uuidv4(),
-        target: "service-worker-clipboard-write-text-offscreen-response-handler"
+        target: "service-worker-clipboard-write-text-offscreen-response-handler",
       };
       const promises = defaultCallbacks();
       HandleOffscreenResponseService.setResponseCallback(message.id, promises);
@@ -89,7 +96,7 @@ describe("HandleOffscreenResponseService", () => {
       const message = {
         id: uuidv4(),
         target: "service-worker-offscreen-error-response-handler",
-        data: {error: JSON.stringify(error, Object.getOwnPropertyNames(error))},
+        data: { error: JSON.stringify(error, Object.getOwnPropertyNames(error)) },
       };
 
       const promises = defaultCallbacks();
@@ -104,7 +111,7 @@ describe("HandleOffscreenResponseService", () => {
     it("should ignore message with unknown target", () => {
       expect.assertions(2);
 
-      const message = {target: "???"};
+      const message = { target: "???" };
 
       HandleOffscreenResponseService.handleOffscreenResponse(message);
 
@@ -143,9 +150,8 @@ describe("HandleOffscreenResponseService", () => {
       const error = new Error("Something went wrong with the fetch");
       const message = {
         data: {
-          error: JSON.stringify(error, Object.getOwnPropertyNames(error))
+          error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
         },
-
       };
       const expectedError = new Error("Something went wrong while processing an offscreen request");
       expectedError.cause = message.data.error;

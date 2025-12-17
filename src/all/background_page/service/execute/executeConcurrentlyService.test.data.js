@@ -12,10 +12,12 @@
  * @since         4.9.4
  */
 
-export const successPromise = value => () => new Promise(resolve => setTimeout(() => resolve(value), Math.floor(Math.random() * 50) + 1));
-export const rejectPromise = value => () => new Promise((resolve, reject) => setTimeout(() => reject(new Error(value)), Math.floor(Math.random() * 50) + 1));
+export const successPromise = (value) => () =>
+  new Promise((resolve) => setTimeout(() => resolve(value), Math.floor(Math.random() * 50) + 1));
+export const rejectPromise = (value) => () =>
+  new Promise((resolve, reject) => setTimeout(() => reject(new Error(value)), Math.floor(Math.random() * 50) + 1));
 
-export const defaultSuccessfulAllPromises = count => {
+export const defaultSuccessfulAllPromises = (count) => {
   const promises = [];
   for (let i = 0; i < count; i++) {
     promises.push(successPromise(`TEST ${i + 1}`));
@@ -23,7 +25,7 @@ export const defaultSuccessfulAllPromises = count => {
   return promises;
 };
 
-export const defaultRejectAllPromises = count => {
+export const defaultRejectAllPromises = (count) => {
   const promises = [];
   for (let i = 0; i < count; i++) {
     promises.push(rejectPromise(`TEST ${i + 1}`));

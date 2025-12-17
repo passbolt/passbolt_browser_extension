@@ -22,7 +22,7 @@ describe("Update subscription entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "data": "key"
+      data: "key",
     };
     const entity = new UpdateSubscriptionEntity(dto);
     expect(entity.toDto()).toEqual(dto);
@@ -34,7 +34,7 @@ describe("Update subscription entity", () => {
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        data: {required: 'The data is required.'}
+        data: { required: "The data is required." },
       });
     }
   });
@@ -42,14 +42,13 @@ describe("Update subscription entity", () => {
   it("constructor returns validation error if dto required fields are invalid", () => {
     try {
       new UpdateSubscriptionEntity({
-        "data": []
+        data: [],
       });
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        data: {type: 'The data is not a valid string.'},
+        data: { type: "The data is not a valid string." },
       });
     }
   });
 });
-

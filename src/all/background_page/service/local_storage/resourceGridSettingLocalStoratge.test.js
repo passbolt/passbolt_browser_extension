@@ -13,13 +13,11 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import ResourceGridUserSettingLocalStorage from "./ressourceGridSettingLocalStorage";
-import {
-  defaultGridUserSettingData
-} from "passbolt-styleguide/src/shared/models/entity/gridUserSetting/gridUserSettingEntity.test.data";
+import { defaultGridUserSettingData } from "passbolt-styleguide/src/shared/models/entity/gridUserSetting/gridUserSettingEntity.test.data";
 import GridUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/gridUserSetting/gridUserSettingEntity";
-import {defaultSorterData} from "passbolt-styleguide/src/shared/models/entity/sorter/sorterEntity.test.data";
+import { defaultSorterData } from "passbolt-styleguide/src/shared/models/entity/sorter/sorterEntity.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -47,24 +45,24 @@ describe("ResourceGridUserSettingLocalStorage", () => {
   });
 
   describe("::get", () => {
-    it("returns undefined if nothing is stored in the local storage.", async() => {
+    it("returns undefined if nothing is stored in the local storage.", async () => {
       expect.assertions(1);
       const result = await storage.get();
       expect(result).toBeNull();
     });
 
-    it("returns content stored in the local storage.", async() => {
+    it("returns content stored in the local storage.", async () => {
       const settingsDto = defaultGridUserSettingData();
       expect.assertions(2);
-      browser.storage.local.set({[storage.storageKey]: settingsDto});
+      browser.storage.local.set({ [storage.storageKey]: settingsDto });
       const result = await storage.get();
       expect(result).toBeInstanceOf(GridUserSettingEntity);
-      expect(result.toDto({columns_setting: true, sorter: true})).toEqual(settingsDto);
+      expect(result.toDto({ columns_setting: true, sorter: true })).toEqual(settingsDto);
     });
   });
 
   describe("::set", () => {
-    it("stores content in the local storage.", async() => {
+    it("stores content in the local storage.", async () => {
       expect.assertions(2);
       const settingsDto = defaultGridUserSettingData();
       const settings = new GridUserSettingEntity(settingsDto);
@@ -73,57 +71,57 @@ describe("ResourceGridUserSettingLocalStorage", () => {
       expect(browser.storage.local.store[storage.storageKey]).toEqual(settingsDto);
       // Expect the get to retrieve the set data.
       const resultGet = await storage.get();
-      expect(resultGet.toDto({columns_setting: true, sorter: true})).toEqual(settingsDto);
+      expect(resultGet.toDto({ columns_setting: true, sorter: true })).toEqual(settingsDto);
     });
 
-    it("throws if no data is given to store.", async() => {
+    it("throws if no data is given to store.", async () => {
       expect.assertions(2);
       await expect(() => storage.set()).rejects.toThrow(TypeError);
       // Expect the local storage (mocked here) to not be set.
       expect(browser.storage.local.store[storage.storageKey]).toBeUndefined();
     });
 
-    it("throws if invalid data is given to store.", async() => {
+    it("throws if invalid data is given to store.", async () => {
       expect.assertions(2);
       await expect(() => storage.set({})).rejects.toThrow(TypeError);
       // Expect the local storage (mocked here) to not be set.
       expect(browser.storage.local.store[storage.storageKey]).toBeUndefined();
     });
 
-    it("waits any on-going call to set to perform another set.", async() => {
+    it("waits any on-going call to set to perform another set.", async () => {
       expect.assertions(3);
       const promisesResolvers = [];
 
       jest.spyOn(storage, "_setBrowserStorage").mockImplementation(() => {
         let resolve;
-        const promise = new Promise(_resolve => resolve = _resolve);
+        const promise = new Promise((_resolve) => (resolve = _resolve));
         promisesResolvers.push(resolve);
         return promise;
       });
 
       const dto1 = defaultGridUserSettingData();
-      const dto2 = defaultGridUserSettingData({sorter: defaultSorterData({"propertyName": "id"})});
+      const dto2 = defaultGridUserSettingData({ sorter: defaultSorterData({ propertyName: "id" }) });
       const resultPromise1 = storage.set(new GridUserSettingEntity(dto1));
       const resultPromise2 = storage.set(new GridUserSettingEntity(dto2));
-      expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: dto1});
-      expect(storage._setBrowserStorage).not.toHaveBeenCalledWith({[storage.storageKey]: dto2});
+      expect(storage._setBrowserStorage).toHaveBeenCalledWith({ [storage.storageKey]: dto1 });
+      expect(storage._setBrowserStorage).not.toHaveBeenCalledWith({ [storage.storageKey]: dto2 });
       promisesResolvers[0]();
       await resultPromise1;
-      expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: dto2});
+      expect(storage._setBrowserStorage).toHaveBeenCalledWith({ [storage.storageKey]: dto2 });
       promisesResolvers[1]();
       await resultPromise2;
     });
   });
 
   describe("::flush", () => {
-    it("flushes works with not initialized local storage.", async() => {
+    it("flushes works with not initialized local storage.", async () => {
       expect.assertions(1);
       await storage.flush();
       // Expect the local storage (mocked here) to not be set.
       expect(browser.storage.local.store[storage.storageKey]).toBeUndefined();
     });
 
-    it("flushes content of the local storage.", async() => {
+    it("flushes content of the local storage.", async () => {
       expect.assertions(1);
       const settings = new GridUserSettingEntity(defaultGridUserSettingData());
       await storage.set(settings);

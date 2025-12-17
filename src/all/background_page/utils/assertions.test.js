@@ -27,15 +27,15 @@ import {
   assertArray,
   assertNonEmptyArray,
 } from "./assertions";
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from "uuid";
 import GenerateSsoIvService from "../service/crypto/generateSsoIvService";
-import {buildMockedCryptoKey} from "./assertions.test.data";
+import { buildMockedCryptoKey } from "./assertions.test.data";
 import PasswordGeneratorSettingsEntity from "../model/entity/passwordPolicies/passwordGeneratorSettingsEntity";
-import {defaultAccountRecoveryPrivateKeyPasswordDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
+import { defaultAccountRecoveryPrivateKeyPasswordDto } from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
 import AccountRecoveryPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyEntity";
 import ResourceEntity from "../model/entity/resource/resourceEntity";
 import FolderEntity from "../model/entity/folder/folderEntity";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 
 describe("Assertions", () => {
   describe("Assertions::assertUuid", () => {
@@ -48,10 +48,10 @@ describe("Assertions", () => {
     it("Should throw an error if the parameter is not valid", () => {
       const scenarios = [
         {},
-        '',
+        "",
         false,
         12,
-        'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' // looks like a UUID but, it's not
+        "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", // looks like a UUID but, it's not
       ];
 
       expect.assertions(scenarios.length);
@@ -61,7 +61,6 @@ describe("Assertions", () => {
     });
   });
 
-
   describe("Assertions::assertBase64String", () => {
     it("Should not throw an error if the parameter is valid", () => {
       expect.assertions(1);
@@ -70,13 +69,7 @@ describe("Assertions", () => {
     });
 
     it("Should throw an error if the parameter is not valid", () => {
-      const scenarios = [
-        {},
-        '',
-        false,
-        12,
-        'aH+'
-      ];
+      const scenarios = [{}, "", false, 12, "aH+"];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -93,11 +86,7 @@ describe("Assertions", () => {
     });
 
     it("Should throw an error if the parameter is not valid", () => {
-      const scenarios = [
-        {},
-        false,
-        12,
-      ];
+      const scenarios = [{}, false, 12];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -107,24 +96,24 @@ describe("Assertions", () => {
   });
 
   describe("Assertions::assertNonExtractableSsoKey", () => {
-    it("Should not throw an error if the parameter is valid", async() => {
+    it("Should not throw an error if the parameter is valid", async () => {
       expect.assertions(1);
 
-      const ssoKey = await buildMockedCryptoKey({extractable: false});
+      const ssoKey = await buildMockedCryptoKey({ extractable: false });
       expect(() => assertNonExtractableSsoKey(ssoKey)).not.toThrow();
     });
 
-    it("Should throw an error if the parameter is not valid", async() => {
+    it("Should throw an error if the parameter is not valid", async () => {
       const scenarios = [
         {},
         false,
         12,
         "",
-        await buildMockedCryptoKey({extractable: true}),
-        await buildMockedCryptoKey({algoLength: 128}),
-        await buildMockedCryptoKey({usages: ["encrypt"]}),
-        await buildMockedCryptoKey({usages: ["decrypt"]}),
-        await buildMockedCryptoKey({usages: ["encrypt", "decrypt"]}),
+        await buildMockedCryptoKey({ extractable: true }),
+        await buildMockedCryptoKey({ algoLength: 128 }),
+        await buildMockedCryptoKey({ usages: ["encrypt"] }),
+        await buildMockedCryptoKey({ usages: ["decrypt"] }),
+        await buildMockedCryptoKey({ usages: ["encrypt", "decrypt"] }),
       ];
 
       expect.assertions(scenarios.length);
@@ -135,24 +124,24 @@ describe("Assertions", () => {
   });
 
   describe("Assertions::assertExtractableSsoKey", () => {
-    it("Should not throw an error if the parameter is valid", async() => {
+    it("Should not throw an error if the parameter is valid", async () => {
       expect.assertions(1);
 
       const ssoKey = await buildMockedCryptoKey({});
       expect(() => assertExtractableSsoKey(ssoKey)).not.toThrow();
     });
 
-    it("Should throw an error if the parameter is not valid", async() => {
+    it("Should throw an error if the parameter is not valid", async () => {
       const scenarios = [
         {},
         false,
         12,
         "",
-        await buildMockedCryptoKey({extractable: false}),
-        await buildMockedCryptoKey({extractable: false, algoLength: 128}),
-        await buildMockedCryptoKey({extractable: false, usages: ["encrypt"]}),
-        await buildMockedCryptoKey({extractable: false, usages: ["decrypt"]}),
-        await buildMockedCryptoKey({extractable: false, usages: ["encrypt", "decrypt"]}),
+        await buildMockedCryptoKey({ extractable: false }),
+        await buildMockedCryptoKey({ extractable: false, algoLength: 128 }),
+        await buildMockedCryptoKey({ extractable: false, usages: ["encrypt"] }),
+        await buildMockedCryptoKey({ extractable: false, usages: ["decrypt"] }),
+        await buildMockedCryptoKey({ extractable: false, usages: ["encrypt", "decrypt"] }),
       ];
 
       expect.assertions(scenarios.length);
@@ -190,10 +179,10 @@ describe("Assertions", () => {
 
   describe("Assertions::assertBoolean", () => {
     each([
-      {scenario: "True", value: true},
-      {scenario: "False", value: false},
-      {scenario: "undefined", value: undefined},
-    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      { scenario: "True", value: true },
+      { scenario: "False", value: false },
+      { scenario: "undefined", value: undefined },
+    ]).describe(`Should not throw an error if the parameter is valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertBoolean(props.value)).not.toThrow();
@@ -201,11 +190,11 @@ describe("Assertions", () => {
     });
 
     each([
-      {scenario: "1", value: 1},
-      {scenario: "0", value: 0},
-      {scenario: "null", value: null},
-      {scenario: "true", value: "true"}
-    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      { scenario: "1", value: 1 },
+      { scenario: "0", value: 0 },
+      { scenario: "null", value: null },
+      { scenario: "true", value: "true" },
+    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertBoolean(props.value)).toThrow();
@@ -221,13 +210,7 @@ describe("Assertions", () => {
     });
 
     it("Should throw an error if the parameter is not valid", () => {
-      const scenarios = [
-        {},
-        false,
-        12,
-        "",
-        PasswordGeneratorSettingsEntity.createFromDefault()
-      ];
+      const scenarios = [{}, false, 12, "", PasswordGeneratorSettingsEntity.createFromDefault()];
       expect.assertions(scenarios.length);
 
       const expectedMessage = "The given data is not a valid User Passphrase Policies entity";
@@ -255,12 +238,12 @@ describe("Assertions", () => {
 
   describe("Assertions::assertNumber", () => {
     each([
-      {scenario: "Positive number", value: 42},
-      {scenario: "Negative number", value: -42},
-      {scenario: "0", value: 0},
-      {scenario: "Float", value: 42.2},
-      {scenario: "undefined", value: undefined},
-    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      { scenario: "Positive number", value: 42 },
+      { scenario: "Negative number", value: -42 },
+      { scenario: "0", value: 0 },
+      { scenario: "Float", value: 42.2 },
+      { scenario: "undefined", value: undefined },
+    ]).describe(`Should not throw an error if the parameter is valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertNumber(props.value)).not.toThrow();
@@ -268,13 +251,13 @@ describe("Assertions", () => {
     });
 
     each([
-      {scenario: "String number", value: "1"},
-      {scenario: "true", value: true},
-      {scenario: "false", value: false},
-      {scenario: "null", value: null},
-      {scenario: "object", value: {}},
-      {scenario: "array", value: {}}
-    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      { scenario: "String number", value: "1" },
+      { scenario: "true", value: true },
+      { scenario: "false", value: false },
+      { scenario: "null", value: null },
+      { scenario: "object", value: {} },
+      { scenario: "array", value: {} },
+    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertNumber(props.value)).toThrow();
@@ -284,9 +267,9 @@ describe("Assertions", () => {
 
   describe("Assertions::assertArrayUUID", () => {
     each([
-      {scenario: "Array of uuid", value: [uuid(), uuid()]},
-      {scenario: "Empty array", value: []},
-    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      { scenario: "Array of uuid", value: [uuid(), uuid()] },
+      { scenario: "Empty array", value: [] },
+    ]).describe(`Should not throw an error if the parameter is valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArrayUUID(props.value)).not.toThrow();
@@ -294,11 +277,11 @@ describe("Assertions", () => {
     });
 
     each([
-      {scenario: "object", value: {}},
-      {scenario: "null", value: null},
-      {scenario: "array of number", value: [1, 2]},
-      {scenario: "array of string", value: ["1", "2"]}
-    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      { scenario: "object", value: {} },
+      { scenario: "null", value: null },
+      { scenario: "array of number", value: [1, 2] },
+      { scenario: "array of string", value: ["1", "2"] },
+    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArrayUUID(props.value)).toThrow();
@@ -308,9 +291,9 @@ describe("Assertions", () => {
 
   describe("Assertions:assertArray", () => {
     each([
-      {scenario: "Array", value: [false, true, 42, "42", {}, []]},
-      {scenario: "Empty array", value: []},
-    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      { scenario: "Array", value: [false, true, 42, "42", {}, []] },
+      { scenario: "Empty array", value: [] },
+    ]).describe(`Should not throw an error if the parameter is valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArray(props.value)).not.toThrow();
@@ -318,9 +301,9 @@ describe("Assertions", () => {
     });
 
     each([
-      {scenario: "object", value: {}},
-      {scenario: "null", value: null},
-    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      { scenario: "object", value: {} },
+      { scenario: "null", value: null },
+    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArray(props.value)).toThrow();
@@ -329,20 +312,21 @@ describe("Assertions", () => {
   });
 
   describe("Assertions:assertNonEmptyArray", () => {
-    each([
-      {scenario: "Array", value: [false, true, 42, "42", {}, []]},
-    ]).describe(`Should not throw an error if the parameter is valid`, props => {
-      it(`Scenario: ${props.scenario}`, () => {
-        expect.assertions(1);
-        expect(() => assertNonEmptyArray(props.value)).not.toThrow();
-      });
-    });
+    each([{ scenario: "Array", value: [false, true, 42, "42", {}, []] }]).describe(
+      `Should not throw an error if the parameter is valid`,
+      (props) => {
+        it(`Scenario: ${props.scenario}`, () => {
+          expect.assertions(1);
+          expect(() => assertNonEmptyArray(props.value)).not.toThrow();
+        });
+      },
+    );
 
     each([
-      {scenario: "object", value: {}},
-      {scenario: "null", value: null},
-      {scenario: "Empty array", value: []},
-    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      { scenario: "object", value: {} },
+      { scenario: "null", value: null },
+      { scenario: "Empty array", value: [] },
+    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertNonEmptyArray(props.value)).toThrow();

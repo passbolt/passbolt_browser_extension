@@ -23,19 +23,19 @@ describe("Sso Login URL Entity", () => {
 
   it("constructor works if a valid DTO is provided", () => {
     const availableUrl = [
-      {providerId: "azure", url: 'https://login.microsoftonline.com'},
-      {providerId: "azure", url: 'https://login.microsoftonline.us'},
-      {providerId: "azure", url: 'https://login.partner.microsoftonline.cn'},
-      {providerId: "google", url: 'https://accounts.google.com'},
-      {providerId: "oauth2", url: 'https://oauth2.generic.provider.com'},
-      {providerId: "adfs", url: 'https://adfs.partner.microsoft.com'},
+      { providerId: "azure", url: "https://login.microsoftonline.com" },
+      { providerId: "azure", url: "https://login.microsoftonline.us" },
+      { providerId: "azure", url: "https://login.partner.microsoftonline.cn" },
+      { providerId: "google", url: "https://accounts.google.com" },
+      { providerId: "oauth2", url: "https://oauth2.generic.provider.com" },
+      { providerId: "adfs", url: "https://adfs.partner.microsoft.com" },
     ];
 
     expect.assertions(availableUrl.length);
 
     for (let i = 0; i < availableUrl.length; i++) {
       const dto = {
-        url: availableUrl[i].url
+        url: availableUrl[i].url,
       };
       const entity = new SsoLoginUrlEntity(dto, availableUrl[i].providerId);
       expect(entity.toDto()).toEqual(dto);
@@ -43,14 +43,14 @@ describe("Sso Login URL Entity", () => {
   });
 
   each([
-    {scenario: 'Global microsoft online url', url: 'https://login.microsoftonline.com', providerId: "azure"},
-    {scenario: 'US microsoft online url', url: 'https://login.microsoftonline.us', providerId: "azure"},
-    {scenario: 'China microsoft online url', url: 'https://login.partner.microsoftonline.cn', providerId: "azure"},
-    {scenario: 'Google url', url: 'https://accounts.google.com', providerId: "google"}
-  ]).describe("Should accept supported url", test => {
-    it(`Should accept supported url: ${test.scenario}`, async() => {
+    { scenario: "Global microsoft online url", url: "https://login.microsoftonline.com", providerId: "azure" },
+    { scenario: "US microsoft online url", url: "https://login.microsoftonline.us", providerId: "azure" },
+    { scenario: "China microsoft online url", url: "https://login.partner.microsoftonline.cn", providerId: "azure" },
+    { scenario: "Google url", url: "https://accounts.google.com", providerId: "google" },
+  ]).describe("Should accept supported url", (test) => {
+    it(`Should accept supported url: ${test.scenario}`, async () => {
       const dto = {
-        url: test.url
+        url: test.url,
       };
       const entity = new SsoLoginUrlEntity(dto, test.providerId);
       expect(entity.toDto()).toEqual(dto);
@@ -58,22 +58,22 @@ describe("Sso Login URL Entity", () => {
   });
 
   each([
-    {scenario: 'Authorize domain with insecure protocol', url: 'http://login.microsoftonline.com'},
-    {scenario: 'Authorize domain with wrong protocol', url: 'ftp://login.microsoftonline.us'},
-    {scenario: 'Authorize domain with no protocol', url: 'login.microsoftonline.us'},
-    {scenario: 'Not a supported domain', url: 'https://login.microsoft.com'},
-    {scenario: 'Authorized domain and protocol but wrong port', url: 'https://login.microsoftonline.com:4443'},
-    {scenario: 'Xss attack', url: 'javascript:alert("hey, here is an XSS")'},
-    {scenario: 'Subdomain attack', url: 'https://attacker.login.microsoftonline.com'},
-    {scenario: 'Regex wild mark attack', url: 'https://loginxmicrosoftonline.com'},
-    {scenario: 'Query parameter attack', url: 'https://attacker.com?domain=https://login.microsoftonline.com'},
-    {scenario: 'Hash attack', url: 'https://attacker.com#https://login.microsoftonline.com'},
-    {scenario: 'Mixing provider URL attack', url: 'https://login.microsoftonline.com', providerId: "google"},
-    {scenario: 'Not using HTTPS', url: 'http://not.secure.com', providerId: "oauth2"},
-  ]).describe("Should not accept unsupported or attacker url", test => {
-    it(`Should not accept unsupported or attacker url: ${test.scenario}`, async() => {
+    { scenario: "Authorize domain with insecure protocol", url: "http://login.microsoftonline.com" },
+    { scenario: "Authorize domain with wrong protocol", url: "ftp://login.microsoftonline.us" },
+    { scenario: "Authorize domain with no protocol", url: "login.microsoftonline.us" },
+    { scenario: "Not a supported domain", url: "https://login.microsoft.com" },
+    { scenario: "Authorized domain and protocol but wrong port", url: "https://login.microsoftonline.com:4443" },
+    { scenario: "Xss attack", url: 'javascript:alert("hey, here is an XSS")' },
+    { scenario: "Subdomain attack", url: "https://attacker.login.microsoftonline.com" },
+    { scenario: "Regex wild mark attack", url: "https://loginxmicrosoftonline.com" },
+    { scenario: "Query parameter attack", url: "https://attacker.com?domain=https://login.microsoftonline.com" },
+    { scenario: "Hash attack", url: "https://attacker.com#https://login.microsoftonline.com" },
+    { scenario: "Mixing provider URL attack", url: "https://login.microsoftonline.com", providerId: "google" },
+    { scenario: "Not using HTTPS", url: "http://not.secure.com", providerId: "oauth2" },
+  ]).describe("Should not accept unsupported or attacker url", (test) => {
+    it(`Should not accept unsupported or attacker url: ${test.scenario}`, async () => {
       const dto = {
-        url: test.url
+        url: test.url,
       };
 
       const providerId = test.providerId || "azure";

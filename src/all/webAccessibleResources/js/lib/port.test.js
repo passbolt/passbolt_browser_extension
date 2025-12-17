@@ -12,18 +12,18 @@
  * @since         3.8.0
  */
 import Port from "./port";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 describe("Port", () => {
   describe("Port::connect", () => {
-    it("Should create new port with the name and connect", async() => {
+    it("Should create new port with the name and connect", async () => {
       expect.assertions(5);
 
       const portname = uuidv4();
       const port = new Port(portname);
       expect(port._connected).toBeFalsy();
       port.connect();
-      expect(browser.runtime.connect).toHaveBeenCalledWith({name: portname});
+      expect(browser.runtime.connect).toHaveBeenCalledWith({ name: portname });
       expect(port._port.onDisconnect.addListener).toHaveBeenCalled();
       expect(port._port.onMessage.addListener).toHaveBeenCalled();
 
@@ -31,17 +31,17 @@ describe("Port", () => {
       expect(Object.keys(port._listeners).length).toBe(0);
     });
 
-    it("Should raise an error if port has no name", async() => {
+    it("Should raise an error if port has no name", async () => {
       expect.assertions(1);
 
       try {
         new Port(null);
       } catch (error) {
-        expect(error.message).toBe('The port name should be a valid string.');
+        expect(error.message).toBe("The port name should be a valid string.");
       }
     });
 
-    it("Should raise an error if context is invalid and send destroy message", async() => {
+    it("Should raise an error if context is invalid and send destroy message", async () => {
       expect.assertions(3);
 
       const portname = uuidv4();
@@ -49,7 +49,9 @@ describe("Port", () => {
       const callback = jest.fn();
       port.onConnectError(callback);
 
-      jest.spyOn(browser.runtime, "connect").mockImplementationOnce(() => { throw new Error("context invalid"); });
+      jest.spyOn(browser.runtime, "connect").mockImplementationOnce(() => {
+        throw new Error("context invalid");
+      });
       jest.spyOn(port.onConnectErrorHandler, "callback");
 
       expect(port._connected).toBeFalsy();
@@ -57,14 +59,14 @@ describe("Port", () => {
         await port.connect();
       } catch (error) {
         console.error(error);
-        expect(browser.runtime.connect).toHaveBeenCalledWith({name: portname});
+        expect(browser.runtime.connect).toHaveBeenCalledWith({ name: portname });
         expect(port.onConnectErrorHandler.callback).toHaveBeenCalled();
       }
     });
   });
 
   describe("Port::request", () => {
-    it("Should post a message and wait a success result", async() => {
+    it("Should post a message and wait a success result", async () => {
       expect.assertions(6);
 
       const portname = uuidv4();
@@ -77,25 +79,25 @@ describe("Port", () => {
       jest.spyOn(port.lock, "release");
 
       const message = "request_message";
-      const promise = port.request(message, {data: "data"});
+      const promise = port.request(message, { data: "data" });
       const requestId = Object.keys(port._listeners)[0];
 
-      expect(port.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
+      expect(port.emit).toHaveBeenCalledWith(message, requestId, { data: "data" });
       expect(port.lock.acquire).toHaveBeenCalled();
       // Force to wait the promise has been resolve
       await Promise.resolve();
       expect(port.lock.release).toHaveBeenCalled();
       // Force to wait the promise has been resolve to be sure the post message has been called
       await Promise.resolve();
-      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
+      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, { data: "data" }]));
 
-      const dataReceived = {data: "dataReceived"};
+      const dataReceived = { data: "dataReceived" };
       port._onMessage(JSON.stringify([requestId, "SUCCESS", dataReceived]));
       expect(Object.keys(port._listeners).length).toBe(0);
       expect(await promise).toStrictEqual(dataReceived);
     });
 
-    it("Should post a message and wait an error result", async() => {
+    it("Should post a message and wait an error result", async () => {
       expect.assertions(6);
 
       const portname = uuidv4();
@@ -108,19 +110,19 @@ describe("Port", () => {
       jest.spyOn(port.lock, "release");
 
       const message = "request_message";
-      const promise = port.request(message, {data: "data"});
+      const promise = port.request(message, { data: "data" });
       const requestId = Object.keys(port._listeners)[0];
 
-      expect(port.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
+      expect(port.emit).toHaveBeenCalledWith(message, requestId, { data: "data" });
       expect(port.lock.acquire).toHaveBeenCalled();
       // Force to wait the promise has been resolve
       await Promise.resolve();
       expect(port.lock.release).toHaveBeenCalled();
       // Force to wait the promise has been resolve to be sure the post message has been called
       await Promise.resolve();
-      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
+      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, { data: "data" }]));
 
-      const dataReceived = {data: "dataReceived"};
+      const dataReceived = { data: "dataReceived" };
       port._onMessage(JSON.stringify([requestId, "ERROR", dataReceived]));
       expect(Object.keys(port._listeners).length).toBe(0);
       try {
@@ -130,7 +132,7 @@ describe("Port", () => {
       }
     });
 
-    it("Should post a message on a disconnected port and wait to connect again before sending a message", async() => {
+    it("Should post a message on a disconnected port and wait to connect again before sending a message", async () => {
       expect.assertions(7);
 
       const portname = uuidv4();
@@ -147,10 +149,10 @@ describe("Port", () => {
 
       const message = "request_message";
       port._connected = false;
-      const promise = port.request(message, {data: "data"});
+      const promise = port.request(message, { data: "data" });
       const requestId = Object.keys(port._listeners)[0];
 
-      expect(port.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
+      expect(port.emit).toHaveBeenCalledWith(message, requestId, { data: "data" });
       expect(port.lock.acquire).toHaveBeenCalled();
       // Wait connect listener has been added
       await Promise.resolve();
@@ -162,9 +164,9 @@ describe("Port", () => {
       expect(port.lock.release).toHaveBeenCalled();
       // Wait release has been done
       await Promise.resolve();
-      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
+      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, { data: "data" }]));
 
-      const dataReceived = {data: "dataReceived"};
+      const dataReceived = { data: "dataReceived" };
       port._onMessage(JSON.stringify([requestId, "SUCCESS", dataReceived]));
       expect(Object.keys(port._listeners).length).toBe(0);
       expect(await promise).toStrictEqual(dataReceived);

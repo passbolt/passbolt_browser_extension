@@ -13,16 +13,14 @@
  */
 
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultUserPassphrasePoliciesDto} from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity.test.data";
+import { defaultUserPassphrasePoliciesDto } from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity.test.data";
 import AccountTemporaryEntity from "./accountTemporaryEntity";
 import {
   temporaryAccountRecoveryAccountDto,
   temporaryRecoverAccountDto,
-  temporarySetupAccountDto
+  temporarySetupAccountDto,
 } from "./accountTemporaryEntity.test.data";
-import {
-  enabledAccountRecoveryOrganizationPolicyDto
-} from "../accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
+import { enabledAccountRecoveryOrganizationPolicyDto } from "../accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 
 describe("AccountTemporaryEntity", () => {
   describe("AccountTemporaryEntity:constructor", () => {
@@ -53,7 +51,7 @@ describe("AccountTemporaryEntity", () => {
 
     it("it should raise an error if the account type is unkonwn (account recovery account)", () => {
       expect.assertions(1);
-      const dto = temporarySetupAccountDto({account: {type: "unknown"}});
+      const dto = temporarySetupAccountDto({ account: { type: "unknown" } });
       try {
         new AccountTemporaryEntity(dto);
       } catch (error) {
@@ -74,14 +72,13 @@ describe("AccountTemporaryEntity", () => {
 
     it("it should return the account and account recovery organization policy if requested", () => {
       expect.assertions(2);
-      const expectedKeys = [
-        'account',
-        'account_recovery_organization_policy'
-      ];
+      const expectedKeys = ["account", "account_recovery_organization_policy"];
 
-      const dto = temporarySetupAccountDto({account_recovery_organization_policy: enabledAccountRecoveryOrganizationPolicyDto()});
+      const dto = temporarySetupAccountDto({
+        account_recovery_organization_policy: enabledAccountRecoveryOrganizationPolicyDto(),
+      });
       const entity = new AccountTemporaryEntity(dto);
-      const resultDto = entity.toDto({account: true, account_recovery_organization_policy: true});
+      const resultDto = entity.toDto({ account: true, account_recovery_organization_policy: true });
       const keys = Object.keys(resultDto);
       expect(Object.keys(resultDto).length).toBe(2);
       expect(keys).toEqual(expectedKeys);
@@ -89,14 +86,12 @@ describe("AccountTemporaryEntity", () => {
 
     it("it should return all the options if requested", () => {
       expect.assertions(2);
-      const expectedKeys = [
-        'account',
-        'passphrase',
-        'worker_id',
-        'user_passphrase_policies',
-      ];
+      const expectedKeys = ["account", "passphrase", "worker_id", "user_passphrase_policies"];
 
-      const dto = temporaryRecoverAccountDto({passphrase: "passphrase", user_passphrase_policies: defaultUserPassphrasePoliciesDto()});
+      const dto = temporaryRecoverAccountDto({
+        passphrase: "passphrase",
+        user_passphrase_policies: defaultUserPassphrasePoliciesDto(),
+      });
       const entity = new AccountTemporaryEntity(dto);
       const resultDto = entity.toDto(AccountTemporaryEntity.ALL_CONTAIN_OPTIONS);
       const keys = Object.keys(resultDto);
@@ -106,14 +101,11 @@ describe("AccountTemporaryEntity", () => {
 
     it("it should return the account and passphrase if requested", () => {
       expect.assertions(2);
-      const expectedKeys = [
-        'account',
-        'passphrase'
-      ];
+      const expectedKeys = ["account", "passphrase"];
 
-      const dto = temporarySetupAccountDto({passphrase: "passphrase"});
+      const dto = temporarySetupAccountDto({ passphrase: "passphrase" });
       const entity = new AccountTemporaryEntity(dto);
-      const resultDto = entity.toDto({account: true, passphrase: true});
+      const resultDto = entity.toDto({ account: true, passphrase: true });
       const keys = Object.keys(resultDto);
       expect(Object.keys(resultDto).length).toBe(2);
       expect(keys).toEqual(expectedKeys);
@@ -121,13 +113,9 @@ describe("AccountTemporaryEntity", () => {
 
     it("it should return all options if requested", () => {
       expect.assertions(2);
-      const expectedKeys = [
-        'account',
-        'passphrase',
-        'worker_id',
-      ];
+      const expectedKeys = ["account", "passphrase", "worker_id"];
 
-      const dto = temporarySetupAccountDto({passphrase: "passphrase"});
+      const dto = temporarySetupAccountDto({ passphrase: "passphrase" });
       const entity = new AccountTemporaryEntity(dto);
       const resultDto = entity.toDto(AccountTemporaryEntity.ALL_CONTAIN_OPTIONS);
       const keys = Object.keys(resultDto);

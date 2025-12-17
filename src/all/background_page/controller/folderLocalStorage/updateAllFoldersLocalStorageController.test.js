@@ -12,11 +12,11 @@
  * @since         4.9.4
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import UpdateAllFolderLocalStorageController from "./updateAllFoldersLocalStorageController";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 import FindFoldersService from "../../service/folder/findFoldersService";
 import FolderLocalStorage from "../../service/local_storage/folderLocalStorage";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
@@ -30,17 +30,21 @@ describe("UpdateAllFoldersLocalStorageController", () => {
     controller = new UpdateAllFolderLocalStorageController(null, null, apiClientOptions, account);
   });
   describe("UpdateAllFoldersLocalStorageController::exec", () => {
-    it("Should call the findAndUpdateFoldersLocalStorageService and emit a success message", async() => {
+    it("Should call the findAndUpdateFoldersLocalStorageService and emit a success message", async () => {
       expect.assertions(3);
       const multipleFolderDtos = [defaultFolderDto(), defaultFolderDto(), defaultFolderDto(), defaultFolderDto()];
-      jest.spyOn(FindFoldersService.prototype, "findAll").mockImplementationOnce(() => new FoldersCollection(multipleFolderDtos));
+      jest
+        .spyOn(FindFoldersService.prototype, "findAll")
+        .mockImplementationOnce(() => new FoldersCollection(multipleFolderDtos));
       jest.spyOn(controller.findAndUpdateFoldersLocalStorageService, "findAndUpdateAll");
 
       await controller.exec();
       const foldersLSDto = await FolderLocalStorage.get();
 
       expect(controller.findAndUpdateFoldersLocalStorageService.findAndUpdateAll).toHaveBeenCalledTimes(1);
-      expect(controller.findAndUpdateFoldersLocalStorageService.findAndUpdateAll).toHaveBeenCalledWith({updatePeriodThreshold: 10000});
+      expect(controller.findAndUpdateFoldersLocalStorageService.findAndUpdateAll).toHaveBeenCalledWith({
+        updatePeriodThreshold: 10000,
+      });
       expect(foldersLSDto).toEqual(multipleFolderDtos);
     });
   });

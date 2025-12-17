@@ -13,7 +13,7 @@
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountRecoveryRequestEntity from "./accountRecoveryRequestEntity";
-import {pendingAccountRecoveryRequestDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import { pendingAccountRecoveryRequestDto } from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("AccountRecoveryRequest entity", () => {
@@ -32,7 +32,6 @@ describe("AccountRecoveryRequest entity", () => {
       assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "user_id");
     });
 
-
     it("validates armored_key property", () => {
       assertEntityProperty.string(AccountRecoveryRequestEntity, "armored_key");
       assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "armored_key");
@@ -40,31 +39,33 @@ describe("AccountRecoveryRequest entity", () => {
     });
 
     it("validates fingerprint property", () => {
-      const successScenarios = [
-        {scenario: "with a valid fingerprint string", value: "ABCD".repeat(10)},
-      ];
-      const failingScenarios = [
-        assertEntityProperty.SCENARIO_INTEGER,
-        assertEntityProperty.SCENARIO_FLOAT,
-      ];
-      assertEntityProperty.assert(AccountRecoveryRequestEntity, "fingerprint", successScenarios, failingScenarios, "type");
+      const successScenarios = [{ scenario: "with a valid fingerprint string", value: "ABCD".repeat(10) }];
+      const failingScenarios = [assertEntityProperty.SCENARIO_INTEGER, assertEntityProperty.SCENARIO_FLOAT];
+      assertEntityProperty.assert(
+        AccountRecoveryRequestEntity,
+        "fingerprint",
+        successScenarios,
+        failingScenarios,
+        "type",
+      );
 
       const wrongLengthScenario = [
-        {scenario: "too long", value: "a".repeat(41)},
-        {scenario: "too short", value: "a".repeat(39)},
+        { scenario: "too long", value: "a".repeat(41) },
+        { scenario: "too short", value: "a".repeat(39) },
       ];
-      assertEntityProperty.assert(AccountRecoveryRequestEntity, "fingerprint", successScenarios, wrongLengthScenario, "length");
+      assertEntityProperty.assert(
+        AccountRecoveryRequestEntity,
+        "fingerprint",
+        successScenarios,
+        wrongLengthScenario,
+        "length",
+      );
       assertEntityProperty.nullable(AccountRecoveryRequestEntity, "fingerprint");
       assertEntityProperty.notRequired(AccountRecoveryRequestEntity, "fingerprint");
     });
 
     it("validates status property", () => {
-      const expectedValues = [
-        "pending",
-        "rejected",
-        "approved",
-        "completed"
-      ];
+      const expectedValues = ["pending", "rejected", "approved", "completed"];
       const unexpectedValues = ["1", "false", "test"];
       assertEntityProperty.enumeration(AccountRecoveryRequestEntity, "status", expectedValues, unexpectedValues);
       assertEntityProperty.required(AccountRecoveryRequestEntity, "status");
@@ -95,12 +96,12 @@ describe("AccountRecoveryRequest entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "id": "d4c0e643-3967-443b-93b3-102d902c4510",
-      "status": "pending",
-      "created": "2020-05-04T20:31:45+00:00",
-      "modified": "2020-05-04T20:31:45+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
+      id: "d4c0e643-3967-443b-93b3-102d902c4510",
+      status: "pending",
+      created: "2020-05-04T20:31:45+00:00",
+      modified: "2020-05-04T20:31:45+00:00",
+      created_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+      modified_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
     };
     const entity = new AccountRecoveryRequestEntity(dto);
     expect(entity.toDto()).toEqual(dto);
@@ -113,21 +114,41 @@ describe("AccountRecoveryRequest entity", () => {
     expect.assertions(8);
     const resultDto = entity.toDto();
     const keys = Object.keys(resultDto);
-    const expectedKeys = ['id', 'user_id', 'armored_key', 'fingerprint', 'status', 'created', 'modified', 'created_by',
-      'modified_by'];
+    const expectedKeys = [
+      "id",
+      "user_id",
+      "armored_key",
+      "fingerprint",
+      "status",
+      "created",
+      "modified",
+      "created_by",
+      "modified_by",
+    ];
     expect(Object.keys(resultDto).length).toBe(9);
     expect(keys).toEqual(expectedKeys);
     expect(entity.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).toBeTruthy();
     expect(entity.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.length).toEqual(1);
 
-    const resultDtoWithContain = entity.toDto({account_recovery_private_key: true});
+    const resultDtoWithContain = entity.toDto({ account_recovery_private_key: true });
     const keysWithContain = Object.keys(resultDtoWithContain);
-    const expectedKeysWithContain = ['id', 'user_id', 'armored_key', 'fingerprint', 'status', 'created', 'modified', 'created_by',
-      'modified_by', 'account_recovery_private_key'];
+    const expectedKeysWithContain = [
+      "id",
+      "user_id",
+      "armored_key",
+      "fingerprint",
+      "status",
+      "created",
+      "modified",
+      "created_by",
+      "modified_by",
+      "account_recovery_private_key",
+    ];
     expect(Object.keys(keysWithContain).length).toBe(10);
     expect(keysWithContain).toEqual(expectedKeysWithContain);
     expect(resultDtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords.length).toBe(1);
-    expect(resultDtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key)
-      .toEqual(dto.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key);
+    expect(
+      resultDtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key,
+    ).toEqual(dto.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key);
   });
 });

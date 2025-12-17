@@ -12,26 +12,26 @@
  * @since         3.6.0
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import each from "jest-each";
 import User from "../../model/user";
 import Keyring from "../../model/keyring";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import RecoverAccountController from "./recoverAccountController";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
-import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { defaultAccountAccountRecoveryDto } from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import {
   approvedAccountRecoveryRequestDto,
   approvedAccountRecoveryRequestWithoutPrivateKeyDto,
-  approvedAccountRecoveryRequestWithoutResponsesDto
+  approvedAccountRecoveryRequestWithoutResponsesDto,
 } from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
@@ -43,18 +43,20 @@ describe("RecoverAccountController", () => {
   describe("RecoverAccountController::exec", () => {
     const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
     const apiClientOptions = defaultApiClientOptions();
-    const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({id: accountRecovery.accountRecoveryRequestId});
+    const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({
+      id: accountRecovery.accountRecoveryRequestId,
+    });
     const passphrase = pgpKeys.account_recovery_request.passphrase;
 
-    const mockOrganisationSettings = isSsoEnabled => {
+    const mockOrganisationSettings = (isSsoEnabled) => {
       const organizationSettings = anonymousOrganizationSettings();
       if (isSsoEnabled) {
-        organizationSettings.passbolt.plugins.sso = {enabled: true};
+        organizationSettings.passbolt.plugins.sso = { enabled: true };
       }
-      fetch.doMockOnce(() => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
+      fetch.doMockOnce(() => mockApiResponse(organizationSettings, { servertime: Date.now() / 1000 }));
     };
 
-    it("Should perform the account recovery.", async() => {
+    it("Should perform the account recovery.", async () => {
       // Mock API fetch account recovery request get response.
       fetch.doMockOnce(() => mockApiResponse(accountRecoveryRequestDto));
       // Mock API complete request.
@@ -62,10 +64,12 @@ describe("RecoverAccountController", () => {
       // Mock API organisation settings
       mockOrganisationSettings();
       // Mock temporary account
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: accountRecovery}));
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: accountRecovery }));
       jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
 
-      const controller = new RecoverAccountController({port: {_port: {name: "test"}}}, null, apiClientOptions);
+      const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
       await controller.exec(passphrase);
 
       expect.assertions(9);
@@ -92,13 +96,15 @@ describe("RecoverAccountController", () => {
     });
 
     each([
-      {expectedError: "A passphrase is required.", passphrase: undefined},
-      {expectedError: "The passphrase should be a string.", passphrase: 42}
-    ]).describe("Should assert the signed-in user passphrase parameter.", scenario => {
-      it(`Should validate the scenario: ${scenario.expectedError}`, async() => {
+      { expectedError: "A passphrase is required.", passphrase: undefined },
+      { expectedError: "The passphrase should be a string.", passphrase: 42 },
+    ]).describe("Should assert the signed-in user passphrase parameter.", (scenario) => {
+      it(`Should validate the scenario: ${scenario.expectedError}`, async () => {
         // Mock temporary account
-        jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: accountRecovery}));
-        const controller = new RecoverAccountController({port: {_port: {name: "test"}}}, null, apiClientOptions);
+        jest
+          .spyOn(AccountTemporarySessionStorageService, "get")
+          .mockImplementationOnce(() => ({ account: accountRecovery }));
+        const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
         const promise = controller.exec(scenario.passphrase);
         expect.assertions(1);
         await expect(promise).rejects.toThrowError(scenario.expectedError);
@@ -106,48 +112,76 @@ describe("RecoverAccountController", () => {
     });
 
     each([
-      {expectedError: "The account recovery request id should match the request id associated to the account being recovered.", findRequestMock: approvedAccountRecoveryRequestDto()},
-      {expectedError: "The account recovery request should have a private key.", findRequestMock: approvedAccountRecoveryRequestWithoutPrivateKeyDto({id: accountRecovery.accountRecoveryRequestId})},
-      {expectedError: "The account recovery request should have a collection of responses.", findRequestMock: approvedAccountRecoveryRequestWithoutResponsesDto({id: accountRecovery.accountRecoveryRequestId})},
-      {expectedError: "The account recovery request responses should contain exactly one response.", findRequestMock: approvedAccountRecoveryRequestDto({id: accountRecovery.accountRecoveryRequestId, account_recovery_responses: []})},
-    ]).describe("Should assert the signed-in user passphrase parameter.", scenario => {
-      it(`Should validate the scenario: ${scenario.expectedError}`, async() => {
+      {
+        expectedError:
+          "The account recovery request id should match the request id associated to the account being recovered.",
+        findRequestMock: approvedAccountRecoveryRequestDto(),
+      },
+      {
+        expectedError: "The account recovery request should have a private key.",
+        findRequestMock: approvedAccountRecoveryRequestWithoutPrivateKeyDto({
+          id: accountRecovery.accountRecoveryRequestId,
+        }),
+      },
+      {
+        expectedError: "The account recovery request should have a collection of responses.",
+        findRequestMock: approvedAccountRecoveryRequestWithoutResponsesDto({
+          id: accountRecovery.accountRecoveryRequestId,
+        }),
+      },
+      {
+        expectedError: "The account recovery request responses should contain exactly one response.",
+        findRequestMock: approvedAccountRecoveryRequestDto({
+          id: accountRecovery.accountRecoveryRequestId,
+          account_recovery_responses: [],
+        }),
+      },
+    ]).describe("Should assert the signed-in user passphrase parameter.", (scenario) => {
+      it(`Should validate the scenario: ${scenario.expectedError}`, async () => {
         // Mock API fetch account recovery request get response.
         fetch.doMockOnce(() => mockApiResponse(scenario.findRequestMock));
         // Mock temporary account
-        jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: accountRecovery}));
+        jest
+          .spyOn(AccountTemporarySessionStorageService, "get")
+          .mockImplementationOnce(() => ({ account: accountRecovery }));
 
-        const controller = new RecoverAccountController({port: {_port: {name: "test"}}}, null, apiClientOptions);
+        const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
         const promise = controller.exec(passphrase);
         expect.assertions(1);
         await expect(promise).rejects.toThrowError(scenario.expectedError);
       });
     });
 
-    it("Should assert the account recovery user private key can be decrypted.", async() => {
+    it("Should assert the account recovery user private key can be decrypted.", async () => {
       // Mock API fetch account recovery request get response.
       fetch.doMockOnce(() => mockApiResponse(accountRecoveryRequestDto));
       // Mock temporary account
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: accountRecovery}));
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: accountRecovery }));
 
-      const controller = new RecoverAccountController({port: {_port: {name: "test"}}}, null, apiClientOptions);
+      const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
       const promise = controller.exec("wrong passphrase");
       expect.assertions(1);
       await expect(promise).rejects.toThrowError(InvalidMasterPasswordError);
     });
 
-    it("Should not add the account to the local storage if the complete API request fails.", async() => {
+    it("Should not add the account to the local storage if the complete API request fails.", async () => {
       const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
-      const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({id: accountRecovery.accountRecoveryRequestId});
+      const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({
+        id: accountRecovery.accountRecoveryRequestId,
+      });
       // Mock temporary account
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: accountRecovery}));
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: accountRecovery }));
 
       // Mock API fetch account recovery request get response.
       fetch.doMockOnce(() => mockApiResponse(accountRecoveryRequestDto));
       // Mock API complete request.
       fetch.doMockOnce(() => Promise.reject(new Error("Unable to reach the server, an unexpected error occurred")));
 
-      const controller = new RecoverAccountController({port: {_port: {name: "test"}}}, null, apiClientOptions);
+      const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
       const promise = controller.exec(passphrase);
 
       expect.assertions(2);
@@ -155,16 +189,18 @@ describe("RecoverAccountController", () => {
       expect(() => User.getInstance().get()).toThrow("The user is not set");
     });
 
-    it("Should refresh the SSO kit if SSO is enabled.", async() => {
+    it("Should refresh the SSO kit if SSO is enabled.", async () => {
       const apiClientOptions = defaultApiClientOptions();
       const passphrase = pgpKeys.account_recovery_request.passphrase;
       const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
-      const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({id: accountRecovery.accountRecoveryRequestId});
+      const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({
+        id: accountRecovery.accountRecoveryRequestId,
+      });
 
       expect.assertions(3);
       const expetedProvider = "azure";
       const organizationSettings = anonymousOrganizationSettings();
-      organizationSettings.passbolt.plugins.sso = {enabled: true};
+      organizationSettings.passbolt.plugins.sso = { enabled: true };
 
       // Mock API fetch account recovery request get response.
       fetch.doMockOnce(() => mockApiResponse(accountRecoveryRequestDto));
@@ -173,14 +209,16 @@ describe("RecoverAccountController", () => {
       // Mock API organisation settings
       mockOrganisationSettings(true);
       // Mock configured SSO settings
-      fetch.doMockOnce(() => mockApiResponse({provider: expetedProvider}));
+      fetch.doMockOnce(() => mockApiResponse({ provider: expetedProvider }));
       // Mock temporary account
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: accountRecovery}));
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: accountRecovery }));
       jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
 
       jest.spyOn(GenerateSsoKitService, "generate");
 
-      const controller = new RecoverAccountController({port: {_port: {name: "test"}}}, null, apiClientOptions);
+      const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
       await controller.exec(passphrase);
 
       expect(SsoDataStorage.flush).toHaveBeenCalled();
@@ -188,11 +226,13 @@ describe("RecoverAccountController", () => {
       expect(GenerateSsoKitService.generate).toHaveBeenCalledWith(passphrase, expetedProvider);
     });
 
-    it("Should only flush SSO kit if SSO is disabled.", async() => {
+    it("Should only flush SSO kit if SSO is disabled.", async () => {
       const apiClientOptions = defaultApiClientOptions();
       const passphrase = pgpKeys.account_recovery_request.passphrase;
       const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
-      const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({id: accountRecovery.accountRecoveryRequestId});
+      const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({
+        id: accountRecovery.accountRecoveryRequestId,
+      });
       // Mock API fetch account recovery request get response.
       fetch.doMockOnce(() => mockApiResponse(accountRecoveryRequestDto));
       // Mock API complete request.
@@ -200,12 +240,14 @@ describe("RecoverAccountController", () => {
       // Mock API organisation settings
       mockOrganisationSettings();
       // Mock temporary account
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: accountRecovery}));
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: accountRecovery }));
       jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
 
       jest.spyOn(GenerateSsoKitService, "generate");
 
-      const controller = new RecoverAccountController({port: {_port: {name: "test"}}}, null, apiClientOptions);
+      const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
       await controller.exec(passphrase);
 
       expect.assertions(2);
@@ -214,8 +256,8 @@ describe("RecoverAccountController", () => {
       expect(GenerateSsoKitService.generate).not.toHaveBeenCalled();
     });
 
-    it("Should raise an error if no account has been found.", async() => {
-      const controller = new RecoverAccountController({port: {_port: {name: "test"}}}, null, apiClientOptions);
+    it("Should raise an error if no account has been found.", async () => {
+      const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
       expect.assertions(1);
       try {
         await controller.exec();

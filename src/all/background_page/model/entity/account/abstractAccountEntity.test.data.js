@@ -13,8 +13,8 @@
  */
 import AbstractAccountEntity from "./abstractAccountEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultSecurityTokenDto} from "../../entity/securityToken/SecurityTokenEntity.test.data";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { defaultSecurityTokenDto } from "../../entity/securityToken/SecurityTokenEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 /**
  * "Copy" of the AbstractAccountEntity class for testing purpose.
@@ -24,24 +24,23 @@ import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
  */
 export class StubAbstractAccountEntity extends AbstractAccountEntity {
   constructor(accountDto, options = {}) {
-    super(EntitySchema.validate(
-      AbstractAccountEntity.ENTITY_NAME,
-      accountDto,
-      AbstractAccountEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(AbstractAccountEntity.ENTITY_NAME, accountDto, AbstractAccountEntity.getSchema()),
+      options,
+    );
   }
 }
 
 export const defaultAbstractAccountDto = (data = {}) => ({
-  "type": "abstract-account",
-  "domain": "https://passbolt.local",
-  "user_id": pgpKeys.ada.userId,
-  "user_key_fingerprint": pgpKeys.account_recovery_request.fingerprint,
-  "user_public_armored_key": pgpKeys.account_recovery_request.public,
-  "server_public_armored_key": pgpKeys.server.public,
-  "username": "ada@passbolt.com",
-  "first_name": "Ada",
-  "last_name": "Lovelace",
-  "locale": "en-UK",
-  "security_token": defaultSecurityTokenDto(data?.security_token),
+  type: "abstract-account",
+  domain: "https://passbolt.local",
+  user_id: pgpKeys.ada.userId,
+  user_key_fingerprint: pgpKeys.account_recovery_request.fingerprint,
+  user_public_armored_key: pgpKeys.account_recovery_request.public,
+  server_public_armored_key: pgpKeys.server.public,
+  username: "ada@passbolt.com",
+  first_name: "Ada",
+  last_name: "Lovelace",
+  locale: "en-UK",
+  security_token: defaultSecurityTokenDto(data?.security_token),
 });

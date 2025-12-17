@@ -21,26 +21,26 @@ import AppBootstrapPagemod from "./appBootstrapPagemod";
 import WebIntegrationPagemod from "./webIntegrationPagemod";
 import PublicWebsiteSignInPagemod from "./publicWebsiteSignInPagemod";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
-import {userLoggedInAuthStatus} from "../controller/auth/authCheckStatus.test.data";
+import { userLoggedInAuthStatus } from "../controller/auth/authCheckStatus.test.data";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 jest.spyOn(pagemod.prototype, "injectFiles").mockImplementation(jest.fn());
 jest.spyOn(pagemod.prototype, "attachEvents").mockImplementation(jest.fn());
 
 describe("PagemodManager", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
   describe("PagemodManager::exec", () => {
-    it("Should find the recover page mod and inject file", async() => {
+    it("Should find the recover page mod and inject file", async () => {
       expect.assertions(2);
       // data mocked
       const details = {
         tabId: 1,
         frameId: 0,
-        url: "https://passbolt.dev/setup/recover/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47"
+        url: "https://passbolt.dev/setup/recover/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47",
       };
       // process
       await PagemodManager.exec(details);
@@ -49,13 +49,13 @@ describe("PagemodManager", () => {
       expect(RecoverBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
-    it("Should find the setup page mod and inject file", async() => {
+    it("Should find the setup page mod and inject file", async () => {
       expect.assertions(2);
       // data mocked
       const details = {
         tabId: 1,
         frameId: 0,
-        url: "https://passbolt.dev/setup/start/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47"
+        url: "https://passbolt.dev/setup/start/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47",
       };
       // process
       await PagemodManager.exec(details);
@@ -64,13 +64,13 @@ describe("PagemodManager", () => {
       expect(SetupBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
-    it("Should find the auth page mod and inject file", async() => {
+    it("Should find the auth page mod and inject file", async () => {
       expect.assertions(2);
       // data mocked
       const details = {
         tabId: 1,
         frameId: 0,
-        url: "https://passbolt.dev/auth/login"
+        url: "https://passbolt.dev/auth/login",
       };
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
@@ -82,17 +82,19 @@ describe("PagemodManager", () => {
       expect(AuthBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
-    it("Should find the app page mod and inject file", async() => {
+    it("Should find the app page mod and inject file", async () => {
       expect.assertions(2);
       // data mocked
       const details = {
         tabId: 1,
         frameId: 0,
-        url: "https://passbolt.dev/app"
+        url: "https://passbolt.dev/app",
       };
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
-      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(async() => userLoggedInAuthStatus());
+      jest
+        .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
+        .mockImplementation(async () => userLoggedInAuthStatus());
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       // process
       await PagemodManager.exec(details);
@@ -101,13 +103,13 @@ describe("PagemodManager", () => {
       expect(AppBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
-    it("Should find the web integration page mod and inject file", async() => {
+    it("Should find the web integration page mod and inject file", async () => {
       expect.assertions(2);
       // data mocked
       const details = {
         tabId: 1,
         frameId: 0,
-        url: "https://test.dev/auth/login"
+        url: "https://test.dev/auth/login",
       };
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
@@ -119,13 +121,13 @@ describe("PagemodManager", () => {
       expect(WebIntegrationPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
-    it("Should find the public website sign in page mod and inject file", async() => {
+    it("Should find the public website sign in page mod and inject file", async () => {
       expect.assertions(2);
       // data mocked
       const details = {
         tabId: 1,
         frameId: 0,
-        url: "https://www.passbolt.com"
+        url: "https://www.passbolt.com",
       };
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
@@ -137,13 +139,13 @@ describe("PagemodManager", () => {
       expect(PublicWebsiteSignInPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
-    it("Should not find any pagemod", async() => {
+    it("Should not find any pagemod", async () => {
       expect.assertions(1);
       // data mocked
       const details = {
         tabId: 1,
         frameId: 0,
-        url: "about:settings"
+        url: "about:settings",
       };
       // process
       await PagemodManager.exec(details);
@@ -153,11 +155,11 @@ describe("PagemodManager", () => {
   });
 
   describe("PagemodManager::attachEventToPort", () => {
-    it("Should attach event to the port for a specific pagemod", async() => {
+    it("Should attach event to the port for a specific pagemod", async () => {
       expect.assertions(2);
       // data mocked
       const port = {
-        name: "test"
+        name: "test",
       };
       // process
       await PagemodManager.attachEventToPort(port, "RecoverBootstrap");
@@ -166,11 +168,11 @@ describe("PagemodManager", () => {
       expect(pagemod.prototype.attachEvents).toHaveBeenCalledTimes(1);
     });
 
-    it("Should not attach event to the port if no pagemod found", async() => {
+    it("Should not attach event to the port if no pagemod found", async () => {
       expect.assertions(1);
       // data mocked
       const port = {
-        name: "test"
+        name: "test",
       };
       // process
       await PagemodManager.attachEventToPort(port, "TEST");
@@ -180,7 +182,7 @@ describe("PagemodManager", () => {
   });
 
   describe("PagemodManager::hasPagemodMatchUrlToReload", () => {
-    it("Should refresh tab if pagemod must refresh tab url", async() => {
+    it("Should refresh tab if pagemod must refresh tab url", async () => {
       expect.assertions(7);
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
@@ -188,10 +190,22 @@ describe("PagemodManager", () => {
       // expectations
       expect(await PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev")).toBeTruthy();
       expect(await PagemodManager.hasPagemodMatchUrlToReload("https://www.passbolt.com")).toBeFalsy();
-      expect(await PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/setup/recover/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47")).toBeTruthy();
+      expect(
+        await PagemodManager.hasPagemodMatchUrlToReload(
+          "https://passbolt.dev/setup/recover/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47",
+        ),
+      ).toBeTruthy();
       expect(await PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/auth/login")).toBeTruthy();
-      expect(await PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/setup/start/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47")).toBeTruthy();
-      expect(await PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/account-recovery/continue/d57c10f5-639d-5160-9c81-8a0c6c4ec856/cb66b7ca-bb85-4088-b0da-c50f6f0c2a13")).toBeTruthy();
+      expect(
+        await PagemodManager.hasPagemodMatchUrlToReload(
+          "https://passbolt.dev/setup/start/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47",
+        ),
+      ).toBeTruthy();
+      expect(
+        await PagemodManager.hasPagemodMatchUrlToReload(
+          "https://passbolt.dev/account-recovery/continue/d57c10f5-639d-5160-9c81-8a0c6c4ec856/cb66b7ca-bb85-4088-b0da-c50f6f0c2a13",
+        ),
+      ).toBeTruthy();
       expect(await PagemodManager.hasPagemodMatchUrlToReload("https://localhost")).toBeFalsy();
     });
   });

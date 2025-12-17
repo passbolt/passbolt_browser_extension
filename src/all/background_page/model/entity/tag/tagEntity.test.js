@@ -14,7 +14,7 @@
 import TagEntity from "./tagEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultTagDto, minimalTagDto} from "./tagEntity.test.data";
+import { defaultTagDto, minimalTagDto } from "./tagEntity.test.data";
 
 describe("TagEntity", () => {
   describe("TagEntity::getSchema", () => {
@@ -46,7 +46,7 @@ describe("TagEntity", () => {
       expect.assertions(4);
       const dto = minimalTagDto();
       const entity = new TagEntity(dto);
-      const expectedToDto = {...dto, is_shared: false}; // Is shared is marshalled.
+      const expectedToDto = { ...dto, is_shared: false }; // Is shared is marshalled.
       expect(entity.toDto()).toEqual(expectedToDto);
       expect(entity.id).toBeNull();
       expect(entity.slug).toEqual(dto.slug);
@@ -69,7 +69,7 @@ describe("TagEntity", () => {
       const entityNotShared = new TagEntity(dtoNotShared);
       expect(entityNotShared.slug).toEqual(dtoNotShared.slug);
       expect(entityNotShared.isShared).toBeFalsy();
-      const dtoShared = minimalTagDto({slug: "#shared-tag"});
+      const dtoShared = minimalTagDto({ slug: "#shared-tag" });
       const entityShared = new TagEntity(dtoShared);
       expect(entityShared.slug).toEqual(dtoShared.slug);
       expect(entityShared.isShared).toBeTruthy();
@@ -78,11 +78,10 @@ describe("TagEntity", () => {
     // The entity should throw an exception, the validation instantiated the error but does not throw it.
     it.skip("should throw an exception if a personal tag starts with a hashtag", () => {
       expect.assertions(1);
-      const dto = defaultTagDto({slug: "#shared-tag", is_shared: false});
+      const dto = defaultTagDto({ slug: "#shared-tag", is_shared: false });
       expect(() => new TagEntity(dto)).toThrowEntityValidationError("is_shared", "hashtag", dto);
     });
 
     it.todo("should throw an exception if a shared tag does not start with a hashtag");
   });
 });
-

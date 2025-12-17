@@ -12,13 +12,13 @@
  * @since         4.1.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import GetOrFindLoggedInUserController from "./getOrFindLoggedInUserController";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import UserEntity from "../../model/entity/user/userEntity";
 import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
 
@@ -29,7 +29,7 @@ beforeEach(() => {
 
 describe("GetOrFindLoggedInUserController", () => {
   describe("GetOrFindLoggedInUserController::exec", () => {
-    it("Should find the information and set the cache if cache is empty.", async() => {
+    it("Should find the information and set the cache if cache is empty.", async () => {
       expect.assertions(5);
       const account = new AccountEntity(defaultAccountDto());
 
@@ -48,7 +48,7 @@ describe("GetOrFindLoggedInUserController", () => {
       expect(fetch).toHaveBeenCalled();
     });
 
-    it("Should return cached data if any.", async() => {
+    it("Should return cached data if any.", async () => {
       expect.assertions(3);
       const account = new AccountEntity(defaultAccountDto());
 
@@ -63,7 +63,7 @@ describe("GetOrFindLoggedInUserController", () => {
       expect(fetch).not.toHaveBeenCalled();
     });
 
-    it("Should refresh the cache if enforced.", async() => {
+    it("Should refresh the cache if enforced.", async () => {
       expect.assertions(7);
       const account = new AccountEntity(defaultAccountDto());
 
@@ -71,7 +71,7 @@ describe("GetOrFindLoggedInUserController", () => {
       await UserMeSessionStorageService.set(account, new UserEntity(defaultUserDto()));
       expect(await UserMeSessionStorageService.get(account)).not.toBeNull();
       // Spy on the cache set function
-      jest.spyOn(UserMeSessionStorageService, 'set');
+      jest.spyOn(UserMeSessionStorageService, "set");
       // Mock the API response
       const mockApiResult = defaultUserDto();
       fetch.doMock(() => mockApiResponse(mockApiResult));

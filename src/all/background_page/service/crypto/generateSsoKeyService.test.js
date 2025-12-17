@@ -16,17 +16,17 @@ import GenerateSsoKeyService from "./generateSsoKeyService";
 
 describe("GenerateSsoKeyService service", () => {
   each([
-    {isExtractable: false, scenario: "non extractable"},
-    {isExtractable: true, scenario: "extractable"}
-  ]).describe("Should generate a key according to the SSO specification", props => {
-    it(`for a key of type: ${props.scenario}`, async() => {
+    { isExtractable: false, scenario: "non extractable" },
+    { isExtractable: true, scenario: "extractable" },
+  ]).describe("Should generate a key according to the SSO specification", (props) => {
+    it(`for a key of type: ${props.scenario}`, async () => {
       expect.assertions(1);
       const exepctedAlgo = {
-        name: 'AES-GCM',
-        length: 256
+        name: "AES-GCM",
+        length: 256,
       };
 
-      const expectedCapabilities = ['encrypt', 'decrypt'];
+      const expectedCapabilities = ["encrypt", "decrypt"];
       const expectedFakeKey = await crypto.subtle.generateKey(exepctedAlgo, props.isExtractable, expectedCapabilities);
 
       const key = await GenerateSsoKeyService.generateSsoKey(props.isExtractable);

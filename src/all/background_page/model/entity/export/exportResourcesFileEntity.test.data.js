@@ -12,8 +12,8 @@
  * @since         4.8.0
  */
 
-import {defaultExternalResourceDto} from "../resource/external/externalResourceEntity.test.data";
-import {defaultExternalFolderDto} from "../folder/external/externalFolderEntity.test.data";
+import { defaultExternalResourceDto } from "../resource/external/externalResourceEntity.test.data";
+import { defaultExternalFolderDto } from "../folder/external/externalFolderEntity.test.data";
 
 export const defaultKdbxExportResourceFileDto = (data = {}) => ({
   format: "kdbx",
@@ -48,18 +48,20 @@ export const defaultEmptyOptions = (data = {}) => ({
   ...data,
 });
 
-export const defaultPasswordCredentialOptions = (data = {}) => defaultEmptyOptions({
-  credentials: {
-    password: "1234",
-    keyfile: null,
-  },
-  ...data
-});
+export const defaultPasswordCredentialOptions = (data = {}) =>
+  defaultEmptyOptions({
+    credentials: {
+      password: "1234",
+      keyfile: null,
+    },
+    ...data,
+  });
 
-export const defaultKeyFileCredentialOptions = (data = {}) => defaultEmptyOptions({
-  credentials: {
-    password: null,
-    keyfile: "test==",
-  },
-  ...data
-});
+export const defaultKeyFileCredentialOptions = (data = {}) =>
+  defaultEmptyOptions({
+    credentials: {
+      password: null,
+      keyfile: "test==",
+    },
+    ...data,
+  });

@@ -12,8 +12,8 @@
  * @since         5.6.0
  */
 
-import {v4 as uuidv4} from "uuid";
-import {readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
+import { v4 as uuidv4 } from "uuid";
+import { readSecret } from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 
 export const groupNameUpdateOperationDto = (data = {}) => ({
   id: uuidv4(),
@@ -27,31 +27,40 @@ const defaultGroupUser = (data = {}) => ({
   ...data,
 });
 
-export const groupMemberRoleUpdateOperationDto = (data = {}) => groupNameUpdateOperationDto({
-  ...data,
-  groups_users: [defaultGroupUser({
-    id: uuidv4(),
-  })]
-});
+export const groupMemberRoleUpdateOperationDto = (data = {}) =>
+  groupNameUpdateOperationDto({
+    ...data,
+    groups_users: [
+      defaultGroupUser({
+        id: uuidv4(),
+      }),
+    ],
+  });
 
-export const groupMemberRemovalOperationDto = (data = {}) => groupNameUpdateOperationDto({
-  ...data,
-  groups_users: [defaultGroupUser({
-    id: uuidv4(),
-    delete: true,
-  })]
-});
+export const groupMemberRemovalOperationDto = (data = {}) =>
+  groupNameUpdateOperationDto({
+    ...data,
+    groups_users: [
+      defaultGroupUser({
+        id: uuidv4(),
+        delete: true,
+      }),
+    ],
+  });
 
-export const groupMemberAdditionWithoutSecretOperationDto = (data = {}) => groupNameUpdateOperationDto({
-  ...data,
-  groups_users: [defaultGroupUser({
-    delete: true,
-  })]
-});
+export const groupMemberAdditionWithoutSecretOperationDto = (data = {}) =>
+  groupNameUpdateOperationDto({
+    ...data,
+    groups_users: [
+      defaultGroupUser({
+        delete: true,
+      }),
+    ],
+  });
 
 export const groupMemberAdditionOperationDto = (data = {}) => {
   const defaultData = groupMemberAdditionWithoutSecretOperationDto(data);
-  const secrets = data.secrets || [readSecret({user_id: defaultData.groups_users[0].user_id, ...data})];
+  const secrets = data.secrets || [readSecret({ user_id: defaultData.groups_users[0].user_id, ...data })];
   return {
     ...defaultData,
     secrets,
@@ -74,7 +83,7 @@ export const defaultGroupUpdateDto = () => {
   const memberToUpgradetoManager = {
     id: uuidv4(),
     user_id: uuidv4(),
-    is_admin: true
+    is_admin: true,
   };
   const managerToDowngradetoMember = {
     id: uuidv4(),
@@ -101,17 +110,7 @@ export const defaultGroupUpdateDto = () => {
   return {
     id: uuidv4(),
     name: "Group to update",
-    groups_users: [
-      memberToRemove,
-      managerToDowngradetoMember,
-      managerToAdd,
-      memberToAdd,
-      memberToUpgradetoManager
-    ],
-    secrets: [
-      secret1ManagerToAdd,
-      secret1MemberToAdd,
-      secret2MemberToAdd,
-    ]
+    groups_users: [memberToRemove, managerToDowngradetoMember, managerToAdd, memberToAdd, memberToUpgradetoManager],
+    secrets: [secret1ManagerToAdd, secret1MemberToAdd, secret2MemberToAdd],
   };
 };

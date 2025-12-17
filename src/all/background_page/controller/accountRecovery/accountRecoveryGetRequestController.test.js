@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {pendingAccountRecoveryRequestDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { pendingAccountRecoveryRequestDto } from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import AccountRecoveryGetRequestController from "./accountRecoveryGetRequestController";
 import AccountRecoveryRequestEntity from "../../model/entity/accountRecovery/accountRecoveryRequestEntity";
 
@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe("AccountRecoveryGetRequestController", () => {
   describe("AccountRecoveryGetRequestController::exec", () => {
-    it("Should retrieve an account recovery request.", async() => {
+    it("Should retrieve an account recovery request.", async () => {
       // Mock API fetch account recovery organization policy response.
       const mockApiResult = pendingAccountRecoveryRequestDto();
       fetch.doMock(() => mockApiResponse(mockApiResult));
@@ -38,7 +38,7 @@ describe("AccountRecoveryGetRequestController", () => {
       await expect(accountRecoveryRequestDto).toEqual(mockApiResult);
     });
 
-    it("Should throw an error if the account recovery request id is not a valid.", async() => {
+    it("Should throw an error if the account recovery request id is not a valid.", async () => {
       // Mock API fetch account recovery organization policy response.
       const mockApiResult = pendingAccountRecoveryRequestDto();
       fetch.doMock(() => mockApiResponse(mockApiResult));
@@ -49,7 +49,9 @@ describe("AccountRecoveryGetRequestController", () => {
       const promiseMissingParameter = controller.exec();
       await expect(promiseMissingParameter).rejects.toThrowError("An account recovery request id is required");
       const promiseInvalidTypeParameter = controller.exec(2);
-      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The account recovery request should be a string.");
+      await expect(promiseInvalidTypeParameter).rejects.toThrowError(
+        "The account recovery request should be a string.",
+      );
       const promiseNotValidUuid = controller.exec("not-a-valid-uuid");
       await expect(promiseNotValidUuid).rejects.toThrowError("The account recovery request should be a valid uuid.");
     });

@@ -14,9 +14,9 @@
 
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {defaultVerifyProviderData} from "./mfaVerifyProviderEntity.test.data";
+import { defaultVerifyProviderData } from "./mfaVerifyProviderEntity.test.data";
 import MfaSetupTotpEntity from "./mfaSetupTotpEntity";
-import {defaultSetupTotpData} from "./mfaSetupTotpEntity.test.data";
+import { defaultSetupTotpData } from "./mfaSetupTotpEntity.test.data";
 
 describe("MfaSetupTotpEntity", () => {
   it("schema must validate", () => {
@@ -34,18 +34,20 @@ describe("MfaSetupTotpEntity", () => {
       new MfaSetupTotpEntity({});
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('totp', 'required')).toBe(true);
-      expect(error.hasError('otpProvisioningUri', 'required')).toBe(true);
+      expect(error.hasError("totp", "required")).toBe(true);
+      expect(error.hasError("otpProvisioningUri", "required")).toBe(true);
     }
   });
   it("constructor returns validation error if totp code is not a valid format", () => {
     try {
-      new MfaSetupTotpEntity(defaultVerifyProviderData({
-        totp: "221"
-      }));
+      new MfaSetupTotpEntity(
+        defaultVerifyProviderData({
+          totp: "221",
+        }),
+      );
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('totp', 'pattern')).toBe(true);
+      expect(error.hasError("totp", "pattern")).toBe(true);
     }
   });
 });

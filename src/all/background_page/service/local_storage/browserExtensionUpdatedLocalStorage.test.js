@@ -21,7 +21,7 @@ beforeEach(() => {
 
 describe("BrowserExtensionUpdatedLocalStorage", () => {
   describe("::get", () => {
-    it("returns undefined if nothing is stored in the local storage.", async() => {
+    it("returns undefined if nothing is stored in the local storage.", async () => {
       expect.assertions(1);
 
       const storage = new BrowserExtensionUpdatedLocalStorage();
@@ -30,12 +30,12 @@ describe("BrowserExtensionUpdatedLocalStorage", () => {
       expect(result).toBeUndefined();
     });
 
-    it("returns the content stored in the local storage.", async() => {
+    it("returns the content stored in the local storage.", async () => {
       expect.assertions(1);
 
       const now = Date.now();
       const storage = new BrowserExtensionUpdatedLocalStorage();
-      await browser.storage.local.set({[storage.storageKey]: now});
+      await browser.storage.local.set({ [storage.storageKey]: now });
 
       const result = await storage.get();
       expect(result).toEqual(now);
@@ -43,7 +43,7 @@ describe("BrowserExtensionUpdatedLocalStorage", () => {
   });
 
   describe("::set", () => {
-    it("stores content in the local storage.", async() => {
+    it("stores content in the local storage.", async () => {
       expect.assertions(2);
 
       const now = Date.now();
@@ -57,7 +57,7 @@ describe("BrowserExtensionUpdatedLocalStorage", () => {
       expect(resultGet).toEqual(now);
     });
 
-    it("throws if no data is given to store.", async() => {
+    it("throws if no data is given to store.", async () => {
       expect.assertions(2);
 
       const storage = new BrowserExtensionUpdatedLocalStorage();
@@ -67,7 +67,7 @@ describe("BrowserExtensionUpdatedLocalStorage", () => {
       expect(browser.storage.local.store[storage.storageKey]).toBeUndefined();
     });
 
-    it("throws if invalid data is given to store.", async() => {
+    it("throws if invalid data is given to store.", async () => {
       expect.assertions(2);
 
       const storage = new BrowserExtensionUpdatedLocalStorage();
@@ -77,14 +77,14 @@ describe("BrowserExtensionUpdatedLocalStorage", () => {
       expect(browser.storage.local.store[storage.storageKey]).toBeUndefined();
     });
 
-    it("waits any on-going call to set to perform another set.", async() => {
+    it("waits any on-going call to set to perform another set.", async () => {
       expect.assertions(3);
       const promisesResolvers = [];
 
       const storage = new BrowserExtensionUpdatedLocalStorage();
       jest.spyOn(browser.storage.local, "set").mockImplementation(() => {
         let resolve;
-        const promise = new Promise(_resolve => resolve = _resolve);
+        const promise = new Promise((_resolve) => (resolve = _resolve));
         promisesResolvers.push(resolve);
         return promise;
       });
@@ -95,19 +95,19 @@ describe("BrowserExtensionUpdatedLocalStorage", () => {
       const resultPromise1 = storage.set(date1);
       const resultPromise2 = storage.set(date2);
 
-      expect(browser.storage.local.set).toHaveBeenCalledWith({[storage.storageKey]: date1});
-      expect(browser.storage.local.set).not.toHaveBeenCalledWith({[storage.storageKey]: date2});
+      expect(browser.storage.local.set).toHaveBeenCalledWith({ [storage.storageKey]: date1 });
+      expect(browser.storage.local.set).not.toHaveBeenCalledWith({ [storage.storageKey]: date2 });
       promisesResolvers[0]();
       await resultPromise1;
 
-      expect(browser.storage.local.set).toHaveBeenCalledWith({[storage.storageKey]: date2});
+      expect(browser.storage.local.set).toHaveBeenCalledWith({ [storage.storageKey]: date2 });
       promisesResolvers[1]();
       await resultPromise2;
     });
   });
 
   describe("::flush", () => {
-    it("flushes works with not initialized local storage.", async() => {
+    it("flushes works with not initialized local storage.", async () => {
       expect.assertions(1);
 
       const storage = new BrowserExtensionUpdatedLocalStorage();
@@ -117,7 +117,7 @@ describe("BrowserExtensionUpdatedLocalStorage", () => {
       expect(browser.storage.local.store[storage.storageKey]).toBeUndefined();
     });
 
-    it("flushes content of the local storage.", async() => {
+    it("flushes content of the local storage.", async () => {
       expect.assertions(1);
 
       const now = Date.now();

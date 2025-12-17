@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import GetGpgKeyInfoService from "./getGpgKeyInfoService";
 import ExternalGpgKeyCollection from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyCollection";
@@ -31,13 +31,12 @@ const {
   ecc_brainpoolp256r1KeyDto,
   ecc_brainpoolp384r1KeyDto,
   ecc_brainpoolp512r1KeyDto,
-  invalidKeyDto
-} = require('./getGpgKeyInfoService.test.data');
-const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
-
+  invalidKeyDto,
+} = require("./getGpgKeyInfoService.test.data");
+const { pgpKeys } = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 
 describe("GpgKeyInfo service", () => {
-  it(`should provide the right information given a key from a compatible type`, async() => {
+  it(`should provide the right information given a key from a compatible type`, async () => {
     const dto = validKeyDto();
     const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
 
@@ -50,16 +49,17 @@ describe("GpgKeyInfo service", () => {
     expect(receivedData).toEqual(dto);
   });
 
-  it("should throw an exception if the parameter type is incorrect", async() => {
+  it("should throw an exception if the parameter type is incorrect", async () => {
     const dto = validKeyDto();
     const wronglyTypedData = [
-      42, true,
-      {armored_key: dto.armored_key},
-      {armoredKey: dto.armored_key},
-      {key: dto.armored_key},
-      new ExternalGpgKeyCollection([{armored_key: dto.armored_key}]),
-      new ExternalGpgKeyEntity({armored_key: dto.armored_key}),
-      pgpKeys.ada.public
+      42,
+      true,
+      { armored_key: dto.armored_key },
+      { armoredKey: dto.armored_key },
+      { key: dto.armored_key },
+      new ExternalGpgKeyCollection([{ armored_key: dto.armored_key }]),
+      new ExternalGpgKeyEntity({ armored_key: dto.armored_key }),
+      pgpKeys.ada.public,
     ];
 
     expect.assertions(wronglyTypedData.length);
@@ -73,7 +73,7 @@ describe("GpgKeyInfo service", () => {
     }
   });
 
-  it("should throw an exception if the key is not properly formatted", async() => {
+  it("should throw an exception if the key is not properly formatted", async () => {
     expect.assertions(1);
     try {
       await GetGpgKeyInfoService.getKeyInfo(":D");
@@ -82,7 +82,7 @@ describe("GpgKeyInfo service", () => {
     }
   });
 
-  it("should give the information of a key that will expire", async() => {
+  it("should give the information of a key that will expire", async () => {
     expect.assertions(1);
     const dto = validKeyWithExpirationDateDto();
     const armoredKey = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
@@ -93,7 +93,7 @@ describe("GpgKeyInfo service", () => {
     expect(keyInfoDto).toEqual(dto);
   });
 
-  it("should give the information of a key that is expired", async() => {
+  it("should give the information of a key that is expired", async () => {
     expect.assertions(1);
     const dto = expiredKeyDto();
     const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
@@ -104,7 +104,7 @@ describe("GpgKeyInfo service", () => {
     expect(keyInfoDto).toEqual(dto);
   });
 
-  it("should give the information of a key that is revoked", async() => {
+  it("should give the information of a key that is revoked", async () => {
     expect.assertions(1);
     const dto = revokedKeyDto();
     const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
@@ -115,7 +115,7 @@ describe("GpgKeyInfo service", () => {
     expect(keyInfoDto).toEqual(dto);
   });
 
-  it("should give the information of a key that is non RSA", async() => {
+  it("should give the information of a key that is non RSA", async () => {
     const scenarios = [
       eddsaCurveKeyDto(),
       ecc_p256KeyDto(),
@@ -144,7 +144,7 @@ describe("GpgKeyInfo service", () => {
     }
   });
 
-  it("should accept keys with a null expiry date", async() => {
+  it("should accept keys with a null expiry date", async () => {
     const dto = invalidKeyDto();
     const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);

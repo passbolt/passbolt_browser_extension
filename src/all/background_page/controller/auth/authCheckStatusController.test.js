@@ -22,7 +22,7 @@ beforeEach(() => {
 });
 
 describe("AuthCheckStatusController", () => {
-  it("should return the auth status matching the unauthanticated state", async() => {
+  it("should return the auth status matching the unauthanticated state", async () => {
     expect.assertions(3);
     jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
     jest.spyOn(AuthStatusLocalStorage, "flush");
@@ -39,7 +39,7 @@ describe("AuthCheckStatusController", () => {
     });
   });
 
-  it("expects the user to be fully authenticated", async() => {
+  it("expects the user to be fully authenticated", async () => {
     expect.assertions(3);
     jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
     jest.spyOn(AuthStatusLocalStorage, "flush");
@@ -56,11 +56,13 @@ describe("AuthCheckStatusController", () => {
     });
   });
 
-  it("expects the user to require MFA authentication", async() => {
+  it("expects the user to require MFA authentication", async () => {
     expect.assertions(3);
     jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
     jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => { throw new MfaAuthenticationRequiredError(); });
+    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => {
+      throw new MfaAuthenticationRequiredError();
+    });
 
     const controller = new AuthCheckStatusController();
     const authStatus = await controller.exec(true);
@@ -73,7 +75,7 @@ describe("AuthCheckStatusController", () => {
     });
   });
 
-  it("should return the auth status from the local storage", async() => {
+  it("should return the auth status from the local storage", async () => {
     expect.assertions(4);
     const expectedAuthStatus = {
       isAuthenticated: false,

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
+const { pgpKeys } = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 
 exports.dummyData = {
   viableKey: pgpKeys.test_no_expiry_with_secret.public,
@@ -21,5 +21,5 @@ exports.dummyData = {
   existingKey: pgpKeys.ada.public,
   serverKey: pgpKeys.user76.public,
   invalidKey: pgpKeys.invalidKeyWithoutChecksum.private,
-  notAKey: ":D"
+  notAKey: ":D",
 };

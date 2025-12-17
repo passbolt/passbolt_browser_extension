@@ -16,7 +16,7 @@ import PermissionEntity from "./permissionEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {
   defaultPermissionDto,
-  minimumPermissionDto
+  minimumPermissionDto,
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import UserEntity from "../user/userEntity";
 import GroupEntity from "../group/groupEntity";
@@ -35,7 +35,10 @@ describe("PermissionEntity", () => {
 
     it("validates aco property", () => {
       assertEntityProperty.string(PermissionEntity, "aco");
-      assertEntityProperty.enumeration(PermissionEntity, "aco", [PermissionEntity.ACO_FOLDER, PermissionEntity.ACO_RESOURCE]);
+      assertEntityProperty.enumeration(PermissionEntity, "aco", [
+        PermissionEntity.ACO_FOLDER,
+        PermissionEntity.ACO_RESOURCE,
+      ]);
       assertEntityProperty.required(PermissionEntity, "aco");
     });
 
@@ -47,7 +50,12 @@ describe("PermissionEntity", () => {
 
     it("validates aro property", () => {
       assertEntityProperty.string(PermissionEntity, "aro");
-      assertEntityProperty.enumeration(PermissionEntity, "aro", [PermissionEntity.ARO_GROUP, PermissionEntity.ARO_USER], ['not-valid-aro', '']);
+      assertEntityProperty.enumeration(
+        PermissionEntity,
+        "aro",
+        [PermissionEntity.ARO_GROUP, PermissionEntity.ARO_USER],
+        ["not-valid-aro", ""],
+      );
       assertEntityProperty.required(PermissionEntity, "aro");
     });
 
@@ -96,7 +104,7 @@ describe("PermissionEntity", () => {
 
     it("constructor works if valid DTO is provided with optional and non supported fields", () => {
       expect.assertions(11);
-      const dto = defaultPermissionDto({}, {withGroup: true, withUser: true});
+      const dto = defaultPermissionDto({}, { withGroup: true, withUser: true });
       const entity = new PermissionEntity(dto);
       expect(entity.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
       expect(entity.id).toEqual(dto.id);
@@ -118,7 +126,7 @@ describe("PermissionEntity", () => {
       const dto1 = defaultPermissionDto();
       const entity1 = new PermissionEntity(dto1);
       const entity2 = new PermissionEntity(dto1);
-      const entity3 = new PermissionEntity(defaultPermissionDto({id: crypto.randomUUID()}));
+      const entity3 = new PermissionEntity(defaultPermissionDto({ id: crypto.randomUUID() }));
       expect(PermissionEntity.isIdMatching(entity1, entity2)).toBeTruthy();
       expect(PermissionEntity.isIdMatching(entity1, entity3)).toBeFalsy();
     });
@@ -130,7 +138,7 @@ describe("PermissionEntity", () => {
       const dto1 = defaultPermissionDto();
       const entity1 = new PermissionEntity(dto1);
       const entity2 = new PermissionEntity(dto1);
-      const entity3 = new PermissionEntity(defaultPermissionDto({aro: PermissionEntity.ARO_GROUP}));
+      const entity3 = new PermissionEntity(defaultPermissionDto({ aro: PermissionEntity.ARO_GROUP }));
       expect(PermissionEntity.isAroMatching(entity1, entity2)).toBeTruthy();
       expect(PermissionEntity.isAroMatching(entity1, entity3)).toBeFalsy();
     });
@@ -142,7 +150,7 @@ describe("PermissionEntity", () => {
       const dto1 = defaultPermissionDto();
       const entity1 = new PermissionEntity(dto1);
       const entity2 = new PermissionEntity(dto1);
-      const entity3 = new PermissionEntity(defaultPermissionDto({aco: PermissionEntity.ACO_FOLDER}));
+      const entity3 = new PermissionEntity(defaultPermissionDto({ aco: PermissionEntity.ACO_FOLDER }));
       expect(PermissionEntity.isAcoMatching(entity1, entity2)).toBeTruthy();
       expect(PermissionEntity.isAcoMatching(entity1, entity3)).toBeFalsy();
     });
@@ -154,7 +162,9 @@ describe("PermissionEntity", () => {
       const dto1 = defaultPermissionDto();
       const entity1 = new PermissionEntity(dto1);
       const entity2 = new PermissionEntity(dto1);
-      const entity3 = new PermissionEntity(defaultPermissionDto({aro: PermissionEntity.ARO_GROUP, aco: PermissionEntity.ACO_FOLDER}));
+      const entity3 = new PermissionEntity(
+        defaultPermissionDto({ aro: PermissionEntity.ARO_GROUP, aco: PermissionEntity.ACO_FOLDER }),
+      );
       expect(PermissionEntity.isAcoAndAroMatching(entity1, entity2)).toBeTruthy();
       expect(PermissionEntity.isAcoAndAroMatching(entity1, entity3)).toBeFalsy();
     });
@@ -166,7 +176,7 @@ describe("PermissionEntity", () => {
       const dto1 = defaultPermissionDto();
       const entity1 = new PermissionEntity(dto1);
       const entity2 = new PermissionEntity(dto1);
-      const entity3 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_READ}));
+      const entity3 = new PermissionEntity(defaultPermissionDto({ type: PermissionEntity.PERMISSION_READ }));
       expect(PermissionEntity.isTypeMatching(entity1, entity2)).toBeTruthy();
       expect(PermissionEntity.isTypeMatching(entity1, entity3)).toBeFalsy();
     });
@@ -178,7 +188,13 @@ describe("PermissionEntity", () => {
       const dto1 = defaultPermissionDto();
       const entity1 = new PermissionEntity(dto1);
       const entity2 = new PermissionEntity(dto1);
-      const entity3 = new PermissionEntity(defaultPermissionDto({aro: PermissionEntity.ARO_GROUP, aco: PermissionEntity.ACO_FOLDER, type: PermissionEntity.PERMISSION_READ}));
+      const entity3 = new PermissionEntity(
+        defaultPermissionDto({
+          aro: PermissionEntity.ARO_GROUP,
+          aco: PermissionEntity.ACO_FOLDER,
+          type: PermissionEntity.PERMISSION_READ,
+        }),
+      );
       expect(PermissionEntity.isMatchingAroAcoType(entity1, entity2)).toBeTruthy();
       expect(PermissionEntity.isMatchingAroAcoType(entity1, entity3)).toBeFalsy();
     });
@@ -187,9 +203,9 @@ describe("PermissionEntity", () => {
   describe("PermissionEntity::getHighestPermissionType", () => {
     it("should get the highest permission type", () => {
       expect.assertions(4);
-      const entity1 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_OWNER}));
-      const entity2 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_UPDATE}));
-      const entity3 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_READ}));
+      const entity1 = new PermissionEntity(defaultPermissionDto({ type: PermissionEntity.PERMISSION_OWNER }));
+      const entity2 = new PermissionEntity(defaultPermissionDto({ type: PermissionEntity.PERMISSION_UPDATE }));
+      const entity3 = new PermissionEntity(defaultPermissionDto({ type: PermissionEntity.PERMISSION_READ }));
       expect(PermissionEntity.getHighestPermissionType(entity1, entity2)).toBe(PermissionEntity.PERMISSION_OWNER);
       expect(PermissionEntity.getHighestPermissionType(entity2, entity3)).toBe(PermissionEntity.PERMISSION_UPDATE);
       expect(PermissionEntity.getHighestPermissionType(entity3, entity1)).toBe(PermissionEntity.PERMISSION_OWNER);
@@ -200,9 +216,9 @@ describe("PermissionEntity", () => {
   describe("PermissionEntity::getHighestPermission", () => {
     it("should get the highest permission", () => {
       expect.assertions(4);
-      const entity1 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_OWNER}));
-      const entity2 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_UPDATE}));
-      const entity3 = new PermissionEntity(defaultPermissionDto({type: PermissionEntity.PERMISSION_READ}));
+      const entity1 = new PermissionEntity(defaultPermissionDto({ type: PermissionEntity.PERMISSION_OWNER }));
+      const entity2 = new PermissionEntity(defaultPermissionDto({ type: PermissionEntity.PERMISSION_UPDATE }));
+      const entity3 = new PermissionEntity(defaultPermissionDto({ type: PermissionEntity.PERMISSION_READ }));
       expect(PermissionEntity.getHighestPermission(entity1, entity2)).toBe(entity1);
       expect(PermissionEntity.getHighestPermission(entity2, entity3)).toBe(entity2);
       expect(PermissionEntity.getHighestPermission(entity3, entity1)).toBe(entity1);
@@ -236,11 +252,11 @@ describe("PermissionEntity", () => {
       const uuid0 = crypto.randomUUID();
       const p2 = p.copyForAnotherAco(PermissionEntity.ACO_FOLDER, uuid0);
       expect(p2.toDto()).toEqual({
-        'aro': PermissionEntity.ARO_USER,
-        'aro_foreign_key': p.aroForeignKey,
-        'aco': PermissionEntity.ACO_FOLDER,
-        'aco_foreign_key': uuid0,
-        'type': PermissionEntity.PERMISSION_OWNER,
+        aro: PermissionEntity.ARO_USER,
+        aro_foreign_key: p.aroForeignKey,
+        aco: PermissionEntity.ACO_FOLDER,
+        aco_foreign_key: uuid0,
+        type: PermissionEntity.PERMISSION_OWNER,
       });
     });
   });

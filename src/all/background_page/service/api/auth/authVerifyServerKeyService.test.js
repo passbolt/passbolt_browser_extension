@@ -11,25 +11,25 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.1.0
  */
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
 import AuthVerifyServerKeyService from "./authVerifyServerKeyService";
-import {mockApiResponse, mockApiResponseError} from "../../../../../../test/mocks/mockApiResponse";
+import { mockApiResponse, mockApiResponseError } from "../../../../../../test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
-import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../../model/entity/account/accountEntity.test.data";
 import GpgAuthToken from "../../../model/gpgAuthToken";
-import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import AccountEntity from "../../../model/entity/account/accountEntity";
 
-beforeEach(async() => {
+beforeEach(async () => {
   enableFetchMocks();
   jest.clearAllMocks();
 });
 
 describe("AuthVerifyServerKeyService", () => {
   describe("AuthVerifyServerKeyService::exec", () => {
-    it("Should call the API on verify endpoint with a POST request", async() => {
+    it("Should call the API on verify endpoint with a POST request", async () => {
       expect.assertions(2);
 
       const apiClientOptions = defaultApiClientOptions();
@@ -39,8 +39,8 @@ describe("AuthVerifyServerKeyService", () => {
       const encryptedToken = await EncryptMessageService.encrypt(originalToken.token, serverKey);
       const service = new AuthVerifyServerKeyService(apiClientOptions);
 
-      fetch.doMockOnceIf(/auth\/verify\.json\?api-version=v2/, async req => {
-        expect(req.headers.get('content-type') !== "application/json").toBeTruthy();
+      fetch.doMockOnceIf(/auth\/verify\.json\?api-version=v2/, async (req) => {
+        expect(req.headers.get("content-type") !== "application/json").toBeTruthy();
         expect(req.method).toStrictEqual("POST");
         return mockApiResponse({});
       });
@@ -48,7 +48,7 @@ describe("AuthVerifyServerKeyService", () => {
       await service.verify(account.userKeyFingerprint, encryptedToken);
     });
 
-    it("Should throw an exception if the POST verify endpoint send an error", async() => {
+    it("Should throw an exception if the POST verify endpoint send an error", async () => {
       expect.assertions(2);
 
       const apiClientOptions = defaultApiClientOptions();
@@ -58,7 +58,7 @@ describe("AuthVerifyServerKeyService", () => {
       const encryptedToken = await EncryptMessageService.encrypt(originalToken.token, serverKey);
       const service = new AuthVerifyServerKeyService(apiClientOptions);
 
-      fetch.doMockOnceIf(/auth\/verify\.json\?api-version=v2/, async req => {
+      fetch.doMockOnceIf(/auth\/verify\.json\?api-version=v2/, async (req) => {
         expect(req.method).toStrictEqual("POST");
         return mockApiResponseError(500, "Something went wrong");
       });
@@ -66,7 +66,7 @@ describe("AuthVerifyServerKeyService", () => {
       try {
         await service.verify(account.userKeyFingerprint, encryptedToken);
       } catch (e) {
-        const expectedError = new PassboltApiFetchError('Something went wrong');
+        const expectedError = new PassboltApiFetchError("Something went wrong");
         expect(e).toStrictEqual(expectedError);
       }
     });

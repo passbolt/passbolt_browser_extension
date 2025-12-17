@@ -16,7 +16,7 @@ import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PasswordPoliciesEntity from "./passwordPoliciesEntity";
-import {defaultPasswordPolicies} from "./passwordPoliciesEntity.test.data";
+import { defaultPasswordPolicies } from "./passwordPoliciesEntity.test.data";
 
 describe("PasswordPolicies entity", () => {
   it("schema must validate", () => {
@@ -51,26 +51,26 @@ describe("PasswordPolicies entity", () => {
   });
 
   each([
-    {dto: {id: "string but not uuid"}, errorType: "format"},
-    {dto: {id: -1}, errorType: "type"},
+    { dto: { id: "string but not uuid" }, errorType: "format" },
+    { dto: { id: -1 }, errorType: "type" },
 
-    {dto: {external_dictionary_check: 0}, errorType: "type"},
+    { dto: { external_dictionary_check: 0 }, errorType: "type" },
 
-    {dto: {default_generator: "wrong generator"}, errorType: "enum"},
-    {dto: {default_generator: -1}, errorType: "type"},
+    { dto: { default_generator: "wrong generator" }, errorType: "enum" },
+    { dto: { default_generator: -1 }, errorType: "type" },
 
-    {dto: {created: "string but not a date"}, errorType: "format"},
-    {dto: {created: -1}, errorType: "type"},
+    { dto: { created: "string but not a date" }, errorType: "format" },
+    { dto: { created: -1 }, errorType: "type" },
 
-    {dto: {created_by: "string but not uuid"}, errorType: "format"},
-    {dto: {created_by: -1}, errorType: "type"},
+    { dto: { created_by: "string but not uuid" }, errorType: "format" },
+    { dto: { created_by: -1 }, errorType: "type" },
 
-    {dto: {modified: "string but not a date"}, errorType: "format"},
-    {dto: {modified: -1}, errorType: "type"},
+    { dto: { modified: "string but not a date" }, errorType: "format" },
+    { dto: { modified: -1 }, errorType: "type" },
 
-    {dto: {modified_by: "string but not uuid"}, errorType: "format"},
-    {dto: {modified_by: -1}, errorType: "type"},
-  ]).describe("should throw an exception if DTO contains invalid values", scenario => {
+    { dto: { modified_by: "string but not uuid" }, errorType: "format" },
+    { dto: { modified_by: -1 }, errorType: "type" },
+  ]).describe("should throw an exception if DTO contains invalid values", (scenario) => {
     it(`scenario: ${JSON.stringify(scenario)}`, () => {
       expect.assertions(2);
       const fieldName = Object.keys(scenario.dto)[0];
@@ -86,9 +86,9 @@ describe("PasswordPolicies entity", () => {
   });
 
   each([
-    {dto: {password_generator_settings: {length: "nested object"}}, errorType: "type"},
-    {dto: {passphrase_generator_settings: {words: "nested object"}}, errorType: "type"},
-  ]).describe("should throw an exception if nested object in DTO contains invalid values", scenario => {
+    { dto: { password_generator_settings: { length: "nested object" } }, errorType: "type" },
+    { dto: { passphrase_generator_settings: { words: "nested object" } }, errorType: "type" },
+  ]).describe("should throw an exception if nested object in DTO contains invalid values", (scenario) => {
     it(`scenario: ${JSON.stringify(scenario)}`, () => {
       expect.assertions(2);
       const nestedPropertyName = Object.keys(scenario.dto)[0];

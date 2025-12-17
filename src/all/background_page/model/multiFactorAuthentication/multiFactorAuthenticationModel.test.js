@@ -12,22 +12,21 @@
  * @since         4.4.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MultiFactorAuthenticationModel from "./multiFactorAuthenticationModel";
-import {defaultSetupTotpData} from "../entity/mfa/mfaSetupTotpEntity.test.data";
-import {defaultVerifyProviderData} from "../entity/mfa/mfaVerifyProviderEntity.test.data";
+import { defaultSetupTotpData } from "../entity/mfa/mfaSetupTotpEntity.test.data";
+import { defaultVerifyProviderData } from "../entity/mfa/mfaVerifyProviderEntity.test.data";
 import MfaVerifyProviderEntity from "../entity/mfa/mfaVerifyProviderEntity";
-import {defaultMfaProviderData} from "../entity/mfa/mfaProviderEntity.test.data";
+import { defaultMfaProviderData } from "../entity/mfa/mfaProviderEntity.test.data";
 import MfaSetupTotpEntity from "../entity/mfa/mfaSetupTotpEntity";
 import MfaProviderEntity from "../entity/mfa/mfaProviderEntity";
-import {defaultTotpQrCodeData} from "../entity/mfa/mfaTotpSetupInfoEntity.test.data";
+import { defaultTotpQrCodeData } from "../entity/mfa/mfaTotpSetupInfoEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
 });
-
 
 describe("MultiFactorAuthenticationModel", () => {
   let model;
@@ -36,7 +35,7 @@ describe("MultiFactorAuthenticationModel", () => {
     model = new MultiFactorAuthenticationModel(defaultApiClientOptions());
   });
 
-  it("Should able to setup totp", async() => {
+  it("Should able to setup totp", async () => {
     expect.assertions(1);
     jest.spyOn(model.multiFactorAuthenticationService, "setupTotp");
 
@@ -47,7 +46,7 @@ describe("MultiFactorAuthenticationModel", () => {
     expect(model.multiFactorAuthenticationService.setupTotp).toHaveBeenCalledWith(defaultSetupTotpData());
   });
 
-  it("Should able to verify a MFA configuration", async() => {
+  it("Should able to verify a MFA configuration", async () => {
     expect.assertions(2);
     jest.spyOn(model.multiFactorAuthenticationService, "verifyProvider");
 
@@ -59,7 +58,7 @@ describe("MultiFactorAuthenticationModel", () => {
     expect(result).toEqual(new MfaVerifyProviderEntity(defaultVerifyProviderData()));
   });
 
-  it("Should able to remove a MFA provider", async() => {
+  it("Should able to remove a MFA provider", async () => {
     expect.assertions(1);
     jest.spyOn(model.multiFactorAuthenticationService, "removeProvider");
 
@@ -70,7 +69,7 @@ describe("MultiFactorAuthenticationModel", () => {
     expect(model.multiFactorAuthenticationService.removeProvider).toHaveBeenCalledWith("totp");
   });
 
-  it("Should retrieve the QR code uri from API", async() => {
+  it("Should retrieve the QR code uri from API", async () => {
     expect.assertions(2);
     jest.spyOn(model.multiFactorAuthenticationService, "getMfaToTpSetupInfo");
 

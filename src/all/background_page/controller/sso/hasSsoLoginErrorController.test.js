@@ -11,31 +11,31 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import '../../../../../test/mocks/mockSsoDataStorage';
-import {enableFetchMocks} from "jest-fetch-mock";
-import HasSsoLoginErrorController from './hasSsoLoginErrorController';
-import each from 'jest-each';
+import "../../../../../test/mocks/mockSsoDataStorage";
+import { enableFetchMocks } from "jest-fetch-mock";
+import HasSsoLoginErrorController from "./hasSsoLoginErrorController";
+import each from "jest-each";
 
 beforeAll(() => {
   enableFetchMocks();
 });
 
 const scenarios = [
-  {url: "https://passbolt.test/auth/login", expectedResult: false},
-  {url: "https://passbolt.test/auth/login/", expectedResult: false},
-  {url: "https://passbolt.test/auth/login?case=else", expectedResult: false},
-  {url: "https://passbolt.test/auth/login/?case=else", expectedResult: false},
-  {url: "https://passbolt.test/auth/login?case=sso-login-error", expectedResult: true},
-  {url: "https://passbolt.test/auth/login/?case=sso-login-error", expectedResult: true},
+  { url: "https://passbolt.test/auth/login", expectedResult: false },
+  { url: "https://passbolt.test/auth/login/", expectedResult: false },
+  { url: "https://passbolt.test/auth/login?case=else", expectedResult: false },
+  { url: "https://passbolt.test/auth/login/?case=else", expectedResult: false },
+  { url: "https://passbolt.test/auth/login?case=sso-login-error", expectedResult: true },
+  { url: "https://passbolt.test/auth/login/?case=sso-login-error", expectedResult: true },
 ];
 
-each(scenarios).describe("HasSsoLoginErrorController", scenario => {
-  it(`Should return '${scenario.expectedResult}' with the URL: ${scenario.url}`, async() => {
+each(scenarios).describe("HasSsoLoginErrorController", (scenario) => {
+  it(`Should return '${scenario.expectedResult}' with the URL: ${scenario.url}`, async () => {
     expect.assertions(1);
     const worker = {
       tab: {
-        url: scenario.url
-      }
+        url: scenario.url,
+      },
     };
     const controller = new HasSsoLoginErrorController(worker);
     const result = await controller.exec();

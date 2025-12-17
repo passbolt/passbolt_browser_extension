@@ -13,14 +13,14 @@
  */
 
 import each from "jest-each";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {RequestFetchOffscreenService} from "./requestFetchOffscreenService";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { RequestFetchOffscreenService } from "./requestFetchOffscreenService";
 import {
   FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR,
-  FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS
+  FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS,
 } from "../../../offscreens/service/network/fetchOffscreenService";
 import ResponseFetchOffscreenService from "./responseFetchOffscreenService";
-import {defaultCallbacks, defaultResponseMessage} from "./responseFetchOffscreenService.test.data";
+import { defaultCallbacks, defaultResponseMessage } from "./responseFetchOffscreenService.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -33,11 +33,11 @@ beforeEach(() => {
 describe("ResponseFetchOffscreenService", () => {
   describe("::assertMessage", () => {
     each([
-      {scenario: "success", type: FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS},
-      {scenario: "error", type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR},
-    ]).describe("should accept if message type is valid", _props => {
+      { scenario: "success", type: FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS },
+      { scenario: "error", type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR },
+    ]).describe("should accept if message type is valid", (_props) => {
       it(`should validate message type: ${_props.scenario}`, () => {
-        const message = defaultResponseMessage({type: _props.type});
+        const message = defaultResponseMessage({ type: _props.type });
         try {
           ResponseFetchOffscreenService.assertMessage(message);
           expect(true).toBeTruthy();
@@ -48,14 +48,14 @@ describe("ResponseFetchOffscreenService", () => {
     });
 
     each([
-      {scenario: "undefined", type: undefined},
-      {scenario: "null", type: null},
-      {scenario: "invalid string", type: "invalid"},
-      {scenario: "boolean", type: true},
-      {scenario: "object", type: {data: FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS}},
-    ]).describe("should throw if message type is not valid", _props => {
+      { scenario: "undefined", type: undefined },
+      { scenario: "null", type: null },
+      { scenario: "invalid string", type: "invalid" },
+      { scenario: "boolean", type: true },
+      { scenario: "object", type: { data: FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS } },
+    ]).describe("should throw if message type is not valid", (_props) => {
       it(`should trow if message type: ${_props.scenario}`, () => {
-        const message = defaultResponseMessage({type: _props.type});
+        const message = defaultResponseMessage({ type: _props.type });
         try {
           ResponseFetchOffscreenService.assertMessage(message);
           expect(true).toBeFalsy();
@@ -66,18 +66,20 @@ describe("ResponseFetchOffscreenService", () => {
     });
 
     it("should validate message id", () => {
-      expect(() => ResponseFetchOffscreenService.assertMessage(defaultResponseMessage({id: crypto.randomUUID()}))).not.toThrow();
+      expect(() =>
+        ResponseFetchOffscreenService.assertMessage(defaultResponseMessage({ id: crypto.randomUUID() })),
+      ).not.toThrow();
     });
 
     each([
-      {scenario: "undefined", id: undefined},
-      {scenario: "null", id: null},
-      {scenario: "invalid string", id: "invalid"},
-      {scenario: "boolean", id: true},
-      {scenario: "object", id: {data: crypto.randomUUID()}},
-    ]).describe("should throw if message id is not valid", _props => {
+      { scenario: "undefined", id: undefined },
+      { scenario: "null", id: null },
+      { scenario: "invalid string", id: "invalid" },
+      { scenario: "boolean", id: true },
+      { scenario: "object", id: { data: crypto.randomUUID() } },
+    ]).describe("should throw if message id is not valid", (_props) => {
       it(`should trow if message id: ${_props.scenario}`, () => {
-        const message = defaultResponseMessage({id: _props.id});
+        const message = defaultResponseMessage({ id: _props.id });
         try {
           ResponseFetchOffscreenService.assertMessage(message);
           expect(true).toBeFalsy();
@@ -88,17 +90,17 @@ describe("ResponseFetchOffscreenService", () => {
     });
 
     it("should validate message data", () => {
-      expect(() => defaultResponseMessage({data: {prop: "value"}})).not.toThrow();
+      expect(() => defaultResponseMessage({ data: { prop: "value" } })).not.toThrow();
     });
 
     each([
-      {scenario: "undefined", data: undefined},
-      {scenario: "null", data: null},
-      {scenario: "invalid string", data: "invalid"},
-      {scenario: "boolean", data: true},
-    ]).describe("should throw if message data is not valid", _props => {
+      { scenario: "undefined", data: undefined },
+      { scenario: "null", data: null },
+      { scenario: "invalid string", data: "invalid" },
+      { scenario: "boolean", data: true },
+    ]).describe("should throw if message data is not valid", (_props) => {
       it(`should trow if message id: ${_props.scenario}`, () => {
-        const message = defaultResponseMessage({data: _props.data});
+        const message = defaultResponseMessage({ data: _props.data });
         try {
           ResponseFetchOffscreenService.assertMessage(message);
           expect(true).toBeFalsy();
@@ -110,7 +112,7 @@ describe("ResponseFetchOffscreenService", () => {
   });
 
   describe("::buildFetchResponse", () => {
-    it("should build the fetch response object based on the offscreen message data", async() => {
+    it("should build the fetch response object based on the offscreen message data", async () => {
       expect.assertions(8);
       const message = defaultResponseMessage();
       const response = ResponseFetchOffscreenService.buildFetchResponse(message.data);
@@ -130,7 +132,7 @@ describe("ResponseFetchOffscreenService", () => {
       expect.assertions(1);
       const id = crypto.randomUUID();
       const callbacks = defaultCallbacks();
-      const message = defaultResponseMessage({id});
+      const message = defaultResponseMessage({ id });
 
       ResponseFetchOffscreenService.handleFetchResponse(message, callbacks);
       expect(callbacks.resolve).toHaveBeenCalledWith(expect.any(Response));
@@ -140,7 +142,7 @@ describe("ResponseFetchOffscreenService", () => {
       expect.assertions(1);
       const id = crypto.randomUUID();
       const callbacks = defaultCallbacks();
-      const message = defaultResponseMessage({id: id, type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR});
+      const message = defaultResponseMessage({ id: id, type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR });
 
       ResponseFetchOffscreenService.handleFetchResponse(message, callbacks);
       expect(callbacks.reject).toHaveBeenCalledWith(expect.any(Error));

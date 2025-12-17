@@ -12,16 +12,16 @@
  * @since         4.10.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindPermissionsService from "./findPermissionsService";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { ownerPermissionDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
 
 describe("FindPermissionService", () => {
   describe("::findAllByAcoForeignKeyForDisplay", () => {
-    it("Should call permission service to find all permission from a resource id", async() => {
+    it("Should call permission service to find all permission from a resource id", async () => {
       expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -34,11 +34,14 @@ describe("FindPermissionService", () => {
       const permissionsCollection = await service.findAllByAcoForeignKeyForDisplay(resourceId);
 
       expect(service.permissionService.findAllByAcoForeignKey).toHaveBeenCalledTimes(1);
-      expect(service.permissionService.findAllByAcoForeignKey).toHaveBeenCalledWith(resourceId, FindPermissionsService.DEFAULT_CONTAIN);
+      expect(service.permissionService.findAllByAcoForeignKey).toHaveBeenCalledWith(
+        resourceId,
+        FindPermissionsService.DEFAULT_CONTAIN,
+      );
       expect(permissionsCollection.toDto()).toStrictEqual(expectedDto);
     });
 
-    it("Should fail if the resource id is not a uuid", async() => {
+    it("Should fail if the resource id is not a uuid", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -53,7 +56,7 @@ describe("FindPermissionService", () => {
   });
 
   describe("::findAllByAcoForeignKey", () => {
-    it("Should call permission service to find all permission from a resource id without contain", async() => {
+    it("Should call permission service to find all permission from a resource id without contain", async () => {
       expect.assertions(3);
       const account = new AccountEntity(defaultAccountDto());
       const service = new FindPermissionsService(account, defaultApiClientOptions());
@@ -67,7 +70,7 @@ describe("FindPermissionService", () => {
       expect(permissionsCollection.toDto()).toStrictEqual(expectedDto);
     });
 
-    it("Should fail if the resource id is not a uuid", async() => {
+    it("Should fail if the resource id is not a uuid", async () => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
       const service = new FindPermissionsService(account, defaultApiClientOptions());
@@ -79,7 +82,7 @@ describe("FindPermissionService", () => {
       }
     });
 
-    it("Should fail if the permission service returns an error 500", async() => {
+    it("Should fail if the permission service returns an error 500", async () => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
       const service = new FindPermissionsService(account, defaultApiClientOptions());

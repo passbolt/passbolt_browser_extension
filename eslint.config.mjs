@@ -13,6 +13,8 @@ import pluginSecurity from 'eslint-plugin-security';
 import nodePlugin from 'eslint-plugin-n';
 import * as regexpPlugin from "eslint-plugin-regexp";
 import pluginPromise from 'eslint-plugin-promise';
+import prettierPlugin from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +27,7 @@ export default [
   nodePlugin.configs["flat/recommended-script"],
   regexpPlugin.configs["flat/recommended"],
   pluginPromise.configs['flat/recommended'],
+  prettierConfig,                                // Must be last - disables conflicts
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],
 
@@ -81,35 +84,6 @@ export default [
        * CUSTOM OVERRIDES
        * ============================================
        */
-
-      "array-bracket-spacing": 1, // Enforces consistent spacing inside array brackets
-      "block-spacing": 1, // Enforces consistent spacing inside single-line blocks
-      "brace-style": ["warn", "1tbs", {allowSingleLine: true}], // Enforces one true brace style (opening brace on same line)
-      "comma-spacing": 1, // Enforces consistent spacing before/after commas
-      "computed-property-spacing": 1, // Enforces consistent spacing inside computed property brackets
-      "eol-last": 1, // Requires newline at the end of files
-      "func-call-spacing": 1, // Disallows spaces between function name and parentheses in calls
-      "key-spacing": ["warn", {mode: "minimum"}], // Enforces minimum spacing between keys and values in object literals
-      "keyword-spacing": 1, // Enforces consistent spacing before/after keywords (if, else, for, etc.)
-      "linebreak-style": 1, // Enforces consistent linebreak style (unix vs windows)
-      "no-trailing-spaces": 1, // Disallows trailing whitespace at the end of lines
-      "object-curly-spacing": ["warn", "never"], // Disallows spaces inside object curly braces
-      "one-var": ["error", {initialized: "never", uninitialized: "always"}], // Enforces variables declaration style (one declaration for uninitialized, separate for initialized)
-      "padded-blocks": ["warn", "never"], // Disallows padding blank lines within blocks
-      "semi": ["warn", "always"], // Requires semicolons at the end of statements
-      "semi-spacing": 1, // Enforces spacing before/after semicolons
-      "space-before-blocks": 1, // Requires space before opening brace of blocks
-      "space-before-function-paren": ["warn", "never"], // Disallows space before function parentheses
-      "space-in-parens": ["warn", "never"], // Disallows spaces inside parentheses
-      "space-infix-ops": 1, // Requires spaces around infix operators (+, -, =, etc.)
-      "arrow-body-style": ["warn", "as-needed"], // Requires braces around arrow function body only when needed
-      "arrow-parens": ["warn", "as-needed"], // Requires parens around arrow function parameters only when needed
-      "arrow-spacing": 1, // Enforces consistent spacing before/after arrow function arrows
-      "template-curly-spacing": ["warn", "never"], // Disallows spaces inside template literal curly braces
-      "multiline-comment-style": ["error", "starred-block"], // Enforces starred-block style for multiline comments (/* * */)
-      "indent": ["warn", 2, {MemberExpression: 1, SwitchCase: 1}], // Enforces 2 spaces indentation with specific rules for member expressions and switch cases
-      // "object-shorthand": ["error", "consistent"],
-
 
       // Critical rules not in recommended configs
       'curly': 'error',                          // Always use braces
@@ -229,10 +203,12 @@ export default [
 
     plugins: {
       jest: jestPlugin,
+      prettier: prettierPlugin,
     },
 
     rules: {
       ...jestPlugin.configs['flat/recommended'].rules,
+      'prettier/prettier': 'warn',
 
       // Test-specific overrides
       'no-console': 'off',                       // Allow console in tests

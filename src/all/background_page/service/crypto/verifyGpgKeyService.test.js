@@ -12,12 +12,12 @@
  * @since         3.6.0
  */
 import VerifyGpgKeyService from "./verifyGpgKeyService";
-import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import SignGpgKeyService from "./signGpgKeyService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 describe("VerifyGpgKeyService", () => {
-  it("should verify a key single signature.", async() => {
+  it("should verify a key single signature.", async () => {
     const adminKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
     const sigingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
     const verifyingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
@@ -27,9 +27,12 @@ describe("VerifyGpgKeyService", () => {
     expect(verified).toBeTruthy();
   });
 
-  it("should verify a key single signature with the presence of other signatures not verified.", async() => {
+  it("should verify a key single signature with the presence of other signatures not verified.", async () => {
     const adminKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
-    const sigingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.private_decrypted, pgpKeys.betty.private_decrypted]);
+    const sigingKeys = await OpenpgpAssertion.readAllKeysOrFail([
+      pgpKeys.ada.private_decrypted,
+      pgpKeys.betty.private_decrypted,
+    ]);
     const verifyingKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
     const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
     const verified = await VerifyGpgKeyService.verify(keyToVerify, [verifyingKey]);
@@ -37,22 +40,11 @@ describe("VerifyGpgKeyService", () => {
     expect(verified).toBeTruthy();
   });
 
-  it("should verify a key multiple signatures.", async() => {
-    const adminKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
-    const sigingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.private_decrypted, pgpKeys.betty.private_decrypted]);
-    const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
-    const verifyingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
-    const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
-    expect.assertions(1);
-    expect(verified).toBeTruthy();
-  });
-
-  it("should verify a key multiple signatures with the presence of other signatures not verified .", async() => {
+  it("should verify a key multiple signatures.", async () => {
     const adminKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
     const sigingKeys = await OpenpgpAssertion.readAllKeysOrFail([
       pgpKeys.ada.private_decrypted,
       pgpKeys.betty.private_decrypted,
-      pgpKeys.account_recovery_organization.private_decrypted
     ]);
     const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
     const verifyingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
@@ -61,7 +53,21 @@ describe("VerifyGpgKeyService", () => {
     expect(verified).toBeTruthy();
   });
 
-  it("should fail if it cannot verify a single signature.", async() => {
+  it("should verify a key multiple signatures with the presence of other signatures not verified .", async () => {
+    const adminKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
+    const sigingKeys = await OpenpgpAssertion.readAllKeysOrFail([
+      pgpKeys.ada.private_decrypted,
+      pgpKeys.betty.private_decrypted,
+      pgpKeys.account_recovery_organization.private_decrypted,
+    ]);
+    const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
+    const verifyingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
+    const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
+    expect.assertions(1);
+    expect(verified).toBeTruthy();
+  });
+
+  it("should fail if it cannot verify a single signature.", async () => {
     const keyToVerify = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
     const verifyingKeys = [await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public)];
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
@@ -69,7 +75,7 @@ describe("VerifyGpgKeyService", () => {
     expect(verified).toBeFalsy();
   });
 
-  it("should fail if it cannot verify a single signature with the presence of other signatures.", async() => {
+  it("should fail if it cannot verify a single signature with the presence of other signatures.", async () => {
     const adminKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
     const sigingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.betty.private_decrypted]);
     const verifyingKeys = [await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public)];
@@ -79,7 +85,7 @@ describe("VerifyGpgKeyService", () => {
     expect(verified).toBeFalsy();
   });
 
-  it("should fail if it cannot verify multiple signatures.", async() => {
+  it("should fail if it cannot verify multiple signatures.", async () => {
     const keyToVerify = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
     const verifyingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
@@ -87,9 +93,11 @@ describe("VerifyGpgKeyService", () => {
     expect(verified).toBeFalsy();
   });
 
-  it("should fail if it cannot verify a single signature with the presence of other signatures.", async() => {
+  it("should fail if it cannot verify a single signature with the presence of other signatures.", async () => {
     const adminKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
-    const sigingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.account_recovery_organization.private_decrypted]);
+    const sigingKeys = await OpenpgpAssertion.readAllKeysOrFail([
+      pgpKeys.account_recovery_organization.private_decrypted,
+    ]);
     const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
     const verifyingKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);

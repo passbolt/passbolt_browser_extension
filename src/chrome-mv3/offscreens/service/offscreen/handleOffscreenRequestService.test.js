@@ -12,10 +12,12 @@
  * @since         5.3.2
  */
 
-import FetchOffscreenService, {FETCH_OFFSCREEN_DATA_TYPE_JSON} from "../network/fetchOffscreenService";
+import FetchOffscreenService, { FETCH_OFFSCREEN_DATA_TYPE_JSON } from "../network/fetchOffscreenService";
 import WriteClipobardOffscreenService from "../clipboard/writeClipobardOffscreenService";
-import HandleOffscreenRequestService, {SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER} from "./handleOffscreenRequestService";
-import {v4 as uuidv4} from "uuid";
+import HandleOffscreenRequestService, {
+  SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER,
+} from "./handleOffscreenRequestService";
+import { v4 as uuidv4 } from "uuid";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -23,7 +25,7 @@ beforeEach(() => {
 
 describe("HandleOffscreenRequestService", () => {
   describe("::handleOffscreenRequest", () => {
-    it("should redirect fetch request to FetchOffscreenService", async() => {
+    it("should redirect fetch request to FetchOffscreenService", async () => {
       expect.assertions(3);
 
       const message = {
@@ -34,9 +36,9 @@ describe("HandleOffscreenRequestService", () => {
           options: {
             body: {
               data: "test",
-              dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON
-            }
-          }
+              dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON,
+            },
+          },
         },
       };
 
@@ -50,7 +52,7 @@ describe("HandleOffscreenRequestService", () => {
       expect(WriteClipobardOffscreenService.handleClipboardRequest).not.toHaveBeenCalled();
     });
 
-    it("should redirect clipboard write request to WriteClipobardOffscreenService", async() => {
+    it("should redirect clipboard write request to WriteClipobardOffscreenService", async () => {
       expect.assertions(3);
 
       const message = {
@@ -71,7 +73,7 @@ describe("HandleOffscreenRequestService", () => {
       expect(WriteClipobardOffscreenService.handleClipboardRequest).toHaveBeenCalledWith(message.data);
     });
 
-    it("should send back a generic offscreen message if something wrong happens during the offscreen process", async() => {
+    it("should send back a generic offscreen message if something wrong happens during the offscreen process", async () => {
       expect.assertions(2);
 
       const message = {
@@ -81,7 +83,9 @@ describe("HandleOffscreenRequestService", () => {
       };
 
       const error = new Error("Impossible to copy to clipboard");
-      jest.spyOn(WriteClipobardOffscreenService, "handleClipboardRequest").mockImplementation(() => { throw error; });
+      jest.spyOn(WriteClipobardOffscreenService, "handleClipboardRequest").mockImplementation(() => {
+        throw error;
+      });
       jest.spyOn(chrome.runtime, "sendMessage").mockImplementation(() => {});
 
       await HandleOffscreenRequestService.handleOffscreenRequest(message);
@@ -89,7 +93,7 @@ describe("HandleOffscreenRequestService", () => {
       const expectedMessage = {
         id: message.id,
         target: SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER,
-        data: {error: JSON.stringify(error, Object.getOwnPropertyNames(error))},
+        data: { error: JSON.stringify(error, Object.getOwnPropertyNames(error)) },
       };
 
       expect(chrome.runtime.sendMessage).toHaveBeenCalledTimes(1);

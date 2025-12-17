@@ -36,16 +36,16 @@ describe("ResourcesCsvExporter", () => {
       CsvSafariRowComposer,
       CsvDashlaneRowComposer,
       CsvNordpassRowComposer,
-      CsvLogMeOnceRowComposer
+      CsvLogMeOnceRowComposer,
     ];
     expect(ResourcesCsvExporter.register).toEqual(expect.arrayContaining(supportedRowComposers));
   });
 
-  it("should export with no content", async() => {
+  it("should export with no content", async () => {
     const exportDto = {
-      "format": "csv-kdbx",
-      "export_resources": [],
-      "export_folders": []
+      format: "csv-kdbx",
+      export_resources: [],
+      export_folders: [],
     };
 
     const exportEntity = new ExportResourcesFileEntity(exportDto);
@@ -57,15 +57,18 @@ describe("ResourcesCsvExporter", () => {
   });
 
   function buildImportResourceDto(num, data) {
-    return Object.assign({
-      id: `7f077753-0835-4054-92ee-556660ea04f${num}`,
-      name: `Password ${num}`,
-      username: `username${num}`,
-      uri: `https://url${num}.com`,
-      description: `Description ${num}`,
-      secret_clear: `Secret ${num}`,
-      folder_parent_path: '',
-    }, data);
+    return Object.assign(
+      {
+        id: `7f077753-0835-4054-92ee-556660ea04f${num}`,
+        name: `Password ${num}`,
+        username: `username${num}`,
+        uri: `https://url${num}.com`,
+        description: `Description ${num}`,
+        secret_clear: `Secret ${num}`,
+        folder_parent_path: "",
+      },
+      data,
+    );
   }
 
   function buildCsvHeader(RowComposer) {
@@ -73,17 +76,19 @@ describe("ResourcesCsvExporter", () => {
   }
 
   function buildCsvRow(RowComposer, externalResourceDto) {
-    return `"${Object.keys(RowComposer.mapping).map(fieldName => externalResourceDto[fieldName]).join('","')}"`;
+    return `"${Object.keys(RowComposer.mapping)
+      .map((fieldName) => externalResourceDto[fieldName])
+      .join('","')}"`;
   }
 
-  it("should export resources", async() => {
+  it("should export resources", async () => {
     const exportResource1 = buildImportResourceDto(1);
-    const exportResource2 = buildImportResourceDto(2, {"folder_parent_path": "Folder 1"});
-    const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2"});
+    const exportResource2 = buildImportResourceDto(2, { folder_parent_path: "Folder 1" });
+    const exportResource3 = buildImportResourceDto(3, { folder_parent_path: "Folder 1/Folder2" });
     const exportDto = {
-      "format": "csv-kdbx",
-      "export_resources": [exportResource1, exportResource2, exportResource3],
-      "export_folders": []
+      format: "csv-kdbx",
+      export_resources: [exportResource1, exportResource2, exportResource3],
+      export_folders: [],
     };
 
     const exportEntity = new ExportResourcesFileEntity(exportDto);

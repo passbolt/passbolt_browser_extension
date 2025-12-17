@@ -12,34 +12,44 @@
  * @since         5.4.0
  */
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import KeepCleartextMetadataForExistingInstanceController from "./keepCleartextMetadataForExistingInstanceController";
 
 describe("KeepCleartextMetadataForExistingInstanceController", () => {
   describe("::exec", () => {
-    it("should call for the orchestrator not to enable metadata encryption", async() => {
+    it("should call for the orchestrator not to enable metadata encryption", async () => {
       expect.assertions(2);
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const controller = new KeepCleartextMetadataForExistingInstanceController(null, null, apiClientOptions, account);
 
-      jest.spyOn(controller.configureMetadataSettingsService, "keepCleartextMetadataForExistingInstance").mockImplementation(() => {});
+      jest
+        .spyOn(controller.configureMetadataSettingsService, "keepCleartextMetadataForExistingInstance")
+        .mockImplementation(() => {});
 
       await controller.exec();
 
-      expect(controller.configureMetadataSettingsService.keepCleartextMetadataForExistingInstance).toHaveBeenCalledTimes(1);
-      expect(controller.configureMetadataSettingsService.keepCleartextMetadataForExistingInstance).toHaveBeenCalledWith();
+      expect(
+        controller.configureMetadataSettingsService.keepCleartextMetadataForExistingInstance,
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        controller.configureMetadataSettingsService.keepCleartextMetadataForExistingInstance,
+      ).toHaveBeenCalledWith();
     });
 
-    it("should not intercept unexpected error if something goes wrong when enabling the metadata encryption", async() => {
+    it("should not intercept unexpected error if something goes wrong when enabling the metadata encryption", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const controller = new KeepCleartextMetadataForExistingInstanceController(null, null, apiClientOptions, account);
-      jest.spyOn(controller.configureMetadataSettingsService, "keepCleartextMetadataForExistingInstance").mockImplementation(() => { throw new Error("Something went wrong!"); });
+      jest
+        .spyOn(controller.configureMetadataSettingsService, "keepCleartextMetadataForExistingInstance")
+        .mockImplementation(() => {
+          throw new Error("Something went wrong!");
+        });
 
       await expect(() => controller.exec()).rejects.toThrowError("Something went wrong!");
     });

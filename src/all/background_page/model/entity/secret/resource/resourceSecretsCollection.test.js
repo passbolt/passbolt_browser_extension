@@ -14,9 +14,9 @@
 
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ResourceSecretsCollection from "./resourceSecretsCollection";
-import {minimalDto, readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
+import { minimalDto, readSecret } from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
-import {defaultResourcesSecretsDtos} from "./resourceSecretsCollection.test.data";
+import { defaultResourcesSecretsDtos } from "./resourceSecretsCollection.test.data";
 
 describe("ResourceSecretsCollection", () => {
   it("schema must validate", () => {
@@ -61,8 +61,8 @@ describe("ResourceSecretsCollection", () => {
 
     it("works if valid complete DTOs are provided", () => {
       const resourceId = crypto.randomUUID();
-      const dto1 = readSecret({resource_id: resourceId});
-      const dto2 = readSecret({resource_id: resourceId});
+      const dto1 = readSecret({ resource_id: resourceId });
+      const dto2 = readSecret({ resource_id: resourceId });
       const dtos = [dto1, dto2];
       const collection = new ResourceSecretsCollection(dtos);
 
@@ -76,60 +76,59 @@ describe("ResourceSecretsCollection", () => {
 
     it("should throw if the collection schema does not validate", () => {
       expect.assertions(1);
-      expect(() => new ResourceSecretsCollection({}))
-        .toThrowEntityValidationError("items");
+      expect(() => new ResourceSecretsCollection({})).toThrowEntityValidationError("items");
     });
 
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = readSecret();
-      const dto2 = readSecret({data: 42});
+      const dto2 = readSecret({ data: 42 });
 
       expect.assertions(1);
-      expect(() => new ResourceSecretsCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("1.data.type");
+      expect(() => new ResourceSecretsCollection([dto1, dto2])).toThrowCollectionValidationError("1.data.type");
     });
 
     it("should throw if one of data item does not validate the unique id build rule", () => {
       const resourceId = crypto.randomUUID();
-      const dto1 = readSecret({resource_id: resourceId});
-      const dto2 = readSecret({resource_id: resourceId});
-      const dto3 = readSecret({id: dto2.id, resource_id: resourceId});
+      const dto1 = readSecret({ resource_id: resourceId });
+      const dto2 = readSecret({ resource_id: resourceId });
+      const dto3 = readSecret({ id: dto2.id, resource_id: resourceId });
 
       expect.assertions(1);
-      expect(() => new ResourceSecretsCollection([dto1, dto2, dto3]))
-        .toThrowCollectionValidationError("2.id.unique");
+      expect(() => new ResourceSecretsCollection([dto1, dto2, dto3])).toThrowCollectionValidationError("2.id.unique");
     });
 
     it("should throw if one of data item does not validate the unique user id build rule", () => {
       const resourceId = crypto.randomUUID();
-      const dto1 = readSecret({resource_id: resourceId});
-      const dto2 = readSecret({resource_id: resourceId});
-      const dto3 = readSecret({user_id: dto2.user_id, resource_id: resourceId});
+      const dto1 = readSecret({ resource_id: resourceId });
+      const dto2 = readSecret({ resource_id: resourceId });
+      const dto3 = readSecret({ user_id: dto2.user_id, resource_id: resourceId });
 
       expect.assertions(1);
-      expect(() => new ResourceSecretsCollection([dto1, dto2, dto3]))
-        .toThrowCollectionValidationError("2.user_id.unique");
+      expect(() => new ResourceSecretsCollection([dto1, dto2, dto3])).toThrowCollectionValidationError(
+        "2.user_id.unique",
+      );
     });
 
     it("should throw if one of data item does not validate the same resource id build rule", () => {
       const resourceId = crypto.randomUUID();
-      const dto1 = readSecret({resource_id: resourceId});
-      const dto2 = readSecret({resource_id: resourceId});
-      const dto3 = readSecret({resource_id: crypto.randomUUID()});
+      const dto1 = readSecret({ resource_id: resourceId });
+      const dto2 = readSecret({ resource_id: resourceId });
+      const dto3 = readSecret({ resource_id: crypto.randomUUID() });
 
       expect.assertions(1);
-      expect(() => new ResourceSecretsCollection([dto1, dto2, dto3]))
-        .toThrowCollectionValidationError("2.resource_id.same_resource");
+      expect(() => new ResourceSecretsCollection([dto1, dto2, dto3])).toThrowCollectionValidationError(
+        "2.resource_id.same_resource",
+      );
     });
 
     it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
       const resourceId = crypto.randomUUID();
-      const dto1 = readSecret({resource_id: resourceId});
-      const dto2 = readSecret({resource_id: crypto.randomUUID()});
-      const dto3 = readSecret({resource_id: resourceId});
+      const dto1 = readSecret({ resource_id: resourceId });
+      const dto2 = readSecret({ resource_id: crypto.randomUUID() });
+      const dto3 = readSecret({ resource_id: resourceId });
 
       expect.assertions(3);
-      const collection = new ResourceSecretsCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
+      const collection = new ResourceSecretsCollection([dto1, dto2, dto3], { ignoreInvalidEntity: true });
       expect(collection.items).toHaveLength(2);
       expect(collection.items[0].id).toEqual(dto1.id);
       expect(collection.items[1].id).toEqual(dto3.id);
@@ -137,7 +136,7 @@ describe("ResourceSecretsCollection", () => {
   });
 
   describe("ResourceSecretsCollection:pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const count = 10_000;
       const dtos = defaultResourcesSecretsDtos(count);
 

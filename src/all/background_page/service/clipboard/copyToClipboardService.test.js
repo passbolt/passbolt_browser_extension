@@ -12,12 +12,12 @@
  * @since         5.3.2
  */
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import CopyToClipboardService from "./copyToClipboardService";
 import "../../../../../test/mocks/mockNavigatorClipboard";
 import "../../../../../test/mocks/mockAlarms";
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.clearAllMocks();
   jest.useFakeTimers();
   await browser.alarms.clearAll();
@@ -25,7 +25,7 @@ beforeEach(async() => {
 
 describe("CopyToClipboardService", () => {
   describe("::copyTemporarily", () => {
-    it("should copy the given data into the clipboard and set an alarm", async() => {
+    it("should copy the given data into the clipboard and set an alarm", async () => {
       expect.assertions(5);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -40,12 +40,14 @@ describe("CopyToClipboardService", () => {
 
       expect(await navigator.clipboard.readText()).toStrictEqual(data);
       expect(browser.alarms.create).toHaveBeenCalledTimes(1);
-      expect(browser.alarms.create).toHaveBeenCalledWith(CopyToClipboardService.ALARM_NAME, {when: Date.now() + 30_000});
+      expect(browser.alarms.create).toHaveBeenCalledWith(CopyToClipboardService.ALARM_NAME, {
+        when: Date.now() + 30_000,
+      });
       expect(browser.alarms.clear).toHaveBeenCalledTimes(1);
       expect(browser.alarms.clear).toHaveBeenCalledWith(CopyToClipboardService.ALARM_NAME);
     });
 
-    it("should throw an error if the data is not a string", async() => {
+    it("should throw an error if the data is not a string", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -56,7 +58,7 @@ describe("CopyToClipboardService", () => {
   });
 
   describe("::copy", () => {
-    it("should copy the given data into the clipboard and unset any flush alarm", async() => {
+    it("should copy the given data into the clipboard and unset any flush alarm", async () => {
       expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -73,7 +75,7 @@ describe("CopyToClipboardService", () => {
       expect(browser.alarms.clear).toHaveBeenCalledWith(CopyToClipboardService.ALARM_NAME);
     });
 
-    it("should throw an error if the data is not a string", async() => {
+    it("should throw an error if the data is not a string", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -84,7 +86,7 @@ describe("CopyToClipboardService", () => {
   });
 
   describe("::flushTemporaryContent", () => {
-    it("should flush the data in the clipboard", async() => {
+    it("should flush the data in the clipboard", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -98,14 +100,14 @@ describe("CopyToClipboardService", () => {
   });
 
   describe("::flushTemporaryContentIfAny", () => {
-    it("should flush the data in the clipboard if an alarm has been set", async() => {
+    it("should flush the data in the clipboard if an alarm has been set", async () => {
       expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new CopyToClipboardService(account);
 
-      jest.spyOn(browser.alarms, "get").mockImplementation(async() => ({test: 42}));
-      jest.spyOn(navigator.clipboard, "writeText").mockImplementation(async() => {});
+      jest.spyOn(browser.alarms, "get").mockImplementation(async () => ({ test: 42 }));
+      jest.spyOn(navigator.clipboard, "writeText").mockImplementation(async () => {});
 
       await service.copyTemporarily("data");
       await service.flushTemporaryContentIfAny();
@@ -115,7 +117,7 @@ describe("CopyToClipboardService", () => {
       expect(await navigator.clipboard.writeText).toHaveBeenCalledWith("\x00");
     });
 
-    it("should not flush the data in the clipboard if not alarm has been set", async() => {
+    it("should not flush the data in the clipboard if not alarm has been set", async () => {
       expect.assertions(2);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -123,7 +125,7 @@ describe("CopyToClipboardService", () => {
       const clipboardContent = "data";
 
       jest.spyOn(browser.alarms, "get").mockImplementation(() => null);
-      jest.spyOn(navigator.clipboard, "writeText").mockImplementation(async() => {});
+      jest.spyOn(navigator.clipboard, "writeText").mockImplementation(async () => {});
 
       await service.copy(clipboardContent);
       await service.flushTemporaryContentIfAny();
@@ -134,7 +136,7 @@ describe("CopyToClipboardService", () => {
   });
 
   describe("::clearAlarm", () => {
-    it("should remove the alarm if any", async() => {
+    it("should remove the alarm if any", async () => {
       expect.assertions(1);
 
       jest.spyOn(browser.alarms, "clear").mockImplementation(() => {});
@@ -149,23 +151,23 @@ describe("CopyToClipboardService", () => {
   });
 
   describe("::handleClipboardTemporaryContentFlushEvent", () => {
-    it("should call to flush the clipboard if the alarm triggers", async() => {
+    it("should call to flush the clipboard if the alarm triggers", async () => {
       expect.assertions(1);
 
       jest.spyOn(CopyToClipboardService.prototype, "flushTemporaryContent").mockImplementation(() => {});
 
-      const alarm = {name: "ClipboardTemporaryContentFlush"};
+      const alarm = { name: "ClipboardTemporaryContentFlush" };
       await CopyToClipboardService.handleClipboardTemporaryContentFlushEvent(alarm);
 
       expect(CopyToClipboardService.prototype.flushTemporaryContent).toHaveBeenCalledTimes(1);
     });
 
-    it("should do nothing if the alarm is not the right one", async() => {
+    it("should do nothing if the alarm is not the right one", async () => {
       expect.assertions(1);
 
       jest.spyOn(CopyToClipboardService.prototype, "flushTemporaryContent").mockImplementation(() => {});
 
-      const alarm = {name: "other-alarm"};
+      const alarm = { name: "other-alarm" };
       await CopyToClipboardService.handleClipboardTemporaryContentFlushEvent(alarm);
 
       expect(CopyToClipboardService.prototype.flushTemporaryContent).not.toHaveBeenCalled();

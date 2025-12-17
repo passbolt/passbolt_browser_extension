@@ -16,11 +16,14 @@ import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PasswordGeneratorSettingsEntity from "./passwordGeneratorSettingsEntity";
-import {defaultPasswordGeneratorSettings} from "./passwordGeneratorSettingsEntity.test.data";
+import { defaultPasswordGeneratorSettings } from "./passwordGeneratorSettingsEntity.test.data";
 
 describe("PasswordGeneratorSettings entity", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(PasswordGeneratorSettingsEntity.ENTITY_NAME, PasswordGeneratorSettingsEntity.getSchema());
+    EntitySchema.validateSchema(
+      PasswordGeneratorSettingsEntity.ENTITY_NAME,
+      PasswordGeneratorSettingsEntity.getSchema(),
+    );
   });
 
   it("should accept a mininal valid DTO", () => {
@@ -57,21 +60,21 @@ describe("PasswordGeneratorSettings entity", () => {
      * {dto: {length: -1}, errorType: "minimum"},
      * {dto: {length: 2000}, errorType: "maximum"},
      */
-    {dto: {length: ""}, errorType: "type"},
-    {dto: {mask_upper: -1}, errorType: "type"},
-    {dto: {mask_lower: -1}, errorType: "type"},
-    {dto: {mask_digit: -1}, errorType: "type"},
-    {dto: {mask_parenthesis: -1}, errorType: "type"},
-    {dto: {mask_emoji: -1}, errorType: "type"},
-    {dto: {mask_char1: -1}, errorType: "type"},
-    {dto: {mask_char2: -1}, errorType: "type"},
-    {dto: {mask_char3: -1}, errorType: "type"},
-    {dto: {mask_char4: -1}, errorType: "type"},
-    {dto: {mask_char5: -1}, errorType: "type"},
-    {dto: {exclude_look_alike_chars: -1}, errorType: "type"},
-    {dto: {min_length: ""}, errorType: "type"},
-    {dto: {max_length: ""}, errorType: "type"},
-  ]).describe("should throw an exception if DTO contains invalid values", scenario => {
+    { dto: { length: "" }, errorType: "type" },
+    { dto: { mask_upper: -1 }, errorType: "type" },
+    { dto: { mask_lower: -1 }, errorType: "type" },
+    { dto: { mask_digit: -1 }, errorType: "type" },
+    { dto: { mask_parenthesis: -1 }, errorType: "type" },
+    { dto: { mask_emoji: -1 }, errorType: "type" },
+    { dto: { mask_char1: -1 }, errorType: "type" },
+    { dto: { mask_char2: -1 }, errorType: "type" },
+    { dto: { mask_char3: -1 }, errorType: "type" },
+    { dto: { mask_char4: -1 }, errorType: "type" },
+    { dto: { mask_char5: -1 }, errorType: "type" },
+    { dto: { exclude_look_alike_chars: -1 }, errorType: "type" },
+    { dto: { min_length: "" }, errorType: "type" },
+    { dto: { max_length: "" }, errorType: "type" },
+  ]).describe("should throw an exception if DTO contains invalid values", (scenario) => {
     it(`scenario: ${JSON.stringify(scenario)}`, () => {
       expect.assertions(2);
       const fieldName = Object.keys(scenario.dto)[0];

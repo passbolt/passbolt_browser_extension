@@ -15,8 +15,11 @@
 import expect from "expect";
 import CreateScimSettingsController from "./createScimSettingsController";
 import ScimSettingsEntity from "passbolt-styleguide/src/shared/models/entity/scimSettings/scimSettingsEntity";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultScimSettingsDto, scimSettingsWithoutSecretTokenDto} from "../../service/api/scimSettings/scimSettingsApiService.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import {
+  defaultScimSettingsDto,
+  scimSettingsWithoutSecretTokenDto,
+} from "../../service/api/scimSettings/scimSettingsApiService.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("CreateScimSettingsController", () => {
@@ -28,7 +31,7 @@ describe("CreateScimSettingsController", () => {
   });
 
   describe("::exec", () => {
-    it("should create SCIM settings", async() => {
+    it("should create SCIM settings", async () => {
       expect.assertions(3);
       const scimSettingsDto = defaultScimSettingsDto();
       const scimSettingsEntity = new ScimSettingsEntity(scimSettingsDto);
@@ -41,7 +44,7 @@ describe("CreateScimSettingsController", () => {
       expect(result).toBeInstanceOf(ScimSettingsEntity);
     });
 
-    it("should handle errors when creating SCIM settings", async() => {
+    it("should handle errors when creating SCIM settings", async () => {
       expect.assertions(2);
       const error = new Error("Failed to create SCIM settings");
       jest.spyOn(controller.enableScimSettingsService, "enable").mockRejectedValue(error);
@@ -50,7 +53,7 @@ describe("CreateScimSettingsController", () => {
       expect(controller.enableScimSettingsService.enable).toHaveBeenCalled();
     });
 
-    it("should throw error if secret_token is missing", async() => {
+    it("should throw error if secret_token is missing", async () => {
       expect.assertions(2);
       jest.spyOn(controller.enableScimSettingsService, "enable");
 

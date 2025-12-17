@@ -13,23 +13,17 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService";
 import {
   defaultMetadataTypesSettingsV4Dto,
-  defaultMetadataTypesSettingsV50FreshDto
+  defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import {
-  defaultCeOrganizationSettings
-} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import {
-  defaultMetadataKeysSettingsDto
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
+import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -38,7 +32,7 @@ beforeEach(() => {
 describe("GetOrFindMetadataSettingsService", () => {
   let getOrFindMetadataSettingsService, account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
     getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
@@ -48,13 +42,23 @@ describe("GetOrFindMetadataSettingsService", () => {
   });
 
   describe("::getOrFindTypesSettings", () => {
-    it("with empty storage, retrieves the metadata types settings from the API and store them into the local storage.", async() => {
+    it("with empty storage, retrieves the metadata types settings from the API and store them into the local storage.", async () => {
       expect.assertions(3);
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
       const siteSettingsDto = defaultCeOrganizationSettings();
-      jest.spyOn(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataTypesSettingsApiService, "findSettings")
+      jest
+        .spyOn(
+          getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+            .metadataTypesSettingsApiService,
+          "findSettings",
+        )
         .mockImplementation(() => metadataTypesSettingsDto);
-      jest.spyOn(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel.organizationSettingsService, "find")
+      jest
+        .spyOn(
+          getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel
+            .organizationSettingsService,
+          "find",
+        )
         .mockImplementation(() => siteSettingsDto);
 
       // Control initial storage value.
@@ -68,38 +72,59 @@ describe("GetOrFindMetadataSettingsService", () => {
       await expect(storageValue).toEqual(metadataTypesSettingsDto);
     });
 
-    it("with populated storage, retrieves the metadata types settings from the local storage.", async() => {
+    it("with populated storage, retrieves the metadata types settings from the local storage.", async () => {
       expect.assertions(2);
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
-      await getOrFindMetadataSettingsService.metadataTypesSettingsLocalStorage.set(new MetadataTypesSettingsEntity(metadataTypesSettingsDto));
-      jest.spyOn(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataTypesSettingsApiService, "findSettings");
+      await getOrFindMetadataSettingsService.metadataTypesSettingsLocalStorage.set(
+        new MetadataTypesSettingsEntity(metadataTypesSettingsDto),
+      );
+      jest.spyOn(
+        getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+          .metadataTypesSettingsApiService,
+        "findSettings",
+      );
 
       const entity = await getOrFindMetadataSettingsService.getOrFindTypesSettings();
 
-      expect(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataTypesSettingsApiService.findSettings)
-        .not.toHaveBeenCalled();
+      expect(
+        getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+          .metadataTypesSettingsApiService.findSettings,
+      ).not.toHaveBeenCalled();
       expect(entity.toDto()).toEqual(metadataTypesSettingsDto);
     });
 
-    it("with storage populated with incomplete data, retrieves the metadata types settings marshall with default value.", async() => {
+    it("with storage populated with incomplete data, retrieves the metadata types settings marshall with default value.", async () => {
       expect.assertions(2);
-      browser.storage.local.set({[getOrFindMetadataSettingsService.metadataTypesSettingsLocalStorage.storageKey]: {}});
+      browser.storage.local.set({
+        [getOrFindMetadataSettingsService.metadataTypesSettingsLocalStorage.storageKey]: {},
+      });
 
-      jest.spyOn(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataTypesSettingsApiService, "findSettings");
+      jest.spyOn(
+        getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+          .metadataTypesSettingsApiService,
+        "findSettings",
+      );
 
       const entity = await getOrFindMetadataSettingsService.getOrFindTypesSettings();
 
-      expect(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataTypesSettingsApiService.findSettings)
-        .not.toHaveBeenCalled();
+      expect(
+        getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+          .metadataTypesSettingsApiService.findSettings,
+      ).not.toHaveBeenCalled();
       expect(entity.toDto()).toEqual(defaultMetadataTypesSettingsV4Dto());
     });
   });
 
   describe("::getOrFindKeysSettings", () => {
-    it("with empty storage, retrieves the metadata keys settings from the API and store them into the local storage.", async() => {
+    it("with empty storage, retrieves the metadata keys settings from the API and store them into the local storage.", async () => {
       expect.assertions(3);
       const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
-      jest.spyOn(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings")
+      jest
+        .spyOn(
+          getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+            .metadataKeysSettingsApiService,
+          "findSettings",
+        )
         .mockImplementation(() => metadataKeysSettingsDto);
 
       // Control initial storage value.
@@ -113,29 +138,43 @@ describe("GetOrFindMetadataSettingsService", () => {
       await expect(storageValue).toEqual(metadataKeysSettingsDto);
     });
 
-    it("with populated storage, retrieves the metadata keys settings from the local storage.", async() => {
+    it("with populated storage, retrieves the metadata keys settings from the local storage.", async () => {
       expect.assertions(2);
       const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
-      await getOrFindMetadataSettingsService.metadataKeysSettingsLocalStorage.set(new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
-      jest.spyOn(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings");
+      await getOrFindMetadataSettingsService.metadataKeysSettingsLocalStorage.set(
+        new MetadataKeysSettingsEntity(metadataKeysSettingsDto),
+      );
+      jest.spyOn(
+        getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+          .metadataKeysSettingsApiService,
+        "findSettings",
+      );
 
       const entity = await getOrFindMetadataSettingsService.getOrFindKeysSettings();
 
-      expect(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService.findSettings)
-        .not.toHaveBeenCalled();
+      expect(
+        getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+          .metadataKeysSettingsApiService.findSettings,
+      ).not.toHaveBeenCalled();
       expect(entity.toDto()).toEqual(metadataKeysSettingsDto);
     });
 
-    it("with storage populated with incomplete data, retrieves the metadata keys settings marshall with default value.", async() => {
+    it("with storage populated with incomplete data, retrieves the metadata keys settings marshall with default value.", async () => {
       expect.assertions(2);
-      browser.storage.local.set({[getOrFindMetadataSettingsService.metadataKeysSettingsLocalStorage.storageKey]: {}});
+      browser.storage.local.set({ [getOrFindMetadataSettingsService.metadataKeysSettingsLocalStorage.storageKey]: {} });
 
-      jest.spyOn(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService, "findSettings");
+      jest.spyOn(
+        getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+          .metadataKeysSettingsApiService,
+        "findSettings",
+      );
 
       const entity = await getOrFindMetadataSettingsService.getOrFindKeysSettings();
 
-      expect(getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService.metadataKeysSettingsApiService.findSettings)
-        .not.toHaveBeenCalled();
+      expect(
+        getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+          .metadataKeysSettingsApiService.findSettings,
+      ).not.toHaveBeenCalled();
       expect(entity.toDto()).toEqual(defaultMetadataKeysSettingsDto());
     });
   });

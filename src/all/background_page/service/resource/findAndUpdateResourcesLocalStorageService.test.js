@@ -13,32 +13,38 @@
  */
 
 import ResourceService from "../api/resource/resourceService";
-import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
+import { ApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import FindAndUpdateResourcesLocalStorage from "./findAndUpdateResourcesLocalStorageService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {multipleResourceDtos, singleResourceDtos} from "./findAndUpdateResourcesLocalStorageService.test.data";
-import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { multipleResourceDtos, singleResourceDtos } from "./findAndUpdateResourcesLocalStorageService.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypeService from "../api/resourceType/resourceTypeService";
 import FindResourcesService from "./findResourcesService";
-import {defaultResourceDto, resourceLegacyDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {
+  defaultResourceDto,
+  resourceLegacyDto,
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
-import {multipleResourceIncludingUnsupportedResourceTypesDtos, multipleResourceWithMetadataEncrypted} from "./findResourcesService.test.data";
-import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import {
+  multipleResourceIncludingUnsupportedResourceTypesDtos,
+  multipleResourceWithMetadataEncrypted,
+} from "./findResourcesService.test.data";
+import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 import DecryptMessageService from "../crypto/decryptMessageService";
-import {defaultDecryptedSharedMetadataKeysDtos} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
+import { defaultDecryptedSharedMetadataKeysDtos } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {v4 as uuidv4} from "uuid";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import { v4 as uuidv4 } from "uuid";
 
 jest.useFakeTimers();
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.clearAllMocks();
   jest.clearAllTimers();
 });
@@ -46,7 +52,7 @@ beforeEach(async() => {
 describe("UpdateResourcesLocalStorage", () => {
   // mock data
   const account = new AccountEntity(defaultAccountDto());
-  const apiClientOptions = new ApiClientOptions().setBaseUrl('https://localhost');
+  const apiClientOptions = new ApiClientOptions().setBaseUrl("https://localhost");
 
   describe("::findAndUpdateAll", () => {
     let service;
@@ -56,14 +62,16 @@ describe("UpdateResourcesLocalStorage", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
     });
 
-    it("asserts updatePeriodThreshold parameter", async() => {
+    it("asserts updatePeriodThreshold parameter", async () => {
       expect.assertions(1);
-      const options = new ApiClientOptions().setBaseUrl('https://localhost');
+      const options = new ApiClientOptions().setBaseUrl("https://localhost");
       const resourceLocalStorageUpdateService = new FindAndUpdateResourcesLocalStorage(account, options);
-      expect(() => resourceLocalStorageUpdateService.findAndUpdateAll({updatePeriodThreshold: false})).rejects.toThrow("Parameter updatePeriodThreshold should be a number.");
+      expect(() =>
+        resourceLocalStorageUpdateService.findAndUpdateAll({ updatePeriodThreshold: false }),
+      ).rejects.toThrow("Parameter updatePeriodThreshold should be a number.");
     });
 
-    it("updates local storage when no resources are returned by the API.", async() => {
+    it("updates local storage when no resources are returned by the API.", async () => {
       expect.assertions(3);
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
@@ -76,7 +84,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesLSDto));
     });
 
-    it("updates local storage with a single resource.", async() => {
+    it("updates local storage with a single resource.", async () => {
       expect.assertions(4);
       const resourcesDto = singleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
@@ -91,7 +99,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesDto));
     });
 
-    it("updates local storage with multiple resources.", async() => {
+    it("updates local storage with multiple resources.", async () => {
       expect.assertions(5);
       const resourcesDto = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
@@ -107,7 +115,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesDto));
     });
 
-    it("overrides local storage with a second update call.", async() => {
+    it("overrides local storage with a second update call.", async () => {
       expect.assertions(5);
       const resourcesDto = singleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
@@ -124,7 +132,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesDto));
     });
 
-    it("does not update the local storage if the update period threshold given in parameter is not overdue.", async() => {
+    it("does not update the local storage if the update period threshold given in parameter is not overdue.", async () => {
       expect.assertions(6);
       const resourcesDto = singleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
@@ -132,10 +140,10 @@ describe("UpdateResourcesLocalStorage", () => {
       jest.spyOn(ResourceLocalStorage, "get");
       await ResourceLocalStorage.set(new ResourcesCollection(multipleResourceDtos()));
 
-      const resourcesCollection =  await service.findAndUpdateAll();
+      const resourcesCollection = await service.findAndUpdateAll();
       const unexpectedDto = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => unexpectedDto);
-      const resourcesCollectionWithThreshold =  await service.findAndUpdateAll({updatePeriodThreshold: 1000});
+      const resourcesCollectionWithThreshold = await service.findAndUpdateAll({ updatePeriodThreshold: 1000 });
 
       const resourcesLSDto = await ResourceLocalStorage.get();
       expect(FindResourcesService.prototype.findAllForLocalStorage).toHaveBeenCalledTimes(1);
@@ -146,17 +154,17 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollectionWithThreshold).not.toEqual(new ResourcesCollection(unexpectedDto));
     });
 
-    it("updates the local storage if the update period threshold given in parameter is overdue.", async() => {
+    it("updates the local storage if the update period threshold given in parameter is overdue.", async () => {
       expect.assertions(5);
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => singleResourceDtos());
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
       await ResourceLocalStorage.set(new ResourcesCollection(multipleResourceDtos()));
 
-      const resourcesCollection =  await service.findAndUpdateAll();
+      const resourcesCollection = await service.findAndUpdateAll();
       const resourcesDto = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
       jest.advanceTimersByTime(1001);
-      const resourcesCollectionOverdue =  await service.findAndUpdateAll({updatePeriodThreshold: 1000});
+      const resourcesCollectionOverdue = await service.findAndUpdateAll({ updatePeriodThreshold: 1000 });
 
       const resourcesLSDto = await ResourceLocalStorage.get();
       expect(FindResourcesService.prototype.findAllForLocalStorage).toHaveBeenCalledTimes(2);
@@ -166,7 +174,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollectionOverdue).toEqual(new ResourcesCollection(resourcesDto));
     });
 
-    it("should update the local storage without resources having unknown resource types.", async() => {
+    it("should update the local storage without resources having unknown resource types.", async () => {
       expect.assertions(2);
       const apiResources = multipleResourceIncludingUnsupportedResourceTypesDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => apiResources);
@@ -180,9 +188,9 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesLSDto).toHaveLength(4);
     });
 
-    it("should not decrypt resources if decryption result is already known and resource is unmodified.", async() => {
+    it("should not decrypt resources if decryption result is already known and resource is unmodified.", async () => {
       expect.assertions(2);
-      const localResource = [resourceLegacyDto({name: "Resource0"})];
+      const localResource = [resourceLegacyDto({ name: "Resource0" })];
       const resourceWithEncryptedMetadata = resourceLegacyDto(localResource[0]);
       resourceWithEncryptedMetadata.metadata = metadata.withAdaKey.encryptedMetadata[0];
 
@@ -198,13 +206,13 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollection.items[0].isMetadataDecrypted()).toStrictEqual(true);
     });
 
-    it("should filter out all resources which throws an error.", async() => {
+    it("should filter out all resources which throws an error.", async () => {
       expect.assertions(2);
 
       await ResourceLocalStorage.set(new ResourcesCollection([]));
 
       const resourceWithUnsupportedResourceType = multipleResourceIncludingUnsupportedResourceTypesDtos();
-      const resourceWithError = defaultResourceDto({resource_type_id: null});
+      const resourceWithError = defaultResourceDto({ resource_type_id: null });
       const apiResources = resourceWithUnsupportedResourceType.concat(resourceWithError);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => apiResources);
@@ -214,31 +222,39 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(storedResourceCollection).toHaveLength(4);
     });
 
-    it("should return a collection with resources metadata decrypted", async() => {
-      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
-      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
-      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
-      const resourceTypesDto = resourceTypesCollectionDto();
+    it(
+      "should return a collection with resources metadata decrypted",
+      async () => {
+        const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+        const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+        const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+        const resourceTypesDto = resourceTypesCollectionDto();
 
-      expect.assertions(2 + resourcesDto.length);
+        expect.assertions(2 + resourcesDto.length);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
-      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(service.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+        jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+        jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
+        jest
+          .spyOn(GetDecryptedUserPrivateKeyService, "getKey")
+          .mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+        jest
+          .spyOn(service.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll")
+          .mockImplementation(() => metadataKeys);
 
-      const resources = await service.findAndUpdateAll();
+        const resources = await service.findAndUpdateAll();
 
-      expect(resources).toHaveLength(resourcesDto.length);
-      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(2);
+        expect(resources).toHaveLength(resourcesDto.length);
+        expect(PassphraseStorageService.get).toHaveBeenCalledTimes(2);
 
-      for (let i = 0; i < resources._items.length; i++) {
-        expect(resources._items[i].isMetadataDecrypted()).toStrictEqual(true);
-      }
-    }, 10 * 1000);
+        for (let i = 0; i < resources._items.length; i++) {
+          expect(resources._items[i].isMetadataDecrypted()).toStrictEqual(true);
+        }
+      },
+      10 * 1000,
+    );
 
-    it("should return a collection with resources metadata decrypted and resources metadata encrypted filtered out (shared key cannot be found)", async() => {
+    it("should return a collection with resources metadata decrypted and resources metadata encrypted filtered out (shared key cannot be found)", async () => {
       const metadata_key_id = uuidv4();
       const resourcesDto = multipleResourceWithMetadataEncrypted(metadata_key_id);
       const resourceTypesDto = resourceTypesCollectionDto();
@@ -246,8 +262,12 @@ describe("UpdateResourcesLocalStorage", () => {
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(service.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => new MetadataKeysCollection([]));
+      jest
+        .spyOn(GetDecryptedUserPrivateKeyService, "getKey")
+        .mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+      jest
+        .spyOn(service.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll")
+        .mockImplementation(() => new MetadataKeysCollection([]));
 
       const resources = await service.findAndUpdateAll();
 
@@ -260,11 +280,11 @@ describe("UpdateResourcesLocalStorage", () => {
       }
     });
 
-    it("waits any on-going call to the update and returns the result of the local storage.", async() => {
+    it("waits any on-going call to the update and returns the result of the local storage.", async () => {
       expect.assertions(3);
       const resourcesDto = singleResourceDtos();
       let resolve;
-      const promise = new Promise(_resolve => resolve = _resolve);
+      const promise = new Promise((_resolve) => (resolve = _resolve));
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => promise);
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
 
@@ -288,7 +308,7 @@ describe("UpdateResourcesLocalStorage", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
     });
 
-    it("should extract the id from the resource collection", async() => {
+    it("should extract the id from the resource collection", async () => {
       expect.assertions(3);
 
       const resourcesDto = multipleResourceDtos();
@@ -303,7 +323,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollection).toEqual(expectedCollection);
     });
 
-    it("should allow empty collection for a group ID", async() => {
+    it("should allow empty collection for a group ID", async () => {
       expect.assertions(1);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
@@ -313,7 +333,7 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(resourcesCollection.length).toEqual(0);
     });
 
-    it("should update localstorage with new resources", async() => {
+    it("should update localstorage with new resources", async () => {
       expect.assertions(6);
 
       const resourceDto1 = defaultResourceDto();
@@ -326,9 +346,9 @@ describe("UpdateResourcesLocalStorage", () => {
 
       const resources = [
         resourceDto1,
-        {...resourceDto2, name: "Resource 2 name update"},
+        { ...resourceDto2, name: "Resource 2 name update" },
         resourceDto3,
-        {...resourceDto4, name: "Resource 4 name update"},
+        { ...resourceDto4, name: "Resource 4 name update" },
       ];
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resources);
@@ -340,12 +360,16 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(expectLocalStorageResult).toEqual(expect.any(Array));
       expect(expectLocalStorageResult).toHaveLength(4);
       expect(expectLocalStorageResult[0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
-      expect(expectLocalStorageResult[1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
+      expect(expectLocalStorageResult[1]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto2, name: "Resource 2 name update" }),
+      );
       expect(expectLocalStorageResult[2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
-      expect(expectLocalStorageResult[3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
+      expect(expectLocalStorageResult[3]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto4, name: "Resource 4 name update" }),
+      );
     });
 
-    it("should add new entry to localstorage with new resources", async() => {
+    it("should add new entry to localstorage with new resources", async () => {
       expect.assertions(4);
 
       const resourceDto1 = defaultResourceDto();
@@ -354,10 +378,7 @@ describe("UpdateResourcesLocalStorage", () => {
 
       await ResourceLocalStorage.set(new ResourcesCollection(resourcesDtos));
 
-      const resources = [
-        resourceDto1,
-        resourceDto2
-      ];
+      const resources = [resourceDto1, resourceDto2];
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resources);
 
@@ -380,7 +401,7 @@ describe("UpdateResourcesLocalStorage", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
     });
 
-    it("should extract the id from the resource collection", async() => {
+    it("should extract the id from the resource collection", async () => {
       expect.assertions(2);
 
       const parentFolderId = uuidv4();
@@ -395,12 +416,12 @@ describe("UpdateResourcesLocalStorage", () => {
       expect(service.findResourcesServices.findAllByParentFolderIdForLocalStorage).toHaveBeenCalledWith(parentFolderId);
     });
 
-    it("should assert its parameter", async() => {
+    it("should assert its parameter", async () => {
       expect.assertions(1);
       await expect(() => service.findAndUpdateAllByParentFolderId("test")).rejects.toThrow();
     });
 
-    it("should update the local storage resource collection by removing deleted resources, moving resources and updating resources data", async() => {
+    it("should update the local storage resource collection by removing deleted resources, moving resources and updating resources data", async () => {
       expect.assertions(8);
 
       const parentFolderId = uuidv4();
@@ -428,24 +449,18 @@ describe("UpdateResourcesLocalStorage", () => {
       await ResourceLocalStorage.set(localStorageResourceCollection);
 
       // the resources in the folder on the API does not have resource2 anymore but resources1 remains and is changed.
-      const apiResourcesDtoInFolder = [
-        {...resourcesDto[1]},
-      ];
+      const apiResourcesDtoInFolder = [{ ...resourcesDto[1] }];
       apiResourcesDtoInFolder[0].metadata.name = "Resource1 - UPDATED";
-      apiResourcesDtoInFolder[0].modified = (new Date()).toISOString();
+      apiResourcesDtoInFolder[0].modified = new Date().toISOString();
 
       // resource2 on the API will be return and updated, resource3 will never be sent back as it is deleted
-      const allIdsApiResourcesDto = [
-        {...resourcesDto[2]},
-      ];
+      const allIdsApiResourcesDto = [{ ...resourcesDto[2] }];
       allIdsApiResourcesDto[0].folder_parent_id = otherParentFolderId;
 
       async function mockedFindAllApi(_, filter) {
         const isParentFolderSearchRequest = Boolean(filter["has-parent"]);
 
-        return isParentFolderSearchRequest
-          ? apiResourcesDtoInFolder
-          : allIdsApiResourcesDto;
+        return isParentFolderSearchRequest ? apiResourcesDtoInFolder : allIdsApiResourcesDto;
       }
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(mockedFindAllApi);

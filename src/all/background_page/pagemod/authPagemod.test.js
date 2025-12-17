@@ -11,17 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {ConfigEvents} from "../event/configEvents";
+import { ConfigEvents } from "../event/configEvents";
 import Auth from "./authPagemod";
-import {UserEvents} from "../event/userEvents";
-import {KeyringEvents} from "../event/keyringEvents";
-import {AuthEvents} from "../event/authEvents";
-import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
-import {LocaleEvents} from "../event/localeEvents";
-import {v4 as uuid} from 'uuid';
-import {enableFetchMocks} from "jest-fetch-mock";
+import { UserEvents } from "../event/userEvents";
+import { KeyringEvents } from "../event/keyringEvents";
+import { AuthEvents } from "../event/authEvents";
+import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { LocaleEvents } from "../event/localeEvents";
+import { v4 as uuid } from "uuid";
+import { enableFetchMocks } from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import {RememberMeEvents} from "../event/rememberMeEvents";
+import { RememberMeEvents } from "../event/rememberMeEvents";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
@@ -33,33 +33,33 @@ jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 
 describe("Auth", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
   });
 
   describe("Auth::attachEvents", () => {
-    it("Should attach events", async() => {
+    it("Should attach events", async () => {
       expect.assertions(11);
       // data mocked
       const port = {
         _port: {
           sender: {
             tab: {
-              url: "https://localhost"
-            }
-          }
-        }
+              url: "https://localhost",
+            },
+          },
+        },
       };
-      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
-      const mockedAccount = {user_id: uuid(), domain: "https://test-domain.passbolt.com"};
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
+      const mockedAccount = { user_id: uuid(), domain: "https://test-domain.passbolt.com" };
       const mockApiClient = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
-      jest.spyOn(GetActiveAccountService, 'get').mockImplementation(() => mockedAccount);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
       // process
       await Auth.attachEvents(port);
       // expectations
-      const expectedPortAndTab = {port: port, tab: port._port.sender.tab};
+      const expectedPortAndTab = { port: port, tab: port._port.sender.tab };
       expect(GetActiveAccountService.get).toHaveBeenCalledTimes(1);
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
@@ -68,14 +68,22 @@ describe("Auth", () => {
       expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(LocaleEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(Auth.events).toStrictEqual([ConfigEvents, UserEvents, KeyringEvents, AuthEvents, OrganizationSettingsEvents, LocaleEvents, RememberMeEvents]);
+      expect(Auth.events).toStrictEqual([
+        ConfigEvents,
+        UserEvents,
+        KeyringEvents,
+        AuthEvents,
+        OrganizationSettingsEvents,
+        LocaleEvents,
+        RememberMeEvents,
+      ]);
       expect(Auth.mustReloadOnExtensionUpdate).toBeFalsy();
-      expect(Auth.appName).toBe('Auth');
+      expect(Auth.appName).toBe("Auth");
     });
   });
 
   describe("Auth::canBeAttachedTo", () => {
-    it("Should have the canBeAttachedTo not valid", async() => {
+    it("Should have the canBeAttachedTo not valid", async () => {
       expect.assertions(1);
       // process
       const canBeAttachedTo = await Auth.canBeAttachedTo({});

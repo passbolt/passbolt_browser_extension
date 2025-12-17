@@ -12,8 +12,8 @@
  * @since         4.7.0
  */
 import AuthenticationStatusService from "./authenticationStatusService";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse, mockApiResponseError, mockApiRedirectResponse} from "../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse, mockApiResponseError, mockApiRedirectResponse } from "../../../../test/mocks/mockApiResponse";
 import NotFoundError from "../error/notFoundError";
 import MockExtension from "../../../../test/mocks/mockExtension";
 import MfaAuthenticationRequiredError from "../error/mfaAuthenticationRequiredError";
@@ -22,7 +22,7 @@ beforeAll(() => {
   enableFetchMocks();
 });
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.clearAllMocks();
   await MockExtension.withConfiguredAccount();
 });
@@ -32,27 +32,29 @@ describe("AuthenticationStatusService::isAuthenticated", () => {
     fetch.doMockOnceIf(/auth\/is-authenticated\.json/, callback);
   }
 
-  it("should return true if the user is fully authenticated", async() => {
+  it("should return true if the user is fully authenticated", async () => {
     expect.assertions(1);
     mockIsAuthenticated(() => mockApiResponse({}));
     await expect(AuthenticationStatusService.isAuthenticated()).resolves.toStrictEqual(true);
   });
 
-  it("should return false if the user is not signed in and doesn't required MFA", async() => {
+  it("should return false if the user is not signed in and doesn't required MFA", async () => {
     expect.assertions(1);
     mockIsAuthenticated(() => mockApiResponseError(403, "User is not signed in"));
     await expect(AuthenticationStatusService.isAuthenticated()).resolves.toStrictEqual(false);
   });
 
-  it("should throw an Error if the endpoint is not found", async() => {
+  it("should throw an Error if the endpoint is not found", async () => {
     expect.assertions(1);
     mockIsAuthenticated(() => mockApiResponseError(404, "Endpoint is not found"));
     await expect(AuthenticationStatusService.isAuthenticated()).rejects.toThrowError(new NotFoundError());
   });
 
-  it("should throw an MfaAuthenticationRequiredError if the user miss the Mfa authentication", async() => {
+  it("should throw an MfaAuthenticationRequiredError if the user miss the Mfa authentication", async () => {
     expect.assertions(1);
     mockIsAuthenticated(() => mockApiRedirectResponse("/mfa/verify/error.json"));
-    await expect(AuthenticationStatusService.isAuthenticated()).rejects.toThrowError(new MfaAuthenticationRequiredError());
+    await expect(AuthenticationStatusService.isAuthenticated()).rejects.toThrowError(
+      new MfaAuthenticationRequiredError(),
+    );
   });
 });

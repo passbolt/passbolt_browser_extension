@@ -13,9 +13,9 @@
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import UpdatedPermissionsCollection from "./updatedPermissionsCollection";
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
-import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
-import {defaultUpdatePermissionDto} from "./updatedPermissionEntity.test.data";
+import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { defaultGroupDto } from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
+import { defaultUpdatePermissionDto } from "./updatedPermissionEntity.test.data";
 import UpdatedPermissionEntity from "./updatedPermissionEntity";
 
 describe("UpdatedPermissionsCollection", () => {
@@ -33,8 +33,8 @@ describe("UpdatedPermissionsCollection", () => {
     it("works if valid DTOs are provided", () => {
       expect.assertions(6);
 
-      const dto1 = defaultUpdatePermissionDto({user: defaultUserDto()});
-      const dto2 = defaultUpdatePermissionDto({group: defaultGroupDto()});
+      const dto1 = defaultUpdatePermissionDto({ user: defaultUserDto() });
+      const dto2 = defaultUpdatePermissionDto({ group: defaultGroupDto() });
       const dtos = [dto1, dto2];
       const collection = new UpdatedPermissionsCollection(dtos);
 
@@ -49,15 +49,14 @@ describe("UpdatedPermissionsCollection", () => {
 
     it("should throw if the collection schema does not validate", () => {
       expect.assertions(1);
-      expect(() => new UpdatedPermissionsCollection({}))
-        .toThrowEntityValidationError("items");
+      expect(() => new UpdatedPermissionsCollection({})).toThrowEntityValidationError("items");
     });
 
     it("should throw if one of data item does not validate the collection entity schema", () => {
       expect.assertions(1);
 
       const dto1 = defaultUpdatePermissionDto();
-      const dto2 = defaultUpdatePermissionDto({user: 42});
+      const dto2 = defaultUpdatePermissionDto({ user: 42 });
 
       expect(() => new UpdatedPermissionsCollection([dto1, dto2])).toThrow();
     });
@@ -80,12 +79,18 @@ describe("UpdatedPermissionsCollection", () => {
       const userB = defaultUserDto();
       userB.profile.first_name = "user B";
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: userA}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: userB}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: userA }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: userB }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(-1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionA)).toStrictEqual(0);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        -1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(
+        1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionA)).toStrictEqual(
+        0,
+      );
     });
 
     it("should consider equal permisions with users having the same name", () => {
@@ -96,10 +101,12 @@ describe("UpdatedPermissionsCollection", () => {
       const userB = defaultUserDto();
       userB.profile.first_name = "user";
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: userA}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: userB}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: userA }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: userB }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(0);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        0,
+      );
     });
 
     it("should put user without definition after users with definition", () => {
@@ -108,97 +115,133 @@ describe("UpdatedPermissionsCollection", () => {
       const userB = defaultUserDto();
       userB.profile.first_name = "user B";
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: userB}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: userB }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(-1);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(
+        -1,
+      );
     });
 
     it("both undfined users should be considered equal", () => {
       expect.assertions(1);
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(0);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        0,
+      );
     });
 
     it("should order groups by their name", () => {
       expect.assertions(3);
 
-      const groupA = defaultGroupDto({name: "Group A"});
-      const groupB = defaultGroupDto({name: "Group B"});
+      const groupA = defaultGroupDto({ name: "Group A" });
+      const groupB = defaultGroupDto({ name: "Group B" });
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: groupA}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: groupB}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: groupA }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: groupB }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(-1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionA)).toStrictEqual(0);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        -1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(
+        1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionA)).toStrictEqual(
+        0,
+      );
     });
 
     it("should consider equal permisions with groups having the same name", () => {
       expect.assertions(1);
 
-      const groupA = defaultGroupDto({name: "Group"});
-      const groupB = defaultGroupDto({name: "Group"});
+      const groupA = defaultGroupDto({ name: "Group" });
+      const groupB = defaultGroupDto({ name: "Group" });
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: groupA}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: groupB}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: groupA }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: groupB }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(0);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        0,
+      );
     });
 
     it("should put group without definition after groups with definition", () => {
       expect.assertions(2);
 
-      const groupB = defaultGroupDto({name: "Group B"});
+      const groupB = defaultGroupDto({ name: "Group B" });
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: null}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: groupB}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: null }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: groupB }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(-1);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(
+        -1,
+      );
     });
 
     it("should put group after users", () => {
       expect.assertions(2);
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: defaultGroupDto()}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: defaultUserDto()}));
+      const permissionA = new UpdatedPermissionEntity(
+        defaultUpdatePermissionDto({ user: null, group: defaultGroupDto() }),
+      );
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: defaultUserDto() }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(-1);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(
+        -1,
+      );
     });
 
     it("should put undefined group after users", () => {
       expect.assertions(2);
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: null}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: defaultUserDto()}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: null }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: defaultUserDto() }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(-1);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(
+        -1,
+      );
     });
 
     it("should put undefined users after group", () => {
       expect.assertions(2);
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null,  group: defaultGroupDto()}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null}));
+      const permissionA = new UpdatedPermissionEntity(
+        defaultUpdatePermissionDto({ user: null, group: defaultGroupDto() }),
+      );
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(-1);
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(1);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        -1,
+      );
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionB, permissionA)).toStrictEqual(
+        1,
+      );
     });
 
     it("should put undefined grantees at the same level", () => {
       expect.assertions(1);
 
-      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: null}));
-      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({user: null, group: null}));
+      const permissionA = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: null }));
+      const permissionB = new UpdatedPermissionEntity(defaultUpdatePermissionDto({ user: null, group: null }));
 
-      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(0);
+      expect(UpdatedPermissionsCollection.sortPermissionsByGranteeTypeAndName(permissionA, permissionB)).toStrictEqual(
+        0,
+      );
     });
   });
 });

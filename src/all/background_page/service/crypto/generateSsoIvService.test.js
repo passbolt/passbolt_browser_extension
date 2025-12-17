@@ -18,7 +18,7 @@ beforeEach(() => {
 });
 
 describe("GenerateSsoIv service", () => {
-  it("should generate an IV compatible with SSO's algorithm by default", async() => {
+  it("should generate an IV compatible with SSO's algorithm by default", async () => {
     expect.assertions(2);
 
     const iv = GenerateSsoIvService.generateIv();
@@ -26,7 +26,7 @@ describe("GenerateSsoIv service", () => {
     expect(iv.length).toBe(12);
   });
 
-  it("should generate an IV with the demanded size", async() => {
+  it("should generate an IV with the demanded size", async () => {
     expect.assertions(2);
 
     const iv2 = GenerateSsoIvService.generateIv(6);

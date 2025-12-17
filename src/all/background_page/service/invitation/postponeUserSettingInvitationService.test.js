@@ -12,10 +12,10 @@
  * @since         3.10.0
  */
 
-import PostponeUserSettingInvitationService from './postponeUserSettingInvitationService';
+import PostponeUserSettingInvitationService from "./postponeUserSettingInvitationService";
 
 describe("PostponedUserSettingInvitation service", () => {
-  it("Retrieve the right information for account recovery", async() => {
+  it("Retrieve the right information for account recovery", async () => {
     expect.assertions(2);
     //Check that the default value is false
     expect(PostponeUserSettingInvitationService.hasPostponedAccountRecovery()).toBe(false);
@@ -24,7 +24,7 @@ describe("PostponedUserSettingInvitation service", () => {
     expect(PostponeUserSettingInvitationService.hasPostponedAccountRecovery()).toBe(true);
   });
 
-  it("Retrieve the right information for mfa", async() => {
+  it("Retrieve the right information for mfa", async () => {
     expect.assertions(2);
     //Check that the default value is false
     expect(PostponeUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(false);
@@ -33,8 +33,7 @@ describe("PostponedUserSettingInvitation service", () => {
     expect(PostponeUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(true);
   });
 
-
-  it("Should listen the event passbolt.auth.after-logout and reset the postpone the right information", async() => {
+  it("Should listen the event passbolt.auth.after-logout and reset the postpone the right information", async () => {
     expect.assertions(6);
     PostponeUserSettingInvitationService.reset();
     expect(PostponeUserSettingInvitationService.hasPostponedAccountRecovery()).toBe(false);

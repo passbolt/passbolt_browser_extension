@@ -13,12 +13,15 @@
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import UserRememberMeLatestChoiceEntity from "./userRememberMeLatestChoiceEntity";
-import {defaultRememberMeLatestChoiceDto} from "./userRememberMeLatestChoiceEntity.test.data";
+import { defaultRememberMeLatestChoiceDto } from "./userRememberMeLatestChoiceEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("UserRememberMeLatestChoiceEntity", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(UserRememberMeLatestChoiceEntity.ENTITY_NAME, UserRememberMeLatestChoiceEntity.getSchema());
+    EntitySchema.validateSchema(
+      UserRememberMeLatestChoiceEntity.ENTITY_NAME,
+      UserRememberMeLatestChoiceEntity.getSchema(),
+    );
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -28,16 +31,25 @@ describe("UserRememberMeLatestChoiceEntity", () => {
     expect(entity.duration).toStrictEqual(0);
   });
 
-  it(`Should not accept non integer duration`, async() => {
+  it(`Should not accept non integer duration`, async () => {
     const forbiddenCases = [
-      "-1", "0", "1", NaN, "test", 3.14, -3.14, false, null, undefined,
+      "-1",
+      "0",
+      "1",
+      NaN,
+      "test",
+      3.14,
+      -3.14,
+      false,
+      null,
+      undefined,
       /* @todo add -2 like value when minimum validation is supported */
     ];
     expect.assertions(forbiddenCases.length);
-    const expectedError = new EntityValidationError('Could not validate entity UserRememberMeLatestChoice.');
+    const expectedError = new EntityValidationError("Could not validate entity UserRememberMeLatestChoice.");
 
     for (let i = 0; i < forbiddenCases.length; i++) {
-      const dto = defaultRememberMeLatestChoiceDto({duration: forbiddenCases[i]});
+      const dto = defaultRememberMeLatestChoiceDto({ duration: forbiddenCases[i] });
       expect(() => new UserRememberMeLatestChoiceEntity(dto)).toThrow(expectedError);
     }
   });

@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
-import {readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
-import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { v4 as uuidv4 } from "uuid";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { users } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { readSecret } from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
+import { ownerPermissionDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 async function buildReadSecret(userId, resourceId, decryptedPrivateKey, cleartextMessage) {
   return readSecret({
@@ -28,7 +28,7 @@ async function buildReadSecret(userId, resourceId, decryptedPrivateKey, cleartex
   });
 }
 
-export const _3ResourcesSharedWith3UsersResourcesDto = async() => {
+export const _3ResourcesSharedWith3UsersResourcesDto = async () => {
   const resource1Id = uuidv4();
   const resource2Id = uuidv4();
   const resource3Id = uuidv4();
@@ -56,35 +56,35 @@ export const _3ResourcesSharedWith3UsersResourcesDto = async() => {
     aco_foreign_key: resource1Id,
     aro_foreign_key: userAda.id,
     user: userAda,
-    group: null
+    group: null,
   });
 
   const resource2FullPermissionAda = ownerPermissionDto({
     aco_foreign_key: resource2Id,
     aro_foreign_key: userAda.id,
     user: userAda,
-    group: null
+    group: null,
   });
 
   const resource3FullPermissionAda = ownerPermissionDto({
     aco_foreign_key: resource3Id,
     aro_foreign_key: userAda.id,
     user: userAda,
-    group: null
+    group: null,
   });
 
   const resource2FullPermissionAdmin = ownerPermissionDto({
     aco_foreign_key: resource2Id,
     aro_foreign_key: userAdmin.id,
     user: userAdmin,
-    group: null
+    group: null,
   });
 
   const resource3FullPermissionBetty = ownerPermissionDto({
     aco_foreign_key: resource3Id,
     aro_foreign_key: userBetty.id,
     user: userBetty,
-    group: null
+    group: null,
   });
 
   const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
@@ -96,21 +96,21 @@ export const _3ResourcesSharedWith3UsersResourcesDto = async() => {
     id: resource1Id,
     permission: resource1PermissionOwner,
     permissions: [resource1FullPermissionAda],
-    secrets: [secret1]
+    secrets: [secret1],
   });
 
   const resource2 = defaultResourceDto({
     id: resource2Id,
     permission: resource2PermissionOwner,
     permissions: [resource2FullPermissionAda, resource2FullPermissionAdmin],
-    secrets: [secret2]
+    secrets: [secret2],
   });
 
   const resource3 = defaultResourceDto({
     id: resource3Id,
     permission: resource3PermissionOwner,
     permissions: [resource3FullPermissionAda, resource3FullPermissionBetty],
-    secrets: [secret3]
+    secrets: [secret3],
   });
 
   return [resource1, resource2, resource3];
@@ -123,7 +123,7 @@ export const createChangesDto = (data = {}) => {
     aro: "User",
     aro_foreign_key: uuidv4(),
     is_new: true,
-    type: 1
+    type: 1,
   };
   return Object.assign(defaultData, data);
 };

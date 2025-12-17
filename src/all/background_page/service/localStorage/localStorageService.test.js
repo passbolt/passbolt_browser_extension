@@ -15,24 +15,24 @@
 import LocalStorageService from "./localStorageService";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {RBACS_LOCAL_STORAGE_KEY} from "../local_storage/rbacLocalStorage";
+import { RBACS_LOCAL_STORAGE_KEY } from "../local_storage/rbacLocalStorage";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import PostponeUserSettingInvitationService from "../invitation/postponeUserSettingInvitationService";
-import {PASSWORD_POLICIES_LOCAL_STORAGE_KEY} from "../local_storage/passwordPoliciesLocalStorage";
-import {PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY} from "../local_storage/passwordExpirySettingsLocalStorage";
+import { PASSWORD_POLICIES_LOCAL_STORAGE_KEY } from "../local_storage/passwordPoliciesLocalStorage";
+import { PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY } from "../local_storage/passwordExpirySettingsLocalStorage";
 import MetadataTypesSettingsLocalStorage, {
-  METADATA_TYPES_SETTINGS_LOCAL_STORAGE_KEY
+  METADATA_TYPES_SETTINGS_LOCAL_STORAGE_KEY,
 } from "../local_storage/metadataTypesSettingsLocalStorage";
 import MetadataKeysSessionStorage, {
-  METADATA_KEYS_SESSION_STORAGE_KEY
+  METADATA_KEYS_SESSION_STORAGE_KEY,
 } from "../session_storage/metadataKeysSessionStorage";
 import SessionKeysBundlesSessionStorageService, {
-  SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY
+  SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY,
 } from "../sessionStorage/sessionKeysBundlesSessionStorageService";
-import {METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY} from "../local_storage/metadataKeysSettingsLocalStorage";
-import GroupLocalStorage, {GROUP_LOCAL_STORAGE_KEY} from "../local_storage/groupLocalStorage";
+import { METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY } from "../local_storage/metadataKeysSettingsLocalStorage";
+import GroupLocalStorage, { GROUP_LOCAL_STORAGE_KEY } from "../local_storage/groupLocalStorage";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -40,7 +40,7 @@ beforeEach(() => {
 
 describe("LocalStorageService", () => {
   describe("LocalStorageService::flush", () => {
-    it("Should flush all storage (with no account set)", async() => {
+    it("Should flush all storage (with no account set)", async () => {
       expect.assertions(21);
       // spy on
       jest.spyOn(browser.storage.local, "remove");
@@ -79,7 +79,7 @@ describe("LocalStorageService", () => {
       expect(GroupLocalStorage.prototype.flush).not.toHaveBeenCalled();
     });
 
-    it("Should flush all storage (with an account set)", async() => {
+    it("Should flush all storage (with an account set)", async () => {
       expect.assertions(26);
       // mock data
       MockExtension.withConfiguredAccount();
@@ -113,11 +113,19 @@ describe("LocalStorageService", () => {
       expect(GetLegacyAccountService.get).toHaveBeenCalled();
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_POLICIES_LOCAL_STORAGE_KEY}-${account.id}`);
-      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
-      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${METADATA_TYPES_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
-      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(
+        `${PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`,
+      );
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(
+        `${METADATA_TYPES_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`,
+      );
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(
+        `${METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`,
+      );
       expect(browser.storage.session.remove).toHaveBeenCalledWith(`${METADATA_KEYS_SESSION_STORAGE_KEY}-${account.id}`);
-      expect(browser.storage.session.remove).toHaveBeenCalledWith(`${SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.session.remove).toHaveBeenCalledWith(
+        `${SESSION_KEYS_BUNDLES_SESSION_STORAGE_KEY}-${account.id}`,
+      );
       expect(UserMeSessionStorageService.remove).toHaveBeenCalledWith(account);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${GROUP_LOCAL_STORAGE_KEY}`);
       /**

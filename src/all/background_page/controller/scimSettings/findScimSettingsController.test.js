@@ -15,8 +15,8 @@
 import expect from "expect";
 import FindScimSettingsController from "./findScimSettingsController";
 import ScimSettingsEntity from "passbolt-styleguide/src/shared/models/entity/scimSettings/scimSettingsEntity";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultScimSettingsDto} from "../../service/api/scimSettings/scimSettingsApiService.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultScimSettingsDto } from "../../service/api/scimSettings/scimSettingsApiService.test.data";
 
 describe("FindScimSettingsController", () => {
   let apiClientOptions, controller;
@@ -27,7 +27,7 @@ describe("FindScimSettingsController", () => {
   });
 
   describe("::exec", () => {
-    it("should find SCIM settings", async() => {
+    it("should find SCIM settings", async () => {
       const scimSettingsDto = defaultScimSettingsDto();
       const scimSettingsEntity = new ScimSettingsEntity(scimSettingsDto);
       jest.spyOn(controller.findScimSettingsService, "get").mockResolvedValue(scimSettingsEntity);
@@ -38,7 +38,7 @@ describe("FindScimSettingsController", () => {
       expect(controller.findScimSettingsService.get).toHaveBeenCalled();
     });
 
-    it("should handle errors when finding SCIM settings", async() => {
+    it("should handle errors when finding SCIM settings", async () => {
       const error = new Error("Failed to find SCIM settings");
       jest.spyOn(controller.findScimSettingsService, "get").mockRejectedValue(error);
 

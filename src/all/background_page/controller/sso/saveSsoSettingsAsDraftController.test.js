@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {enableFetchMocks} from "jest-fetch-mock";
-import {v4 as uuid} from "uuid";
-import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { v4 as uuid } from "uuid";
+import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
 import SaveSsoSettingsAsDraftController from "./saveSsoSettingsAsDraftController";
-import {withAzureSsoSettings} from "./saveSsoSettingsAsDraftController.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { withAzureSsoSettings } from "./saveSsoSettingsAsDraftController.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
@@ -26,7 +26,7 @@ beforeEach(() => {
 
 describe("SaveSsoSettingsAsDraftController", () => {
   describe("SaveSsoSettingsAsDraftController::exec", () => {
-    it("Should save the given settings as a draft.", async() => {
+    it("Should save the given settings as a draft.", async () => {
       expect.assertions(2);
       const ssoSettingsDto = withAzureSsoSettings();
 
@@ -39,7 +39,7 @@ describe("SaveSsoSettingsAsDraftController", () => {
         data: Object.assign({}, ssoSettingsDto.data),
       });
 
-      fetch.doMockOnceIf(new RegExp('/sso/settings.json'), async req => {
+      fetch.doMockOnceIf(new RegExp("/sso/settings.json"), async (req) => {
         const data = JSON.parse(await req.text());
 
         expect(data).toStrictEqual(ssoSettingsDto);
@@ -52,9 +52,11 @@ describe("SaveSsoSettingsAsDraftController", () => {
       expect(settings).toStrictEqual(new SsoSettingsEntity(expectedSavedSettings));
     });
 
-    it("Should send an Error if the save can't happen.", async() => {
+    it("Should send an Error if the save can't happen.", async () => {
       expect.assertions(1);
-      fetch.doMockOnceIf(new RegExp('/sso/settings.json'), () => mockApiResponseError(500, "Can't save the settings for some reason."));
+      fetch.doMockOnceIf(new RegExp("/sso/settings.json"), () =>
+        mockApiResponseError(500, "Can't save the settings for some reason."),
+      );
 
       const controller = new SaveSsoSettingsAsDraftController(null, null, defaultApiClientOptions());
       try {

@@ -12,51 +12,55 @@
  * @since         4.0.0
  */
 import InformCallToAction from "./informCallToActionPagemod";
-import {InformCallToActionEvents} from "../event/informCallToActionEvents";
-import {v4 as uuid} from 'uuid';
-import {enableFetchMocks} from "jest-fetch-mock";
+import { InformCallToActionEvents } from "../event/informCallToActionEvents";
+import { v4 as uuid } from "uuid";
+import { enableFetchMocks } from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 jest.spyOn(InformCallToActionEvents, "listen").mockImplementation(jest.fn());
 
 describe("InFormCallToAction", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
   });
 
   describe("InformCallToAction::attachEvents", () => {
-    it("Should attach events", async() => {
+    it("Should attach events", async () => {
       expect.assertions(4);
       // data mocked
       const port = {
         _port: {
           sender: {
             tab: {
-              url: "https://localhost"
-            }
-          }
-        }
+              url: "https://localhost",
+            },
+          },
+        },
       };
       // mock functions
-      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
-      const mockedAccount = {user_id: uuid(), domain: "https://test.passbolt.local"};
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
+      const mockedAccount = { user_id: uuid(), domain: "https://test.passbolt.local" };
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
-      jest.spyOn(GetActiveAccountService, 'get').mockImplementation(() => mockedAccount);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
       // process
       await InformCallToAction.attachEvents(port);
       // expectations
-      expect(InformCallToActionEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformCallToAction.appName}, apiClientOptions, mockedAccount);
+      expect(InformCallToActionEvents.listen).toHaveBeenCalledWith(
+        { port: port, tab: port._port.sender.tab, name: InformCallToAction.appName },
+        apiClientOptions,
+        mockedAccount,
+      );
       expect(InformCallToAction.events).toStrictEqual([InformCallToActionEvents]);
       expect(InformCallToAction.mustReloadOnExtensionUpdate).toBeFalsy();
-      expect(InformCallToAction.appName).toBe('InFormCallToAction');
+      expect(InformCallToAction.appName).toBe("InFormCallToAction");
     });
   });
 
   describe("InformCallToAction::canBeAttachedTo", () => {
-    it("Should have the canBeAttachedTo not valid", async() => {
+    it("Should have the canBeAttachedTo not valid", async () => {
       expect.assertions(1);
       // process
       const canBeAttachedTo = await InformCallToAction.canBeAttachedTo({});

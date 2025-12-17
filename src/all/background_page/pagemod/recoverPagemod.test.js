@@ -12,13 +12,12 @@
  * @since         3.9.0
  */
 import Recover from "./recoverPagemod";
-import {RecoverEvents} from "../event/recoverEvents";
+import { RecoverEvents } from "../event/recoverEvents";
 import BuildAccountRecoverService from "../service/recover/buildAccountRecoverService";
-import {ConfigEvents} from "../event/configEvents";
-import BuildApiClientOptionsService
-  from "../service/account/buildApiClientOptionsService";
-import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
-import {enableFetchMocks} from "jest-fetch-mock";
+import { ConfigEvents } from "../event/configEvents";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
+import { enableFetchMocks } from "jest-fetch-mock";
 
 jest.spyOn(BuildAccountRecoverService, "buildFromRecoverUrl");
 jest.spyOn(BuildApiClientOptionsService, "buildFromAccount");
@@ -27,26 +26,26 @@ jest.spyOn(RecoverEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 
 describe("Recover", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
   });
 
   describe("Recover::attachEvents", () => {
-    it("Should attach events", async() => {
+    it("Should attach events", async () => {
       expect.assertions(8);
       // data mocked
       const port = {
         _port: {
           sender: {
             tab: {
-              url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"
-            }
-          }
-        }
+              url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+            },
+          },
+        },
       };
-      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
       // process
       await Recover.attachEvents(port);
       // expectations
@@ -57,12 +56,12 @@ describe("Recover", () => {
       expect(PownedPasswordEvents.listen).toHaveBeenCalled();
       expect(Recover.events).toStrictEqual([ConfigEvents, RecoverEvents, PownedPasswordEvents]);
       expect(Recover.mustReloadOnExtensionUpdate).toBeFalsy();
-      expect(Recover.appName).toBe('Recover');
+      expect(Recover.appName).toBe("Recover");
     });
   });
 
   describe("Recover::canBeAttachedTo", () => {
-    it("Should have the canBeAttachedTo not valid", async() => {
+    it("Should have the canBeAttachedTo not valid", async () => {
       expect.assertions(1);
       // process
       const canBeAttachedTo = await Recover.canBeAttachedTo({});

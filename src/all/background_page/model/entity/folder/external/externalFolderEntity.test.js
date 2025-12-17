@@ -13,8 +13,8 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ExternalFolderEntity from "./externalFolderEntity";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultExternalFolderDto, minimalExternalFolderDto} from "./externalFolderEntity.test.data";
-import {v4 as uuid} from 'uuid';
+import { defaultExternalFolderDto, minimalExternalFolderDto } from "./externalFolderEntity.test.data";
+import { v4 as uuid } from "uuid";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("ExternalFolderEntity", () => {
@@ -55,7 +55,7 @@ describe("ExternalFolderEntity", () => {
 
       const dto = minimalExternalFolderDto();
       const result = Object.assign({}, dto, {
-        "folder_parent_path": ""
+        folder_parent_path: "",
       });
 
       const entity = new ExternalFolderEntity(dto);
@@ -70,7 +70,7 @@ describe("ExternalFolderEntity", () => {
     it("constructor sanitize folder_parent_path", () => {
       expect.assertions(1);
       const dto = minimalExternalFolderDto({
-        "folder_parent_path": "// at/ the///root //"
+        folder_parent_path: "// at/ the///root //",
       });
       const entity = new ExternalFolderEntity(dto);
       expect(entity.folderParentPath).toStrictEqual("/ at/ the/root /");
@@ -120,9 +120,9 @@ describe("ExternalFolderEntity", () => {
     it("changeRootPath change the folder root path and keep the full path", () => {
       expect.assertions(4);
 
-      const rootFolder = new ExternalFolderEntity({"name": "root"});
-      const intermediateFolder = new ExternalFolderEntity({"name": "Intermediate Folder"});
-      const folder = new ExternalFolderEntity({"name": "Folder 1"});
+      const rootFolder = new ExternalFolderEntity({ name: "root" });
+      const intermediateFolder = new ExternalFolderEntity({ name: "Intermediate Folder" });
+      const folder = new ExternalFolderEntity({ name: "Folder 1" });
 
       intermediateFolder.changeRootPath(rootFolder);
       expect(intermediateFolder.folderParentPath).toStrictEqual("root");
@@ -137,35 +137,35 @@ describe("ExternalFolderEntity", () => {
   describe("::splitFolderPath", () => {
     it("should split folder path using '/' as a delimiter", () => {
       expect.assertions(1);
-      const folderPathString =  "Root/DatabaseCC/Domaine/Windows";
+      const folderPathString = "Root/DatabaseCC/Domaine/Windows";
       const expectedResult = ["Root", "DatabaseCC", "Domaine", "Windows"];
       expect(ExternalFolderEntity.splitFolderPath(folderPathString)).toStrictEqual(expectedResult);
     });
 
     it("should split folder path using '/'as a delimiter but keep the starting '/ ' as part of the folders name", () => {
       expect.assertions(1);
-      const folderPathString =  "Root/DatabaseCC// Domaine/Windows// Subfolder";
+      const folderPathString = "Root/DatabaseCC// Domaine/Windows// Subfolder";
       const expectedResult = ["Root", "DatabaseCC", "/ Domaine", "Windows", "/ Subfolder"];
       expect(ExternalFolderEntity.splitFolderPath(folderPathString)).toStrictEqual(expectedResult);
     });
 
     it("should split folder path using '/' as a delimiter but keep the ending ' /' as part of the folders name", () => {
       expect.assertions(1);
-      const folderPathString =  "Root/DatabaseCC //Domaine/Windows //Subfolder";
+      const folderPathString = "Root/DatabaseCC //Domaine/Windows //Subfolder";
       const expectedResult = ["Root", "DatabaseCC /", "Domaine", "Windows /", "Subfolder"];
       expect(ExternalFolderEntity.splitFolderPath(folderPathString)).toStrictEqual(expectedResult);
     });
 
     it("should split folder path using '/' as a delimiter but keep the in-between ' / ' as part of the folders name", () => {
       expect.assertions(1);
-      const folderPathString =  "Root/DatabaseCC / Domaine/Windows / Subfolder";
+      const folderPathString = "Root/DatabaseCC / Domaine/Windows / Subfolder";
       const expectedResult = ["Root", "DatabaseCC / Domaine", "Windows / Subfolder"];
       expect(ExternalFolderEntity.splitFolderPath(folderPathString)).toStrictEqual(expectedResult);
     });
 
     it("should split folder path using '/' as a delimiter but keep all the special '/' patterns as part of the folders name", () => {
       expect.assertions(1);
-      const folderPathString =  "/ Root/DatabaseCC / Domaine/Windows /// Sub / folder /";
+      const folderPathString = "/ Root/DatabaseCC / Domaine/Windows /// Sub / folder /";
       const expectedResult = ["/ Root", "DatabaseCC / Domaine", "Windows /", "/ Sub / folder /"];
       expect(ExternalFolderEntity.splitFolderPath(folderPathString)).toStrictEqual(expectedResult);
     });
@@ -174,7 +174,7 @@ describe("ExternalFolderEntity", () => {
   describe("::escapeName", () => {
     it("Should keep the name if no special pattern is present", () => {
       expect.assertions(1);
-      const folderName =  "Root";
+      const folderName = "Root";
       const expectedFolderName = "Root";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
@@ -186,56 +186,56 @@ describe("ExternalFolderEntity", () => {
 
     it("Should trim the given name", () => {
       expect.assertions(1);
-      const folderName =  " Root ";
+      const folderName = " Root ";
       const expectedFolderName = "Root";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should add a space for any starting '/'", () => {
       expect.assertions(1);
-      const folderName =  "/Root";
+      const folderName = "/Root";
       const expectedFolderName = "/ Root";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should add a space for any starting '/' even when there are already spaces", () => {
       expect.assertions(1);
-      const folderName =  "/ Root";
+      const folderName = "/ Root";
       const expectedFolderName = "/  Root";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should put a space before any ending '/'", () => {
       expect.assertions(1);
-      const folderName =  "Root/";
+      const folderName = "Root/";
       const expectedFolderName = "Root /";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should put a space before any ending '/' even when there are already spaces", () => {
       expect.assertions(1);
-      const folderName =  "Root /";
+      const folderName = "Root /";
       const expectedFolderName = "Root  /";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should surrond '/' characters with spaces", () => {
       expect.assertions(1);
-      const folderName =  "R/o/o/t";
+      const folderName = "R/o/o/t";
       const expectedFolderName = "R / o/o / t";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should surrond '/' characters with spaces even when there are already spaces", () => {
       expect.assertions(1);
-      const folderName =  "R / o / o / t";
+      const folderName = "R / o / o / t";
       const expectedFolderName = "R  /  o  /  o  /  t";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should apply spaces for all '/' patterns that can be found", () => {
       expect.assertions(1);
-      const folderName =  "///R/o / ot/";
+      const folderName = "///R/o / ot/";
       const expectedFolderName = "/  / /R / o  /  ot /";
       expect(ExternalFolderEntity.escapeName(folderName)).toStrictEqual(expectedFolderName);
     });
@@ -244,7 +244,7 @@ describe("ExternalFolderEntity", () => {
   describe("::resolveEscapedName", () => {
     it("Should keep the name if no special pattern is present", () => {
       expect.assertions(1);
-      const folderName =  "Root";
+      const folderName = "Root";
       const expectedFolderName = "Root";
       expect(ExternalFolderEntity.resolveEscapedName(folderName)).toStrictEqual(expectedFolderName);
     });
@@ -256,49 +256,49 @@ describe("ExternalFolderEntity", () => {
 
     it("Should keep the name as-is even with trailing spaces", () => {
       expect.assertions(1);
-      const folderName =  " Root ";
+      const folderName = " Root ";
       const expectedFolderName = " Root ";
       expect(ExternalFolderEntity.resolveEscapedName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should not keep the name as-is even with internal `/`", () => {
       expect.assertions(1);
-      const folderName =  "Ro/ot";
+      const folderName = "Ro/ot";
       const expectedFolderName = "Ro/ot";
       expect(ExternalFolderEntity.resolveEscapedName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should remove spaces surrounding a '/' inside the string", () => {
       expect.assertions(1);
-      const folderName =  "Ro / ot";
+      const folderName = "Ro / ot";
       const expectedFolderName = "Ro/ot";
       expect(ExternalFolderEntity.resolveEscapedName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should remove the space from '/ ' if the string starts with this pattern", () => {
       expect.assertions(1);
-      const folderName =  "/ Root";
+      const folderName = "/ Root";
       const expectedFolderName = "/Root";
       expect(ExternalFolderEntity.resolveEscapedName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should remove the space from ' /' if the string ends with this pattern", () => {
       expect.assertions(1);
-      const folderName =  "Root /";
+      const folderName = "Root /";
       const expectedFolderName = "Root/";
       expect(ExternalFolderEntity.resolveEscapedName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should apply all the rules at once", () => {
       expect.assertions(1);
-      const folderName =  "/ R / oo / t /";
+      const folderName = "/ R / oo / t /";
       const expectedFolderName = "/R/oo/t/";
       expect(ExternalFolderEntity.resolveEscapedName(folderName)).toStrictEqual(expectedFolderName);
     });
 
     it("Should apply all the rules at once and keep the trailing spaces", () => {
       expect.assertions(1);
-      const folderName =  "  / R / oo / t /  ";
+      const folderName = "  / R / oo / t /  ";
       const expectedFolderName = " /R/oo/t/ ";
       expect(ExternalFolderEntity.resolveEscapedName(folderName)).toStrictEqual(expectedFolderName);
     });
@@ -393,14 +393,18 @@ describe("ExternalFolderEntity", () => {
       expect.assertions(1);
 
       const entity = new ExternalFolderEntity(minimalExternalFolderDto());
-      expect(() => { entity.id = 42; }).toThrow(EntityValidationError);
+      expect(() => {
+        entity.id = 42;
+      }).toThrow(EntityValidationError);
     });
 
     it("should validate folderParentId when using the setter", () => {
       expect.assertions(1);
 
       const entity = new ExternalFolderEntity(minimalExternalFolderDto());
-      expect(() => { entity.folderParentId = 42; }).toThrow(EntityValidationError);
+      expect(() => {
+        entity.folderParentId = 42;
+      }).toThrow(EntityValidationError);
     });
   });
 });

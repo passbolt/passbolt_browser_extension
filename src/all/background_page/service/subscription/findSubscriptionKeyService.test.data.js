@@ -11,16 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.9.0
  */
-import {defaultApiClientOptions} from 'passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data';
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 export const API_CLIENT_OPTIONS = defaultApiClientOptions();
 
-export const KEY = 'a valid subscription key';
+export const KEY = "a valid subscription key";
 
 export const KEY_DTO = {
-  subscription_id: 'dev',
+  subscription_id: "dev",
   users: 50,
-  expiry: '4096-01-01',
-  created: '2025-01-01',
+  expiry: "4096-01-01",
+  created: "2025-01-01",
   data: KEY,
 };

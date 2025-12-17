@@ -15,7 +15,7 @@
 import DownloadRecoveryKitController from "./downloadRecoverKitController";
 import {
   startAccountSetupDto,
-  withUserKeyAccountSetupDto
+  withUserKeyAccountSetupDto,
 } from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import FileService from "../../service/file/fileService";
@@ -25,28 +25,28 @@ jest.mock("../../service/file/fileService");
 
 describe("DownloadRecoveryKitController", () => {
   describe("DownloadRecoveryKitController::exec", () => {
-    it("Should throw an exception if the account does have a defined user armored private key.", async() => {
+    it("Should throw an exception if the account does have a defined user armored private key.", async () => {
       const account = new AccountSetupEntity(startAccountSetupDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
 
-      const controller = new DownloadRecoveryKitController({port: {_port: {name: "test"}}}, null);
+      const controller = new DownloadRecoveryKitController({ port: { _port: { name: "test" } } }, null);
 
       expect.assertions(1);
       const promise = controller.exec();
       await expect(promise).rejects.toThrowError("An account user private armored key is required.");
     });
 
-    it("Should trigger the recovery kit download.", async() => {
+    it("Should trigger the recovery kit download.", async () => {
       FileService.saveFile = jest.fn();
       const mockedWorker = {
         tab: {
-          id: "id"
+          id: "id",
         },
-        port: {_port: {name: "test"}}
+        port: { _port: { name: "test" } },
       };
 
       const account = new AccountSetupEntity(withUserKeyAccountSetupDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
       const controller = new DownloadRecoveryKitController(mockedWorker, null);
 
       expect.assertions(1);
@@ -55,12 +55,12 @@ describe("DownloadRecoveryKitController", () => {
         "passbolt-recovery-kit.asc",
         account.userPrivateArmoredKey,
         "text/plain",
-        mockedWorker.tab.id
+        mockedWorker.tab.id,
       );
     });
 
-    it("Should raise an error if no account has been found.", async() => {
-      const controller = new DownloadRecoveryKitController({port: {_port: {name: "test"}}}, null);
+    it("Should raise an error if no account has been found.", async () => {
+      const controller = new DownloadRecoveryKitController({ port: { _port: { name: "test" } } }, null);
       expect.assertions(1);
       try {
         await controller.exec();

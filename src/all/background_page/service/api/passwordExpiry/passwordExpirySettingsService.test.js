@@ -12,30 +12,33 @@
  * @since         4.4.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
-import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
-import {mockApiResponse, mockApiResponseError} from '../../../../../../test/mocks/mockApiResponse';
+import { defaultAccountDto } from "../../../model/entity/account/accountEntity.test.data";
+import { mockApiResponse, mockApiResponseError } from "../../../../../../test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import PasswordExpirySettingsService from "./passwordExpirySettingsService";
-import {v4 as uuid} from 'uuid';
-import {defaultPasswordExpirySettingsDto, defaultPasswordExpirySettingsDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
+import { v4 as uuid } from "uuid";
+import {
+  defaultPasswordExpirySettingsDto,
+  defaultPasswordExpirySettingsDtoFromApi,
+} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 
 describe("PasswordExpiry service", () => {
   let apiClientOptions;
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
 
     const account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  describe('::find', () => {
-    it("should return the dto served by the API", async() => {
+  describe("::find", () => {
+    it("should return the dto served by the API", async () => {
       expect.assertions(1);
       const expectedDto = defaultPasswordExpirySettingsDto();
       fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => mockApiResponse(expectedDto));
@@ -46,7 +49,7 @@ describe("PasswordExpiry service", () => {
       expect(resultDto).toStrictEqual(expectedDto);
     });
 
-    it("should throw an error if the API returns an error response", async() => {
+    it("should throw an error if the API returns an error response", async () => {
       expect.assertions(1);
       fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => mockApiResponseError(500, "Something went wrong!"));
 
@@ -58,9 +61,11 @@ describe("PasswordExpiry service", () => {
       }
     });
 
-    it("should throw an error if something happens on the API", async() => {
+    it("should throw an error if something happens on the API", async () => {
       expect.assertions(1);
-      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => { throw new Error("Something went wrong"); });
+      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => {
+        throw new Error("Something went wrong");
+      });
 
       const service = new PasswordExpirySettingsService(apiClientOptions);
       try {
@@ -71,13 +76,13 @@ describe("PasswordExpiry service", () => {
     });
   });
 
-  describe('::create', () => {
-    it("Should create the settings on the API and return the saved data from the API", async() => {
+  describe("::create", () => {
+    it("Should create the settings on the API and return the saved data from the API", async () => {
       expect.assertions(2);
       const dataToRegister = defaultPasswordExpirySettingsDto();
       const expectedDto = defaultPasswordExpirySettingsDtoFromApi(dataToRegister);
 
-      fetch.doMockOnceIf(/password-expiry\/settings\.json/, async request => {
+      fetch.doMockOnceIf(/password-expiry\/settings\.json/, async (request) => {
         const body = JSON.parse(await request.text());
         expect(body).toStrictEqual(dataToRegister);
         return mockApiResponse(expectedDto);
@@ -89,10 +94,12 @@ describe("PasswordExpiry service", () => {
       expect(resultDto).toStrictEqual(expectedDto);
     });
 
-    it("Should throw an error if an error happens on the API", async() => {
+    it("Should throw an error if an error happens on the API", async () => {
       expect.assertions(1);
 
-      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => mockApiResponseError(500, "Something wrong happened!"));
+      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () =>
+        mockApiResponseError(500, "Something wrong happened!"),
+      );
 
       const service = new PasswordExpirySettingsService(apiClientOptions);
       try {
@@ -102,10 +109,12 @@ describe("PasswordExpiry service", () => {
       }
     });
 
-    it("Should throw an error if an error happens when requesting the API", async() => {
+    it("Should throw an error if an error happens when requesting the API", async () => {
       expect.assertions(1);
 
-      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => { throw new Error("Something wrong happened"); });
+      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => {
+        throw new Error("Something wrong happened");
+      });
 
       const service = new PasswordExpirySettingsService(apiClientOptions);
       try {
@@ -116,8 +125,8 @@ describe("PasswordExpiry service", () => {
     });
   });
 
-  describe('::delete', () => {
-    it("should delete the resource with the given id from the API", async() => {
+  describe("::delete", () => {
+    it("should delete the resource with the given id from the API", async () => {
       expect.assertions(1);
       const expectedId = uuid();
       fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${expectedId}\.json`), () => mockApiResponse({}));
@@ -126,11 +135,13 @@ describe("PasswordExpiry service", () => {
       await expect(service.delete(expectedId)).resolves.not.toThrow();
     });
 
-    it("should throw an error if the API returns an error response", async() => {
+    it("should throw an error if the API returns an error response", async () => {
       expect.assertions(1);
 
       const expectedId = uuid();
-      fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${expectedId}\.json`), () => mockApiResponseError(500, "Something went wrong!"));
+      fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${expectedId}\.json`), () =>
+        mockApiResponseError(500, "Something went wrong!"),
+      );
 
       const service = new PasswordExpirySettingsService(apiClientOptions);
       try {
@@ -140,11 +151,13 @@ describe("PasswordExpiry service", () => {
       }
     });
 
-    it("should throw an error if something happens on the API", async() => {
+    it("should throw an error if something happens on the API", async () => {
       expect.assertions(1);
 
       const expectedId = uuid();
-      fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${expectedId}\.json`), () => { throw new Error("Something went wrong"); });
+      fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${expectedId}\.json`), () => {
+        throw new Error("Something went wrong");
+      });
 
       const service = new PasswordExpirySettingsService(apiClientOptions);
       try {

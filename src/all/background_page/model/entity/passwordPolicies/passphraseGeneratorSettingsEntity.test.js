@@ -16,11 +16,14 @@ import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PassphraseGeneratorSettingsEntity from "./passphraseGeneratorSettingsEntity";
-import {defaultPassphraseGeneratorSettings} from "./passphraseGeneratorSettingsEntity.test.data";
+import { defaultPassphraseGeneratorSettings } from "./passphraseGeneratorSettingsEntity.test.data";
 
 describe("PassphraseGeneratorSettings entity", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(PassphraseGeneratorSettingsEntity.ENTITY_NAME, PassphraseGeneratorSettingsEntity.getSchema());
+    EntitySchema.validateSchema(
+      PassphraseGeneratorSettingsEntity.ENTITY_NAME,
+      PassphraseGeneratorSettingsEntity.getSchema(),
+    );
   });
 
   it("should accept a mininal valid DTO", () => {
@@ -57,13 +60,13 @@ describe("PassphraseGeneratorSettings entity", () => {
      * {dto: {words: -1}, errorType: "minimum"},
      * {dto: {words: 2000}, errorType: "maximum"},
      */
-    {dto: {word_separator: -1}, errorType: "type"},
-    {dto: {word_separator: " ".padEnd(11)}, errorType: "maxLength"},
-    {dto: {word_case: -1}, errorType: "type"},
-    {dto: {word_case: "Something wrong"}, errorType: "enum"},
-    {dto: {min_words: "Something wrong"}, errorType: "type"},
-    {dto: {max_words: "Something wrong"}, errorType: "type"},
-  ]).describe("should throw an exception if DTO contains invalid values", scenario => {
+    { dto: { word_separator: -1 }, errorType: "type" },
+    { dto: { word_separator: " ".padEnd(11) }, errorType: "maxLength" },
+    { dto: { word_case: -1 }, errorType: "type" },
+    { dto: { word_case: "Something wrong" }, errorType: "enum" },
+    { dto: { min_words: "Something wrong" }, errorType: "type" },
+    { dto: { max_words: "Something wrong" }, errorType: "type" },
+  ]).describe("should throw an exception if DTO contains invalid values", (scenario) => {
     it(`scenario: ${JSON.stringify(scenario)}`, () => {
       expect.assertions(2);
       const fieldName = Object.keys(scenario.dto)[0];

@@ -16,11 +16,11 @@ import IsExtensionFirstInstallController from "./isExtensionFirstInstallControll
 
 describe("IsExtensionFirstInstallController", () => {
   describe("IsExtensionFirstInstallController::exec", () => {
-    it("Should return false if it's not the extension first install.", async() => {
+    it("Should return false if it's not the extension first install.", async () => {
       const mockedWorker = {
         tab: {
-          url: "moz-extension://134c1a66-c6e3-1343-a5d4-63c511465c17/data/app.html"
-        }
+          url: "moz-extension://134c1a66-c6e3-1343-a5d4-63c511465c17/data/app.html",
+        },
       };
       const controller = new IsExtensionFirstInstallController(mockedWorker);
       const check = await controller.exec();
@@ -29,11 +29,11 @@ describe("IsExtensionFirstInstallController", () => {
       await expect(check).toEqual(false);
     });
 
-    it("Should return true if it's the extension first install.", async() => {
+    it("Should return true if it's the extension first install.", async () => {
       const mockedWorker = {
         tab: {
-          url: "moz-extension://134c1a66-c6e3-1343-a5d4-63c511465c17/data/app.html?first-install=1"
-        }
+          url: "moz-extension://134c1a66-c6e3-1343-a5d4-63c511465c17/data/app.html?first-install=1",
+        },
       };
       const controller = new IsExtensionFirstInstallController(mockedWorker);
       const check = await controller.exec();

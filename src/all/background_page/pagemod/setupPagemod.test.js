@@ -12,13 +12,12 @@
  * @since         3.9.0
  */
 import Setup from "./setupPagemod";
-import {ConfigEvents} from "../event/configEvents";
-import {SetupEvents} from "../event/setupEvents";
-import BuildApiClientOptionsService
-  from "../service/account/buildApiClientOptionsService";
+import { ConfigEvents } from "../event/configEvents";
+import { SetupEvents } from "../event/setupEvents";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import BuildAccountSetupService from "../service/setup/buildAccountSetupService";
-import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
-import {enableFetchMocks} from "jest-fetch-mock";
+import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
+import { enableFetchMocks } from "jest-fetch-mock";
 
 jest.spyOn(BuildAccountSetupService, "buildFromSetupUrl");
 jest.spyOn(BuildApiClientOptionsService, "buildFromAccount");
@@ -27,26 +26,26 @@ jest.spyOn(SetupEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 
 describe("Setup", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
   });
 
   describe("Setup::attachEvents", () => {
-    it("Should attach events", async() => {
+    it("Should attach events", async () => {
       expect.assertions(8);
       // data mocked
       const port = {
         _port: {
           sender: {
             tab: {
-              url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"
-            }
-          }
-        }
+              url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+            },
+          },
+        },
       };
-      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
       // process
       await Setup.attachEvents(port);
       // expectations
@@ -57,12 +56,12 @@ describe("Setup", () => {
       expect(PownedPasswordEvents.listen).toHaveBeenCalled();
       expect(Setup.events).toStrictEqual([ConfigEvents, SetupEvents, PownedPasswordEvents]);
       expect(Setup.mustReloadOnExtensionUpdate).toBeFalsy();
-      expect(Setup.appName).toBe('Setup');
+      expect(Setup.appName).toBe("Setup");
     });
   });
 
   describe("Setup::canBeAttachedTo", () => {
-    it("Should have the canBeAttachedTo not valid", async() => {
+    it("Should have the canBeAttachedTo not valid", async () => {
       expect.assertions(1);
       // process
       const canBeAttachedTo = await Setup.canBeAttachedTo({});

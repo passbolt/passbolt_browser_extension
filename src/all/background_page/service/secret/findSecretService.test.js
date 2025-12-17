@@ -12,16 +12,16 @@
  * @since         4.10.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {v4 as uuidv4} from "uuid";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { v4 as uuidv4 } from "uuid";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import FindSecretService from "./findSecretService";
-import {minimalDto} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
+import { minimalDto } from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 
 describe("FindSecretService", () => {
   describe("FindSecretService::exec", () => {
-    it("Should call Secret service to find all Secret from a resource id", async() => {
+    it("Should call Secret service to find all Secret from a resource id", async () => {
       expect.assertions(3);
       // initialisation
       const account = new AccountEntity(defaultAccountDto());
@@ -38,7 +38,7 @@ describe("FindSecretService", () => {
       expect(secretEntity.toDto()).toStrictEqual(expectedDto);
     });
 
-    it("Should fail if the resource id is not a uuid", async() => {
+    it("Should fail if the resource id is not a uuid", async () => {
       expect.assertions(1);
       // initialisation
       const account = new AccountEntity(defaultAccountDto());

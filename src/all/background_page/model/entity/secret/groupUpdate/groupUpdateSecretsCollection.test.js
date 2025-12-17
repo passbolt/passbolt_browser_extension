@@ -14,10 +14,10 @@
 
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import GroupUpdateSecretsCollection from "./groupUpdateSecretsCollection";
-import {minimalDto, readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
+import { minimalDto, readSecret } from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
-import {v4 as uuid} from "uuid";
-import {defaultResourcesSecretsDtos} from "./groupUpdateSecretsCollection.test.data";
+import { v4 as uuid } from "uuid";
+import { defaultResourcesSecretsDtos } from "./groupUpdateSecretsCollection.test.data";
 
 describe("GroupUpdateSecretsCollection", () => {
   describe("::getSchema", () => {
@@ -51,8 +51,8 @@ describe("GroupUpdateSecretsCollection", () => {
 
     it("works if valid complete DTOs are provided", () => {
       const resource_id = uuid();
-      const dto1 = readSecret({resource_id});
-      const dto2 = readSecret({resource_id});
+      const dto1 = readSecret({ resource_id });
+      const dto2 = readSecret({ resource_id });
       const collection = new GroupUpdateSecretsCollection([dto1, dto2]);
 
       expect.assertions(3);
@@ -64,26 +64,24 @@ describe("GroupUpdateSecretsCollection", () => {
     it("should throw if the collection schema does not validate", () => {
       expect.assertions(1);
 
-      expect(() => new GroupUpdateSecretsCollection({}))
-        .toThrowEntityValidationError("items");
+      expect(() => new GroupUpdateSecretsCollection({})).toThrowEntityValidationError("items");
     });
 
     it("should throw if one of data item does not validate the collection entity schema", () => {
       expect.assertions(1);
 
       const dto1 = readSecret();
-      const dto2 = readSecret({data: 42});
+      const dto2 = readSecret({ data: 42 });
 
-      expect(() => new GroupUpdateSecretsCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("1.data.type");
+      expect(() => new GroupUpdateSecretsCollection([dto1, dto2])).toThrowCollectionValidationError("1.data.type");
     });
 
     it("should ignore an entity that does not pass the validation", () => {
       expect.assertions(2);
 
       const dto1 = readSecret();
-      const dto2 = readSecret({data: 42});
-      const collection = new GroupUpdateSecretsCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      const dto2 = readSecret({ data: 42 });
+      const collection = new GroupUpdateSecretsCollection([dto1, dto2], { ignoreInvalidEntity: true });
 
       expect(collection).toHaveLength(1);
       expect(collection._items[0]).toStrictEqual(new SecretEntity(dto1));
@@ -94,10 +92,11 @@ describe("GroupUpdateSecretsCollection", () => {
 
       const dto1 = readSecret();
       const dto2 = readSecret();
-      const dto3 = readSecret({id: dto2.id});
+      const dto3 = readSecret({ id: dto2.id });
 
-      expect(() => new GroupUpdateSecretsCollection([dto1, dto2, dto3]))
-        .toThrowCollectionValidationError("2.id.unique");
+      expect(() => new GroupUpdateSecretsCollection([dto1, dto2, dto3])).toThrowCollectionValidationError(
+        "2.id.unique",
+      );
     });
 
     it("should throw if one of data item does not validate the unique resource id + user id build rule", () => {
@@ -105,10 +104,11 @@ describe("GroupUpdateSecretsCollection", () => {
 
       const dto1 = readSecret();
       const dto2 = readSecret();
-      const dto3 = readSecret({user_id: dto2.user_id, resource_id: dto2.resource_id});
+      const dto3 = readSecret({ user_id: dto2.user_id, resource_id: dto2.resource_id });
 
-      expect(() => new GroupUpdateSecretsCollection([dto1, dto2, dto3]))
-        .toThrowCollectionValidationError("2.resource_id:user_id.unique");
+      expect(() => new GroupUpdateSecretsCollection([dto1, dto2, dto3])).toThrowCollectionValidationError(
+        "2.resource_id:user_id.unique",
+      );
     });
   });
 
@@ -117,12 +117,14 @@ describe("GroupUpdateSecretsCollection", () => {
       expect.assertions(1);
 
       const entity = new SecretEntity(readSecret());
-      expect(GroupUpdateSecretsCollection.getResourceIdUserIdKey(entity)).toStrictEqual(`${entity.resourceId}:${entity.userId}`);
+      expect(GroupUpdateSecretsCollection.getResourceIdUserIdKey(entity)).toStrictEqual(
+        `${entity.resourceId}:${entity.userId}`,
+      );
     });
   });
 
   describe("GroupUpdateSecretsCollection:pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const groupUpdateSecretsCount = 10_000;
       const dtos = defaultResourcesSecretsDtos(groupUpdateSecretsCount);
 

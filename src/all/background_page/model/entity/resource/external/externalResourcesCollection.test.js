@@ -15,16 +15,16 @@ import ExternalResourcesCollection from "./externalResourcesCollection";
 import {
   buildDefineNumberOfExternalResourcesCollectionDto,
   defaultExternalResourceCollectionDto,
-  externalResourceCollectionWithoutIdsDto
+  externalResourceCollectionWithoutIdsDto,
 } from "./externalResourcesCollection.test.data";
 import ResourcesCollection from "../resourcesCollection";
 import ExternalResourceEntity from "./externalResourceEntity";
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import ExternalFoldersCollection from "../../folder/external/externalFoldersCollection";
-import {defaultExternalFoldersCollectionDto} from "../../folder/external/externalFoldersCollection.test.data";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
+import { defaultExternalFoldersCollectionDto } from "../../folder/external/externalFoldersCollection.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourcesSecretsDtos } from "../../secret/resource/resourceSecretsCollection.test.data";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
 
 //@MU TODO: fix this test
@@ -52,7 +52,7 @@ describe.skip("ExternalResourcesCollection", () => {
     it("constructor fails if reusing same id", () => {
       expect.assertions(1);
       const id = uuid();
-      const externalResourceCollectionDto = defaultExternalResourceCollectionDto({id: id});
+      const externalResourceCollectionDto = defaultExternalResourceCollectionDto({ id: id });
       expect(() => new ExternalResourcesCollection(externalResourceCollectionDto)).toThrow(CollectionValidationError);
     });
 
@@ -66,16 +66,19 @@ describe.skip("ExternalResourcesCollection", () => {
       expect.assertions(1);
       const externalResourceCollectionWithIdsDto = defaultExternalResourceCollectionDto();
       const externalResourceCollectionWithNullIdsDto = externalResourceCollectionWithoutIdsDto();
-      const externalResourceCollectionDto = [...externalResourceCollectionWithIdsDto, ...externalResourceCollectionWithNullIdsDto];
+      const externalResourceCollectionDto = [
+        ...externalResourceCollectionWithIdsDto,
+        ...externalResourceCollectionWithNullIdsDto,
+      ];
       expect(() => new ExternalResourcesCollection(externalResourceCollectionDto)).not.toThrow();
     });
 
     it("constructor ignores invalid entities: entities with same non null id", () => {
       expect.assertions(1);
       const externalResourceCollectionDto = defaultExternalResourceCollectionDto({
-        id: uuid()
+        id: uuid(),
       });
-      const collection = new ExternalResourcesCollection(externalResourceCollectionDto, {ignoreInvalidEntity: true});
+      const collection = new ExternalResourcesCollection(externalResourceCollectionDto, { ignoreInvalidEntity: true });
 
       expect(collection).toHaveLength(1);
     });
@@ -83,11 +86,11 @@ describe.skip("ExternalResourcesCollection", () => {
     it("constructor ignores invalid entities: entities with same non null id and keeps the one with null ids", () => {
       expect.assertions(1);
       const externalResourceCollectionDto = defaultExternalResourceCollectionDto({
-        id: uuid()
+        id: uuid(),
       });
       const unsetIdExternalResourceCollectionDto = externalResourceCollectionWithoutIdsDto();
       const collectionDto = [...externalResourceCollectionDto, ...unsetIdExternalResourceCollectionDto];
-      const collection = new ExternalResourcesCollection(collectionDto, {ignoreInvalidEntity: true});
+      const collection = new ExternalResourcesCollection(collectionDto, { ignoreInvalidEntity: true });
 
       expect(collection).toHaveLength(unsetIdExternalResourceCollectionDto.length + 1);
     });
@@ -97,7 +100,11 @@ describe.skip("ExternalResourcesCollection", () => {
     it("setFolderParentIdByPath set the folder_parent_id of the resources having a given path", () => {
       expect.assertions(4);
 
-      const dto = defaultExternalResourceCollectionDto({name: "Password ", folder_parent_id: null, folder_parent_path: "Root/Folder 1"});
+      const dto = defaultExternalResourceCollectionDto({
+        name: "Password ",
+        folder_parent_id: null,
+        folder_parent_path: "Root/Folder 1",
+      });
       dto[0].name += "1";
       dto[1].name += "2";
       dto[2].name += "3";
@@ -118,7 +125,7 @@ describe.skip("ExternalResourcesCollection", () => {
 
   describe("::changeRootPath", () => {
     it("changeRootPath change the root path of the resources of the collection", () => {
-      const dto = defaultExternalResourceCollectionDto({name: "Password ", folder_parent_path: "Fodler 1"});
+      const dto = defaultExternalResourceCollectionDto({ name: "Password ", folder_parent_path: "Fodler 1" });
 
       expect.assertions(dto.length);
 
@@ -131,7 +138,7 @@ describe.skip("ExternalResourcesCollection", () => {
       dto[0].name += "4";
 
       const collection = new ExternalResourcesCollection(dto);
-      const rootFolder = new ExternalFolderEntity({"name": "Root", "folder_parent_path": "New"});
+      const rootFolder = new ExternalFolderEntity({ name: "Root", folder_parent_path: "New" });
       collection.changeRootPath(rootFolder);
       for (const externalResourceEntity of collection) {
         expect(externalResourceEntity.folderParentPath).toMatch(/^New\/Root/);
@@ -145,7 +152,9 @@ describe.skip("ExternalResourcesCollection", () => {
       const externalResourceCollection = new ExternalResourcesCollection(collectionDto);
       const resourceEntityCollection = externalResourceCollection.toResourceCollectionImportDto();
 
-      const expectedCollectionDto = collectionDto.map(dto => new ExternalResourceEntity(dto).toResourceEntityImportDto());
+      const expectedCollectionDto = collectionDto.map((dto) =>
+        new ExternalResourceEntity(dto).toResourceEntityImportDto(),
+      );
 
       expect(resourceEntityCollection).toStrictEqual(expectedCollectionDto);
     });
@@ -232,7 +241,10 @@ describe.skip("ExternalResourcesCollection", () => {
 
       const resourcesCollectionDto = [resourceDto1, resourceDto2];
       const resourcesCollection = new ResourcesCollection(resourcesCollectionDto);
-      const externalResourceCollection = ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, externalFoldersCollection);
+      const externalResourceCollection = ExternalResourcesCollection.constructFromResourcesCollection(
+        resourcesCollection,
+        externalFoldersCollection,
+      );
 
       expect(externalResourceCollection).toBeInstanceOf(ExternalResourcesCollection);
       expect(externalResourceCollection).toHaveLength(2);
@@ -266,18 +278,22 @@ describe.skip("ExternalResourcesCollection", () => {
     it("should assert the resourcesCollection to be of the right type", () => {
       expect.assertions(1);
       const externalFoldersCollection = new ExternalFoldersCollection(defaultExternalFoldersCollectionDto());
-      expect(() => ExternalResourcesCollection.constructFromResourcesCollection(null, externalFoldersCollection)).toThrow(TypeError);
+      expect(() =>
+        ExternalResourcesCollection.constructFromResourcesCollection(null, externalFoldersCollection),
+      ).toThrow(TypeError);
     });
 
     it("should assert the externalFoldersCollection to be of the right type", () => {
       expect.assertions(1);
       const resourcesCollection = new ResourcesCollection([defaultResourceDto()]);
-      expect(() => ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, null)).toThrow(TypeError);
+      expect(() => ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, null)).toThrow(
+        TypeError,
+      );
     });
   });
 
   describe("ExternalResourcesCollection:pushMany", () => {
-    it.skip("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it.skip("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const externalResourcesCount = 10_000;
       const dtos = buildDefineNumberOfExternalResourcesCollectionDto(externalResourcesCount);
 

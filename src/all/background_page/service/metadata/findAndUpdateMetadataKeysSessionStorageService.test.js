@@ -13,17 +13,15 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindAndUpdateMetadataKeysSessionStorageService from "./findAndUpdateMetadataKeysSessionStorageService";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {
-  defaultMetadataPrivateKeyDto
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
-import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
-import {v4 as uuidv4} from "uuid";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { defaultMetadataPrivateKeyDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
+import { defaultMetadataKeyDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
+import { v4 as uuidv4 } from "uuid";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 
 beforeEach(() => {
@@ -31,64 +29,112 @@ beforeEach(() => {
 });
 
 describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
-  let findAndUpdateKeysSessionStorageService,
-    account,
-    apiClientOptions;
+  let findAndUpdateKeysSessionStorageService, account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
-    findAndUpdateKeysSessionStorageService = new FindAndUpdateMetadataKeysSessionStorageService(account, apiClientOptions);
+    findAndUpdateKeysSessionStorageService = new FindAndUpdateMetadataKeysSessionStorageService(
+      account,
+      apiClientOptions,
+    );
     // flush account related storage before each.
     findAndUpdateKeysSessionStorageService.metadataKeysSessionStorage.flush();
   });
 
   describe("::findAndUpdateAll", () => {
-    it("should throw an error if the user passphrase is not set and is required", async() => {
+    it("should throw an error if the user passphrase is not set and is required", async () => {
       expect.assertions(1);
       const id = uuidv4();
-      const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
-      jest.spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll").mockImplementation(() => metadataKeysDto);
+      const metadataPrivateKeysDto = [
+        defaultMetadataPrivateKeyDto({
+          metadata_key_id: id,
+          data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage,
+        }),
+      ];
+      const metadataKeysDto = [
+        defaultMetadataKeyDto({
+          id: id,
+          metadata_private_keys: metadataPrivateKeysDto,
+          fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c",
+        }),
+      ];
+      jest
+        .spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll")
+        .mockImplementation(() => metadataKeysDto);
 
-      await expect(() => findAndUpdateKeysSessionStorageService.findAndUpdateAll()).rejects.toThrow(UserPassphraseRequiredError);
+      await expect(() => findAndUpdateKeysSessionStorageService.findAndUpdateAll()).rejects.toThrow(
+        UserPassphraseRequiredError,
+      );
     });
 
-    it("retrieves the metadata keys from the API and store them into the session storage and decrypt them using the passphrase from the session storage.", async() => {
+    it("retrieves the metadata keys from the API and store them into the session storage and decrypt them using the passphrase from the session storage.", async () => {
       expect.assertions(7);
 
       const id = uuidv4();
-      const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
+      const metadataPrivateKeysDto = [
+        defaultMetadataPrivateKeyDto({
+          metadata_key_id: id,
+          data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage,
+        }),
+      ];
+      const metadataKeysDto = [
+        defaultMetadataKeyDto({
+          id: id,
+          metadata_private_keys: metadataPrivateKeysDto,
+          fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c",
+        }),
+      ];
       const expectedMetadataKeysDto = JSON.parse(JSON.stringify(metadataKeysDto));
-      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
+      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(
+        pgpKeys.metadataKey.decryptedMetadataPrivateKeyData,
+      );
 
-      jest.spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll").mockImplementation(() => metadataKeysDto);
+      jest
+        .spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll")
+        .mockImplementation(() => metadataKeysDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
 
       const collection = await findAndUpdateKeysSessionStorageService.findAndUpdateAll();
 
-      expect(collection.toDto({metadata_private_keys: true})).toEqual(expectedMetadataKeysDto);
+      expect(collection.toDto({ metadata_private_keys: true })).toEqual(expectedMetadataKeysDto);
       expect(collection).toBeInstanceOf(MetadataKeysCollection);
       expect(collection).toHaveLength(1);
       expect(collection.hasEncryptedKeys()).toStrictEqual(false);
-      expect(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService.findAll).toHaveBeenCalledTimes(1);
+      expect(
+        findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService.findAll,
+      ).toHaveBeenCalledTimes(1);
       expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
 
       const storageValue = await findAndUpdateKeysSessionStorageService.metadataKeysSessionStorage.get();
       await expect(storageValue).toEqual(expectedMetadataKeysDto);
     });
 
-    it("does not retrieve the passphrase from the session storage if passed as parameter.", async() => {
+    it("does not retrieve the passphrase from the session storage if passed as parameter.", async () => {
       expect.assertions(1);
 
       const id = uuidv4();
-      const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
+      const metadataPrivateKeysDto = [
+        defaultMetadataPrivateKeyDto({
+          metadata_key_id: id,
+          data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage,
+        }),
+      ];
+      const metadataKeysDto = [
+        defaultMetadataKeyDto({
+          id: id,
+          metadata_private_keys: metadataPrivateKeysDto,
+          fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c",
+        }),
+      ];
       const expectedMetadataKeysDto = JSON.parse(JSON.stringify(metadataKeysDto));
-      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
+      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(
+        pgpKeys.metadataKey.decryptedMetadataPrivateKeyData,
+      );
 
-      jest.spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll").mockImplementation(() => metadataKeysDto);
+      jest
+        .spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll")
+        .mockImplementation(() => metadataKeysDto);
       jest.spyOn(PassphraseStorageService, "get");
 
       await findAndUpdateKeysSessionStorageService.findAndUpdateAll(pgpKeys.ada.passphrase);
@@ -96,45 +142,88 @@ describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
       expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
-    it("overrides session storage with a second update call.", async() => {
+    it("overrides session storage with a second update call.", async () => {
       expect.assertions(2);
 
       // Store information in storage.
       const storedId = uuidv4();
-      const storedMetadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: storedId, data: JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData)})];
-      const storedMetadataKeysDto = [defaultMetadataKeyDto({id: storedId, metadata_private_keys: storedMetadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
-      await findAndUpdateKeysSessionStorageService.metadataKeysSessionStorage.set(new MetadataKeysCollection(storedMetadataKeysDto));
+      const storedMetadataPrivateKeysDto = [
+        defaultMetadataPrivateKeyDto({
+          metadata_key_id: storedId,
+          data: JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData),
+        }),
+      ];
+      const storedMetadataKeysDto = [
+        defaultMetadataKeyDto({
+          id: storedId,
+          metadata_private_keys: storedMetadataPrivateKeysDto,
+          fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c",
+        }),
+      ];
+      await findAndUpdateKeysSessionStorageService.metadataKeysSessionStorage.set(
+        new MetadataKeysCollection(storedMetadataKeysDto),
+      );
 
       // Mock data relative to service call
       const id = uuidv4();
-      const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
+      const metadataPrivateKeysDto = [
+        defaultMetadataPrivateKeyDto({
+          metadata_key_id: id,
+          data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage,
+        }),
+      ];
+      const metadataKeysDto = [
+        defaultMetadataKeyDto({
+          id: id,
+          metadata_private_keys: metadataPrivateKeysDto,
+          fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c",
+        }),
+      ];
       const expectedMetadataKeysDto = JSON.parse(JSON.stringify(metadataKeysDto));
-      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
+      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(
+        pgpKeys.metadataKey.decryptedMetadataPrivateKeyData,
+      );
 
-      jest.spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll").mockImplementation(() => metadataKeysDto);
+      jest
+        .spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll")
+        .mockImplementation(() => metadataKeysDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
 
       const collection = await findAndUpdateKeysSessionStorageService.findAndUpdateAll();
 
-      expect(collection.toDto({metadata_private_keys: true})).toEqual(expectedMetadataKeysDto);
+      expect(collection.toDto({ metadata_private_keys: true })).toEqual(expectedMetadataKeysDto);
       const storageValue = await findAndUpdateKeysSessionStorageService.metadataKeysSessionStorage.get();
       await expect(storageValue).toEqual(expectedMetadataKeysDto);
     });
 
-    it("waits any on-going call to the update and returns the result of the session storage.", async() => {
+    it("waits any on-going call to the update and returns the result of the session storage.", async () => {
       expect.assertions(4);
 
       // Mock data relative to service call
       const id = uuidv4();
-      const metadataPrivateKeysDto = [defaultMetadataPrivateKeyDto({metadata_key_id: id, data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage})];
-      const metadataKeysDto = [defaultMetadataKeyDto({id: id, metadata_private_keys: metadataPrivateKeysDto, fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c"})];
+      const metadataPrivateKeysDto = [
+        defaultMetadataPrivateKeyDto({
+          metadata_key_id: id,
+          data: pgpKeys.metadataKey.encryptedMetadataPrivateKeyDataMessage,
+        }),
+      ];
+      const metadataKeysDto = [
+        defaultMetadataKeyDto({
+          id: id,
+          metadata_private_keys: metadataPrivateKeysDto,
+          fingerprint: "c0dce0aaea4d8cce961c26bddfb6e74e598f025c",
+        }),
+      ];
       const expectedMetadataKeysDto = JSON.parse(JSON.stringify(metadataKeysDto));
-      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(pgpKeys.metadataKey.decryptedMetadataPrivateKeyData);
+      expectedMetadataKeysDto[0].metadata_private_keys[0].data = JSON.parse(
+        pgpKeys.metadataKey.decryptedMetadataPrivateKeyData,
+      );
 
       let resolve;
-      const promise = new Promise(_resolve => resolve = _resolve);
-      jest.spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll").mockImplementation(() => promise);
+      const promise = new Promise((_resolve) => (resolve = _resolve));
+      jest
+        .spyOn(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService, "findAll")
+        .mockImplementation(() => promise);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
 
       const promiseFirstCall = findAndUpdateKeysSessionStorageService.findAndUpdateAll();
@@ -143,9 +232,11 @@ describe("FindAndUpdateMetadataKeysSessionStorageService", () => {
       const resultFirstCall = await promiseFirstCall;
       const resultSecondCall = await promiseSecondCall;
 
-      expect(findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService.findAll).toHaveBeenCalledTimes(1);
-      expect(resultFirstCall.toDto({metadata_private_keys: true})).toEqual(expectedMetadataKeysDto);
-      expect(resultSecondCall.toDto({metadata_private_keys: true})).toEqual(expectedMetadataKeysDto);
+      expect(
+        findAndUpdateKeysSessionStorageService.findMetadataKeysService.metadataKeysApiService.findAll,
+      ).toHaveBeenCalledTimes(1);
+      expect(resultFirstCall.toDto({ metadata_private_keys: true })).toEqual(expectedMetadataKeysDto);
+      expect(resultSecondCall.toDto({ metadata_private_keys: true })).toEqual(expectedMetadataKeysDto);
       const storageValue = await findAndUpdateKeysSessionStorageService.metadataKeysSessionStorage.get();
       await expect(storageValue).toEqual(expectedMetadataKeysDto);
     });

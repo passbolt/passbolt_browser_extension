@@ -19,9 +19,9 @@ import {
   defaultFolderDto,
   folderWithReadPermissionDto,
   folderWithUpdatePermissionDto,
-  minimalFolderDto
+  minimalFolderDto,
 } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
-import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import { ownerPermissionDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import PermissionsCollection from "../permission/permissionsCollection";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import UserEntity from "../user/userEntity";
@@ -83,7 +83,7 @@ describe("FolderEntity", () => {
     const dto = minimalFolderDto();
     const entity = new FolderEntity(dto);
     expect(entity.id).toBeNull();
-    expect(entity.name).toEqual('Folder name');
+    expect(entity.name).toEqual("Folder name");
     expect(entity.folderParentId).toBeNull();
     expect(entity.created).toBeNull();
     expect(entity.modified).toBeNull();
@@ -97,21 +97,21 @@ describe("FolderEntity", () => {
   });
 
   it("constructor works if valid DTO is provided with optional properties", () => {
-    const dto = defaultFolderDto({}, {withPermissions: {count: 3}, withCreator: true, withModifier: true});
+    const dto = defaultFolderDto({}, { withPermissions: { count: 3 }, withCreator: true, withModifier: true });
     const entity = new FolderEntity(dto);
     expect(entity.id).toEqual(dto.id);
-    expect(entity.name).toEqual('Accounting');
+    expect(entity.name).toEqual("Accounting");
     expect(entity.folderParentId).toBeNull();
     expect(entity.created).toEqual("2020-02-01T00:00:00+00:00");
     expect(entity.modified).toEqual("2020-02-01T00:00:00+00:00");
     expect(entity.permission).toBeInstanceOf(PermissionEntity);
-    expect(entity.permission.toDto()).toEqual(expect.objectContaining({type: 15}));
+    expect(entity.permission.toDto()).toEqual(expect.objectContaining({ type: 15 }));
     expect(entity.permissions).toBeInstanceOf(PermissionsCollection);
     expect(entity.permissions.length).toEqual(3);
     expect(entity._creator).toBeInstanceOf(UserEntity);
-    expect(entity._creator.toDto()).toEqual(expect.objectContaining({username: "ada@passbolt.com"}));
+    expect(entity._creator.toDto()).toEqual(expect.objectContaining({ username: "ada@passbolt.com" }));
     expect(entity._modifier).toBeInstanceOf(UserEntity);
-    expect(entity._modifier.toDto()).toEqual(expect.objectContaining({username: "ada@passbolt.com"}));
+    expect(entity._modifier.toDto()).toEqual(expect.objectContaining({ username: "ada@passbolt.com" }));
     expect(entity.isReadOnly()).toBe(false);
     expect(entity.canUpdate()).toBe(true);
     expect(entity.isOwner()).toBe(true);
@@ -119,38 +119,36 @@ describe("FolderEntity", () => {
     expect(entity.isShared()).toBe(true);
   });
 
-  it('Should allow personal with null value', async() => {
+  it("Should allow personal with null value", async () => {
     expect.assertions(1);
     const dto = defaultFolderDto({
-      personal: null
+      personal: null,
     });
     const entity = new FolderEntity(dto);
     expect(entity.isPersonal()).toBe(null);
   });
 
-  it('Should not accept invalid associated permission', async() => {
+  it("Should not accept invalid associated permission", async () => {
     expect.assertions(2);
     const dto = defaultFolderDto({
-      permission: ownerPermissionDto({id: "invalid-id"})
+      permission: ownerPermissionDto({ id: "invalid-id" }),
     });
     try {
       new FolderEntity(dto);
     } catch (error) {
       expect(error).toBeInstanceOf(EntityValidationError);
-      expect(error.hasError('id', 'format')).toBeTruthy();
+      expect(error.hasError("id", "format")).toBeTruthy();
     }
   });
 
-  it('Should not accept invalid associated permissions', async() => {
+  it("Should not accept invalid associated permissions", async () => {
     expect.assertions(2);
     const dto = defaultFolderDto({
-      permissions: [ownerPermissionDto({id: "invalid-id"})]
+      permissions: [ownerPermissionDto({ id: "invalid-id" })],
     });
     // The error is still incomplete, it should return an EntityValidationError with details on the permissions property.
-    expect(() => new FolderEntity(dto))
-      .not.toThrowCollectionValidationError("permissions.0.id.format");
-    expect(() => new FolderEntity(dto))
-      .toThrowCollectionValidationError("0.id.format");
+    expect(() => new FolderEntity(dto)).not.toThrowCollectionValidationError("permissions.0.id.format");
+    expect(() => new FolderEntity(dto)).toThrowCollectionValidationError("0.id.format");
   });
 
   describe("FolderEntity:toDto", () => {
@@ -189,10 +187,10 @@ describe("FolderEntity", () => {
         "creator",
         "modifier",
         "permission",
-        "permissions"
+        "permissions",
       ];
 
-      const dto = defaultFolderDto({}, {withPermissions: true, withCreator: true, withModifier: true});
+      const dto = defaultFolderDto({}, { withPermissions: true, withCreator: true, withModifier: true });
       const entity = new FolderEntity(dto);
       const resultDto = entity.toDto(FolderEntity.ALL_CONTAIN_OPTIONS);
       const keys = Object.keys(resultDto);
@@ -210,28 +208,28 @@ describe("FolderEntity", () => {
       expect.assertions(22);
 
       const personalFolderDto = defaultFolderDto({
-        "personal": true,
+        personal: true,
       });
       const personal = new FolderEntity(personalFolderDto);
 
       // Should not crash when value is null
       const personalNullFolderDto = defaultFolderDto({
-        "personal": null,
+        personal: null,
       });
       const personalNullFolder = new FolderEntity(personalNullFolderDto);
 
       const sharedOwnerDto = defaultFolderDto({
-        "personal": false,
+        personal: false,
       });
       const sharedOwner = new FolderEntity(sharedOwnerDto);
 
       const sharedUpdateDto = folderWithUpdatePermissionDto({
-        "personal": false,
+        personal: false,
       });
       const sharedUpdate = new FolderEntity(sharedUpdateDto);
 
       const sharedReadDto = folderWithReadPermissionDto({
-        "personal": false,
+        personal: false,
       });
       const sharedRead = new FolderEntity(sharedReadDto);
 

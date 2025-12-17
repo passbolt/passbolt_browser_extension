@@ -14,12 +14,21 @@ import CsvLastPassRowParser from "./csvLastPassRowParser";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import {defaultMetadataTypesSettingsV4Dto, defaultMetadataTypesSettingsV50FreshDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import {RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_V5_DEFAULT_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG, RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG, RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import {
+  defaultMetadataTypesSettingsV4Dto,
+  defaultMetadataTypesSettingsV50FreshDto,
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {
+  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+  RESOURCE_TYPE_V5_DEFAULT_SLUG,
+  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+  RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG,
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ImportResourcesFileEntity from "../../../entity/import/importResourcesFileEntity";
 import BinaryConvert from "../../../../utils/format/binaryConvert";
-import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
+import { SECRET_DATA_OBJECT_TYPE } from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
 describe("CsvLastPassRowParser", () => {
   it("can parse LastPass csv", () => {
@@ -46,23 +55,25 @@ describe("CsvLastPassRowParser", () => {
     expect.assertions(2);
 
     const data = {
-      "name": "Password 1",
-      "username": "Username 1",
-      "url": "https://url1.com",
-      "password": "Secret 1",
-      "extra": "Description 1",
-      "grouping": "Folder 1"
+      name: "Password 1",
+      username: "Username 1",
+      url: "https://url1.com",
+      password: "Secret 1",
+      extra: "Description 1",
+      grouping: "Folder 1",
     };
 
     const importDto = {
-      "ref": "import-ref",
-      "file_type": "csv",
-      "file": btoa(BinaryConvert.toBinary(data))
+      ref: "import-ref",
+      file_type: "csv",
+      file: btoa(BinaryConvert.toBinary(data)),
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
-    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
+    const expectedResourceType = resourceTypesCollection.items.find(
+      (resourceType) => resourceType.slug === RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+    );
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.username,
@@ -73,7 +84,12 @@ describe("CsvLastPassRowParser", () => {
       folder_parent_path: data.grouping,
     });
 
-    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvLastPassRowParser.parse(
+      data,
+      importEntity,
+      resourceTypesCollection,
+      metadataTypesSettings,
+    );
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -83,23 +99,25 @@ describe("CsvLastPassRowParser", () => {
     expect.assertions(2);
 
     const data = {
-      "name": "Password 1",
-      "username": "Username 1",
-      "url": "https://url1.com",
-      "password": "Secret 1",
-      "extra": "Description 1",
-      "grouping": "Folder 1"
+      name: "Password 1",
+      username: "Username 1",
+      url: "https://url1.com",
+      password: "Secret 1",
+      extra: "Description 1",
+      grouping: "Folder 1",
     };
     const importDto = {
-      "ref": "import-ref",
-      "file_type": "csv",
-      "file": btoa(BinaryConvert.toBinary(data))
+      ref: "import-ref",
+      file_type: "csv",
+      file: btoa(BinaryConvert.toBinary(data)),
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
 
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
-    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    const expectedResourceType = resourceTypesCollection.items.find(
+      (resourceType) => resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_SLUG,
+    );
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.username,
@@ -110,7 +128,12 @@ describe("CsvLastPassRowParser", () => {
       folder_parent_path: data.grouping,
     });
 
-    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvLastPassRowParser.parse(
+      data,
+      importEntity,
+      resourceTypesCollection,
+      metadataTypesSettings,
+    );
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -120,25 +143,27 @@ describe("CsvLastPassRowParser", () => {
     expect.assertions(2);
 
     const data = {
-      "name": "Test site",
-      "username": "user1",
-      "url": "https://sitename",
-      "password": "password1",
-      "totp": "TMMNBXF73KLJGMZF",
-      "extra": "",
-      "grouping": "(none)",
-      "fav": "0"
+      name: "Test site",
+      username: "user1",
+      url: "https://sitename",
+      password: "password1",
+      totp: "TMMNBXF73KLJGMZF",
+      extra: "",
+      grouping: "(none)",
+      fav: "0",
     };
 
     const importDto = {
-      "ref": "import-ref",
-      "file_type": "csv",
-      "file": btoa(BinaryConvert.toBinary(data))
+      ref: "import-ref",
+      file_type: "csv",
+      file: btoa(BinaryConvert.toBinary(data)),
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
-    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG);
+    const expectedResourceType = resourceTypesCollection.items.find(
+      (resourceType) => resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+    );
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.username,
@@ -150,11 +175,16 @@ describe("CsvLastPassRowParser", () => {
         secret_key: "TMMNBXF73KLJGMZF",
         algorithm: "SHA1",
         digits: 6,
-        period: 30
-      }
+        period: 30,
+      },
     });
 
-    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvLastPassRowParser.parse(
+      data,
+      importEntity,
+      resourceTypesCollection,
+      metadataTypesSettings,
+    );
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -164,25 +194,27 @@ describe("CsvLastPassRowParser", () => {
     expect.assertions(2);
 
     const data = {
-      "name": "Test site",
-      "username": "user1",
-      "url": "https://sitename",
-      "password": "password1",
-      "totp": "TMMNBXF73KLJGMZF",
-      "extra": "",
-      "grouping": "(none)",
-      "fav": "0"
+      name: "Test site",
+      username: "user1",
+      url: "https://sitename",
+      password: "password1",
+      totp: "TMMNBXF73KLJGMZF",
+      extra: "",
+      grouping: "(none)",
+      fav: "0",
     };
 
     const importDto = {
-      "ref": "import-ref",
-      "file_type": "csv",
-      "file": btoa(BinaryConvert.toBinary(data))
+      ref: "import-ref",
+      file_type: "csv",
+      file: btoa(BinaryConvert.toBinary(data)),
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
-    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
+    const expectedResourceType = resourceTypesCollection.items.find(
+      (resourceType) => resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
+    );
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.username,
@@ -194,11 +226,16 @@ describe("CsvLastPassRowParser", () => {
         secret_key: "TMMNBXF73KLJGMZF",
         algorithm: "SHA1",
         digits: 6,
-        period: 30
-      }
+        period: 30,
+      },
     });
 
-    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvLastPassRowParser.parse(
+      data,
+      importEntity,
+      resourceTypesCollection,
+      metadataTypesSettings,
+    );
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
@@ -207,25 +244,27 @@ describe("CsvLastPassRowParser", () => {
     expect.assertions(3);
 
     const data = {
-      "name": "Test site",
-      "username": "user1",
-      "url": "https://sitename",
-      "password": "",
-      "totp": "",
-      "extra": "notes",
-      "grouping": "(none)",
-      "fav": "0"
+      name: "Test site",
+      username: "user1",
+      url: "https://sitename",
+      password: "",
+      totp: "",
+      extra: "notes",
+      grouping: "(none)",
+      fav: "0",
     };
 
     const importDto = {
-      "ref": "import-ref",
-      "file_type": "csv",
-      "file": btoa(BinaryConvert.toBinary(data))
+      ref: "import-ref",
+      file_type: "csv",
+      file: btoa(BinaryConvert.toBinary(data)),
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
-    const expectedResourceType = resourceTypesCollection.items.find(resourceType =>  resourceType.slug === RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG);
+    const expectedResourceType = resourceTypesCollection.items.find(
+      (resourceType) => resourceType.slug === RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG,
+    );
     const expectedEntity = new ExternalResourceEntity({
       name: data.name,
       username: data.username,
@@ -236,10 +275,18 @@ describe("CsvLastPassRowParser", () => {
       description: "notes",
     });
 
-    const externalResourceEntity = CsvLastPassRowParser.parse(data, importEntity, resourceTypesCollection, metadataTypesSettings);
+    const externalResourceEntity = CsvLastPassRowParser.parse(
+      data,
+      importEntity,
+      resourceTypesCollection,
+      metadataTypesSettings,
+    );
 
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
-    expect(externalResourceEntity.toSecretDto(expectedResourceType)).toEqual({description: 'notes', object_type: SECRET_DATA_OBJECT_TYPE});
+    expect(externalResourceEntity.toSecretDto(expectedResourceType)).toEqual({
+      description: "notes",
+      object_type: SECRET_DATA_OBJECT_TYPE,
+    });
   });
 });

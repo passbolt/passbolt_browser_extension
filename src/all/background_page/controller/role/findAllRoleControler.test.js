@@ -13,11 +13,11 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindAllRoleController from "./findAllRoleControler";
 import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";
-import {rolesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection.test.data";
+import { rolesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe("FindAllRoleController", () => {
   describe("::exec", () => {
-    it("Should retrieve all the roles.", async() => {
+    it("Should retrieve all the roles.", async () => {
       expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -40,12 +40,14 @@ describe("FindAllRoleController", () => {
       expect(controller.getOrFindRolesService.getOrFindAll).toHaveBeenCalledTimes(1);
     });
 
-    it("Should let error been thrown from the service if any.", async() => {
+    it("Should let error been thrown from the service if any.", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
       const controller = new FindAllRoleController(null, null, defaultApiClientOptions(), account);
-      jest.spyOn(controller.getOrFindRolesService, "getOrFindAll").mockImplementation(() => { throw new Error("Something went wrong!"); });
+      jest.spyOn(controller.getOrFindRolesService, "getOrFindAll").mockImplementation(() => {
+        throw new Error("Something went wrong!");
+      });
 
       await expect(() => controller.exec()).rejects.toThrowError();
     });

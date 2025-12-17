@@ -14,20 +14,20 @@
 
 import ShareModel from "./shareModel";
 import UserAndGroupSearchResultsCollection from "../entity/userAndGroupSearchResultEntity/userAndGroupSearchResultCollection";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultGroupSearchResultDto, defaultUserSearchResultDto} from "../entity/userAndGroupSearchResultEntity/userAndGroupSearchResultEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import {
+  defaultGroupSearchResultDto,
+  defaultUserSearchResultDto,
+} from "../entity/userAndGroupSearchResultEntity/userAndGroupSearchResultEntity.test.data";
 
 jest.mock("../../service/local_storage/resourceLocalStorage");
 
 describe("ShareModel", () => {
-  describe('::search', () => {
-    it("Should call for the service to update search for matching users and groups", async() => {
+  describe("::search", () => {
+    it("Should call for the service to update search for matching users and groups", async () => {
       expect.assertions(3);
 
-      const collectionDto = [
-        defaultUserSearchResultDto(),
-        defaultGroupSearchResultDto(),
-      ];
+      const collectionDto = [defaultUserSearchResultDto(), defaultGroupSearchResultDto()];
       const collection = new UserAndGroupSearchResultsCollection(collectionDto);
 
       const searchKeyword = "test";
@@ -47,7 +47,7 @@ describe("ShareModel", () => {
       expect(result).toStrictEqual(collection);
     });
 
-    it("Should throw an Error if the keyword is not a valid string", async() => {
+    it("Should throw an Error if the keyword is not a valid string", async () => {
       expect.assertions(1);
 
       const model = new ShareModel(defaultApiClientOptions());

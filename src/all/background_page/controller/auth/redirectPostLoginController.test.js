@@ -13,7 +13,7 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import RedirectPostLoginController from "./redirectPostLoginController";
 
 beforeEach(() => {
@@ -22,7 +22,7 @@ beforeEach(() => {
 
 describe("RedirectPostLoginController", () => {
   describe("::exec", () => {
-    it("should redirect to the main entry point if no redirect is set", async() => {
+    it("should redirect to the main entry point if no redirect is set", async () => {
       expect.assertions(2);
 
       const worker = {
@@ -38,10 +38,10 @@ describe("RedirectPostLoginController", () => {
       await controller.exec();
 
       expect(chrome.tabs.update).toHaveBeenCalledTimes(1);
-      expect(chrome.tabs.update).toHaveBeenCalledWith(worker.tab.id, {url: account.domain});
+      expect(chrome.tabs.update).toHaveBeenCalledWith(worker.tab.id, { url: account.domain });
     });
 
-    it("should redirect to the given URL if a redirect is set", async() => {
+    it("should redirect to the given URL if a redirect is set", async () => {
       expect.assertions(2);
 
       const worker = {
@@ -57,10 +57,10 @@ describe("RedirectPostLoginController", () => {
       await controller.exec();
 
       expect(chrome.tabs.update).toHaveBeenCalledTimes(1);
-      expect(chrome.tabs.update).toHaveBeenCalledWith(worker.tab.id, {url: `${account.domain}/app/administration`});
+      expect(chrome.tabs.update).toHaveBeenCalledWith(worker.tab.id, { url: `${account.domain}/app/administration` });
     });
 
-    it("should not redirect to the given URL if it is not valid", async() => {
+    it("should not redirect to the given URL if it is not valid", async () => {
       expect.assertions(2);
 
       const worker = {
@@ -76,7 +76,7 @@ describe("RedirectPostLoginController", () => {
       await controller.exec();
 
       expect(chrome.tabs.update).toHaveBeenCalledTimes(1);
-      expect(chrome.tabs.update).toHaveBeenCalledWith(worker.tab.id, {url: account.domain});
+      expect(chrome.tabs.update).toHaveBeenCalledWith(worker.tab.id, { url: account.domain });
     });
   });
 });

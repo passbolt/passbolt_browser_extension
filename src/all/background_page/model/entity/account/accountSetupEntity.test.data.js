@@ -12,17 +12,17 @@
  * @since         3.6.0
  */
 
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import AccountSetupEntity from "./accountSetupEntity";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { defaultSecurityTokenDto } from "../securityToken/SecurityTokenEntity.test.data";
 
 export const initialAccountSetupDto = (data = {}) => {
   const defaultData = {
-    "type": AccountSetupEntity.TYPE_ACCOUNT_SETUP,
-    "domain": "https://passbolt.local",
-    "user_id": pgpKeys.ada.userId,
-    "authentication_token_token": uuidv4(),
+    type: AccountSetupEntity.TYPE_ACCOUNT_SETUP,
+    domain: "https://passbolt.local",
+    user_id: pgpKeys.ada.userId,
+    authentication_token_token: uuidv4(),
   };
 
   return Object.assign(defaultData, data);
@@ -30,9 +30,9 @@ export const initialAccountSetupDto = (data = {}) => {
 
 export const startAccountSetupDto = (data = {}) => {
   const defaultData = {
-    "first_name": "Ada",
-    "last_name": "Lovelace",
-    "username": "ada@passbolt.dev"
+    first_name: "Ada",
+    last_name: "Lovelace",
+    username: "ada@passbolt.dev",
   };
 
   return initialAccountSetupDto(Object.assign(defaultData, data));
@@ -40,7 +40,7 @@ export const startAccountSetupDto = (data = {}) => {
 
 export const withServerKeyAccountSetupDto = (data = {}) => {
   const defaultData = {
-    "server_public_armored_key": pgpKeys.server.public,
+    server_public_armored_key: pgpKeys.server.public,
   };
 
   return startAccountSetupDto(Object.assign(defaultData, data));
@@ -48,9 +48,9 @@ export const withServerKeyAccountSetupDto = (data = {}) => {
 
 export const withUserKeyAccountSetupDto = (data = {}) => {
   const defaultData = {
-    "user_key_fingerprint": pgpKeys.ada.fingerprint,
-    "user_public_armored_key": pgpKeys.ada.public,
-    "user_private_armored_key": pgpKeys.ada.private,
+    user_key_fingerprint: pgpKeys.ada.fingerprint,
+    user_public_armored_key: pgpKeys.ada.public,
+    user_private_armored_key: pgpKeys.ada.private,
   };
 
   return withServerKeyAccountSetupDto(Object.assign(defaultData, data));
@@ -58,7 +58,7 @@ export const withUserKeyAccountSetupDto = (data = {}) => {
 
 export const withSecurityTokenAccountSetupDto = (data = {}) => {
   const defaultData = {
-    security_token: defaultSecurityTokenDto()
+    security_token: defaultSecurityTokenDto(),
   };
 
   return withUserKeyAccountSetupDto(Object.assign(defaultData, data));

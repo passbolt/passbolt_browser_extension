@@ -15,9 +15,9 @@
 import expect from "expect";
 import UpdateScimSettingsController from "./updateScimSettingsController";
 import ScimSettingsEntity from "passbolt-styleguide/src/shared/models/entity/scimSettings/scimSettingsEntity";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultScimSettingsDto} from "../../service/api/scimSettings/scimSettingsApiService.test.data";
-import {v4 as uuidv4} from "uuid";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultScimSettingsDto } from "../../service/api/scimSettings/scimSettingsApiService.test.data";
+import { v4 as uuidv4 } from "uuid";
 
 describe("UpdateScimSettingsController", () => {
   let apiClientOptions, controller;
@@ -28,7 +28,7 @@ describe("UpdateScimSettingsController", () => {
   });
 
   describe("::exec", () => {
-    it("should update SCIM settings", async() => {
+    it("should update SCIM settings", async () => {
       expect.assertions(3);
       const scimSettingsDto = defaultScimSettingsDto();
       const scimSettingsEntity = new ScimSettingsEntity(scimSettingsDto);
@@ -36,7 +36,7 @@ describe("UpdateScimSettingsController", () => {
       jest.spyOn(controller.updateScimSettingsService, "update").mockResolvedValue(scimSettingsEntity);
       const expected = {
         ...scimSettingsDto,
-        setting_id: undefined
+        setting_id: undefined,
       };
       const result = await controller.exec(id, scimSettingsDto);
 
@@ -45,7 +45,7 @@ describe("UpdateScimSettingsController", () => {
       expect(result).toBeInstanceOf(ScimSettingsEntity);
     });
 
-    it("should handle errors when updating SCIM settings", async() => {
+    it("should handle errors when updating SCIM settings", async () => {
       expect.assertions(2);
       const error = new Error("Failed to update SCIM settings");
       const id = uuidv4();

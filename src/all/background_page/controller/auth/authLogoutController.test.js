@@ -11,18 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AuthLogoutController from "./authLogoutController";
 import AuthModel from "../../model/auth/authModel";
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from "uuid";
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.clearAllMocks();
 });
 
 describe("AuthLogoutController", () => {
   describe("AuthLogoutController::exec", () => {
-    it("Should sign-out the user and not redirect after for the quickaccess.", async() => {
+    it("Should sign-out the user and not redirect after for the quickaccess.", async () => {
       expect.assertions(2);
       const logoutSpy = jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
 
@@ -33,7 +33,7 @@ describe("AuthLogoutController", () => {
       expect(browser.tabs.update).not.toHaveBeenCalled();
     });
 
-    it("Should sign-out the user and redirect after.", async() => {
+    it("Should sign-out the user and redirect after.", async () => {
       expect.assertions(3);
       const logoutSpy = jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
 
@@ -49,7 +49,9 @@ describe("AuthLogoutController", () => {
 
       expect(logoutSpy).toHaveBeenCalledTimes(1);
       expect(browser.tabs.update).toHaveBeenCalledTimes(1);
-      expect(browser.tabs.update).toHaveBeenCalledWith(worker.tab.id, {url: apiClientOptions.getBaseUrl().toString()});
+      expect(browser.tabs.update).toHaveBeenCalledWith(worker.tab.id, {
+        url: apiClientOptions.getBaseUrl().toString(),
+      });
     });
   });
 });

@@ -12,29 +12,28 @@
  * @since         4.11.0
  */
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindAllNonDeletedMetadataKeysController from "./findAllNonDeletedMetadataKeysController";
-import {
-  defaultMetadataKeysDtos
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
+import { defaultMetadataKeysDtos } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 
 describe("FindAllNonDeletedMetadataKeysController", () => {
   let controller, account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
     controller = new FindAllNonDeletedMetadataKeysController(null, null, apiClientOptions, account);
   });
 
   describe("::exec", () => {
-    it("find all non deleted metadadata keys.", async() => {
+    it("find all non deleted metadadata keys.", async () => {
       expect.assertions(3);
 
       const metadataKeysDto = defaultMetadataKeysDtos();
-      jest.spyOn(controller.findMetadataKeysService, "findAllNonDeleted")
+      jest
+        .spyOn(controller.findMetadataKeysService, "findAllNonDeleted")
         .mockImplementationOnce(() => new MetadataKeysCollection(metadataKeysDto));
 
       const metadataKeys = await controller.exec();

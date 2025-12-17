@@ -15,7 +15,7 @@
 import CryptoRandomValuesService from "./cryptoRandomValuesService";
 
 describe("RandomValue service", () => {
-  it(`should provide a random value`, async() => {
+  it(`should provide a random value`, async () => {
     expect.assertions(1);
     const value = CryptoRandomValuesService.randomValuesArray(32);
     expect(value.length).toEqual(32);

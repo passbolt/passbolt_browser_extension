@@ -28,8 +28,8 @@ describe("ProgressService", () => {
     const stepMessageOverDebounceUpdated = "step message update to display";
     const mockedWorker = {
       port: {
-        emit: jest.fn()
-      }
+        emit: jest.fn(),
+      },
     };
     const progressService = new ProgressService(mockedWorker, title);
 
@@ -37,33 +37,42 @@ describe("ProgressService", () => {
     progressService.start(goals, message);
     expect(progressService.progress).toBe(0);
 
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.open-progress-dialog', title, goals, message);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith(
+      "passbolt.progress.open-progress-dialog",
+      title,
+      goals,
+      message,
+    );
 
     progressService.finishStep(message, true);
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', message, 1);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith("passbolt.progress.update", message, 1);
     expect(progressService.progress).toBe(1);
 
     progressService.finishStep(null, true);
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', message, 2);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith("passbolt.progress.update", message, 2);
     expect(progressService.progress).toBe(2);
 
     progressService.updateGoals(1);
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update-goals', 1);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith("passbolt.progress.update-goals", 1);
 
     progressService.updateStepMessage(stepMessageBelowDebounceLimit);
-    expect(mockedWorker.port.emit).not.toHaveBeenCalledWith('passbolt.progress.update', stepMessageBelowDebounceLimit, 2);
+    expect(mockedWorker.port.emit).not.toHaveBeenCalledWith(
+      "passbolt.progress.update",
+      stepMessageBelowDebounceLimit,
+      2,
+    );
 
     jest.advanceTimersByTime(81);
     progressService.updateStepMessage(stepMessageOverDebounceUpdated);
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', stepMessageOverDebounceUpdated, 2);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith("passbolt.progress.update", stepMessageOverDebounceUpdated, 2);
 
     jest.advanceTimersByTime(81);
     progressService.finishSteps(8);
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.update', stepMessageOverDebounceUpdated, 10);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith("passbolt.progress.update", stepMessageOverDebounceUpdated, 10);
     expect(progressService.progress).toBe(10);
 
     progressService.close();
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.close-progress-dialog');
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith("passbolt.progress.close-progress-dialog");
   });
 
   it("should set the right title if set after construction", () => {
@@ -73,16 +82,26 @@ describe("ProgressService", () => {
     const message = "message";
     const mockedWorker = {
       port: {
-        emit: jest.fn()
-      }
+        emit: jest.fn(),
+      },
     };
     const progressService = new ProgressService(mockedWorker, title);
     progressService.start(goals, message);
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.open-progress-dialog', title, goals, message);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith(
+      "passbolt.progress.open-progress-dialog",
+      title,
+      goals,
+      message,
+    );
     progressService.close();
 
     progressService.title = newTitle;
     progressService.start(goals, message);
-    expect(mockedWorker.port.emit).toHaveBeenCalledWith('passbolt.progress.open-progress-dialog', newTitle, goals, message);
+    expect(mockedWorker.port.emit).toHaveBeenCalledWith(
+      "passbolt.progress.open-progress-dialog",
+      newTitle,
+      goals,
+      message,
+    );
   });
 });

@@ -12,11 +12,11 @@
  * @since         4.5.0
  */
 
-import {defaultPasswordExpiryResourceDto} from "./passwordExpiryResourceEntity.test.data";
+import { defaultPasswordExpiryResourceDto } from "./passwordExpiryResourceEntity.test.data";
 
-export const defaultPasswordExpiryCollectionDto = (data = {}) => ([
+export const defaultPasswordExpiryCollectionDto = (data = {}) => [
   defaultPasswordExpiryResourceDto(data),
   defaultPasswordExpiryResourceDto(data),
   defaultPasswordExpiryResourceDto(data),
   defaultPasswordExpiryResourceDto(data),
-]);
+];

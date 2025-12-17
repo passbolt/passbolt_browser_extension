@@ -12,34 +12,36 @@
  * @since         4.12.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponseWithPagination} from '../../../../../../test/mocks/mockApiResponse';
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponseWithPagination } from "../../../../../../test/mocks/mockApiResponse";
 import AccountEntity from "../../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
-import {mockApiResponseError} from "passbolt-styleguide/test/mocks/mockApiResponse";
+import { mockApiResponseError } from "passbolt-styleguide/test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
-import {defaultResourceDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
+import { defaultResourceDtosCollection } from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import MigrateMetadataResourcesApiService from "./migrateMetadataResourcesApiService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 
 describe("migrateMetadataResourcesApiService", () => {
   let apiClientOptions;
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
     const account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  describe('::findAll', () => {
-    it("retrieves the settings from API", async() => {
+  describe("::findAll", () => {
+    it("retrieves the settings from API", async () => {
       expect.assertions(5);
       const pageCount = 5;
       const resourcesCollection = defaultResourceDtosCollection();
-      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => mockApiResponseWithPagination(resourcesCollection, {}, pageCount));
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () =>
+        mockApiResponseWithPagination(resourcesCollection, {}, pageCount),
+      );
 
       const service = new MigrateMetadataResourcesApiService(apiClientOptions);
       const result = await service.findAll();
@@ -52,18 +54,22 @@ describe("migrateMetadataResourcesApiService", () => {
       expect(result._props.body).toStrictEqual(resourcesCollection);
     });
 
-    it("throws API error if the API encountered an issue", async() => {
+    it("throws API error if the API encountered an issue", async () => {
       expect.assertions(1);
-      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => mockApiResponseError(500, "Something wrong happened!"));
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () =>
+        mockApiResponseError(500, "Something wrong happened!"),
+      );
 
       const service = new MigrateMetadataResourcesApiService(apiClientOptions);
 
       await expect(() => service.findAll()).rejects.toThrow(PassboltApiFetchError);
     });
 
-    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async() => {
+    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async () => {
       expect.assertions(1);
-      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => { throw new Error("Service unavailable"); });
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => {
+        throw new Error("Service unavailable");
+      });
 
       const service = new MigrateMetadataResourcesApiService(apiClientOptions);
 
@@ -71,13 +77,13 @@ describe("migrateMetadataResourcesApiService", () => {
     });
   });
 
-  describe('::migrate', () => {
-    it("should send the updated resources collection to the API and returned the next resources collection page", async() => {
+  describe("::migrate", () => {
+    it("should send the updated resources collection to the API and returned the next resources collection page", async () => {
       expect.assertions(3);
 
       const nextCollection = defaultResourceDtosCollection();
       const resourcesCollection = new ResourcesCollection(defaultResourceDtosCollection());
-      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, async req => {
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, async (req) => {
         const body = JSON.parse(await req.text());
         expect(body).toStrictEqual(resourcesCollection.toDto());
         return mockApiResponseWithPagination(nextCollection, {}, 1);
@@ -90,9 +96,11 @@ describe("migrateMetadataResourcesApiService", () => {
       expect(result._props.body).toStrictEqual(nextCollection);
     });
 
-    it("throws API error if the API encountered an issue", async() => {
+    it("throws API error if the API encountered an issue", async () => {
       expect.assertions(1);
-      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => mockApiResponseError(500, "Something wrong happened!"));
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () =>
+        mockApiResponseError(500, "Something wrong happened!"),
+      );
 
       const service = new MigrateMetadataResourcesApiService(apiClientOptions);
       const resourcesCollection = new ResourcesCollection(defaultResourceDtosCollection());
@@ -100,9 +108,11 @@ describe("migrateMetadataResourcesApiService", () => {
       await expect(() => service.migrate(resourcesCollection)).rejects.toThrow(PassboltApiFetchError);
     });
 
-    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async() => {
+    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async () => {
       expect.assertions(1);
-      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => { throw new Error("Service unavailable"); });
+      fetch.doMockOnceIf(/metadata\/upgrade\/resources\.json/, () => {
+        throw new Error("Service unavailable");
+      });
 
       const service = new MigrateMetadataResourcesApiService(apiClientOptions);
       const resourcesCollection = new ResourcesCollection(defaultResourceDtosCollection());

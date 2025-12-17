@@ -13,7 +13,7 @@
  */
 import FavoriteEntity from "./favoriteEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultFavoriteDto} from "passbolt-styleguide/src/shared/models/entity/favorite/favoriteEntity.test.data";
+import { defaultFavoriteDto } from "passbolt-styleguide/src/shared/models/entity/favorite/favoriteEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("FavoriteEntity", () => {
@@ -62,12 +62,7 @@ describe("FavoriteEntity", () => {
   describe("FavoriteEntity:toDto", () => {
     it("should return the expected properties.", () => {
       expect.assertions(2);
-      const expectedKeys = [
-        "id",
-        "user_id",
-        "foreign_key",
-        "created",
-      ];
+      const expectedKeys = ["id", "user_id", "foreign_key", "created"];
 
       const dto = defaultFavoriteDto();
       const entity = new FavoriteEntity(dto);

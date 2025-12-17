@@ -12,30 +12,35 @@
  * @since         4.12.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultPassboltResponsePaginationHeaderDto} from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponsePaginationHeaderEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultPassboltResponsePaginationHeaderDto } from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponsePaginationHeaderEntity.test.data";
 import MigrateMetadataResourcesController from "./migrateMetadataResourcesController";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultMigrateMetadataDto} from "passbolt-styleguide/src/shared/models/entity/metadata/migrateMetadataEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultMigrateMetadataDto } from "passbolt-styleguide/src/shared/models/entity/metadata/migrateMetadataEntity.test.data";
 import MigrateMetadataEntity from "passbolt-styleguide/src/shared/models/entity/metadata/migrateMetadataEntity";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 import Keyring from "../../model/keyring";
 
 describe("MigrateMetadataResourcesController", () => {
   describe("::exec", () => {
-    it("Migrate the resources metadata.", async() => {
+    it("Migrate the resources metadata.", async () => {
       expect.assertions(7);
 
       const passphrase = "ada@passbolt.com";
       const migrateMetadataDto = defaultMigrateMetadataDto();
       const paginationDatils = defaultPassboltResponsePaginationHeaderDto({
         count: 78,
-        limit: 20
+        limit: 20,
       });
       const pageCount = 4;
-      const worker = {port: new MockPort()};
-      const controller = new MigrateMetadataResourcesController(worker, null, defaultApiClientOptions(), new AccountEntity(defaultAccountDto()));
+      const worker = { port: new MockPort() };
+      const controller = new MigrateMetadataResourcesController(
+        worker,
+        null,
+        defaultApiClientOptions(),
+        new AccountEntity(defaultAccountDto()),
+      );
 
       jest.spyOn(controller.migrateMetadataResourcesService, "migrate").mockReturnValue();
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockReturnValue(passphrase);
@@ -47,7 +52,11 @@ describe("MigrateMetadataResourcesController", () => {
 
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
       expect(controller.migrateMetadataResourcesService.migrate).toHaveBeenCalledTimes(1);
-      expect(controller.migrateMetadataResourcesService.migrate).toHaveBeenCalledWith(new MigrateMetadataEntity(migrateMetadataDto), passphrase, {count: 0});
+      expect(controller.migrateMetadataResourcesService.migrate).toHaveBeenCalledWith(
+        new MigrateMetadataEntity(migrateMetadataDto),
+        passphrase,
+        { count: 0 },
+      );
       expect(controller.progressService.start).toHaveBeenCalledTimes(1);
       expect(controller.progressService.start).toHaveBeenCalledWith(pageCount + 3, "Migrating metadata");
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);

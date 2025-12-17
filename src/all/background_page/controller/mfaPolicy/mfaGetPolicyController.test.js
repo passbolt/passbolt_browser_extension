@@ -12,20 +12,19 @@
  * @since         3.10.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import MfaGetPolicyController from './mfaGetPolicyController';
-import MfaPolicyEntity from '../../model/entity/mfa/mfaPolicyEntity';
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import MfaGetPolicyController from "./mfaGetPolicyController";
+import MfaPolicyEntity from "../../model/entity/mfa/mfaPolicyEntity";
 
 beforeEach(() => {
   enableFetchMocks();
 });
 
-
 describe("MfaGetPolicyController", () => {
-  it("can get the current mfa policy", async() => {
-    const apiResult = {policy: MfaPolicyEntity.MANDATORY, remember_me_for_a_month: true};
+  it("can get the current mfa policy", async () => {
+    const apiResult = { policy: MfaPolicyEntity.MANDATORY, remember_me_for_a_month: true };
     // Mock API fetch account recovery organization policy response.
     fetch.doMock(() => mockApiResponse(apiResult));
 
@@ -35,4 +34,3 @@ describe("MfaGetPolicyController", () => {
     expect(result.toJSON()).toEqual(apiResult);
   });
 });
-

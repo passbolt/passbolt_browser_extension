@@ -13,13 +13,11 @@
  */
 
 import each from "jest-each";
-import {Config} from "../../model/config";
+import { Config } from "../../model/config";
 import ParseAppUrlService from "./parseAppUrlService";
 
-const errorMatchPattern =
-  "Cannot parse application url. The url does not match the pattern.";
-const errorDomainInvalid =
-  "Cannot parse application url. The domain is not valid.";
+const errorMatchPattern = "Cannot parse application url. The url does not match the pattern.";
+const errorDomainInvalid = "Cannot parse application url. The domain is not valid.";
 
 const domain = "https://passbolt.dev";
 
@@ -80,18 +78,14 @@ describe("ParseAppUrlService", () => {
         url: "https://demo.passbolt.com/app/users#hash",
         domain: `https://demo.passbolt.com`,
       },
-    ]).describe("should parse", _props => {
+    ]).describe("should parse", (_props) => {
       beforeEach(() => {
         Config.write("user.settings.trustedDomain", _props.domain);
       });
       it(`should parse: ${_props.scenario}`, () => {
         expect.assertions(2);
-        expect(() => ParseAppUrlService.parse(_props.url)).not.toThrow(
-          errorMatchPattern
-        );
-        expect(() => ParseAppUrlService.parse(_props.url)).not.toThrow(
-          errorDomainInvalid
-        );
+        expect(() => ParseAppUrlService.parse(_props.url)).not.toThrow(errorMatchPattern);
+        expect(() => ParseAppUrlService.parse(_props.url)).not.toThrow(errorDomainInvalid);
       });
     });
 
@@ -110,46 +104,40 @@ describe("ParseAppUrlService", () => {
       },
       {
         scenario: "Original domain as subdomain attack",
-        url: "https://passbolt.dev.attacker.com"
+        url: "https://passbolt.dev.attacker.com",
       },
       {
         scenario: "Subdomain attack",
-        url: "https://attack.passbolt.dev"
+        url: "https://attack.passbolt.dev",
       },
       {
         scenario: "Regex wild mark attack",
-        url: "https://passboltxdev"
+        url: "https://passboltxdev",
       },
       {
         scenario: "Non application entry point",
-        url: "https://passbolt.dev/auth/login"
+        url: "https://passbolt.dev/auth/login",
       },
       {
         scenario: "Domain look alike as hash attack",
-        url: `https://www.attacker.com#${domain}`
+        url: `https://www.attacker.com#${domain}`,
       },
-    ]).describe("should not parse", _props => {
+    ]).describe("should not parse", (_props) => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);
-        expect(() => ParseAppUrlService.parse(_props.url)).toThrowError(
-          errorMatchPattern
-        );
+        expect(() => ParseAppUrlService.parse(_props.url)).toThrowError(errorMatchPattern);
       });
     });
   });
   describe("ParseAppUrlService:getContext", () => {
     it(`should return regex based on trusted domain`, () => {
       expect.assertions(1);
-      expect(ParseAppUrlService.getRegex()).toBe(
-        "^https\\:\\/\\/passbolt\\.dev/?(/app.*)?(#.*)?$"
-      );
+      expect(ParseAppUrlService.getRegex()).toBe("^https\\:\\/\\/passbolt\\.dev/?(/app.*)?(#.*)?$");
     });
     it(`should escaped characters from domain`, () => {
       Config.write("user.settings.trustedDomain", "https://passbolt.dev/#/");
       expect.assertions(1);
-      expect(ParseAppUrlService.getRegex()).toBe(
-        "^https\\:\\/\\/passbolt\\.dev\\/\\#\\//?(/app.*)?(#.*)?$"
-      );
+      expect(ParseAppUrlService.getRegex()).toBe("^https\\:\\/\\/passbolt\\.dev\\/\\#\\//?(/app.*)?(#.*)?$");
     });
   });
 });

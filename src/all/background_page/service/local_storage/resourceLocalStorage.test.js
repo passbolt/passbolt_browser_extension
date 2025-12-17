@@ -11,36 +11,36 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.9.0
  */
-import {v4 as uuidv4} from 'uuid';
-import ResourceLocalStorage, {RESOURCES_LOCAL_STORAGE_KEY} from "./resourceLocalStorage";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { v4 as uuidv4 } from "uuid";
+import ResourceLocalStorage, { RESOURCES_LOCAL_STORAGE_KEY } from "./resourceLocalStorage";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
-import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 import expect from "expect";
 
 describe("ResourceLocalStorage", () => {
   describe("::get", () => {
-    it("Should return undefined if nothing stored in the storage", async() => {
+    it("Should return undefined if nothing stored in the storage", async () => {
       expect.assertions(1);
       const result = await ResourceLocalStorage.get();
       expect(result).toBeUndefined();
     });
 
-    it("Should return content stored in the local storage", async() => {
+    it("Should return content stored in the local storage", async () => {
       expect.assertions(3);
       const resourcesDto = [defaultResourceDto()];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto });
       const result = await ResourceLocalStorage.get();
       expect(result).toEqual(expect.any(Array));
       expect(result).toHaveLength(1);
       expect(result).toEqual(resourcesDto);
     });
 
-    it("Should initialize the cache when getting the data for the first time", async() => {
+    it("Should initialize the cache when getting the data for the first time", async () => {
       expect.assertions(5);
       const resourcesDto = [defaultResourceDto()];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto });
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.get();
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
@@ -49,10 +49,10 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage._cachedData).toEqual(resourcesDto);
     });
 
-    it("Should return content stored in the local storage from the cache if set", async() => {
+    it("Should return content stored in the local storage from the cache if set", async () => {
       expect.assertions(4);
       const resourcesDto = [defaultResourceDto()];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto });
       // call a first time to initialize the cache.
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.get();
@@ -66,12 +66,14 @@ describe("ResourceLocalStorage", () => {
   });
 
   describe("::set", () => {
-    it("Should throw if parameter is invalid.", async() => {
+    it("Should throw if parameter is invalid.", async () => {
       expect.assertions(1);
-      await expect(() => ResourceLocalStorage.set(42)).rejects.toThrowError("ResourceLocalStorage::set expects a ResourcesCollection");
+      await expect(() => ResourceLocalStorage.set(42)).rejects.toThrowError(
+        "ResourceLocalStorage::set expects a ResourcesCollection",
+      );
     });
 
-    it("Should set local storage with empty data", async() => {
+    it("Should set local storage with empty data", async () => {
       expect.assertions(2);
       const resources = new ResourcesCollection([]);
       await ResourceLocalStorage.set(resources);
@@ -80,7 +82,7 @@ describe("ResourceLocalStorage", () => {
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(0);
     });
 
-    it("Should store data in the local storage", async() => {
+    it("Should store data in the local storage", async () => {
       expect.assertions(3);
       const resourcesDto = [defaultResourceDto(), defaultResourceDto()];
       const resources = new ResourcesCollection(resourcesDto);
@@ -88,10 +90,12 @@ describe("ResourceLocalStorage", () => {
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toBeInstanceOf(Array);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(2);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(
+        resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN),
+      );
     });
 
-    it("Should set the cache when setting the local storage", async() => {
+    it("Should set the cache when setting the local storage", async () => {
       expect.assertions(5);
       const resourcesDto = [defaultResourceDto(), defaultResourceDto()];
       const resources = new ResourcesCollection(resourcesDto);
@@ -105,24 +109,24 @@ describe("ResourceLocalStorage", () => {
   });
 
   describe("::getResourceById", () => {
-    it("Should return undefined if the local storage is not yet initialized", async() => {
+    it("Should return undefined if the local storage is not yet initialized", async () => {
       expect.assertions(1);
       const result = await ResourceLocalStorage.getResourceById(uuidv4());
       expect(result).toBeUndefined();
     });
 
-    it("Should return nothing if the target resource is not found in the local storage", async() => {
+    it("Should return nothing if the target resource is not found in the local storage", async () => {
       expect.assertions(1);
       const resourcesDto = [defaultResourceDto(), defaultResourceDto()];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto });
       const result = await ResourceLocalStorage.getResourceById(uuidv4());
       expect(result).toBeUndefined();
     });
 
-    it("Should return the target resource if found in the local storage", async() => {
+    it("Should return the target resource if found in the local storage", async () => {
       expect.assertions(2);
       const resourcesDto = [defaultResourceDto(), defaultResourceDto()];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto });
       const result = await ResourceLocalStorage.getResourceById(resourcesDto[0].id);
       expect(result).toEqual(expect.any(Object));
       expect(result).toEqual(resourcesDto[0]);
@@ -130,53 +134,57 @@ describe("ResourceLocalStorage", () => {
   });
 
   describe("::getResourcesById", () => {
-    it("Should return undefined if the local storage is not yet initialized", async() => {
+    it("Should return undefined if the local storage is not yet initialized", async () => {
       expect.assertions(1);
       const result = await ResourceLocalStorage.getResourcesByIds([uuidv4(), uuidv4()]);
       expect(result).toBeUndefined();
     });
 
-    it("Should return nothing if the target resource is not found in the local storage", async() => {
+    it("Should return nothing if the target resource is not found in the local storage", async () => {
       expect.assertions(1);
       const resourcesDto = [defaultResourceDto(), defaultResourceDto()];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto });
       const result = await ResourceLocalStorage.getResourcesByIds([uuidv4(), uuidv4()]);
       expect(result).toEqual([]);
     });
 
-    it("Should return the target resources if found in the local storage", async() => {
+    it("Should return the target resources if found in the local storage", async () => {
       expect.assertions(2);
       const resourcesDto = [defaultResourceDto(), defaultResourceDto(), defaultResourceDto()];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto });
       const result = await ResourceLocalStorage.getResourcesByIds([resourcesDto[0].id, resourcesDto[2].id, uuidv4()]);
       expect(result).toEqual(expect.any(Array));
       expect(result).toEqual([resourcesDto[0], resourcesDto[2]]);
     });
 
-    it("Should return the target resources if found in the local storage", async() => {
+    it("Should return the target resources if found in the local storage", async () => {
       expect.assertions(2);
       const resourcesDto = [defaultResourceDto(), defaultResourceDto(), defaultResourceDto()];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto});
-      const result = await ResourceLocalStorage.getResourcesByIds([resourcesDto[0].id, resourcesDto[1].id, resourcesDto[2].id]);
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDto });
+      const result = await ResourceLocalStorage.getResourcesByIds([
+        resourcesDto[0].id,
+        resourcesDto[1].id,
+        resourcesDto[2].id,
+      ]);
       expect(result).toEqual(expect.any(Array));
       expect(result).toEqual(resourcesDto);
     });
   });
 
   describe("::addResource", () => {
-    it("Should throw if no data passed as parameter", async() => {
+    it("Should throw if no data passed as parameter", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.addResource();
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects a ResourceEntity to be set");
     });
 
-    it("Should throw if the resource parameter is not a ResourceEntity", async() => {
+    it("Should throw if the resource parameter is not a ResourceEntity", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.addResource(42);
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects an object of type ResourceEntity");
     });
 
-    it("Should throw if the resource does not validate", async() => {
+    it("Should throw if the resource does not validate", async () => {
       expect.assertions(1);
       const resourceDto = defaultResourceDto();
       delete resourceDto.id;
@@ -185,7 +193,7 @@ describe("ResourceLocalStorage", () => {
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects ResourceEntity id to be set");
     });
 
-    it("Should store a new resource", async() => {
+    it("Should store a new resource", async () => {
       expect.assertions(3);
       const resourceDto = defaultResourceDto();
       const resource = new ResourceEntity(resourceDto);
@@ -193,10 +201,12 @@ describe("ResourceLocalStorage", () => {
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5(resourceDto),
+      );
     });
 
-    it("Should update the cache with the added resource", async() => {
+    it("Should update the cache with the added resource", async () => {
       expect.assertions(5);
       const resourceDto = defaultResourceDto();
       const resource = new ResourceEntity(resourceDto);
@@ -210,19 +220,19 @@ describe("ResourceLocalStorage", () => {
   });
 
   describe("::addResources", () => {
-    it("Should throw if no data passed as parameter", async() => {
+    it("Should throw if no data passed as parameter", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.addResources();
       await expect(promise).rejects.toThrow("he `resources` parameter should be of type ResourcesCollection");
     });
 
-    it("Should throw if the resourcesEntities parameter is not an array", async() => {
+    it("Should throw if the resourcesEntities parameter is not an array", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.addResources(42);
       await expect(promise).rejects.toThrow("he `resources` parameter should be of type ResourcesCollection");
     });
 
-    it("Should throw if one of the resources does not validate", async() => {
+    it("Should throw if one of the resources does not validate", async () => {
       expect.assertions(1);
       const resourceDto1 = defaultResourceDto();
       delete resourceDto1.id;
@@ -233,7 +243,7 @@ describe("ResourceLocalStorage", () => {
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects ResourceEntity id to be set");
     });
 
-    it("Should store new resources", async() => {
+    it("Should store new resources", async () => {
       expect.assertions(4);
       const resourceDto1 = defaultResourceDto();
       const resource1 = new ResourceEntity(resourceDto1);
@@ -244,11 +254,15 @@ describe("ResourceLocalStorage", () => {
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(2);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto2));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5(resourceDto1),
+      );
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5(resourceDto2),
+      );
     });
 
-    it("Should update the cache with the added resources", async() => {
+    it("Should update the cache with the added resources", async () => {
       expect.assertions(6);
       const resourceDto1 = defaultResourceDto();
       const resource1 = new ResourceEntity(resourceDto1);
@@ -266,19 +280,19 @@ describe("ResourceLocalStorage", () => {
   });
 
   describe("::updateResource", () => {
-    it("Should throw if no data passed as parameter", async() => {
+    it("Should throw if no data passed as parameter", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.updateResource();
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects a ResourceEntity to be set");
     });
 
-    it("Should throw if the resource parameter is not a ResourceEntity", async() => {
+    it("Should throw if the resource parameter is not a ResourceEntity", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.updateResource(42);
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects an object of type ResourceEntity");
     });
 
-    it("Should throw if the resource does not validate", async() => {
+    it("Should throw if the resource does not validate", async () => {
       expect.assertions(1);
       const resourceDto = defaultResourceDto();
       delete resourceDto.id;
@@ -287,34 +301,36 @@ describe("ResourceLocalStorage", () => {
       await expect(promise).rejects.toThrow("esourceLocalStorage expects ResourceEntity id to be set");
     });
 
-    it("Should throw if the resource is not found in the local storage", async() => {
+    it("Should throw if the resource is not found in the local storage", async () => {
       expect.assertions(1);
       const resourceDto = defaultResourceDto();
       const resource = new ResourceEntity(resourceDto);
       const promise = ResourceLocalStorage.updateResource(resource);
-      await expect(promise).rejects.toThrow('The resource could not be found in the local storage');
+      await expect(promise).rejects.toThrow("The resource could not be found in the local storage");
     });
 
-    it("Should update the resource", async() => {
+    it("Should update the resource", async () => {
       expect.assertions(4);
       const resourceDto = defaultResourceDto();
       const resourcesDtos = [resourceDto];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
-      const resource = new ResourceEntity({...resourceDto, name: "Updated name"});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
+      const resource = new ResourceEntity({ ...resourceDto, name: "Updated name" });
       await ResourceLocalStorage.updateResource(resource);
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resource.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(
+        resource.toDto(ResourceLocalStorage.DEFAULT_CONTAIN),
+      );
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0].name).not.toEqual(resourceDto.metadata.name);
     });
 
-    it("Should update the cache with the updated resource", async() => {
+    it("Should update the cache with the updated resource", async () => {
       expect.assertions(6);
       const resourceDto = defaultResourceDto();
       const resourcesDtos = [resourceDto];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
-      const resource = new ResourceEntity({...resourceDto, name: "Updated name"});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
+      const resource = new ResourceEntity({ ...resourceDto, name: "Updated name" });
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.updateResource(resource);
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
@@ -326,19 +342,19 @@ describe("ResourceLocalStorage", () => {
   });
 
   describe("::updateResourcesCollection", () => {
-    it("Should throw if no data passed as parameter", async() => {
+    it("Should throw if no data passed as parameter", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.updateResourcesCollection();
       await expect(promise).rejects.toThrow("The parameter resourcesEntities should be of ResourcesCollection type.");
     });
 
-    it("Should throw if the resourcesEntities parameter is not an array", async() => {
+    it("Should throw if the resourcesEntities parameter is not an array", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.updateResourcesCollection(42);
       await expect(promise).rejects.toThrow("The parameter resourcesEntities should be of ResourcesCollection type.");
     });
 
-    it("Should throw if one of the resources does not validate", async() => {
+    it("Should throw if one of the resources does not validate", async () => {
       expect.assertions(1);
       const resourceDto1 = defaultResourceDto();
       delete resourceDto1.id;
@@ -348,53 +364,61 @@ describe("ResourceLocalStorage", () => {
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects ResourceEntity id to be set");
     });
 
-    it("Should throw if one of the resource is not found in the local storage", async() => {
+    it("Should throw if one of the resource is not found in the local storage", async () => {
       expect.assertions(1);
 
       const resourceDto = defaultResourceDto();
       const resources = new ResourcesCollection([resourceDto]);
 
       const promise = ResourceLocalStorage.updateResourcesCollection(resources);
-      await expect(promise).rejects.toThrow('The resource could not be found in the local storage');
+      await expect(promise).rejects.toThrow("The resource could not be found in the local storage");
     });
 
-    it("Should update resources", async() => {
+    it("Should update resources", async () => {
       expect.assertions(6);
       const resourceDto1 = defaultResourceDto();
       const resourceDto2 = defaultResourceDto();
       const resourceDto3 = defaultResourceDto();
       const resourceDto4 = defaultResourceDto();
       const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       const resources = new ResourcesCollection([
         resourceDto1,
-        {...resourceDto2, name: "Resource 2 name update"},
+        { ...resourceDto2, name: "Resource 2 name update" },
         resourceDto3,
-        {...resourceDto4, name: "Resource 4 name update"},
+        { ...resourceDto4, name: "Resource 4 name update" },
       ]);
       await ResourceLocalStorage.updateResourcesCollection(resources);
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(4);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5(resourceDto1),
+      );
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto2, name: "Resource 2 name update" }),
+      );
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][2]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5(resourceDto3),
+      );
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][3]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto4, name: "Resource 4 name update" }),
+      );
     });
 
-    it("Should update cache when updating resources", async() => {
+    it("Should update cache when updating resources", async () => {
       expect.assertions(8);
       const resourceDto1 = defaultResourceDto();
       const resourceDto2 = defaultResourceDto();
       const resourceDto3 = defaultResourceDto();
       const resourceDto4 = defaultResourceDto();
       const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       const resources = new ResourcesCollection([
         resourceDto1,
-        {...resourceDto2, name: "Resource 2 name update"},
+        { ...resourceDto2, name: "Resource 2 name update" },
         resourceDto3,
-        {...resourceDto4, name: "Resource 4 name update"},
+        { ...resourceDto4, name: "Resource 4 name update" },
       ]);
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.updateResourcesCollection(resources);
@@ -402,25 +426,29 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(4);
       expect(ResourceLocalStorage._cachedData[0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
-      expect(ResourceLocalStorage._cachedData[1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
+      expect(ResourceLocalStorage._cachedData[1]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto2, name: "Resource 2 name update" }),
+      );
       expect(ResourceLocalStorage._cachedData[2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
-      expect(ResourceLocalStorage._cachedData[3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
+      expect(ResourceLocalStorage._cachedData[3]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto4, name: "Resource 4 name update" }),
+      );
     });
   });
   describe("::addOrReplaceResourcesCollection", () => {
-    it("Should throw if no data passed as parameter", async() => {
+    it("Should throw if no data passed as parameter", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.addOrReplaceResourcesCollection();
       await expect(promise).rejects.toThrow("The parameter resourcesEntities should be of ResourcesCollection type.");
     });
 
-    it("Should throw if the resourcesEntities parameter is not an array", async() => {
+    it("Should throw if the resourcesEntities parameter is not an array", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.addOrReplaceResourcesCollection(42);
       await expect(promise).rejects.toThrow("The parameter resourcesEntities should be of ResourcesCollection type.");
     });
 
-    it("Should throw if one of the resources does not validate", async() => {
+    it("Should throw if one of the resources does not validate", async () => {
       expect.assertions(1);
       const resourceDto1 = defaultResourceDto();
       delete resourceDto1.id;
@@ -430,7 +458,7 @@ describe("ResourceLocalStorage", () => {
       await expect(promise).rejects.toThrow("ResourceLocalStorage expects ResourceEntity id to be set");
     });
 
-    it("Should add the resource if one of the resource is not found in the local storage", async() => {
+    it("Should add the resource if one of the resource is not found in the local storage", async () => {
       expect.assertions(3);
 
       const resourceDto = defaultResourceDto();
@@ -440,46 +468,56 @@ describe("ResourceLocalStorage", () => {
 
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5(resourceDto),
+      );
     });
 
-    it("Should update resources", async() => {
+    it("Should update resources", async () => {
       expect.assertions(6);
       const resourceDto1 = defaultResourceDto();
       const resourceDto2 = defaultResourceDto();
       const resourceDto3 = defaultResourceDto();
       const resourceDto4 = defaultResourceDto();
       const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       const resources = new ResourcesCollection([
         resourceDto1,
-        {...resourceDto2, name: "Resource 2 name update"},
+        { ...resourceDto2, name: "Resource 2 name update" },
         resourceDto3,
-        {...resourceDto4, name: "Resource 4 name update"},
+        { ...resourceDto4, name: "Resource 4 name update" },
       ]);
       await ResourceLocalStorage.addOrReplaceResourcesCollection(resources);
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(4);
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
-      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5(resourceDto1),
+      );
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][1]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto2, name: "Resource 2 name update" }),
+      );
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][2]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5(resourceDto3),
+      );
+      expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][3]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto4, name: "Resource 4 name update" }),
+      );
     });
 
-    it("Should update cache when updating resources", async() => {
+    it("Should update cache when updating resources", async () => {
       expect.assertions(8);
       const resourceDto1 = defaultResourceDto();
       const resourceDto2 = defaultResourceDto();
       const resourceDto3 = defaultResourceDto();
       const resourceDto4 = defaultResourceDto();
       const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       const resources = new ResourcesCollection([
         resourceDto1,
-        {...resourceDto2, name: "Resource 2 name update"},
+        { ...resourceDto2, name: "Resource 2 name update" },
         resourceDto3,
-        {...resourceDto4, name: "Resource 4 name update"},
+        { ...resourceDto4, name: "Resource 4 name update" },
       ]);
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.addOrReplaceResourcesCollection(resources);
@@ -487,42 +525,46 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage._cachedData).toEqual(expect.any(Array));
       expect(ResourceLocalStorage._cachedData).toHaveLength(4);
       expect(ResourceLocalStorage._cachedData[0]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto1));
-      expect(ResourceLocalStorage._cachedData[1]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto2, name: "Resource 2 name update"}));
+      expect(ResourceLocalStorage._cachedData[1]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto2, name: "Resource 2 name update" }),
+      );
       expect(ResourceLocalStorage._cachedData[2]).toEqual(ResourceEntity.transformDtoFromV4toV5(resourceDto3));
-      expect(ResourceLocalStorage._cachedData[3]).toEqual(ResourceEntity.transformDtoFromV4toV5({...resourceDto4, name: "Resource 4 name update"}));
+      expect(ResourceLocalStorage._cachedData[3]).toEqual(
+        ResourceEntity.transformDtoFromV4toV5({ ...resourceDto4, name: "Resource 4 name update" }),
+      );
     });
   });
 
   describe("::deleteResource", () => {
-    it("Should throw if no data passed as parameter", async() => {
+    it("Should throw if no data passed as parameter", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.delete();
       await expect(promise).rejects.toThrow("The parameter resourceId should be a UUID.");
     });
 
-    it("Should throw if the resource parameter is not a ResourceEntity", async() => {
+    it("Should throw if the resource parameter is not a ResourceEntity", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.delete(42);
       await expect(promise).rejects.toThrow("The parameter resourceId should be a UUID.");
     });
 
-    it("Should do nothing if the resource is not found in the local storage", async() => {
+    it("Should do nothing if the resource is not found in the local storage", async () => {
       expect.assertions(2);
       const resourceDto = defaultResourceDto();
       const resourcesDtos = [resourceDto];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       await ResourceLocalStorage.delete(uuidv4());
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
     });
 
-    it("Should update the resource", async() => {
+    it("Should update the resource", async () => {
       expect.assertions(3);
       const resourceDto1 = defaultResourceDto();
       const resourceDto2 = defaultResourceDto();
       const resourcesDtos = [resourceDto1, resourceDto2];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       await ResourceLocalStorage.delete(resourceDto1.id);
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
@@ -530,12 +572,12 @@ describe("ResourceLocalStorage", () => {
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resourceDto2);
     });
 
-    it("Should update cache after deleting the resource", async() => {
+    it("Should update cache after deleting the resource", async () => {
       expect.assertions(5);
       const resourceDto1 = defaultResourceDto();
       const resourceDto2 = defaultResourceDto();
       const resourcesDtos = [resourceDto1, resourceDto2];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.delete(resourceDto1.id);
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();
@@ -546,42 +588,52 @@ describe("ResourceLocalStorage", () => {
   });
 
   describe("::assertEntityBeforeSave", () => {
-    it("Should throw if no data provided", async() => {
+    it("Should throw if no data provided", async () => {
       expect.assertions(1);
-      await expect(() => ResourceLocalStorage.assertEntityBeforeSave()).toThrow("ResourceLocalStorage expects a ResourceEntity to be set");
+      await expect(() => ResourceLocalStorage.assertEntityBeforeSave()).toThrow(
+        "ResourceLocalStorage expects a ResourceEntity to be set",
+      );
     });
 
-    it("Should throw if not a ResourceEntity is provided", async() => {
+    it("Should throw if not a ResourceEntity is provided", async () => {
       expect.assertions(1);
-      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(42)).toThrow("ResourceLocalStorage expects an object of type ResourceEntity");
+      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(42)).toThrow(
+        "ResourceLocalStorage expects an object of type ResourceEntity",
+      );
     });
 
-    it("Should throw if the resource has no id", async() => {
+    it("Should throw if the resource has no id", async () => {
       expect.assertions(1);
       const resourceDto = defaultResourceDto();
       delete resourceDto.id;
       const resource = new ResourceEntity(resourceDto);
-      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(resource)).toThrow("ResourceLocalStorage expects ResourceEntity id to be set");
+      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(resource)).toThrow(
+        "ResourceLocalStorage expects ResourceEntity id to be set",
+      );
     });
 
-    it("Should throw if the resource has no permission", async() => {
+    it("Should throw if the resource has no permission", async () => {
       expect.assertions(1);
       const resourceDto = defaultResourceDto();
       delete resourceDto.permission;
       const resource = new ResourceEntity(resourceDto);
-      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(resource)).toThrow("ResourceLocalStorage::set expects ResourceEntity permission to be set");
+      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(resource)).toThrow(
+        "ResourceLocalStorage::set expects ResourceEntity permission to be set",
+      );
     });
 
-    it("Should throw if the resource metadata are encrypted", async() => {
+    it("Should throw if the resource metadata are encrypted", async () => {
       expect.assertions(1);
-      const resourceDto = defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[0]});
+      const resourceDto = defaultResourceDto({ metadata: metadata.withSharedKey.encryptedMetadata[0] });
       const resource = new ResourceEntity(resourceDto);
-      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(resource)).toThrow("ResourceLocalStorage::set expects ResourceEntity metadata to be decrypted");
+      await expect(() => ResourceLocalStorage.assertEntityBeforeSave(resource)).toThrow(
+        "ResourceLocalStorage::set expects ResourceEntity metadata to be decrypted",
+      );
     });
   });
 
   describe("::flush", () => {
-    it("Should flush not initialized local storage and cache", async() => {
+    it("Should flush not initialized local storage and cache", async () => {
       expect.assertions(2);
       await ResourceLocalStorage.flush();
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
@@ -589,7 +641,7 @@ describe("ResourceLocalStorage", () => {
       expect(ResourceLocalStorage._cachedData).toBeNull();
     });
 
-    it("Should flush", async() => {
+    it("Should flush", async () => {
       expect.assertions(2);
       const resourcesDto = [defaultResourceDto(), defaultResourceDto()];
       const resources = new ResourcesCollection(resourcesDto);
@@ -602,36 +654,36 @@ describe("ResourceLocalStorage", () => {
   });
 
   describe("::deleteResources", () => {
-    it("Should throw if no data passed as parameter", async() => {
+    it("Should throw if no data passed as parameter", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.deleteResources();
       await expect(promise).rejects.toThrow("The given parameter is not a valid array of uuid");
     });
 
-    it("Should throw if the resourceIds parameter is not a valid entry", async() => {
+    it("Should throw if the resourceIds parameter is not a valid entry", async () => {
       expect.assertions(1);
       const promise = ResourceLocalStorage.deleteResources(42);
       await expect(promise).rejects.toThrow("he given parameter is not a valid array of uuid");
     });
 
-    it("Should do nothing if the resource is not found in the local storage", async() => {
+    it("Should do nothing if the resource is not found in the local storage", async () => {
       expect.assertions(2);
       const resourceDto = defaultResourceDto();
       const resourcesDtos = [resourceDto];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       await ResourceLocalStorage.deleteResources([uuidv4()]);
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toHaveLength(1);
     });
 
-    it("Should update the resources", async() => {
+    it("Should update the resources", async () => {
       expect.assertions(3);
       const resourceDto1 = defaultResourceDto();
       const resourceDto2 = defaultResourceDto();
       const resourceDto3 = defaultResourceDto();
       const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       await ResourceLocalStorage.deleteResources([resourceDto1.id, resourceDto2.id]);
       const localStorageData = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY]).toEqual(expect.any(Array));
@@ -639,13 +691,13 @@ describe("ResourceLocalStorage", () => {
       expect(localStorageData[RESOURCES_LOCAL_STORAGE_KEY][0]).toEqual(resourceDto3);
     });
 
-    it("Should update cache after deleting the resources", async() => {
+    it("Should update cache after deleting the resources", async () => {
       expect.assertions(5);
       const resourceDto1 = defaultResourceDto();
       const resourceDto2 = defaultResourceDto();
       const resourceDto3 = defaultResourceDto();
       const resourcesDtos = [resourceDto1, resourceDto2, resourceDto3];
-      await browser.storage.local.set({[RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos});
+      await browser.storage.local.set({ [RESOURCES_LOCAL_STORAGE_KEY]: resourcesDtos });
       expect(ResourceLocalStorage.hasCachedData()).toBeFalsy();
       await ResourceLocalStorage.deleteResources([resourceDto1.id, resourceDto2.id]);
       expect(ResourceLocalStorage.hasCachedData()).toBeTruthy();

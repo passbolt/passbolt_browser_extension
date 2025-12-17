@@ -13,12 +13,12 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ExternalFoldersCollection from "./externalFoldersCollection";
 import ExternalFolderEntity from "./externalFolderEntity";
-import {defaultExternalFoldersCollectionDto} from "./externalFoldersCollection.test.data";
-import {v4 as uuid} from "uuid";
+import { defaultExternalFoldersCollectionDto } from "./externalFoldersCollection.test.data";
+import { v4 as uuid } from "uuid";
 import FolderEntity from "../folderEntity";
 import FoldersCollection from "../foldersCollection";
-import {defaultExternalFolderDto, minimalExternalFolderDto} from "./externalFolderEntity.test.data";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { defaultExternalFolderDto, minimalExternalFolderDto } from "./externalFolderEntity.test.data";
+import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 
 describe("ExternalFoldersCollection", () => {
   describe("::getSchema", () => {
@@ -102,7 +102,9 @@ describe("ExternalFoldersCollection", () => {
       expect(collection._items[0].name).toStrictEqual("Folder");
       expect(collection._items[1].folderParentPath).toStrictEqual("");
       expect(collection._items[1].name).toStrictEqual("Root");
-      expect(collection._items[2].folderParentPath).toStrictEqual(`${externalFolderDto.folder_parent_path}/${externalFolderDto.name}`);
+      expect(collection._items[2].folderParentPath).toStrictEqual(
+        `${externalFolderDto.folder_parent_path}/${externalFolderDto.name}`,
+      );
       expect(collection._items[2].name).toStrictEqual("SubFolder");
     });
 
@@ -148,7 +150,7 @@ describe("ExternalFoldersCollection", () => {
       const existingParentFolderPath = collectionDto[0].folder_parent_path;
 
       const collection = new ExternalFoldersCollection(collectionDto);
-      const rootFolder = new ExternalFolderEntity({"name": "Root", "folder_parent_path": "New"});
+      const rootFolder = new ExternalFolderEntity({ name: "Root", folder_parent_path: "New" });
       collection.changeRootPath(rootFolder);
 
       for (const externalFolderEntity of collection) {
@@ -179,9 +181,11 @@ describe("ExternalFoldersCollection", () => {
 
     it("should build a FoldersCollection while resolving escaped folder name", () => {
       expect.assertions(1);
-      const externalFolder = new ExternalFolderEntity(minimalExternalFolderDto({
-        name: "/ Ro / ot /",
-      }));
+      const externalFolder = new ExternalFolderEntity(
+        minimalExternalFolderDto({
+          name: "/ Ro / ot /",
+        }),
+      );
       const foldersCollection = ExternalFoldersCollection.toFoldersCollection([externalFolder]);
       expect(foldersCollection.items[0].name).toBe("/Ro/ot/");
     });
@@ -193,7 +197,7 @@ describe("ExternalFoldersCollection", () => {
       const dto = defaultExternalFoldersCollectionDto();
       const collection = new ExternalFoldersCollection(dto);
       const collectionSize = collection.length;
-      const pathForRemoval = new ExternalFolderEntity({name: "toBeRemoved"});
+      const pathForRemoval = new ExternalFolderEntity({ name: "toBeRemoved" });
 
       collection._items[0].changeRootPath(pathForRemoval);
       collection._items[2].changeRootPath(pathForRemoval);
@@ -218,9 +222,11 @@ describe("ExternalFoldersCollection", () => {
     it("should get the folder parent path of the given folder entity when no escaping is necessary", () => {
       expect.assertions(1);
       const rootFolderEntity = new FolderEntity(defaultFolderDto());
-      const folderEntity = new FolderEntity(defaultFolderDto({
-        folder_parent_id: rootFolderEntity.id,
-      }));
+      const folderEntity = new FolderEntity(
+        defaultFolderDto({
+          folder_parent_id: rootFolderEntity.id,
+        }),
+      );
       const foldersCollection = new FoldersCollection([rootFolderEntity.toDto(), folderEntity.toDto()]);
 
       const result = ExternalFoldersCollection.getEscapedFolderParentPath(foldersCollection, folderEntity);
@@ -229,17 +235,21 @@ describe("ExternalFoldersCollection", () => {
 
     it("should escape the folder parent path of the given folder entity", () => {
       expect.assertions(1);
-      const folderEntity1 = new FolderEntity(defaultFolderDto({
-        name: "/ Root /",
-      }));
-      const folderEntity2 = new FolderEntity(defaultFolderDto({
-        folder_parent_id: folderEntity1.id,
-        name: "/  / Folder",
-      }));
+      const folderEntity1 = new FolderEntity(
+        defaultFolderDto({
+          name: "/ Root /",
+        }),
+      );
+      const folderEntity2 = new FolderEntity(
+        defaultFolderDto({
+          folder_parent_id: folderEntity1.id,
+          name: "/  / Folder",
+        }),
+      );
       const foldersCollection = new FoldersCollection([folderEntity1.toDto(), folderEntity2.toDto()]);
 
       const result = ExternalFoldersCollection.getEscapedFolderParentPath(foldersCollection, folderEntity2);
-      expect(result).toStrictEqual('/  Root  /');
+      expect(result).toStrictEqual("/  Root  /");
     });
   });
 
@@ -510,7 +520,7 @@ describe("ExternalFoldersCollection", () => {
   });
 
   describe("ExternalFoldersCollection:pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const externalFoldersCount = 10_000;
       const dtos = defaultExternalFoldersCollectionDto(externalFoldersCount);
 

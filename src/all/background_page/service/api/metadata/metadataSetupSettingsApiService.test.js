@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.4.0
  */
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
 import MetadataSetupSettingsApiService from "./metadataSetupSettingsApiService";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {enableMetadataSetupSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataSetupSettingsEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableMetadataSetupSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataSetupSettingsEntity.test.data";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
 beforeEach(() => {
@@ -24,8 +24,8 @@ beforeEach(() => {
 });
 
 describe("metadataSetupSettingsApiService", () => {
-  describe('::find', () => {
-    it("Should return a PassboltResponseEntity if everything goes well.", async() => {
+  describe("::find", () => {
+    it("Should return a PassboltResponseEntity if everything goes well.", async () => {
       expect.assertions(2);
 
       const apiClientOptions = defaultApiClientOptions();
@@ -40,13 +40,15 @@ describe("metadataSetupSettingsApiService", () => {
       expect(apiResult.body).toStrictEqual(expectedBodyResponse);
     });
 
-    it("should throw an error if something goes wrong during the fetch", async() => {
+    it("should throw an error if something goes wrong during the fetch", async () => {
       expect.assertions(1);
 
       const apiClientOptions = defaultApiClientOptions();
       const service = new MetadataSetupSettingsApiService(apiClientOptions);
 
-      fetch.doMockOnceIf(/\/metadata\/setup\/settings\.json/, () => { throw new Error("Something went wrong"); });
+      fetch.doMockOnceIf(/\/metadata\/setup\/settings\.json/, () => {
+        throw new Error("Something went wrong");
+      });
 
       await expect(() => service.find()).rejects.toThrowError();
     });

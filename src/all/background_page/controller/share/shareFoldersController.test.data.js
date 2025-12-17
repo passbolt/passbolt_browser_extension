@@ -11,14 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.6.0
  */
-import {v4 as uuidv4} from "uuid";
-import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
-import {
-  ownerFolderPermissionDto
-} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import { v4 as uuidv4 } from "uuid";
+import { users } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { ownerFolderPermissionDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 
-export const _3FoldersSharedWith3UsersResourcesDto = async() => {
+export const _3FoldersSharedWith3UsersResourcesDto = async () => {
   const folder1Id = uuidv4();
   const folder2Id = uuidv4();
   const folder3Id = uuidv4();
@@ -46,35 +44,35 @@ export const _3FoldersSharedWith3UsersResourcesDto = async() => {
     aco_foreign_key: folder1Id,
     aro_foreign_key: userAda.id,
     user: userAda,
-    group: null
+    group: null,
   });
 
   const folder2FullPermissionAda = ownerFolderPermissionDto({
     aco_foreign_key: folder2Id,
     aro_foreign_key: userAda.id,
     user: userAda,
-    group: null
+    group: null,
   });
 
   const folder3FullPermissionAda = ownerFolderPermissionDto({
     aco_foreign_key: folder3Id,
     aro_foreign_key: userAda.id,
     user: userAda,
-    group: null
+    group: null,
   });
 
   const folder2FullPermissionAdmin = ownerFolderPermissionDto({
     aco_foreign_key: folder2Id,
     aro_foreign_key: userAdmin.id,
     user: userAdmin,
-    group: null
+    group: null,
   });
 
   const folder3FullPermissionBetty = ownerFolderPermissionDto({
     aco_foreign_key: folder3Id,
     aro_foreign_key: userBetty.id,
     user: userBetty,
-    group: null
+    group: null,
   });
 
   const folder1 = defaultFolderDto({
@@ -87,14 +85,14 @@ export const _3FoldersSharedWith3UsersResourcesDto = async() => {
     id: folder2Id,
     permission: folder2PermissionOwner,
     permissions: [folder2FullPermissionAda, folder2FullPermissionAdmin],
-    folder_parent_id: folder1Id
+    folder_parent_id: folder1Id,
   });
 
   const folder3 = defaultFolderDto({
     id: folder3Id,
     permission: folder3PermissionOwner,
     permissions: [folder3FullPermissionAda, folder3FullPermissionBetty],
-    folder_parent_id: folder2Id
+    folder_parent_id: folder2Id,
   });
 
   return [folder1, folder2, folder3];
@@ -107,7 +105,7 @@ export const createChangesFolderDto = (data = {}) => {
     aro: "User",
     aro_foreign_key: uuidv4(),
     is_new: true,
-    type: 1
+    type: 1,
   };
   return Object.assign(defaultData, data);
 };

@@ -12,12 +12,12 @@
  * @since         3.6.0
  */
 import RevokeGpgKeyService from "./revokeGpgKeyService";
-import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
-import {OpenpgpAssertion} from '../../utils/openpgp/openpgpAssertions';
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import GetGpgKeyInfoService from "./getGpgKeyInfoService";
 
 describe("RevokeGpgKey service", () => {
-  it("should generate a revoked public key given a decrypted private key", async() => {
+  it("should generate a revoked public key given a decrypted private key", async () => {
     expect.assertions(4);
 
     const bettyPrivateGpgKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
@@ -28,7 +28,7 @@ describe("RevokeGpgKey service", () => {
     expect(publicKeyInfo.revoked).toBe(false);
 
     const revokedPublicKey = await RevokeGpgKeyService.revoke(bettyPrivateGpgKey);
-    const revokedKeyInfo =  await GetGpgKeyInfoService.getKeyInfo(revokedPublicKey);
+    const revokedKeyInfo = await GetGpgKeyInfoService.getKeyInfo(revokedPublicKey);
     expect(revokedKeyInfo.private).toBe(false);
     expect(revokedKeyInfo.revoked).toBe(true);
   });

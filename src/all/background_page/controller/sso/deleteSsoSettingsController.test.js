@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {enableFetchMocks} from "jest-fetch-mock";
-import {v4 as uuid} from "uuid";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { v4 as uuid } from "uuid";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import DeleteSsoSettingsController from "./deleteSsoSettingsController";
 
 beforeEach(() => {
@@ -24,12 +24,12 @@ beforeEach(() => {
 
 describe("DeleteSsoSettingsController", () => {
   describe("DeleteSsoSettingsController::exec", () => {
-    it("Should delete the given settings.", async() => {
+    it("Should delete the given settings.", async () => {
       expect.assertions(1);
 
       const settingsId = uuid();
 
-      fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), async req => {
+      fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), async (req) => {
         expect(req.url).toBe(`https://localhost/sso/settings/${settingsId}.json?api-version=v2`);
         return mockApiResponse({});
       });
@@ -38,7 +38,7 @@ describe("DeleteSsoSettingsController", () => {
       await controller.exec(settingsId);
     });
 
-    it("Should throw an error if the given settings id is not a valid uuid.", async() => {
+    it("Should throw an error if the given settings id is not a valid uuid.", async () => {
       expect.assertions(1);
 
       const controller = new DeleteSsoSettingsController(null, null, defaultApiClientOptions());

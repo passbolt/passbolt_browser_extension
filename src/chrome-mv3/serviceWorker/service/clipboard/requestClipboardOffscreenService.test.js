@@ -13,8 +13,8 @@
  */
 
 import Validator from "validator";
-import {RequestClipboardOffscreenService} from "./requestClipboardOffscreenService";
-import {v4 as uuidv4} from "uuid";
+import { RequestClipboardOffscreenService } from "./requestClipboardOffscreenService";
+import { v4 as uuidv4 } from "uuid";
 import HandleOffscreenResponseService from "../offscreen/handleOffscreenResponseService";
 
 beforeEach(() => {
@@ -23,24 +23,24 @@ beforeEach(() => {
 
 describe("RequestClipboardOffscreenService", () => {
   describe("::sendWriteTextOffscreenMessage", () => {
-    it("should send a message to the offscreen document", async() => {
+    it("should send a message to the offscreen document", async () => {
       expect.assertions(1);
       const id = uuidv4();
-      const data = {clipboardContent: "test-data"};
+      const data = { clipboardContent: "test-data" };
       const target = "clipboard-write-offscreen";
 
       await RequestClipboardOffscreenService.sendWriteTextOffscreenMessage(id, data);
 
-      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({id, data, target});
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ id, data, target });
     });
   });
 
   describe("::writeText", () => {
-    it("should send a message to the offscreen document and stack the response callback handlers", async() => {
+    it("should send a message to the offscreen document and stack the response callback handlers", async () => {
       expect.assertions(5);
 
       let sentMessage;
-      jest.spyOn(chrome.runtime, "sendMessage").mockImplementationOnce(message => {
+      jest.spyOn(chrome.runtime, "sendMessage").mockImplementationOnce((message) => {
         sentMessage = message;
         HandleOffscreenResponseService._offscreenResponsePromisesCallbacks[message.id].resolve();
       });
@@ -55,14 +55,16 @@ describe("RequestClipboardOffscreenService", () => {
       expect(chrome.runtime.sendMessage).toHaveBeenCalledTimes(1);
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
         id: sentMessage.id,
-        data: {clipboardContent: clipboardContentToWrite},
+        data: { clipboardContent: clipboardContentToWrite },
         target: "clipboard-write-offscreen",
       });
     });
 
-    it("should throw if the message cannot be sent to the offscreen document for unexpected reason", async() => {
+    it("should throw if the message cannot be sent to the offscreen document for unexpected reason", async () => {
       expect.assertions(1);
-      jest.spyOn(chrome.runtime, "sendMessage").mockImplementationOnce(() => { throw new Error("Test error"); });
+      jest.spyOn(chrome.runtime, "sendMessage").mockImplementationOnce(() => {
+        throw new Error("Test error");
+      });
 
       await expect(() => RequestClipboardOffscreenService.writeText("test")).rejects.toThrow();
     });

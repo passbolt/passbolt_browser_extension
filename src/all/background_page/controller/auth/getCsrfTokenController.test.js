@@ -12,9 +12,9 @@
  * @since         5.0.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import GetCsrfTokenController from "./getCsrfTokenController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 beforeEach(() => {
   enableFetchMocks();
 });
@@ -22,18 +22,17 @@ beforeEach(() => {
 describe("GetCsrfTokenController", () => {
   let controller, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     apiClientOptions = defaultApiClientOptions();
     controller = new GetCsrfTokenController(null, null, apiClientOptions);
   });
 
-
   describe("::exec", () => {
-    it("Should retrieve CSRF token from apiClientOptions.", async() => {
+    it("Should retrieve CSRF token from apiClientOptions.", async () => {
       expect.assertions(1);
 
       const csrfToken = "csrf-token";
-      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: csrfToken }));
       const result = await controller.exec();
 
       expect(result).toEqual(csrfToken);

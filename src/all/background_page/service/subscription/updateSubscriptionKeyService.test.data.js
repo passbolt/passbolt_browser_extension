@@ -11,21 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.9.0
  */
-import {defaultApiClientOptions} from 'passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data';
-import UpdateSubscriptionEntity from '../../model/entity/subscription/update/updateSubscriptionEntity';
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import UpdateSubscriptionEntity from "../../model/entity/subscription/update/updateSubscriptionEntity";
 
 export const API_CLIENT_OPTIONS = defaultApiClientOptions();
 
-export const NEW_KEY = 'a new valid subscription key';
+export const NEW_KEY = "a new valid subscription key";
 
 export const NEW_KEY_DTO = new UpdateSubscriptionEntity({
   data: NEW_KEY,
 });
 
 export const UPDATED_KEY_DTO = {
-  subscription_id: 'dev',
+  subscription_id: "dev",
   users: 50,
-  expiry: '4096-01-01',
-  created: '2025-01-01',
+  expiry: "4096-01-01",
+  created: "2025-01-01",
   data: NEW_KEY,
 };

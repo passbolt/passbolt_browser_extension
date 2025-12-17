@@ -11,16 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.3.0
  */
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
 
 export const worker = {
   port: {
     emit: jest.fn(),
-    request: jest.fn()
+    request: jest.fn(),
   },
   tab: {
-    id: uuid()
-  }
+    id: uuid(),
+  },
 };
 
 export const requestId = uuid();

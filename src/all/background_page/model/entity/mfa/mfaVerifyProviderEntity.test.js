@@ -15,7 +15,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import MfaVerifyProviderEntity from "./mfaVerifyProviderEntity";
-import {defaultVerifyProviderData} from "./mfaVerifyProviderEntity.test.data";
+import { defaultVerifyProviderData } from "./mfaVerifyProviderEntity.test.data";
 
 describe("MfaVerifyProviderEntity", () => {
   it("schema must validate", () => {
@@ -33,17 +33,19 @@ describe("MfaVerifyProviderEntity", () => {
       new MfaVerifyProviderEntity({});
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('verified', 'required')).toBe(true);
+      expect(error.hasError("verified", "required")).toBe(true);
     }
   });
   it("constructor returns validation error if verified field is not a string", () => {
     try {
-      new MfaVerifyProviderEntity(defaultVerifyProviderData({
-        verified: 3
-      }));
+      new MfaVerifyProviderEntity(
+        defaultVerifyProviderData({
+          verified: 3,
+        }),
+      );
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('verified', 'type')).toBe(true);
+      expect(error.hasError("verified", "type")).toBe(true);
     }
   });
 });

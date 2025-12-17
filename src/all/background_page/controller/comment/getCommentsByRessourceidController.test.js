@@ -12,15 +12,15 @@
  * @since         3.8.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import GetCommentsByRessourceController from "./getCommentsByRessourceIdController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {v4 as uuidv4} from "uuid";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { v4 as uuidv4 } from "uuid";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {defaultCommentCollectionDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntityCollection.test.data";
+import { defaultCommentCollectionDto } from "passbolt-styleguide/src/shared/models/entity/comment/commentEntityCollection.test.data";
 
-beforeEach(async() =>  {
+beforeEach(async () => {
   enableFetchMocks();
   fetch.resetMocks();
   await MockExtension.withConfiguredAccount();
@@ -33,13 +33,13 @@ const fetchCommentsMock = () => {
 
 const mockedWorker = {
   port: {
-    emit: jest.fn()
-  }
+    emit: jest.fn(),
+  },
 };
 
 describe("GetCommentsByRessourceController", () => {
   describe("CreateCommentController::constructor", () => {
-    it("Should init all properties.", async() => {
+    it("Should init all properties.", async () => {
       const requestId = uuidv4();
 
       const controller = new GetCommentsByRessourceController(mockedWorker, requestId, defaultApiClientOptions());
@@ -52,7 +52,7 @@ describe("GetCommentsByRessourceController", () => {
     });
   });
   describe("GetCommentsByRessourceController::exec", () => {
-    it("Should retrieve the comments being used by the worker.", async() => {
+    it("Should retrieve the comments being used by the worker.", async () => {
       expect.assertions(7);
 
       fetchCommentsMock();
@@ -72,23 +72,27 @@ describe("GetCommentsByRessourceController", () => {
       expect(spy).toHaveBeenCalledWith(resourceId);
     });
 
-    it("Should raise an error when resourceId is null", async() => {
+    it("Should raise an error when resourceId is null", async () => {
       const controller = new GetCommentsByRessourceController(null, null, defaultApiClientOptions());
 
       expect.assertions(1);
 
       await expect(controller.exec(null)).rejects.toThrowError(new TypeError("A resource id is required."));
     });
-    it("Should raise an error when resourceId is not a valid uuid", async() => {
+    it("Should raise an error when resourceId is not a valid uuid", async () => {
       const uuid = "12345-6789";
       const controller = new GetCommentsByRessourceController(null, null, defaultApiClientOptions());
 
       expect.assertions(1);
 
-      await expect(controller.exec(uuid)).rejects.toThrowError(new TypeError("The resource id should be a valid uuid."));
+      await expect(controller.exec(uuid)).rejects.toThrowError(
+        new TypeError("The resource id should be a valid uuid."),
+      );
     });
-    it("Should raise an error when service is not unavailable", async() => {
-      fetch.doMock(() => { throw mockedError; });
+    it("Should raise an error when service is not unavailable", async () => {
+      fetch.doMock(() => {
+        throw mockedError;
+      });
       const mockedError = new TypeError("Unable to reach the server, an unexpected error occurred");
       const controller = new GetCommentsByRessourceController(mockedWorker, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller, "exec");

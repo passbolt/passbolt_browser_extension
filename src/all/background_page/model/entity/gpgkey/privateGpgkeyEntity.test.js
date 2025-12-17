@@ -14,11 +14,11 @@
 import PrivateGpgkeyEntity from "./privateGpgkeyEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 const validDto = {
   armored_key: pgpKeys.ada.private,
-  passphrase: "passphrase"
+  passphrase: "passphrase",
 };
 
 describe("PrivateGpgkey entity", () => {
@@ -42,8 +42,8 @@ describe("PrivateGpgkey entity", () => {
       new PrivateGpgkeyEntity({});
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('armored_key', 'required')).toBe(true);
-      expect(error.hasError('passphrase', 'required')).toBe(true);
+      expect(error.hasError("armored_key", "required")).toBe(true);
+      expect(error.hasError("passphrase", "required")).toBe(true);
     }
   });
 });

@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 import GetGpgKeyCreationDateService from "./getGpgKeyCreationDateService";
-import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 let currentTime;
 beforeEach(() => {
@@ -30,28 +30,30 @@ beforeEach(() => {
 });
 
 describe("GetGpgCompatibleDate service", () => {
-  it("should get the server time if it's in the past", async() => {
+  it("should get the server time if it's in the past", async () => {
     const serverTimestamp = currentTime.getTime() - 3600000; //current time minus one hour
     const serverTime = new Date(serverTimestamp);
 
-    fetch.doMock(() => mockApiResponse(anonymousOrganizationSettings(), {servertime: serverTime.getTime() / 1000}));
+    fetch.doMock(() => mockApiResponse(anonymousOrganizationSettings(), { servertime: serverTime.getTime() / 1000 }));
 
     const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
     expect(gpgDate).toEqual(serverTime.getTime());
   });
 
-  it("should get the client time if the server time is in the future", async() => {
+  it("should get the client time if the server time is in the future", async () => {
     const serverTimestamp = currentTime.getTime() + 3600000; //current time plus one hour
     const serverTime = new Date(serverTimestamp);
 
-    fetch.doMock(() => mockApiResponse(anonymousOrganizationSettings(), {servertime: serverTime.getTime() / 1000}));
+    fetch.doMock(() => mockApiResponse(anonymousOrganizationSettings(), { servertime: serverTime.getTime() / 1000 }));
 
     const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
     expect(gpgDate).toEqual(currentTime.getTime());
   });
 
-  it("should get by default the client time if the server time is not available", async() => {
-    fetch.doMock(() => { throw new Error("Something wrong happened"); });
+  it("should get by default the client time if the server time is not available", async () => {
+    fetch.doMock(() => {
+      throw new Error("Something wrong happened");
+    });
 
     const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
     expect(gpgDate).toEqual(currentTime.getTime());

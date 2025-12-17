@@ -12,13 +12,13 @@
  * @since         5.7.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import DeleteSecretRevisionsSettingsController from "./deleteSecretRevisionsSettingsController";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 describe("DeleteSecretRevisionsSettingsController", () => {
   describe("::exec", () => {
-    it("should delete the given secret revisions settings onto the API through the dedicated service", async() => {
+    it("should delete the given secret revisions settings onto the API through the dedicated service", async () => {
       expect.assertions(1);
 
       const settingsId = uuidv4();
@@ -30,12 +30,14 @@ describe("DeleteSecretRevisionsSettingsController", () => {
       expect(controller.deleteSecretRevisionsSettingsService.deleteSettings).toHaveBeenCalledTimes(1);
     });
 
-    it("should not catch errors and let them being thrown if something wrong happened", async() => {
+    it("should not catch errors and let them being thrown if something wrong happened", async () => {
       expect.assertions(1);
 
       const expectedError = new Error("Something went wrong!");
       const controller = new DeleteSecretRevisionsSettingsController(null, null, defaultApiClientOptions());
-      jest.spyOn(controller.deleteSecretRevisionsSettingsService, "deleteSettings").mockImplementation(() => { throw expectedError; });
+      jest.spyOn(controller.deleteSecretRevisionsSettingsService, "deleteSettings").mockImplementation(() => {
+        throw expectedError;
+      });
 
       try {
         await controller.exec();

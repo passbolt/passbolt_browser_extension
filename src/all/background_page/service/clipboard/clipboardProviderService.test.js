@@ -22,37 +22,37 @@ beforeEach(() => {
 
 describe("ClipboardProviderService", () => {
   describe("::getClipboard", () => {
-    it("should return the customNavigatorClipboard if it is set", async() => {
+    it("should return the customNavigatorClipboard if it is set", async () => {
       expect.assertions(1);
 
-      const customNavigatorClipboard = {writeText: jest.fn()};
+      const customNavigatorClipboard = { writeText: jest.fn() };
       global.customNavigatorClipboard = customNavigatorClipboard;
 
       expect(ClipboardProviderService.getClipboard()).toStrictEqual(customNavigatorClipboard);
     });
 
-    it("should return the EdgeBackgroundPageClipboardService if not on Firefox and is on MV2", async() => {
+    it("should return the EdgeBackgroundPageClipboardService if not on Firefox and is on MV2", async () => {
       expect.assertions(1);
 
-      chrome.runtime.getManifest.mockImplementation(() => ({manifest_version: 2}));
+      chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 2 }));
       jest.spyOn(BrowserService, "isFirefox").mockImplementation(() => false);
 
       expect(ClipboardProviderService.getClipboard()).toStrictEqual(EdgeBackgroundPageClipboardService);
     });
 
-    it("should return the navigator.clipboard in every other cases: Firefox", async() => {
+    it("should return the navigator.clipboard in every other cases: Firefox", async () => {
       expect.assertions(1);
 
-      chrome.runtime.getManifest.mockImplementation(() => ({manifest_version: 2}));
+      chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 2 }));
       jest.spyOn(BrowserService, "isFirefox").mockImplementation(() => true);
 
       expect(ClipboardProviderService.getClipboard()).toStrictEqual(navigator.clipboard);
     });
 
-    it("should return the navigator.clipboard in every other cases: Firefox + mv3", async() => {
+    it("should return the navigator.clipboard in every other cases: Firefox + mv3", async () => {
       expect.assertions(1);
 
-      chrome.runtime.getManifest.mockImplementation(() => ({manifest_version: 3}));
+      chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 3 }));
       jest.spyOn(BrowserService, "isFirefox").mockImplementation(() => true);
 
       expect(ClipboardProviderService.getClipboard()).toStrictEqual(navigator.clipboard);

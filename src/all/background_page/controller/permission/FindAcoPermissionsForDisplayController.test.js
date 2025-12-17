@@ -12,16 +12,14 @@
  * @since         4.9.4
  */
 
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import FindAcoPermissionsForDisplayController from "./FindAcoPermissionsForDisplayController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import PermissionEntity from "../../model/entity/permission/permissionEntity";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
-import {
-  defaultPermissionsDtos
-} from "passbolt-styleguide/src/shared/models/entity/permission/permissionCollection.test.data";
+import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { defaultPermissionsDtos } from "passbolt-styleguide/src/shared/models/entity/permission/permissionCollection.test.data";
 import PermissionsCollection from "../../model/entity/permission/permissionsCollection";
 import FolderService from "../../service/api/folder/folderService";
 
@@ -29,15 +27,17 @@ describe("FindAcoPermissionsForDisplayController", () => {
   const account = new AccountEntity(defaultAccountDto());
 
   describe("FindAcoPermissionsForDisplayController::exec", () => {
-    it("Should find all permission from a resource id.", async() => {
+    it("Should find all permission from a resource id.", async () => {
       expect.assertions(4);
 
       // initialisation
       const controller = new FindAcoPermissionsForDisplayController(null, null, defaultApiClientOptions(), account);
       const resourceId = uuidv4();
-      const permissionsDto = defaultPermissionsDtos({}, {withUser: true});
+      const permissionsDto = defaultPermissionsDtos({}, { withUser: true });
       // mocked function
-      jest.spyOn(controller.findPermissionService, "findAllByAcoForeignKeyForDisplay").mockImplementationOnce(() => new PermissionsCollection(permissionsDto));
+      jest
+        .spyOn(controller.findPermissionService, "findAllByAcoForeignKeyForDisplay")
+        .mockImplementationOnce(() => new PermissionsCollection(permissionsDto));
       jest.spyOn(controller.findFolderService, "findById");
 
       // process
@@ -50,15 +50,17 @@ describe("FindAcoPermissionsForDisplayController", () => {
       expect(permissionsCollection.toDto()).toEqual(permissionsDto);
     });
 
-    it("Should find all permission from a folder id.", async() => {
+    it("Should find all permission from a folder id.", async () => {
       expect.assertions(4);
 
       // initialisation
-      const folderDto = defaultFolderDto({}, {withPermissions: true});
+      const folderDto = defaultFolderDto({}, { withPermissions: true });
       const controller = new FindAcoPermissionsForDisplayController(null, null, defaultApiClientOptions(), account);
       const folderId = uuidv4();
       // mocked function
-      jest.spyOn(controller.findPermissionService, "findAllByAcoForeignKeyForDisplay").mockImplementationOnce(jest.fn());
+      jest
+        .spyOn(controller.findPermissionService, "findAllByAcoForeignKeyForDisplay")
+        .mockImplementationOnce(jest.fn());
       jest.spyOn(controller.findFolderService, "findById");
       jest.spyOn(FolderService.prototype, "get").mockImplementation(() => folderDto);
 
@@ -68,11 +70,15 @@ describe("FindAcoPermissionsForDisplayController", () => {
       // expectations
       expect(controller.findPermissionService.findAllByAcoForeignKeyForDisplay).toHaveBeenCalledTimes(0);
       expect(controller.findFolderService.findById).toHaveBeenCalledTimes(1);
-      expect(controller.findFolderService.findById).toHaveBeenCalledWith(folderId, {'permissions.user.profile': true, 'permissions.group': true, "permission": true});
+      expect(controller.findFolderService.findById).toHaveBeenCalledWith(folderId, {
+        "permissions.user.profile": true,
+        "permissions.group": true,
+        permission: true,
+      });
       expect(permissionsCollection.toDto()).toEqual(folderDto.permissions);
     });
 
-    it("Should throw error if acoId is not a uuid.", async() => {
+    it("Should throw error if acoId is not a uuid.", async () => {
       expect.assertions(1);
 
       // initialisation
@@ -86,7 +92,7 @@ describe("FindAcoPermissionsForDisplayController", () => {
       }
     });
 
-    it("Should throw error if acoType is not a string.", async() => {
+    it("Should throw error if acoType is not a string.", async () => {
       expect.assertions(1);
 
       // initialisation
@@ -101,4 +107,3 @@ describe("FindAcoPermissionsForDisplayController", () => {
     });
   });
 });
-

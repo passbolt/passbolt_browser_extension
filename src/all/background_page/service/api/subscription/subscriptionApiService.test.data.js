@@ -12,13 +12,13 @@
  * @since         5.8.0
  */
 
-import {defaultApiClientOptions} from 'passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data';
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 export const API_CLIENT_OPTIONS = defaultApiClientOptions();
 export const KEY_DTO = {
-  subscription_id: 'dev',
+  subscription_id: "dev",
   users: 1,
-  data: 'a perfectly valid subscription key',
-  expiry: '4096-01-01',
-  created: '2025-01-01',
+  data: "a perfectly valid subscription key",
+  expiry: "4096-01-01",
+  created: "2025-01-01",
 };

@@ -17,7 +17,7 @@ import ExecuteConcurrentlyService from "./executeConcurrentlyService";
 import {
   defaultRejectAllPromises,
   defaultSuccessfulAllPromises,
-  rejectPromise
+  rejectPromise,
 } from "./executeConcurrentlyService.test.data";
 
 beforeEach(() => {
@@ -27,7 +27,7 @@ beforeEach(() => {
 
 describe("ExecuteConcurrentlyService", () => {
   describe("ExecuteConcurrentlyService::execute", () => {
-    it("execute successful promises in parallel and get the results", async() => {
+    it("execute successful promises in parallel and get the results", async () => {
       expect.assertions(51);
       const arrayOfPromises = defaultSuccessfulAllPromises(50);
       const service = new ExecuteConcurrentlyService();
@@ -38,33 +38,35 @@ describe("ExecuteConcurrentlyService", () => {
       }
     });
 
-    it("execute reject promises in parallel and get the results", async() => {
+    it("execute reject promises in parallel and get the results", async () => {
       expect.assertions(51);
       const arrayOfPromises = defaultRejectAllPromises(50);
       const service = new ExecuteConcurrentlyService();
-      const results = await service.execute(arrayOfPromises, 5, {ignoreError: true});
+      const results = await service.execute(arrayOfPromises, 5, { ignoreError: true });
       expect(results).toHaveLength(50);
       for (let i = 0; i < results.length; i++) {
         expect(results[i]).toEqual(new Error(`TEST ${i + 1}`));
       }
     });
 
-    it("execute reject and success promises in parallel and get the results", async() => {
+    it("execute reject and success promises in parallel and get the results", async () => {
       expect.assertions(51);
       const arrayOfSuccessPromises = defaultSuccessfulAllPromises(25);
       const arrayOfRejectPromises = defaultRejectAllPromises(25);
       const service = new ExecuteConcurrentlyService();
-      const results = await service.execute([...arrayOfSuccessPromises, ...arrayOfRejectPromises], 5, {ignoreError: true});
+      const results = await service.execute([...arrayOfSuccessPromises, ...arrayOfRejectPromises], 5, {
+        ignoreError: true,
+      });
       expect(results).toHaveLength(50);
       for (let i = 0; i < results.length / 2; i++) {
         expect(results[i]).toEqual(`TEST ${i + 1}`);
       }
-      for (let i =  results.length / 2; i < results.length; i++) {
-        expect(results[i]).toEqual(new Error(`TEST ${i + 1 -  results.length / 2}`));
+      for (let i = results.length / 2; i < results.length; i++) {
+        expect(results[i]).toEqual(new Error(`TEST ${i + 1 - results.length / 2}`));
       }
     });
 
-    it("execute reject promises in parallel and throw error", async() => {
+    it("execute reject promises in parallel and throw error", async () => {
       expect.assertions(1);
       const arrayOfPromises = defaultRejectAllPromises(10);
       const service = new ExecuteConcurrentlyService();
@@ -72,7 +74,7 @@ describe("ExecuteConcurrentlyService", () => {
       await expect(promise).rejects.toThrowError();
     });
 
-    it("execute reject and success promises in parallel and throw error", async() => {
+    it("execute reject and success promises in parallel and throw error", async () => {
       expect.assertions(1);
       const arrayOfPromises = defaultSuccessfulAllPromises(10);
       arrayOfPromises.splice(5, 0, rejectPromise("ERROR"));
@@ -81,7 +83,7 @@ describe("ExecuteConcurrentlyService", () => {
       await expect(promise).rejects.toThrowError(new Error("ERROR"));
     });
 
-    it("should trhow an error if execute twice", async() => {
+    it("should trhow an error if execute twice", async () => {
       expect.assertions(2);
       const arrayOfPromises = defaultSuccessfulAllPromises(10);
       arrayOfPromises.splice(5, 0, rejectPromise("ERROR"));

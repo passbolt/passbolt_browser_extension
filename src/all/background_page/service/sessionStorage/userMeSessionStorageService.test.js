@@ -14,26 +14,26 @@
 
 import UserMeSessionStorageService from "./userMeSessionStorageService";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import UserEntity from "../../model/entity/user/userEntity";
 import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/profileEntity";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 describe("UserMeSessionStorageService", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     await browser.storage.session.clear();
   });
 
   describe("UserMeSessionStorageService::get", () => {
-    it('should return null if there is no data in the storage', async() => {
+    it("should return null if there is no data in the storage", async () => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
       const cachedUser = await UserMeSessionStorageService.get(account);
       expect(cachedUser).toBeNull();
     });
 
-    it('should return the user in cache associated to the passed account if one in cache', async() => {
+    it("should return the user in cache associated to the passed account if one in cache", async () => {
       expect.assertions(4);
       const account = new AccountEntity(defaultAccountDto());
       const user = new UserEntity(defaultUserDto());
@@ -46,13 +46,15 @@ describe("UserMeSessionStorageService", () => {
       expect(cachedUser.profile).toBeInstanceOf(ProfileEntity);
     });
 
-    it('should return null if trying to access the cache of another account', async() => {
+    it("should return null if trying to access the cache of another account", async () => {
       expect.assertions(1);
       const otherAccount = new AccountEntity(defaultAccountDto());
 
-      const account = new AccountEntity(defaultAccountDto({
-        user_id: uuidv4(),
-      }));
+      const account = new AccountEntity(
+        defaultAccountDto({
+          user_id: uuidv4(),
+        }),
+      );
       const user = new UserEntity(defaultUserDto());
       await UserMeSessionStorageService.set(account, user);
 
@@ -60,7 +62,7 @@ describe("UserMeSessionStorageService", () => {
       expect(cachedUserOtherAccount).toBeNull();
     });
 
-    it('should return the cached user for the given account even if there are other cached users for other accounts', async() => {
+    it("should return the cached user for the given account even if there are other cached users for other accounts", async () => {
       expect.assertions(2);
       const otherAccount = new AccountEntity(defaultAccountDto());
       const userOtherAccount = new UserEntity(defaultUserDto());
@@ -77,7 +79,7 @@ describe("UserMeSessionStorageService", () => {
   });
 
   describe("UserMeSessionStorageService::set", () => {
-    it('should override an existing cached user if one already present', async() => {
+    it("should override an existing cached user if one already present", async () => {
       expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -93,7 +95,7 @@ describe("UserMeSessionStorageService", () => {
   });
 
   describe("UserMeSessionStorageService::remove", () => {
-    it('should not crash if nothing to remove', async() => {
+    it("should not crash if nothing to remove", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -101,7 +103,7 @@ describe("UserMeSessionStorageService", () => {
       expect(true).toBeTruthy();
     });
 
-    it('should remove a cached user', async() => {
+    it("should remove a cached user", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
@@ -113,12 +115,14 @@ describe("UserMeSessionStorageService", () => {
       expect(Object.keys(await browser.storage.session.get()).length).toEqual(0);
     });
 
-    it('should not remove another cached user if there is none for the given account', async() => {
+    it("should not remove another cached user if there is none for the given account", async () => {
       expect.assertions(1);
 
-      const otherAccount = new AccountEntity(defaultAccountDto({
-        user_id: uuidv4(),
-      }));
+      const otherAccount = new AccountEntity(
+        defaultAccountDto({
+          user_id: uuidv4(),
+        }),
+      );
       const userOtherAccount = new UserEntity(defaultUserDto());
       await UserMeSessionStorageService.set(otherAccount, userOtherAccount);
 
@@ -129,12 +133,14 @@ describe("UserMeSessionStorageService", () => {
       expect(Object.keys(await browser.storage.session.get()).length).toEqual(1);
     });
 
-    it('should not remove another cached user if there is a cached user for the given account', async() => {
+    it("should not remove another cached user if there is a cached user for the given account", async () => {
       expect.assertions(3);
 
-      const otherAccount = new AccountEntity(defaultAccountDto({
-        user_id: uuidv4(),
-      }));
+      const otherAccount = new AccountEntity(
+        defaultAccountDto({
+          user_id: uuidv4(),
+        }),
+      );
       const userOtherAccount = new UserEntity(defaultUserDto());
       await UserMeSessionStorageService.set(otherAccount, userOtherAccount);
 

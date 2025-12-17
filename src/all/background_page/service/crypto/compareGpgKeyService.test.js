@@ -17,35 +17,47 @@
  */
 
 import CompareGpgKeyService from "./compareGpgKeyService";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 describe("CompareGpgKeyService", () => {
   describe("CompareGpgKeyService::areKeysTheSame", () => {
-    it("Should validate with 2 identical keys", async() => {
-      const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
-      const result = await CompareGpgKeyService.areKeysTheSame(key, key);
+    it(
+      "Should validate with 2 identical keys",
+      async () => {
+        const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
+        const result = await CompareGpgKeyService.areKeysTheSame(key, key);
 
-      expect.assertions(1);
-      expect(result).toBe(true);
-    }, 10 * 1000);
+        expect.assertions(1);
+        expect(result).toBe(true);
+      },
+      10 * 1000,
+    );
 
-    it("should reject if keys are different", async() => {
-      const keyA = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
-      const keyB = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
-      const result = await CompareGpgKeyService.areKeysTheSame(keyA, keyB);
+    it(
+      "should reject if keys are different",
+      async () => {
+        const keyA = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+        const keyB = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
+        const result = await CompareGpgKeyService.areKeysTheSame(keyA, keyB);
 
-      expect.assertions(1);
-      expect(result).toBe(false);
-    }, 10 * 1000);
+        expect.assertions(1);
+        expect(result).toBe(false);
+      },
+      10 * 1000,
+    );
 
-    it("should reject if keys share the same fingerprint but one has an expiration date", async() => {
-      const keyA = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
-      const keyB = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public_with_expiration_date);
-      const result = await CompareGpgKeyService.areKeysTheSame(keyA, keyB);
+    it(
+      "should reject if keys share the same fingerprint but one has an expiration date",
+      async () => {
+        const keyA = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+        const keyB = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public_with_expiration_date);
+        const result = await CompareGpgKeyService.areKeysTheSame(keyA, keyB);
 
-      expect.assertions(1);
-      expect(result).toBe(false);
-    }, 10 * 1000);
+        expect.assertions(1);
+        expect(result).toBe(false);
+      },
+      10 * 1000,
+    );
   });
 });

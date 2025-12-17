@@ -12,18 +12,17 @@
  * @since         4.4.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MfaSetupRemoveProviderController from "./MfaSetupRemoveProviderController";
-import {defaultMfaProviderData} from "../../model/entity/mfa/mfaProviderEntity.test.data";
+import { defaultMfaProviderData } from "../../model/entity/mfa/mfaProviderEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import MfaProviderEntity from "../../model/entity/mfa/mfaProviderEntity";
 
 beforeEach(() => {
   enableFetchMocks();
 });
-
 
 describe("MfaSetupRemoveProviderController", () => {
   let controller;
@@ -32,7 +31,7 @@ describe("MfaSetupRemoveProviderController", () => {
     controller = new MfaSetupRemoveProviderController(null, null, defaultApiClientOptions());
   });
 
-  it("Should remove the totp", async() => {
+  it("Should remove the totp", async () => {
     expect.assertions(1);
     jest.spyOn(controller.multiFactorAuthenticationModel, "removeProvider");
 
@@ -40,17 +39,19 @@ describe("MfaSetupRemoveProviderController", () => {
 
     await controller.exec(defaultMfaProviderData());
 
-    expect(controller.multiFactorAuthenticationModel.removeProvider).toHaveBeenCalledWith(new MfaProviderEntity(defaultMfaProviderData()));
+    expect(controller.multiFactorAuthenticationModel.removeProvider).toHaveBeenCalledWith(
+      new MfaProviderEntity(defaultMfaProviderData()),
+    );
   });
 
-  it("Should validate the totp with entity", async() => {
+  it("Should validate the totp with entity", async () => {
     expect.assertions(2);
 
     try {
       await controller.exec({});
     } catch (error) {
       expect(error).toBeInstanceOf(EntityValidationError);
-      expect(error.hasError('provider', 'required')).toBeTruthy();
+      expect(error.hasError("provider", "required")).toBeTruthy();
     }
   });
 });

@@ -11,24 +11,28 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import GroupsUpdateController from "./groupUpdateController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GroupLocalStorage from "../../service/local_storage/groupLocalStorage";
 
-const {enableFetchMocks} = require("jest-fetch-mock");
-const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
-const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
-const {users} = require("passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data");
+const { enableFetchMocks } = require("jest-fetch-mock");
+const { mockApiResponse } = require("../../../../../test/mocks/mockApiResponse");
+const { pgpKeys } = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
+const { users } = require("passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data");
 
-const {updateGroupNameDto, add2UsersToGroupDto, add2UsersToGroupDryRunResponse} = require("./groupUpdateController.test.data");
-const {defaultGroupDto} = require("passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data");
-const {defaultDryRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
+const {
+  updateGroupNameDto,
+  add2UsersToGroupDto,
+  add2UsersToGroupDryRunResponse,
+} = require("./groupUpdateController.test.data");
+const { defaultGroupDto } = require("passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data");
+const { defaultDryRunResponse } = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
 
 jest.mock("../../service/progress/progressService");
 jest.mock("../../service/passphrase/getPassphraseService");
@@ -43,16 +47,16 @@ describe("GroupsUpdateController", () => {
     /**
      * This scenario consists to only change the name of the group.
      */
-    it("Only group's name changed", async() => {
+    it("Only group's name changed", async () => {
       expect.assertions(3);
 
-      const localGroup = defaultGroupDto({}, {withGroupsUsers: true});
-      const dto = updateGroupNameDto({id: localGroup.id, groups_users: localGroup.groups_users});
+      const localGroup = defaultGroupDto({}, { withGroupsUsers: true });
+      const dto = updateGroupNameDto({ id: localGroup.id, groups_users: localGroup.groups_users });
       await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
 
       const account = new AccountEntity(defaultAccountDto());
       const storageKey = GroupLocalStorage.getStorageKey(account.id);
-      browser.storage.local.set({[storageKey]: [localGroup]});
+      browser.storage.local.set({ [storageKey]: [localGroup] });
 
       const clientOptions = defaultApiClientOptions();
       const controller = new GroupsUpdateController(null, null, clientOptions, account);
@@ -62,13 +66,13 @@ describe("GroupsUpdateController", () => {
       fetch.doMockOnce(() => mockApiResponse(defaultDryRunResponse()));
 
       // 2nd API call is for the update of the groups
-      fetch.doMockOnce(async req => {
-        const {id, name, groups_users, secrets} = JSON.parse(await req.text());
+      fetch.doMockOnce(async (req) => {
+        const { id, name, groups_users, secrets } = JSON.parse(await req.text());
 
         expect(name).toBe(dto.name);
         expect(groups_users).toBeUndefined();
         expect(secrets).toBeUndefined();
-        return mockApiResponse({id, name});
+        return mockApiResponse({ id, name });
       });
 
       await controller.exec(dto);
@@ -89,10 +93,10 @@ describe("GroupsUpdateController", () => {
      *  - Resource 2 for betty
      *  - Resource 3 for admin
      */
-    it("Add 2 users in a group with 1 secret being unknown for both users and 2 other secrets known by only one user each", async() => {
+    it("Add 2 users in a group with 1 secret being unknown for both users and 2 other secrets known by only one user each", async () => {
       expect.assertions(20);
 
-      const getResourceId = (data, index) => data['dry-run'].Secrets[index].Secret[0].resource_id;
+      const getResourceId = (data, index) => data["dry-run"].Secrets[index].Secret[0].resource_id;
       const findSecret = (secrets, userId, resource1Id) => {
         for (const i in secrets) {
           const secret = secrets[i];
@@ -102,8 +106,8 @@ describe("GroupsUpdateController", () => {
         }
       };
 
-      const localGroup = defaultGroupDto({}, {withGroupsUsers: true});
-      const dto = add2UsersToGroupDto({id: localGroup.id, groups_users: localGroup.groups_users});
+      const localGroup = defaultGroupDto({}, { withGroupsUsers: true });
+      const dto = add2UsersToGroupDto({ id: localGroup.id, groups_users: localGroup.groups_users });
       await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
       const keyring = new Keyring();
 
@@ -113,7 +117,7 @@ describe("GroupsUpdateController", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const storageKey = GroupLocalStorage.getStorageKey(account.id);
-      browser.storage.local.set({[storageKey]: [localGroup]});
+      browser.storage.local.set({ [storageKey]: [localGroup] });
 
       const clientOptions = defaultApiClientOptions();
       const controller = new GroupsUpdateController(null, null, clientOptions, account);
@@ -131,20 +135,20 @@ describe("GroupsUpdateController", () => {
       fetch.doMockOnce(() => mockApiResponse({}));
 
       // 1st operation is group name update operation
-      fetch.doMockOnce(async req => {
-        const {id, name, groups_users, secrets} = JSON.parse(await req.text());
+      fetch.doMockOnce(async (req) => {
+        const { id, name, groups_users, secrets } = JSON.parse(await req.text());
 
         expect(id).toBe(localGroup.id);
         expect(name).toBe(localGroup.name);
         expect(groups_users).toBeUndefined();
         expect(secrets).toBeUndefined();
 
-        return mockApiResponse({id, name, groups_users, secrets});
+        return mockApiResponse({ id, name, groups_users, secrets });
       });
 
       // 2st operation is an addition of a group manager in the group
-      fetch.doMockOnce(async req => {
-        const {id, name, groups_users, secrets} = JSON.parse(await req.text());
+      fetch.doMockOnce(async (req) => {
+        const { id, name, groups_users, secrets } = JSON.parse(await req.text());
 
         expect(id).toBe(localGroup.id);
         expect(name).toBe(localGroup.name);
@@ -162,12 +166,12 @@ describe("GroupsUpdateController", () => {
         const adminResource3Data = await OpenpgpAssertion.readMessageOrFail(adminResource3.data);
         expect(await DecryptMessageService.decrypt(adminResource1Data, adminPrivateKey)).toBe("resource1-password");
         expect(await DecryptMessageService.decrypt(adminResource3Data, adminPrivateKey)).toBe("resource3-password");
-        return mockApiResponse({id, name, groups_users, secrets});
+        return mockApiResponse({ id, name, groups_users, secrets });
       });
 
       // 3rd operation is an addition of a user in the group
-      fetch.doMockOnce(async req => {
-        const {id, name, groups_users, secrets} = JSON.parse(await req.text());
+      fetch.doMockOnce(async (req) => {
+        const { id, name, groups_users, secrets } = JSON.parse(await req.text());
 
         expect(id).toBe(localGroup.id);
         expect(name).toBe(localGroup.name);
@@ -186,7 +190,7 @@ describe("GroupsUpdateController", () => {
         expect(await DecryptMessageService.decrypt(bettyResource1Data, bettyPrivateKey)).toBe("resource1-password");
         expect(await DecryptMessageService.decrypt(bettyResource2Data, bettyPrivateKey)).toBe("resource2-password");
 
-        return mockApiResponse({id, name, groups_users, secrets});
+        return mockApiResponse({ id, name, groups_users, secrets });
       });
 
       await controller.exec(dto);

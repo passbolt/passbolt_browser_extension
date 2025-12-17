@@ -12,15 +12,15 @@
  * @since         5.3.2
  */
 
-import {v4 as uuidv4} from 'uuid';
-import CancelClipboardContentFlushController from './cancelClipboardContentFlushController';
+import { v4 as uuidv4 } from "uuid";
+import CancelClipboardContentFlushController from "./cancelClipboardContentFlushController";
 
-describe('CancelClipboardContentFlushController', () => {
-  describe('constructor', () => {
-    it('should set the worker and requestId properties', () => {
+describe("CancelClipboardContentFlushController", () => {
+  describe("constructor", () => {
+    it("should set the worker and requestId properties", () => {
       expect.assertions(2);
 
-      const worker = {port: {}};
+      const worker = { port: {} };
       const requestId = uuidv4();
       const controller = new CancelClipboardContentFlushController(worker, requestId);
 
@@ -29,8 +29,8 @@ describe('CancelClipboardContentFlushController', () => {
     });
   });
 
-  describe('exec', () => {
-    it('should call copyTemporarily of the right service', async() => {
+  describe("exec", () => {
+    it("should call copyTemporarily of the right service", async () => {
       expect.assertions(1);
 
       const toCopy = "text";

@@ -13,18 +13,17 @@
  */
 
 import MfaGetMfaSettingsController from "./mfaGetMfaSettingsController";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mfaDto} from './mfaGetMfaSettingsController.test.data';
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mfaDto } from "./mfaGetMfaSettingsController.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
 });
 
-
 describe("MfaGetMfaSettingsController", () => {
-  it("can get the mfa settings for the current user", async() => {
+  it("can get the mfa settings for the current user", async () => {
     // Mock API fetch account recovery organization policy response.
     const mockApiResult = mfaDto();
     fetch.doMock(() => mockApiResponse(mockApiResult));

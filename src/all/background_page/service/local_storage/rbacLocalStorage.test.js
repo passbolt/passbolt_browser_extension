@@ -12,12 +12,12 @@
  * @since         4.1.0
  */
 import RbacLocalStorage from "./rbacLocalStorage";
-import {defaultRbacWithUiActionData} from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity.test.data";
+import { defaultRbacWithUiActionData } from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity.test.data";
 import RbacEntity from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity";
 import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 describe("RbacLocalStorage", () => {
   // mock data
@@ -26,25 +26,25 @@ describe("RbacLocalStorage", () => {
   jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
 
   describe("RbacLocalStorage::get", () => {
-    it("Should return undefined if nothing stored in the storage", async() => {
+    it("Should return undefined if nothing stored in the storage", async () => {
       expect.assertions(1);
       const rbacLocalstorage = new RbacLocalStorage(account);
       const result = await rbacLocalstorage.get();
       expect(result).toEqual(undefined);
     });
 
-    it("Should return content stored in the local storage", async() => {
+    it("Should return content stored in the local storage", async () => {
       const rbacs = [defaultRbacWithUiActionData()];
       expect.assertions(1);
       const rbacLocalstorage = new RbacLocalStorage(account);
-      browser.storage.local.set({[rbacLocalstorage.storageKey]: rbacs});
+      browser.storage.local.set({ [rbacLocalstorage.storageKey]: rbacs });
       const result = await rbacLocalstorage.get();
       expect(result).toEqual(rbacs);
     });
   });
 
   describe("RbacLocalStorage::set", () => {
-    it("Should set a rbac colection in the local storage", async() => {
+    it("Should set a rbac colection in the local storage", async () => {
       expect.assertions(2);
       const rbacLocalstorage = new RbacLocalStorage(account);
       const rbac = new RbacEntity(defaultRbacWithUiActionData());
@@ -57,7 +57,7 @@ describe("RbacLocalStorage", () => {
   });
 
   describe("RbacLocalStorage::flush", () => {
-    it("Should flush all the rbac from the local storage", async() => {
+    it("Should flush all the rbac from the local storage", async () => {
       expect.assertions(1);
       const rbacLocalstorage = new RbacLocalStorage(account);
       await rbacLocalstorage.flush();

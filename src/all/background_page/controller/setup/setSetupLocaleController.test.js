@@ -12,13 +12,13 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import SetSetupLocaleController from "./setSetupLocaleController";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
-import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
+import { initialAccountSetupDto } from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
@@ -27,33 +27,43 @@ beforeEach(() => {
 
 describe("SetAccountLocaleController", () => {
   describe("SetAccountLocaleController::exec", () => {
-    it("Should set the account locale and initialize i18next with it.", async() => {
+    it("Should set the account locale and initialize i18next with it.", async () => {
       const account = new AccountSetupEntity(initialAccountSetupDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
       jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
-      const controller = new SetSetupLocaleController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
+      const controller = new SetSetupLocaleController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+        account,
+      );
 
       // Mock API fetch organization settings
       const mockApiResult = anonymousOrganizationSettings();
       fetch.doMockOnce(() => mockApiResponse(mockApiResult));
 
       expect.assertions(1);
-      const localeDto = {locale: "fr-FR"};
+      const localeDto = { locale: "fr-FR" };
       await controller.exec(localeDto);
       expect(account.locale).toEqual(localeDto.locale);
     });
 
-    it("Should not accept unsupported locale.", async() => {
+    it("Should not accept unsupported locale.", async () => {
       const account = new AccountSetupEntity(initialAccountSetupDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new SetSetupLocaleController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new SetSetupLocaleController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+        account,
+      );
 
       // Mock API fetch organization settings
       const mockApiResult = anonymousOrganizationSettings();
       fetch.doMockOnce(() => mockApiResponse(mockApiResult));
 
       expect.assertions(1);
-      const localeDto = {locale: "ma-MA"};
+      const localeDto = { locale: "ma-MA" };
       const promise = controller.exec(localeDto);
       await expect(promise).rejects.toThrowError("Unsupported locale.");
     });

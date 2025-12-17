@@ -20,20 +20,26 @@ import {
   changeToADisabledAccountRecoveryOrganizationPolicyDto,
   changeAnEnabledAccountRecoveryOrganizationPolicyTypeDto,
   changeToAndEnabledAccountRecoveryOrganizationPolicyDto,
-  rotateAccountRecoveryOrganizationPolicyKeyDto
+  rotateAccountRecoveryOrganizationPolicyKeyDto,
 } from "./accountRecoveryOrganizationPolicyChangeEntity.test.data";
 
 describe("AccountRecoveryOrganizationPolicyChange entity", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(AccountRecoveryOrganizationPolicyChangeEntity.ENTITY_NAME, AccountRecoveryOrganizationPolicyChangeEntity.getSchema());
+    EntitySchema.validateSchema(
+      AccountRecoveryOrganizationPolicyChangeEntity.ENTITY_NAME,
+      AccountRecoveryOrganizationPolicyChangeEntity.getSchema(),
+    );
   });
 
   each([
-    {scenario: "Change to a disabled policy", dto: changeToADisabledAccountRecoveryOrganizationPolicyDto()},
-    {scenario: "Change to an enabled policy", dto: changeToAndEnabledAccountRecoveryOrganizationPolicyDto()},
-    {scenario: "Change to another enabled policy type", dto: changeAnEnabledAccountRecoveryOrganizationPolicyTypeDto()},
-    {scenario: "Rotate key only (without policy change)", dto: rotateAccountRecoveryOrganizationPolicyKeyDto()},
-  ]).describe("constructor works with data", _props => {
+    { scenario: "Change to a disabled policy", dto: changeToADisabledAccountRecoveryOrganizationPolicyDto() },
+    { scenario: "Change to an enabled policy", dto: changeToAndEnabledAccountRecoveryOrganizationPolicyDto() },
+    {
+      scenario: "Change to another enabled policy type",
+      dto: changeAnEnabledAccountRecoveryOrganizationPolicyTypeDto(),
+    },
+    { scenario: "Rotate key only (without policy change)", dto: rotateAccountRecoveryOrganizationPolicyKeyDto() },
+  ]).describe("constructor works with data", (_props) => {
     it(`it supports scenario: ${_props.scenario}`, () => {
       expect.assertions(1);
       const entity = new AccountRecoveryOrganizationPolicyChangeEntity(_props.dto);
@@ -46,17 +52,25 @@ describe("AccountRecoveryOrganizationPolicyChange entity", () => {
     try {
       new AccountRecoveryOrganizationPolicyChangeEntity({});
     } catch (error) {
-      expect(error).toStrictEqual(new EntityValidationError("AccountRecoveryOrganizationPolicyChangeEntity expects a policy or an account_recovery_organization_public_key set to be valid."));
+      expect(error).toStrictEqual(
+        new EntityValidationError(
+          "AccountRecoveryOrganizationPolicyChangeEntity expects a policy or an account_recovery_organization_public_key set to be valid.",
+        ),
+      );
     }
   });
 
   it("constructor returns validation error if policy is disabled and account_recovery_organization_public_key is set", () => {
     expect.assertions(1);
-    const wrongDto = changeToAndEnabledAccountRecoveryOrganizationPolicyDto({policy: "disabled"});
+    const wrongDto = changeToAndEnabledAccountRecoveryOrganizationPolicyDto({ policy: "disabled" });
     try {
       new AccountRecoveryOrganizationPolicyChangeEntity(wrongDto);
     } catch (error) {
-      expect(error).toStrictEqual(new EntityValidationError("AccountRecoveryOrganizationPolicyChangeEntity expects not to have an account recovery organization public key if the policy type is disabled."));
+      expect(error).toStrictEqual(
+        new EntityValidationError(
+          "AccountRecoveryOrganizationPolicyChangeEntity expects not to have an account recovery organization public key if the policy type is disabled.",
+        ),
+      );
     }
   });
 });

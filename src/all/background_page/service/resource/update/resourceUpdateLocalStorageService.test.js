@@ -12,14 +12,12 @@
  * @since         5.2.0
  */
 
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import ResourceUpdateLocalStorageService from "./resourceUpdateLocalStorageService";
-import {
-  defaultResourceDtosCollection
-} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
+import { defaultResourceDtosCollection } from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -30,12 +28,12 @@ beforeEach(() => {
 describe("resourceUpdateLocalStorageService", () => {
   let resourceUpdateLocalStorageService;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     resourceUpdateLocalStorageService = new ResourceUpdateLocalStorageService();
   });
 
   describe("resourceUpdateLocalStorageService::updateFolderParentId", () => {
-    it("Should update the resources folder parent id of resources present in local storage", async() => {
+    it("Should update the resources folder parent id of resources present in local storage", async () => {
       expect.assertions(2);
 
       const resourceDtos = defaultResourceDtosCollection();
@@ -43,7 +41,7 @@ describe("resourceUpdateLocalStorageService", () => {
       await ResourceLocalStorage.set(collection);
       const folderParentId = uuidv4();
 
-      resourceDtos.forEach(resourceDto => {
+      resourceDtos.forEach((resourceDto) => {
         delete resourceDto.secrets;
         delete resourceDto.permissions;
         resourceDto.folder_parent_id = folderParentId;
@@ -57,14 +55,14 @@ describe("resourceUpdateLocalStorageService", () => {
       expect(ResourceLocalStorage.updateResourcesCollection).toHaveBeenCalledWith(resourceCollectionExpected);
     });
 
-    it("Should update the resources folder parent id to null for resources present in local storage", async() => {
+    it("Should update the resources folder parent id to null for resources present in local storage", async () => {
       expect.assertions(2);
 
       const resourceDtos = defaultResourceDtosCollection();
       const collection = new ResourcesCollection(resourceDtos);
       await ResourceLocalStorage.set(collection);
 
-      resourceDtos.forEach(resourceDto => {
+      resourceDtos.forEach((resourceDto) => {
         delete resourceDto.secrets;
         delete resourceDto.permissions;
         resourceDto.folder_parent_id = null;
@@ -78,7 +76,7 @@ describe("resourceUpdateLocalStorageService", () => {
       expect(ResourceLocalStorage.updateResourcesCollection).toHaveBeenCalledWith(resourceCollectionExpected);
     });
 
-    it("Should not update resources folder parent id if there is no resource in local storage", async() => {
+    it("Should not update resources folder parent id if there is no resource in local storage", async () => {
       expect.assertions(1);
 
       const resourceDtos = defaultResourceDtosCollection();
@@ -92,7 +90,7 @@ describe("resourceUpdateLocalStorageService", () => {
       expect(ResourceLocalStorage.updateResourcesCollection).not.toHaveBeenCalled();
     });
 
-    it("Should update the resources folder parent id for only resources present in local storage", async() => {
+    it("Should update the resources folder parent id for only resources present in local storage", async () => {
       expect.assertions(2);
 
       const resourceDtos = defaultResourceDtosCollection();
@@ -116,7 +114,7 @@ describe("resourceUpdateLocalStorageService", () => {
       expect(ResourceLocalStorage.updateResourcesCollection).toHaveBeenCalledWith(resourceCollectionExpected);
     });
 
-    it("Should not update resources folder parent id if ids not matched in the resource local storage", async() => {
+    it("Should not update resources folder parent id if ids not matched in the resource local storage", async () => {
       expect.assertions(1);
 
       const resourceDtos = defaultResourceDtosCollection();
@@ -131,14 +129,22 @@ describe("resourceUpdateLocalStorageService", () => {
       expect(ResourceLocalStorage.updateResourcesCollection).not.toHaveBeenCalled();
     });
 
-    it("Should throw an error if resource id is not a uuid", async() => {
+    it("Should throw an error if resource id is not a uuid", async () => {
       expect.assertions(1);
-      expect(() => resourceUpdateLocalStorageService.updateFolderParentId([uuidv4(), "non-uuid"], null)).rejects.toThrow(new TypeError('The parameter "resourcesIds" should contain only uuid', {cause: new TypeError("The given parameter is not a valid UUID")}));
+      expect(() =>
+        resourceUpdateLocalStorageService.updateFolderParentId([uuidv4(), "non-uuid"], null),
+      ).rejects.toThrow(
+        new TypeError('The parameter "resourcesIds" should contain only uuid', {
+          cause: new TypeError("The given parameter is not a valid UUID"),
+        }),
+      );
     });
 
-    it("Should throw an error if resource id is not a uuid", async() => {
+    it("Should throw an error if resource id is not a uuid", async () => {
       expect.assertions(1);
-      expect(() => resourceUpdateLocalStorageService.updateFolderParentId([uuidv4()], "non-uuid")).rejects.toThrow(new TypeError("The folder parent id should be a valid UUID"));
+      expect(() => resourceUpdateLocalStorageService.updateFolderParentId([uuidv4()], "non-uuid")).rejects.toThrow(
+        new TypeError("The folder parent id should be a valid UUID"),
+      );
     });
   });
 });

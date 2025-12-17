@@ -12,8 +12,8 @@
  * @since         4.9.0
  */
 
-import {defaultProfileDto} from "passbolt-styleguide/src/shared/models/entity/profile/ProfileEntity.test.data";
-import {v4 as uuid} from "uuid";
+import { defaultProfileDto } from "passbolt-styleguide/src/shared/models/entity/profile/ProfileEntity.test.data";
+import { v4 as uuid } from "uuid";
 
 /**
  * Default user search result dto for UserAndGroupSearchResult.
@@ -21,9 +21,9 @@ import {v4 as uuid} from "uuid";
  * @returns {object}
  */
 export const defaultUserSearchResultDto = (data = {}) => ({
-  "id": uuid(),
-  "username": "ada@passbolt.com",
-  "profile": defaultProfileDto(),
+  id: uuid(),
+  username: "ada@passbolt.com",
+  profile: defaultProfileDto(),
   ...data,
 });
 
@@ -33,8 +33,8 @@ export const defaultUserSearchResultDto = (data = {}) => ({
  * @returns {object}
  */
 export const defaultGroupSearchResultDto = (data = {}) => ({
-  "id": uuid(),
-  "name": "found group",
-  "user_count": 3,
+  id: uuid(),
+  name: "found group",
+  user_count: 3,
   ...data,
 });

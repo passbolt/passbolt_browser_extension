@@ -12,25 +12,28 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import User from "../../model/user";
 import AccountRecoverySaveUserSettingsController from "./accountRecoverySaveUserSettingController";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import {
   createAcceptedAccountRecoveryUserSettingDto,
-  createRejectedAccountRecoveryUserSettingDto
+  createRejectedAccountRecoveryUserSettingDto,
 } from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity.test.data";
-import {enabledAccountRecoveryOrganizationPolicyDto, disabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import {
+  enabledAccountRecoveryOrganizationPolicyDto,
+  disabledAccountRecoveryOrganizationPolicyDto,
+} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.resetModules();
   enableFetchMocks();
   fetch.resetMocks();
@@ -39,23 +42,27 @@ beforeEach(async() => {
 
 describe("AccountRecoverySaveUserSettingsController", () => {
   describe("AccountRecoverySaveUserSettingsController::exec", () => {
-    it("Should save a rejected account recovery user setting.", async() => {
+    it("Should save a rejected account recovery user setting.", async () => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
 
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API account recovery user settings post. Return data such as the API will.
-      fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
+      fetch.doMockOnce(async (req) => mockApiResponse(JSON.parse(await req.text())));
 
-      const accountRecoveryUserSettingDto = createRejectedAccountRecoveryUserSettingDto({user_id: User.getInstance().get().id});
+      const accountRecoveryUserSettingDto = createRejectedAccountRecoveryUserSettingDto({
+        user_id: User.getInstance().get().id,
+      });
       const savedAccountRecoveryUserSetting = await controller.exec(accountRecoveryUserSettingDto);
 
       expect.assertions(1);
-      const savedAccountRecoveryUserSettingDto = savedAccountRecoveryUserSetting.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS);
+      const savedAccountRecoveryUserSettingDto = savedAccountRecoveryUserSetting.toDto(
+        AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS,
+      );
       expect(savedAccountRecoveryUserSettingDto).toEqual(accountRecoveryUserSettingDto);
     });
 
-    it("Should save an approved account recovery user setting.", async() => {
+    it("Should save an approved account recovery user setting.", async () => {
       const account = new AccountEntity(defaultAccountDto());
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions(), account);
 
@@ -64,20 +71,26 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API account recovery user settings post. Return data such as the API will.
-      fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
+      fetch.doMockOnce(async (req) => mockApiResponse(JSON.parse(await req.text())));
 
-      const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({user_id: User.getInstance().get().id});
+      const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({
+        user_id: User.getInstance().get().id,
+      });
       const savedAccountRecoveryUserSetting = await controller.exec(accountRecoveryUserSettingDto);
 
       expect.assertions(5);
       expect(savedAccountRecoveryUserSetting).toBeInstanceOf(AccountRecoveryUserSettingEntity);
       expect(savedAccountRecoveryUserSetting.status).toEqual(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
       expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey).not.toBeUndefined();
-      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).not.toBeUndefined();
-      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).toHaveLength(1);
+      expect(
+        savedAccountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords,
+      ).not.toBeUndefined();
+      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).toHaveLength(
+        1,
+      );
     });
 
-    it("Should throw an error if no account recovery organization policy is found.", async() => {
+    it("Should throw an error if no account recovery organization policy is found.", async () => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
 
       // Mock user passphrase capture.
@@ -85,14 +98,16 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(null));
 
-      const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({user_id: User.getInstance().get().id});
+      const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({
+        user_id: User.getInstance().get().id,
+      });
       const result = controller.exec(accountRecoveryUserSettingDto);
 
       expect.assertions(1);
       await expect(result).rejects.toThrowError("Account recovery organization policy not found.");
     });
 
-    it("Should throw an error if the account recovery organization policy is disabled.", async() => {
+    it("Should throw an error if the account recovery organization policy is disabled.", async () => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
 
       // Mock user passphrase capture.
@@ -100,7 +115,9 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(disabledAccountRecoveryOrganizationPolicyDto()));
 
-      const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({user_id: User.getInstance().get().id});
+      const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({
+        user_id: User.getInstance().get().id,
+      });
       const result = controller.exec(accountRecoveryUserSettingDto);
 
       expect.assertions(1);

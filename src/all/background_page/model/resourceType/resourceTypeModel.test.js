@@ -12,14 +12,12 @@
  * @since         4.9.4
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {
-  resourceTypesCollectionDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypeModel from "./resourceTypeModel";
 import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
-import {resourceTypePasswordDescriptionTotpDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import { resourceTypePasswordDescriptionTotpDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -34,7 +32,7 @@ describe("ResourceTypeModel", () => {
   });
 
   describe("::getOrFindAll", () => {
-    it("Should get resource types from local storage", async() => {
+    it("Should get resource types from local storage", async () => {
       expect.assertions(3);
 
       jest.spyOn(resourceTypeModel.resourceTypeService, "findAll");
@@ -47,9 +45,11 @@ describe("ResourceTypeModel", () => {
       expect(ResourceTypeLocalStorage.set).toHaveBeenCalledTimes(0);
     });
 
-    it("Should find resource types from api call", async() => {
+    it("Should find resource types from api call", async () => {
       expect.assertions(4);
-      jest.spyOn(resourceTypeModel.resourceTypeService, "findAll").mockImplementationOnce(() => resourceTypesCollectionDto());
+      jest
+        .spyOn(resourceTypeModel.resourceTypeService, "findAll")
+        .mockImplementationOnce(() => resourceTypesCollectionDto());
 
       const resourceTypeCollection = await resourceTypeModel.getOrFindAll();
 
@@ -61,13 +61,13 @@ describe("ResourceTypeModel", () => {
   });
 
   describe("::getSecretSchemaById", () => {
-    it("Should return the right secret schema based on the resource type id", async() => {
+    it("Should return the right secret schema based on the resource type id", async () => {
       expect.assertions(1);
 
       const availableResourceType = resourceTypesCollectionDto();
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementationOnce(() => availableResourceType);
 
-      const expectedResourceType = availableResourceType.find(rt => rt.slug === "password-description-totp");
+      const expectedResourceType = availableResourceType.find((rt) => rt.slug === "password-description-totp");
 
       const secretSchema = await resourceTypeModel.getSecretSchemaById(expectedResourceType.id);
       const expectedSchema = resourceTypePasswordDescriptionTotpDto().definition.secret;
@@ -75,14 +75,14 @@ describe("ResourceTypeModel", () => {
       expect(secretSchema).toStrictEqual(expectedSchema);
     });
 
-    it("Should find the data from the API before returning the right secret schema based", async() => {
+    it("Should find the data from the API before returning the right secret schema based", async () => {
       expect.assertions(1);
 
       const availableResourceType = resourceTypesCollectionDto();
       jest.spyOn(ResourceTypeLocalStorage, "get").mockImplementationOnce(() => undefined);
       jest.spyOn(resourceTypeModel.resourceTypeService, "findAll").mockImplementationOnce(() => availableResourceType);
 
-      const expectedResourceType = availableResourceType.find(rt => rt.slug === "password-description-totp");
+      const expectedResourceType = availableResourceType.find((rt) => rt.slug === "password-description-totp");
 
       const secretSchema = await resourceTypeModel.getSecretSchemaById(expectedResourceType.id);
       const expectedSchema = resourceTypePasswordDescriptionTotpDto().definition.secret;
@@ -90,10 +90,12 @@ describe("ResourceTypeModel", () => {
       expect(secretSchema).toStrictEqual(expectedSchema);
     });
 
-    it("Should assert the parameter is a proper UUID", async() => {
+    it("Should assert the parameter is a proper UUID", async () => {
       expect.assertions(1);
 
-      expect(() => resourceTypeModel.getSecretSchemaById("non-uuid")).rejects.toThrow(new Error('The resource type id should be a valid UUID'));
+      expect(() => resourceTypeModel.getSecretSchemaById("non-uuid")).rejects.toThrow(
+        new Error("The resource type id should be a valid UUID"),
+      );
     });
   });
 });

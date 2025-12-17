@@ -25,11 +25,11 @@ beforeEach(() => {
 
 describe("GeneratePortIdController", () => {
   describe("GeneratePortIdController::isAllowedToGeneratePortId", () => {
-    it("Should allowed to generate port id", async() => {
+    it("Should allowed to generate port id", async () => {
       expect.assertions(6);
       // data mocked
       const worker = {
-        name: "WebIntegration"
+        name: "WebIntegration",
       };
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
@@ -42,11 +42,11 @@ describe("GeneratePortIdController", () => {
       expect(controller.isAllowedToGeneratePortId(worker.name, "InFormMenu")).toBeTruthy();
     });
 
-    it("Should not allowed to generate port id for unknown application", async() => {
+    it("Should not allowed to generate port id for unknown application", async () => {
       expect.assertions(2);
       // data mocked
       const worker = {
-        name: "Unknown"
+        name: "Unknown",
       };
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
@@ -57,39 +57,39 @@ describe("GeneratePortIdController", () => {
   });
 
   describe("GeneratePortIdController::exec", () => {
-    it("Should store worker and generate a port id for setup", async() => {
+    it("Should store worker and generate a port id for setup", async () => {
       expect.assertions(2);
       // data mocked
       const worker = {
         tab: {
-          id: 1
+          id: 1,
         },
-        name: "SetupBootstrap"
+        name: "SetupBootstrap",
       };
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
-      const id  = await controller.exec("Setup");
+      const id = await controller.exec("Setup");
       // data expected
       const workerEntity = new WorkerEntity({
         id: id,
         tabId: worker.tab.id,
         name: "Setup",
         frameId: null,
-        status: WorkerEntity.STATUS_WAITING_CONNECTION
+        status: WorkerEntity.STATUS_WAITING_CONNECTION,
       });
       // expectations
       expect(id).toMatch(/^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/);
       expect(WorkersSessionStorage.addWorker).toHaveBeenCalledWith(workerEntity);
     });
 
-    it("Should not store worker and generate a port id for application not allowed", async() => {
+    it("Should not store worker and generate a port id for application not allowed", async () => {
       expect.assertions(1);
       // data mocked
       const worker = {
         tab: {
-          id: 1
+          id: 1,
         },
-        name: "AppBootstrap"
+        name: "AppBootstrap",
       };
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
@@ -101,19 +101,19 @@ describe("GeneratePortIdController", () => {
       }
     });
 
-    it("Should not allowed to generate port id for an application name that is not a string", async() => {
+    it("Should not allowed to generate port id for an application name that is not a string", async () => {
       expect.assertions(1);
       // data mocked
       const worker = {
         tab: {
-          id: 1
+          id: 1,
         },
-        name: "AppBootstrap"
+        name: "AppBootstrap",
       };
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
       try {
-        await controller.exec({name: "QuickAccess"});
+        await controller.exec({ name: "QuickAccess" });
       } catch (error) {
         // expectations
         expect(error.message).toStrictEqual("The application name should be a string");

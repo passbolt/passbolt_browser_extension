@@ -15,7 +15,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import MfaProviderEntity from "./mfaProviderEntity";
-import {defaultMfaProviderData} from "./mfaProviderEntity.test.data";
+import { defaultMfaProviderData } from "./mfaProviderEntity.test.data";
 
 describe("MfaProviderEntity", () => {
   it("schema must validate", () => {
@@ -33,17 +33,19 @@ describe("MfaProviderEntity", () => {
       new MfaProviderEntity({});
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('provider', 'required')).toBe(true);
+      expect(error.hasError("provider", "required")).toBe(true);
     }
   });
   it("constructor returns validation error if provider field is not part of the enum", () => {
     try {
-      new MfaProviderEntity(defaultMfaProviderData({
-        provider: "google"
-      }));
+      new MfaProviderEntity(
+        defaultMfaProviderData({
+          provider: "google",
+        }),
+      );
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('provider', 'enum')).toBe(true);
+      expect(error.hasError("provider", "enum")).toBe(true);
     }
   });
 });

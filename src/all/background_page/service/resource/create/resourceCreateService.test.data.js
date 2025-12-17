@@ -12,12 +12,15 @@
  * @since         4.10.0
  */
 
-import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
+import { ownerPermissionDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import FolderEntity from "../../../model/entity/folder/folderEntity";
 import PermissionChangesCollection from "../../../model/entity/permission/change/permissionChangesCollection";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 
-export const permission = ownerPermissionDto({aco: "Folder", aco_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450"});
+export const permission = ownerPermissionDto({
+  aco: "Folder",
+  aco_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450",
+});
 
 export function folderDto() {
   return defaultFolderDto({
@@ -25,31 +28,28 @@ export function folderDto() {
     name: "Test",
     folder_parent_id: null,
     permission: permission,
-    permissions: [permission]
+    permissions: [permission],
   });
 }
 
 export function folderModelMock(data = {}) {
   return {
     findForShare: () => new FolderEntity(folderDto()),
-    ...data
+    ...data,
   };
 }
 
-
 export function resourceModelMock(data = {}) {
   return {
-    calculatePermissionsChangesForCreate: () =>  new PermissionChangesCollection([
-      permission
-    ]),
+    calculatePermissionsChangesForCreate: () => new PermissionChangesCollection([permission]),
     updateLocalStorage: jest.fn(),
-    ...data
+    ...data,
   };
 }
 
 export function shareModelMock(data = {}) {
   return {
     bulkShareResources: () => jest.fn(),
-    ...data
+    ...data,
   };
 }

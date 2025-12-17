@@ -15,7 +15,7 @@ import MessageService from "./messageService";
 
 describe("MessageService", () => {
   describe("MessageService::onMessage", () => {
-    it("Should receive a message know by message service", async() => {
+    it("Should receive a message know by message service", async () => {
       expect.assertions(2);
       // data mocked
       const callback = jest.fn();
@@ -30,7 +30,7 @@ describe("MessageService", () => {
   });
 
   describe("MessageService::emit", () => {
-    it("Should emit a success message", async() => {
+    it("Should emit a success message", async () => {
       expect.assertions(1);
       // process
       const messageService = new MessageService();
@@ -39,7 +39,7 @@ describe("MessageService", () => {
       expect(result).toStrictEqual("result");
     });
 
-    it("Should emit an error message", async() => {
+    it("Should emit an error message", async () => {
       expect.assertions(1);
       // process
       const messageService = new MessageService();

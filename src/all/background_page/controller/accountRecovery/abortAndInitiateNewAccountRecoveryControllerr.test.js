@@ -12,12 +12,12 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AbortAndInitiateNewAccountRecoveryController from "./abortAndInitiateNewAccountRecoveryController";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
-import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
+import { defaultAccountAccountRecoveryDto } from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
 import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 
 beforeEach(() => {
@@ -26,13 +26,21 @@ beforeEach(() => {
 
 describe("AbortAndInitiateNewAccountRecoveryController", () => {
   describe("AbortAndInitiateNewAccountRecoveryController::exec", () => {
-    it("Should abort the current request and initiate a new one.", async() => {
+    it("Should abort the current request and initiate a new one.", async () => {
       const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
       await AccountLocalStorage.add(accountRecovery);
-      const controller = new AbortAndInitiateNewAccountRecoveryController(null, null, defaultApiClientOptions(), accountRecovery);
+      const controller = new AbortAndInitiateNewAccountRecoveryController(
+        null,
+        null,
+        defaultApiClientOptions(),
+        accountRecovery,
+      );
 
       // Mock the abort API request response.
-      const mockApiAbortFetch = fetch.doMockOnceIf(new RegExp(`/setup/recover/abort/${accountRecovery.userId}.json`), () => mockApiResponse());
+      const mockApiAbortFetch = fetch.doMockOnceIf(
+        new RegExp(`/setup/recover/abort/${accountRecovery.userId}.json`),
+        () => mockApiResponse(),
+      );
       const mockApiHelpFetch = fetch.doMockOnceIf(new RegExp(`/users/recover.json`), () => mockApiResponse());
 
       expect.assertions(4);

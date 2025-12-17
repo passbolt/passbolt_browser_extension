@@ -13,18 +13,18 @@
  */
 
 describe("SessionStorage", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     await browser.storage.session.clear();
   });
 
   describe("SessionStorage::set", () => {
-    it("Should create new values when the storage is empty", async() => {
+    it("Should create new values when the storage is empty", async () => {
       expect.assertions(2);
 
       const dataToSet = {
         keyA: "valueA",
         keyB: "valueB",
-        keyC: "valueC"
+        keyC: "valueC",
       };
 
       //ensure the storage is empty
@@ -36,17 +36,17 @@ describe("SessionStorage", () => {
       expect(newStorage).toEqual(dataToSet);
     });
 
-    it("Should replace the existing values", async() => {
+    it("Should replace the existing values", async () => {
       expect.assertions(2);
 
       const originalData = {
         keyA: "valueA",
         keyB: "valueB",
-        keyC: "valueC"
+        keyC: "valueC",
       };
       const newData = {
         keyB: "valueB-bis",
-        keyC: "valueC-bis"
+        keyC: "valueC-bis",
       };
 
       await browser.storage.session.set(originalData);
@@ -58,18 +58,18 @@ describe("SessionStorage", () => {
       expect(newStorage).toEqual(Object.assign({}, originalData, newData));
     });
 
-    it("Should replace and create new values", async() => {
+    it("Should replace and create new values", async () => {
       expect.assertions(2);
 
       const originalData = {
         keyA: "valueA",
         keyB: "valueB",
-        keyC: "valueC"
+        keyC: "valueC",
       };
       const newData = {
         keyB: "valueB-bis",
         keyC: "valueC-bis",
-        keyD: "valueD"
+        keyD: "valueD",
       };
 
       await browser.storage.session.set(originalData);
@@ -83,7 +83,7 @@ describe("SessionStorage", () => {
   });
 
   describe("SessionStorage::get", () => {
-    it("Should return an empty object if the given key doesn't exist in store", async() => {
+    it("Should return an empty object if the given key doesn't exist in store", async () => {
       expect.assertions(2);
 
       const emptyStore = await browser.storage.session.get();
@@ -94,13 +94,13 @@ describe("SessionStorage", () => {
       expect(value).toStrictEqual({});
     });
 
-    it("Should return all stored value if no key is specified", async() => {
+    it("Should return all stored value if no key is specified", async () => {
       expect.assertions(2);
 
       const dataToSet = {
         keyA: "valueA",
         keyB: "valueB",
-        keyC: "valueC"
+        keyC: "valueC",
       };
 
       const emptyStore = await browser.storage.session.get();
@@ -112,13 +112,13 @@ describe("SessionStorage", () => {
       expect(value).toStrictEqual(dataToSet);
     });
 
-    it("Should return an object with a single field if the asked key is a string", async() => {
+    it("Should return an object with a single field if the asked key is a string", async () => {
       expect.assertions(2);
 
       const dataToSet = {
         keyA: "valueA",
         keyB: "valueB",
-        keyC: "valueC"
+        keyC: "valueC",
       };
 
       const emptyStore = await browser.storage.session.get();
@@ -127,18 +127,18 @@ describe("SessionStorage", () => {
       await browser.storage.session.set(dataToSet);
 
       const value = await browser.storage.session.get("keyA");
-      expect(value).toStrictEqual({keyA: "valueA"});
+      expect(value).toStrictEqual({ keyA: "valueA" });
     });
   });
 
   describe("SessionStorage::remove", () => {
-    it("Should do nothing if the key doesn't exist", async() => {
+    it("Should do nothing if the key doesn't exist", async () => {
       expect.assertions(2);
 
       const dataToSet = {
         keyA: "valueA",
         keyB: "valueB",
-        keyC: "valueC"
+        keyC: "valueC",
       };
       await browser.storage.session.set(dataToSet);
 
@@ -150,13 +150,13 @@ describe("SessionStorage", () => {
       expect(newValues).toStrictEqual(dataToSet);
     });
 
-    it("Should remove the existing key", async() => {
+    it("Should remove the existing key", async () => {
       expect.assertions(2);
 
       const dataToSet = {
         keyA: "valueA",
         keyB: "valueB",
-        keyC: "valueC"
+        keyC: "valueC",
       };
       await browser.storage.session.set(dataToSet);
 
@@ -171,7 +171,7 @@ describe("SessionStorage", () => {
   });
 
   describe("SessionStorage::clear", () => {
-    it("Should do nothing if the store is empty", async() => {
+    it("Should do nothing if the store is empty", async () => {
       expect.assertions(2);
 
       const value = await browser.storage.session.get();
@@ -182,13 +182,13 @@ describe("SessionStorage", () => {
       expect(newValue).toStrictEqual({});
     });
 
-    it("Should remove the existing keys", async() => {
+    it("Should remove the existing keys", async () => {
       expect.assertions(2);
 
       const dataToSet = {
         keyA: "valueA",
         keyB: "valueB",
-        keyC: "valueC"
+        keyC: "valueC",
       };
       await browser.storage.session.set(dataToSet);
 

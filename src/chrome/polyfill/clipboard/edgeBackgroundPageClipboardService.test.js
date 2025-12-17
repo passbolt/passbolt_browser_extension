@@ -15,13 +15,15 @@ import EdgeBackgroundPageClipboardService from "./edgeBackgroundPageClipboardSer
 
 describe("EdgeBackgroundPageClipboardService", () => {
   describe("::writeText", () => {
-    it("should write the given data to the clipboard", async() => {
+    it("should write the given data to the clipboard", async () => {
       expect.assertions(8);
 
       let copiedValue = "";
       const fakeElement = {
         value: "",
-        select: jest.fn().mockImplementation(() => { copiedValue = fakeElement.value; }),
+        select: jest.fn().mockImplementation(() => {
+          copiedValue = fakeElement.value;
+        }),
       };
       // Faking document for this specific context
       global.document = {
@@ -30,7 +32,7 @@ describe("EdgeBackgroundPageClipboardService", () => {
           appendChild: jest.fn(),
           removeChild: jest.fn(),
         },
-        execCommand: jest.fn()
+        execCommand: jest.fn(),
       };
 
       document.execCommand.mockImplementation(() => {});

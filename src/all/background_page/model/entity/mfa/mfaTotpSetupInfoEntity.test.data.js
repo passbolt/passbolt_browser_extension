@@ -14,7 +14,8 @@
 
 export const defaultTotpQrCodeData = (props = {}) => {
   const data = {
-    otpProvisioningUri: "otpauth://totp/www.passbolt.local:admin%40passbolt.com?issuer=www.passbolt.local&secret=TVWEGQFS3WPCID6GYAPHHCC54VXHFUL7EC5FVHEMVH7CKQI2XEQQ",
+    otpProvisioningUri:
+      "otpauth://totp/www.passbolt.local:admin%40passbolt.com?issuer=www.passbolt.local&secret=TVWEGQFS3WPCID6GYAPHHCC54VXHFUL7EC5FVHEMVH7CKQI2XEQQ",
   };
   return Object.assign(data, props);
 };

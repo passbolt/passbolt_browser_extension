@@ -13,9 +13,9 @@
  */
 import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import PortManager from "./portManager";
-import {mockPort} from "./portManager.test.data";
+import { mockPort } from "./portManager.test.data";
 import PagemodManager from "../../pagemod/pagemodManager";
-import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
+import { readWorker } from "../../model/entity/worker/workerEntity.test.data";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import GetLegacyAccountService from "../../service/account/getLegacyAccountService";
 
@@ -23,19 +23,19 @@ const spyGetWorkerById = jest.spyOn(WorkersSessionStorage, "getWorkerById");
 const spyGetWorkersByTabId = jest.spyOn(WorkersSessionStorage, "getWorkersByTabId");
 
 describe("PortManager", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
     await PortManager.flush();
   });
 
   describe("PortManager::onPortConnect", () => {
-    it("Should connect new port if it is in the workersSessionStorage", async() => {
+    it("Should connect new port if it is in the workersSessionStorage", async () => {
       expect.assertions(4);
       // data mocked
       const workerDto = readWorker();
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto));
-      const port = mockPort({name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId});
+      const port = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
       // mock functions
       jest.spyOn(PagemodManager, "attachEventToPort");
       // process
@@ -44,14 +44,14 @@ describe("PortManager", () => {
       expect(PortManager._ports[workerDto.id]).toBeDefined();
       expect(PortManager._ports[workerDto.id]._port).toBe(port);
       expect(PagemodManager.attachEventToPort).toHaveBeenCalledWith(PortManager._ports[workerDto.id], workerDto.name);
-      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify(['passbolt.port.ready']));
+      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify(["passbolt.port.ready"]));
     });
 
-    it("Should connect new port if it is the quick access", async() => {
+    it("Should connect new port if it is the quick access", async () => {
       expect.assertions(5);
       // data mocked
       const popupUrl = "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess";
-      const port = mockPort({name: "quickaccess", url: popupUrl});
+      const port = mockPort({ name: "quickaccess", url: popupUrl });
       delete port.sender.tab;
       // mock functions
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
@@ -64,15 +64,15 @@ describe("PortManager", () => {
       expect(PortManager._ports[port.name]).toBeDefined();
       expect(PortManager._ports[port.name]._port).toBe(port);
       expect(PagemodManager.attachEventToPort).toHaveBeenCalledWith(PortManager._ports[port.name], "QuickAccess");
-      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify(['passbolt.port.ready']));
+      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify(["passbolt.port.ready"]));
     });
 
-    it("Should not connect new port if it is not in the workersSessionStorage", async() => {
+    it("Should not connect new port if it is not in the workersSessionStorage", async () => {
       expect.assertions(3);
       // data mocked
       const workerDto = readWorker();
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto));
-      const port = mockPort({name: workerDto.id, tabId: 2, frameId: workerDto.frameId});
+      const port = mockPort({ name: workerDto.id, tabId: 2, frameId: workerDto.frameId });
       // mock functions
       jest.spyOn(PagemodManager, "attachEventToPort");
       // process
@@ -83,13 +83,20 @@ describe("PortManager", () => {
       expect(port.postMessage).not.toHaveBeenCalled();
     });
 
-    it("Should not connect new port if it is not the quick access url", async() => {
+    it("Should not connect new port if it is not the quick access url", async () => {
       expect.assertions(4);
       // data mocked
-      const port = mockPort({name: "test", url: "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=test"});
+      const port = mockPort({
+        name: "test",
+        url: "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=test",
+      });
       delete port.sender.tab;
       // mock functions
-      jest.spyOn(browser.action, "getPopup").mockImplementationOnce(() => "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess");
+      jest
+        .spyOn(browser.action, "getPopup")
+        .mockImplementationOnce(
+          () => "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess",
+        );
       jest.spyOn(PagemodManager, "attachEventToPort");
       // process
       try {
@@ -105,18 +112,18 @@ describe("PortManager", () => {
   });
 
   describe("PortManager::onTabRemoved", () => {
-    it("Should remove the workers and runtime memory ports for a specific tab id", async() => {
+    it("Should remove the workers and runtime memory ports for a specific tab id", async () => {
       expect.assertions(6);
       // data mocked
       const workerDto1 = readWorker();
-      const workerDto2 = readWorker({frameId: null});
-      const workerDto3 = readWorker({tabId: 5});
+      const workerDto2 = readWorker({ frameId: null });
+      const workerDto3 = readWorker({ tabId: 5 });
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto1));
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto2));
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto3));
-      const port = mockPort({name: workerDto1.id, tabId: workerDto1.tabId, frameId: workerDto1.frameId});
-      const port2 = mockPort({name: workerDto2.id, tabId: workerDto2.tabId, frameId: 3});
-      const port3 = mockPort({name: workerDto3.id, tabId: workerDto3.tabId, frameId: workerDto3.frameId});
+      const port = mockPort({ name: workerDto1.id, tabId: workerDto1.tabId, frameId: workerDto1.frameId });
+      const port2 = mockPort({ name: workerDto2.id, tabId: workerDto2.tabId, frameId: 3 });
+      const port3 = mockPort({ name: workerDto3.id, tabId: workerDto3.tabId, frameId: workerDto3.frameId });
       // mock functions
       jest.spyOn(PagemodManager, "attachEventToPort");
       jest.spyOn(WorkersSessionStorage, "deleteByTabId");
@@ -141,7 +148,7 @@ describe("PortManager", () => {
       expect(WorkersSessionStorage.deleteByTabId).toHaveBeenCalledWith(1);
     });
 
-    it("Should fail if the tabId is not provided", async() => {
+    it("Should fail if the tabId is not provided", async () => {
       expect.assertions(1);
       // process
       const promise = PortManager.onTabRemoved();
@@ -149,7 +156,7 @@ describe("PortManager", () => {
       await expect(promise).rejects.toThrow();
     });
 
-    it("Should fail if the tabId is not a valid integer", async() => {
+    it("Should fail if the tabId is not a valid integer", async () => {
       expect.assertions(1);
       // process
       const promise = PortManager.onTabRemoved("not-valid-integer");

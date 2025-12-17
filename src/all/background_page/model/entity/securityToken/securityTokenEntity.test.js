@@ -21,9 +21,9 @@ describe("SecurityToken entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "code": "PB1",
-      "color": "#FFF",
-      "textcolor": "#000",
+      code: "PB1",
+      color: "#FFF",
+      textcolor: "#000",
     };
 
     const entity = new SecurityTokenEntity(dto);
@@ -35,27 +35,27 @@ describe("SecurityToken entity", () => {
       new SecurityTokenEntity({});
       expect(true).toBeFalsy();
     } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('code', 'required')).toBe(true);
-      expect(error.hasError('color', 'required')).toBe(true);
-      expect(error.hasError('textcolor', 'required')).toBe(true);
+      expect(error instanceof EntityValidationError).toBe(true);
+      expect(error.hasError("code", "required")).toBe(true);
+      expect(error.hasError("color", "required")).toBe(true);
+      expect(error.hasError("textcolor", "required")).toBe(true);
     }
   });
 
   it("constructor returns validation error if dto required fields are invalid", () => {
     try {
       new SecurityTokenEntity({
-        "code": "🏆‍️",
-        "color": "🏆‍️",
-        "textcolor": "true"
+        code: "🏆‍️",
+        color: "🏆‍️",
+        textcolor: "true",
       });
       expect(false).toBe(true);
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        code: {pattern: 'The code is not valid.'},
-        color: {format: 'The color is not a valid x-hex-color.'},
-        textcolor: {format: 'The textcolor is not a valid x-hex-color.'}
+        code: { pattern: "The code is not valid." },
+        color: { format: "The color is not a valid x-hex-color." },
+        textcolor: { format: "The textcolor is not a valid x-hex-color." },
       });
     }
   });

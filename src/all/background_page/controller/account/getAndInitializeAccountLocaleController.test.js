@@ -12,13 +12,13 @@
  * @since         3.6.0
  */
 
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import GetAndInitializeAccountLocaleController from "./getAndInitializeAccountLocaleController";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -26,10 +26,15 @@ beforeEach(() => {
 
 describe("GetAndInitializeAccountLocaleController", () => {
   describe("GetAndInitializeAccountLocaleController::exec", () => {
-    it("Should retrieve the account locale and initialize i18next with it.", async() => {
+    it("Should retrieve the account locale and initialize i18next with it.", async () => {
       const storedAccountDto = defaultAccountDto();
       const storedAccount = new AccountEntity(storedAccountDto);
-      const controller = new GetAndInitializeAccountLocaleController(null, null, defaultApiClientOptions(), storedAccount);
+      const controller = new GetAndInitializeAccountLocaleController(
+        null,
+        null,
+        defaultApiClientOptions(),
+        storedAccount,
+      );
 
       // Mock API fetch organization settings
       const mockApiResult = anonymousOrganizationSettings();
@@ -37,14 +42,19 @@ describe("GetAndInitializeAccountLocaleController", () => {
 
       expect.assertions(1);
       const locale = await controller.exec();
-      const expectedLocaleDto = {locale: "de-DE", label: "Deutsch"};
+      const expectedLocaleDto = { locale: "de-DE", label: "Deutsch" };
       expect(locale.toDto()).toEqual(expectedLocaleDto);
     });
 
-    it("Should retrieve the organization locale if no account locale defined and initialize i18next with it.", async() => {
-      const storedAccountDto = defaultAccountDto({locale: null});
+    it("Should retrieve the organization locale if no account locale defined and initialize i18next with it.", async () => {
+      const storedAccountDto = defaultAccountDto({ locale: null });
       const storedAccount = new AccountEntity(storedAccountDto);
-      const controller = new GetAndInitializeAccountLocaleController(null, null, defaultApiClientOptions(), storedAccount);
+      const controller = new GetAndInitializeAccountLocaleController(
+        null,
+        null,
+        defaultApiClientOptions(),
+        storedAccount,
+      );
 
       // Mock API fetch organization settings
       const mockApiResult = anonymousOrganizationSettings();
@@ -52,23 +62,27 @@ describe("GetAndInitializeAccountLocaleController", () => {
 
       expect.assertions(1);
       const locale = await controller.exec();
-      const expectedLocaleDto = {locale: "en-UK", label: "English"};
+      const expectedLocaleDto = { locale: "en-UK", label: "English" };
       expect(locale.toDto()).toEqual(expectedLocaleDto);
     });
 
-
-    it("Should fallback on default extension locale if nothing found.", async() => {
-      const storedAccountDto = defaultAccountDto({locale: null});
+    it("Should fallback on default extension locale if nothing found.", async () => {
+      const storedAccountDto = defaultAccountDto({ locale: null });
       const storedAccount = new AccountEntity(storedAccountDto);
-      const controller = new GetAndInitializeAccountLocaleController(null, null, defaultApiClientOptions(), storedAccount);
+      const controller = new GetAndInitializeAccountLocaleController(
+        null,
+        null,
+        defaultApiClientOptions(),
+        storedAccount,
+      );
 
       // Mock API fetch organization settings
-      const mockApiResult = anonymousOrganizationSettings({app: {locale: null}});
+      const mockApiResult = anonymousOrganizationSettings({ app: { locale: null } });
       fetch.doMockOnce(() => mockApiResponse(mockApiResult));
 
       expect.assertions(1);
       const locale = await controller.exec();
-      const expectedLocaleDto = {locale: "en-UK", label: "English"};
+      const expectedLocaleDto = { locale: "en-UK", label: "English" };
       expect(locale.toDto()).toEqual(expectedLocaleDto);
     });
   });

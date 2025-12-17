@@ -13,25 +13,25 @@
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
 import "../../../../../test/mocks/mockCryptoKey";
-import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { v4 as uuidv4 } from "uuid";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import UpdatePrivateKeyController from "./updatePrivateKeyController";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import FileService from "../../service/file/fileService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
-import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
+import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
 import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntity";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
-import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
+import { generateSsoKitServerData } from "../../model/entity/sso/ssoKitServerPart.test.data";
 
 const mockedSaveFile = jest.spyOn(FileService, "saveFile");
 
@@ -45,18 +45,20 @@ describe("UpdatePrivateKeyController", () => {
   const mockOrganisationSettingCall = (ssoEnabled = false) => {
     const organizationSettings = anonymousOrganizationSettings();
     if (ssoEnabled) {
-      organizationSettings.passbolt.plugins.sso = {enabled: true};
+      organizationSettings.passbolt.plugins.sso = { enabled: true };
     }
-    fetch.doMockOnceIf(new RegExp('/settings.json'), () => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
+    fetch.doMockOnceIf(new RegExp("/settings.json"), () =>
+      mockApiResponse(organizationSettings, { servertime: Date.now() / 1000 }),
+    );
   };
 
   describe("UpdatePrivateKeyController::exec", () => {
-    it("Should trigger the download of the recovery kit with the new passphrase.", async() => {
+    it("Should trigger the download of the recovery kit with the new passphrase.", async () => {
       expect.assertions(4);
 
       await MockExtension.withConfiguredAccount();
       mockOrganisationSettingCall();
-      mockedSaveFile.mockImplementation(async(fileName, fileContent, fileContentType, workerTabId) => {
+      mockedSaveFile.mockImplementation(async (fileName, fileContent, fileContentType, workerTabId) => {
         expect(fileName).toStrictEqual("passbolt-recovery-kit.asc");
         expect(fileContentType).toStrictEqual("text/plain");
         expect(workerTabId).toStrictEqual(worker.tab.id);
@@ -70,8 +72,8 @@ describe("UpdatePrivateKeyController", () => {
 
       const worker = {
         tab: {
-          id: uuidv4()
-        }
+          id: uuidv4(),
+        },
       };
 
       const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
@@ -80,7 +82,7 @@ describe("UpdatePrivateKeyController", () => {
       await controller.exec(oldPassphrase, newPassphrase);
     });
 
-    it("Should throw an error if no passphrase is provided.", async() => {
+    it("Should throw an error if no passphrase is provided.", async () => {
       expect.assertions(2);
       await MockExtension.withConfiguredAccount();
       const controller = new UpdatePrivateKeyController(null, null, defaultApiClientOptions());
@@ -101,7 +103,7 @@ describe("UpdatePrivateKeyController", () => {
       }
     });
 
-    it("Should throw an error if passphrases are not strings.", async() => {
+    it("Should throw an error if passphrases are not strings.", async () => {
       expect.assertions(2);
       await MockExtension.withConfiguredAccount();
       const controller = new UpdatePrivateKeyController(null, null, defaultApiClientOptions());
@@ -122,19 +124,19 @@ describe("UpdatePrivateKeyController", () => {
       }
     });
 
-    it("Should update the local SSO kit if one already exists.", async() => {
+    it("Should update the local SSO kit if one already exists.", async () => {
       expect.assertions(2);
       const data = await generateSsoKitServerData();
-      const dto = {data};
+      const dto = { data };
 
       const newPassphrase = "newPassphrase";
       const ssoKit = await clientSsoKit();
       const newSsoKitId = uuidv4();
-      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({id: newSsoKitId}));
+      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({ id: newSsoKitId }));
       const worker = {
         tab: {
-          id: uuidv4()
-        }
+          id: uuidv4(),
+        },
       };
 
       await MockExtension.withConfiguredAccount();
@@ -144,7 +146,7 @@ describe("UpdatePrivateKeyController", () => {
 
       mockOrganisationSettingCall(true);
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoKit.id}.json`), () => mockApiResponse({}));
-      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => mockApiResponse({id: newSsoKitId, data: data}));
+      fetch.doMockOnceIf(new RegExp("/sso/keys.json"), () => mockApiResponse({ id: newSsoKitId, data: data }));
 
       jest.spyOn(GenerateSsoKitService, "generateSsoKits").mockImplementation((passphrase, providerId) => {
         expect(passphrase).toBe(newPassphrase);
@@ -156,23 +158,23 @@ describe("UpdatePrivateKeyController", () => {
         };
       });
 
-      SsoDataStorage.save.mockImplementation(kit => {
+      SsoDataStorage.save.mockImplementation((kit) => {
         expect(kit).toBe(newSsoKit);
       });
 
-      mockedSaveFile.mockImplementation(async() => {});
+      mockedSaveFile.mockImplementation(async () => {});
 
       const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
       const oldPassphrase = pgpKeys.ada.passphrase;
       await controller.exec(oldPassphrase, newPassphrase);
     });
 
-    it("Should not create a local SSO kit if none exists.", async() => {
+    it("Should not create a local SSO kit if none exists.", async () => {
       expect.assertions(2);
       const worker = {
         tab: {
-          id: uuidv4()
-        }
+          id: uuidv4(),
+        },
       };
 
       await MockExtension.withConfiguredAccount();
@@ -182,8 +184,12 @@ describe("UpdatePrivateKeyController", () => {
       mockOrganisationSettingCall(true);
 
       const shouldNotHaveBeenCalledError = new Error("This API request should not have been made");
-      fetch.doMockOnceIf(new RegExp(`/sso/keys/[a-fA-F0-9-].*\.json`), () => { throw shouldNotHaveBeenCalledError; });
-      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => { throw shouldNotHaveBeenCalledError; });
+      fetch.doMockOnceIf(new RegExp(`/sso/keys/[a-fA-F0-9-].*\.json`), () => {
+        throw shouldNotHaveBeenCalledError;
+      });
+      fetch.doMockOnceIf(new RegExp("/sso/keys.json"), () => {
+        throw shouldNotHaveBeenCalledError;
+      });
 
       jest.spyOn(GenerateSsoKitService, "generateSsoKits");
 
@@ -196,18 +202,18 @@ describe("UpdatePrivateKeyController", () => {
       expect(SsoDataStorage.save).not.toHaveBeenCalled();
     });
 
-    it("Should not update the passsphrase if the kit can't be send to the server.", async() => {
+    it("Should not update the passsphrase if the kit can't be send to the server.", async () => {
       mockOrganisationSettingCall(true);
       const data = await generateSsoKitServerData();
-      const dto = {data};
+      const dto = { data };
       const newPassphrase = "newPassphrase";
       const ssoKit = await clientSsoKit();
       const newSsoKitId = uuidv4();
-      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({id: newSsoKitId}));
+      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({ id: newSsoKitId }));
       const worker = {
         tab: {
-          id: uuidv4()
-        }
+          id: uuidv4(),
+        },
       };
 
       await MockExtension.withConfiguredAccount();
@@ -217,7 +223,9 @@ describe("UpdatePrivateKeyController", () => {
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoKit.id}.json`), () => mockApiResponse({}));
 
       const expectedError = new Error("Something went wrong");
-      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => { throw expectedError; });
+      fetch.doMockOnceIf(new RegExp("/sso/keys.json"), () => {
+        throw expectedError;
+      });
 
       jest.spyOn(GenerateSsoKitService, "generateSsoKits").mockImplementation(() => ({
         serverPart: new SsoKitServerPartEntity(dto),
@@ -225,30 +233,30 @@ describe("UpdatePrivateKeyController", () => {
       }));
       jest.spyOn(PassphraseStorageService, "flushPassphrase");
 
-      mockedSaveFile.mockImplementation(async() => {});
+      mockedSaveFile.mockImplementation(async () => {});
 
       const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
       const oldPassphrase = pgpKeys.ada.passphrase;
       try {
         await controller.exec(oldPassphrase, newPassphrase);
-      } catch { }
+      } catch {}
 
       expect(SsoDataStorage.save).not.toHaveBeenCalled();
       expect(PassphraseStorageService.flushPassphrase).not.toHaveBeenCalled();
       expect(mockedSaveFile).not.toHaveBeenCalled();
     });
 
-    it("Should ignore the sso kit deletion on server side if it gets a 404.", async() => {
+    it("Should ignore the sso kit deletion on server side if it gets a 404.", async () => {
       const data = await generateSsoKitServerData();
-      const dto = {data};
+      const dto = { data };
       const newPassphrase = "newPassphrase";
       const ssoKit = await clientSsoKit();
       const newSsoKitId = uuidv4();
-      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({id: newSsoKitId}));
+      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({ id: newSsoKitId }));
       const worker = {
         tab: {
-          id: uuidv4()
-        }
+          id: uuidv4(),
+        },
       };
 
       await MockExtension.withConfiguredAccount();
@@ -258,33 +266,33 @@ describe("UpdatePrivateKeyController", () => {
 
       mockOrganisationSettingCall(true);
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoKit.id}.json`), () => mockApiResponseError(404));
-      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => mockApiResponse({id: newSsoKitId, data: data}));
+      fetch.doMockOnceIf(new RegExp("/sso/keys.json"), () => mockApiResponse({ id: newSsoKitId, data: data }));
 
       jest.spyOn(GenerateSsoKitService, "generateSsoKits").mockImplementation(() => ({
         serverPart: new SsoKitServerPartEntity(dto),
         clientPart: newSsoKit,
       }));
 
-      SsoDataStorage.save.mockImplementation(kit => {
+      SsoDataStorage.save.mockImplementation((kit) => {
         expect(kit).toBe(newSsoKit);
       });
 
-      mockedSaveFile.mockImplementation(async() => {});
+      mockedSaveFile.mockImplementation(async () => {});
 
       const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
       const oldPassphrase = pgpKeys.ada.passphrase;
       await controller.exec(oldPassphrase, newPassphrase);
     });
 
-    it("Should not generate another SSO kit if the passphrase can't be rotated.", async() => {
+    it("Should not generate another SSO kit if the passphrase can't be rotated.", async () => {
       const newPassphrase = "newPassphrase";
       const ssoKit = await clientSsoKit();
       const newSsoKitId = uuidv4();
-      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({id: newSsoKitId}));
+      const newSsoKit = new SsoKitClientPartEntity(await clientSsoKit({ id: newSsoKitId }));
       const worker = {
         tab: {
-          id: uuidv4()
-        }
+          id: uuidv4(),
+        },
       };
 
       await MockExtension.withConfiguredAccount();
@@ -295,16 +303,20 @@ describe("UpdatePrivateKeyController", () => {
       mockOrganisationSettingCall(true);
 
       const shouldNotHaveBeenCalledError = new Error("This API request should not have been made");
-      fetch.doMockOnceIf(new RegExp(`/sso/keys/[a-fA-F0-9-].*\.json`), () => { throw shouldNotHaveBeenCalledError; });
-      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => { throw shouldNotHaveBeenCalledError; });
+      fetch.doMockOnceIf(new RegExp(`/sso/keys/[a-fA-F0-9-].*\.json`), () => {
+        throw shouldNotHaveBeenCalledError;
+      });
+      fetch.doMockOnceIf(new RegExp("/sso/keys.json"), () => {
+        throw shouldNotHaveBeenCalledError;
+      });
 
       jest.spyOn(GenerateSsoKitService, "generateSsoKits");
 
-      SsoDataStorage.save.mockImplementation(kit => {
+      SsoDataStorage.save.mockImplementation((kit) => {
         expect(kit).toBe(newSsoKit);
       });
 
-      mockedSaveFile.mockImplementation(async() => {});
+      mockedSaveFile.mockImplementation(async () => {});
 
       const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
       try {

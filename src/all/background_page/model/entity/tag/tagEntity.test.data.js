@@ -14,18 +14,19 @@
 
 export const minimalTagDto = (data = {}) => ({
   slug: "minimal-tag",
-  ...data
+  ...data,
 });
 
 export const defaultTagDto = (data = {}) => ({
   id: crypto.randomUUID(),
   slug: "personal-tag",
   is_shared: false,
-  ...data
+  ...data,
 });
 
-export const sharedTagDto = (data = {}) => defaultTagDto({
-  slug: "#shared-tag",
-  is_shared: true,
-  ...data
-});
+export const sharedTagDto = (data = {}) =>
+  defaultTagDto({
+    slug: "#shared-tag",
+    is_shared: true,
+    ...data,
+  });

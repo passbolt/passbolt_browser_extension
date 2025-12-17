@@ -14,41 +14,37 @@
 import GroupApiService from "./groupApiService";
 
 describe("Group entity", () => {
-  it('remap legacy contains', () => {
+  it("remap legacy contains", () => {
     const v1 = {
       Group: {
-        name: 'test name',
+        name: "test name",
       },
       GroupUsers: [
-        {GroupUser: {user_id: 'uuid1'}},
-        {GroupUser: {user_id: 'uuid2', is_admin: 1}},
-        {GroupUser: {user_id: 'uuid3', is_admin: 0}},
-      ]
+        { GroupUser: { user_id: "uuid1" } },
+        { GroupUser: { user_id: "uuid2", is_admin: 1 } },
+        { GroupUser: { user_id: "uuid3", is_admin: 0 } },
+      ],
     };
     const v2 = {
-      name: 'test name',
-      groups_users: [
-        {user_id: 'uuid1'},
-        {user_id: 'uuid2', is_admin: true},
-        {user_id: 'uuid3', is_admin: false},
-      ]
+      name: "test name",
+      groups_users: [{ user_id: "uuid1" }, { user_id: "uuid2", is_admin: true }, { user_id: "uuid3", is_admin: false }],
     };
     const sut = GroupApiService.remapV2DataToV1(v2); // crassette
     expect(sut).toEqual(v1);
   });
 
-  it('remap to legacy data', () => {
+  it("remap to legacy data", () => {
     let v2 = {
-      'modifier': true,
-      'groups_users': true
+      modifier: true,
+      groups_users: true,
     };
     let v1 = {
-      'modifier': true,
-      'group_user': true
+      modifier: true,
+      group_user: true,
     };
     expect(GroupApiService.remapLegacyContain(v2)).toEqual(v1);
-    v2 = {groups_users: {user: {profile: true}}};
-    v1 = {group_user: {user: {profile: true}}};
+    v2 = { groups_users: { user: { profile: true } } };
+    v1 = { group_user: { user: { profile: true } } };
     expect(GroupApiService.remapLegacyContain(v2)).toEqual(v1);
   });
 });

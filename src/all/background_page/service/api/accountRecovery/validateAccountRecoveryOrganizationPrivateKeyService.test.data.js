@@ -11,59 +11,55 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 exports.dummyData = {
   correctKeyPair: {
     publicKey: {
       policy: "opt-in",
-      account_recovery_organization_public_key:
-      {
+      account_recovery_organization_public_key: {
         armored_key: pgpKeys.ada.public,
-      }
+      },
     },
     privateKey: {
       armored_key: pgpKeys.ada.private,
-      passphrase: "ada@passbolt.com"
-    }
+      passphrase: "ada@passbolt.com",
+    },
   },
   decryptedCorrectKeyPair: {
     publicKey: {
       policy: "opt-in",
-      account_recovery_organization_public_key:
-        {
-          armored_key: pgpKeys.account_recovery_organization.public,
-        }
+      account_recovery_organization_public_key: {
+        armored_key: pgpKeys.account_recovery_organization.public,
+      },
     },
     privateKey: {
       armored_key: pgpKeys.account_recovery_organization.private_decrypted,
-      passphrase: ""
-    }
+      passphrase: "",
+    },
   },
   invalidKeyPair: {
     publicKey: {
       policy: "opt-in",
-      account_recovery_organization_public_key:
-      {
+      account_recovery_organization_public_key: {
         armored_key: pgpKeys.ada.public,
-      }
+      },
     },
     privateKey: {
       armored_key: pgpKeys.betty.private,
-      passphrase: "betty@passbolt.com"
-    }
+      passphrase: "betty@passbolt.com",
+    },
   },
   invalidPassphrase: {
     publicKey: {
       policy: "opt-in",
-      account_recovery_organization_public_key:
-      {
+      account_recovery_organization_public_key: {
         armored_key: pgpKeys.ada.public,
-      }
+      },
     },
     privateKey: {
       armored_key: pgpKeys.ada.private,
-      passphrase: "dada@passbolt.com"
-    }
-  }
+      passphrase: "dada@passbolt.com",
+    },
+  },
 };

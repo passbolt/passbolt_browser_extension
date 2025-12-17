@@ -14,7 +14,7 @@
 import UserDeleteTransferEntity from "./userDeleteTransferEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultUserDeleteTransferDto} from "passbolt-styleguide/src/shared/models/entity/user/userDeleteTransferEntity.test.data";
+import { defaultUserDeleteTransferDto } from "passbolt-styleguide/src/shared/models/entity/user/userDeleteTransferEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 
@@ -65,11 +65,17 @@ describe("User delete transfer entity", () => {
     it("constructor should fail", () => {
       expect.assertions(3);
       let t;
-      t = () => { new UserDeleteTransferEntity({}); };
+      t = () => {
+        new UserDeleteTransferEntity({});
+      };
       expect(t).toThrow(EntityValidationError);
-      t = () => { new UserDeleteTransferEntity({owners: []}); };
+      t = () => {
+        new UserDeleteTransferEntity({ owners: [] });
+      };
       expect(t).toThrow(CollectionValidationError);
-      t = () => { new UserDeleteTransferEntity({managers: []}); };
+      t = () => {
+        new UserDeleteTransferEntity({ managers: [] });
+      };
       expect(t).toThrow(CollectionValidationError);
     });
   });

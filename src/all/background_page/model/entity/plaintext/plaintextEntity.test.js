@@ -20,7 +20,7 @@ import {
   plaintextSecretPasswordStringDto,
   plaintextSecretStandaloneTotpSchema,
   plaintextSecretStringSchema,
-  plaintextSecretTotpDto
+  plaintextSecretTotpDto,
 } from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 import PlaintextEntity from "./plaintextEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
@@ -30,7 +30,9 @@ describe("PlaintextEntity", () => {
     it("should throw an error", () => {
       expect.assertions(1);
 
-      expect(() => PlaintextEntity.getSchema()).toThrow(new TypeError('Plaintext only support dynamic schemas, defined from resource type.'));
+      expect(() => PlaintextEntity.getSchema()).toThrow(
+        new TypeError("Plaintext only support dynamic schemas, defined from resource type."),
+      );
     });
   });
 
@@ -40,7 +42,7 @@ describe("PlaintextEntity", () => {
 
       const dto = plaintextSecretPasswordStringDto();
       const schema = plaintextSecretStringSchema();
-      const entity = new PlaintextEntity(dto, {schema});
+      const entity = new PlaintextEntity(dto, { schema });
 
       expect(entity.toDto()).toStrictEqual(dto);
     });
@@ -50,7 +52,7 @@ describe("PlaintextEntity", () => {
 
       const dto = plaintextSecretPasswordAndDescriptionDto();
       const schema = plaintextSecretPasswordAndDescriptionSchema();
-      const entity = new PlaintextEntity(dto, {schema});
+      const entity = new PlaintextEntity(dto, { schema });
 
       expect(entity.toDto()).toStrictEqual(dto);
     });
@@ -60,7 +62,7 @@ describe("PlaintextEntity", () => {
 
       const dto = plaintextSecretPasswordDescriptionTotpDto();
       const schema = plaintextSecretPasswordDescriptionAndTotpSchema();
-      const entity = new PlaintextEntity(dto, {schema});
+      const entity = new PlaintextEntity(dto, { schema });
 
       expect(entity.toDto()).toStrictEqual(dto);
     });
@@ -70,7 +72,7 @@ describe("PlaintextEntity", () => {
 
       const dto = plaintextSecretTotpDto();
       const schema = plaintextSecretStandaloneTotpSchema();
-      const entity = new PlaintextEntity(dto, {schema});
+      const entity = new PlaintextEntity(dto, { schema });
 
       expect(entity.toDto()).toStrictEqual(dto);
     });
@@ -78,19 +80,19 @@ describe("PlaintextEntity", () => {
     it("constructor should throw an error if the data does not validate the given schema", () => {
       expect.assertions(1);
 
-      const dto = plaintextSecretTotpDto({totp: "test"});
+      const dto = plaintextSecretTotpDto({ totp: "test" });
       const schema = plaintextSecretStandaloneTotpSchema();
 
-      expect(() => new PlaintextEntity(dto, {schema})).toThrow(EntityValidationError);
+      expect(() => new PlaintextEntity(dto, { schema })).toThrow(EntityValidationError);
     });
 
     it("constructor should not validate if the options state not to validate the data", () => {
       expect.assertions(1);
 
-      const dto = plaintextSecretTotpDto({totp: "test"});
+      const dto = plaintextSecretTotpDto({ totp: "test" });
       const schema = plaintextSecretStandaloneTotpSchema();
 
-      expect(() => new PlaintextEntity(dto, {schema: schema, validate: false})).not.toThrow();
+      expect(() => new PlaintextEntity(dto, { schema: schema, validate: false })).not.toThrow();
     });
   });
 
@@ -111,7 +113,7 @@ describe("PlaintextEntity", () => {
 
       const dto = plaintextSecretPasswordDescriptionTotpDto();
       const schema = plaintextSecretPasswordDescriptionAndTotpSchema();
-      const entity = new PlaintextEntity(dto, {schema});
+      const entity = new PlaintextEntity(dto, { schema });
 
       expect(entity.password).toStrictEqual(dto.password);
       expect(entity.description).toStrictEqual(dto.description);
@@ -121,17 +123,17 @@ describe("PlaintextEntity", () => {
     it("should return null if the data does not exist", () => {
       expect.assertions(3);
 
-      const dto = {test: "test"};
+      const dto = { test: "test" };
       const schema = {
         type: "object",
         required: [],
         properties: {
           test: {
-            type: "string"
+            type: "string",
           },
         },
       };
-      const entity = new PlaintextEntity(dto, {schema});
+      const entity = new PlaintextEntity(dto, { schema });
 
       expect(entity.password).toBeNull();
       expect(entity.description).toBeNull();

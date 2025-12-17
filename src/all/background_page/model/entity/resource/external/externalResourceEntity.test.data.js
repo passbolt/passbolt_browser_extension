@@ -12,10 +12,10 @@
  * @since         4.10.0
  */
 
-import {v4 as uuidv4} from "uuid";
-import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
-import {defaultTotpDto} from "../../totp/totpDto.test.data";
-import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
+import { v4 as uuidv4 } from "uuid";
+import { defaultResourcesSecretsDtos } from "../../secret/resource/resourceSecretsCollection.test.data";
+import { defaultTotpDto } from "../../totp/totpDto.test.data";
+import { defaultCustomFieldsCollection } from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
 
 export const minimalExternalResourceDto = (data = {}) => ({
   name: "Minimal External Resource",
@@ -74,14 +74,14 @@ export const defaultExternalResourceImportMinimalDto = (data = {}) => {
     description: "",
     resource_type_id: uuidv4(),
     folder_parent_path: "private/data",
-    ...data
+    ...data,
   });
 
   /**
    * Timestamp during test are unstable we check the path after timestamp
    */
   if (data.folder_parent_path_expected) {
-    defaultData.folder_parent_path = `${data.folder_parent_path.split('/')[0]}${data.folder_parent_path_expected}`;
+    defaultData.folder_parent_path = `${data.folder_parent_path.split("/")[0]}${data.folder_parent_path_expected}`;
   }
 
   return defaultData;

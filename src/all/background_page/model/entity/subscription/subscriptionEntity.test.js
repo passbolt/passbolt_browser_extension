@@ -22,11 +22,11 @@ describe("Subscription entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "subscription_id": "test",
-      "users": 10,
-      "created": "2021-03-12",
-      "expiry": "2022-03-12",
-      "data": "key"
+      subscription_id: "test",
+      users: 10,
+      created: "2021-03-12",
+      expiry: "2022-03-12",
+      data: "key",
     };
     const entity = new SubscriptionEntity(dto);
     expect(entity.toDto()).toEqual(dto);
@@ -38,11 +38,11 @@ describe("Subscription entity", () => {
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        subscription_id: {required: 'The subscription_id is required.'},
-        users: {required: 'The users is required.'},
-        created: {required: 'The created is required.'},
-        expiry: {required: 'The expiry is required.'},
-        data: {required: 'The data is required.'}
+        subscription_id: { required: "The subscription_id is required." },
+        users: { required: "The users is required." },
+        created: { required: "The created is required." },
+        expiry: { required: "The expiry is required." },
+        data: { required: "The data is required." },
       });
     }
   });
@@ -50,26 +50,25 @@ describe("Subscription entity", () => {
   it("constructor returns validation error if dto required fields are invalid", () => {
     try {
       new SubscriptionEntity({
-        "customer_id": [],
-        "subscription_id": [],
-        "users": [],
-        "email": "test",
-        "created": [],
-        "expiry": [],
-        "data": []
+        customer_id: [],
+        subscription_id: [],
+        users: [],
+        email: "test",
+        created: [],
+        expiry: [],
+        data: [],
       });
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        customer_id: {type: 'The customer_id is not a valid string.'},
-        subscription_id: {type: 'The subscription_id is not a valid string.'},
-        users: {type: 'The users is not a valid integer.'},
-        email: {format: 'The email is not a valid email.'},
-        created: {type: 'The created is not a valid string.'},
-        expiry: {type: 'The expiry is not a valid string.'},
-        data: {type: 'The data is not a valid string.'},
+        customer_id: { type: "The customer_id is not a valid string." },
+        subscription_id: { type: "The subscription_id is not a valid string." },
+        users: { type: "The users is not a valid integer." },
+        email: { format: "The email is not a valid email." },
+        created: { type: "The created is not a valid string." },
+        expiry: { type: "The expiry is not a valid string." },
+        data: { type: "The data is not a valid string." },
       });
     }
   });
 });
-

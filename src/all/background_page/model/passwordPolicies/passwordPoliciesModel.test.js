@@ -12,34 +12,34 @@
  * @since         4.3.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
-import {defaultAccountDto} from "../entity/account/accountEntity.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
+import { defaultAccountDto } from "../entity/account/accountEntity.test.data";
 import AccountEntity from "../entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import PasswordPoliciesModel from "./passwordPoliciesModel";
-import {defaultPasswordPolicies} from "../entity/passwordPolicies/passwordPoliciesEntity.test.data";
+import { defaultPasswordPolicies } from "../entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import PasswordPoliciesEntity from "../entity/passwordPolicies/passwordPoliciesEntity";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 
 describe("PasswordPoliciesModel", () => {
   let account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
 
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
   describe("::get", () => {
-    it("should get the value from the local storage", async() => {
+    it("should get the value from the local storage", async () => {
       expect.assertions(2);
 
       const expectedPasswordPolicies = defaultPasswordPolicies({
-        default_generator: "passphrase"
+        default_generator: "passphrase",
       });
       const storedEntity = new PasswordPoliciesEntity(expectedPasswordPolicies);
 
@@ -54,7 +54,7 @@ describe("PasswordPoliciesModel", () => {
       expect(spyOnApiFind).not.toHaveBeenCalled();
     });
 
-    it("should return null if nothing is stored on the local storage", async() => {
+    it("should return null if nothing is stored on the local storage", async () => {
       expect.assertions(2);
 
       const model = new PasswordPoliciesModel(account, apiClientOptions);
@@ -69,11 +69,11 @@ describe("PasswordPoliciesModel", () => {
   });
 
   describe("::getOrFind", () => {
-    it("should call the api and return the an entity if the local storage is empty", async() => {
+    it("should call the api and return the an entity if the local storage is empty", async () => {
       expect.assertions(3);
 
       const expectedPasswordPolicies = defaultPasswordPolicies({
-        default_generator: "passphrase"
+        default_generator: "passphrase",
       });
 
       fetch.doMockOnceIf(/password-policies\/settings\.json/, () => mockApiResponse(expectedPasswordPolicies));
@@ -94,11 +94,11 @@ describe("PasswordPoliciesModel", () => {
       expect(resultDto).toStrictEqual(expectedPasswordPolicies);
     });
 
-    it("should call the api, save the result to the local storage and do not ask the API again to find the settings", async() => {
+    it("should call the api, save the result to the local storage and do not ask the API again to find the settings", async () => {
       expect.assertions(8);
 
       const expectedPasswordPolicies = defaultPasswordPolicies({
-        default_generator: "passphrase"
+        default_generator: "passphrase",
       });
 
       fetch.doMockOnceIf(/password-policies\/settings\.json/, () => mockApiResponse(expectedPasswordPolicies));
@@ -128,15 +128,17 @@ describe("PasswordPoliciesModel", () => {
       expect(resultFromLocalStorageDto).toStrictEqual(expectedPasswordPolicies);
     });
 
-    it("should call the api and return a full entity with an old API implementation if the local storage is empty", async() => {
+    it("should call the api and return a full entity with an old API implementation if the local storage is empty", async () => {
       expect.assertions(3);
 
       const oldFormatDto = {
-        default_generator: "passphrase"
+        default_generator: "passphrase",
       };
       const expectedPasswordPolicies = defaultPasswordPolicies(oldFormatDto);
 
-      fetch.doMockOnceIf(/password-policies\/settings\.json/, () => mockApiResponseError(404, "Endpoint is not existing"));
+      fetch.doMockOnceIf(/password-policies\/settings\.json/, () =>
+        mockApiResponseError(404, "Endpoint is not existing"),
+      );
       fetch.doMockOnceIf(/password-generator\/settings\.json/, () => mockApiResponse(oldFormatDto));
 
       const model = new PasswordPoliciesModel(account, apiClientOptions);
@@ -155,10 +157,12 @@ describe("PasswordPoliciesModel", () => {
       expect(resultDto).toStrictEqual(expectedPasswordPolicies);
     });
 
-    it("should throw an error if something goes wrong on the API", async() => {
+    it("should throw an error if something goes wrong on the API", async () => {
       expect.assertions(2);
 
-      const serverErrorCallback = () => { throw new Error("something went wrong"); };
+      const serverErrorCallback = () => {
+        throw new Error("something went wrong");
+      };
       fetch.doMockOnceIf(/password-policies\/settings\.json/, serverErrorCallback);
       fetch.doMockOnceIf(/password-generator\/settings\.json/, serverErrorCallback);
 
@@ -180,14 +184,14 @@ describe("PasswordPoliciesModel", () => {
   });
 
   describe("::save", () => {
-    it("should save the given entity to the API and register the new result onto the local storage", async() => {
+    it("should save the given entity to the API and register the new result onto the local storage", async () => {
       expect.assertions(4);
 
       const expectedPasswordPolicies = defaultPasswordPolicies({
-        default_generator: "passphrase"
+        default_generator: "passphrase",
       });
 
-      fetch.doMockOnceIf(/password-policies\/settings\.json/, async request => {
+      fetch.doMockOnceIf(/password-policies\/settings\.json/, async (request) => {
         const body = JSON.parse(await request.text());
         expect(body).toStrictEqual(expectedPasswordPolicies);
         return mockApiResponse(expectedPasswordPolicies);
@@ -206,14 +210,16 @@ describe("PasswordPoliciesModel", () => {
       expect(resultDto).toStrictEqual(expectedPasswordPolicies);
     });
 
-    it("should throw an excption if the API can't save the entity and not store the entity on the local storage", async() => {
+    it("should throw an excption if the API can't save the entity and not store the entity on the local storage", async () => {
       expect.assertions(2);
 
       const expectedPasswordPolicies = defaultPasswordPolicies({
-        default_generator: "passphrase"
+        default_generator: "passphrase",
       });
 
-      fetch.doMockOnceIf(/password-policies\/settings\.json/, async() => { throw new Error("something went wrong!"); });
+      fetch.doMockOnceIf(/password-policies\/settings\.json/, async () => {
+        throw new Error("something went wrong!");
+      });
 
       const model = new PasswordPoliciesModel(account, apiClientOptions);
       const storage = model.passwordPoliciesLocalStorage;

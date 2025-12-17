@@ -14,7 +14,10 @@
 import CommentEntity from "./commentEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultCommentDto, minimumCommentDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
+import {
+  defaultCommentDto,
+  minimumCommentDto,
+} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
 
 describe("Comment entity", () => {
   describe("::getSchema", () => {
@@ -38,9 +41,7 @@ describe("Comment entity", () => {
     });
 
     it("validates foreign_model property", () => {
-      const expectedValues = [
-        "Resource",
-      ];
+      const expectedValues = ["Resource"];
       const unexpectedValues = ["1", "false", "test"];
       assertEntityProperty.enumeration(CommentEntity, "foreign_model", expectedValues, unexpectedValues);
       assertEntityProperty.required(CommentEntity, "foreign_model");
@@ -115,10 +116,10 @@ describe("Comment entity", () => {
 
       const dto = defaultCommentDto({
         // non supported
-        _type: "None"
+        _type: "None",
       });
       const filtered = defaultCommentDto({
-        id: dto.id
+        id: dto.id,
       });
 
       const entity = new CommentEntity(dto);
@@ -132,23 +133,28 @@ describe("Comment entity", () => {
     it("works with associated user model for creator / modifier", () => {
       expect.assertions(7);
 
-      const dto = defaultCommentDto({}, {
-        withCreator: true,
-        withModifier: true
-      });
+      const dto = defaultCommentDto(
+        {},
+        {
+          withCreator: true,
+          withModifier: true,
+        },
+      );
 
       const entity = new CommentEntity(dto);
-      expect(entity.creator.username).toBe('ada@passbolt.com');
-      expect(entity.creator.profile.firstName).toBe('Ada');
-      expect(entity.creator.profile.avatar.urlMedium).toBe('\/avatars\/view\/e6927385-195c-4c7f-a107-a202ea86de40\/medium.jpg');
+      expect(entity.creator.username).toBe("ada@passbolt.com");
+      expect(entity.creator.profile.firstName).toBe("Ada");
+      expect(entity.creator.profile.avatar.urlMedium).toBe(
+        "\/avatars\/view\/e6927385-195c-4c7f-a107-a202ea86de40\/medium.jpg",
+      );
 
       const serializedDto = entity.toDto();
-      expect(Object.prototype.hasOwnProperty.call(serializedDto, 'creator')).toBe(false);
-      expect(Object.prototype.hasOwnProperty.call(serializedDto, 'modifier')).toBe(false);
+      expect(Object.prototype.hasOwnProperty.call(serializedDto, "creator")).toBe(false);
+      expect(Object.prototype.hasOwnProperty.call(serializedDto, "modifier")).toBe(false);
 
-      const serializedDtoWithAssoc = entity.toDto({creator: true, modifier: true});
-      expect(Object.prototype.hasOwnProperty.call(serializedDtoWithAssoc, 'creator')).toBe(true);
-      expect(Object.prototype.hasOwnProperty.call(serializedDtoWithAssoc, 'modifier')).toBe(true);
+      const serializedDtoWithAssoc = entity.toDto({ creator: true, modifier: true });
+      expect(Object.prototype.hasOwnProperty.call(serializedDtoWithAssoc, "creator")).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(serializedDtoWithAssoc, "modifier")).toBe(true);
     });
   });
 });

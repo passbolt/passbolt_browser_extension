@@ -12,26 +12,26 @@
  * @since         5.4.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {v4 as uuidv4} from "uuid";
-import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
+import { enableFetchMocks } from "jest-fetch-mock";
+import { v4 as uuidv4 } from "uuid";
+import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
 import ActionLogApiService from "./actionLogApiService";
 import AccountEntity from "../../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
-import {defaultActionLogsCollection} from "../../../model/entity/actionLog/actionLogsCollection.test.data";
+import { defaultActionLogsCollection } from "../../../model/entity/actionLog/actionLogsCollection.test.data";
 
 describe("ActionLogService", () => {
   let apiClientOptions, account;
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  describe('::findAllFor', () => {
-    it("Retrieves all action logs for a foreign model", async() => {
+  describe("::findAllFor", () => {
+    it("Retrieves all action logs for a foreign model", async () => {
       expect.assertions(2);
 
       const apiResponse = [defaultActionLogsCollection];
@@ -44,7 +44,7 @@ describe("ActionLogService", () => {
       expect(result).toHaveLength(apiResponse.length);
     });
 
-    it("throws API error if the API encountered an issue", async() => {
+    it("throws API error if the API encountered an issue", async () => {
       expect.assertions(1);
 
       const service = new ActionLogApiService(apiClientOptions, account);

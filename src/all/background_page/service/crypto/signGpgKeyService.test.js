@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 import SignGpgKeyService from "./signGpgKeyService";
-import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
-import {OpenpgpAssertion} from '../../utils/openpgp/openpgpAssertions';
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 describe("SignGpgKey service", () => {
-  it("should sign a given public key with as many as private key provided", async() => {
+  it("should sign a given public key with as many as private key provided", async () => {
     expect.assertions(2);
 
     const keyToSign = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);

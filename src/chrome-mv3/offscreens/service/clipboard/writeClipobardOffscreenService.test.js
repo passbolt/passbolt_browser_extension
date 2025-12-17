@@ -14,17 +14,20 @@
 import WriteClipobardOffscreenService from "./writeClipobardOffscreenService";
 
 export const SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN = "clipboard-write-offscreen";
-export const SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER = "service-worker-clipboard-write-text-offscreen-response-handler";
+export const SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER =
+  "service-worker-clipboard-write-text-offscreen-response-handler";
 
 describe("WriteClipobardOffscreenService", () => {
   describe("::handleClipboardRequest", () => {
-    it("should run the copy to clipboard and return a message tailored for the requester", async() => {
+    it("should run the copy to clipboard and return a message tailored for the requester", async () => {
       expect.assertions(9);
 
       let copiedValue = "";
       const fakeElement = {
         value: "",
-        select: jest.fn().mockImplementation(() => { copiedValue = fakeElement.value; }),
+        select: jest.fn().mockImplementation(() => {
+          copiedValue = fakeElement.value;
+        }),
       };
       global.document = {
         createElement: () => fakeElement,
@@ -32,11 +35,11 @@ describe("WriteClipobardOffscreenService", () => {
           appendChild: jest.fn(),
           removeChild: jest.fn(),
         },
-        execCommand: jest.fn()
+        execCommand: jest.fn(),
       };
 
       const clipboardContent = "test";
-      const result = await WriteClipobardOffscreenService.handleClipboardRequest({clipboardContent});
+      const result = await WriteClipobardOffscreenService.handleClipboardRequest({ clipboardContent });
       const expectedResult = {
         target: "service-worker-clipboard-write-text-offscreen-response-handler",
         data: null,

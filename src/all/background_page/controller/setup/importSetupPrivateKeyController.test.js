@@ -14,15 +14,15 @@
 import ImportSetupPrivateKeyController from "./importSetupPrivateKeyController";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import GpgKeyError from "../../error/GpgKeyError";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import {
   startAccountSetupDto,
-  withServerKeyAccountSetupDto
+  withServerKeyAccountSetupDto,
 } from "../../model/entity/account/accountSetupEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
@@ -41,20 +41,24 @@ beforeEach(() => {
 
 describe("ImportSetupPrivateKeyController", () => {
   describe("GenerateKeyPairSetupController::exec", () => {
-    it("Should throw an exception if the passed DTO is not valid.", async() => {
+    it("Should throw an exception if the passed DTO is not valid.", async () => {
       const account = new AccountSetupEntity(withServerKeyAccountSetupDto());
-      const controller = new ImportSetupPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      const controller = new ImportSetupPrivateKeyController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       const scenarios = [
-        {dto: null, expectedError: Error},
-        {dto: undefined, expectedError: Error},
+        { dto: null, expectedError: Error },
+        { dto: undefined, expectedError: Error },
 
-        {dto: true, expectedError: Error},
-        {dto: 1, expectedError: Error},
-        {dto: "", expectedError: Error},
+        { dto: true, expectedError: Error },
+        { dto: 1, expectedError: Error },
+        { dto: "", expectedError: Error },
 
-        {dto: {}, expectedError: Error},
-        {dto: pgpKeys.ada.public, expectedError: Error}
+        { dto: {}, expectedError: Error },
+        { dto: pgpKeys.ada.public, expectedError: Error },
       ];
 
       expect.assertions(scenarios.length);
@@ -62,7 +66,7 @@ describe("ImportSetupPrivateKeyController", () => {
       for (let i = 0; i < scenarios.length; i++) {
         const scenario = scenarios[i];
         try {
-          jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+          jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
           await controller.exec(scenario.dto);
         } catch (e) {
           expect(e).toBeInstanceOf(scenario.expectedError);
@@ -70,47 +74,66 @@ describe("ImportSetupPrivateKeyController", () => {
       }
     });
 
-    it("Should throw an exception if the setupEntity is not initialized properly.", async() => {
+    it("Should throw an exception if the setupEntity is not initialized properly.", async () => {
       expect.assertions(1);
       const account = new AccountSetupEntity(startAccountSetupDto());
-      const controller = new ImportSetupPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new ImportSetupPrivateKeyController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
 
       try {
         await controller.exec(pgpKeys.ada.private);
       } catch (e) {
-        expect(e).toStrictEqual(new Error('The server public key should have been provided before importing a private key'));
+        expect(e).toStrictEqual(
+          new Error("The server public key should have been provided before importing a private key"),
+        );
       }
     });
 
-    it("Should throw an exception if the process of verification fails.", async() => {
+    it("Should throw an exception if the process of verification fails.", async () => {
       expect.assertions(1);
       await MockExtension.withConfiguredAccount();
 
       const account = new AccountSetupEntity(withServerKeyAccountSetupDto());
-      const controller = new ImportSetupPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      const controller = new ImportSetupPrivateKeyController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(jest.fn());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      jest
+        .spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge")
+        .mockImplementationOnce(jest.fn());
 
       try {
         await controller.exec(pgpKeys.ada.private);
       } catch (e) {
-        expect(e).toStrictEqual(new GpgKeyError('This key is already used by another user.'));
+        expect(e).toStrictEqual(new GpgKeyError("This key is already used by another user."));
       }
     });
 
-    it("Should set the private key and public of the setup entity.", async() => {
+    it("Should set the private key and public of the setup entity.", async () => {
       expect.assertions(14);
       await MockExtension.withConfiguredAccount();
 
       const expectedKeyData = pgpKeys.ada;
       const account = new AccountSetupEntity(withServerKeyAccountSetupDto());
-      const controller = new ImportSetupPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new ImportSetupPrivateKeyController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
       jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
-      jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(() => { throw new Error('User not known'); });
-
+      jest
+        .spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge")
+        .mockImplementationOnce(() => {
+          throw new Error("User not known");
+        });
 
       await controller.exec(expectedKeyData.private);
       await expect(account.userKeyFingerprint).not.toBeNull();
@@ -135,7 +158,10 @@ describe("ImportSetupPrivateKeyController", () => {
       expect(publicKeyInfo.userIds).toStrictEqual(expectedKeyData.user_ids);
       expect(privateKeyInfo.userIds).toStrictEqual(expectedKeyData.user_ids);
 
-      expect(controller.authVerifyServerChallengeService.verifyAndValidateServerChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.serverPublicArmoredKey);
+      expect(controller.authVerifyServerChallengeService.verifyAndValidateServerChallenge).toHaveBeenCalledWith(
+        account.userKeyFingerprint,
+        account.serverPublicArmoredKey,
+      );
       expect(controller.authVerifyServerChallengeService.verifyAndValidateServerChallenge).toHaveBeenCalledTimes(1);
     }, 10000);
   });

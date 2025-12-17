@@ -12,22 +12,22 @@
  * @since         4.12.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {
-  resourceTypesCollectionDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import FindAllByDeletedAndNonDeletedResourceTypesContoller from "./findAllByDeletedAndNonDeletedResourceTypesContoller";
 
 describe("FindAllByDeletedAndNonDeletedResourceTypesContoller", () => {
   describe("::exec", () => {
-    it("Should call for the right service and return the ResourceTypesCollection.", async() => {
+    it("Should call for the right service and return the ResourceTypesCollection.", async () => {
       expect.assertions(2);
 
       const expectedCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
 
       const controller = new FindAllByDeletedAndNonDeletedResourceTypesContoller(null, null, defaultApiClientOptions());
-      jest.spyOn(controller.resourceTypeService, "findAllByDeletedAndNonDeleted").mockImplementationOnce(() => expectedCollection);
+      jest
+        .spyOn(controller.resourceTypeService, "findAllByDeletedAndNonDeleted")
+        .mockImplementationOnce(() => expectedCollection);
 
       const resourceTypesCollection = await controller.exec();
 

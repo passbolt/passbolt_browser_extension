@@ -12,8 +12,8 @@
  * @since         4.0.0
  */
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
-import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
-import {mockPort} from "../../sdk/port/portManager.test.data";
+import { readWorker } from "../../model/entity/worker/workerEntity.test.data";
+import { mockPort } from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
 import PortManager from "../../sdk/port/portManager";
 import WebNavigationService from "../webNavigation/webNavigationService";
@@ -32,7 +32,7 @@ jest.spyOn(WorkerService, "execNavigationForWorkerWaitingConnection");
 jest.spyOn(WebNavigationService, "exec");
 
 describe("TabService", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
     jest.clearAllTimers();
@@ -40,46 +40,46 @@ describe("TabService", () => {
   });
 
   describe("TabService::exec", () => {
-    it("exits if onUpdated event status is not completed", async() => {
+    it("exits if onUpdated event status is not completed", async () => {
       expect.assertions(3);
       // process
-      await TabService.exec(1, {status: "loading"}, null);
+      await TabService.exec(1, { status: "loading" }, null);
       // expectations
       expect(PortManager.getPortById).not.toHaveBeenCalled();
       expect(WorkersSessionStorage.getWorkerOnMainFrame).not.toHaveBeenCalled();
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
     });
 
-    it("exits if tabs onUpdated event tab object has no url", async() => {
+    it("exits if tabs onUpdated event tab object has no url", async () => {
       expect.assertions(3);
       // process
-      await TabService.exec(1, {status: "complete"}, {});
+      await TabService.exec(1, { status: "complete" }, {});
       // expectations
       expect(PortManager.getPortById).not.toHaveBeenCalled();
       expect(WorkersSessionStorage.getWorkerOnMainFrame).not.toHaveBeenCalled();
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
     });
 
-    it("exits if tabs onUpdated event tab object url protocol is not https or https", async() => {
+    it("exits if tabs onUpdated event tab object url protocol is not https or https", async () => {
       expect.assertions(3);
       // process
-      await TabService.exec(1, {status: "complete"}, {url: "about:blank"});
+      await TabService.exec(1, { status: "complete" }, { url: "about:blank" });
       // expectations
       expect(PortManager.getPortById).not.toHaveBeenCalled();
       expect(WorkersSessionStorage.getWorkerOnMainFrame).not.toHaveBeenCalled();
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
     });
 
-    it("exits if 1. a worker was attached to the tab 2. a port is found in runtime memory 3. a content script application is still connected to this port", async() => {
+    it("exits if 1. a worker was attached to the tab 2. a port is found in runtime memory 3. a content script application is still connected to this port", async () => {
       expect.assertions(6);
       // data mocked
       const worker = readWorker();
       const frameDetails = {
         url: "https://passbolt.dev",
         tabId: worker.tabId,
-        frameId: worker.frameId
+        frameId: worker.frameId,
       };
-      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url});
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url });
       const portWrapper = new Port(port);
       jest.spyOn(portWrapper, "request").mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(global, "setTimeout");
@@ -89,27 +89,27 @@ describe("TabService", () => {
       mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => portWrapper);
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {url: "https://passbolt.dev"});
+      await TabService.exec(frameDetails.tabId, { status: "complete" }, { url: "https://passbolt.dev" });
       // await promise resolve to have finally method finished
       await Promise.resolve();
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
-      expect(portWrapper.request).toHaveBeenCalledWith('passbolt.port.check');
+      expect(portWrapper.request).toHaveBeenCalledWith("passbolt.port.check");
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
       // Called 1 times during the execution
       expect(global.setTimeout).toHaveBeenCalledTimes(1);
       expect(global.clearTimeout).toHaveBeenCalledTimes(1);
     });
 
-    it("exits if 1. a worker was attached to the tab 2. NO port is found in runtime memory 3. a content script application was able to reconnect the port", async() => {
+    it("exits if 1. a worker was attached to the tab 2. NO port is found in runtime memory 3. a content script application was able to reconnect the port", async () => {
       expect.assertions(3);
       // data mocked
       const worker = readWorker();
       const frameDetails = {
         url: "https://passbolt.dev",
         tabId: worker.tabId,
-        frameId: worker.frameId
+        frameId: worker.frameId,
       };
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
@@ -118,29 +118,37 @@ describe("TabService", () => {
       mockBrowserTabServiceSendMessage.mockImplementationOnce(jest.fn);
 
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {url: "https://passbolt.dev"});
+      await TabService.exec(frameDetails.tabId, { status: "complete" }, { url: "https://passbolt.dev" });
 
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
-      const expectWorker = {...worker, status: workerEntity.STATUS_RECONNECTING};
-      expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(expect.objectContaining(expectWorker), 'passbolt.port.connect', expectWorker.id);
+      const expectWorker = { ...worker, status: workerEntity.STATUS_RECONNECTING };
+      expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining(expectWorker),
+        "passbolt.port.connect",
+        expectWorker.id,
+      );
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
     });
 
-    it("triggers the pagemods identification process if no worker was previously attached to the tab", async() => {
+    it("triggers the pagemods identification process if no worker was previously attached to the tab", async () => {
       expect.assertions(5);
       // data mocked
       const frameDetails = {
         url: "https://localhost",
         tabId: 1234,
-        frameId: 0
+        frameId: 0,
       };
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       // mock function
       mockWorker.mockImplementationOnce(() => null);
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});
+      await TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: frameDetails.url },
+      );
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
       expect(PortManager.getPortById).not.toHaveBeenCalled();
@@ -150,16 +158,21 @@ describe("TabService", () => {
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
     });
 
-    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. a port is found in runtime memory 3. the port sender url and tab url origins are not similar", async() => {
+    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. a port is found in runtime memory 3. the port sender url and tab url origins are not similar", async () => {
       expect.assertions(5);
       // data mocked
       const worker = readWorker();
       const frameDetails = {
         url: "https://localhost",
         tabId: worker.tabId,
-        frameId: 0
+        frameId: 0,
       };
-      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: "https://passbolt.dev"});
+      const port = mockPort({
+        name: worker.id,
+        tabId: worker.tabId,
+        frameId: worker.frameId,
+        url: "https://passbolt.dev",
+      });
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       // mock function
@@ -167,7 +180,11 @@ describe("TabService", () => {
       mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => new Port(port));
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: "https://localhost"});
+      await TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: "https://localhost" },
+      );
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
@@ -177,16 +194,16 @@ describe("TabService", () => {
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
     });
 
-    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. A port is found in runtime memory 3. No content script application was able to aknowledge presence on the port", async() => {
+    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. A port is found in runtime memory 3. No content script application was able to aknowledge presence on the port", async () => {
       expect.assertions(5);
       // data mocked
       const worker = readWorker();
       const frameDetails = {
         url: "https://localhost",
         tabId: worker.tabId,
-        frameId: 0
+        frameId: 0,
       };
-      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url});
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url });
       const portWrapper = new Port(port);
       jest.spyOn(portWrapper, "request").mockImplementationOnce(() => Promise.reject());
       jest.spyOn(global, "setTimeout");
@@ -196,7 +213,11 @@ describe("TabService", () => {
       mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => portWrapper);
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});
+      await TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: frameDetails.url },
+      );
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
@@ -206,14 +227,14 @@ describe("TabService", () => {
       expect(global.clearTimeout).toHaveBeenCalledTimes(1);
     });
 
-    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. No port is found in runtime memory 3. No content script application was not able to reconnect its port.", async() => {
+    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. No port is found in runtime memory 3. No content script application was not able to reconnect its port.", async () => {
       expect.assertions(3);
       // data mocked
       const worker = readWorker();
       const frameDetails = {
         url: "https://passbolt.dev",
         tabId: worker.tabId,
-        frameId: worker.frameId
+        frameId: worker.frameId,
       };
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
@@ -223,7 +244,11 @@ describe("TabService", () => {
       });
 
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: "https://passbolt.dev"});
+      await TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: "https://passbolt.dev" },
+      );
 
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
@@ -231,10 +256,10 @@ describe("TabService", () => {
       expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
     });
 
-    it("debounces the trigger of the pagemods identification process 1. a worker was attached to the tab 2. the worker is waiting for the content script application to connect its port", async() => {
+    it("debounces the trigger of the pagemods identification process 1. a worker was attached to the tab 2. the worker is waiting for the content script application to connect its port", async () => {
       expect.assertions(5);
       // data mocked
-      const worker = readWorker({status: workerEntity.STATUS_WAITING_CONNECTION});
+      const worker = readWorker({ status: workerEntity.STATUS_WAITING_CONNECTION });
       const frameDetails = {
         url: "https://url.com",
         tabId: worker.tabId,
@@ -246,10 +271,14 @@ describe("TabService", () => {
 
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
-      mockBrowserTabServiceGetById.mockImplementationOnce(() => ({url: frameDetails.url}));
+      mockBrowserTabServiceGetById.mockImplementationOnce(() => ({ url: frameDetails.url }));
 
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});
+      await TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: frameDetails.url },
+      );
       // start the timeout promise
       jest.runAllTimers();
 
@@ -266,10 +295,10 @@ describe("TabService", () => {
       expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
     });
 
-    it("debounces the trigger of the pagemods identification process 1. a worker was attached to the tab 2. the worker is waiting for the content script application to reconnect its port ", async() => {
+    it("debounces the trigger of the pagemods identification process 1. a worker was attached to the tab 2. the worker is waiting for the content script application to reconnect its port ", async () => {
       expect.assertions(5);
       // data mocked
-      const worker = readWorker({status: workerEntity.STATUS_RECONNECTING});
+      const worker = readWorker({ status: workerEntity.STATUS_RECONNECTING });
       const frameDetails = {
         url: "https://url.com",
         tabId: worker.tabId,
@@ -281,10 +310,14 @@ describe("TabService", () => {
 
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
-      mockBrowserTabServiceGetById.mockImplementationOnce(() => ({url: frameDetails.url}));
+      mockBrowserTabServiceGetById.mockImplementationOnce(() => ({ url: frameDetails.url }));
 
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});
+      await TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: frameDetails.url },
+      );
       // start the timeout promise
       jest.runAllTimers();
 

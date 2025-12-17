@@ -20,25 +20,26 @@ beforeEach(() => {
 
 describe("CreateOffscreenDocumentService", () => {
   describe("::createIfNotExistOffscreenDocument", () => {
-    it("should create the offscreen document if it does not exist yet ", async() => {
+    it("should create the offscreen document if it does not exist yet ", async () => {
       expect.assertions(2);
       jest.spyOn(chrome.runtime, "getContexts").mockImplementationOnce(() => []);
       await CreateOffscreenDocumentService.createIfNotExistOffscreenDocument();
 
       const expectedGetContextsData = {
         contextTypes: ["OFFSCREEN_DOCUMENT"],
-        documentUrls: ["chrome-extension://didegimhafipceonhjepacocaffmoppf/offscreens/offscreen.html"]
+        documentUrls: ["chrome-extension://didegimhafipceonhjepacocaffmoppf/offscreens/offscreen.html"],
       };
       const expectedCreateDocumentData = {
         url: "offscreens/offscreen.html",
         reasons: ["WORKERS", "CLIPBOARD"],
-        justification: "1. Read/write clipboard as clipboard API is unavailable in MV3 service workers 2. Perform requests to self hosted Passbolt API serving invalid certificate.",
+        justification:
+          "1. Read/write clipboard as clipboard API is unavailable in MV3 service workers 2. Perform requests to self hosted Passbolt API serving invalid certificate.",
       };
       expect(chrome.runtime.getContexts).toHaveBeenCalledWith(expectedGetContextsData);
       expect(chrome.offscreen.createDocument).toHaveBeenCalledWith(expectedCreateDocumentData);
     });
 
-    it("should not create the offscreen document if it already exist ", async() => {
+    it("should not create the offscreen document if it already exist ", async () => {
       expect.assertions(1);
       jest.spyOn(chrome.runtime, "getContexts").mockImplementationOnce(() => ["shallow-offscreen-document-mock"]);
       await CreateOffscreenDocumentService.createIfNotExistOffscreenDocument();

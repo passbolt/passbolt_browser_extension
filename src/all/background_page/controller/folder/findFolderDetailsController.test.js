@@ -12,8 +12,8 @@
  * @since         4.9.4
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 import FindFolderDetailsController from "./findFolderDetailsController";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import FolderService from "../../service/api/folder/folderService";
@@ -26,9 +26,9 @@ describe("FindFolderDetailsController", () => {
     controller = new FindFolderDetailsController(null, null, apiClientOptions);
   });
   describe("FindFolderDetailsController::exec", () => {
-    it("Should call the findAndUpdateFoldersLocalStorageService", async() => {
+    it("Should call the findAndUpdateFoldersLocalStorageService", async () => {
       expect.assertions(3);
-      const folderDto = defaultFolderDto({}, {withCreator: true, withModifier: true});
+      const folderDto = defaultFolderDto({}, { withCreator: true, withModifier: true });
       jest.spyOn(FolderService.prototype, "get").mockImplementationOnce(() => folderDto);
       jest.spyOn(controller.findFolderService, "findById");
       jest.spyOn(controller.findFolderService, "findByIdWithCreatorAndModifier");
@@ -36,11 +36,14 @@ describe("FindFolderDetailsController", () => {
       const folderEntity = await controller.exec(folderDto.id);
 
       expect(controller.findFolderService.findByIdWithCreatorAndModifier).toHaveBeenCalledTimes(1);
-      expect(controller.findFolderService.findById).toHaveBeenCalledWith(folderDto.id, {creator: true, modifier: true});
+      expect(controller.findFolderService.findById).toHaveBeenCalledWith(folderDto.id, {
+        creator: true,
+        modifier: true,
+      });
       expect(folderEntity).toEqual(new FolderEntity(folderDto));
     });
 
-    it("Should throw an error if folder id is not an uuid", async() => {
+    it("Should throw an error if folder id is not an uuid", async () => {
       expect.assertions(1);
 
       const promise = controller.exec();

@@ -14,7 +14,7 @@
 
 import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import RemovePortController from "./removePortController";
-import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
+import { readWorker } from "../../model/entity/worker/workerEntity.test.data";
 import PortManager from "../../sdk/port/portManager";
 import Port from "../../sdk/port";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
@@ -23,7 +23,7 @@ jest.spyOn(WorkersSessionStorage, "getWorkersByNameAndTabId");
 jest.spyOn(WorkersSessionStorage, "deleteById");
 jest.spyOn(PortManager, "removePort");
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.resetModules();
   jest.clearAllMocks();
   await PortManager.flush();
@@ -31,10 +31,10 @@ beforeEach(async() => {
 
 describe("RemovePortController", () => {
   describe("RemovePortController::isAllowedToRemovePort", () => {
-    it("Should allowed to remove port", async() => {
+    it("Should allowed to remove port", async () => {
       expect.assertions(6);
       // data mocked
-      const worker = readWorker({name: "WebIntegration"});
+      const worker = readWorker({ name: "WebIntegration" });
       // process
       const controller = new RemovePortController(worker);
       // expectations
@@ -46,10 +46,10 @@ describe("RemovePortController", () => {
       expect(controller.isAllowedToRemovePort(worker.name, "InFormMenu")).toBeTruthy();
     });
 
-    it("Should not allowed to remove port for unknown application", async() => {
+    it("Should not allowed to remove port for unknown application", async () => {
       expect.assertions(2);
       // data mocked
-      const worker = readWorker({name: "Unknown"});
+      const worker = readWorker({ name: "Unknown" });
       // process
       const controller = new RemovePortController(worker);
       // expectations
@@ -59,48 +59,68 @@ describe("RemovePortController", () => {
   });
 
   describe("RemovePortController::exec", () => {
-    it("Should remove worker and port for InformMenu", async() => {
+    it("Should remove worker and port for InformMenu", async () => {
       expect.assertions(3);
       // data mocked
-      const workerWebIntegration = readWorker({name: "WebIntegration"});
-      const workerInformMenu = readWorker({name: "InFormMenu", tabId: workerWebIntegration.tabId, frameId: 1234});
+      const workerWebIntegration = readWorker({ name: "WebIntegration" });
+      const workerInformMenu = readWorker({ name: "InFormMenu", tabId: workerWebIntegration.tabId, frameId: 1234 });
       // process
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerWebIntegration));
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerInformMenu));
-      const controller = new RemovePortController({name: workerWebIntegration.name, tab: {id: workerWebIntegration.tabId}});
+      const controller = new RemovePortController({
+        name: workerWebIntegration.name,
+        tab: { id: workerWebIntegration.tabId },
+      });
       await controller.exec("InFormMenu");
       // expectations
-      expect(WorkersSessionStorage.getWorkersByNameAndTabId).toHaveBeenCalledWith(workerInformMenu.name, workerWebIntegration.tabId);
-      expect(PortManager.removePort).toHaveBeenCalledWith(workerInformMenu.id, {"reason": "disconnected"});
+      expect(WorkersSessionStorage.getWorkersByNameAndTabId).toHaveBeenCalledWith(
+        workerInformMenu.name,
+        workerWebIntegration.tabId,
+      );
+      expect(PortManager.removePort).toHaveBeenCalledWith(workerInformMenu.id, { reason: "disconnected" });
       expect(WorkersSessionStorage.deleteById).toHaveBeenCalledWith(workerInformMenu.id);
     });
 
-    it("Should remove worker and port for InformCallToAction", async() => {
+    it("Should remove worker and port for InformCallToAction", async () => {
       expect.assertions(5);
       // data mocked
-      const workerWebIntegration = readWorker({name: "WebIntegration"});
-      const workerInformCallToAction = readWorker({name: "InFormCallToAction", tabId: workerWebIntegration.tabId, frameId: 1234});
-      const workerInformCallToActionToRemoved = readWorker({name: "InFormCallToAction", tabId: workerWebIntegration.tabId, frameId: 12345});
-      const workerInformCallToActionNotExist = readWorker({name: "InFormCallToAction", tabId: workerWebIntegration.tabId, frameId: 123456});
+      const workerWebIntegration = readWorker({ name: "WebIntegration" });
+      const workerInformCallToAction = readWorker({
+        name: "InFormCallToAction",
+        tabId: workerWebIntegration.tabId,
+        frameId: 1234,
+      });
+      const workerInformCallToActionToRemoved = readWorker({
+        name: "InFormCallToAction",
+        tabId: workerWebIntegration.tabId,
+        frameId: 12345,
+      });
+      const workerInformCallToActionNotExist = readWorker({
+        name: "InFormCallToAction",
+        tabId: workerWebIntegration.tabId,
+        frameId: 123456,
+      });
       const port = {
         name: workerInformCallToAction.id,
         onMessage: {
-          addListener: () => jest.fn()
+          addListener: () => jest.fn(),
         },
         onDisconnect: {
-          addListener: () => jest.fn()
+          addListener: () => jest.fn(),
         },
-        postMessage: () => jest.fn()
+        postMessage: () => jest.fn(),
       };
       const portDisconnected = {
         name: workerInformCallToActionToRemoved.id,
         onMessage: {
-          addListener: () => jest.fn()
+          addListener: () => jest.fn(),
         },
         onDisconnect: {
-          addListener: () => jest.fn()
+          addListener: () => jest.fn(),
         },
-        postMessage: () => { throw new Error('Disconnected'); }
+        postMessage: () => {
+          throw new Error("Disconnected");
+        },
       };
       const portInformCallToAction = new Port(port);
       const portInformCallToActionToRemoved = new Port(portDisconnected);
@@ -111,24 +131,32 @@ describe("RemovePortController", () => {
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerInformCallToActionNotExist));
       PortManager.registerPort(portInformCallToAction);
       PortManager.registerPort(portInformCallToActionToRemoved);
-      const controller = new RemovePortController({name: workerWebIntegration.name, tab: {id: workerWebIntegration.tabId}});
+      const controller = new RemovePortController({
+        name: workerWebIntegration.name,
+        tab: { id: workerWebIntegration.tabId },
+      });
       await controller.exec("InFormCallToAction");
       // expectations
-      expect(WorkersSessionStorage.getWorkersByNameAndTabId).toHaveBeenCalledWith(workerInformCallToActionToRemoved.name, workerWebIntegration.tabId);
-      expect(PortManager.removePort).toHaveBeenCalledWith(workerInformCallToActionToRemoved.id, {"reason": "disconnected"});
+      expect(WorkersSessionStorage.getWorkersByNameAndTabId).toHaveBeenCalledWith(
+        workerInformCallToActionToRemoved.name,
+        workerWebIntegration.tabId,
+      );
+      expect(PortManager.removePort).toHaveBeenCalledWith(workerInformCallToActionToRemoved.id, {
+        reason: "disconnected",
+      });
       expect(WorkersSessionStorage.deleteById).toHaveBeenCalledWith(workerInformCallToActionToRemoved.id);
       expect(WorkersSessionStorage.deleteById).toHaveBeenCalledWith(workerInformCallToActionNotExist.id);
       expect((await WorkersSessionStorage.getWorkers()).length).toStrictEqual(2);
     });
 
-    it("Should not remove worker and port for application not allowed", async() => {
+    it("Should not remove worker and port for application not allowed", async () => {
       expect.assertions(1);
       // data mocked
       const worker = {
         tab: {
-          id: 1
+          id: 1,
         },
-        name: "WebIntegration"
+        name: "WebIntegration",
       };
       // process
       const controller = new RemovePortController(worker);
@@ -140,19 +168,19 @@ describe("RemovePortController", () => {
       }
     });
 
-    it("Should not remove worker and port for an application name that is not a string", async() => {
+    it("Should not remove worker and port for an application name that is not a string", async () => {
       expect.assertions(1);
       // data mocked
       const worker = {
         tab: {
-          id: 1
+          id: 1,
         },
-        name: "WebIntegration"
+        name: "WebIntegration",
       };
       // process
       const controller = new RemovePortController(worker);
       try {
-        await controller.exec({name: "QuickAccess"});
+        await controller.exec({ name: "QuickAccess" });
       } catch (error) {
         // expectations
         expect(error.message).toStrictEqual("The application name should be a string");

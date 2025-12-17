@@ -29,12 +29,12 @@ export const defaultGpgAuthTokenVerifyHeadersDto = (data = {}) => {
     "x-gpgauth-pubkey-url": "/auth/verify.json",
     "x-gpgauth-verify-response": gpgAuthToken.token,
     "x-gpgauth-verify-url": "/auth/verify",
-    "x-gpgauth-version": "1.3.0"
+    "x-gpgauth-version": "1.3.0",
   };
   const defaultData = {
     ...headers,
-    has: value => Boolean(headers[value]),
-    get: value => headers[value]
+    has: (value) => Boolean(headers[value]),
+    get: (value) => headers[value],
   };
   return Object.assign(defaultData, data);
 };
@@ -53,12 +53,12 @@ export const defaultGpgAuthTokenLoginStage1HeadersDto = (data = {}) => {
     "x-gpgauth-pubkey-url": "/auth/verify.json",
     "x-gpgauth-user-auth-token": data.token,
     "x-gpgauth-verify-url": "/auth/verify",
-    "x-gpgauth-version": "1.3.0"
+    "x-gpgauth-version": "1.3.0",
   };
   const defaultData = {
     ...headers,
-    has: value => Boolean(headers[value]),
-    get: value => headers[value]
+    has: (value) => Boolean(headers[value]),
+    get: (value) => headers[value],
   };
   return Object.assign(defaultData, data);
 };
@@ -77,12 +77,12 @@ export const defaultGpgAuthTokenLoginCompleteHeadersDto = (data = {}) => {
     "x-gpgauth-pubkey-url": "/auth/verify.json",
     "x-gpgauth-refer": "/",
     "x-gpgauth-verify-url": "/auth/verify",
-    "x-gpgauth-version": "1.3.0"
+    "x-gpgauth-version": "1.3.0",
   };
   const defaultData = {
     ...headers,
-    has: value => Boolean(headers[value]),
-    get: value => headers[value]
+    has: (value) => Boolean(headers[value]),
+    get: (value) => headers[value],
   };
   return Object.assign(defaultData, data);
 };

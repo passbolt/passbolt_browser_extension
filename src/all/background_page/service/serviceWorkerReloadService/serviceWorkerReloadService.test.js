@@ -20,7 +20,7 @@ import ServiceWorkerReloadService from "./serviceWorkerReloadService";
 
 describe("ServiceWorkerReloadService", () => {
   describe("::reloadIfNecessary", () => {
-    it("should not reload the service worker if it is not necessary", async() => {
+    it("should not reload the service worker if it is not necessary", async () => {
       expect.assertions(2);
 
       jest.spyOn(browser.runtime, "reload").mockImplementation(() => {});
@@ -32,7 +32,7 @@ describe("ServiceWorkerReloadService", () => {
       expect(WorkerService.destroyWorkersByName).not.toHaveBeenCalled();
     });
 
-    it("should reload the service worker if it is necessary", async() => {
+    it("should reload the service worker if it is necessary", async () => {
       expect.assertions(4);
 
       const storage = new BrowserExtensionUpdatedLocalStorage();
@@ -45,7 +45,10 @@ describe("ServiceWorkerReloadService", () => {
 
       expect(browser.runtime.reload).toHaveBeenCalledTimes(1);
       expect(WorkerService.destroyWorkersByName).toHaveBeenCalledTimes(1);
-      expect(WorkerService.destroyWorkersByName).toHaveBeenCalledWith([webIntegrationPagemod.appName, publicWebsiteSignInPagemod.appName]);
+      expect(WorkerService.destroyWorkersByName).toHaveBeenCalledWith([
+        webIntegrationPagemod.appName,
+        publicWebsiteSignInPagemod.appName,
+      ]);
 
       const storedData = await storage.get();
       expect(storedData).toBeUndefined();

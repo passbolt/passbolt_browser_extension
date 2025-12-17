@@ -16,7 +16,7 @@ import AuthBootstrap from "./authBootstrapPagemod";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
-import {PortEvents} from "../event/portEvents";
+import { PortEvents } from "../event/portEvents";
 import each from "jest-each";
 import Pagemod from "./pagemod";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
@@ -34,7 +34,7 @@ describe("AuthBootstrap", () => {
   });
 
   describe("AuthBootstrap::injectFile", () => {
-    it("Should inject file", async() => {
+    it("Should inject file", async () => {
       expect.assertions(10);
       // process
       await AuthBootstrap.injectFiles(1, 0);
@@ -44,51 +44,61 @@ describe("AuthBootstrap", () => {
       expect(ScriptExecution.prototype.injectPortname).toHaveBeenCalledTimes(1);
       expect(ScriptExecution.prototype.injectCss).toHaveBeenCalledWith(AuthBootstrap.contentStyleFiles);
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(AuthBootstrap.contentScriptFiles);
-      expect(AuthBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
-      expect(AuthBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/login.js']);
+      expect(AuthBootstrap.contentStyleFiles).toStrictEqual([
+        "webAccessibleResources/css/themes/default/ext_external.min.css",
+      ]);
+      expect(AuthBootstrap.contentScriptFiles).toStrictEqual([
+        "contentScripts/js/dist/vendors.js",
+        "contentScripts/js/dist/login.js",
+      ]);
       expect(AuthBootstrap.events).toStrictEqual([PortEvents]);
       expect(AuthBootstrap.mustReloadOnExtensionUpdate).toBeTruthy();
-      expect(AuthBootstrap.appName).toBe('AuthBootstrap');
+      expect(AuthBootstrap.appName).toBe("AuthBootstrap");
     });
   });
 
   describe("AuthBootstrap::canBeAttachedTo", () => {
-    it("Should be able to attach auth bootstrap pagemod to browser frame", async() => {
+    it("Should be able to attach auth bootstrap pagemod to browser frame", async () => {
       expect.assertions(1);
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
-      const result = await AuthBootstrap.canBeAttachedTo({frameId: Pagemod.TOP_FRAME_ID, url: "https://passbolt.dev/auth/login"});
+      const result = await AuthBootstrap.canBeAttachedTo({
+        frameId: Pagemod.TOP_FRAME_ID,
+        url: "https://passbolt.dev/auth/login",
+      });
       expect(result).toBeTruthy();
     });
 
     each([
-      {scenario: "No domain", url: "auth/login", frameId: Pagemod.TOP_FRAME_ID},
-      {scenario: "Not top frame", url: "https://passbolt.dev/auth/login", frameId: 1},
-    ]).describe("Should not be able to attach a pagemod to browser frame", _props => {
-      it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async() => {
+      { scenario: "No domain", url: "auth/login", frameId: Pagemod.TOP_FRAME_ID },
+      { scenario: "Not top frame", url: "https://passbolt.dev/auth/login", frameId: 1 },
+    ]).describe("Should not be able to attach a pagemod to browser frame", (_props) => {
+      it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         // mock functions
         jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
         jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
-        const result = await AuthBootstrap.canBeAttachedTo({frameId: _props.frameId, url: _props.url});
+        const result = await AuthBootstrap.canBeAttachedTo({ frameId: _props.frameId, url: _props.url });
         expect(result).toBeFalsy();
       });
     });
 
-    it("Should have the constraint not valid if the user is not valid", async() => {
+    it("Should have the constraint not valid if the user is not valid", async () => {
       expect.assertions(1);
       // mock functions
-      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => { throw new Error(); });
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {
+        throw new Error();
+      });
       // process
-      const result = await AuthBootstrap.canBeAttachedTo({frameId: 0});
+      const result = await AuthBootstrap.canBeAttachedTo({ frameId: 0 });
       // expectations
       expect(result).toBeFalsy();
     });
   });
 
   describe("AuthBootstrap::attachEvents", () => {
-    it("Should attach events", async() => {
+    it("Should attach events", async () => {
       expect.assertions(1);
       // data mocked
       const port = {
@@ -96,15 +106,19 @@ describe("AuthBootstrap", () => {
         _port: {
           sender: {
             tab: {
-              url: "https://passbolt.dev/auth/login"
-            }
-          }
-        }
+              url: "https://passbolt.dev/auth/login",
+            },
+          },
+        },
       };
       // process
       await AuthBootstrap.attachEvents(port);
       // expectations
-      expect(PortEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: AuthBootstrap.appName});
+      expect(PortEvents.listen).toHaveBeenCalledWith({
+        port: port,
+        tab: port._port.sender.tab,
+        name: AuthBootstrap.appName,
+      });
     });
   });
 });

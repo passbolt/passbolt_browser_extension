@@ -21,14 +21,17 @@ import {
   createAlternativeAccountRecoveryOrganizationPublicKeyDto,
   createRevokedAccountRecoveryOrganizationPublicKeyDto,
   defaultAccountRecoveryOrganizationPublicKeyDto,
-  revokedAccountRecoveryOrganizationPublicKeyDto
+  revokedAccountRecoveryOrganizationPublicKeyDto,
 } from "./accountRecoveryOrganizationPublicKeyEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("AccountRecoveryOrganizationPublicKey entity", () => {
   describe("AccountRecoveryOrganizationPublicKeyEntity::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME, AccountRecoveryOrganizationPublicKeyEntity.getSchema());
+      EntitySchema.validateSchema(
+        AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME,
+        AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
+      );
     });
 
     it("validates id property", () => {
@@ -43,12 +46,16 @@ describe("AccountRecoveryOrganizationPublicKey entity", () => {
     });
 
     it("validates fingerprint property", () => {
-      const successScenarios = [
-        {scenario: "with a valid fingerprint string", value: "ABCD".repeat(10)},
-      ];
+      const successScenarios = [{ scenario: "with a valid fingerprint string", value: "ABCD".repeat(10) }];
       // the fingerprint is sanitized and therefore we can't pass a bad value
       const failingScenarios = [];
-      assertEntityProperty.assert(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint", successScenarios, failingScenarios, "format");
+      assertEntityProperty.assert(
+        AccountRecoveryOrganizationPublicKeyEntity,
+        "fingerprint",
+        successScenarios,
+        failingScenarios,
+        "format",
+      );
       assertEntityProperty.nullable(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint");
       assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint");
     });
@@ -83,17 +90,16 @@ describe("AccountRecoveryOrganizationPublicKey entity", () => {
   });
 
   each([
-    {scenario: "Create", dto: createAccountRecoveryOrganizationPublicKeyDto()},
-    {scenario: "Read", dto: defaultAccountRecoveryOrganizationPublicKeyDto()},
-    {scenario: "Create revoked", dto: createRevokedAccountRecoveryOrganizationPublicKeyDto()},
-    {scenario: "Read revoked", dto: revokedAccountRecoveryOrganizationPublicKeyDto()},
-    {scenario: "Create alternative", dto: createAlternativeAccountRecoveryOrganizationPublicKeyDto()},
-    {scenario: "Read alternative", dto: alternativeAccountRecoveryOrganizationPublicKeyDto()},
-  ]).describe("constructor works with data", _props => {
+    { scenario: "Create", dto: createAccountRecoveryOrganizationPublicKeyDto() },
+    { scenario: "Read", dto: defaultAccountRecoveryOrganizationPublicKeyDto() },
+    { scenario: "Create revoked", dto: createRevokedAccountRecoveryOrganizationPublicKeyDto() },
+    { scenario: "Read revoked", dto: revokedAccountRecoveryOrganizationPublicKeyDto() },
+    { scenario: "Create alternative", dto: createAlternativeAccountRecoveryOrganizationPublicKeyDto() },
+    { scenario: "Read alternative", dto: alternativeAccountRecoveryOrganizationPublicKeyDto() },
+  ]).describe("constructor works with data", (_props) => {
     it(`it supports scenario ${_props.scenario}`, () => {
       const entity = new AccountRecoveryOrganizationPublicKeyEntity(_props.dto);
       expect(entity.toJSON()).toEqual(_props.dto);
     });
   });
 });
-

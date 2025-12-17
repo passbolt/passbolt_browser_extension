@@ -12,13 +12,13 @@
  * @since         5.7.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GroupsCollection from "../../model/entity/group/groupsCollection";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import UpdateAllGroupsLocalStorageController from "./updateAllGroupsLocalStorageController";
 import FindAndUpdateGroupsLocalStorageService from "../../service/group/findAndUpdateGroupsLocalStorageService";
-import {setupMockData} from "../../service/group/findGroupsService.test.data";
+import { setupMockData } from "../../service/group/findGroupsService.test.data";
 
 describe("UpdateAllGroupsLocalStorageController", () => {
   let controller;
@@ -31,13 +31,15 @@ describe("UpdateAllGroupsLocalStorageController", () => {
   });
 
   describe("UpdateAllGroupsLocalStorageController::exec", () => {
-    it("Should call for the service to find groups and update the local storage", async() => {
+    it("Should call for the service to find groups and update the local storage", async () => {
       expect.assertions(2);
 
       const groupsDtos = setupMockData();
       const groupCollection = new GroupsCollection(groupsDtos);
 
-      jest.spyOn(FindAndUpdateGroupsLocalStorageService.prototype, "findAndUpdateAll").mockResolvedValue(groupCollection);
+      jest
+        .spyOn(FindAndUpdateGroupsLocalStorageService.prototype, "findAndUpdateAll")
+        .mockResolvedValue(groupCollection);
       const result = await controller.exec();
 
       expect(result).toStrictEqual(groupCollection);

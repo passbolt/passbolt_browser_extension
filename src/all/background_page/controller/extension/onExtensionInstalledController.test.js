@@ -28,49 +28,67 @@ beforeEach(() => {
 
 describe("OnExtensionInstalledController", () => {
   describe("OnExtensionInstalledController::exec", () => {
-    it("Should exec install if the reason is install", async() => {
+    it("Should exec install if the reason is install", async () => {
       expect.assertions(7);
       // data mocked
       const details = {
-        reason: browser.runtime.OnInstalledReason.INSTALL
+        reason: browser.runtime.OnInstalledReason.INSTALL,
       };
       const tabs = [
-        {id: 1, url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
-        {id: 2, url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
-        {id: 3, url: "https://passbolt.dev/auth/login"},
-        {id: 4, url: "https://localhost"},
-        {id: 5, url: "https://chromewebstore.google.com/id/passbolt"},
-        {id: 6, url: "https://addons.mozilla.org/id/passbolt"}
+        {
+          id: 1,
+          url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+        },
+        {
+          id: 2,
+          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+        },
+        { id: 3, url: "https://passbolt.dev/auth/login" },
+        { id: 4, url: "https://localhost" },
+        { id: 5, url: "https://chromewebstore.google.com/id/passbolt" },
+        { id: 6, url: "https://addons.mozilla.org/id/passbolt" },
       ];
       // mock function
       jest.spyOn(OnExtensionInstalledController, "onInstall");
       jest.spyOn(browser.tabs, "query").mockImplementation(() => Promise.resolve(tabs));
-      jest.spyOn(browser.tabs, "update").mockImplementation(tabId => tabs.find(tab => tab.id === tabId));
+      jest.spyOn(browser.tabs, "update").mockImplementation((tabId) => tabs.find((tab) => tab.id === tabId));
       // process
       await OnExtensionInstalledController.exec(details);
       // expectation
       expect(OnExtensionInstalledController.onInstall).toHaveBeenCalled();
-      expect(browser.tabs.update).toHaveBeenCalledWith(tabs[0].id, {url: `${tabs[0].url}?first-install=1`, active: true});
-      expect(browser.tabs.update).toHaveBeenCalledWith(tabs[1].id, {url: `${tabs[1].url}?first-install=1`, active: true});
+      expect(browser.tabs.update).toHaveBeenCalledWith(tabs[0].id, {
+        url: `${tabs[0].url}?first-install=1`,
+        active: true,
+      });
+      expect(browser.tabs.update).toHaveBeenCalledWith(tabs[1].id, {
+        url: `${tabs[1].url}?first-install=1`,
+        active: true,
+      });
       expect(browser.tabs.update).toHaveBeenCalledTimes(2);
       expect(browser.tabs.remove).toHaveBeenCalledWith(tabs[4].id);
       expect(browser.tabs.remove).toHaveBeenCalledWith(tabs[5].id);
       expect(browser.tabs.remove).toHaveBeenCalledTimes(2);
     });
 
-    it("Should exec update if the reason is update", async() => {
+    it("Should exec update if the reason is update", async () => {
       expect.assertions(9);
       // data mocked
       const details = {
-        reason: browser.runtime.OnInstalledReason.UPDATE
+        reason: browser.runtime.OnInstalledReason.UPDATE,
       };
       const tabs = [
-        {id: 1, url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
-        {id: 2, url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
-        {id: 3, url: "https://passbolt.dev/auth/login"},
-        {id: 4, url: "https://passbolt.dev"},
-        {id: 5, url: "https://passbolt.com"},
-        {id: 6, url: "https://localhost"}
+        {
+          id: 1,
+          url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+        },
+        {
+          id: 2,
+          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+        },
+        { id: 3, url: "https://passbolt.dev/auth/login" },
+        { id: 4, url: "https://passbolt.dev" },
+        { id: 5, url: "https://passbolt.com" },
+        { id: 6, url: "https://localhost" },
       ];
       // mock function
       jest.spyOn(OnExtensionInstalledController, "onUpdate");
@@ -87,16 +105,16 @@ describe("OnExtensionInstalledController", () => {
       expect(browser.tabs.reload).toHaveBeenCalledWith(tabs[2].id);
       expect(browser.tabs.reload).toHaveBeenCalledWith(tabs[3].id);
       expect(browser.tabs.reload).toHaveBeenCalledTimes(4);
-      expect(WebNavigationService.exec).toHaveBeenCalledWith({frameId: 0, tabId: tabs[4].id, url: tabs[4].url});
-      expect(WebNavigationService.exec).toHaveBeenCalledWith({frameId: 0, tabId: tabs[5].id, url: tabs[5].url});
+      expect(WebNavigationService.exec).toHaveBeenCalledWith({ frameId: 0, tabId: tabs[4].id, url: tabs[4].url });
+      expect(WebNavigationService.exec).toHaveBeenCalledWith({ frameId: 0, tabId: tabs[5].id, url: tabs[5].url });
       expect(WebNavigationService.exec).toHaveBeenCalledTimes(2);
     });
 
-    it("Should exec browser update if the reason is chrome update", async() => {
+    it("Should exec browser update if the reason is chrome update", async () => {
       expect.assertions(3);
       // data mocked
       const details = {
-        reason: browser.runtime.OnInstalledReason.CHROME_UPDATE
+        reason: browser.runtime.OnInstalledReason.CHROME_UPDATE,
       };
       // mock function
       jest.spyOn(OnExtensionInstalledController, "onBrowserUpdate");
@@ -110,19 +128,22 @@ describe("OnExtensionInstalledController", () => {
       expect(AuthModel.prototype.logout).toHaveBeenCalledTimes(0);
     });
 
-    it("Should exec browser update if the reason is browser update", async() => {
+    it("Should exec browser update if the reason is browser update", async () => {
       expect.assertions(4);
       // data mocked
       const details = {
-        reason: browser.runtime.OnInstalledReason.BROWSER_UPDATE
+        reason: browser.runtime.OnInstalledReason.BROWSER_UPDATE,
       };
       const tabs = [
-        {id: 1, url: "https://passbolt.dev/app/passwords"},
-        {id: 2, url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
-        {id: 3, url: "https://passbolt.dev/auth/login"},
-        {id: 4, url: "https://passbolt.dev"},
-        {id: 5, url: "https://passbolt.com"},
-        {id: 6, url: "https://localhost"}
+        { id: 1, url: "https://passbolt.dev/app/passwords" },
+        {
+          id: 2,
+          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+        },
+        { id: 3, url: "https://passbolt.dev/auth/login" },
+        { id: 4, url: "https://passbolt.dev" },
+        { id: 5, url: "https://passbolt.com" },
+        { id: 6, url: "https://localhost" },
       ];
       // mock function
       jest.spyOn(OnExtensionInstalledController, "onBrowserUpdate");
@@ -131,7 +152,9 @@ describe("OnExtensionInstalledController", () => {
       jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
       jest.spyOn(browser.tabs, "query").mockImplementation(() => Promise.resolve(tabs));
       jest.spyOn(browser.tabs, "reload");
-      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => ({isAuthenticated: true}));
+      jest
+        .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
+        .mockImplementation(() => ({ isAuthenticated: true }));
       // process
       await OnExtensionInstalledController.exec(details);
       // expectation
@@ -141,11 +164,11 @@ describe("OnExtensionInstalledController", () => {
       expect(browser.tabs.reload).toHaveBeenCalledWith(tabs[0].id);
     });
 
-    it("Should not exec update neither install if the reason is unknown", async() => {
+    it("Should not exec update neither install if the reason is unknown", async () => {
       expect.assertions(3);
       // data mocked
       const details = {
-        reason: "unknown"
+        reason: "unknown",
       };
       // mock function
       jest.spyOn(OnExtensionInstalledController, "onUpdate");

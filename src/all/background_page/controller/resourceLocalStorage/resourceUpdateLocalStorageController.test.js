@@ -12,21 +12,21 @@
  * @since         4.9.4
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import ResourceUpdateLocalStorageController from "./resourceUpdateLocalStorageController";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import ResourceService from "../../service/api/resource/resourceService";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
-import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import {TEST_RESOURCE_TYPE_V5_DEFAULT} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {METADATA_KEY_TYPE_USER_KEY} from "../../model/entity/resource/resourceEntity";
-import {v4 as uuidv4} from "uuid";
-import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { TEST_RESOURCE_TYPE_V5_DEFAULT } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import { METADATA_KEY_TYPE_USER_KEY } from "../../model/entity/resource/resourceEntity";
+import { v4 as uuidv4 } from "uuid";
+import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 
 describe("ResourceUpdateLocalStorageController", () => {
   let controller, worker;
@@ -34,47 +34,52 @@ describe("ResourceUpdateLocalStorageController", () => {
   beforeEach(() => {
     worker = {
       port: {
-        emit: jest.fn()
-      }
+        emit: jest.fn(),
+      },
     };
     const account = new AccountEntity(defaultAccountDto());
     const apiClientOptions = defaultApiClientOptions();
     controller = new ResourceUpdateLocalStorageController(worker, null, apiClientOptions, account);
   });
   describe("ResourceUpdateLocalStorageController::_exec", () => {
-    it("Should call the resourceLocalStorageUpdateService and emit a success message", async() => {
+    it("Should call the resourceLocalStorageUpdateService and emit a success message", async () => {
       expect.assertions(3);
 
       jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateAll").mockImplementationOnce(jest.fn());
-      await controller._exec({updatePeriodThreshold: 10000});
+      await controller._exec({ updatePeriodThreshold: 10000 });
 
       expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
-      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledWith({updatePeriodThreshold: 10000});
-      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'SUCCESS');
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledWith({
+        updatePeriodThreshold: 10000,
+      });
+      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "SUCCESS");
     });
 
-    it("Should call the resourceUpdateService and emit an error message", async() => {
+    it("Should call the resourceUpdateService and emit an error message", async () => {
       expect.assertions(2);
 
       const error = new Error();
-      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateAll").mockImplementationOnce(() => { throw error; });
+      jest.spyOn(controller.findAndUpdateResourcesLocalStorage, "findAndUpdateAll").mockImplementationOnce(() => {
+        throw error;
+      });
       await controller._exec();
 
-      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledWith({"updatePeriodThreshold": 10000});
-      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, 'ERROR', error);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledWith({
+        updatePeriodThreshold: 10000,
+      });
+      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "ERROR", error);
     });
 
-    it("requests the user passphrase whenever the decryption of the metadata requires it and try to load the data again", async() => {
+    it("requests the user passphrase whenever the decryption of the metadata requires it and try to load the data again", async () => {
       expect.assertions(4);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [defaultResourceDto(
-        {
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [
+        defaultResourceDto({
           resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
           metadata_key_type: METADATA_KEY_TYPE_USER_KEY,
           metadata_key_id: uuidv4(),
-          metadata: metadata.withAdaKey.encryptedMetadata[0]
-        }
-      )
+          metadata: metadata.withAdaKey.encryptedMetadata[0],
+        }),
       ]);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
       jest.spyOn(GetPassphraseService.prototype, "requestPassphrase").mockImplementation(() => pgpKeys.ada.passphrase);
@@ -85,8 +90,14 @@ describe("ResourceUpdateLocalStorageController", () => {
 
       expect(PassphraseStorageService.set).toHaveBeenCalledWith(pgpKeys.ada.passphrase, 60);
       expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(2);
-      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenNthCalledWith(1, {"updatePeriodThreshold": 10000});
-      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenNthCalledWith(2, {}, pgpKeys.ada.passphrase);
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenNthCalledWith(1, {
+        updatePeriodThreshold: 10000,
+      });
+      expect(controller.findAndUpdateResourcesLocalStorage.findAndUpdateAll).toHaveBeenNthCalledWith(
+        2,
+        {},
+        pgpKeys.ada.passphrase,
+      );
     });
   });
 });

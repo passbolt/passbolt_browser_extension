@@ -12,18 +12,16 @@
  * @since         4.11.0
  */
 
-import {defaultUsersDtos} from "passbolt-styleguide/src/shared/models/entity/user/usersCollection.test.data";
+import { defaultUsersDtos } from "passbolt-styleguide/src/shared/models/entity/user/usersCollection.test.data";
 import UsersCollection from "../../model/entity/user/usersCollection";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindUsersService from "./findUsersService";
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import UserLocalStorage from "../local_storage/userLocalStorage";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
-import {
-  customEmailValidationProOrganizationSettings
-} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { customEmailValidationProOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
 
@@ -41,13 +39,13 @@ describe("FindResourcesService", () => {
     role: false,
   };
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     apiClientOptions = defaultApiClientOptions();
     findUsersService = new FindUsersService(account, apiClientOptions);
   });
 
   describe("::findAll", () => {
-    it("returns all users as a collection.", async() => {
+    it("returns all users as a collection.", async () => {
       expect.assertions(2);
 
       const usersDto = defaultUsersDtos();
@@ -59,7 +57,7 @@ describe("FindResourcesService", () => {
       expect(users.toDto()).toEqual(usersDto);
     });
 
-    it("disables default API contains when not explicitly requested.", async() => {
+    it("disables default API contains when not explicitly requested.", async () => {
       expect.assertions(1);
 
       jest.spyOn(findUsersService.userApiService, "findAll").mockReturnValue([]);
@@ -69,58 +67,64 @@ describe("FindResourcesService", () => {
       expect(findUsersService.userApiService.findAll).toHaveBeenCalledWith(defaultFindAllContains, {});
     });
 
-    it("requests the API with the given contains.", async() => {
+    it("requests the API with the given contains.", async () => {
       expect.assertions(3);
 
       const usersDto = defaultUsersDtos();
       jest.spyOn(findUsersService.userApiService, "findAll").mockImplementation(() => usersDto);
 
-      const users = await findUsersService.findAll({
-        is_mfa_enabled: true,
-        last_logged_in: true,
-        gpgkey: true,
-        groups_users: true,
-        profile: true,
-        role: true,
-        account_recovery_user_setting: true,
-        pending_account_recovery_request: true,
-      }, null);
+      const users = await findUsersService.findAll(
+        {
+          is_mfa_enabled: true,
+          last_logged_in: true,
+          gpgkey: true,
+          groups_users: true,
+          profile: true,
+          role: true,
+          account_recovery_user_setting: true,
+          pending_account_recovery_request: true,
+        },
+        null,
+      );
 
       expect(users).toBeInstanceOf(UsersCollection);
-      expect(findUsersService.userApiService.findAll).toHaveBeenCalledWith({
-        is_mfa_enabled: true,
-        last_logged_in: true,
-        gpgkey: true,
-        groups_users: true,
-        profile: true,
-        role: true,
-        account_recovery_user_setting: true,
-        pending_account_recovery_request: true,
-      }, null);
+      expect(findUsersService.userApiService.findAll).toHaveBeenCalledWith(
+        {
+          is_mfa_enabled: true,
+          last_logged_in: true,
+          gpgkey: true,
+          groups_users: true,
+          profile: true,
+          role: true,
+          account_recovery_user_setting: true,
+          pending_account_recovery_request: true,
+        },
+        null,
+      );
       expect(users.toDto()).toEqual(usersDto);
     });
 
-    it("throws if unsupported contains are given.", async() => {
+    it("throws if unsupported contains are given.", async () => {
       expect.assertions(1);
 
       const usersDto = defaultUsersDtos();
       jest.spyOn(findUsersService.userApiService, "findAll").mockImplementation(() => usersDto);
 
       const promise = findUsersService.findAll({
-        invalid: true
+        invalid: true,
       });
 
       expect(promise).rejects.toThrow(Error("Unsupported contains parameter used, please check supported contains"));
     });
 
-    it("requests the API with the give filters.", async() => {
+    it("requests the API with the give filters.", async () => {
       expect.assertions(3);
 
       const usersDto = defaultUsersDtos();
       jest.spyOn(findUsersService.userApiService, "findAll").mockImplementation(() => usersDto);
 
       const users = await findUsersService.findAll(null, {
-        "search": false,
+        search: false,
         "has-groups": true,
         "has-access": false,
         "is-admin": true,
@@ -129,7 +133,7 @@ describe("FindResourcesService", () => {
 
       expect(users).toBeInstanceOf(UsersCollection);
       expect(findUsersService.userApiService.findAll).toHaveBeenCalledWith(defaultFindAllContains, {
-        "search": false,
+        search: false,
         "has-groups": true,
         "has-access": false,
         "is-admin": true,
@@ -138,26 +142,28 @@ describe("FindResourcesService", () => {
       expect(users.toDto()).toEqual(usersDto);
     });
 
-    it("throws if unsupported filters are given.", async() => {
+    it("throws if unsupported filters are given.", async () => {
       expect.assertions(1);
 
       const usersDto = defaultUsersDtos();
       jest.spyOn(findUsersService.userApiService, "findAll").mockReturnValue(usersDto);
 
       const promise = findUsersService.findAll(null, {
-        "is-not-supported": true
+        "is-not-supported": true,
       });
 
       expect(promise).rejects.toThrow(Error("Unsupported filter parameter used, please check supported filters"));
     });
 
-    it("skips invalid entity with ignore strategy.", async() => {
+    it("skips invalid entity with ignore strategy.", async () => {
       expect.assertions(2);
 
       const usersDto = defaultUsersDtos();
-      const usersDtoWithInvalidUser = usersDto.concat([defaultUserDto({
-        username: null
-      })]);
+      const usersDtoWithInvalidUser = usersDto.concat([
+        defaultUserDto({
+          username: null,
+        }),
+      ]);
 
       jest.spyOn(findUsersService.userApiService, "findAll").mockReturnValue(usersDtoWithInvalidUser);
       const users = await findUsersService.findAll(null, null, true);
@@ -166,13 +172,15 @@ describe("FindResourcesService", () => {
       expect(users.toDto(UserLocalStorage.DEFAULT_CONTAIN)).toEqual(usersDto);
     });
 
-    it("does not skip invalid entity without ignore strategy.", async() => {
+    it("does not skip invalid entity without ignore strategy.", async () => {
       expect.assertions(1);
 
       let usersDto = defaultUsersDtos();
-      usersDto = usersDto.concat([defaultUserDto({
-        username: null
-      })]);
+      usersDto = usersDto.concat([
+        defaultUserDto({
+          username: null,
+        }),
+      ]);
 
       jest.spyOn(findUsersService.userApiService, "findAll").mockReturnValue(usersDto);
       const promise = findUsersService.findAll(null, null, false);
@@ -180,12 +188,12 @@ describe("FindResourcesService", () => {
       await expect(promise).rejects.toThrow(CollectionValidationError);
     });
 
-    it("validates username with custom validation rule", async() => {
+    it("validates username with custom validation rule", async () => {
       expect.assertions(2);
 
       const organizationSettings = customEmailValidationProOrganizationSettings();
       OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
-      const usersDto = [defaultUserDto({username: "ada@passbolt.c"})];
+      const usersDto = [defaultUserDto({ username: "ada@passbolt.c" })];
       jest.spyOn(findUsersService.userApiService, "findAll").mockReturnValue(usersDto);
 
       const users = await findUsersService.findAll();
@@ -207,29 +215,29 @@ describe("FindResourcesService", () => {
   });
 
   describe("::findAllActive", () => {
-    it("requests the API with the is-active filter.", async() => {
+    it("requests the API with the is-active filter.", async () => {
       expect.assertions(2);
       const usersDto = defaultUsersDtos();
       jest.spyOn(findUsersService.userApiService, "findAll").mockReturnValue(usersDto);
 
       const users = await findUsersService.findAllActive();
 
-      const expectedFilters = {"is-active": true};
+      const expectedFilters = { "is-active": true };
       expect(findUsersService.userApiService.findAll).toHaveBeenCalledWith(defaultFindAllContains, expectedFilters);
       expect(users).toBeInstanceOf(UsersCollection);
     });
   });
 
   describe("::findAllActive", () => {
-    it("requests the API with the is-active filter.", async() => {
+    it("requests the API with the is-active filter.", async () => {
       expect.assertions(2);
       const usersDto = defaultUsersDtos();
       jest.spyOn(findUsersService.userApiService, "findAll").mockReturnValue(usersDto);
 
       const users = await findUsersService.findAllActiveWithMissingKeys();
 
-      const expectedContains = {...defaultFindAllContains, "missing_metadata_key_ids": true};
-      const expectedFilters = {"is-active": true};
+      const expectedContains = { ...defaultFindAllContains, missing_metadata_key_ids: true };
+      const expectedFilters = { "is-active": true };
       expect(findUsersService.userApiService.findAll).toHaveBeenCalledWith(expectedContains, expectedFilters);
       expect(users).toBeInstanceOf(UsersCollection);
     });

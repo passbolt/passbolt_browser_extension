@@ -14,8 +14,8 @@
 
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import MfaEnabledProviderEntity from './mfaEnabledProviderEntity';
-import {createMfaCombinedEnabledProviders} from './mfaCombinedEnabledProvidersEntity.data';
+import MfaEnabledProviderEntity from "./mfaEnabledProviderEntity";
+import { createMfaCombinedEnabledProviders } from "./mfaCombinedEnabledProvidersEntity.data";
 
 describe("MfaEnabledProvider entity", () => {
   it("schema must validate", () => {
@@ -37,9 +37,9 @@ describe("MfaEnabledProvider entity", () => {
       expect(true).toBeFalsy();
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('yubikey', 'required')).toBe(true);
-      expect(error.hasError('totp', 'required')).toBe(true);
-      expect(error.hasError('duo', 'required')).toBe(true);
+      expect(error.hasError("yubikey", "required")).toBe(true);
+      expect(error.hasError("totp", "required")).toBe(true);
+      expect(error.hasError("duo", "required")).toBe(true);
     }
   });
 });

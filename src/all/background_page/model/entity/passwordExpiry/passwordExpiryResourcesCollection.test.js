@@ -16,13 +16,15 @@ import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import {
   defaultPasswordExpiryResourceDto,
-  defaultPasswordExpiryResourceDtoFromApi
+  defaultPasswordExpiryResourceDtoFromApi,
 } from "./passwordExpiryResourceEntity.test.data";
-
 
 describe("PasswordExpiryPasswordExpiryResources Collection", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(PasswordExpiryResourcesCollection.ENTITY_NAME, PasswordExpiryResourcesCollection.getSchema());
+    EntitySchema.validateSchema(
+      PasswordExpiryResourcesCollection.ENTITY_NAME,
+      PasswordExpiryResourcesCollection.getSchema(),
+    );
   });
   it("constructor works if valid minimal DTO is provided", () => {
     expect.assertions(4);
@@ -52,7 +54,9 @@ describe("PasswordExpiryPasswordExpiryResources Collection", () => {
     const passwordExpiryPasswordExpiryResource1 = defaultPasswordExpiryResourceDto();
     const dto = [passwordExpiryPasswordExpiryResource1, passwordExpiryPasswordExpiryResource1];
 
-    const t = () => { new PasswordExpiryResourcesCollection(dto); };
+    const t = () => {
+      new PasswordExpiryResourcesCollection(dto);
+    };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -60,10 +64,18 @@ describe("PasswordExpiryPasswordExpiryResources Collection", () => {
     expect.assertions(1);
     const passwordExpiryPasswordExpiryResource1 = defaultPasswordExpiryResourceDto();
     const passwordExpiryPasswordExpiryResource2 = defaultPasswordExpiryResourceDto();
-    const passwordExpiryPasswordExpiryResource3 = defaultPasswordExpiryResourceDto({id: passwordExpiryPasswordExpiryResource1.id});
-    const dto = [passwordExpiryPasswordExpiryResource1, passwordExpiryPasswordExpiryResource2, passwordExpiryPasswordExpiryResource3];
+    const passwordExpiryPasswordExpiryResource3 = defaultPasswordExpiryResourceDto({
+      id: passwordExpiryPasswordExpiryResource1.id,
+    });
+    const dto = [
+      passwordExpiryPasswordExpiryResource1,
+      passwordExpiryPasswordExpiryResource2,
+      passwordExpiryPasswordExpiryResource3,
+    ];
 
-    const t = () => { new PasswordExpiryResourcesCollection(dto); };
+    const t = () => {
+      new PasswordExpiryResourcesCollection(dto);
+    };
     expect(t).toThrow(EntityCollectionError);
   });
 });

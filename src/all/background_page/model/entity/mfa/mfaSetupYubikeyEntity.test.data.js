@@ -18,4 +18,3 @@ export const defaultSetupYubikeyData = (props = {}) => {
   };
   return Object.assign(data, props);
 };
-

@@ -16,7 +16,7 @@ import OnStartUpService from "./onStartUpService";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import User from "../../model/user";
 import LocalStorageService from "../localStorage/localStorageService";
-import {BrowserExtensionIconService} from "../ui/browserExtensionIcon.service";
+import { BrowserExtensionIconService } from "../ui/browserExtensionIcon.service";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -26,7 +26,7 @@ beforeEach(() => {
 
 describe("OnStartUpService", () => {
   describe("OnStartUpService::exec", () => {
-    it("Should exec start up process if the user is not valid", async() => {
+    it("Should exec start up process if the user is not valid", async () => {
       expect.assertions(2);
       // data mocked
       await MockExtension.withConfiguredAccount();
@@ -41,7 +41,7 @@ describe("OnStartUpService", () => {
       expect(BrowserExtensionIconService.deactivate).toHaveBeenCalledTimes(0);
     });
 
-    it("Should exec start up process if the user is valid", async() => {
+    it("Should exec start up process if the user is valid", async () => {
       expect.assertions(2);
       // data mocked
       await MockExtension.withConfiguredAccount();

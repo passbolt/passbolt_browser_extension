@@ -12,18 +12,17 @@
  * @since         4.4.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import MfaSetupVerifyYubikeyCodeController from "./MfaSetupVerifyYubikeyCodeController";
-import {defaultSetupYubikeyData} from "../../model/entity/mfa/mfaSetupYubikeyEntity.test.data";
+import { defaultSetupYubikeyData } from "../../model/entity/mfa/mfaSetupYubikeyEntity.test.data";
 import MfaSetupYubikeyEntity from "../../model/entity/mfa/mfaSetupYubikeyEntity";
 
 beforeEach(() => {
   enableFetchMocks();
 });
-
 
 describe("MfaSetupVerifyYubikeyCodeController", () => {
   let controller;
@@ -32,7 +31,7 @@ describe("MfaSetupVerifyYubikeyCodeController", () => {
     controller = new MfaSetupVerifyYubikeyCodeController(null, null, defaultApiClientOptions());
   });
 
-  it("Should verify the otp code", async() => {
+  it("Should verify the otp code", async () => {
     expect.assertions(1);
     jest.spyOn(controller.multiFactorAuthenticationModel, "setupYubikey");
 
@@ -40,17 +39,19 @@ describe("MfaSetupVerifyYubikeyCodeController", () => {
 
     await controller.exec(defaultSetupYubikeyData());
 
-    expect(controller.multiFactorAuthenticationModel.setupYubikey).toHaveBeenCalledWith(new MfaSetupYubikeyEntity(defaultSetupYubikeyData()));
+    expect(controller.multiFactorAuthenticationModel.setupYubikey).toHaveBeenCalledWith(
+      new MfaSetupYubikeyEntity(defaultSetupYubikeyData()),
+    );
   });
 
-  it("Should validate the hotp code with entity", async() => {
+  it("Should validate the hotp code with entity", async () => {
     expect.assertions(2);
 
     try {
       await controller.exec({});
     } catch (error) {
       expect(error).toBeInstanceOf(EntityValidationError);
-      expect(error.hasError('hotp', 'required')).toBeTruthy();
+      expect(error.hasError("hotp", "required")).toBeTruthy();
     }
   });
 });

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
 
 export const defaultExternalFolderDto = (data = {}) => ({
   id: uuid(),

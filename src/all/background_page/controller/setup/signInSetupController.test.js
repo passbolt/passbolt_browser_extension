@@ -13,19 +13,19 @@
  */
 
 import "../../../../../test/mocks/mockSsoDataStorage";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SignInSetupController from "./signInSetupController";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
-import {withAzureSsoSettings} from "../sso/getCurrentSsoSettingsController.test.data";
+import { withAzureSsoSettings } from "../sso/getCurrentSsoSettingsController.test.data";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import PostLoginService from "../../service/auth/postLoginService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
@@ -37,35 +37,53 @@ beforeEach(() => {
 
 describe("SignInSetupController", () => {
   describe("SignInSetupController::exec", () => {
-    it("Should throw an exception if the passphrase is not a valid.", async() => {
+    it("Should throw an exception if the passphrase is not a valid.", async () => {
       const account = new AccountEntity(defaultAccountDto());
-      const controller = new SignInSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      const controller = new SignInSetupController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       expect.assertions(2);
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
       const promiseMissingParameter = controller.exec();
       await expect(promiseMissingParameter).rejects.toThrowError("A passphrase is required.");
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account, passphrase: {}}));
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: account, passphrase: {} }));
       const promiseInvalidTypeParameter = controller.exec();
       await expect(promiseInvalidTypeParameter).rejects.toThrowError("The passphrase should be a string.");
     }, 10000);
 
-    it("Should throw an exception if the provided remember me is not a valid boolean.", async() => {
+    it("Should throw an exception if the provided remember me is not a valid boolean.", async () => {
       const account = new AccountEntity(defaultAccountDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account, passphrase: pgpKeys.ada.passphrase}));
-      const controller = new SignInSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: account, passphrase: pgpKeys.ada.passphrase }));
+      const controller = new SignInSetupController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       expect.assertions(1);
       const promiseInvalidTypeParameter = controller.exec(42);
       await expect(promiseInvalidTypeParameter).rejects.toThrowError("The rememberMe should be a boolean.");
     }, 10000);
 
-    it("Should throw an exception if the provided passphrase can't decrypt the current private key.", async() => {
+    it("Should throw an exception if the provided passphrase can't decrypt the current private key.", async () => {
       await MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account, passphrase: "fake passphrase"}));
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: account, passphrase: "fake passphrase" }));
 
-      const controller = new SignInSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      const controller = new SignInSetupController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       expect.assertions(1);
       try {
@@ -75,18 +93,20 @@ describe("SignInSetupController", () => {
       }
     }, 10000);
 
-    it("Should ask for SSO kits generation.", async() => {
+    it("Should ask for SSO kits generation.", async () => {
       expect.assertions(6);
       const organizationSettings = anonymousOrganizationSettings();
       organizationSettings.passbolt.plugins.sso = {
-        enabled: true
+        enabled: true,
       };
-      fetch.doMockOnceIf(new RegExp('/settings.json'), () => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
-      fetch.doMockOnceIf(new RegExp('/sso/settings/current.json'), () => mockApiResponse(withAzureSsoSettings()));
-      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
-      jest.spyOn(PassphraseStorageService, "set").mockImplementation(async() => {});
-      jest.spyOn(PostLoginService, "exec").mockImplementation(async() => {});
-      jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async() => {});
+      fetch.doMockOnceIf(new RegExp("/settings.json"), () =>
+        mockApiResponse(organizationSettings, { servertime: Date.now() / 1000 }),
+      );
+      fetch.doMockOnceIf(new RegExp("/sso/settings/current.json"), () => mockApiResponse(withAzureSsoSettings()));
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
+      jest.spyOn(PassphraseStorageService, "set").mockImplementation(async () => {});
+      jest.spyOn(PostLoginService, "exec").mockImplementation(async () => {});
+      jest.spyOn(KeepSessionAliveService, "start").mockImplementation(async () => {});
 
       SsoDataStorage.setMockedData(null);
 
@@ -94,14 +114,26 @@ describe("SignInSetupController", () => {
 
       await MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account, passphrase: "ada@passbolt.com"}));
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: account, passphrase: "ada@passbolt.com" }));
 
-      const controller = new SignInSetupController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
-      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+      const controller = new SignInSetupController(
+        { tab: { id: 1 }, port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
+      jest
+        .spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge")
+        .mockImplementationOnce(jest.fn());
       jest.spyOn(AccountTemporarySessionStorageService, "remove");
 
       await controller.exec(true);
-      expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, "ada@passbolt.com");
+      expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(
+        account.userKeyFingerprint,
+        account.userPrivateArmoredKey,
+        "ada@passbolt.com",
+      );
       expect(PassphraseStorageService.set).toHaveBeenCalledWith("ada@passbolt.com", -1);
       expect(PostLoginService.exec).toHaveBeenCalled();
       expect(GenerateSsoKitService.generate).toHaveBeenCalledWith("ada@passbolt.com", "azure");
@@ -109,8 +141,12 @@ describe("SignInSetupController", () => {
       expect(AccountTemporarySessionStorageService.remove).toHaveBeenCalledTimes(1);
     }, 10000);
 
-    it("Should raise an error if no account has been found.", async() => {
-      const controller = new SignInSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+    it("Should raise an error if no account has been found.", async () => {
+      const controller = new SignInSetupController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
       expect.assertions(1);
       try {
         await controller.exec();
@@ -119,39 +155,57 @@ describe("SignInSetupController", () => {
       }
     });
 
-    it("Should remember the passphrase if requested by the user.", async() => {
-      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+    it("Should remember the passphrase if requested by the user.", async () => {
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
       jest.spyOn(PassphraseStorageService, "set");
       await MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
-      const controller = new SignInSetupController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      const controller = new SignInSetupController(
+        { tab: { id: 1 }, port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account, passphrase: "ada@passbolt.com"}));
-      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+      jest
+        .spyOn(AccountTemporarySessionStorageService, "get")
+        .mockImplementationOnce(() => ({ account: account, passphrase: "ada@passbolt.com" }));
+      jest
+        .spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge")
+        .mockImplementationOnce(jest.fn());
 
       await controller.exec(true);
 
       expect(PassphraseStorageService.set).toHaveBeenCalledWith("ada@passbolt.com", -1);
     });
 
-    it("Should remember the passphrase during 1 minutes if not requested by the user.", async() => {
+    it("Should remember the passphrase during 1 minutes if not requested by the user.", async () => {
       expect.assertions(3);
 
       const userKeyInfo = pgpKeys.ada;
       const passphrase = userKeyInfo.passphrase;
       await MockExtension.withConfiguredAccount(userKeyInfo);
       const account = new AccountEntity(defaultAccountDto());
-      const controller = new SignInSetupController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
-      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+      const controller = new SignInSetupController(
+        { tab: { id: 1 }, port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
       jest.spyOn(PassphraseStorageService, "set");
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account, passphrase}));
-      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account, passphrase }));
+      jest
+        .spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge")
+        .mockImplementationOnce(jest.fn());
 
       await controller.exec();
 
       expect(PassphraseStorageService.set).toHaveBeenCalledWith("ada@passbolt.com", 60);
       expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledTimes(1);
-      expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(userKeyInfo.fingerprint, userKeyInfo.private, passphrase);
+      expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(
+        userKeyInfo.fingerprint,
+        userKeyInfo.private,
+        passphrase,
+      );
     });
   });
 });

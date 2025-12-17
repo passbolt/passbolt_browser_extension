@@ -13,15 +13,15 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import DeleteUserService from "./deleteUserService";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import DeleteDryRunError from "../../error/deleteDryRunError";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import UserDeleteTransferEntity from "../../model/entity/user/transfer/userDeleteTransferEntity";
-import {defaultUserDeleteTransferDto} from "passbolt-styleguide/src/shared/models/entity/user/userDeleteTransferEntity.test.data";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultUserDeleteTransferDto } from "passbolt-styleguide/src/shared/models/entity/user/userDeleteTransferEntity.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import UserLocalStorage from "../local_storage/userLocalStorage";
 
 beforeEach(() => {
@@ -32,13 +32,13 @@ describe("DeleteUserService", () => {
   let deleteUserService, apiClientOptions;
   const account = new AccountEntity(defaultAccountDto());
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     apiClientOptions = defaultApiClientOptions();
     deleteUserService = new DeleteUserService(account, apiClientOptions);
   });
 
   describe("::deleteDryRun", () => {
-    it("Do not need to transfer ownership.", async() => {
+    it("Do not need to transfer ownership.", async () => {
       expect.assertions(1);
 
       const usersId = uuidv4();
@@ -49,7 +49,7 @@ describe("DeleteUserService", () => {
       expect(deleteUserService.userServiceApi.delete).toHaveBeenCalledWith(usersId, {}, true);
     });
 
-    it("Need to transfer ownership.", async() => {
+    it("Need to transfer ownership.", async () => {
       expect.assertions(1);
 
       const usersId = uuidv4();
@@ -59,12 +59,14 @@ describe("DeleteUserService", () => {
         body: {
           errors: {
             resources: {
-              sole_owner: [resourceDto]
-            }
-          }
-        }
+              sole_owner: [resourceDto],
+            },
+          },
+        },
       };
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => { throw new PassboltApiFetchError("Error", error); });
+      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {
+        throw new PassboltApiFetchError("Error", error);
+      });
 
       try {
         await deleteUserService.deleteDryRun(usersId);
@@ -73,14 +75,16 @@ describe("DeleteUserService", () => {
       }
     });
 
-    it("throw any error not handled.", async() => {
+    it("throw any error not handled.", async () => {
       expect.assertions(1);
 
       const usersId = uuidv4();
       const error = {
         code: 404,
       };
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => { throw new PassboltApiFetchError("Error", error); });
+      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {
+        throw new PassboltApiFetchError("Error", error);
+      });
 
       try {
         await deleteUserService.deleteDryRun(usersId);
@@ -89,17 +93,17 @@ describe("DeleteUserService", () => {
       }
     });
 
-    it("throws if user id is not an uuid.", async() => {
+    it("throws if user id is not an uuid.", async () => {
       expect.assertions(1);
 
       const promise = deleteUserService.deleteDryRun({});
 
-      expect(promise).rejects.toThrow(Error("The parameter \"userId\" should be a UUID"));
+      expect(promise).rejects.toThrow(Error('The parameter "userId" should be a UUID'));
     });
   });
 
   describe("::delete", () => {
-    it("delete a user with no transfer.", async() => {
+    it("delete a user with no transfer.", async () => {
       expect.assertions(2);
 
       const usersId = uuidv4();
@@ -112,7 +116,7 @@ describe("DeleteUserService", () => {
       expect(UserLocalStorage.delete).toHaveBeenCalledWith(usersId);
     });
 
-    it("delete a user with transfer.", async() => {
+    it("delete a user with transfer.", async () => {
       expect.assertions(2);
 
       const usersId = uuidv4();
@@ -127,7 +131,7 @@ describe("DeleteUserService", () => {
       expect(UserLocalStorage.delete).toHaveBeenCalledWith(usersId);
     });
 
-    it("delete a user with an error and need to transfer ownership.", async() => {
+    it("delete a user with an error and need to transfer ownership.", async () => {
       expect.assertions(1);
 
       const usersId = uuidv4();
@@ -137,12 +141,14 @@ describe("DeleteUserService", () => {
         body: {
           errors: {
             resources: {
-              sole_owner: [resourceDto]
-            }
-          }
-        }
+              sole_owner: [resourceDto],
+            },
+          },
+        },
       };
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => { throw new PassboltApiFetchError("Error", error); });
+      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {
+        throw new PassboltApiFetchError("Error", error);
+      });
 
       try {
         await deleteUserService.delete(usersId, null);
@@ -151,14 +157,16 @@ describe("DeleteUserService", () => {
       }
     });
 
-    it("delete a user with an unexpected error.", async() => {
+    it("delete a user with an unexpected error.", async () => {
       expect.assertions(1);
 
       const usersId = uuidv4();
       const error = {
         code: 404,
       };
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => { throw new PassboltApiFetchError("Error", error); });
+      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {
+        throw new PassboltApiFetchError("Error", error);
+      });
 
       try {
         await deleteUserService.delete(usersId, null);
@@ -167,12 +175,12 @@ describe("DeleteUserService", () => {
       }
     });
 
-    it("throws if user id is not an uuid.", async() => {
+    it("throws if user id is not an uuid.", async () => {
       expect.assertions(1);
 
       const promise = deleteUserService.delete({});
 
-      expect(promise).rejects.toThrow(Error("The parameter \"userId\" should be a UUID"));
+      expect(promise).rejects.toThrow(Error('The parameter "userId" should be a UUID'));
     });
   });
 });

@@ -14,7 +14,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import GroupDeleteTransferEntity from "./groupDeleteTransferEntity";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultGroupTransferDto} from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
+import { defaultGroupTransferDto } from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
 
 describe("Group delete transfer entity", () => {
   describe("::getSchema", () => {

@@ -15,7 +15,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import MfaSetupYubikeyEntity from "./mfaSetupYubikeyEntity";
-import {defaultSetupYubikeyData} from "./mfaSetupYubikeyEntity.test.data";
+import { defaultSetupYubikeyData } from "./mfaSetupYubikeyEntity.test.data";
 
 describe("MfaSetupYubikeyEntity", () => {
   it("schema must validate", () => {
@@ -36,19 +36,21 @@ describe("MfaSetupYubikeyEntity", () => {
       new MfaSetupYubikeyEntity({});
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('hotp', 'required')).toBe(true);
+      expect(error.hasError("hotp", "required")).toBe(true);
     }
   });
   it("constructor returns validation error if hotp code is not a valid format", () => {
     expect.assertions(2);
 
     try {
-      new MfaSetupYubikeyEntity(defaultSetupYubikeyData({
-        hotp: "221"
-      }));
+      new MfaSetupYubikeyEntity(
+        defaultSetupYubikeyData({
+          hotp: "221",
+        }),
+      );
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('hotp', 'pattern')).toBe(true);
+      expect(error.hasError("hotp", "pattern")).toBe(true);
     }
   });
 });

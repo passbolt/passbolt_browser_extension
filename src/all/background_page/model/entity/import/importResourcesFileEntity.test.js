@@ -13,15 +13,25 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ImportResourcesFileEntity from "./importResourcesFileEntity";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultImportResourceFileCSVDto, defaultImportResourceFileOptionsDto, importResourceFileWithAllOptionsDto} from "./importResourcesFileEntity.test.data";
+import {
+  defaultImportResourceFileCSVDto,
+  defaultImportResourceFileOptionsDto,
+  importResourceFileWithAllOptionsDto,
+} from "./importResourcesFileEntity.test.data";
 import FolderEntity from "../folder/folderEntity";
-import {defaultFolderDto, minimalFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import {
+  defaultFolderDto,
+  minimalFolderDto,
+} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 import TagEntity from "../tag/tagEntity";
-import {defaultTagDto} from "../tag/tagEntity.test.data";
+import { defaultTagDto } from "../tag/tagEntity.test.data";
 import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
-import {defaultExternalResourceCollectionDto, externalResourceCollectionWithIdsDto} from "../resource/external/externalResourcesCollection.test.data";
+import {
+  defaultExternalResourceCollectionDto,
+  externalResourceCollectionWithIdsDto,
+} from "../resource/external/externalResourcesCollection.test.data";
 import ExternalFoldersCollection from "../folder/external/externalFoldersCollection";
-import {defaultExternalFoldersCollectionDto} from "../folder/external/externalFoldersCollection.test.data";
+import { defaultExternalFoldersCollectionDto } from "../folder/external/externalFoldersCollection.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import ImportError from "../../../error/importError";
 
@@ -41,20 +51,22 @@ describe("ImportResourcesFileEntity entity", () => {
         assertEntityProperty.SCENARIO_FALSE,
       ];
 
-      const failingPatternScenario = [
-        {scenario: "string not respecting pattern", value: "test//test"}
-      ];
+      const failingPatternScenario = [{ scenario: "string not respecting pattern", value: "test//test" }];
 
       assertEntityProperty.string(ImportResourcesFileEntity, "ref");
       assertEntityProperty.assert(ImportResourcesFileEntity, "ref", successScenarios, failingTypeScenarios, "type");
-      assertEntityProperty.assert(ImportResourcesFileEntity, "ref", successScenarios, failingPatternScenario, "pattern");
+      assertEntityProperty.assert(
+        ImportResourcesFileEntity,
+        "ref",
+        successScenarios,
+        failingPatternScenario,
+        "pattern",
+      );
       assertEntityProperty.required(ImportResourcesFileEntity, "ref");
     });
 
     it("validates file property", () => {
-      const successScenarios = [
-        {scenario: "base64 string", value: "cGFzc2JvbHQ="},
-      ];
+      const successScenarios = [{ scenario: "base64 string", value: "cGFzc2JvbHQ=" }];
 
       const failingTypeScenarios = [
         assertEntityProperty.SCENARIO_NULL,
@@ -63,13 +75,17 @@ describe("ImportResourcesFileEntity entity", () => {
         assertEntityProperty.SCENARIO_FALSE,
       ];
 
-      const failingPatternScenario = [
-        {scenario: "string not using base64 charset", value: "!!!!"},
-      ];
+      const failingPatternScenario = [{ scenario: "string not using base64 charset", value: "!!!!" }];
 
       assertEntityProperty.string(ImportResourcesFileEntity, "file");
       assertEntityProperty.assert(ImportResourcesFileEntity, "file", successScenarios, failingTypeScenarios, "type");
-      assertEntityProperty.assert(ImportResourcesFileEntity, "file", successScenarios, failingPatternScenario, "format");
+      assertEntityProperty.assert(
+        ImportResourcesFileEntity,
+        "file",
+        successScenarios,
+        failingPatternScenario,
+        "format",
+      );
       assertEntityProperty.required(ImportResourcesFileEntity, "file");
     });
 
@@ -83,12 +99,12 @@ describe("ImportResourcesFileEntity entity", () => {
 
     it("validates options property", () => {
       const correctOptions = [
-        {folders: true, tags: false, credentials: {password: null, file: "test=="}},
-        {folders: false, tags: true, credentials: {password: "password", file: null}},
+        { folders: true, tags: false, credentials: { password: null, file: "test==" } },
+        { folders: false, tags: true, credentials: { password: "password", file: null } },
       ];
       const successScenarios = [
         assertEntityProperty.SCENARIO_ARRAY,
-        {scenario: "with valid options", value: correctOptions}
+        { scenario: "with valid options", value: correctOptions },
       ];
 
       const failingScenarios = [
@@ -132,40 +148,59 @@ describe("ImportResourcesFileEntity entity", () => {
     });
 
     it("constructor should validate options property fields", () => {
-      const successScenarios = [
-        {scenario: "a valid option", value: defaultImportResourceFileOptionsDto()},
-      ];
+      const successScenarios = [{ scenario: "a valid option", value: defaultImportResourceFileOptionsDto() }];
       const failScenarios = [
-        {scenario: "a non boolean tags option", value: defaultImportResourceFileOptionsDto({tags: "test"})},
-        {scenario: "a non boolean folders option", value: defaultImportResourceFileOptionsDto({folders: "test"})},
+        { scenario: "a non boolean tags option", value: defaultImportResourceFileOptionsDto({ tags: "test" }) },
+        { scenario: "a non boolean folders option", value: defaultImportResourceFileOptionsDto({ folders: "test" }) },
       ];
-      assertEntityProperty.assertAssociation(ImportResourcesFileEntity, "options", defaultImportResourceFileCSVDto(), successScenarios, failScenarios);
+      assertEntityProperty.assertAssociation(
+        ImportResourcesFileEntity,
+        "options",
+        defaultImportResourceFileCSVDto(),
+        successScenarios,
+        failScenarios,
+      );
     });
 
     it("constructor should validate options.credentials property", () => {
       const successScenarios = [
-        {scenario: "a valid option.credentials", value: defaultImportResourceFileOptionsDto()},
-        {scenario: "a valid option.credentials with null props", value: defaultImportResourceFileOptionsDto({
-          options: {
-            credentials: {
-              keyfile: null,
-              password: null
-            }
-          }
-        })},
+        { scenario: "a valid option.credentials", value: defaultImportResourceFileOptionsDto() },
+        {
+          scenario: "a valid option.credentials with null props",
+          value: defaultImportResourceFileOptionsDto({
+            options: {
+              credentials: {
+                keyfile: null,
+                password: null,
+              },
+            },
+          }),
+        },
       ];
       const failScenarios = [
-        {scenario: "a non string options.credentials.keyfile", value: defaultImportResourceFileOptionsDto({credentials: {keyfile: []}})},
-        {scenario: "a non string options.credentials.password", value: defaultImportResourceFileOptionsDto({credentials: {password: []}})},
+        {
+          scenario: "a non string options.credentials.keyfile",
+          value: defaultImportResourceFileOptionsDto({ credentials: { keyfile: [] } }),
+        },
+        {
+          scenario: "a non string options.credentials.password",
+          value: defaultImportResourceFileOptionsDto({ credentials: { password: [] } }),
+        },
       ];
-      assertEntityProperty.assertAssociation(ImportResourcesFileEntity, "options", defaultImportResourceFileCSVDto(), successScenarios, failScenarios);
+      assertEntityProperty.assertAssociation(
+        ImportResourcesFileEntity,
+        "options",
+        defaultImportResourceFileCSVDto(),
+        successScenarios,
+        failScenarios,
+      );
     });
 
     it("constructor should validate options property", () => {
       expect.assertions(1);
 
       const dto = defaultImportResourceFileCSVDto({
-        options: {folders: "test"},
+        options: { folders: "test" },
       });
       expect(() => new ImportResourcesFileEntity(dto)).toThrow(EntityValidationError);
     });
@@ -174,7 +209,7 @@ describe("ImportResourcesFileEntity entity", () => {
       expect.assertions(1);
 
       const dto = defaultImportResourceFileCSVDto({
-        options: defaultImportResourceFileOptionsDto({credentials: null}),
+        options: defaultImportResourceFileOptionsDto({ credentials: null }),
       });
       expect(() => new ImportResourcesFileEntity(dto)).not.toThrow();
     });
@@ -256,7 +291,7 @@ describe("ImportResourcesFileEntity entity", () => {
       const dto = defaultImportResourceFileCSVDto();
       const entity = new ImportResourcesFileEntity(dto);
 
-      expect(() => entity.referenceFolder = "test").toThrow(TypeError);
+      expect(() => (entity.referenceFolder = "test")).toThrow(TypeError);
     });
 
     it("should assert referenceTag as a TagEntity", () => {
@@ -265,7 +300,7 @@ describe("ImportResourcesFileEntity entity", () => {
       const dto = defaultImportResourceFileCSVDto();
       const entity = new ImportResourcesFileEntity(dto);
 
-      expect(() => entity.referenceTag = "test").toThrow(TypeError);
+      expect(() => (entity.referenceTag = "test")).toThrow(TypeError);
     });
 
     it("should assert importResources as a ExternalResourcesCollection", () => {
@@ -274,7 +309,7 @@ describe("ImportResourcesFileEntity entity", () => {
       const dto = defaultImportResourceFileCSVDto();
       const entity = new ImportResourcesFileEntity(dto);
 
-      expect(() => entity.importResources = "test").toThrow(TypeError);
+      expect(() => (entity.importResources = "test")).toThrow(TypeError);
     });
   });
 
@@ -283,9 +318,9 @@ describe("ImportResourcesFileEntity entity", () => {
       expect.assertions(3);
 
       const entity = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
-      const resourceDto1 = {name: "Resource 1", username: "user1"};
-      const resourceDto2 = {name: "Resource 2", username: "user2"};
-      const resourceDto3 = {name: "Resource 3", username: "user3"};
+      const resourceDto1 = { name: "Resource 1", username: "user1" };
+      const resourceDto2 = { name: "Resource 2", username: "user2" };
+      const resourceDto3 = { name: "Resource 3", username: "user3" };
 
       const warning1 = new ImportError("Warning 1", resourceDto1);
       const warning2 = new ImportError("Warning 2", resourceDto2);
@@ -306,8 +341,8 @@ describe("ImportResourcesFileEntity entity", () => {
       expect.assertions(2);
 
       const entity = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
-      const resourceDto1 = {name: "Resource 1", username: "user1"};
-      const resourceDto2 = {name: "Resource 2", username: "user2"};
+      const resourceDto1 = { name: "Resource 1", username: "user1" };
+      const resourceDto2 = { name: "Resource 2", username: "user2" };
 
       const warning1 = new ImportError("Warning 1", resourceDto1);
 
@@ -324,7 +359,7 @@ describe("ImportResourcesFileEntity entity", () => {
       expect.assertions(1);
 
       const entity = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
-      const resourceDto = {name: "Resource 1", username: "user1"};
+      const resourceDto = { name: "Resource 1", username: "user1" };
 
       entity.removeWarningsForResource(resourceDto);
 
@@ -351,7 +386,7 @@ describe("ImportResourcesFileEntity entity", () => {
         },
         options: {
           folders: true,
-          tags: true
+          tags: true,
         },
         references: {
           folder: null,
@@ -402,7 +437,7 @@ describe("ImportResourcesFileEntity entity", () => {
         },
         options: {
           folders: true,
-          tags: true
+          tags: true,
         },
         references: {
           folder: folderReference.toDto(),
@@ -435,7 +470,7 @@ describe("ImportResourcesFileEntity entity", () => {
         },
         options: {
           folders: true,
-          tags: true
+          tags: true,
         },
         references: {
           folder: null,

@@ -12,11 +12,11 @@
  * @since         3.9.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import GetCurrentSsoSettingsController from "./getCurrentSsoSettingsController";
-import {withAzureSsoSettings} from "./getCurrentSsoSettingsController.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { withAzureSsoSettings } from "./getCurrentSsoSettingsController.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
 
 beforeEach(() => {
@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe("GetCurrentSsoSettingsController", () => {
   describe("GetCurrentSsoSettingsController::exec", () => {
-    it("Should retrieve the current SSO settings.", async() => {
+    it("Should retrieve the current SSO settings.", async () => {
       expect.assertions(1);
       const ssoSettingsDto = withAzureSsoSettings();
       fetch.doMockOnceIf(new RegExp(`/sso/settings/current.json`), () => mockApiResponse(ssoSettingsDto));

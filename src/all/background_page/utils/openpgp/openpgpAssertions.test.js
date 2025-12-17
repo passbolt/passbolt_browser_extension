@@ -11,23 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {OpenpgpAssertion} from "./openpgpAssertions";
-import * as openpgp from 'openpgp';
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { OpenpgpAssertion } from "./openpgpAssertions";
+import * as openpgp from "openpgp";
 import Uint8ArrayConvert from "../format/uint8ArrayConvert";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 
-
 describe("OpenPGP Assertions", () => {
   describe("OpenPGP Assertions::readKeyOrFail", () => {
-    it("Should return openpgp.PublicKey or openpgp.PrivateKey for every acceptable type", async() => {
+    it("Should return openpgp.PublicKey or openpgp.PrivateKey for every acceptable type", async () => {
       const scenarios = [
-        {key: pgpKeys.ada.public, expectedType: openpgp.PublicKey},
-        {key: pgpKeys.ada.private, expectedType: openpgp.PrivateKey},
-        {key: pgpKeys.ada.private_decrypted, expectedType: openpgp.PrivateKey},
-        {key: pgpKeys.OpenPpgJsV5EccLegacy.private, expectedType: openpgp.PrivateKey},
-        {key: pgpKeys.OpenPpgJsV5EccLegacy.public, expectedType: openpgp.PublicKey},
+        { key: pgpKeys.ada.public, expectedType: openpgp.PublicKey },
+        { key: pgpKeys.ada.private, expectedType: openpgp.PrivateKey },
+        { key: pgpKeys.ada.private_decrypted, expectedType: openpgp.PrivateKey },
+        { key: pgpKeys.OpenPpgJsV5EccLegacy.private, expectedType: openpgp.PrivateKey },
+        { key: pgpKeys.OpenPpgJsV5EccLegacy.public, expectedType: openpgp.PublicKey },
       ];
 
       expect.assertions(scenarios.length);
@@ -37,16 +36,11 @@ describe("OpenPGP Assertions", () => {
       }
     });
 
-    it("Should throw an Error if the input key is not valid", async() => {
-      const openpgpMessage = await openpgp.createMessage({text: "passbolt message", format: 'utf8'});
+    it("Should throw an Error if the input key is not valid", async () => {
+      const openpgpMessage = await openpgp.createMessage({ text: "passbolt message", format: "utf8" });
       const expectedError = new Error("The key should be a valid openpgp armored key string.");
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
-      const scenarios = [
-        adaPublicKey,
-        ":D",
-        openpgpMessage,
-        123123
-      ];
+      const scenarios = [adaPublicKey, ":D", openpgpMessage, 123123];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -60,7 +54,7 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::readAllKeysOrFail", () => {
-    it("Should return an array containing openpgp.PublicKey or openpgp.PrivateKey from an array of acceptable key type", async() => {
+    it("Should return an array containing openpgp.PublicKey or openpgp.PrivateKey from an array of acceptable key type", async () => {
       const keyList = [
         pgpKeys.ada.public,
         pgpKeys.ada.private,
@@ -74,12 +68,13 @@ describe("OpenPGP Assertions", () => {
       expect(readKeyList.length).toBe(keyList.length);
 
       for (let i = 0; i < readKeyList.length; i++) {
-        const isOfExpectedType = readKeyList[i] instanceof openpgp.PublicKey || readKeyList[i] instanceof openpgp.PrivateKey;
+        const isOfExpectedType =
+          readKeyList[i] instanceof openpgp.PublicKey || readKeyList[i] instanceof openpgp.PrivateKey;
         expect(isOfExpectedType).toBe(true);
       }
     });
 
-    it("Should throw an Error if at least one of the key in the list is not valid", async() => {
+    it("Should throw an Error if at least one of the key in the list is not valid", async () => {
       const invalidKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const validKey = pgpKeys.ada.public;
       const keyList = [validKey, invalidKey];
@@ -91,23 +86,18 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::createMessageOrFail", () => {
-    it("Should return an openpgp.Message given a string", async() => {
+    it("Should return an openpgp.Message given a string", async () => {
       const message = "passbolt message";
       expect.assertions(1);
       const readMessage = await OpenpgpAssertion.createMessageOrFail(message);
       expect(readMessage).toBeInstanceOf(openpgp.Message);
     });
 
-    it("Should throw an Error if the input message is not valid", async() => {
+    it("Should throw an Error if the input message is not valid", async () => {
       const expectedError = new Error("The message should be of type string.");
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
-      const scenarios = [
-        1234,
-        true,
-        adaPublicKey,
-        message,
-      ];
+      const scenarios = [1234, true, adaPublicKey, message];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -121,23 +111,18 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::createCleartextMessageOrFail", () => {
-    it("Should return an openpgp.CLeartextMessage given a string", async() => {
+    it("Should return an openpgp.CLeartextMessage given a string", async () => {
       const message = "passbolt message";
       expect.assertions(1);
       const readMessage = await OpenpgpAssertion.createCleartextMessageOrFail(message);
       expect(readMessage).toBeInstanceOf(openpgp.CleartextMessage);
     });
 
-    it("Should throw an Error if the input message is not valid", async() => {
+    it("Should throw an Error if the input message is not valid", async () => {
       const expectedError = new Error("The message should be of type string.");
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const message = await OpenpgpAssertion.createCleartextMessageOrFail("Message");
-      const scenarios = [
-        1234,
-        true,
-        adaPublicKey,
-        message,
-      ];
+      const scenarios = [1234, true, adaPublicKey, message];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -151,23 +136,18 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::readMessageOrFail", () => {
-    it("Should return an openpgp.Message given an armored message string", async() => {
+    it("Should return an openpgp.Message given an armored message string", async () => {
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
       expect.assertions(1);
       const readMessage = await OpenpgpAssertion.readMessageOrFail(message.armor());
       expect(readMessage).toBeInstanceOf(openpgp.Message);
     });
 
-    it("Should throw an Error if the input message is not valid", async() => {
+    it("Should throw an Error if the input message is not valid", async () => {
       const expectedError = new Error("The message should be of type string.");
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
-      const scenarios = [
-        1234,
-        true,
-        adaPublicKey,
-        message,
-      ];
+      const scenarios = [1234, true, adaPublicKey, message];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -181,7 +161,7 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertKey", () => {
-    it("Should validate if the key is an expected key type", async() => {
+    it("Should validate if the key is an expected key type", async () => {
       const scenarios = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.public,
         pgpKeys.ada.private,
@@ -198,11 +178,7 @@ describe("OpenPGP Assertions", () => {
 
     it("Should throw an Error if the key is an not of an expected key type", () => {
       const expectedError = new Error("The key should be a valid openpgp key.");
-      const scenarios = [
-        1234,
-        true,
-        pgpKeys.ada.public
-      ];
+      const scenarios = [1234, true, pgpKeys.ada.public];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -216,7 +192,7 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertKeys", () => {
-    it("Should validate if all the keys are of an expected key type", async() => {
+    it("Should validate if all the keys are of an expected key type", async () => {
       const keys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.public,
         pgpKeys.ada.private,
@@ -229,14 +205,10 @@ describe("OpenPGP Assertions", () => {
       expect(OpenpgpAssertion.assertKeys(keys)).toBeUndefined();
     });
 
-    it("Should throw an Error if a key is an not of an expected key type", async() => {
+    it("Should throw an Error if a key is an not of an expected key type", async () => {
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const adaPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
-      const keys = [
-        adaPublicKey,
-        adaPrivateKey,
-        "Fake key"
-      ];
+      const keys = [adaPublicKey, adaPrivateKey, "Fake key"];
 
       expect.assertions(1);
       try {
@@ -246,7 +218,7 @@ describe("OpenPGP Assertions", () => {
       }
     });
 
-    it("Should throw an Error if the provided argument is not an array", async() => {
+    it("Should throw an Error if the provided argument is not an array", async () => {
       expect.assertions(1);
 
       try {
@@ -258,22 +230,17 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertPublicKey", () => {
-    it("Should validate if the key is an expected key type", async() => {
+    it("Should validate if the key is an expected key type", async () => {
       expect.assertions(1);
       const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       expect(OpenpgpAssertion.assertPublicKey(key)).toBeUndefined();
     });
 
-    it("Should throw an Error if the key is an not of an expected key type", async() => {
+    it("Should throw an Error if the key is an not of an expected key type", async () => {
       const expectedError = new Error("The key should be a valid openpgp public key.");
       const adaPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
-      const scenarios = [
-        1234,
-        true,
-        adaPrivateKey,
-        message,
-      ];
+      const scenarios = [1234, true, adaPrivateKey, message];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -287,7 +254,7 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertPublicKeys", () => {
-    it("Should validate if all the keys are of an expected key type", async() => {
+    it("Should validate if all the keys are of an expected key type", async () => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.public,
         pgpKeys.betty.public,
@@ -299,14 +266,10 @@ describe("OpenPGP Assertions", () => {
       expect(OpenpgpAssertion.assertPublicKeys(readKeys)).toBeUndefined();
     });
 
-    it("Should throw an Error if a key is an not of an expected key type", async() => {
+    it("Should throw an Error if a key is an not of an expected key type", async () => {
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
       const adaPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
-      const readKeys = [
-        adaPublicKey,
-        adaPrivateKey,
-        pgpKeys.ecdsa_p521.public
-      ];
+      const readKeys = [adaPublicKey, adaPrivateKey, pgpKeys.ecdsa_p521.public];
 
       expect.assertions(1);
       try {
@@ -316,7 +279,7 @@ describe("OpenPGP Assertions", () => {
       }
     });
 
-    it("Should throw an Error if the provided argument is not an array", async() => {
+    it("Should throw an Error if the provided argument is not an array", async () => {
       expect.assertions(1);
 
       try {
@@ -328,22 +291,17 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertPrivateKey", () => {
-    it("Should validate if the key is an expected key type", async() => {
+    it("Should validate if the key is an expected key type", async () => {
       expect.assertions(1);
       const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
       expect(OpenpgpAssertion.assertPrivateKey(key)).toBeUndefined();
     });
 
-    it("Should throw an Error if the key is an not of an expected key type", async() => {
+    it("Should throw an Error if the key is an not of an expected key type", async () => {
       const expectedError = new Error("The key should be a valid openpgp private key.");
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
-      const scenarios = [
-        1234,
-        true,
-        adaPublicKey,
-        message,
-      ];
+      const scenarios = [1234, true, adaPublicKey, message];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -357,7 +315,7 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertPrivateKeys", () => {
-    it("Should validate if all the keys are of an expected key type", async() => {
+    it("Should validate if all the keys are of an expected key type", async () => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.private,
         pgpKeys.betty.private,
@@ -370,14 +328,10 @@ describe("OpenPGP Assertions", () => {
       expect(OpenpgpAssertion.assertPrivateKeys(readKeys)).toBeUndefined();
     });
 
-    it("Should throw an Error if the key is an not of an expected key type", async() => {
+    it("Should throw an Error if the key is an not of an expected key type", async () => {
       const adaPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
       const bettyPrivateDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
-      const readKeys = [
-        adaPrivateKey,
-        bettyPrivateDecryptedKey,
-        pgpKeys.ecdsa_p521.public
-      ];
+      const readKeys = [adaPrivateKey, bettyPrivateDecryptedKey, pgpKeys.ecdsa_p521.public];
 
       expect.assertions(1);
       try {
@@ -387,7 +341,7 @@ describe("OpenPGP Assertions", () => {
       }
     });
 
-    it("Should throw an Error if the provided argument is not an array", async() => {
+    it("Should throw an Error if the provided argument is not an array", async () => {
       expect.assertions(1);
       try {
         OpenpgpAssertion.assertPrivateKeys("I'm not array :D");
@@ -398,23 +352,23 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertDecryptedPrivateKey", () => {
-    it("Should validate if the key is an expected key type", async() => {
+    it("Should validate if the key is an expected key type", async () => {
       expect.assertions(1);
       const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
       expect(OpenpgpAssertion.assertDecryptedPrivateKey(key)).toBeUndefined();
     });
 
-    it("Should throw an Error if the key is an not of an expected key type", async() => {
+    it("Should throw an Error if the key is an not of an expected key type", async () => {
       const typeError = new Error("The key should be a valid openpgp private key.");
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const adaPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
       const scenarios = [
-        {input: 1234, expectedError: typeError},
-        {input: true, expectedError: typeError},
-        {input: adaPublicKey, expectedError: typeError},
-        {input: message, expectedError: typeError},
-        {input: adaPrivateKey, expectedError: new Error("The private key should be decrypted.")},
+        { input: 1234, expectedError: typeError },
+        { input: true, expectedError: typeError },
+        { input: adaPublicKey, expectedError: typeError },
+        { input: message, expectedError: typeError },
+        { input: adaPrivateKey, expectedError: new Error("The private key should be decrypted.") },
       ];
 
       expect.assertions(scenarios.length);
@@ -429,17 +383,17 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertDecryptedPrivateKeys", () => {
-    it("Should validate if all the keys are of an expected key type", async() => {
+    it("Should validate if all the keys are of an expected key type", async () => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.private_decrypted,
-        pgpKeys.betty.private_decrypted
+        pgpKeys.betty.private_decrypted,
       ]);
 
       expect.assertions(1);
       expect(OpenpgpAssertion.assertDecryptedPrivateKeys(readKeys)).toBeUndefined();
     });
 
-    it("Should throw an Error if one of the key is not decrypted", async() => {
+    it("Should throw an Error if one of the key is not decrypted", async () => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.private_decrypted,
         pgpKeys.betty.private_decrypted,
@@ -454,7 +408,7 @@ describe("OpenPGP Assertions", () => {
       }
     });
 
-    it("Should throw an Error if one of the key is an not of an expected key type", async() => {
+    it("Should throw an Error if one of the key is an not of an expected key type", async () => {
       const adaPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
       const bettyPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
       const readKeys = [adaPrivateKey, bettyPrivateKey, pgpKeys.ecdsa_p521.public];
@@ -467,7 +421,7 @@ describe("OpenPGP Assertions", () => {
       }
     });
 
-    it("Should throw an Error if the provided argument is not an array", async() => {
+    it("Should throw an Error if the provided argument is not an array", async () => {
       expect.assertions(1);
       try {
         OpenpgpAssertion.assertDecryptedPrivateKeys("I'm not array :D");
@@ -478,29 +432,29 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertEncryptedPrivateKey", () => {
-    it("Should validate if the key is an expected key type", async() => {
+    it("Should validate if the key is an expected key type", async () => {
       expect.assertions(1);
       const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
       expect(OpenpgpAssertion.assertEncryptedPrivateKey(key)).toBeUndefined();
     });
 
-    it("Should validate if the key is a legacy ECC key type", async() => {
+    it("Should validate if the key is a legacy ECC key type", async () => {
       expect.assertions(1);
       const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.OpenPpgJsV5EccLegacy.private);
       expect(OpenpgpAssertion.assertEncryptedPrivateKey(key)).toBeUndefined();
     });
 
-    it("Should throw an Error if the key is an not of an expected key type", async() => {
+    it("Should throw an Error if the key is an not of an expected key type", async () => {
       const typeError = new Error("The key should be a valid openpgp private key.");
       const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const adaPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
       const scenarios = [
-        {input: 1234, expectedError: typeError},
-        {input: true, expectedError: typeError},
-        {input: adaPublicKey, expectedError: typeError},
-        {input: message, expectedError: typeError},
-        {input: adaPrivateKey, expectedError: new Error("The private key should be encrypted.")},
+        { input: 1234, expectedError: typeError },
+        { input: true, expectedError: typeError },
+        { input: adaPublicKey, expectedError: typeError },
+        { input: message, expectedError: typeError },
+        { input: adaPrivateKey, expectedError: new Error("The private key should be encrypted.") },
       ];
 
       expect.assertions(scenarios.length);
@@ -515,7 +469,7 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertEncryptedPrivateKeys", () => {
-    it("Should validate if all the keys are of an expected key type", async() => {
+    it("Should validate if all the keys are of an expected key type", async () => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.private,
         pgpKeys.betty.private,
@@ -526,7 +480,7 @@ describe("OpenPGP Assertions", () => {
       expect(OpenpgpAssertion.assertEncryptedPrivateKeys(readKeys)).toBeUndefined();
     });
 
-    it("Should throw an Error if one of the key is not encrypted", async() => {
+    it("Should throw an Error if one of the key is not encrypted", async () => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.private,
         pgpKeys.betty.private,
@@ -541,11 +495,11 @@ describe("OpenPGP Assertions", () => {
       }
     });
 
-    it("Should throw an Error if one of the key is an not of an expected key type", async() => {
+    it("Should throw an Error if one of the key is an not of an expected key type", async () => {
       const readKeys = await OpenpgpAssertion.readAllKeysOrFail([
         pgpKeys.ada.private,
         pgpKeys.betty.private,
-        pgpKeys.ecdsa_p521.public
+        pgpKeys.ecdsa_p521.public,
       ]);
 
       expect.assertions(1);
@@ -556,7 +510,7 @@ describe("OpenPGP Assertions", () => {
       }
     });
 
-    it("Should throw an Error if the provided argument is not an array", async() => {
+    it("Should throw an Error if the provided argument is not an array", async () => {
       expect.assertions(1);
       try {
         OpenpgpAssertion.assertEncryptedPrivateKeys("I'm not array :D");
@@ -567,21 +521,16 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertMessage", () => {
-    it("Should validate if the message is of an expected key type", async() => {
+    it("Should validate if the message is of an expected key type", async () => {
       const readMessage = await OpenpgpAssertion.createMessageOrFail("Message");
       expect.assertions(1);
       expect(readMessage).toBeInstanceOf(openpgp.Message);
     });
 
-    it("Should throw an Error if the key is an not of an expected key type", async() => {
+    it("Should throw an Error if the key is an not of an expected key type", async () => {
       const expectedError = new Error("The message should be a valid openpgp message.");
       const adaPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
-      const scenarios = [
-        1234,
-        true,
-        pgpKeys.ada.public,
-        adaPrivateKey
-      ];
+      const scenarios = [1234, true, pgpKeys.ada.public, adaPrivateKey];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
@@ -595,7 +544,7 @@ describe("OpenPGP Assertions", () => {
   });
 
   describe("OpenPGP Assertions::assertSessionKey", () => {
-    it("Should validate if the session key is valid", async() => {
+    it("Should validate if the session key is valid", async () => {
       expect.assertions(1);
       const sessionKeyString = "9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC";
       const readSessionKey = await OpenpgpAssertion.readSessionKeyOrFail(sessionKeyString);
@@ -603,52 +552,68 @@ describe("OpenPGP Assertions", () => {
       expect(() => OpenpgpAssertion.assertSessionKey(readSessionKey)).not.toThrowError();
     });
 
-    it("Should throw an Error if the session key is not an object", async() => {
+    it("Should throw an Error if the session key is not an object", async () => {
       expect.assertions(1);
-      expect(() => OpenpgpAssertion.assertSessionKey("error")).toThrowError(Error("The session keys should be an object."));
+      expect(() => OpenpgpAssertion.assertSessionKey("error")).toThrowError(
+        Error("The session keys should be an object."),
+      );
     });
 
-    it("Should throw an Error if the session key is not valid", async() => {
+    it("Should throw an Error if the session key is not valid", async () => {
       expect.assertions(1);
-      expect(() => OpenpgpAssertion.assertSessionKey({})).toThrowError(Error("The session keys should be a valid openpgp session key aes256."));
+      expect(() => OpenpgpAssertion.assertSessionKey({})).toThrowError(
+        Error("The session keys should be a valid openpgp session key aes256."),
+      );
     });
 
-    it("Should throw an Error if the session key has not AES256 algoithm", async() => {
+    it("Should throw an Error if the session key has not AES256 algoithm", async () => {
       expect.assertions(1);
-      expect(() => OpenpgpAssertion.assertSessionKey({data: new Uint8Array(32), algorithm: "aes128"})).toThrowError(Error("The session keys should be a valid openpgp session key aes256."));
+      expect(() => OpenpgpAssertion.assertSessionKey({ data: new Uint8Array(32), algorithm: "aes128" })).toThrowError(
+        Error("The session keys should be a valid openpgp session key aes256."),
+      );
     });
   });
 
   describe("OpenPGP Assertions::readSessionKeyOrFail", () => {
-    it("Should return openpgp.SessionKey", async() => {
+    it("Should return openpgp.SessionKey", async () => {
       expect.assertions(2);
       const sessionKey = "9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC";
       const readSessionKey = OpenpgpAssertion.readSessionKeyOrFail(sessionKey);
-      const dataExpected = Uint8ArrayConvert.fromHex("901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC");
+      const dataExpected = Uint8ArrayConvert.fromHex(
+        "901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC",
+      );
       expect(dataExpected).toHaveLength(32);
-      expect(readSessionKey).toEqual({data: dataExpected, algorithm: "aes256"});
+      expect(readSessionKey).toEqual({ data: dataExpected, algorithm: "aes256" });
     });
 
-    it("Should throw an Error if the session key is not string", async() => {
+    it("Should throw an Error if the session key is not string", async () => {
       expect.assertions(1);
-      expect(() => OpenpgpAssertion.readSessionKeyOrFail({})).toThrowError(TypeError("The session key should be a string."));
+      expect(() => OpenpgpAssertion.readSessionKeyOrFail({})).toThrowError(
+        TypeError("The session key should be a string."),
+      );
     });
 
-    it("Should throw an Error if the session key not following the format integer:hexadecimal-string", async() => {
+    it("Should throw an Error if the session key not following the format integer:hexadecimal-string", async () => {
       expect.assertions(1);
       const sessionKey = "error";
-      expect(() => OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).toThrowError(Error('The parameter session key does not match the expected format "integer:hexadecimal-string".'));
+      expect(() => OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).toThrowError(
+        Error('The parameter session key does not match the expected format "integer:hexadecimal-string".'),
+      );
     });
 
-    it("Should throw an Error if the session key is not valid", async() => {
+    it("Should throw an Error if the session key is not valid", async () => {
       expect.assertions(1);
       const sessionKey = "11:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC";
-      expect(() => OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).toThrowError(new Error("The session key should be a valid openpgp session key.", {cause: new Error("Invalid enum value.")}));
+      expect(() => OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).toThrowError(
+        new Error("The session key should be a valid openpgp session key.", {
+          cause: new Error("Invalid enum value."),
+        }),
+      );
     });
   });
 
   describe("OpenPGP Assertions::assertDecryptedMessage", () => {
-    it("Should validate if the message is of an expected key type", async() => {
+    it("Should validate if the message is of an expected key type", async () => {
       expect.assertions(2);
 
       const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
@@ -661,22 +626,26 @@ describe("OpenPGP Assertions", () => {
       expect(() => OpenpgpAssertion.assertDecryptedMessage(messageEncrypted)).not.toThrowError();
     });
 
-    it("Should throw an Error if the message does not contain session key", async() => {
+    it("Should throw an Error if the message does not contain session key", async () => {
       expect.assertions(1);
 
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
 
-      expect(() => OpenpgpAssertion.assertDecryptedMessage(message)).toThrowError(Error("The message should contain at least one session key."));
+      expect(() => OpenpgpAssertion.assertDecryptedMessage(message)).toThrowError(
+        Error("The message should contain at least one session key."),
+      );
     });
 
-    it("Should throw an Error if the message is not of an expected key type", async() => {
+    it("Should throw an Error if the message is not of an expected key type", async () => {
       expect.assertions(1);
 
       const publicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
       const message = await EncryptMessageService.encrypt("Message", publicKey);
       const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(message);
 
-      expect(() => OpenpgpAssertion.assertDecryptedMessage(messageEncrypted)).toThrowError(Error("The message should be decrypted."));
+      expect(() => OpenpgpAssertion.assertDecryptedMessage(messageEncrypted)).toThrowError(
+        Error("The message should be decrypted."),
+      );
     });
   });
 });

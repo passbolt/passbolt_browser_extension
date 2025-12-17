@@ -13,21 +13,19 @@
  */
 
 import ResourceService from "../api/resource/resourceService";
-import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
+import { ApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import ResourceTypeService from "../api/resourceType/resourceTypeService";
-import {
-  resourceTypesCollectionDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import GetOrFindResourcesService from "./getOrFindResourcesService";
 import FindAndUpdateResourcesLocalStorage from "./findAndUpdateResourcesLocalStorageService";
-import {multipleResourceDtos} from "./getOrFindResourcesService.test.data";
-import {resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
+import { multipleResourceDtos } from "./getOrFindResourcesService.test.data";
+import { resourceAllTypesDtosCollection } from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 
 jest.useFakeTimers();
 
@@ -39,10 +37,10 @@ beforeEach(() => {
 describe("GetOrFindResourcesService", () => {
   // mock data
   const account = new AccountEntity(defaultAccountDto());
-  const apiClientOptions = new ApiClientOptions().setBaseUrl('https://localhost');
+  const apiClientOptions = new ApiClientOptions().setBaseUrl("https://localhost");
 
   describe("::getOrFindAll", () => {
-    it("retrieves empty resources from the API when the local storage is not initialized", async() => {
+    it("retrieves empty resources from the API when the local storage is not initialized", async () => {
       expect.assertions(6);
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
@@ -59,7 +57,7 @@ describe("GetOrFindResourcesService", () => {
       expect(await ResourceLocalStorage.get()).toEqual([]);
     });
 
-    it("retrieves resources of all types from the API when the local storage is not initialized.", async() => {
+    it("retrieves resources of all types from the API when the local storage is not initialized.", async () => {
       expect.assertions(4);
       const resourcesDto = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
@@ -74,7 +72,7 @@ describe("GetOrFindResourcesService", () => {
       expect(await ResourceLocalStorage.get()).toEqual(resourcesDto);
     });
 
-    it("retrieves resources of all types from the local storage when the local storage is initialized.", async() => {
+    it("retrieves resources of all types from the local storage when the local storage is initialized.", async () => {
       expect.assertions(5);
       const resourcesDto = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll");
@@ -91,7 +89,7 @@ describe("GetOrFindResourcesService", () => {
       expect(await ResourceLocalStorage.get()).toEqual(resourcesDto);
     });
 
-    it("does not validate the resources collection if the information is retrieved from the runtime cache.", async() => {
+    it("does not validate the resources collection if the information is retrieved from the runtime cache.", async () => {
       expect.assertions(2);
       jest.spyOn(ResourceService.prototype, "findAll");
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
@@ -106,7 +104,7 @@ describe("GetOrFindResourcesService", () => {
       expect(ResourcesCollection.prototype.validateSchema).toHaveBeenCalledTimes(1);
     });
 
-    it("validates resources collection if the local storage has no runtime cache and the information is retrieved from the local storage.", async() => {
+    it("validates resources collection if the local storage has no runtime cache and the information is retrieved from the local storage.", async () => {
       expect.assertions(2);
       jest.spyOn(ResourceService.prototype, "findAll");
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
@@ -129,7 +127,7 @@ describe("GetOrFindResourcesService", () => {
     beforeEach(() => {
       service = new GetOrFindResourcesService(account, apiClientOptions);
     });
-    it("should return an empty resource collection without URL", async() => {
+    it("should return an empty resource collection without URL", async () => {
       expect.assertions(2);
 
       const resources = await service.getOrFindSuggested();
@@ -138,19 +136,25 @@ describe("GetOrFindResourcesService", () => {
       expect(resources).toHaveLength(0);
     });
 
-    it("should filter the collection by supported resource types and filter by suggested url", async() => {
+    it("should filter the collection by supported resource types and filter by suggested url", async () => {
       expect.assertions(4);
 
-      const suggestedResource1 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["https://passbolt.com"]})});
-      const suggestedResource2 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["passbolt.com"]})});
-      const notSuggestedResource1 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["nost-passbolt.com"]})});
-      const notSuggestedResource2 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: [""]})});
+      const suggestedResource1 = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+      });
+      const suggestedResource2 = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["passbolt.com"] }),
+      });
+      const notSuggestedResource1 = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["nost-passbolt.com"] }),
+      });
+      const notSuggestedResource2 = defaultResourceDto({ metadata: defaultResourceMetadataDto({ uris: [""] }) });
 
       const resourcesCollectionDto = [
         suggestedResource1,
         suggestedResource2,
         notSuggestedResource1,
-        notSuggestedResource2
+        notSuggestedResource2,
       ];
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
@@ -164,8 +168,7 @@ describe("GetOrFindResourcesService", () => {
       expect(resources.getFirstById(suggestedResource2.id)).toBeTruthy();
     });
 
-
-    it("should not return any resources if no suggestions are found.", async() => {
+    it("should not return any resources if no suggestions are found.", async () => {
       expect.assertions(2);
 
       const resourcesCollectionDto = resourceAllTypesDtosCollection();
@@ -186,13 +189,13 @@ describe("GetOrFindResourcesService", () => {
     beforeEach(() => {
       service = new GetOrFindResourcesService(account, apiClientOptions);
     });
-    it("should assert the given parameters", async() => {
+    it("should assert the given parameters", async () => {
       expect.assertions(1);
 
       await expect(() => service.getOrFindByIds()).rejects.toThrow("The given parameter is not a valid array");
     });
 
-    it("should filter the collection by the given ids", async() => {
+    it("should filter the collection by the given ids", async () => {
       expect.assertions(4);
 
       const matchingIdResource1 = defaultResourceDto();
@@ -204,7 +207,7 @@ describe("GetOrFindResourcesService", () => {
         matchingIdResource1,
         matchingIdResource2,
         notMatchingIdResource1,
-        notMatchingIdResource2
+        notMatchingIdResource2,
       ];
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);

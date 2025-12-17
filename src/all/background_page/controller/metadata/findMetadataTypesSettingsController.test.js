@@ -13,19 +13,16 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindMetadataTypesSettingsController from "./findMetadataTypesSettingsController";
 import {
   defaultMetadataTypesSettingsV4Dto,
-  defaultMetadataTypesSettingsV50FreshDto
+  defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {
-  defaultCeOrganizationSettings
-} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -36,7 +33,7 @@ jest.mock("../../service/passphrase/getPassphraseService");
 describe("FindMetadataTypesSettingsController", () => {
   let controller, account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
     controller = new FindMetadataTypesSettingsController(null, null, apiClientOptions, account);
@@ -45,31 +42,46 @@ describe("FindMetadataTypesSettingsController", () => {
   });
 
   describe("::exec", () => {
-    it("get or find metadata types settings for a v5.", async() => {
+    it("get or find metadata types settings for a v5.", async () => {
       expect.assertions(3);
 
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
       const siteSettingsDto = defaultCeOrganizationSettings();
-      jest.spyOn(controller.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService, "findTypesSettings")
+      jest
+        .spyOn(
+          controller.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService,
+          "findTypesSettings",
+        )
         .mockImplementationOnce(() => new MetadataTypesSettingsEntity(metadataTypesSettingsDto));
-      jest.spyOn(controller.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel.organizationSettingsService, "find")
+      jest
+        .spyOn(
+          controller.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel
+            .organizationSettingsService,
+          "find",
+        )
         .mockImplementation(() => siteSettingsDto);
 
       const metadataTypesSettings = await controller.exec();
 
       expect(metadataTypesSettings).toBeInstanceOf(MetadataTypesSettingsEntity);
       expect(metadataTypesSettings.toDto()).toEqual(metadataTypesSettingsDto);
-      const storageValue = await controller.findAndUpdateMetadataSettingsLocalStorageService.metadataTypesSettingsLocalStorage.get();
+      const storageValue =
+        await controller.findAndUpdateMetadataSettingsLocalStorageService.metadataTypesSettingsLocalStorage.get();
       expect(storageValue).toEqual(metadataTypesSettingsDto);
     });
 
-    it("get or find metadata types settings for a v4.", async() => {
+    it("get or find metadata types settings for a v4.", async () => {
       expect.assertions(3);
 
       const siteSettingsDto = defaultCeOrganizationSettings();
       // disable the plugin metadata.
       delete siteSettingsDto.passbolt.plugins.metadata;
-      jest.spyOn(controller.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel.organizationSettingsService, "find")
+      jest
+        .spyOn(
+          controller.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel
+            .organizationSettingsService,
+          "find",
+        )
         .mockImplementation(() => siteSettingsDto);
 
       const metadataTypesSettings = await controller.exec();
@@ -77,7 +89,8 @@ describe("FindMetadataTypesSettingsController", () => {
       const expectedMetadataTypesSettingsDto = defaultMetadataTypesSettingsV4Dto();
       expect(metadataTypesSettings).toBeInstanceOf(MetadataTypesSettingsEntity);
       expect(metadataTypesSettings.toDto()).toEqual(expectedMetadataTypesSettingsDto);
-      const storageValue = await controller.findAndUpdateMetadataSettingsLocalStorageService.metadataTypesSettingsLocalStorage.get();
+      const storageValue =
+        await controller.findAndUpdateMetadataSettingsLocalStorageService.metadataTypesSettingsLocalStorage.get();
       expect(storageValue).toEqual(expectedMetadataTypesSettingsDto);
     });
   });

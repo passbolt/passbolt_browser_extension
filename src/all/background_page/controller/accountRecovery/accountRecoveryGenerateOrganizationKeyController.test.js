@@ -14,12 +14,12 @@
 
 import AccountRecoveryGenerateOrganizationKeyController from "./accountRecoveryGenerateOrganizationKeyController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import * as openpgp from 'openpgp';
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import * as openpgp from "openpgp";
 
 describe("AccountRecoveryGenerateOrganizationKeyController", () => {
   describe("AccountRecoveryGenerateOrganizationKeyController::exec", () => {
-    it("Should assert provided generate key pair dto is valid.", async() => {
+    it("Should assert provided generate key pair dto is valid.", async () => {
       await MockExtension.withConfiguredAccount();
       const controller = new AccountRecoveryGenerateOrganizationKeyController(null, null, defaultApiClientOptions());
       const promise = controller.exec();
@@ -28,7 +28,7 @@ describe("AccountRecoveryGenerateOrganizationKeyController", () => {
       await expect(promise).rejects.toThrowError("Could not validate entity GenerateGpgKeyPairOptionsEntity.");
     });
 
-    it("Should generate an account recovery organization key pair.", async() => {
+    it("Should generate an account recovery organization key pair.", async () => {
       await MockExtension.withConfiguredAccount();
       const controller = new AccountRecoveryGenerateOrganizationKeyController(null, null, defaultApiClientOptions());
       const generateKeyPairDto = {
@@ -41,7 +41,9 @@ describe("AccountRecoveryGenerateOrganizationKeyController", () => {
       expect.assertions(3);
       expect(gpgKeyPair.publicKey).not.toBeNull();
       expect(gpgKeyPair.privateKey).not.toBeNull();
-      const openpgpKeyRsaBits = (await openpgp.readKey({armoredKey: gpgKeyPair.privateKey.armoredKey})).getAlgorithmInfo().bits;
+      const openpgpKeyRsaBits = (
+        await openpgp.readKey({ armoredKey: gpgKeyPair.privateKey.armoredKey })
+      ).getAlgorithmInfo().bits;
       expect(openpgpKeyRsaBits).toEqual(4096);
     }, 20000);
   });

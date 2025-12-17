@@ -16,9 +16,9 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {
   defaultGroupDto,
-  minimumGroupUserDto
+  minimumGroupUserDto,
 } from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
-import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
+import { defaultGroupUser } from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
 import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 
@@ -76,7 +76,7 @@ describe("GroupEntity", () => {
       const entity = new GroupEntity(dto);
       expect(entity.toDto(GroupEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
       expect(entity.id).toBeNull();
-      expect(entity.name).toEqual('Current group');
+      expect(entity.name).toEqual("Current group");
       expect(entity.created).toBeNull();
       expect(entity.modified).toBeNull();
       expect(entity.createdBy).toBeNull();
@@ -87,11 +87,14 @@ describe("GroupEntity", () => {
 
     it("works if valid complete DTO is provided", () => {
       expect.assertions(12);
-      const dto = defaultGroupDto({}, {withMyGroupUser: true, withCreator: true, withModifier: true, withGroupsUsers: true});
+      const dto = defaultGroupDto(
+        {},
+        { withMyGroupUser: true, withCreator: true, withModifier: true, withGroupsUsers: true },
+      );
       const entity = new GroupEntity(dto);
       expect(entity.toDto(GroupEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
       expect(entity.id).toEqual(dto.id);
-      expect(entity.name).toEqual('Current group');
+      expect(entity.name).toEqual("Current group");
       expect(entity.created).toEqual(dto.created);
       expect(entity.modified).toEqual(dto.modified);
       expect(entity.createdBy).toEqual(dto.created_by);
@@ -105,14 +108,11 @@ describe("GroupEntity", () => {
 
     it("should, with enabling the ignore invalid option, ignore groups users which do not validate their schema", () => {
       const dto = defaultGroupDto({
-        groups_users: [
-          defaultGroupUser({group_id: 42}),
-          defaultGroupUser(),
-        ]
+        groups_users: [defaultGroupUser({ group_id: 42 }), defaultGroupUser()],
       });
 
       expect.assertions(2);
-      const entity = new GroupEntity(dto, {ignoreInvalidEntity: true});
+      const entity = new GroupEntity(dto, { ignoreInvalidEntity: true });
       expect(entity._groups_users).toHaveLength(1);
       expect(entity._groups_users.items[0]._props.id).toEqual(dto.groups_users[1].id);
     });
@@ -123,10 +123,7 @@ describe("GroupEntity", () => {
      */
     it("should throw if one of associated collection data item does not validate their schema", () => {
       const dto = defaultGroupDto({
-        groups_users: [
-          defaultGroupUser({group_id: 42}),
-          defaultGroupUser(),
-        ]
+        groups_users: [defaultGroupUser({ group_id: 42 }), defaultGroupUser()],
       });
 
       expect.assertions(2);

@@ -14,7 +14,7 @@
 import NeededSecretEntity from "./neededSecretEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultNeededSecretDto} from "passbolt-styleguide/src/shared/models/entity/secret/neededSecretEntity.test.data";
+import { defaultNeededSecretDto } from "passbolt-styleguide/src/shared/models/entity/secret/neededSecretEntity.test.data";
 
 describe("Needed secret entity", () => {
   describe("::getSchema", () => {

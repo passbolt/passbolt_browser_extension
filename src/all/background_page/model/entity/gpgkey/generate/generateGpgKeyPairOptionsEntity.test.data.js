@@ -16,7 +16,7 @@ export const minimalDto = (data = {}) => {
   const defaultData = {
     name: "Ada Lovelace",
     email: "ada@passbolt.com",
-    passphrase: "passphrase"
+    passphrase: "passphrase",
   };
 
   return Object.assign(defaultData, data);
@@ -26,7 +26,7 @@ export const defaultDto = (data = {}) => {
   const defaultData = {
     keySize: 4096,
     type: "rsa",
-    date: (new Date()).getTime(),
+    date: new Date().getTime(),
   };
 
   return minimalDto(Object.assign(defaultData, data));

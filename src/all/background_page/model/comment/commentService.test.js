@@ -13,21 +13,20 @@
  */
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {v4 as uuidv4} from "uuid";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { v4 as uuidv4 } from "uuid";
+import { enableFetchMocks } from "jest-fetch-mock";
 import CommentApiService from "../../service/api/comment/commentApiService";
 import CommentService from "./commentService";
-import {defaultCommentCollectionDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntityCollection.test.data";
+import { defaultCommentCollectionDto } from "passbolt-styleguide/src/shared/models/entity/comment/commentEntityCollection.test.data";
 import CommentsCollection from "../entity/comment/commentsCollection";
-import {defaultCommentDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
+import { defaultCommentDto } from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
 import CommentEntity from "../entity/comment/commentEntity";
 
 describe("CommentService", () => {
-  let apiClientOptions, account,
-    service;
+  let apiClientOptions, account, service;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     jest.clearAllMocks();
     fetch.resetMocks();
@@ -36,8 +35,8 @@ describe("CommentService", () => {
     service = new CommentService(apiClientOptions, account);
   });
 
-  describe('::findAllByResourceId', () => {
-    it("Should call the comments service API to get the comments collection", async() => {
+  describe("::findAllByResourceId", () => {
+    it("Should call the comments service API to get the comments collection", async () => {
       expect.assertions(2);
       const resourceId = uuidv4();
       const commentsDto = defaultCommentCollectionDto();
@@ -49,15 +48,15 @@ describe("CommentService", () => {
       expect(resultsDto).toBeInstanceOf(CommentsCollection);
     });
 
-    it("should throw an error if id is not defined", async() => {
+    it("should throw an error if id is not defined", async () => {
       expect.assertions(1);
       const promise = service.findAllByResourceId();
       await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
     });
   });
 
-  describe('::create', () => {
-    it("Should call the comments service API to create a new comment", async() => {
+  describe("::create", () => {
+    it("Should call the comments service API to create a new comment", async () => {
       expect.assertions(2);
       const commentDto = new CommentEntity(defaultCommentDto());
 
@@ -68,7 +67,7 @@ describe("CommentService", () => {
       expect(resultsDto).toStrictEqual(commentDto);
     });
 
-    it("should throw an error if comment is not defined", async() => {
+    it("should throw an error if comment is not defined", async () => {
       expect.assertions(1);
       const commentDto = new CommentEntity(defaultCommentDto());
       jest.spyOn(CommentApiService.prototype, "create").mockImplementation(() => null);
@@ -77,8 +76,8 @@ describe("CommentService", () => {
     });
   });
 
-  describe('::delete', () => {
-    it("Should call the comments service API to delete a new comment", async() => {
+  describe("::delete", () => {
+    it("Should call the comments service API to delete a new comment", async () => {
       expect.assertions(1);
       const resourceId = uuidv4();
 
@@ -88,7 +87,7 @@ describe("CommentService", () => {
       await expect(service.delete(resourceId)).resolves.not.toThrow();
     });
 
-    it("should throw an error if comment id is not defined", async() => {
+    it("should throw an error if comment id is not defined", async () => {
       expect.assertions(1);
 
       const expectedError = new Error("The given parameter is not a valid UUID");

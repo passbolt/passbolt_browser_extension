@@ -13,16 +13,16 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { ApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import FolderService from "../api/folder/folderService";
 import FindAndUpdateFoldersLocalStorageService from "./findAndUpdateFoldersLocalStorageService";
 import GetOrFindFoldersService from "./getOrFindFoldersService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import FolderLocalStorage from "../local_storage/folderLocalStorage";
-import {defaultFolderDto} from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
-import {defaultFoldersCollectionDto} from "passbolt-styleguide/src/shared/models/entity/folder/foldersCollection.test.data";
-import {v4 as uuidv4} from "uuid";
+import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { defaultFoldersCollectionDto } from "passbolt-styleguide/src/shared/models/entity/folder/foldersCollection.test.data";
+import { v4 as uuidv4 } from "uuid";
 
 jest.useFakeTimers();
 
@@ -34,10 +34,10 @@ beforeEach(() => {
 describe("GetOrFindFoldersService", () => {
   // mock data
   const account = new AccountEntity(defaultAccountDto());
-  const apiClientOptions = new ApiClientOptions().setBaseUrl('https://localhost');
+  const apiClientOptions = new ApiClientOptions().setBaseUrl("https://localhost");
 
   describe("::getOrFindAll", () => {
-    it("retrieves empty folders from the API when the local storage is not initialized", async() => {
+    it("retrieves empty folders from the API when the local storage is not initialized", async () => {
       expect.assertions(5);
       jest.spyOn(FolderService.prototype, "findAll").mockImplementation(() => []);
       jest.spyOn(FindAndUpdateFoldersLocalStorageService.prototype, "findAndUpdateAll");
@@ -52,7 +52,7 @@ describe("GetOrFindFoldersService", () => {
       expect(await FolderLocalStorage.get()).toEqual([]);
     });
 
-    it("retrieves folders from the API when the local storage is not initialized.", async() => {
+    it("retrieves folders from the API when the local storage is not initialized.", async () => {
       expect.assertions(4);
       const foldersDto = [defaultFolderDto(), defaultFolderDto(), defaultFolderDto(), defaultFolderDto()];
       jest.spyOn(FolderService.prototype, "findAll").mockImplementation(() => foldersDto);
@@ -66,7 +66,7 @@ describe("GetOrFindFoldersService", () => {
       expect(await FolderLocalStorage.get()).toEqual(foldersDto);
     });
 
-    it("retrieves folders from the local storage when the local storage is initialized.", async() => {
+    it("retrieves folders from the local storage when the local storage is initialized.", async () => {
       expect.assertions(5);
       const foldersDto = [defaultFolderDto(), defaultFolderDto(), defaultFolderDto(), defaultFolderDto()];
       jest.spyOn(FolderService.prototype, "findAll");
@@ -82,7 +82,7 @@ describe("GetOrFindFoldersService", () => {
       expect(await FolderLocalStorage.get()).toEqual(foldersDto);
     });
 
-    it("does not validate the folders collection if the information is retrieved from the runtime cache.", async() => {
+    it("does not validate the folders collection if the information is retrieved from the runtime cache.", async () => {
       expect.assertions(2);
       jest.spyOn(FolderService.prototype, "findAll");
       jest.spyOn(FoldersCollection.prototype, "validateSchema");
@@ -96,7 +96,7 @@ describe("GetOrFindFoldersService", () => {
       expect(FoldersCollection.prototype.validateSchema).toHaveBeenCalledTimes(1);
     });
 
-    it("validates folders collection if the local storage has no runtime cache and the information is retrieved from the local storage.", async() => {
+    it("validates folders collection if the local storage has no runtime cache and the information is retrieved from the local storage.", async () => {
       expect.assertions(2);
       jest.spyOn(FolderService.prototype, "findAll");
       jest.spyOn(FoldersCollection.prototype, "validateSchema");
@@ -113,7 +113,7 @@ describe("GetOrFindFoldersService", () => {
   });
 
   describe("::getOrFindById", () => {
-    it("retrieves a folder from the in a collection given its id", async() => {
+    it("retrieves a folder from the in a collection given its id", async () => {
       expect.assertions(1);
 
       const folders = new FoldersCollection(defaultFoldersCollectionDto());
@@ -125,7 +125,7 @@ describe("GetOrFindFoldersService", () => {
       expect(folder).toStrictEqual(folders.items[2]);
     });
 
-    it("returns undefined if nothing is found", async() => {
+    it("returns undefined if nothing is found", async () => {
       expect.assertions(1);
 
       const folders = new FoldersCollection(defaultFoldersCollectionDto());
@@ -137,11 +137,13 @@ describe("GetOrFindFoldersService", () => {
       expect(folder).toBeUndefined();
     });
 
-    it("should assert its parameter", async() => {
+    it("should assert its parameter", async () => {
       expect.assertions(1);
 
       const service = new GetOrFindFoldersService(account, apiClientOptions);
-      await expect(() => service.getOrFindById("test")).rejects.toThrow(new Error("The given parameter is not a valid UUID"));
+      await expect(() => service.getOrFindById("test")).rejects.toThrow(
+        new Error("The given parameter is not a valid UUID"),
+      );
     });
   });
 });

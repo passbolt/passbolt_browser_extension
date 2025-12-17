@@ -21,7 +21,7 @@ describe("Locale entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "locale": "en-UK",
+      locale: "en-UK",
     };
 
     const entity = new LocaleEntity(dto);
@@ -41,15 +41,14 @@ describe("Locale entity", () => {
   it("constructor returns validation error if dto required fields are invalid", () => {
     try {
       new LocaleEntity({
-        "locale": "🏆‍️"
+        locale: "🏆‍️",
       });
       expect(false).toBe(true);
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        locale: {pattern: 'The locale is not valid.'},
+        locale: { pattern: "The locale is not valid." },
       });
     }
   });
 });
-

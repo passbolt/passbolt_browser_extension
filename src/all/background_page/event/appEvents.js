@@ -86,6 +86,7 @@ import FindResourceSecretRevisionsForDisplayController from "../controller/secre
 import DeleteSecretRevisionsSettingsController from "../controller/secretRevision/deleteSecretRevisionsSettingsController";
 import SaveSecretRevisionsSettingsController from "../controller/secretRevision/saveSecretRevisionsSettingsController";
 import FindSubscriptionKeyController from '../controller/subscription/findSubscriptionKeyController';
+import UpdateSubscriptionKeyController from '../controller/subscription/updateSubscriptionKeyController';
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -694,7 +695,7 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec(resourceId);
   });
 
-  /*
+  /**
    * Find the subscription key
    *
    * @listens passbolt.subscription.get
@@ -703,6 +704,18 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.subscription.get', async requestId => {
     const subscriptionKeyController = new FindSubscriptionKeyController(worker, requestId, apiClientOptions);
     await subscriptionKeyController._exec();
+  });
+
+  /**
+   * Update the subscription key
+   *
+   * @listens passbolt.subscription.update
+   * @param requestId {uuid} The request identifier
+   * @param subscriptionKeyDto {{ data: string }} The new subscription key
+   */
+  worker.port.on('passbolt.subscription.update', async(requestId, subscriptionKeyDto) => {
+    const subscriptionController = new UpdateSubscriptionKeyController(worker, requestId, apiClientOptions);
+    return await subscriptionController._exec(subscriptionKeyDto);
   });
 };
 export const AppEvents = {listen};

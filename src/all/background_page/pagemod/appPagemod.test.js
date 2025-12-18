@@ -25,7 +25,6 @@ import { ResourceTypeEvents } from "../event/resourceTypeEvents";
 import { RoleEvents } from "../event/roleEvents";
 import { SecretEvents } from "../event/secretEvents";
 import { ShareEvents } from "../event/shareEvents";
-import { SubscriptionEvents } from "../event/subscriptionEvents";
 import { GroupEvents } from "../event/groupEvents";
 import { CommentEvents } from "../event/commentEvents";
 import { TagEvents } from "../event/tagEvents";
@@ -58,7 +57,6 @@ jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ShareEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(SubscriptionEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(GroupEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(CommentEvents, "listen").mockImplementation(jest.fn());
@@ -85,7 +83,7 @@ describe("App", () => {
 
   describe("App::attachEvents", () => {
     it("Should attach events", async () => {
-      expect.assertions(32);
+      expect.assertions(31);
       // data mocked
       const port = {
         _port: {
@@ -120,7 +118,6 @@ describe("App", () => {
       expect(SecretEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ShareEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(SubscriptionEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(GroupEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(CommentEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
@@ -153,7 +150,6 @@ describe("App", () => {
         SecretEvents,
         OrganizationSettingsEvents,
         ShareEvents,
-        SubscriptionEvents,
         UserEvents,
         GroupEvents,
         CommentEvents,

@@ -13,32 +13,49 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         5.9.0
  */
-import UpdateSubscriptionKeyService from '../../service/subscription/updateSubscriptionKeyService';
-import UpdateSubscriptionEntity from '../../model/entity/subscription/update/updateSubscriptionEntity';
 
-class SubscriptionController {
+import UpdateSubscriptionEntity from '../../model/entity/subscription/update/updateSubscriptionEntity';
+import UpdateSubscriptionKeyService from '../../service/subscription/updateSubscriptionKeyService';
+
+export default class UpdateSubscriptionKeyController {
   /**
    * @constructor
    * @param {Worker} worker
+   * @param {string} requestId
    * @param {ApiClientOptions} apiClientOptions
    */
-  constructor(worker, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
+    this.requestId = requestId;
     this.updateSubscriptionService = new UpdateSubscriptionKeyService(apiClientOptions);
   }
 
   /**
+   * Controller executor
+   * @returns Promise<void>
+   */
+  async _exec() {
+    try {
+      const result = await this.exec.apply(this, arguments);
+      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(this.requestId, 'ERROR', error);
+    }
+  }
+
+  /**
    * Update the subscription key
-   * @param {SubscriptionEntity} subscriptionKeyDto The new subscription key
-   * @returns {Promise<SubscriptionEntity>} The updated subscription key
+   * @param {{ data: string }} subscriptionKeyDto The new subscription key
+   * @returns {Promise<SubscriptionEntity>} The subscription key
    * @throws {Error} Throws an error when encountering any network error
+   * @throws {ValidationError} Throws an error if subscriptionKeyDto format is incorrect
    * @throws {PassboltSubscriptionError} Throws `PassboltSubscriptionError` when payment is required
    */
-  async updateSubscription(subscriptionKeyDto) {
+  exec(subscriptionKeyDto) {
     const updateSubscriptionEntity = new UpdateSubscriptionEntity(subscriptionKeyDto);
-    return await this.updateSubscriptionService.update(updateSubscriptionEntity);
+    return this.updateSubscriptionService.update(updateSubscriptionEntity);
   }
 }
-
-export default SubscriptionController;

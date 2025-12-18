@@ -24,7 +24,6 @@ import {KeyringEvents} from "../event/keyringEvents";
 import {SecretEvents} from "../event/secretEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {ShareEvents} from "../event/shareEvents";
-import {SubscriptionEvents} from "../event/subscriptionEvents";
 import {UserEvents} from "../event/userEvents";
 import {GroupEvents} from "../event/groupEvents";
 import {CommentEvents} from "../event/commentEvents";
@@ -70,7 +69,6 @@ class App extends Pagemod {
       SecretEvents,
       OrganizationSettingsEvents,
       ShareEvents,
-      SubscriptionEvents,
       UserEvents,
       GroupEvents,
       CommentEvents,

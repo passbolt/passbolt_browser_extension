@@ -1,72 +1,102 @@
-Release song: https://www.youtube.com/watch?v=fMnh5Tn8aeM
+Release song: https://www.youtube.com/watch?v=F5uXomY94w8
 
-Passbolt 5.7.0 introduces secret history, a highly demanded feature that gives users visibility and control over previous versions of their secrets. This release also includes several usability improvements requested and bug fixes reported by the community.
+Passbolt 5.8.0 introduces dynamic role management, allowing organizations to define additional roles that better align with internal policies, compliance requirements, and operational needs. This release also adds drag & drop user assignment to groups, simplifying day-to-day user and group management.
 
-## Secret history
+**Warning**: Ensure that all users have updated their browser extension to at least version 5.8 before assigning new roles. Otherwise, they will not be able to connect to Passbolt.
 
-It is now possible to access previous revisions of a secret directly from Passbolt.
+## Dynamic role management
 
-Secret history helps reduce the impact of human error and offers a safer way to manage evolving secrets. For instance, this enables users to undo an accidental update on the spot. Note that the feature is disabled by default and requires an administrator to enable it from the administration workspace.
+As was already the case with the default User role, Passbolt allows administrators to restrict what users can do by limiting access to specific capabilities. With version 5.8, this model is extended beyond the default Admin and User roles, making it possible to create additional roles and assign them to users for more granular control.Default roles cannot be modified or deleted, while newly created roles (up to two per instance)  can copy permissions from existing roles and can be renamed or deleted.
 
-## User and group workspace improvements
+Dynamic roles also enable the delegation of administrative responsibilities. Rather than granting full administrative access, administrators can now assign selected capabilities to custom roles and distribute operational tasks across multiple users. Initial support covers group creation, as well as handling account recovery requests in Passbolt Pro.
 
-A new “Remove from group” action has been added to the user and group workspaces. This addition eliminates the confusion between permanently deleting a user and simply removing them from a specific group.
+At this stage, dynamic role management comes with a defined scope and set of constraints.
 
-Moreover, administrators can now instantly filter users that require attention via the “Attention Required” filter in the workspace. For instance: identifying users with a pending account recovery request to review, or missing metadata keys.
+- The default Admin and User roles keep fixed names and cannot be renamed or deleted.
+- As before, the User role can be restricted, but it cannot be assigned delegated administrative responsibilities.
+- The Admin role, by contrast, always retains access to all capabilities and cannot be restricted.
+- Custom roles are currently limited to two per instance and support a first set of administrative capabilities.
 
-## Import report
+This scope will be expanded progressively as additional needs and use cases are identified by the community.
 
-The application now displays a summary dialog after an import, offering accurate and actionable information. The report precisely categorises alerts into successes, warnings and errors, providing end users with additional logs.
+## Drag & drop users to groups
+
+Managing group membership often requires repetitive actions when working with large teams or frequently changing group structures. With Passbolt 5.8, administrators can now add users to a group by dragging them directly onto it from the Users & Groups workspace. This removes the need to open and edit each group individually and makes day-to-day group management faster and more fluid.
 
 ## Miscellaneous improvements
-As usual this release is packed with improvements and bug fixes reported by the community. Notably, the reliability of autofill has been improved across a wider range of websites. If you find that autofill does not work on a particular website, feel free to open a bug report including the website details to help us identify the custom selector. For more, check out the changelog below.
 
-Many thanks to everyone who provided feedback, reported issues, and helped refine these new features.
+As usual, this release includes fixes and smaller improvements intended to improve the overall experience. For the full list of changes, please refer to the changelog.
+
+Many thanks to everyone who provided feedback and helped refine these features.
 
 ### Added
-- PB-17712 Focus should be put in the passphrase field when importing keepass file protected by passphrase
-- PB-33599 Allow users to access previous revisions of a resource’s secret
-- PB-33599 Allow administrators to configure how many secret revisions are retained
-- PB-44420 Allow administrators to download the Users Directory sync report for follow-up actions
-- PB-44434 As an administrator I can see encrypted metadata healthchecks from the administration workspace
-- PB-45249 Add “Attention required” filter in the “Users & groups” workspace to filter users by attention required
-- PB-45842 Add link to SCIM admin guide in the product
-- PB-46427 Add remove from group button in User & Group Workspace page
+- PB-46646 Reduce accidental destructive actions by moving Delete user and Disable MFA into a More menu in Users and groups
+- PB-28298 Add users to groups by dragging and dropping
+- PB-47198 Add exception to allow users to autofill workbench.cisecurity.org
+- PB-46997 DR - WP1.1 Update RbacsCollection to EntityV2Collection and add new methods
+- PB-46999 DR - WP1.2 Update RoleEntity schema and add new methods
+- PB-47000 DR - WP1.3 Update RolesCollection to EntityV2Collection and add new methods
+- PB-47002 DR - WP2.1 Update of RoleService to a RoleApiService
+- PB-47003 DR - WP2.2 Update of RoleModel to a RoleService
+- PB-47003 DR - WP2.3 Update of RbacService to a RbacApiService
+- PB-47014 DR - WP2.4 Update of RbacModel to a RbacService
+- PB-47015 DR - WP3.1 Create the FindAllRolesController and update the event
+- PB-47015 DR - WP3.1 Create the FindAllRolesController and update the event
+- PB-47017 DR - WP3.2 Update the FindMeController into a FindMeRbacController
+- PB-47088 DR - WP3.3 Create the FindAndUpdateRolesLocalStorageController
+- PB-47018 DR - WP4.1 Create RoleServiceWorkerService to get the roles
+- PB-47019 DR - WP4.2 Create RbacServiceWorkerService to get the RBAC permissions of a signed-in user
+- PB-47021 DR - WP4.3 Add the method canRoleUseAction in CanUseService
+- PB-47089 DR - WP4.4 Add a method to find and update roles in local storage
+- PB-47022 DR - WP5.1 Add the method canIUseAction in RbacContext
+- PB-47023 DR - WP5.2 Verify the signed-in user's RBAC privileges before allowing access to the FilterUsersByGroup functionality
+- PB-47024 DR - WP5.3 Verify the signed-in user's RBAC privileges before allowing access to the DisplayUserWorkspaceMainActions functionality
+
+- PB-47023 DR - WP5.4 Verify the signed-in user's RBAC privileges before allowing access to the DisplayUserWorkspaceActions functionality
+- PB-47036 DR - WP5.5 Verify the signed-in user's RBAC privileges before allowing access to the DisplayUsersWorkspaceFilterBar functionality
+- PB-47037 DR - WP5.6 Verify the signed-in user's RBAC privileges before allowing access to the DisplayUsers functionality
+- PB-47039 DR - WP5.7 Update CreateUser to select role in a dropdown component
+- PB-47042 DR - WP5.8 Update EditUser to select role in a dropdown component
+- PB-47027 DR - WP5.9 Create the component CreateRoleDialog
+- PB-47028 DR - WP5.10 Create the component EditRoleDialog
+- PB-47029 DR - WP5.11 Create the component DeleteRoleDialog
+- PB-47030 DR - WP5.12 Update the style of DisplayRbacAdministration to match current design
+- PB-47031 DR - WP5.13 Add create role in DisplayRbacAdministration
+- PB-47032 DR - WP5.14 Display all roles in DisplayRbacAdministration
+- PB-47033 DR - WP5.15 Add menu item to update the name of new role
+- PB-47016 DR - WP5.16 Add menu item to delete new role
+- PB-47090 DR - WP5.17 Update ManageAccountRecoveryUserSettings to use roles from context
+- PB-47091 DR - WP5.18 Update ReviewAccountRecoveryRequest to use roles from context
+- PB-47092 DR - WP5.19 Update DisplayScimSettingsAdministration to use roles from context
+- PB-47093 DR - WP5.20 Update DisplayUserDetailsInformation to use roles from context
+- PB-47094 DR - WP5.21 Update DisplayAccountRecoveryUserSettings to use roles from context
+- PB-47095 DR - WP5.22 Update UserWorkspaceContext to use roles from context
+- PB-47096 DR - WP5.23 Create the RoleContextProvider and add it on ExtAppContext
+- PB-47214 DR - WP5.24 Update the RoleEntity to avoid name bypass
+- PB-47215 DR - WP5.25 Update RolesCollection to filter out Guest role
+- PB-47216 DR - WP5.26 Update FindRolesService to filter out guest role
+- PB-47231 DR - WP5.27 Create component DeleteRoleNotAllowed
 
 ### Fixed
-- PB-18497 Add loading spinner when submitting imported GPG key during account extension association (activation/recover)
-- PB-36183 Display UTC date in tooltip for relative “X days ago” timestamps
-- PB-42032 Fix: update passphrase help section link goes to the former help site
-- PB-43950 Add padding between fields and their description on the Users Directory administration page
-- PB-44603 Help link in administration internationalization page should target the contribute page of the help site
-- PB-44949 GITHUB#240 Inform menu crash on suggested resource icon
-- PB-45263 Enforce password expiry on imported resources when a password policy requires it
-- PB-45588 Extend metadata description textarea in resource creation dialog to use full available height
-- PB-45699 User without groups is not display correctly on the right sidebar
-- PB-45723 The in-form CTA is not visible since v5.5 for some web application
-- PB-45797 Fix typos in BExt
-- PB-45917 I can autofill my username in the login form of cryptpad in French
-- PB-45992 Keep selection of resources when collapsing the Workspace section
-- PB-46013 Empty Full Report textarea displayed in Users Directory dialogs when there are no resources to synchronize
-- PB-46065 Prevent re-encryption of metadata with personal user key when a resource is shared with a group
-- PB-46118 Import unexpected error handling on import
-- PB-46191 Update UserSettings validateDomain to make sure the issue cannot be exploited
-- PB-46372 As LU, I should see the content share dialog within the boundaries of the dialog
-- PB-46385 Fix auto-fill on OVH with custom selector field on username
+- PB-46180 Incorrect folder name encoding in sharing progress dialog
+- PB-46612 Add missing border radius to secret history selected revision
+- PB-45978 Resize bar continues dragging after mouse release
+- PB-46905 Display the "Remove from group" action button to group managers
+- PB-46627 Fix missing space in the “Advanced settings” of the password generator tabs between the last component and the CTA
+- PB-46930 Secret history review should display an unknown user when creator does not exists
+- PB-47298 KDBX not set expiry if never is set
 
 ### Maintenance
-- PB-30373 Remove unused event passbolt.app-bootstrap.navigate-to-logout
-- PB-45099 Update: Regular expression on private key metadata validation
-- PB-45100 Update: Regular expression on GPG Message validation
-- PB-45585 Fix SCIM styleguide related unit tests error
-- PB-45589 Refactor resource favorite capability to use FavoriteServiceWorkerService instead of direct port requests
-- PB-45590 Migrate favorite logic from FavoriteModel to FavoriteResourceService and remove legacy model
-- PB-45591 Route passbolt.favorite.add/delete events through controllers instead of calling services directly
-- PB-45593 Add test coverage for FavoriteService API and rename class to align with Passbolt standard
-- PB-45678 Upgrade ESLint dependencies across both repositories
-- PB-45835 Migrate group (partially) related code to new architecture
-- PB-45894 Rename leftSideBar and rightSideBar classes to respect naming convention
-- PB-45963 Replace find-all with find-my-groups Port Requests
-- PB-45965 Rename groupService to groupApiService
-- PB-46127 Update i18next dependency
-- PB-46190 Update themeEntity to remove preview unused field
+- PB-46636 Remove eslint v8 compatibility
+- PB-46890 Small upgrade for js-yaml (Medium)
+- PB-46831 Increase coverage of passbolt-styleguide DisplayUserTheme to 100%, and verify no change occurs when the user selects the already-selected theme
+- PB-29338 React 18: upgrade changes with Legacy DOM renderer
+- PB-47057 React 18: Remove unused dev dependency jest-dom
+- PB-47069 DisplayResourceDetailsInformation Test Cases for Expired Passwords
+- PB-46831 Increase coverage of passbolt-styleguide DisplayUserTheme to 100%
+- PB-47069 DisplayResourceDetailsInformation Test Cases for Expired Passwords
+- PB-47311 Major upgrade for serialize-javascript (Medium)
+- PB-46832 Increase coverage of ThemeEntity
+- PB-46833 Increase coverage of AccountSettingsService
+- PB-46834 Increase coverage of ThemeModel
+- PB-47011 ESLINT - WP1.1 Install phantom dependencies

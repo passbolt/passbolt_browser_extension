@@ -12,10 +12,10 @@
  * @since         5.9.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindSubscriptionKeyController from "./findSubscriptionKeyController";
-import SubscriptionEntity from '../../model/entity/subscription/subscriptionEntity';
-import {KEY_DTO} from './findSubscriptionKeyController.test.data';
+import SubscriptionEntity from "../../model/entity/subscription/subscriptionEntity";
+import { KEY_DTO } from "./findSubscriptionKeyController.test.data";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -23,7 +23,7 @@ beforeEach(() => {
 
 describe("FindSubscriptionKeyController", () => {
   describe("::exec", () => {
-    it("should find subscription key", async() => {
+    it("should find subscription key", async () => {
       expect.assertions(2);
 
       const entity = new SubscriptionEntity(KEY_DTO);
@@ -36,7 +36,7 @@ describe("FindSubscriptionKeyController", () => {
       expect(controller.findSubscriptionService.find).toHaveBeenCalledTimes(1);
     });
 
-    it("should not catch errors", async() => {
+    it("should not catch errors", async () => {
       expect.assertions(1);
 
       const expectedError = new Error("Something went wrong!");

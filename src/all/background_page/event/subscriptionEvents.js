@@ -23,22 +23,6 @@ import SubscriptionController from "../controller/subscription/subscriptionContr
  */
 const listen = function(worker, apiClientOptions) {
   /*
-   * Find the subscription
-   *
-   * @listens passbolt.subscription.get
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.subscription.get', async requestId => {
-    const subscriptionController = new SubscriptionController(worker, apiClientOptions);
-    try {
-      const subscriptionEntity = await subscriptionController.getSubscription();
-      worker.port.emit(requestId, 'SUCCESS', subscriptionEntity);
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-  /*
    * Update the subscription key
    *
    * @listens passbolt.subscription.get

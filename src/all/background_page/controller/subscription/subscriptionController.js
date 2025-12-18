@@ -14,7 +14,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import FindSubscriptionKeyService from '../../service/subscription/findSubscriptionKeyService';
 import UpdateSubscriptionKeyService from '../../service/subscription/updateSubscriptionKeyService';
 import UpdateSubscriptionEntity from '../../model/entity/subscription/update/updateSubscriptionEntity';
 
@@ -26,19 +25,7 @@ class SubscriptionController {
    */
   constructor(worker, apiClientOptions) {
     this.worker = worker;
-
-    this.findSubscriptionService = new FindSubscriptionKeyService(apiClientOptions);
     this.updateSubscriptionService = new UpdateSubscriptionKeyService(apiClientOptions);
-  }
-
-  /**
-   * Get the subscription key
-   * @returns {Promise<SubscriptionEntity>} The subscription key
-   * @throws {Error} Throws an error when encountering any network error
-   * @throws {PassboltSubscriptionError} Throws `PassboltSubscriptionError` when payment is required
-   */
-  async getSubscription() {
-    return await this.findSubscriptionService.find();
   }
 
   /**

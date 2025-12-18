@@ -57,4 +57,30 @@ describe("Theme entity", () => {
       });
     }
   });
+
+  describe("::id", () => {
+    it("should return $expectedThemeEntityId of theme", () => {
+      expect.assertions(1);
+
+      const dto = defaultThemeDto();
+      const expectedThemeEntityId = dto.id;
+      const ThemeEntityObj = new ThemeEntity(dto);
+      const receivedThemeEntityId = ThemeEntityObj.id;
+
+      expect(receivedThemeEntityId).toMatch(expectedThemeEntityId);
+    });
+  });
+
+  describe("::name", () => {
+    it("should return $expectedThemeEntityName of theme", () => {
+      expect.assertions(1);
+
+      const dto = defaultThemeDto();
+      const expectedThemeEntityName = dto.name;
+      const ThemeEntityObj = new ThemeEntity(dto);
+      const receivedThemeEntityName = ThemeEntityObj.name;
+
+      expect(receivedThemeEntityName).toBe(expectedThemeEntityName);
+    });
+  });
 });

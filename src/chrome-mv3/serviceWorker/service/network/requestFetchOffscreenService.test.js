@@ -111,7 +111,6 @@ describe("RequestFetchOffscreenService", () => {
       const options = fetchOptionsWithBodyFormData();
 
       const offscreenData = await RequestFetchOffscreenService.buildOffscreenData(resource, options);
-      // eslint-disable-next-line object-shorthand
       const expectedOffscreenMessageData = {
         resource,
         options: {

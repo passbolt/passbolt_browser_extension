@@ -138,5 +138,6 @@
   "Updating resources metadata": "리소스 메타데이터를 업데이트 중",
   "Updating resources metadata {{counter}}/{{total}}": "리소스 메타데이터 업데이트 중 {{counter}}/{{total}}",
   "Updating users' key...": "사용자 키를 업데이트하는 중...",
+  "User key not found": "사용자 키가 없음",
   "You have already started the process on another tab.": "이미 다른 탭에서 프로세스를 시작했습니다."
 }

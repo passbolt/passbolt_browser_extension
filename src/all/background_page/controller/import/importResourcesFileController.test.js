@@ -701,6 +701,37 @@ describe("ImportResourcesFileController", () => {
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
     });
 
+    it("should import KDBX with expiry date", async() => {
+      expect.assertions(2);
+
+      const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-expiry.kdbx", {encoding: 'base64'});
+      const options = {
+        "credentials": {
+          "password": "passbolt"
+        }
+      };
+
+      const result = await controller.exec("kdbx", file, options);
+
+      expect(result.importResources.items[0].expired).not.toBeNull();
+      expect(result.importResources.items[0].expired).toBe("2025-12-09T12:41:34.000Z");
+    });
+
+    it("should import KDBX with never expiry (null)", async() => {
+      expect.assertions(1);
+
+      const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-never-expiry.kdbx", {encoding: 'base64'});
+      const options = {
+        "credentials": {
+          "password": "passbolt"
+        }
+      };
+
+      const result = await controller.exec("kdbx", file, options);
+
+      expect(result.importResources.items[0].expired).toBeNull();
+    });
+
     it("[performance] should ensure performance adding large dataset remains effective", async() => {
       const linesCount = 100;
       const defaultCsvDataFile = defaultKDBXCSVData(linesCount);

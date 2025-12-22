@@ -23,20 +23,20 @@ import SearchUsersAndGroupsController from "../controller/share/searchUsersAndGr
  * @param {ApiClientOptions} apiClientOptions the api client options
  * @param {AccountEntity} account the user account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Retrieve the folders to share.
    * @listens passbolt.share.get-folders
    * @param {array} foldersIds The ids of the folders to retrieve.
    */
-  worker.port.on('passbolt.share.get-folders', async(requestId, foldersIds) => {
+  worker.port.on("passbolt.share.get-folders", async (requestId, foldersIds) => {
     try {
       const folderModel = new FolderModel(apiClientOptions, account);
       const foldersCollection = await folderModel.findAllForShare(foldersIds);
-      worker.port.emit(requestId, 'SUCCESS', foldersCollection);
+      worker.port.emit(requestId, "SUCCESS", foldersCollection);
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 
@@ -47,7 +47,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param resourcesId {array<string>} The resources ids to share
    * @param permissionChangesDto {array} The permission changes
    */
-  worker.port.on('passbolt.share.resources.save', async(requestId, resourcesIds, permissionChangesDto) => {
+  worker.port.on("passbolt.share.resources.save", async (requestId, resourcesIds, permissionChangesDto) => {
     const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions, account);
     await shareResourcesController._exec(resourcesIds, permissionChangesDto);
   });
@@ -60,7 +60,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param folderId {uuid} The folder id to share
    * @param permissionChangesDto {array} The permission changes
    */
-  worker.port.on('passbolt.share.folders.save', async(requestId, folderId, permissionChangesDto) => {
+  worker.port.on("passbolt.share.folders.save", async (requestId, folderId, permissionChangesDto) => {
     const shareFoldersController = new ShareOneFolderController(worker, requestId, apiClientOptions, account);
     await shareFoldersController._exec(folderId, permissionChangesDto);
   });
@@ -72,9 +72,9 @@ const listen = function(worker, apiClientOptions, account) {
    * @param {string} requestId uuid, the request identifier
    * @param {string} keyword the keyword with which to run the search
    */
-  worker.port.on('passbolt.share.search-aros', async(requestId, keyword) => {
+  worker.port.on("passbolt.share.search-aros", async (requestId, keyword) => {
     const controller = new SearchUsersAndGroupsController(worker, requestId, apiClientOptions);
     await controller._exec(keyword);
   });
 };
-export const ShareEvents = {listen};
+export const ShareEvents = { listen };

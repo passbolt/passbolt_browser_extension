@@ -21,7 +21,7 @@ import ConnectPortController from "../../../contentScripts/js/controller/connect
 
 async function main() {
   const query = new URLSearchParams(window.location.search);
-  const portname = query.get('passbolt');
+  const portname = query.get("passbolt");
   const port = new Port(portname);
   await port.connect();
   // Message listener
@@ -34,7 +34,7 @@ async function main() {
   document.body.appendChild(domContainer);
   // TODO: update to createRoot for react 18 when ready
   /* eslint-disable react/no-deprecated */
-  ReactDOM.render(React.createElement(ExtApp, {port: port, storage: storage}), domContainer);
+  ReactDOM.render(React.createElement(ExtApp, { port: port, storage: storage }), domContainer);
 }
 
 main();

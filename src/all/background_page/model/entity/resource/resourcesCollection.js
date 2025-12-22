@@ -14,10 +14,10 @@
 import ResourceEntity from "./resourceEntity";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
-import {assertType} from "../../../utils/assertions";
+import { assertType } from "../../../utils/assertions";
 
-const ENTITY_NAME = 'Resources';
-const RULE_UNIQUE_ID = 'unique_id';
+const ENTITY_NAME = "Resources";
+const RULE_UNIQUE_ID = "unique_id";
 
 class ResourcesCollection extends EntityV2Collection {
   /**
@@ -48,8 +48,8 @@ class ResourcesCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": ResourceEntity.getSchema(),
+      type: "array",
+      items: ResourceEntity.getSchema(),
     };
   }
 
@@ -59,7 +59,7 @@ class ResourcesCollection extends EntityV2Collection {
    * @throws {EntityValidationError} If a permission already exists with the same id.
    */
   validateBuildRules(item, options = {}) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
   }
 
   /*
@@ -82,7 +82,7 @@ class ResourcesCollection extends EntityV2Collection {
    * @returns {Array<string>}
    */
   get ids() {
-    return this._items.map(r => r.id);
+    return this._items.map((r) => r.id);
   }
 
   /**
@@ -92,9 +92,7 @@ class ResourcesCollection extends EntityV2Collection {
    * @returns {Array<string>}
    */
   get folderParentIds() {
-    return this._items
-      .filter(r => (r.folderParentId !== null))
-      .map(r => r.folderParentId);
+    return this._items.filter((r) => r.folderParentId !== null).map((r) => r.folderParentId);
   }
 
   /**
@@ -102,7 +100,7 @@ class ResourcesCollection extends EntityV2Collection {
    * @returns {(ResourceEntity|undefined)}
    */
   getFirstById(resourceId) {
-    return this._items.find(r => (r.id === resourceId));
+    return this._items.find((r) => r.id === resourceId);
   }
 
   /**
@@ -110,7 +108,7 @@ class ResourcesCollection extends EntityV2Collection {
    * @returns {(int|-1)} index of the first element in the array that matches the id. Otherwise -1.
    */
   getFirstIndexById(resourceId) {
-    return this._items.findIndex(r => (r.id === resourceId));
+    return this._items.findIndex((r) => r.id === resourceId);
   }
 
   /*
@@ -125,7 +123,10 @@ class ResourcesCollection extends EntityV2Collection {
    * @returns {ResourcesCollection}
    */
   filterByIsOwner() {
-    return new ResourcesCollection(this._items.filter(r => r.isOwner()), {validate: false});
+    return new ResourcesCollection(
+      this._items.filter((r) => r.isOwner()),
+      { validate: false },
+    );
   }
 
   /**
@@ -136,7 +137,9 @@ class ResourcesCollection extends EntityV2Collection {
    */
   filterByResourceTypes(resourceTypes) {
     if (!(resourceTypes instanceof ResourceTypesCollection)) {
-      throw new TypeError('ResourcesCollection filterByResourceTypes expects resourceTypes to be a ResourceTypesCollection.');
+      throw new TypeError(
+        "ResourcesCollection filterByResourceTypes expects resourceTypes to be a ResourceTypesCollection.",
+      );
     }
 
     const resourceTypesIds = resourceTypes.extract("id");
@@ -150,11 +153,11 @@ class ResourcesCollection extends EntityV2Collection {
    * @throws TypeError if parameters are invalid
    */
   filterBySuggestResources(url) {
-    if (typeof url !== 'string') {
-      throw new TypeError('ResourcesCollection filterBySuggestResources expects url to be a string.');
+    if (typeof url !== "string") {
+      throw new TypeError("ResourcesCollection filterBySuggestResources expects url to be a string.");
     }
 
-    this.filterByCallback(resource => resource.isSuggestion(url));
+    this.filterByCallback((resource) => resource.isSuggestion(url));
   }
 
   /**
@@ -164,23 +167,23 @@ class ResourcesCollection extends EntityV2Collection {
    * @returns {*[]} The resources which they have not the tag
    */
   filterByTagNotPresent(tagId) {
-    const tagIsNotPresent = tag => tag.id !== tagId;
-    const filterResource = resource => resource.tags.tags.every(tagIsNotPresent);
-    return  this._items.filter(filterResource);
+    const tagIsNotPresent = (tag) => tag.id !== tagId;
+    const filterResource = (resource) => resource.tags.tags.every(tagIsNotPresent);
+    return this._items.filter(filterResource);
   }
 
   /**
    * Filter out the resources which metadata is encrypted.
    */
   filterOutMetadataEncrypted() {
-    this.filterByCallback(resource => resource.isMetadataDecrypted());
+    this.filterByCallback((resource) => resource.isMetadataDecrypted());
   }
 
   /**
    * Filter out resources having their metadata not encrypted with a user key.
    */
   filterOutMetadataNotEncryptedWithUserKey() {
-    this.filterByCallback(resource => resource.isMetadataKeyTypeUserKey());
+    this.filterByCallback((resource) => resource.isMetadataKeyTypeUserKey());
   }
 
   /**
@@ -189,12 +192,16 @@ class ResourcesCollection extends EntityV2Collection {
    * @param {ResourcesCollection} resourcesCollection
    */
   setDecryptedMetadataFromCollection(resourcesCollection) {
-    assertType(resourcesCollection, ResourcesCollection, 'The `resourcesCollection` parameter should be a ResourcesCollection.');
+    assertType(
+      resourcesCollection,
+      ResourcesCollection,
+      "The `resourcesCollection` parameter should be a ResourcesCollection.",
+    );
 
     const resourceIdsTable = {};
-    resourcesCollection.items.forEach(el => resourceIdsTable[el.id] = el);
+    resourcesCollection.items.forEach((el) => (resourceIdsTable[el.id] = el));
 
-    this.items.forEach(encryptedResource => {
+    this.items.forEach((encryptedResource) => {
       const decryptedResource = resourceIdsTable[encryptedResource.id];
       if (!decryptedResource) {
         // the resource is new and requires a decryption
@@ -223,14 +230,14 @@ class ResourcesCollection extends EntityV2Collection {
    */
   pushMany(data, entityOptions = {}, options = {}) {
     const uniqueIdsSetCache = new Set(this.extract("id"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);
@@ -241,7 +248,7 @@ class ResourcesCollection extends EntityV2Collection {
    * @param resourceId
    */
   remove(resourceId) {
-    const i = this.items.findIndex(item => item.id === resourceId);
+    const i = this.items.findIndex((item) => item.id === resourceId);
     this.items.splice(i, 1);
   }
 
@@ -267,7 +274,7 @@ class ResourcesCollection extends EntityV2Collection {
       return;
     }
 
-    this.resources.forEach(resource => {
+    this.resources.forEach((resource) => {
       if (!resource._props.expired && resourceTypes.getFirstById(resource.resourceTypeId)) {
         resource.expired = expiryDate;
       }
@@ -323,13 +330,13 @@ class ResourcesCollection extends EntityV2Collection {
    */
   bulkReplaceTagsCollection(resourceIds, tagsCollections) {
     if (!resourceIds || !Array.isArray(resourceIds) || !resourceIds.length) {
-      throw new Error('Resource ids should be provided to bulk update tags in resource collection.');
+      throw new Error("Resource ids should be provided to bulk update tags in resource collection.");
     }
     if (!tagsCollections || !Array.isArray(tagsCollections) || !tagsCollections.length) {
-      throw new Error('Tag collections should be provided to bulk update tags in resource collection.');
+      throw new Error("Tag collections should be provided to bulk update tags in resource collection.");
     }
     if (resourceIds.length !== tagsCollections.length) {
-      throw new Error('Bulk update requires matching tags collections and list of resource ids.');
+      throw new Error("Bulk update requires matching tags collections and list of resource ids.");
     }
 
     let result = 0;
@@ -373,7 +380,7 @@ class ResourcesCollection extends EntityV2Collection {
       const resource = resourcesCollection.items[i];
       const mappedResourceIndex = resourceMapByIdWithIndex[resource.id];
       if (typeof mappedResourceIndex === "undefined") {
-        this.push(resource, {validate: false});
+        this.push(resource, { validate: false });
       } else {
         this._items[mappedResourceIndex] = resource;
       }

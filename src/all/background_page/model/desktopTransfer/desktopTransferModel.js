@@ -24,7 +24,7 @@ class DesktopTransferModel {
   async getAccountKit(account) {
     const accountKitDto = account.toDto({
       user_private_armored_key: true,
-      security_token: true
+      security_token: true,
     });
     const accountToExport = new AccountKitEntity(accountKitDto);
     return accountToExport;

@@ -13,24 +13,16 @@
 
 import GetOrganizationPolicyController from "../controller/accountRecovery/getOrganizationPolicyController";
 import User from "../model/user";
-import AccountRecoverySaveOrganizationPolicyController
-  from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
-import AccountRecoveryValidatePublicKeyController
-  from "../controller/accountRecovery/accountRecoveryValidatePublicKeyController";
-import AccountRecoveryValidateOrganizationPrivateKeyController
-  from "../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController";
-import AccountRecoveryGetUserRequestsController
-  from "../controller/accountRecovery/accountRecoveryGetUserRequestsController";
+import AccountRecoverySaveOrganizationPolicyController from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
+import AccountRecoveryValidatePublicKeyController from "../controller/accountRecovery/accountRecoveryValidatePublicKeyController";
+import AccountRecoveryValidateOrganizationPrivateKeyController from "../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController";
+import AccountRecoveryGetUserRequestsController from "../controller/accountRecovery/accountRecoveryGetUserRequestsController";
 import AccountRecoveryGetRequestController from "../controller/accountRecovery/accountRecoveryGetRequestController";
 import ReviewRequestController from "../controller/accountRecovery/reviewRequestController";
-import AccountRecoveryGenerateOrganizationKeyController
-  from "../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController";
-import AccountRecoverySaveUserSettingsController
-  from "../controller/accountRecovery/accountRecoverySaveUserSettingController";
-import HasUserPostponedUserSettingInvitationController
-  from "../controller/accountRecovery/hasUserPostponedUserSettingInvitationController";
-import PostponeUserSettingInvitationController
-  from "../controller/accountRecovery/postponeUserSettingInvitationController";
+import AccountRecoveryGenerateOrganizationKeyController from "../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController";
+import AccountRecoverySaveUserSettingsController from "../controller/accountRecovery/accountRecoverySaveUserSettingController";
+import HasUserPostponedUserSettingInvitationController from "../controller/accountRecovery/hasUserPostponedUserSettingInvitationController";
+import PostponeUserSettingInvitationController from "../controller/accountRecovery/postponeUserSettingInvitationController";
 import WorkerService from "../service/worker/workerService";
 import TestSsoAuthenticationController from "../controller/sso/testSsoAuthenticationController";
 import GetCurrentSsoSettingsController from "../controller/sso/getCurrentSsoSettingsController";
@@ -44,20 +36,15 @@ import SavePasswordPoliciesController from "../controller/passwordPolicies/saveP
 import FindPasswordPoliciesController from "../controller/passwordPolicies/findPasswordPoliciesController";
 import ExportDesktopAccountController from "../controller/exportAccount/exportDesktopAccountController";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
-import FindUserPassphrasePoliciesController
-  from "../controller/userPassphrasePolicies/findUserPassphrasePoliciesController";
-import SaveUserPassphrasePoliciesController
-  from "../controller/userPassphrasePolicies/saveUserPassphrasePoliciesController";
+import FindUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/findUserPassphrasePoliciesController";
+import SaveUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/saveUserPassphrasePoliciesController";
 import SavePasswordExpirySettingsController from "../controller/passwordExpiry/savePasswordExpirySettingsController";
-import DeletePasswordExpirySettingsController
-  from "../controller/passwordExpiry/deletePasswordExpirySettingsController";
-import GetOrFindPasswordExpirySettingsController
-  from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
+import DeletePasswordExpirySettingsController from "../controller/passwordExpiry/deletePasswordExpirySettingsController";
+import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 import SaveMetadataTypesSettingsController from "../controller/metadata/saveMetadataTypesSettingsController";
 import FindAllNonDeletedMetadataKeysController from "../controller/metadata/findAllNonDeletedMetadataKeysController";
-import FindMetadataKeysSettingsController
-  from "../controller/metadata/findMetadataKeysSettingsController";
+import FindMetadataKeysSettingsController from "../controller/metadata/findMetadataKeysSettingsController";
 import FindMetadataTypesSettingsController from "../controller/metadata/findMetadataTypesSettingsController";
 import GenerateMetadataPrivateKeyController from "../controller/metadata/generateMetadataPrivateKeyController";
 import SaveMetadataKeysSettingsController from "../controller/metadata/saveMetadataKeysSettingsController";
@@ -85,19 +72,19 @@ import FindSecretRevisionsSettingsController from "../controller/secretRevision/
 import FindResourceSecretRevisionsForDisplayController from "../controller/secretRevision/findResourceSecretRevisionsForDisplayController";
 import DeleteSecretRevisionsSettingsController from "../controller/secretRevision/deleteSecretRevisionsSettingsController";
 import SaveSecretRevisionsSettingsController from "../controller/secretRevision/saveSecretRevisionsSettingsController";
-import FindSubscriptionKeyController from '../controller/subscription/findSubscriptionKeyController';
-import UpdateSubscriptionKeyController from '../controller/subscription/updateSubscriptionKeyController';
+import FindSubscriptionKeyController from "../controller/subscription/findSubscriptionKeyController";
+import UpdateSubscriptionKeyController from "../controller/subscription/updateSubscriptionKeyController";
 
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Whenever the (React) app changes his route
    * @listens passbolt.app.route-changed
    * @param path The relative navigated-to path
    */
-  worker.port.on('passbolt.app.route-changed', async path => {
+  worker.port.on("passbolt.app.route-changed", async (path) => {
     if (/^\/[A-Za-z0-9\-\/]*$/.test(path)) {
-      const appBoostrapWorker = await WorkerService.get('AppBootstrap', worker.tab.id);
-      appBoostrapWorker.port.emit('passbolt.app-bootstrap.change-route', path);
+      const appBoostrapWorker = await WorkerService.get("AppBootstrap", worker.tab.id);
+      appBoostrapWorker.port.emit("passbolt.app-bootstrap.change-route", path);
     }
   });
 
@@ -107,106 +94,127 @@ const listen = function(worker, apiClientOptions, account) {
    * ==================================================================================
    */
 
-  worker.port.on('passbolt.account-recovery.get-organization-policy', async requestId => {
+  worker.port.on("passbolt.account-recovery.get-organization-policy", async (requestId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrganizationPolicyController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.account-recovery.save-organization-policy', async(requestId, accountRecoveryOrganizationPolicyDto, privateGpgKeyDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoverySaveOrganizationPolicyController(worker, requestId, apiClientOptions, account);
-    await controller._exec(accountRecoveryOrganizationPolicyDto, privateGpgKeyDto);
-  });
+  worker.port.on(
+    "passbolt.account-recovery.save-organization-policy",
+    async (requestId, accountRecoveryOrganizationPolicyDto, privateGpgKeyDto) => {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new AccountRecoverySaveOrganizationPolicyController(
+        worker,
+        requestId,
+        apiClientOptions,
+        account,
+      );
+      await controller._exec(accountRecoveryOrganizationPolicyDto, privateGpgKeyDto);
+    },
+  );
 
-  worker.port.on('passbolt.account-recovery.validate-organization-key', async(requestId, newAccountRecoveryOrganizationPublicKey) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoveryValidatePublicKeyController(worker, requestId, apiClientOptions);
-    await controller._exec(newAccountRecoveryOrganizationPublicKey);
-  });
+  worker.port.on(
+    "passbolt.account-recovery.validate-organization-key",
+    async (requestId, newAccountRecoveryOrganizationPublicKey) => {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new AccountRecoveryValidatePublicKeyController(worker, requestId, apiClientOptions);
+      await controller._exec(newAccountRecoveryOrganizationPublicKey);
+    },
+  );
 
-  worker.port.on('passbolt.account-recovery.generate-organization-key', async(requestId, generateGpgKeyDto) => {
+  worker.port.on("passbolt.account-recovery.generate-organization-key", async (requestId, generateGpgKeyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoveryGenerateOrganizationKeyController(worker, requestId, apiClientOptions);
     await controller._exec(generateGpgKeyDto);
   });
 
-  worker.port.on('passbolt.account-recovery.download-organization-generated-key', async(requestId, privateKey) => {
+  worker.port.on("passbolt.account-recovery.download-organization-generated-key", async (requestId, privateKey) => {
     const controller = new DownloadOrganizationGeneratedKey(worker, requestId, apiClientOptions);
     await controller._exec(privateKey);
   });
 
-  worker.port.on('passbolt.account-recovery.validate-organization-private-key', async(requestId, accountRecoveryOrganizationPrivateKeyDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(worker, requestId, apiClientOptions);
-    return await controller._exec(accountRecoveryOrganizationPrivateKeyDto);
-  });
+  worker.port.on(
+    "passbolt.account-recovery.validate-organization-private-key",
+    async (requestId, accountRecoveryOrganizationPrivateKeyDto) => {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(
+        worker,
+        requestId,
+        apiClientOptions,
+      );
+      return await controller._exec(accountRecoveryOrganizationPrivateKeyDto);
+    },
+  );
 
-  worker.port.on('passbolt.account-recovery.get-user-requests', async(requestId, userId) => {
+  worker.port.on("passbolt.account-recovery.get-user-requests", async (requestId, userId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoveryGetUserRequestsController(worker, requestId, apiClientOptions);
     await controller._exec(userId);
   });
 
-  worker.port.on('passbolt.account-recovery.get-request', async(requestId, accountRecoveryRequestId) => {
+  worker.port.on("passbolt.account-recovery.get-request", async (requestId, accountRecoveryRequestId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoveryGetRequestController(worker, requestId, apiClientOptions);
     await controller._exec(accountRecoveryRequestId);
   });
 
-  worker.port.on('passbolt.account-recovery.save-user-settings', async(requestId, accountRecoveryUserSettingDto) => {
+  worker.port.on("passbolt.account-recovery.save-user-settings", async (requestId, accountRecoveryUserSettingDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoverySaveUserSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec(accountRecoveryUserSettingDto);
   });
 
-  worker.port.on('passbolt.account-recovery.review-request', async(requestId, accountRecoveryRequestId, responseStatus, privateKeyDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new ReviewRequestController(worker, requestId, apiClientOptions, account);
-    await controller._exec(accountRecoveryRequestId, responseStatus, privateKeyDto);
-  });
+  worker.port.on(
+    "passbolt.account-recovery.review-request",
+    async (requestId, accountRecoveryRequestId, responseStatus, privateKeyDto) => {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new ReviewRequestController(worker, requestId, apiClientOptions, account);
+      await controller._exec(accountRecoveryRequestId, responseStatus, privateKeyDto);
+    },
+  );
 
-  worker.port.on('passbolt.account-recovery.has-user-postponed-user-setting-invitation', async requestId => {
+  worker.port.on("passbolt.account-recovery.has-user-postponed-user-setting-invitation", async (requestId) => {
     const controller = new HasUserPostponedUserSettingInvitationController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.account-recovery.postpone-user-setting-invitation', async requestId => {
+  worker.port.on("passbolt.account-recovery.postpone-user-setting-invitation", async (requestId) => {
     const controller = new PostponeUserSettingInvitationController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.sso.get-current', async requestId => {
+  worker.port.on("passbolt.sso.get-current", async (requestId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetCurrentSsoSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.sso.save-draft', async(requestId, draftSsoSettings) => {
+  worker.port.on("passbolt.sso.save-draft", async (requestId, draftSsoSettings) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new SaveSsoSettingsAsDraftController(worker, requestId, apiClientOptions);
     await controller._exec(draftSsoSettings);
   });
 
-  worker.port.on('passbolt.sso.dry-run', async(requestId, draftId) => {
+  worker.port.on("passbolt.sso.dry-run", async (requestId, draftId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new TestSsoAuthenticationController(worker, requestId, apiClientOptions, account);
     await controller._exec(draftId);
   });
 
-  worker.port.on('passbolt.sso.activate-settings', async(requestId, draftId, ssoToken) => {
+  worker.port.on("passbolt.sso.activate-settings", async (requestId, draftId, ssoToken) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new ActivateSsoSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(draftId, ssoToken);
   });
 
-  worker.port.on('passbolt.sso.delete-settings', async(requestId, settingsId) => {
+  worker.port.on("passbolt.sso.delete-settings", async (requestId, settingsId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new DeleteSsoSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(settingsId);
   });
 
-  worker.port.on('passbolt.sso.generate-sso-kit', async(requestId, provider) => {
+  worker.port.on("passbolt.sso.generate-sso-kit", async (requestId, provider) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GenerateSsoKitController(worker, requestId, apiClientOptions, account);
     await controller._exec(provider);
@@ -218,7 +226,7 @@ const listen = function(worker, apiClientOptions, account) {
    * ==================================================================================
    */
 
-  worker.port.on('passbolt.rbacs.find-me', async(requestId, name) => {
+  worker.port.on("passbolt.rbacs.find-me", async (requestId, name) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindRbacMeController(worker, requestId, apiClientOptions, account);
     await controller._exec(name);
@@ -230,19 +238,19 @@ const listen = function(worker, apiClientOptions, account) {
    * ==================================================================================
    */
 
-  worker.port.on('passbolt.password-policies.get', async requestId => {
+  worker.port.on("passbolt.password-policies.get", async (requestId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.password-policies.save', async(requestId, passwordSettingsDto) => {
+  worker.port.on("passbolt.password-policies.save", async (requestId, passwordSettingsDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new SavePasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec(passwordSettingsDto);
   });
 
-  worker.port.on('passbolt.password-policies.get-admin-settings', async requestId => {
+  worker.port.on("passbolt.password-policies.get-admin-settings", async (requestId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
@@ -254,13 +262,13 @@ const listen = function(worker, apiClientOptions, account) {
    * ==================================================================================
    */
 
-  worker.port.on('passbolt.user-passphrase-policies.find', async requestId => {
+  worker.port.on("passbolt.user-passphrase-policies.find", async (requestId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindUserPassphrasePoliciesController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.user-passphrase-policies.save', async(requestId, userPassphrasePoliciesDto) => {
+  worker.port.on("passbolt.user-passphrase-policies.save", async (requestId, userPassphrasePoliciesDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new SaveUserPassphrasePoliciesController(worker, requestId, apiClientOptions);
     await controller._exec(userPassphrasePoliciesDto);
@@ -272,21 +280,20 @@ const listen = function(worker, apiClientOptions, account) {
    * ==================================================================================
    */
 
-  worker.port.on('passbolt.password-expiry.get-or-find', async(requestId, refreshCache = false) => {
+  worker.port.on("passbolt.password-expiry.get-or-find", async (requestId, refreshCache = false) => {
     const controller = new GetOrFindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec(refreshCache);
   });
 
-  worker.port.on('passbolt.password-expiry.save', async(requestId, passwordExpirySettingsDto) => {
+  worker.port.on("passbolt.password-expiry.save", async (requestId, passwordExpirySettingsDto) => {
     const controller = new SavePasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec(passwordExpirySettingsDto);
   });
 
-  worker.port.on('passbolt.password-expiry.delete', async(requestId, passwordExpiryId) => {
+  worker.port.on("passbolt.password-expiry.delete", async (requestId, passwordExpiryId) => {
     const controller = new DeletePasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec(passwordExpiryId);
   });
-
 
   /*
    * ==================================================================================
@@ -300,7 +307,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.desktop.export-account
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.desktop.export-account', async requestId => {
+  worker.port.on("passbolt.desktop.export-account", async (requestId) => {
     const account = await GetLegacyAccountService.get();
     const controller = new ExportDesktopAccountController(worker, requestId, account);
     await controller._exec();
@@ -318,7 +325,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.find-all-non-deleted-metadata-keys
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.find-all-non-deleted-metadata-keys', async requestId => {
+  worker.port.on("passbolt.metadata.find-all-non-deleted-metadata-keys", async (requestId) => {
     const controller = new FindAllNonDeletedMetadataKeysController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
@@ -329,7 +336,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.find-metadata-keys-settings
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.find-metadata-keys-settings', async requestId => {
+  worker.port.on("passbolt.metadata.find-metadata-keys-settings", async (requestId) => {
     const controller = new FindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
@@ -340,7 +347,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.get-or-find-metadata-keys-settings
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.get-or-find-metadata-keys-settings', async requestId => {
+  worker.port.on("passbolt.metadata.get-or-find-metadata-keys-settings", async (requestId) => {
     const controller = new GetOrFindMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
@@ -351,7 +358,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.generate-metadata-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.generate-metadata-key', async requestId => {
+  worker.port.on("passbolt.metadata.generate-metadata-key", async (requestId) => {
     const controller = new GenerateMetadataPrivateKeyController(worker, requestId, account);
     await controller._exec();
   });
@@ -362,7 +369,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.find-metadata-types-settings
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.find-metadata-types-settings', async requestId => {
+  worker.port.on("passbolt.metadata.find-metadata-types-settings", async (requestId) => {
     const controller = new FindMetadataTypesSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
@@ -373,7 +380,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.get-or-find-metadata-types-settings
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.get-or-find-metadata-types-settings', async requestId => {
+  worker.port.on("passbolt.metadata.get-or-find-metadata-types-settings", async (requestId) => {
     const controller = new GetOrFindMetadataTypesController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
@@ -385,7 +392,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param dto {object} The metadata keys settings dto
    */
-  worker.port.on('passbolt.metadata.save-metadata-keys-settings', async(requestId, dto) => {
+  worker.port.on("passbolt.metadata.save-metadata-keys-settings", async (requestId, dto) => {
     const controller = new SaveMetadataKeysSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec(dto);
   });
@@ -397,7 +404,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param dto {object} The metadata types settings dto
    */
-  worker.port.on('passbolt.metadata.save-metadata-types-settings', async(requestId, dto) => {
+  worker.port.on("passbolt.metadata.save-metadata-types-settings", async (requestId, dto) => {
     const controller = new SaveMetadataTypesSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec(dto);
   });
@@ -409,7 +416,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param dto {object} The metadata key pair dto.
    */
-  worker.port.on('passbolt.metadata.create-key', async(requestId, dto) => {
+  worker.port.on("passbolt.metadata.create-key", async (requestId, dto) => {
     const controller = new CreateMetadataKeyController(worker, requestId, account, apiClientOptions);
     await controller._exec(dto);
   });
@@ -423,7 +430,7 @@ const listen = function(worker, apiClientOptions, account) {
   /*
    * Get the CSRF token from
    */
-  worker.port.on('passbolt.auth.get-csrf-token', async requestId => {
+  worker.port.on("passbolt.auth.get-csrf-token", async (requestId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetCsrfTokenController(worker, requestId, apiClientOptions);
     await controller._exec();
@@ -435,10 +442,13 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.find-metadata-migrate-resources-details
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.find-metadata-migrate-resources-details', async(requestId, sharedContentOnly = false) => {
-    const controller = new FindMetadataMigrateResourcesController(worker, requestId, apiClientOptions);
-    await controller._exec(sharedContentOnly);
-  });
+  worker.port.on(
+    "passbolt.metadata.find-metadata-migrate-resources-details",
+    async (requestId, sharedContentOnly = false) => {
+      const controller = new FindMetadataMigrateResourcesController(worker, requestId, apiClientOptions);
+      await controller._exec(sharedContentOnly);
+    },
+  );
 
   /*
    * Migrate metadata.
@@ -448,10 +458,13 @@ const listen = function(worker, apiClientOptions, account) {
    * @param migrateMetdataDto {object} the migration metadata dto.
    * @param paginationDetails {object} the pagination details dto.
    */
-  worker.port.on('passbolt.metadata.migrate-resources-metadata', async(requestId, migrateMetdataDto, paginationDetails) => {
-    const controller = new MigrateMetadataResourcesController(worker, requestId, apiClientOptions, account);
-    await controller._exec(migrateMetdataDto, paginationDetails);
-  });
+  worker.port.on(
+    "passbolt.metadata.migrate-resources-metadata",
+    async (requestId, migrateMetdataDto, paginationDetails) => {
+      const controller = new MigrateMetadataResourcesController(worker, requestId, apiClientOptions, account);
+      await controller._exec(migrateMetdataDto, paginationDetails);
+    },
+  );
 
   /*
    * Rotate metadata.
@@ -459,7 +472,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.rotate-resources-metadata-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.rotate-metadata-key', async(requestId, metadataKeyPairDto, metadataKeyId) => {
+  worker.port.on("passbolt.metadata.rotate-metadata-key", async (requestId, metadataKeyPairDto, metadataKeyId) => {
     const controller = new RotateMetadataKeyController(worker, requestId, apiClientOptions, account);
     await controller._exec(metadataKeyPairDto, metadataKeyId);
   });
@@ -470,7 +483,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.resume-rotate-resources-metadata-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.resume-rotate-metadata-key', async(requestId, metadataKey) => {
+  worker.port.on("passbolt.metadata.resume-rotate-metadata-key", async (requestId, metadataKey) => {
     const controller = new ResumeRotateMetadataKeyController(worker, requestId, apiClientOptions, account);
     await controller._exec(metadataKey);
   });
@@ -482,7 +495,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param userId {uuid} the user id which missed some metadata private key.
    */
-  worker.port.on('passbolt.metadata.share-missing-metadata-private-keys-with-user', async(requestId, userId) => {
+  worker.port.on("passbolt.metadata.share-missing-metadata-private-keys-with-user", async (requestId, userId) => {
     const controller = new ShareMetadataKeyPrivateController(worker, requestId, apiClientOptions, account);
     await controller._exec(userId);
   });
@@ -493,7 +506,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.find-getting-started-settings
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.find-getting-started-settings', async requestId => {
+  worker.port.on("passbolt.metadata.find-getting-started-settings", async (requestId) => {
     const controller = new FindMetadataGettingStartedSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
@@ -504,8 +517,13 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.enable-encrypted-metadata-for-existing-instance
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.enable-encrypted-metadata-for-existing-instance', async requestId => {
-    const controller = new EnableEncryptedMetadataForExistingInstanceController(worker, requestId, apiClientOptions, account);
+  worker.port.on("passbolt.metadata.enable-encrypted-metadata-for-existing-instance", async (requestId) => {
+    const controller = new EnableEncryptedMetadataForExistingInstanceController(
+      worker,
+      requestId,
+      apiClientOptions,
+      account,
+    );
     await controller._exec();
   });
 
@@ -515,8 +533,13 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.metadata.keep-cleartext-metadata-for-existing-instance
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.metadata.keep-cleartext-metadata-for-existing-instance', async requestId => {
-    const controller = new KeepCleartextMetadataForExistingInstanceController(worker, requestId, apiClientOptions, account);
+  worker.port.on("passbolt.metadata.keep-cleartext-metadata-for-existing-instance", async (requestId) => {
+    const controller = new KeepCleartextMetadataForExistingInstanceController(
+      worker,
+      requestId,
+      apiClientOptions,
+      account,
+    );
     await controller._exec();
   });
 
@@ -533,7 +556,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param {string} requestId The request identifier
    * @param {string} text the content to copy
    */
-  worker.port.on('passbolt.clipboard.copy', async(requestId, text) => {
+  worker.port.on("passbolt.clipboard.copy", async (requestId, text) => {
     const clipboardController = new CopyToClipboardController(worker, requestId);
     await clipboardController._exec(text);
   });
@@ -545,11 +568,10 @@ const listen = function(worker, apiClientOptions, account) {
    * @param {string} requestId The request identifier
    * @param {string} text the content to copy
    */
-  worker.port.on('passbolt.clipboard.copy-temporarily', async(requestId, text) => {
+  worker.port.on("passbolt.clipboard.copy-temporarily", async (requestId, text) => {
     const clipboardController = new CopyTemporarilyToClipboardController(worker, requestId);
     await clipboardController._exec(text);
   });
-
 
   /*
    * ==================================================================================
@@ -562,7 +584,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.scim.find-settings
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.scim.find-settings', async requestId => {
+  worker.port.on("passbolt.scim.find-settings", async (requestId) => {
     const controller = new FindScimSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
@@ -573,7 +595,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.scim.find-settings
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.scim.find-settings', async requestId => {
+  worker.port.on("passbolt.scim.find-settings", async (requestId) => {
     const controller = new FindScimSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
@@ -585,7 +607,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param data {Object} The SCIM settings data
    */
-  worker.port.on('passbolt.scim.create-settings', async(requestId, data) => {
+  worker.port.on("passbolt.scim.create-settings", async (requestId, data) => {
     const controller = new CreateScimSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(data);
   });
@@ -598,7 +620,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param id {string} The SCIM settings ID
    * @param data {Object} The SCIM settings data
    */
-  worker.port.on('passbolt.scim.update-settings', async(requestId, id, data) => {
+  worker.port.on("passbolt.scim.update-settings", async (requestId, id, data) => {
     const controller = new UpdateScimSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(id, data);
   });
@@ -610,7 +632,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param id {string} The SCIM settings ID
    */
-  worker.port.on('passbolt.scim.disable-settings', async(requestId, id) => {
+  worker.port.on("passbolt.scim.disable-settings", async (requestId, id) => {
     const controller = new DisableScimSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(id);
   });
@@ -627,7 +649,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource id
    */
-  worker.port.on('passbolt.favorite.add', async(requestId, resourceId) => {
+  worker.port.on("passbolt.favorite.add", async (requestId, resourceId) => {
     const controller = new FavoriteResourceController(worker, requestId, apiClientOptions, account);
     await controller._exec(resourceId);
   });
@@ -638,7 +660,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource id
    */
-  worker.port.on('passbolt.favorite.delete', async(requestId, resourceId) => {
+  worker.port.on("passbolt.favorite.delete", async (requestId, resourceId) => {
     const controller = new UnfavoriteResourceController(worker, requestId, apiClientOptions, account);
     await controller._exec(resourceId);
   });
@@ -654,7 +676,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.secret-revisions.find-settings
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.secret-revisions.find-settings', async requestId => {
+  worker.port.on("passbolt.secret-revisions.find-settings", async (requestId) => {
     const controller = new FindSecretRevisionsSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
@@ -666,7 +688,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param secretRevisionSettingsDto {Object} The secret revisions settings dto
    */
-  worker.port.on('passbolt.secret-revisions.save-settings', async(requestId, secretRevisionSettingsDto) => {
+  worker.port.on("passbolt.secret-revisions.save-settings", async (requestId, secretRevisionSettingsDto) => {
     const controller = new SaveSecretRevisionsSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(secretRevisionSettingsDto);
   });
@@ -678,7 +700,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param settingsId {uuid} The settings id
    */
-  worker.port.on('passbolt.secret-revisions.delete-settings', async requestId => {
+  worker.port.on("passbolt.secret-revisions.delete-settings", async (requestId) => {
     const controller = new DeleteSecretRevisionsSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
@@ -690,8 +712,13 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource id
    */
-  worker.port.on('passbolt.secret-revisions.find-all-by-resource-id-for-display', async(requestId, resourceId) => {
-    const controller = new FindResourceSecretRevisionsForDisplayController(worker, requestId, apiClientOptions, account);
+  worker.port.on("passbolt.secret-revisions.find-all-by-resource-id-for-display", async (requestId, resourceId) => {
+    const controller = new FindResourceSecretRevisionsForDisplayController(
+      worker,
+      requestId,
+      apiClientOptions,
+      account,
+    );
     await controller._exec(resourceId);
   });
 
@@ -701,7 +728,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.subscription.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.subscription.get', async requestId => {
+  worker.port.on("passbolt.subscription.get", async (requestId) => {
     const subscriptionKeyController = new FindSubscriptionKeyController(worker, requestId, apiClientOptions);
     await subscriptionKeyController._exec();
   });
@@ -713,9 +740,9 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param subscriptionKeyDto {{ data: string }} The new subscription key
    */
-  worker.port.on('passbolt.subscription.update', async(requestId, subscriptionKeyDto) => {
+  worker.port.on("passbolt.subscription.update", async (requestId, subscriptionKeyDto) => {
     const subscriptionController = new UpdateSubscriptionKeyController(worker, requestId, apiClientOptions);
     return await subscriptionController._exec(subscriptionKeyDto);
   });
 };
-export const AppEvents = {listen};
+export const AppEvents = { listen };

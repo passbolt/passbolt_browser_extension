@@ -12,10 +12,10 @@
  * @since         5.5.0
  */
 
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import MetadataKeysApiService from "../api/metadata/metadataKeysApiService";
 import RevokeGpgKeyService from "../crypto/revokeGpgKeyService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 
@@ -55,7 +55,7 @@ export default class ExpireMetadataKeyService {
     const metadataKeyUpdate = new MetadataKeyEntity({
       fingerprint: metadataKey.fingerprint,
       armored_key: publicKeyRevoked.armor(),
-      expired: new Date().toISOString()
+      expired: new Date().toISOString(),
     });
     await this.metadataKeysApiService.update(metadataKeyId, metadataKeyUpdate);
   }

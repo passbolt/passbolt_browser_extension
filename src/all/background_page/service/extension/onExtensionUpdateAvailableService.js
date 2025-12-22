@@ -31,7 +31,7 @@ class OnExtensionUpdateAvailableService {
    */
   static async exec() {
     if (await isUserAuthenticated()) {
-      await browser.storage.session.set({[PASSBOLT_EXTENSION_UPDATE]: true});
+      await browser.storage.session.set({ [PASSBOLT_EXTENSION_UPDATE]: true });
     } else {
       await OnExtensionUpdateAvailableService.cleanAndReload();
     }
@@ -71,7 +71,7 @@ class OnExtensionUpdateAvailableService {
  * Check and process event if the user is authenticated
  * @returns {Promise<bool>}
  */
-const isUserAuthenticated = async() => {
+const isUserAuthenticated = async () => {
   const user = User.getInstance();
   // Check if user is valid
   if (user.isValid()) {
@@ -89,7 +89,7 @@ const isUserAuthenticated = async() => {
       /*
        * Service unavailable
        */
-      console.debug('The Service is unavailable to check if the user is authenticated');
+      console.debug("The Service is unavailable to check if the user is authenticated");
       console.error(error);
     }
   }

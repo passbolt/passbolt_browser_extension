@@ -86,12 +86,12 @@ class MetadataKeysSessionStorage {
     if (collection.hasEncryptedKeys()) {
       throw new TypeError("The parameter `collection` should contain only decrypted keys.");
     }
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       for (const metadataKey of collection) {
         MetadataKeysSessionStorage.assertEntityBeforeSave(metadataKey);
       }
       const dtos = collection.toDto(MetadataKeysSessionStorage.DEFAULT_CONTAIN);
-      await this._setBrowserStorage({[this.storageKey]: dtos});
+      await this._setBrowserStorage({ [this.storageKey]: dtos });
       MetadataKeysSessionStorage._runtimeCachedData[this.account.id] = dtos;
     });
   }
@@ -109,14 +109,14 @@ class MetadataKeysSessionStorage {
       throw new Error("The metadata private key should be decrypted.");
     }
 
-    await navigator.locks.request(this.storageKey, async() => {
-      const metadataKeys = await this.get() || [];
-      const metadataKeyIndex = metadataKeys.findIndex(item => item.id === metadataPrivateKey.metadataKeyId);
+    await navigator.locks.request(this.storageKey, async () => {
+      const metadataKeys = (await this.get()) || [];
+      const metadataKeyIndex = metadataKeys.findIndex((item) => item.id === metadataPrivateKey.metadataKeyId);
       if (metadataKeyIndex === -1) {
-        throw new Error('The metadata key could not be found in the session storage');
+        throw new Error("The metadata key could not be found in the session storage");
       }
       metadataKeys[metadataKeyIndex].metadata_private_keys[0] = metadataPrivateKey.toDto();
-      await this._setBrowserStorage({[this.storageKey]: metadataKeys});
+      await this._setBrowserStorage({ [this.storageKey]: metadataKeys });
       MetadataKeysSessionStorage._runtimeCachedData[this.account.id] = metadataKeys;
     });
   }
@@ -129,20 +129,16 @@ class MetadataKeysSessionStorage {
    * @private
    */
   static assertEntityBeforeSave(metadataKey) {
-    const requiredProperties = [
-      "id", "created", "created_by", "modified", "modified_by"
-    ];
-    const requiredAssociations = [
-      "_metadata_private_keys"
-    ];
+    const requiredProperties = ["id", "created", "created_by", "modified", "modified_by"];
+    const requiredAssociations = ["_metadata_private_keys"];
 
-    requiredProperties.forEach(requiredProperty => {
+    requiredProperties.forEach((requiredProperty) => {
       if (typeof metadataKey._props[requiredProperty] === "undefined") {
         throw new TypeError(`The parameter 'metadataKey' should have the property '${requiredProperty}' set.`);
       }
     });
 
-    requiredAssociations.forEach(requiredAssociation => {
+    requiredAssociations.forEach((requiredAssociation) => {
       if (typeof metadataKey[requiredAssociation] === "undefined") {
         throw new TypeError(`The parameter 'metadataKey' should have the association '${requiredAssociation}' set.`);
       }
@@ -168,7 +164,7 @@ class MetadataKeysSessionStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {metadata_private_keys: true, creator: true};
+    return { metadata_private_keys: true, creator: true };
   }
 }
 

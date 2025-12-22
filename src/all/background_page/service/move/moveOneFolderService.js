@@ -13,12 +13,12 @@
  */
 import GetOrFindFoldersService from "../folder/getOrFindFoldersService";
 import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
-import ShareResourceService, {PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL} from "../share/shareResourceService";
-import {assertString, assertType, assertUuid} from "../../utils/assertions";
+import ShareResourceService, { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../share/shareResourceService";
+import { assertString, assertType, assertUuid } from "../../utils/assertions";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import i18n from "../../sdk/i18n";
 import FolderModel from "../../model/folder/folderModel";
-import ShareFoldersService, {PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE} from "../share/shareFoldersService";
+import ShareFoldersService, { PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE } from "../share/shareFoldersService";
 import FindFoldersService from "../folder/findFoldersService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import FindResourcesService from "../resource/findResourcesService";
@@ -28,19 +28,20 @@ import ResourceModel from "../../model/resource/resourceModel";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ConfirmMoveStrategyService from "./confirmMoveStrategyService";
 
-const STEPS_TO_COMPLETE_SHARE = PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE
-  + PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL;
+const STEPS_TO_COMPLETE_SHARE = PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE + PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL;
 
-const STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE = 1 // Calculate folders permissions
-  + 1 // Calculate resources permissions
-  + 1 // Confirm share operation
-  + STEPS_TO_COMPLETE_SHARE;
+const STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE =
+  1 + // Calculate folders permissions
+  1 + // Calculate resources permissions
+  1 + // Confirm share operation
+  STEPS_TO_COMPLETE_SHARE;
 
-export const PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE = 1 // Retrieve folders permissions
-  + 1 // Retrieve resources permissions
-  + STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE
-  + 1 // Move folder
-  + 1; // Update folders local storage
+export const PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE =
+  1 + // Retrieve folders permissions
+  1 + // Retrieve resources permissions
+  STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE +
+  1 + // Move folder
+  1; // Update folders local storage
 
 class MoveOneFolderService {
   /**
@@ -79,31 +80,54 @@ class MoveOneFolderService {
    * @throw {Error} If the destination folder is already the parent folder
    */
   async moveOne(folderId, destinationFolderId, moveStrategyService, passphrase) {
-    assertUuid(folderId, "The parameter \"folderId\" should be a UUID");
+    assertUuid(folderId, 'The parameter "folderId" should be a UUID');
     if (destinationFolderId !== null) {
-      assertUuid(destinationFolderId, "The parameter \"destinationFolderId\" should be a UUID");
+      assertUuid(destinationFolderId, 'The parameter "destinationFolderId" should be a UUID');
     }
     if (folderId === destinationFolderId) {
       throw new Error(i18n.t("The folder cannot be moved inside itself."));
     }
-    assertType(moveStrategyService, ConfirmMoveStrategyService, "The parameter \"moveStrategyService\" should be MoveStrategy service instance.");
+    assertType(
+      moveStrategyService,
+      ConfirmMoveStrategyService,
+      'The parameter "moveStrategyService" should be MoveStrategy service instance.',
+    );
     if (passphrase) {
-      assertString(passphrase, "The parameter \"passphrase\" should be a string");
+      assertString(passphrase, 'The parameter "passphrase" should be a string');
     }
 
     const folder = await this.getOrFindFoldersService.getOrFindById(folderId);
     const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(folder);
-    const parentFolder = folder.folderParentId ? await this.findFoldersService.findByIdWithPermissions(folder.folderParentId) : null;
-    const destinationFolder = destinationFolderId ? await this.findFoldersService.findByIdWithPermissions(destinationFolderId) : null;
+    const parentFolder = folder.folderParentId
+      ? await this.findFoldersService.findByIdWithPermissions(folder.folderParentId)
+      : null;
+    const destinationFolder = destinationFolderId
+      ? await this.findFoldersService.findByIdWithPermissions(destinationFolderId)
+      : null;
     const resourcesToShareWithPermissions = await this.findResourcesToShareWithPermissions(folderId);
 
     this.assertFolderCanBeMoved(folder, destinationFolder, parentFolder);
 
     const couldOverridePermissions = this.checkCouldOverridePermissions(folder, destinationFolder, parentFolder);
     if (couldOverridePermissions) {
-      const foldersPermissionsChanges = this.calculateFoldersPermissionChanges(folder, foldersToShareWithPermissions, destinationFolder, parentFolder);
-      const resourcesPermissionsChanges = this.calculateResourcesPermissionsChanges(resourcesToShareWithPermissions, destinationFolder, parentFolder);
-      const isShareConfirmed = await this.confirmShareOperation(folder, destinationFolder, moveStrategyService, foldersPermissionsChanges, resourcesPermissionsChanges);
+      const foldersPermissionsChanges = this.calculateFoldersPermissionChanges(
+        folder,
+        foldersToShareWithPermissions,
+        destinationFolder,
+        parentFolder,
+      );
+      const resourcesPermissionsChanges = this.calculateResourcesPermissionsChanges(
+        resourcesToShareWithPermissions,
+        destinationFolder,
+        parentFolder,
+      );
+      const isShareConfirmed = await this.confirmShareOperation(
+        folder,
+        destinationFolder,
+        moveStrategyService,
+        foldersPermissionsChanges,
+        resourcesPermissionsChanges,
+      );
       if (isShareConfirmed) {
         await this.shareResources(resourcesPermissionsChanges, passphrase);
         await this.shareFolders(foldersPermissionsChanges);
@@ -161,7 +185,7 @@ class MoveOneFolderService {
     const resourcesDescendantWithOwnership = resourcesDescendant.filterByIsOwner();
     const resourcesIdsToRetrievePermissions = [...resourcesDescendantWithOwnership.ids];
 
-    if (!(resourcesIdsToRetrievePermissions?.length)) {
+    if (!resourcesIdsToRetrievePermissions?.length) {
       return new ResourcesCollection([]);
     }
 
@@ -179,16 +203,19 @@ class MoveOneFolderService {
    */
   assertFolderCanBeMoved(folder, destinationFolder, parentFolder) {
     if (destinationFolder === null && parentFolder === null) {
-      const message = i18n.t('Folder {{name}} is already in the root folder.', {name: folder.name});
+      const message = i18n.t("Folder {{name}} is already in the root folder.", { name: folder.name });
       throw new Error(message);
     }
 
     if (destinationFolder && folder.folderParentId === destinationFolder.id) {
-      const message = i18n.t('Folder {{name}} is already in folder {{destination}}.', {name: folder.name, destination: destinationFolder.name});
+      const message = i18n.t("Folder {{name}} is already in folder {{destination}}.", {
+        name: folder.name,
+        destination: destinationFolder.name,
+      });
       throw new Error(message);
     }
     if (!FolderEntity.canFolderMove(folder, parentFolder, destinationFolder)) {
-      const message = i18n.t('Folder {{name}} can not be moved.', {name: folder.name});
+      const message = i18n.t("Folder {{name}} can not be moved.", { name: folder.name });
       throw new Error(message);
     }
   }
@@ -236,9 +263,13 @@ class MoveOneFolderService {
       return new PermissionChangesCollection([]);
     }
 
-    const permissionChanges =  new PermissionChangesCollection([]);
+    const permissionChanges = new PermissionChangesCollection([]);
     for (const folderToShare of foldersToShare) {
-      const childrenFolderPermissionChange = this.folderModel.calculatePermissionsChangesForMove(folderToShare, parentFolder, destinationFolder);
+      const childrenFolderPermissionChange = this.folderModel.calculatePermissionsChangesForMove(
+        folderToShare,
+        parentFolder,
+        destinationFolder,
+      );
       permissionChanges.merge(childrenFolderPermissionChange);
     }
 
@@ -258,7 +289,11 @@ class MoveOneFolderService {
 
     const resourcePermissionChanges = new PermissionChangesCollection([]);
     for (const resourceToShare of resourcesToShare) {
-      const resourcePermissionChange = this.resourceModel.calculatePermissionsChangesForMove(resourceToShare, parentFolder, destinationFolder);
+      const resourcePermissionChange = this.resourceModel.calculatePermissionsChangesForMove(
+        resourceToShare,
+        parentFolder,
+        destinationFolder,
+      );
       resourcePermissionChanges.merge(resourcePermissionChange);
     }
 
@@ -275,7 +310,13 @@ class MoveOneFolderService {
    * @param {PermissionChangesCollection} resourcesPermissionsChanges The resources permission changes
    * @returns {Promise<boolean>}
    */
-  async confirmShareOperation(folder, destinationFolder, moveStrategyService, foldersPermissionsChanges, resourcesPermissionsChanges) {
+  async confirmShareOperation(
+    folder,
+    destinationFolder,
+    moveStrategyService,
+    foldersPermissionsChanges,
+    resourcesPermissionsChanges,
+  ) {
     this.progressService.finishStep(i18n.t("Confirming share operation"), true);
 
     if (foldersPermissionsChanges.length || resourcesPermissionsChanges.length) {
@@ -293,7 +334,9 @@ class MoveOneFolderService {
    */
   async shareResources(resourcesPermissionsChanges, passphrase) {
     const resourceIds = new Set();
-    resourcesPermissionsChanges.items.forEach(resourcePermissionChange => resourceIds.add(resourcePermissionChange.acoForeignKey));
+    resourcesPermissionsChanges.items.forEach((resourcePermissionChange) =>
+      resourceIds.add(resourcePermissionChange.acoForeignKey),
+    );
     if (resourceIds.size) {
       await this.shareResourceService.shareAll([...resourceIds], resourcesPermissionsChanges, passphrase);
     } else {
@@ -321,7 +364,7 @@ class MoveOneFolderService {
    * @returns {Promise<void>}
    */
   async move(folder, destinationFolderId) {
-    this.progressService.finishStep(i18n.t('Moving folder'), true);
+    this.progressService.finishStep(i18n.t("Moving folder"), true);
     await this.folderModel.move(folder.id, destinationFolderId);
   }
 }

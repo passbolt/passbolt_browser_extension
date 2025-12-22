@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.11.0
  */
-import PownedPasswordController from '../controller/secret/pownedPasswordController';
+import PownedPasswordController from "../controller/secret/pownedPasswordController";
 
-const listen = function(worker) {
+const listen = function (worker) {
   /*
    * Check if password is powned
    *
@@ -21,10 +21,10 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    * @param password {string} the password to check
    */
-  worker.port.on('passbolt.secrets.powned-password', async(requestId, password) => {
+  worker.port.on("passbolt.secrets.powned-password", async (requestId, password) => {
     const controller = new PownedPasswordController(worker, requestId);
     await controller._exec(password);
   });
 };
 
-export const PownedPasswordEvents = {listen};
+export const PownedPasswordEvents = { listen };

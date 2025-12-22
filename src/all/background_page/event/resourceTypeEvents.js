@@ -20,14 +20,14 @@ import UpdateAllResourceTypesDeletedStatusController from "../controller/resourc
  * @param {Worker} worker
  * @param {ApiClientOptions} apiClientOptions the api client options
  */
-const listen = function(worker, apiClientOptions) {
+const listen = function (worker, apiClientOptions) {
   /*
    * Get the resource types from the local storage.
    *
    * @listens passbolt.resource-type.get-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.resource-type.get-or-find-all', async requestId => {
+  worker.port.on("passbolt.resource-type.get-or-find-all", async (requestId) => {
     const controller = new GetResourceTypesController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
@@ -38,7 +38,7 @@ const listen = function(worker, apiClientOptions) {
    * @listens passbolt.resource-type.get-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.resource-type.find-all-by-deleted-and-non-deleted', async requestId => {
+  worker.port.on("passbolt.resource-type.find-all-by-deleted-and-non-deleted", async (requestId) => {
     const controller = new FindAllByDeletedAndNonDeletedResourceTypesContoller(worker, requestId, apiClientOptions);
     await controller._exec();
   });
@@ -50,10 +50,10 @@ const listen = function(worker, apiClientOptions) {
    * @param requestId {uuid} The request identifier
    * @param resourceTypesCollectionDto {Array} the collection to update
    */
-  worker.port.on('passbolt.resource-types.update-all-deleted-status', async(requestId, resourceTypesCollectionDto) => {
+  worker.port.on("passbolt.resource-types.update-all-deleted-status", async (requestId, resourceTypesCollectionDto) => {
     const controller = new UpdateAllResourceTypesDeletedStatusController(worker, requestId, apiClientOptions);
     await controller._exec(resourceTypesCollectionDto);
   });
 };
 
-export const ResourceTypeEvents = {listen};
+export const ResourceTypeEvents = { listen };

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import AbstractActionLogEntity from "../../../model/entity/actionLog/abstractActionLogEntity";
-import {assertUuid, assertNonEmptyString, assertNumber} from "../../../utils/assertions";
+import { assertUuid, assertNonEmptyString, assertNumber } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
-const RESOURCE_SERVICE_RESOURCE_NAME = 'actionlog';
+const RESOURCE_SERVICE_RESOURCE_NAME = "actionlog";
 
 class ActionLogService extends AbstractService {
   /**
@@ -80,17 +80,17 @@ class ActionLogService extends AbstractService {
     assertNumber(page);
     assertNumber(limit);
     assertUuid(foreignId);
-    if (!page || typeof page !== 'number') {
+    if (!page || typeof page !== "number") {
       throw new TypeError(`ActionLog page should be a valid integer.`);
     }
-    if (!limit || typeof limit !== 'number') {
+    if (!limit || typeof limit !== "number") {
       throw new TypeError(`ActionLog limit should be a valid integer.`);
     }
 
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`);
-    url.searchParams.append('page', page.toString());
-    url.searchParams.append('limit', limit.toString());
-    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    url.searchParams.append("page", page.toString());
+    url.searchParams.append("limit", limit.toString());
+    const response = await this.apiClient.fetchAndHandleResponse("GET", url);
     if (!response.body || !response.body.length) {
       return [];
     }
@@ -105,7 +105,7 @@ class ActionLogService extends AbstractService {
    * @public
    */
   assertValidForeignModel(foreignModel) {
-    assertNonEmptyString(foreignModel, 'ActionLog foreign model should be a valid string.');
+    assertNonEmptyString(foreignModel, "ActionLog foreign model should be a valid string.");
     if (!AbstractActionLogEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
       throw new TypeError(`ActionLog foreign model '${foreignModel}' is not in the list of supported models.`);
     }

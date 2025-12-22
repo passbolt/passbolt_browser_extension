@@ -16,11 +16,11 @@ import TrustedMetadataKeyLocalStorage from "../local_storage/trustedMetadataKeyL
 import EncryptMetadataPrivateKeysService from "./encryptMetadataPrivateKeysService";
 import UpdateMetadataKeyPrivateService from "./updateMetadataKeyPrivateService";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
-import {assertString, assertType} from "../../utils/assertions";
+import { assertString, assertType } from "../../utils/assertions";
 import MetadataTrustedKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity";
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class TrustMetadataKeyService {
   /**
@@ -50,7 +50,11 @@ class TrustMetadataKeyService {
    * @throws {Error} If the `passphrase` is not a string.
    */
   async trust(metadataPrivateKey, passphrase) {
-    assertType(metadataPrivateKey, MetadataPrivateKeyEntity, "The parameter `metadataPrivateKey` should be of type MetadataPrivateKeyEntity.");
+    assertType(
+      metadataPrivateKey,
+      MetadataPrivateKeyEntity,
+      "The parameter `metadataPrivateKey` should be of type MetadataPrivateKeyEntity.",
+    );
     assertString(passphrase, "The `passphrase` parameter should be a string.");
     if (!metadataPrivateKey.isDecrypted) {
       throw new Error("The metadata private key should be decrypted.");
@@ -61,11 +65,13 @@ class TrustMetadataKeyService {
     // If not already signed, sign the metadata private key data and update the API with it.
     if (!signedDate) {
       signedDate = new Date();
-      const encryptedUserPrivateKey =  await OpenpgpAssertion.readKeyOrFail(this.account.userPrivateArmoredKey);
+      const encryptedUserPrivateKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPrivateArmoredKey);
       const decryptedUserPrivateKey = await DecryptPrivateKeyService.decrypt(encryptedUserPrivateKey, passphrase);
       // Clone the metadata private key to not mutate the original metadata private key data with the encrypted one.
       const metadataPrivateKeyToTrust = new MetadataPrivateKeyEntity(metadataPrivateKey.toDto());
-      await this.encryptMetadataPrivateKeysService.encryptOne(metadataPrivateKeyToTrust, decryptedUserPrivateKey, {date: signedDate});
+      await this.encryptMetadataPrivateKeysService.encryptOne(metadataPrivateKeyToTrust, decryptedUserPrivateKey, {
+        date: signedDate,
+      });
       const updatedMetadataPrivateKey = await this.updateMetadataKeyPrivateService.update(metadataPrivateKeyToTrust);
       updatedMetadataPrivateKey.dataSignedByCurrentUser = signedDate.toISOString();
       updatedMetadataPrivateKey.data = metadataPrivateKey.data;
@@ -74,7 +80,7 @@ class TrustMetadataKeyService {
 
     const trustedMetadataKey = new MetadataTrustedKeyEntity({
       fingerprint: metadataPrivateKey.data.fingerprint,
-      signed: signedDate
+      signed: signedDate,
     });
     await this.trustedMetadataKeyLocalStorage.set(trustedMetadataKey);
   }

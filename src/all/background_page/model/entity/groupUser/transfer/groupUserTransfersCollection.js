@@ -28,9 +28,9 @@ class GroupUserTransfersCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": GroupUserTransferEntity.getSchema(),
-      "minItems": 1
+      type: "array",
+      items: GroupUserTransferEntity.getSchema(),
+      minItems: 1,
     };
   }
 }

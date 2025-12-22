@@ -12,7 +12,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const FOLDER_SERVICE_RESOURCE_NAME = 'tags';
+const FOLDER_SERVICE_RESOURCE_NAME = "tags";
 
 class TagService extends AbstractService {
   /**
@@ -65,10 +65,10 @@ class TagService extends AbstractService {
     this.assertValidId(resourceId);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${resourceId}`);
     const data = {
-      'Tags': tagsDto.map(tag => tag.slug) // @deprecated since v3 should be 'tags'
+      Tags: tagsDto.map((tag) => tag.slug), // @deprecated since v3 should be 'tags'
     };
     const bodyString = this.apiClient.buildBody(data);
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
     return response.body;
   }
 

@@ -18,13 +18,10 @@ import AuthStatusLocalStorage from "../local_storage/authStatusLocalStorage";
 import UserLocalStorage from "../local_storage/userLocalStorage";
 import GroupLocalStorage from "../local_storage/groupLocalStorage";
 import RolesLocalStorage from "../local_storage/rolesLocalStorage";
-import PasswordGeneratorLocalStorage
-  from "../local_storage/passwordGeneratorLocalStorage";
-import PostponeUserSettingInvitationService
-  from "../invitation/postponeUserSettingInvitationService";
+import PasswordGeneratorLocalStorage from "../local_storage/passwordGeneratorLocalStorage";
+import PostponeUserSettingInvitationService from "../invitation/postponeUserSettingInvitationService";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
-import SsoKitTemporaryStorageService
-  from "../session_storage/ssoKitTemporaryStorageService";
+import SsoKitTemporaryStorageService from "../session_storage/ssoKitTemporaryStorageService";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
 import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
@@ -68,14 +65,14 @@ class LocalStorageService {
     }
 
     const account = await GetLegacyAccountService.get();
-    (new RbacsLocalStorage(account)).flush();
-    (new PasswordPoliciesLocalStorage(account)).flush();
-    (new PasswordExpirySettingsLocalStorage(account)).flush();
-    (new MetadataKeysSettingsLocalStorage(account)).flush();
-    (new MetadataTypesSettingsLocalStorage(account)).flush();
-    (new MetadataKeysSessionStorage(account)).flush();
-    (new SessionKeysBundlesSessionStorageService(account)).flush();
-    (new GroupLocalStorage(account)).flush();
+    new RbacsLocalStorage(account).flush();
+    new PasswordPoliciesLocalStorage(account).flush();
+    new PasswordExpirySettingsLocalStorage(account).flush();
+    new MetadataKeysSettingsLocalStorage(account).flush();
+    new MetadataTypesSettingsLocalStorage(account).flush();
+    new MetadataKeysSessionStorage(account).flush();
+    new SessionKeysBundlesSessionStorageService(account).flush();
+    new GroupLocalStorage(account).flush();
     UserMeSessionStorageService.remove(account);
   }
 }

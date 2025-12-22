@@ -23,8 +23,8 @@ function globalSetPortname(portname) {
  * @return {string}
  */
 function createObjectURL(dataUrl) {
-  const contentType = dataUrl.split(',')[0].split(':')[1].split(';')[0];
-  const b64Data = dataUrl.split(',')[1];
+  const contentType = dataUrl.split(",")[0].split(":")[1].split(";")[0];
+  const b64Data = dataUrl.split(",")[1];
   const sliceSize = 512;
   // Base64 to BLOB (For security issue, avoid using fetch)
   const byteCharacters = atob(b64Data);
@@ -41,7 +41,7 @@ function createObjectURL(dataUrl) {
     const byteArray = new Uint8Array(byteNumbers);
     byteArrays.push(byteArray);
   }
-  const blob = new Blob(byteArrays, {type: contentType});
+  const blob = new Blob(byteArrays, { type: contentType });
   return self.URL.createObjectURL(blob);
 }
 
@@ -76,10 +76,10 @@ class ScriptExecution {
       files: fileArray,
       target: {
         tabId: this.tabId,
-        frameIds: [this.frameId]
+        frameIds: [this.frameId],
       },
       // Very important to isolated script and avoiding to share global variable between scripts
-      world: "ISOLATED"
+      world: "ISOLATED",
     });
   }
 
@@ -96,8 +96,8 @@ class ScriptExecution {
       files: fileArray,
       target: {
         tabId: this.tabId,
-        frameIds: [this.frameId]
-      }
+        frameIds: [this.frameId],
+      },
     });
   }
 
@@ -111,9 +111,9 @@ class ScriptExecution {
       args: [portName],
       target: {
         tabId: this.tabId,
-        frameIds: [this.frameId]
+        frameIds: [this.frameId],
       },
-      world: "ISOLATED"
+      world: "ISOLATED",
     });
   }
 
@@ -128,9 +128,9 @@ class ScriptExecution {
       args: [dataUrl],
       target: {
         tabId: this.tabId,
-        frameIds: [this.frameId]
+        frameIds: [this.frameId],
       },
-      world: "ISOLATED"
+      world: "ISOLATED",
     });
     return response[0]?.result;
   }
@@ -145,9 +145,9 @@ class ScriptExecution {
       args: [url],
       target: {
         tabId: this.tabId,
-        frameIds: [this.frameId]
+        frameIds: [this.frameId],
       },
-      world: "ISOLATED"
+      world: "ISOLATED",
     });
   }
 }

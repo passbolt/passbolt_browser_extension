@@ -23,11 +23,7 @@ class AccountKitEntity extends AbstractAccountEntity {
    * @inheritDoc
    */
   constructor(accountDto, options = {}) {
-    super(EntitySchema.validate(
-      AccountKitEntity.ENTITY_NAME,
-      accountDto,
-      AccountKitEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(AccountKitEntity.ENTITY_NAME, accountDto, AccountKitEntity.getSchema()), options);
   }
 
   /**
@@ -37,8 +33,8 @@ class AccountKitEntity extends AbstractAccountEntity {
   static getSchema() {
     const abstractAccountEntitySchema = AbstractAccountEntity.getSchema();
     const schema = {
-      "type": "object",
-      "required": [
+      type: "object",
+      required: [
         "domain",
         "user_id",
         "username",
@@ -49,24 +45,24 @@ class AccountKitEntity extends AbstractAccountEntity {
         "user_public_armored_key",
         "security_token",
       ],
-      "properties": {
+      properties: {
         domain: abstractAccountEntitySchema.properties.domain,
         user_id: abstractAccountEntitySchema.properties.user_id,
         username: abstractAccountEntitySchema.properties.username,
         first_name: abstractAccountEntitySchema.properties.first_name,
         last_name: abstractAccountEntitySchema.properties.last_name,
         security_token: abstractAccountEntitySchema.properties.security_token,
-        "user_private_armored_key": {
-          "type": "string",
-          "maxLength": PGP_KEY_MAX_LENGTH
+        user_private_armored_key: {
+          type: "string",
+          maxLength: PGP_KEY_MAX_LENGTH,
         },
-        "user_public_armored_key": {
-          "type": "string",
-          "maxLength": PGP_KEY_MAX_LENGTH
+        user_public_armored_key: {
+          type: "string",
+          maxLength: PGP_KEY_MAX_LENGTH,
         },
-        "server_public_armored_key": {
-          "type": "string",
-          "maxLength": PGP_KEY_MAX_LENGTH
+        server_public_armored_key: {
+          type: "string",
+          maxLength: PGP_KEY_MAX_LENGTH,
         },
       },
     };

@@ -14,14 +14,13 @@
 import MetadataKeysApiService from "../api/metadata/metadataKeysApiService";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 import GetGpgKeyInfoService from "../crypto/getGpgKeyInfoService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {assertString, assertType} from "../../utils/assertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import { assertString, assertType } from "../../utils/assertions";
 import FindUsersService from "../user/findUsersService";
 import EncryptMetadataPrivateKeysService from "./encryptMetadataPrivateKeysService";
 import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
-import ExternalGpgKeyPairEntity
-  from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
+import ExternalGpgKeyPairEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 import Keyring from "../../model/keyring";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 
@@ -80,11 +79,16 @@ export default class CreateMetadataKeyService {
     const metadataKeysSettings = await this.getOrFindMetadataSettings.getOrFindKeysSettings();
     const privateKey = await OpenpgpAssertion.readKeyOrFail(metadataKeyPair.privateKey.armoredKey);
     const metadataKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
-    const metadataPrivateKeysDto = users.items.map(user =>
-      this._buildMetadataPrivateKeyDto(metadataKeyPair.privateKey.armoredKey, metadataKeyInfo.fingerprint, user.id));
+    const metadataPrivateKeysDto = users.items.map((user) =>
+      this._buildMetadataPrivateKeyDto(metadataKeyPair.privateKey.armoredKey, metadataKeyInfo.fingerprint, user.id),
+    );
 
     if (!metadataKeysSettings.zeroKnowledgeKeyShare) {
-      const apiMetadataPrivateKeyDto = this._buildMetadataPrivateKeyDto(metadataKeyPair.privateKey.armoredKey, metadataKeyInfo.fingerprint, null);
+      const apiMetadataPrivateKeyDto = this._buildMetadataPrivateKeyDto(
+        metadataKeyPair.privateKey.armoredKey,
+        metadataKeyInfo.fingerprint,
+        null,
+      );
       metadataPrivateKeysDto.push(apiMetadataPrivateKeyDto);
     }
 
@@ -113,7 +117,7 @@ export default class CreateMetadataKeyService {
         fingerprint: fingerprint,
         armored_key: privateArmoredKey,
         passphrase: "",
-      }
+      },
     };
   }
 }

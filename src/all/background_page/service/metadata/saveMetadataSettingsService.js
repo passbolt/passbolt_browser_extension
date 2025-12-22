@@ -11,20 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.11.0
  */
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import MetadataTypesSettingsApiService from "../api/metadata/metadataTypesSettingsApiService";
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
-import {assertString, assertType} from "../../utils/assertions";
+import { assertString, assertType } from "../../utils/assertions";
 import MetadataKeysSettingsApiService from "../api/metadata/metadataKeysSettingsApiService";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSettingsLocalStorage";
 import ShareMetadataKeyPrivateService from "./shareMetadataKeyPrivateService";
 import FindMetadataSettingsService from "./findMetadataSettingsService";
-import ShareMetadataPrivateKeysCollection
-  from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import ShareMetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import FindAndUpdateMetadataKeysSessionStorageService from "./findAndUpdateMetadataKeysSessionStorageService";
 import EncryptMetadataPrivateKeysService from "./encryptMetadataPrivateKeysService";
@@ -46,7 +43,10 @@ export default class SaveMetadataSettingsService {
     this.metadataTypesSettingsLocalStorage = new MetadataTypesSettingsLocalStorage(account);
     this.findMetadataSettingsService = new FindMetadataSettingsService(apiClientOptions);
     this.shareMetadataKeyPrivateService = new ShareMetadataKeyPrivateService(account, apiClientOptions);
-    this.findAndUpdateMetadataKeysSessionStorageService = new FindAndUpdateMetadataKeysSessionStorageService(account, apiClientOptions);
+    this.findAndUpdateMetadataKeysSessionStorageService = new FindAndUpdateMetadataKeysSessionStorageService(
+      account,
+      apiClientOptions,
+    );
     this.encryptMetadataPrivateKeysService = new EncryptMetadataPrivateKeysService(account);
   }
 
@@ -87,7 +87,10 @@ export default class SaveMetadataSettingsService {
     const decryptedUserPrivateKey = await this._getDecryptedPrivateKey(passphrase);
 
     if (!settings.zeroKnowledgeKeyShare) {
-      settings.metadataPrivateKeys = await this._buildMetadataKeyForServer(shareMetadataPrivateKeysCollection, decryptedUserPrivateKey);
+      settings.metadataPrivateKeys = await this._buildMetadataKeyForServer(
+        shareMetadataPrivateKeysCollection,
+        decryptedUserPrivateKey,
+      );
     }
   }
 
@@ -109,7 +112,8 @@ export default class SaveMetadataSettingsService {
    * @private
    */
   async _getMetadataPrivateKeys(passphrase) {
-    const metadataKeysCollection = await this.findAndUpdateMetadataKeysSessionStorageService.findAndUpdateAll(passphrase);
+    const metadataKeysCollection =
+      await this.findAndUpdateMetadataKeysSessionStorageService.findAndUpdateAll(passphrase);
     const shareMetadataPrivateKeysCollection = new ShareMetadataPrivateKeysCollection([]);
     for (const metadataKeyEntity of metadataKeysCollection) {
       shareMetadataPrivateKeysCollection.pushMany(metadataKeyEntity.metadataPrivateKeys.toDto());
@@ -130,7 +134,10 @@ export default class SaveMetadataSettingsService {
     for (const metadataPrivateKey of metadataPrivateKeysCollection) {
       const clonedSharedMetadataPrivateKey = await metadataPrivateKey.cloneForSharing(null);
       if (metadataPrivateKey.dataSignedByCurrentUser) {
-        await this.encryptMetadataPrivateKeysService.encryptOne(clonedSharedMetadataPrivateKey, decryptedUserPrivateKey);
+        await this.encryptMetadataPrivateKeysService.encryptOne(
+          clonedSharedMetadataPrivateKey,
+          decryptedUserPrivateKey,
+        );
       } else {
         await this.encryptMetadataPrivateKeysService.encryptOne(clonedSharedMetadataPrivateKey, null);
       }

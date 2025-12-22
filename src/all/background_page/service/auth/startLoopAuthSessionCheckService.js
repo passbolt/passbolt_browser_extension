@@ -27,7 +27,7 @@ class StartLoopAuthSessionCheckService {
     await browser.alarms.create(StartLoopAuthSessionCheckService.ALARM_NAME, {
       // this `periodInMinutes` is set to ensure that after going back from sleep mode the alarms still triggers
       periodInMinutes: 1,
-      when: Date.now() + CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD
+      when: Date.now() + CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD,
     });
   }
 

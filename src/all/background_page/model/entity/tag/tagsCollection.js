@@ -14,10 +14,10 @@
 import TagEntity from "./tagEntity";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
-const ENTITY_NAME = 'Tags';
+const ENTITY_NAME = "Tags";
 
-const RULE_UNIQUE_ID = 'unique_id';
-const RULE_UNIQUE_SLUG = 'unique_slug';
+const RULE_UNIQUE_ID = "unique_id";
+const RULE_UNIQUE_SLUG = "unique_slug";
 
 class TagsCollection extends EntityV2Collection {
   /**
@@ -47,8 +47,8 @@ class TagsCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": TagEntity.getSchema(),
+      type: "array",
+      items: TagEntity.getSchema(),
     };
   }
 
@@ -58,7 +58,7 @@ class TagsCollection extends EntityV2Collection {
    * @throws {EntityValidationError} If a tag already exists with the same id.
    */
   validateBuildRules(item, options) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
   }
 
   /*
@@ -85,15 +85,14 @@ class TagsCollection extends EntityV2Collection {
    */
   pushMany(data, entityOptions = {}, options = {}) {
     const uniqueIdsSetCache = new Set(this.extract("id"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache
-      },
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);

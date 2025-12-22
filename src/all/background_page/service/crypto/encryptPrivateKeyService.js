@@ -12,9 +12,9 @@
  * @since         3.6.0
  */
 
-import * as openpgp from 'openpgp';
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {assertPassphrase} from "../../utils/assertions";
+import * as openpgp from "openpgp";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import { assertPassphrase } from "../../utils/assertions";
 
 class EncryptPrivateKeyService {
   /**
@@ -30,10 +30,10 @@ class EncryptPrivateKeyService {
     OpenpgpAssertion.assertDecryptedPrivateKey(decryptedPrivateKey);
     assertPassphrase(passphrase);
 
-    return (await openpgp.encryptKey({
+    return await openpgp.encryptKey({
       privateKey: decryptedPrivateKey,
       passphrase: passphrase,
-    }));
+    });
   }
 }
 

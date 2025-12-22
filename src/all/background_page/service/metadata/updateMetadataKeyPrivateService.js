@@ -14,7 +14,7 @@
 
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
 import MetadataPrivateKeyApiService from "../api/metadata/metadataPrivateKeyApiService";
-import {assertType} from "../../utils/assertions";
+import { assertType } from "../../utils/assertions";
 
 /**
  * The service aims to update a metadata private key.

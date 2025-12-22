@@ -1,5 +1,5 @@
 import storage from "../../sdk/storage";
-import {Config} from "../../model/config";
+import { Config } from "../../model/config";
 import Log from "../../model/log";
 import * as openpgp from "openpgp";
 

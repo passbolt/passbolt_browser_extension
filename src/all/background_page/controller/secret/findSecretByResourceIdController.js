@@ -12,7 +12,7 @@
  * @since         4.9.4
  */
 import i18n from "../../sdk/i18n";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
@@ -36,7 +36,7 @@ class FindSecretByResourceIdController {
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.findSecretService = new FindSecretService(account, apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.progressService = new ProgressService(this.worker, i18n.t('Decrypting ...'));
+    this.progressService = new ProgressService(this.worker, i18n.t("Decrypting ..."));
     this.getPassphraseService = new GetPassphraseService(account);
   }
 
@@ -50,7 +50,7 @@ class FindSecretByResourceIdController {
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

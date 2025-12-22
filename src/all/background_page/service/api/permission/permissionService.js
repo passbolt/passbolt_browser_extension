@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const PERMISSION_SERVICE_RESOURCE_NAME = 'permissions/resource';
+const PERMISSION_SERVICE_RESOURCE_NAME = "permissions/resource";
 
 class PermissionService extends AbstractService {
   /**
@@ -44,9 +44,9 @@ class PermissionService extends AbstractService {
   static getSupportedContainOptions() {
     return [
       // find all
-      'user',
-      'user.profile',
-      'group',
+      "user",
+      "user.profile",
+      "group",
     ];
   }
 
@@ -61,7 +61,9 @@ class PermissionService extends AbstractService {
    */
   async findAllByAcoForeignKey(id, contains) {
     this.assertValidId(id);
-    const options = contains ? this.formatContainOptions(contains, PermissionService.getSupportedContainOptions()) : null;
+    const options = contains
+      ? this.formatContainOptions(contains, PermissionService.getSupportedContainOptions())
+      : null;
     const response = await this.apiClient.get(id, options);
     return response.body;
   }

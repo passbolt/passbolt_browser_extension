@@ -46,7 +46,7 @@ class ExportResourcesFileController {
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -64,16 +64,16 @@ class ExportResourcesFileController {
       await this.exportResourcesService.exportToFile(exportResourcesFileEntity, passphrase);
       const date = new Date().toISOString().slice(0, 10);
       const filename = `passbolt-export-${date}.${exportResourcesFileEntity.fileType}`;
-      const mimeType = {kdbx: "application/x-keepass", csv: "text/csv"}[exportResourcesFileEntity.fileType] || "text/plain";
+      const mimeType =
+        { kdbx: "application/x-keepass", csv: "text/csv" }[exportResourcesFileEntity.fileType] || "text/plain";
       const blobFile = exportResourcesFileEntity.toBlob(mimeType);
       await FileService.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
-      this.progressService.finishStep(i18n.t('Done'), true);
+      this.progressService.finishStep(i18n.t("Done"), true);
       return exportResourcesFileEntity;
     } finally {
       this.progressService.close();
     }
   }
 }
-
 
 export default ExportResourcesFileController;

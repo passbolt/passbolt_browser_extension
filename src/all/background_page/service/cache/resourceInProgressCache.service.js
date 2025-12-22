@@ -57,12 +57,12 @@ class ResourceInProgressCacheService {
    */
   async set(resource, timeoutInMs = VALIDITY_TIMEOUT_IN_MS) {
     if (!(resource instanceof ExternalResourceEntity)) {
-      throw new TypeError('ResourceInProgressCacheService::set expects a ExternalResourceEntity');
+      throw new TypeError("ResourceInProgressCacheService::set expects a ExternalResourceEntity");
     }
     // Clean everything before set the value
     this.reset();
 
-    await browser.storage.session.set({[RESOURCE_IN_PROGRESS_STORAGE_KEY]: resource.toDto()});
+    await browser.storage.session.set({ [RESOURCE_IN_PROGRESS_STORAGE_KEY]: resource.toDto() });
     // Set a timeout to clean the cache if not consumed
     this.timeoutId = setTimeout(this.reset, timeoutInMs);
   }

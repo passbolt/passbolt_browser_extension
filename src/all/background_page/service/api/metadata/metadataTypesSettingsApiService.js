@@ -13,9 +13,8 @@
  */
 
 import AbstractService from "../abstract/abstractService";
-import {assertType} from "../../../utils/assertions";
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import { assertType } from "../../../utils/assertions";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
 const METADATA_TYPES_SETTINGS_API_SERVICE_RESOURCE_NAME = "metadata/types/settings";
 

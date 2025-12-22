@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
+import PostponeUserSettingInvitationService from "../../service/invitation/postponeUserSettingInvitationService";
 
 class PostponeUserSettingMfaInvitationController {
   /**
@@ -34,7 +34,7 @@ class PostponeUserSettingMfaInvitationController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

@@ -15,23 +15,18 @@ import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/
 import UserEntity from "../userEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
-const ENTITY_NAME = 'LoggedUser';
+const ENTITY_NAME = "LoggedUser";
 
 class LoggedUserEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(LoggedUserDto, options = {}) {
-    super(EntitySchema.validate(
-      LoggedUserEntity.ENTITY_NAME,
-      LoggedUserDto,
-      LoggedUserEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(LoggedUserEntity.ENTITY_NAME, LoggedUserDto, LoggedUserEntity.getSchema()), options);
 
     // Associations
     if (this._props.profile) {
-      this._profile = new ProfileEntity(this._props.profile, {clone: false});
+      this._profile = new ProfileEntity(this._props.profile, { clone: false });
       delete this._props.profile;
     }
   }

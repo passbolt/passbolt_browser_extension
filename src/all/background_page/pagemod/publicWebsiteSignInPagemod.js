@@ -12,7 +12,7 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {PublicWebsiteSignInEvents} from "../event/publicWebsiteSignInEvents";
+import { PublicWebsiteSignInEvents } from "../event/publicWebsiteSignInEvents";
 import ParsePublicWebsiteUrlService from "../service/publicWebsite/parsePublicWebsiteUrlService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
@@ -30,8 +30,8 @@ class PublicWebsiteSignIn extends Pagemod {
    */
   get contentScriptFiles() {
     return [
-      'contentScripts/js/dist/public-website-sign-in/vendors.js',
-      'contentScripts/js/dist/public-website-sign-in/public-website-sign-in.js'
+      "contentScripts/js/dist/public-website-sign-in/vendors.js",
+      "contentScripts/js/dist/public-website-sign-in/public-website-sign-in.js",
     ];
   }
 
@@ -46,9 +46,11 @@ class PublicWebsiteSignIn extends Pagemod {
    * @inheritDoc
    */
   async canBeAttachedTo(frameDetails) {
-    return this.assertTopFrameAttachConstraint(frameDetails)
-      && this.assertUrlAttachConstraint(frameDetails)
-      && await this.assertUserValidConstraint();
+    return (
+      this.assertTopFrameAttachConstraint(frameDetails) &&
+      this.assertUrlAttachConstraint(frameDetails) &&
+      (await this.assertUserValidConstraint())
+    );
   }
 
   /**
@@ -57,13 +59,15 @@ class PublicWebsiteSignIn extends Pagemod {
   async attachEvents(port) {
     try {
       const tab = port._port.sender.tab;
-      const account =  await GetActiveAccountService.get();
+      const account = await GetActiveAccountService.get();
       for (const event of this.events) {
-        event.listen({port, tab}, null, account);
+        event.listen({ port, tab }, null, account);
       }
     } catch (error) {
       // Unexpected error, this pagemod shouldn't have been initialized as the PublicWebsiteSignPagemod should have raised an exception and not inject the content script.
-      console.error('PublicWebsiteSignIn::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error(
+        "PublicWebsiteSignIn::attach legacy account cannot be retrieved, please contact your administrator.",
+      );
       console.error(error);
     }
   }

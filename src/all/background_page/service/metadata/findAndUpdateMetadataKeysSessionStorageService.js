@@ -44,11 +44,13 @@ export default class FindAndUpdateMetadataKeysSessionStorageService {
     const lockKey = `${FIND_AND_UPDATE_METADATA_KEYS_SS_LOCK_PREFIX}${this.account.id}`;
 
     // If no update is in progress, refresh the session storage.
-    return await navigator.locks.request(lockKey, {ifAvailable: true}, async lock => {
+    return await navigator.locks.request(lockKey, { ifAvailable: true }, async (lock) => {
       // Lock not granted, an update is already in progress. Wait for its completion and return the value of the session storage.
       if (!lock) {
-        return await navigator.locks.request(lockKey, {mode: "shared"}, async() =>
-          new MetadataKeysCollection(await this.metadataKeysSessionStorage.get())
+        return await navigator.locks.request(
+          lockKey,
+          { mode: "shared" },
+          async () => new MetadataKeysCollection(await this.metadataKeysSessionStorage.get()),
         );
       }
 

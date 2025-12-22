@@ -43,7 +43,7 @@ class WorkerService {
     }
     const port = await PortManager.getPortById(worker.id);
     const tab = port._port.sender.tab;
-    return {port, tab};
+    return { port, tab };
   }
 
   /**
@@ -55,7 +55,7 @@ class WorkerService {
    */
   static async waitExists(applicationName, tabId, numberOfRetry = 50) {
     // Handle worker exist and check 50 times (5 seconds)
-    const handleWorkerExist = async(resolve, reject, numberOfRetry) => {
+    const handleWorkerExist = async (resolve, reject, numberOfRetry) => {
       try {
         await this.get(applicationName, tabId);
         resolve();
@@ -83,7 +83,11 @@ class WorkerService {
     // Clear timeout to take only the last event of the worker to check
     clearTimeout(this.timeoutByWorkerID[workerEntity.id]);
     // Use timeout cause alarm are fired at a minimum of 30 seconds
-    this.timeoutByWorkerID[workerEntity.id] = setTimeout(this.execNavigationForWorkerWaitingConnection, WORKER_CHECK_STATUS_TIME_CHECKING, workerEntity.id);
+    this.timeoutByWorkerID[workerEntity.id] = setTimeout(
+      this.execNavigationForWorkerWaitingConnection,
+      WORKER_CHECK_STATUS_TIME_CHECKING,
+      workerEntity.id,
+    );
   }
 
   /**
@@ -102,7 +106,9 @@ class WorkerService {
 
     const workerEntity = new WorkerEntity(worker);
     if (!workerEntity.isWaitingConnection && !workerEntity.isReconnecting) {
-      console.debug(`WorkerService::execNavigationForWorkerWaitingConnection(${workerId}): Worker port connected to the content script application.`);
+      console.debug(
+        `WorkerService::execNavigationForWorkerWaitingConnection(${workerId}): Worker port connected to the content script application.`,
+      );
       return;
     }
 
@@ -113,10 +119,12 @@ class WorkerService {
       // Mapping the tab info as a frame details to be compliant with webNavigation API
       frameId: 0,
       tabId: worker.tabId,
-      url: tab.url
+      url: tab.url,
     };
 
-    console.debug(`WorkerService::execNavigationForWorkerWaitingConnection(${workerId}): Trigger pagemods identification process.`);
+    console.debug(
+      `WorkerService::execNavigationForWorkerWaitingConnection(${workerId}): Trigger pagemods identification process.`,
+    );
     await WebNavigationService.exec(frameDetails);
   }
 
@@ -126,7 +134,7 @@ class WorkerService {
    * @return {Promise<void>}
    */
   static async destroyWorkersByName(workersName) {
-    this.emitOnWorkersWithName('passbolt.content-script.destroy', workersName);
+    this.emitOnWorkersWithName("passbolt.content-script.destroy", workersName);
   }
 
   /**

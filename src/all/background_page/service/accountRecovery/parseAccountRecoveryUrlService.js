@@ -24,7 +24,7 @@ class ParseAccountRecoveryUrlService {
     const regex = new RegExp(`(.*)\/account-recovery\/continue\/(${uuidRegex})\/(${uuidRegex})`);
 
     if (!regex.test(url)) {
-      throw new Error('Cannot parse account recovery url. The url does not match the pattern.');
+      throw new Error("Cannot parse account recovery url. The url does not match the pattern.");
     }
 
     const parsedUrl = url.match(regex);
@@ -32,16 +32,16 @@ class ParseAccountRecoveryUrlService {
     const [, , user_id, authentication_token_token] = parsedUrl;
 
     // Sanitize domains, removed trailing "/" in order to avoid domains such as https://passbolt.dev//
-    domain = domain.replace(/\/*$/g, '');
+    domain = domain.replace(/\/*$/g, "");
 
     try {
       new URL(domain);
     } catch (error) {
       console.error(error);
-      throw new Error('Cannot parse account recovery url. The domain is not valid.');
+      throw new Error("Cannot parse account recovery url. The domain is not valid.");
     }
 
-    return {domain, user_id, authentication_token_token};
+    return { domain, user_id, authentication_token_token };
   }
 
   /**

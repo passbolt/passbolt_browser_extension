@@ -8,9 +8,9 @@ import i18n from "../sdk/i18n";
 
 class InvalidMasterPasswordError extends Error {
   constructor(message) {
-    message = message || i18n.t('This is not a valid passphrase');
+    message = message || i18n.t("This is not a valid passphrase");
     super(message);
-    this.name = 'InvalidMasterPasswordError';
+    this.name = "InvalidMasterPasswordError";
   }
 }
 

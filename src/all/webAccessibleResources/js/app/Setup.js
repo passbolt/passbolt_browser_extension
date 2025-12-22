@@ -18,7 +18,7 @@ import Port from "../lib/port";
 
 async function main() {
   const query = new URLSearchParams(window.location.search);
-  const portname = query.get('passbolt');
+  const portname = query.get("passbolt");
   const port = new Port(portname);
   await port.connect();
   const domContainer = document.createElement("div");
@@ -26,7 +26,7 @@ async function main() {
 
   // TODO: update to createRoot for react 18 when ready
   /* eslint-disable react/no-deprecated */
-  ReactDOM.render(React.createElement(ExtAuthenticationSetup, {port: port}), domContainer);
+  ReactDOM.render(React.createElement(ExtAuthenticationSetup, { port: port }), domContainer);
 }
 
 main();

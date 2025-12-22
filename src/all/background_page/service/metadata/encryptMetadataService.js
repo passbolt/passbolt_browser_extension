@@ -11,24 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import PassphraseStorageService from '../session_storage/passphraseStorageService';
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 import EncryptMessageService from "../crypto/encryptMessageService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
-import {assertAnyTypeOf, assertType} from "../../utils/assertions";
+import { assertAnyTypeOf, assertType } from "../../utils/assertions";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService";
-import FoldersCollection from '../../model/entity/folder/foldersCollection';
-import ResourcesCollection from '../../model/entity/resource/resourcesCollection';
+import FoldersCollection from "../../model/entity/folder/foldersCollection";
+import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
-import {
-  RESOURCE_TYPE_VERSION_5
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import Keyring from '../../model/keyring';
-import ExternalGpgKeyEntity from 'passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity';
-import EntitySchema from 'passbolt-styleguide/src/shared/models/entity/abstract/entitySchema';
+import { RESOURCE_TYPE_VERSION_5 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import Keyring from "../../model/keyring";
+import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
@@ -59,7 +57,11 @@ class EncryptMetadataService {
    * @throws {Error} if metadata object_type is not defined and valid.
    */
   async encryptOneForForeignModel(entity, passphrase = null) {
-    assertAnyTypeOf(entity, [ResourceEntity, FolderEntity], "The given data type is not a ResourceEntity or a FolderEntity");
+    assertAnyTypeOf(
+      entity,
+      [ResourceEntity, FolderEntity],
+      "The given data type is not a ResourceEntity or a FolderEntity",
+    );
 
     // Do nothing if metadata is already encrypted
     if (!entity.isMetadataDecrypted()) {
@@ -69,19 +71,26 @@ class EncryptMetadataService {
     // Prevent future issue if an encrypted metadata is stored without object_type, this will fail the decryption validation of the entity
     this.assertValidMetadataObjectType(entity);
 
-    passphrase = passphrase || await PassphraseStorageService.getOrFail();
-    const userPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+    passphrase = passphrase || (await PassphraseStorageService.getOrFail());
+    const userPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(
+      this.account.userPrivateArmoredKey,
+      passphrase,
+    );
     const serializedMetadata = JSON.stringify(entity.metadata.toDto(entity.metadata.constructor.DEFAULT_CONTAIN));
 
     let encryptedMetadata;
-    if (entity.isPersonal() && await this.allowUsageOfPersonalKeys()) {
+    if (entity.isPersonal() && (await this.allowUsageOfPersonalKeys())) {
       const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
       encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [userPrivateKey]);
       entity._props.metadata_key_id = null;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
     } else {
-      const {metadataKeyId, metadataPublicKey, metadataPrivateKey} = await this.getLatestMetadataKeysAndId(passphrase);
-      encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, metadataPublicKey, [userPrivateKey, metadataPrivateKey]);
+      const { metadataKeyId, metadataPublicKey, metadataPrivateKey } =
+        await this.getLatestMetadataKeysAndId(passphrase);
+      encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, metadataPublicKey, [
+        userPrivateKey,
+        metadataPrivateKey,
+      ]);
       entity.metadataKeyId = metadataKeyId;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
     }
@@ -100,29 +109,43 @@ class EncryptMetadataService {
    * @throws {Error} if metadata is already encrypted.
    */
   async encryptAllFromForeignModels(collection, passphrase = null) {
-    assertAnyTypeOf(collection, [ResourcesCollection, FoldersCollection], "The given data type is not a ResourcesCollection or a FoldersCollection");
+    assertAnyTypeOf(
+      collection,
+      [ResourcesCollection, FoldersCollection],
+      "The given data type is not a ResourcesCollection or a FoldersCollection",
+    );
 
     // Fail if collection has already some encrypted metadata.
-    if (collection.items.some(resourceEntity => !resourceEntity.isMetadataDecrypted())) {
+    if (collection.items.some((resourceEntity) => !resourceEntity.isMetadataDecrypted())) {
       throw new Error("Unable to encrypt the collection metadata, a resource metadata is already encrypted.");
     }
 
     const resourceTypesV5Collection = await this.resourceTypesModel.getOrFindAll();
     resourceTypesV5Collection.filterByResourceTypeVersion(RESOURCE_TYPE_VERSION_5);
     // No need to encrypt metadata of resource type v4.
-    if (!collection.items.some(resource => Boolean(resourceTypesV5Collection.getFirstById(resource.resourceTypeId)))) {
+    if (
+      !collection.items.some((resource) => Boolean(resourceTypesV5Collection.getFirstById(resource.resourceTypeId)))
+    ) {
       return;
     }
 
     const canUsePersonalKeys = await this.allowUsageOfPersonalKeys();
-    passphrase = passphrase || await PassphraseStorageService.getOrFail();
+    passphrase = passphrase || (await PassphraseStorageService.getOrFail());
 
-    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(
+      this.account.userPrivateArmoredKey,
+      passphrase,
+    );
 
     if (canUsePersonalKeys) {
       await this.encryptAllFromForeignModelsWithUserKey(collection, resourceTypesV5Collection, userDecryptedPrivateKey);
     }
-    await this.encryptAllFromForeignModelsWithSharedKey(collection, resourceTypesV5Collection, userDecryptedPrivateKey, passphrase);
+    await this.encryptAllFromForeignModelsWithSharedKey(
+      collection,
+      resourceTypesV5Collection,
+      userDecryptedPrivateKey,
+      passphrase,
+    );
   }
 
   /**
@@ -136,8 +159,13 @@ class EncryptMetadataService {
    * might be available in the passphrase session storage.
    * @returns {Promise<void>}
    */
-  async encryptAllFromForeignModelsWithSharedKey(collection, resourceTypesV5, userDecryptedPrivateKey, passphrase = null) {
-    const {metadataKeyId, metadataPublicKey, metadataPrivateKey} = await this.getLatestMetadataKeysAndId(passphrase);
+  async encryptAllFromForeignModelsWithSharedKey(
+    collection,
+    resourceTypesV5,
+    userDecryptedPrivateKey,
+    passphrase = null,
+  ) {
+    const { metadataKeyId, metadataPublicKey, metadataPrivateKey } = await this.getLatestMetadataKeysAndId(passphrase);
 
     for (const entity of collection) {
       // If resource type v4, nothing to do.
@@ -150,7 +178,10 @@ class EncryptMetadataService {
       }
 
       const serializedMetadata = JSON.stringify(entity.metadata.toDto(entity.metadata.constructor.DEFAULT_CONTAIN));
-      const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, metadataPublicKey, [userDecryptedPrivateKey, metadataPrivateKey]);
+      const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, metadataPublicKey, [
+        userDecryptedPrivateKey,
+        metadataPrivateKey,
+      ]);
       entity.metadataKeyId = metadataKeyId;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
       entity.metadata = encryptedMetadata;
@@ -184,12 +215,13 @@ class EncryptMetadataService {
         throw collectionValidationError;
       }
 
-
       const userId = entity.soleOwnerId || this.account.userId;
       const userPublicKey = await this._retrieveRecipientKey(userId);
 
       const serializedMetadata = JSON.stringify(entity.metadata.toDto(entity.metadata.constructor.DEFAULT_CONTAIN));
-      const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [userDecryptedPrivateKey]);
+      const encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [
+        userDecryptedPrivateKey,
+      ]);
       entity.metadataKeyId = null;
       entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
       entity.metadata = encryptedMetadata;
@@ -218,7 +250,7 @@ class EncryptMetadataService {
     const metadataPublicKey = await OpenpgpAssertion.readKeyOrFail(metadataKeyEntity.armoredKey);
     const metadataPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
     const metadataKeyId = metadataKeyEntity.id;
-    return {metadataKeyId, metadataPublicKey, metadataPrivateKey};
+    return { metadataKeyId, metadataPublicKey, metadataPrivateKey };
   }
 
   /**
@@ -278,11 +310,19 @@ class EncryptMetadataService {
    */
   assertValidMetadataObjectType(entity) {
     try {
-      EntitySchema.validateProp("object_type", entity.metadata.objectType, entity.metadata.constructor.getSchema().properties.object_type);
+      EntitySchema.validateProp(
+        "object_type",
+        entity.metadata.objectType,
+        entity.metadata.constructor.getSchema().properties.object_type,
+      );
     } catch (error) {
       console.error(error);
       const validationError = new EntityValidationError();
-      validationError.addError('metadata.object_type', 'required-v5', `The resource metadata object_type is required and must be set to '${entity.metadata.constructor.METADATA_OBJECT_TYPE}' for the the entity (${entity?.id}).`);
+      validationError.addError(
+        "metadata.object_type",
+        "required-v5",
+        `The resource metadata object_type is required and must be set to '${entity.metadata.constructor.METADATA_OBJECT_TYPE}' for the the entity (${entity?.id}).`,
+      );
       throw validationError;
     }
   }

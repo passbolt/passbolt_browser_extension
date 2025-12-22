@@ -13,8 +13,7 @@
  */
 import Log from "../../model/log";
 
-const PASSWORD_GENERATOR_LOCAL_STORAGE_KEY = 'passwordGenerator';
-
+const PASSWORD_GENERATOR_LOCAL_STORAGE_KEY = "passwordGenerator";
 
 /**
  * @deprecated since v4.2.0 unused anymore; to be remove on v4.3.0
@@ -28,7 +27,7 @@ class PasswordGeneratorLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
-    Log.write({level: 'debug', message: 'PasswordGeneratorLocalStorage flushed'});
+    Log.write({ level: "debug", message: "PasswordGeneratorLocalStorage flushed" });
     return await browser.storage.local.remove(PASSWORD_GENERATOR_LOCAL_STORAGE_KEY);
   }
 }

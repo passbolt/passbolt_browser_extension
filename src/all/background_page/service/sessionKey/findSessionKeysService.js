@@ -13,8 +13,7 @@
  */
 
 import SessionKeysBundlesApiService from "../api/sessionKey/sessionKeysBundlesApiService";
-import SessionKeysBundlesCollection
-  from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
+import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
 import DecryptSessionKeysBundlesService from "./decryptSessionKeysBundlesService";
 
 class FindSessionKeysService {

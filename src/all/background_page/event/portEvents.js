@@ -13,18 +13,17 @@
  */
 import GeneratePortIdController from "../controller/port/generatePortIdController";
 
-
-const listen = function(worker) {
+const listen = function (worker) {
   /*
    * Generate a port id for the sign-in application.
    *
    * @listens passbolt.port.generate-id
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.port.generate-id', async(requestId, applicationName) => {
+  worker.port.on("passbolt.port.generate-id", async (requestId, applicationName) => {
     const controller = new GeneratePortIdController(worker, requestId);
     await controller._exec(applicationName);
   });
 };
 
-export const PortEvents = {listen};
+export const PortEvents = { listen };

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {assertUuid} from "../../../utils/assertions";
+import { assertUuid } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
-const SSO_SETTINGS_SERVICE_RESOURCE_NAME = '/sso/settings';
+const SSO_SETTINGS_SERVICE_RESOURCE_NAME = "/sso/settings";
 
 class SsoSettingsService extends AbstractService {
   /**
@@ -64,8 +64,10 @@ class SsoSettingsService extends AbstractService {
    * @returns
    */
   async getCurrent(contains) {
-    const options = contains ? this.formatContainOptions(contains, SsoSettingsService.getSupportedContainOptions()) : null;
-    const response = await this.apiClient.get('current', options);
+    const options = contains
+      ? this.formatContainOptions(contains, SsoSettingsService.getSupportedContainOptions())
+      : null;
+    const response = await this.apiClient.get("current", options);
     return response.body;
   }
 

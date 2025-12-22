@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import SsoLoginUrlEntity from "../entity/sso/ssoLoginUrlEntity";
 import SsoLoginService from "../../service/api/sso/ssoLoginService";
 
@@ -38,7 +38,7 @@ class SsoLoginModel {
   async getLoginUrl(providerId, userId) {
     assertUuid(userId, "The user id should be a valid uuid.");
 
-    const redirectUrlDto = await this.ssoLoginService.getLoginUrl(providerId, {user_id: userId});
+    const redirectUrlDto = await this.ssoLoginService.getLoginUrl(providerId, { user_id: userId });
     return new SsoLoginUrlEntity(redirectUrlDto, providerId);
   }
 }

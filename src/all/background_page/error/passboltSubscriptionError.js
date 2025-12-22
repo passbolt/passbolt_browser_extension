@@ -11,7 +11,7 @@
 class PassboltSubscriptionError extends Error {
   constructor(message, subscription = {}) {
     super(message);
-    this.name = 'PassboltSubscriptionError';
+    this.name = "PassboltSubscriptionError";
     this.subscription = subscription;
   }
 }

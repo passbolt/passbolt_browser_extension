@@ -8,9 +8,9 @@ import i18n from "../sdk/i18n";
 
 class PassboltServiceUnavailableError extends Error {
   constructor(message) {
-    message = message || i18n.t('The service is unavailable');
+    message = message || i18n.t("The service is unavailable");
     super(message);
-    this.name = 'PassboltServiceUnavailableError';
+    this.name = "PassboltServiceUnavailableError";
   }
 }
 

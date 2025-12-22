@@ -17,24 +17,27 @@ import PermissionChangeEntity from "./permissionChangeEntity";
 import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'PermissionChanges';
+const ENTITY_NAME = "PermissionChanges";
 
 class PermissionChangesCollection extends EntityCollection {
   /**
    * @inheritDoc
    */
   constructor(permissionsDto, options = {}) {
-    super(EntitySchema.validate(
-      PermissionChangesCollection.ENTITY_NAME,
-      permissionsDto,
-      PermissionChangesCollection.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        PermissionChangesCollection.ENTITY_NAME,
+        permissionsDto,
+        PermissionChangesCollection.getSchema(),
+      ),
+      options,
+    );
 
     /*
      * Note: there is no "multi-item" validation
      * Collection validation will fail at the first item that doesn't validate
      */
-    this._props.forEach(permissionChange => {
+    this._props.forEach((permissionChange) => {
       this.push(permissionChange);
     });
 
@@ -49,8 +52,8 @@ class PermissionChangesCollection extends EntityCollection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": PermissionChangeEntity.getSchema(),
+      type: "array",
+      items: PermissionChangeEntity.getSchema(),
     };
   }
 
@@ -74,7 +77,7 @@ class PermissionChangesCollection extends EntityCollection {
    * @returns {PermissionChangesCollection} a new set of permission changes
    */
   filterByAcoForeignKey(acoForeignKey) {
-    const permissionChanges = this._items.filter(changeEntity => changeEntity.acoForeignKey === acoForeignKey);
+    const permissionChanges = this._items.filter((changeEntity) => changeEntity.acoForeignKey === acoForeignKey);
     return new PermissionChangesCollection(permissionChanges);
   }
 
@@ -85,7 +88,7 @@ class PermissionChangesCollection extends EntityCollection {
    * @returns {PermissionChangesCollection} a new set of permission changes
    */
   filterByAroForeignKey(aroForeignKey) {
-    const permissionChanges = this._items.filter(changeEntity => changeEntity.aroForeignKey === aroForeignKey);
+    const permissionChanges = this._items.filter((changeEntity) => changeEntity.aroForeignKey === aroForeignKey);
     return new PermissionChangesCollection(permissionChanges);
   }
 
@@ -99,7 +102,7 @@ class PermissionChangesCollection extends EntityCollection {
    * @param {PermissionChangeEntity} permissionChange DTO or PermissionChangeEntity
    */
   push(permissionChange) {
-    if (!permissionChange || typeof permissionChange !== 'object') {
+    if (!permissionChange || typeof permissionChange !== "object") {
       throw new TypeError(`PermissionChangesCollection push parameter should be an object.`);
     }
     if (permissionChange instanceof PermissionChangeEntity) {
@@ -150,7 +153,7 @@ class PermissionChangesCollection extends EntityCollection {
    */
   static reuseChanges(aco, acoId, permissions, changes, originalPermissions) {
     if (!aco || !acoId || !permissions || !originalPermissions || !changes) {
-      throw new TypeError('PermissionChangesCollection reuseChanges call is missing parameter(s).');
+      throw new TypeError("PermissionChangesCollection reuseChanges call is missing parameter(s).");
     }
     const result = new PermissionChangesCollection([]);
     for (const change of changes) {
@@ -159,31 +162,36 @@ class PermissionChangesCollection extends EntityCollection {
       switch (change.scenario) {
         case PermissionChangeEntity.PERMISSION_CHANGE_DELETE:
           if (permission && permission.type === change.type) {
-            result.push(PermissionChangeEntity.createFromPermission(
-              permission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE
-            ));
+            result.push(
+              PermissionChangeEntity.createFromPermission(permission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE),
+            );
           }
           break;
         case PermissionChangeEntity.PERMISSION_CHANGE_CREATE:
           if (!permission) {
-            result.push(new PermissionChangeEntity({
-              aco: aco,
-              aco_foreign_key: acoId,
-              aro: change.aro,
-              aro_foreign_key: change.aroForeignKey,
-              type: change.type
-            }));
+            result.push(
+              new PermissionChangeEntity({
+                aco: aco,
+                aco_foreign_key: acoId,
+                aro: change.aro,
+                aro_foreign_key: change.aroForeignKey,
+                type: change.type,
+              }),
+            );
           }
           break;
         case PermissionChangeEntity.PERMISSION_CHANGE_UPDATE:
           if (permission && permission.type !== change.type) {
-            const originalPermission = originalPermissions.items.find(p => p.id === change.id);
+            const originalPermission = originalPermissions.items.find((p) => p.id === change.id);
             if (originalPermission.type === permission.type) {
               const expectedPermission = new PermissionEntity(permission.toDto());
               expectedPermission.type = change.type;
-              result.push(PermissionChangeEntity.createFromPermission(
-                expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE
-              ));
+              result.push(
+                PermissionChangeEntity.createFromPermission(
+                  expectedPermission,
+                  PermissionChangeEntity.PERMISSION_CHANGE_UPDATE,
+                ),
+              );
             }
           }
           break;
@@ -199,8 +207,13 @@ class PermissionChangesCollection extends EntityCollection {
    * @param {PermissionsCollection} expectedSet
    */
   static calculateChanges(originalSet, expectedSet) {
-    if (!originalSet || !(originalSet instanceof PermissionsCollection) || !expectedSet || !(expectedSet instanceof PermissionsCollection)) {
-      throw new TypeError('PermissionChangesCollection calculateChanges invalid parameters');
+    if (
+      !originalSet ||
+      !(originalSet instanceof PermissionsCollection) ||
+      !expectedSet ||
+      !(expectedSet instanceof PermissionsCollection)
+    ) {
+      throw new TypeError("PermissionChangesCollection calculateChanges invalid parameters");
     }
     const result = new PermissionChangesCollection([]);
 
@@ -208,12 +221,18 @@ class PermissionChangesCollection extends EntityCollection {
     for (const expectedPermission of expectedSet) {
       const foundPermission = originalSet.getByAroMatchingPermission(expectedPermission);
       if (!foundPermission) {
-        const newChange = PermissionChangeEntity.createFromPermission(expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_CREATE);
+        const newChange = PermissionChangeEntity.createFromPermission(
+          expectedPermission,
+          PermissionChangeEntity.PERMISSION_CHANGE_CREATE,
+        );
         result.push(newChange);
       } else {
         if (expectedPermission.type !== foundPermission.type) {
           expectedPermission.id = foundPermission.id;
-          const newChange = PermissionChangeEntity.createFromPermission(expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE);
+          const newChange = PermissionChangeEntity.createFromPermission(
+            expectedPermission,
+            PermissionChangeEntity.PERMISSION_CHANGE_UPDATE,
+          );
           result.push(newChange);
         }
       }
@@ -223,7 +242,10 @@ class PermissionChangesCollection extends EntityCollection {
     for (const originalPermission of originalSet) {
       if (!expectedSet.getByAroMatchingPermission(originalPermission)) {
         // Aka, permissions that are in the old set and not the new one
-        const newChange = PermissionChangeEntity.createFromPermission(originalPermission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE);
+        const newChange = PermissionChangeEntity.createFromPermission(
+          originalPermission,
+          PermissionChangeEntity.PERMISSION_CHANGE_DELETE,
+        );
         result.push(newChange);
       }
     }

@@ -67,7 +67,7 @@ class ResourceModel {
    */
   async getAllByIds(resourceIds) {
     const localResources = await ResourceLocalStorage.get();
-    const filteredResources = localResources.filter(localResource => resourceIds.includes(localResource.id));
+    const filteredResources = localResources.filter((localResource) => resourceIds.includes(localResource.id));
     return new ResourcesCollection(filteredResources);
   }
 
@@ -101,24 +101,24 @@ class ResourceModel {
    * @returns {PermissionChangesCollection}
    */
   calculatePermissionsChangesForMove(resource, parentFolder, destFolder) {
-    let remainingPermissions = new PermissionsCollection([], {assertAtLeastOneOwner: false});
+    let remainingPermissions = new PermissionsCollection([], { assertAtLeastOneOwner: false });
 
     // Remove permissions from parent if any
     if (parentFolder !== null) {
       if (!resource.permissions || !parentFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsChangesForMove requires permissions to be set.');
+        throw new TypeError("Resource model calculatePermissionsChangesForMove requires permissions to be set.");
       }
       remainingPermissions = PermissionsCollection.diff(resource.permissions, parentFolder.permissions, false);
     }
     // Add parent permissions
-    let permissionsFromParent = new PermissionsCollection([], {assertAtLeastOneOwner: false});
+    let permissionsFromParent = new PermissionsCollection([], { assertAtLeastOneOwner: false });
     if (destFolder) {
       if (!destFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
+        throw new TypeError(
+          "Resource model calculatePermissionsChangesForMove requires destination permissions to be set.",
+        );
       }
-      permissionsFromParent = destFolder.permissions.cloneForAco(
-        PermissionEntity.ACO_RESOURCE, resource.id, false
-      );
+      permissionsFromParent = destFolder.permissions.cloneForAco(PermissionEntity.ACO_RESOURCE, resource.id, false);
     }
 
     const newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
@@ -127,13 +127,15 @@ class ResourceModel {
        * If the move is toward the root
        * Reuse highest permission
        */
-      newPermissions.addOrReplace(new PermissionEntity({
-        aco: PermissionEntity.ACO_RESOURCE,
-        aro: resource.permission.aro,
-        aco_foreign_key: resource.id,
-        aro_foreign_key: resource.permission.aroForeignKey,
-        type: PermissionEntity.PERMISSION_OWNER,
-      }));
+      newPermissions.addOrReplace(
+        new PermissionEntity({
+          aco: PermissionEntity.ACO_RESOURCE,
+          aro: resource.permission.aro,
+          aco_foreign_key: resource.id,
+          aro_foreign_key: resource.permission.aroForeignKey,
+          type: PermissionEntity.PERMISSION_OWNER,
+        }),
+      );
     }
     newPermissions.assertAtLeastOneOwner();
     return PermissionChangesCollection.calculateChanges(resource.permissions, newPermissions);
@@ -153,7 +155,9 @@ class ResourceModel {
     let changes = null;
     if (destFolder) {
       if (!destFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
+        throw new TypeError(
+          "Resource model calculatePermissionsChangesForMove requires destination permissions to be set.",
+        );
       }
       const currentPermissions = new PermissionsCollection([resource.permission]);
       const permissionsFromDest = destFolder.permissions.cloneForAco(PermissionEntity.ACO_RESOURCE, resource.id);
@@ -179,7 +183,7 @@ class ResourceModel {
   async findAll(contains, filters, orders, ignoreInvalidEntity) {
     let resourcesDto = await this.resourceService.findAll(contains, filters, orders);
     resourcesDto = await this.keepResourcesSupported(resourcesDto);
-    return new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
+    return new ResourcesCollection(resourcesDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
   /*
@@ -213,7 +217,7 @@ class ResourceModel {
    */
   async serializePlaintextDto(resourceTypeId, plaintextDto) {
     // If legacy resource (no resource type available or the plaintextDto is a string)
-    if (!resourceTypeId || typeof plaintextDto === 'string') {
+    if (!resourceTypeId || typeof plaintextDto === "string") {
       if (plaintextDto.length > MAX_LENGTH_PLAINTEXT) {
         throw new TypeError(`The secret should be maximum ${MAX_LENGTH_PLAINTEXT} characters in length.`);
       }
@@ -222,10 +226,10 @@ class ResourceModel {
 
     const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
     if (!schema) {
-      throw new TypeError('Could not find the schema definition for the requested resource type.');
+      throw new TypeError("Could not find the schema definition for the requested resource type.");
     }
 
-    const plaintextEntity = new PlaintextEntity(plaintextDto, {schema});
+    const plaintextEntity = new PlaintextEntity(plaintextDto, { schema });
     return JSON.stringify(plaintextEntity);
   }
 
@@ -316,7 +320,7 @@ class ResourceModel {
       throw new TypeError(`Resources exist check expect an array of uuid.`);
     }
     for (const i in resourceIds) {
-      if (!resources.find(item => item.id === resourceIds[i])) {
+      if (!resources.find((item) => item.id === resourceIds[i])) {
         throw new Error(`Resource with id ${resourceIds[i]} does not exist.`);
       }
     }

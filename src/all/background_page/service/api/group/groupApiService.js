@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const GROUP_SERVICE_RESOURCE_NAME = 'groups';
+const GROUP_SERVICE_RESOURCE_NAME = "groups";
 
 class GroupApiService extends AbstractService {
   /**
@@ -43,19 +43,19 @@ class GroupApiService extends AbstractService {
    */
   static getSupportedContainOptions() {
     return [
-      'modifier',
-      'modifier.profile',
-      'my_group_user',
-      'groups_users',
-      'groups_users.user',
-      'groups_users.user.profile',
-      'groups_users.user.gpgkey',
+      "modifier",
+      "modifier.profile",
+      "my_group_user",
+      "groups_users",
+      "groups_users.user",
+      "groups_users.user.profile",
+      "groups_users.user.gpgkey",
 
       // @deprecated when v2.13 support is removed
-      'group_user',
-      'group_user.user',
-      'group_user.user.profile',
-      'group_user.user.gpgkey'
+      "group_user",
+      "group_user.user",
+      "group_user.user.profile",
+      "group_user.user.gpgkey",
     ];
   }
 
@@ -65,10 +65,7 @@ class GroupApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedFiltersOptions() {
-    return [
-      'has-users',
-      'has-managers',
-    ];
+    return ["has-users", "has-managers"];
   }
 
   /**
@@ -77,10 +74,7 @@ class GroupApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedOrdersOptions() {
-    return [
-      'Group.name DESC',
-      'Group.name ASC',
-    ];
+    return ["Group.name DESC", "Group.name ASC"];
   }
 
   /**
@@ -108,11 +102,13 @@ class GroupApiService extends AbstractService {
    * @public
    */
   async findAll(contains, filters, orders) {
-    const legacyContain = GroupApiService.remapLegacyContain(contains);// crassette
-    contains = legacyContain ? this.formatContainOptions(legacyContain, GroupApiService.getSupportedContainOptions()) : null;
+    const legacyContain = GroupApiService.remapLegacyContain(contains); // crassette
+    contains = legacyContain
+      ? this.formatContainOptions(legacyContain, GroupApiService.getSupportedContainOptions())
+      : null;
     filters = filters ? this.formatFilterOptions(filters, GroupApiService.getSupportedFiltersOptions()) : null;
     orders = orders ? this.formatOrderOptions(orders, GroupApiService.getSupportedFiltersOptions()) : null;
-    const options = {...contains, ...filters, ...orders};
+    const options = { ...contains, ...filters, ...orders };
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];
@@ -162,12 +158,12 @@ class GroupApiService extends AbstractService {
   async updateDryRun(groupId, groupData) {
     this.assertValidId(groupId);
     this.assertNonEmptyData(groupData);
-    const {body} = await this.apiClient.update(groupId, groupData, {}, true);
+    const { body } = await this.apiClient.update(groupId, groupData, {}, true);
 
     if (body) {
       // @deprecated prior to API v2.14, the update dry run returns only v1 format result.
-      if (body['dry-run']) {
-        return this.remapUpdateDryRunDataV1tov2(body['dry-run']);
+      if (body["dry-run"]) {
+        return this.remapUpdateDryRunDataV1tov2(body["dry-run"]);
       } else {
         return body;
       }
@@ -187,8 +183,8 @@ class GroupApiService extends AbstractService {
    */
   async delete(groupId, transfer, dryRun) {
     this.assertValidId(groupId);
-    const data = transfer ? {transfer: transfer} : {};
-    const response = await this.apiClient.delete(groupId, data, {},  dryRun);
+    const data = transfer ? { transfer: transfer } : {};
+    const response = await this.apiClient.delete(groupId, data, {}, dryRun);
     return response.body;
   }
 
@@ -208,18 +204,18 @@ class GroupApiService extends AbstractService {
     }
     const groups_users = [];
     for (const g of data.groups_users) {
-      const group_user =  {};
-      if (Object.prototype.hasOwnProperty.call(g, 'user_id')) {
+      const group_user = {};
+      if (Object.prototype.hasOwnProperty.call(g, "user_id")) {
         group_user.user_id = g.user_id;
       }
-      if (Object.prototype.hasOwnProperty.call(g, 'is_admin')) {
+      if (Object.prototype.hasOwnProperty.call(g, "is_admin")) {
         group_user.is_admin = g.is_admin ? 1 : 0;
       }
-      groups_users.push({'GroupUser': group_user});
+      groups_users.push({ GroupUser: group_user });
     }
     return {
-      'Group': {name: data.name},
-      'GroupUsers': groups_users
+      Group: { name: data.name },
+      GroupUsers: groups_users,
     };
   }
 
@@ -236,8 +232,8 @@ class GroupApiService extends AbstractService {
      * Remap for compatibility reason
      * groups_users => group_user
      */
-    if (Object.prototype.hasOwnProperty.call(contain, 'groups_users')) {
-      if (typeof contain.groups_users === 'boolean') {
+    if (Object.prototype.hasOwnProperty.call(contain, "groups_users")) {
+      if (typeof contain.groups_users === "boolean") {
         contain.group_user = contain.groups_users;
       } else {
         contain.group_user = Object.assign({}, contain.groups_users);
@@ -257,15 +253,16 @@ class GroupApiService extends AbstractService {
     let needed_secrets = [];
 
     if (data.Secrets && Array.isArray(data.Secrets)) {
-      const mapLegacySecret = legacySecret => legacySecret.Secret && Array.isArray(legacySecret.Secret) ? legacySecret.Secret[0] : null;
+      const mapLegacySecret = (legacySecret) =>
+        legacySecret.Secret && Array.isArray(legacySecret.Secret) ? legacySecret.Secret[0] : null;
       secrets = data.Secrets.map(mapLegacySecret);
     }
     if (data.SecretsNeeded && Array.isArray(data.SecretsNeeded)) {
-      const mapLegacyNeededSecret = legacyNeededSecret => legacyNeededSecret.Secret;
+      const mapLegacyNeededSecret = (legacyNeededSecret) => legacyNeededSecret.Secret;
       needed_secrets = data.SecretsNeeded.map(mapLegacyNeededSecret);
     }
 
-    return {secrets: secrets, needed_secrets: needed_secrets};
+    return { secrets: secrets, needed_secrets: needed_secrets };
   }
 }
 

@@ -13,7 +13,7 @@
  */
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
-import {assertArrayUUID, assertUuid} from "../../../utils/assertions";
+import { assertArrayUUID, assertUuid } from "../../../utils/assertions";
 
 class ResourceUpdateLocalStorageService {
   /**
@@ -26,7 +26,7 @@ class ResourceUpdateLocalStorageService {
   async updateFolderParentId(resourceIds, folderParentId) {
     assertArrayUUID(resourceIds, 'The parameter "resourcesIds" should contain only uuid');
     if (folderParentId !== null) {
-      assertUuid(folderParentId, 'The folder parent id should be a valid UUID');
+      assertUuid(folderParentId, "The folder parent id should be a valid UUID");
     }
     // Get the resources from local storage by ids to update only folder parent_id
     const resourcesDto = await ResourceLocalStorage.getResourcesByIds(resourceIds);

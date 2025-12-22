@@ -15,19 +15,14 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
-const ENTITY_NAME = 'MfaTotpSetupInfoEntity';
+const ENTITY_NAME = "MfaTotpSetupInfoEntity";
 
 class MfaTotpSetupInfoEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(dto, options = {}) {
-    super(EntitySchema.validate(
-      MfaTotpSetupInfoEntity.ENTITY_NAME,
-      dto,
-      MfaTotpSetupInfoEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(MfaTotpSetupInfoEntity.ENTITY_NAME, dto, MfaTotpSetupInfoEntity.getSchema()), options);
   }
 
   /**
@@ -36,16 +31,14 @@ class MfaTotpSetupInfoEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "otpProvisioningUri",
-      ],
-      "properties": {
-        "otpProvisioningUri": {
-          "type": "string",
-          "pattern": /^otpauth:\/\/totp\/([^?]+)\?issuer=([^&]+)&secret=([A-Za-z0-9]+)$/
-        }
-      }
+      type: "object",
+      required: ["otpProvisioningUri"],
+      properties: {
+        otpProvisioningUri: {
+          type: "string",
+          pattern: /^otpauth:\/\/totp\/([^?]+)\?issuer=([^&]+)&secret=([A-Za-z0-9]+)$/,
+        },
+      },
     };
   }
 
@@ -64,4 +57,3 @@ class MfaTotpSetupInfoEntity extends Entity {
 }
 
 export default MfaTotpSetupInfoEntity;
-

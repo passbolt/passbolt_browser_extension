@@ -12,7 +12,7 @@
  * @since         4.8.2
  */
 import storage from "../../sdk/storage";
-import {Config} from "../../model/config";
+import { Config } from "../../model/config";
 import GetLegacyAccountService from "./getLegacyAccountService";
 
 const ACTIVE_ACCOUNT_KEY = "active-account";
@@ -25,7 +25,7 @@ export class GetActiveAccountService {
    * @throw {Error} if no account yet associated with this extension.
    */
   get(options = {}) {
-    return navigator.locks.request(ACTIVE_ACCOUNT_KEY, async() => {
+    return navigator.locks.request(ACTIVE_ACCOUNT_KEY, async () => {
       // Check if the storage have some data
       if (Object.keys(storage._data).length === 0) {
         // Fix the initialization of the storage after an update

@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
@@ -53,7 +53,7 @@ class ReviewRequestController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -104,7 +104,7 @@ class ReviewRequestController {
       status: AccountRecoveryResponseEntity.STATUS_REJECTED,
       account_recovery_request_id: requestId,
       responder_foreign_key: organizationPolicy.publicKeyId,
-      responder_foreign_model: AccountRecoveryResponseEntity.RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY
+      responder_foreign_model: AccountRecoveryResponseEntity.RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY,
     };
 
     return new AccountRecoveryResponseEntity(accountRecoveryResponseDto);
@@ -125,17 +125,25 @@ class ReviewRequestController {
       ? organizationPrivateKey
       : await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateGpgkey.passphrase);
 
-    const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, signedInUserPassphrase);
+    const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(
+      userPrivateKey,
+      signedInUserPassphrase,
+    );
 
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(await this._findUserPublicKey(request.userId));
-    const data = await this._encryptResponseData(request, organizationPrivateKeyDecrypted, userPublicKey, signedInUserDecryptedPrivateKey);
+    const data = await this._encryptResponseData(
+      request,
+      organizationPrivateKeyDecrypted,
+      userPublicKey,
+      signedInUserDecryptedPrivateKey,
+    );
 
     const accountRecoveryResponseDto = {
       status: AccountRecoveryResponseEntity.STATUS_APPROVED,
       account_recovery_request_id: request.id,
       responder_foreign_key: organizationPolicy.publicKeyId,
       responder_foreign_model: AccountRecoveryResponseEntity.RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY,
-      data: data
+      data: data,
     };
 
     return new AccountRecoveryResponseEntity(accountRecoveryResponseDto);
@@ -154,7 +162,7 @@ class ReviewRequestController {
    * @private
    */
   async _findAndAssertRequest(requestId) {
-    const findRequestContains = {account_recovery_private_key_passwords: true, armored_key: true};
+    const findRequestContains = { account_recovery_private_key_passwords: true, armored_key: true };
     const request = await this.accountRecoveryModel.findRequestById(requestId, findRequestContains);
 
     const privateKey = request.accountRecoveryPrivateKey;
@@ -168,11 +176,16 @@ class ReviewRequestController {
       throw new Error("The account recovery request private key should have a collection of private key passwords.");
     }
     if (privateKey.accountRecoveryPrivateKeyPasswords.length !== 1) {
-      throw new Error("The account recovery request private key should have a collection containing exactly one private key password.");
+      throw new Error(
+        "The account recovery request private key should have a collection containing exactly one private key password.",
+      );
     }
 
     const privateKeyPassword = privateKey.accountRecoveryPrivateKeyPasswords.items[0];
-    if (privateKeyPassword.recipientForeignModel !== AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY) {
+    if (
+      privateKeyPassword.recipientForeignModel !==
+      AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY
+    ) {
       throw new Error("The request private key password should be encrypted for the organization key.");
     }
     if (privateKeyPassword.privateKeyId !== privateKey.id) {
@@ -214,10 +227,19 @@ class ReviewRequestController {
   async _encryptResponseData(request, organizationPrivateKeyDecrypted, userPublicKey, signedInUserDecryptedPrivateKey) {
     const verificationDomain = this.account.domain;
     const privateKeyPassword = request.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.items[0];
-    const privateKeyPasswordData = await DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, organizationPrivateKeyDecrypted, verificationDomain, request.userId, userPublicKey);
+    const privateKeyPasswordData = await DecryptPrivateKeyPasswordDataService.decrypt(
+      privateKeyPassword,
+      organizationPrivateKeyDecrypted,
+      verificationDomain,
+      request.userId,
+      userPublicKey,
+    );
     const privateKeyPasswordDataSerialized = JSON.stringify(privateKeyPasswordData);
     const requestKey = await OpenpgpAssertion.readKeyOrFail(request.armoredKey);
-    return EncryptMessageService.encrypt(privateKeyPasswordDataSerialized, requestKey, [organizationPrivateKeyDecrypted, signedInUserDecryptedPrivateKey]);
+    return EncryptMessageService.encrypt(privateKeyPasswordDataSerialized, requestKey, [
+      organizationPrivateKeyDecrypted,
+      signedInUserDecryptedPrivateKey,
+    ]);
   }
 
   /**

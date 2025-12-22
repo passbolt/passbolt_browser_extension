@@ -15,14 +15,14 @@ import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/
 import UserEntity from "../user/userEntity";
 import SecurityTokenEntity from "../securityToken/securityTokenEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {v5 as uuidv5} from "uuid";
+import { v5 as uuidv5 } from "uuid";
 
 const ENTITY_NAME = "AbstractAccount";
 
 const FINGERPRINT_MIN_LENGTH = 40;
 const FINGERPRINT_MAX_LENGTH = 40;
 
-const UUID_PASSBOLT_NAMESPACE = 'd5447ca1-950f-459d-8b20-86ddfdd0f922';
+const UUID_PASSBOLT_NAMESPACE = "d5447ca1-950f-459d-8b20-86ddfdd0f922";
 
 class AbstractAccountEntity extends Entity {
   /**
@@ -33,7 +33,7 @@ class AbstractAccountEntity extends Entity {
 
     // Associations
     if (this._props.security_token) {
-      this._security_token = new SecurityTokenEntity(this._props.security_token, {clone: false});
+      this._security_token = new SecurityTokenEntity(this._props.security_token, { clone: false });
       delete this._props.security_token;
     }
   }
@@ -46,45 +46,44 @@ class AbstractAccountEntity extends Entity {
     const userEntitySchema = UserEntity.getSchema();
     const profileEntitySchema = ProfileEntity.getSchema();
     return {
-      "type": "object",
-      "required": [
-      ],
-      "properties": {
-        "type": {
-          "type": "string",
+      type: "object",
+      required: [],
+      properties: {
+        type: {
+          type: "string",
         },
-        "domain": {
-          "type": "string"
+        domain: {
+          type: "string",
         },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
+        user_id: {
+          type: "string",
+          format: "uuid",
         },
-        "user_key_fingerprint": {
-          "type": "string",
-          "minLength": FINGERPRINT_MIN_LENGTH,
-          "maxLength": FINGERPRINT_MAX_LENGTH,
-          "pattern": /^[A-F0-9]{40}$/,
+        user_key_fingerprint: {
+          type: "string",
+          minLength: FINGERPRINT_MIN_LENGTH,
+          maxLength: FINGERPRINT_MAX_LENGTH,
+          pattern: /^[A-F0-9]{40}$/,
         },
-        "user_public_armored_key": {
-          "type": "string"
+        user_public_armored_key: {
+          type: "string",
         },
-        "user_private_armored_key": {
-          "type": "string"
+        user_private_armored_key: {
+          type: "string",
         },
-        "server_public_armored_key": {
-          "type": "string"
+        server_public_armored_key: {
+          type: "string",
         },
-        "username": userEntitySchema.properties.username,
-        "first_name": profileEntitySchema.properties.first_name,
-        "last_name": profileEntitySchema.properties.last_name,
-        "locale": {
-          "type": "string",
-          "pattern": /^[a-z]{2}-[A-Z]{2}$/,
-          "nullable": true,
+        username: userEntitySchema.properties.username,
+        first_name: profileEntitySchema.properties.first_name,
+        last_name: profileEntitySchema.properties.last_name,
+        locale: {
+          type: "string",
+          pattern: /^[a-z]{2}-[A-Z]{2}$/,
+          nullable: true,
         },
-        "security_token": SecurityTokenEntity.getSchema(),
-      }
+        security_token: SecurityTokenEntity.getSchema(),
+      },
     };
   }
 
@@ -212,7 +211,11 @@ class AbstractAccountEntity extends Entity {
    * @param {string} armoredKey The server public armored key
    */
   set userPublicArmoredKey(armoredKey) {
-    EntitySchema.validateProp("user_public_armored_key", armoredKey, AbstractAccountEntity.getSchema().properties.user_public_armored_key);
+    EntitySchema.validateProp(
+      "user_public_armored_key",
+      armoredKey,
+      AbstractAccountEntity.getSchema().properties.user_public_armored_key,
+    );
     this._props.user_public_armored_key = armoredKey;
   }
 
@@ -229,7 +232,11 @@ class AbstractAccountEntity extends Entity {
    * @param {string} armoredKey The user private armored key
    */
   set userPrivateArmoredKey(armoredKey) {
-    EntitySchema.validateProp("user_private_armored_key", armoredKey, AbstractAccountEntity.getSchema().properties.user_private_armored_key);
+    EntitySchema.validateProp(
+      "user_private_armored_key",
+      armoredKey,
+      AbstractAccountEntity.getSchema().properties.user_private_armored_key,
+    );
     this._props.user_private_armored_key = armoredKey;
   }
 
@@ -246,7 +253,11 @@ class AbstractAccountEntity extends Entity {
    * @param {string} armoredKey The server public armored key
    */
   set serverPublicArmoredKey(armoredKey) {
-    EntitySchema.validateProp("server_public_armored_key", armoredKey, AbstractAccountEntity.getSchema().properties.server_public_armored_key);
+    EntitySchema.validateProp(
+      "server_public_armored_key",
+      armoredKey,
+      AbstractAccountEntity.getSchema().properties.server_public_armored_key,
+    );
     this._props.server_public_armored_key = armoredKey;
   }
 
@@ -262,7 +273,11 @@ class AbstractAccountEntity extends Entity {
    * @param {string} fingerprint The key fingerprint.
    */
   set userKeyFingerprint(fingerprint) {
-    EntitySchema.validateProp("user_key_fingerprint", fingerprint, AbstractAccountEntity.getSchema().properties.user_key_fingerprint);
+    EntitySchema.validateProp(
+      "user_key_fingerprint",
+      fingerprint,
+      AbstractAccountEntity.getSchema().properties.user_key_fingerprint,
+    );
     this._props.user_key_fingerprint = fingerprint;
   }
 

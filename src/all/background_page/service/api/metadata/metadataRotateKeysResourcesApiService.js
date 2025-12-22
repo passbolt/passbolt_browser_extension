@@ -14,7 +14,7 @@
 
 import AbstractService from "../abstract/abstractService";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
-import {assertType} from "../../../utils/assertions";
+import { assertType } from "../../../utils/assertions";
 
 const METADATA_ROTATE_KEYS_RESOURCES_API_SERVICE_RESOURCE_NAME = "metadata/rotate-key/resources";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";

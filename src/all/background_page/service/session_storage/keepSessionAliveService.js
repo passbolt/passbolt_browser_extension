@@ -31,7 +31,7 @@ class KeepSessionAliveService {
 
     await browser.alarms.create(KeepSessionAliveService.ALARM_NAME, {
       delayInMinutes: SESSION_CHECK_INTERNAL,
-      periodInMinutes: SESSION_CHECK_INTERNAL
+      periodInMinutes: SESSION_CHECK_INTERNAL,
     });
   }
 
@@ -61,7 +61,7 @@ class KeepSessionAliveService {
       return;
     }
     // The session is kept alive only for the duration users wanted their passphrase to be remembered.
-    if (await PassphraseStorageService.get() === null) {
+    if ((await PassphraseStorageService.get()) === null) {
       return;
     }
     const account = await GetActiveAccountService.get();

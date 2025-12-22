@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import SetupModel from "../../model/setup/setupModel";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import WorkerService from "../../service/worker/workerService";
@@ -45,10 +45,10 @@ class StartRecoverController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -60,7 +60,10 @@ class StartRecoverController {
     try {
       await this._buildTemporaryAccountEntity();
       await this._findAndSetAccountServerPublicKey();
-      const {user, userPassphrasePolicies} = await this.setupModel.startRecover(this.temporaryAccount.account.userId, this.temporaryAccount.account.authenticationTokenToken);
+      const { user, userPassphrasePolicies } = await this.setupModel.startRecover(
+        this.temporaryAccount.account.userId,
+        this.temporaryAccount.account.authenticationTokenToken,
+      );
       // Keep the user passphrase policies in the setup temporary account storage.
       if (userPassphrasePolicies) {
         this.temporaryAccount.userPassphrasePolicies = userPassphrasePolicies;
@@ -81,7 +84,7 @@ class StartRecoverController {
   async _buildTemporaryAccountEntity() {
     const temporaryAccountDto = {
       account: this.account.toDto(AccountRecoverEntity.ALL_CONTAIN_OPTIONS),
-      worker_id: this.worker.port._port.name
+      worker_id: this.worker.port._port.name,
     };
     this.temporaryAccount = new AccountTemporaryEntity(temporaryAccountDto);
   }
@@ -126,7 +129,9 @@ class StartRecoverController {
    * @private
    */
   async _handleUnexpectedError(error) {
-    (await WorkerService.get('RecoverBootstrap', this.worker.tab.id)).port.emit('passbolt.recover-bootstrap.remove-iframe');
+    (await WorkerService.get("RecoverBootstrap", this.worker.tab.id)).port.emit(
+      "passbolt.recover-bootstrap.remove-iframe",
+    );
     console.error(error);
     throw error;
   }

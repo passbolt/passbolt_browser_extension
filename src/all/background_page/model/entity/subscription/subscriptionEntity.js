@@ -20,11 +20,10 @@ class SubscriptionEntity extends Entity {
    * @inheritDoc
    */
   constructor(subscriptionDto, options = {}) {
-    super(EntitySchema.validate(
-      SubscriptionEntity.ENTITY_NAME,
-      subscriptionDto,
-      SubscriptionEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(SubscriptionEntity.ENTITY_NAME, subscriptionDto, SubscriptionEntity.getSchema()),
+      options,
+    );
   }
 
   /**
@@ -33,38 +32,32 @@ class SubscriptionEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "subscription_id",
-        "users",
-        "expiry",
-        "created",
-        "data",
-      ],
-      "properties": {
-        "customer_id": {
-          "type": "string"
+      type: "object",
+      required: ["subscription_id", "users", "expiry", "created", "data"],
+      properties: {
+        customer_id: {
+          type: "string",
         },
-        "subscription_id": {
-          "type": "string"
+        subscription_id: {
+          type: "string",
         },
-        "users": {
-          "type": "integer"
+        users: {
+          type: "integer",
         },
-        "email": {
-          "type": "string",
-          "format": "email"
+        email: {
+          type: "string",
+          format: "email",
         },
-        "created": {
-          "type": "string"
+        created: {
+          type: "string",
         },
-        "expiry": {
-          "type": "string"
+        expiry: {
+          type: "string",
         },
-        "data": {
-          "type": "string"
-        }
-      }
+        data: {
+          type: "string",
+        },
+      },
     };
   }
 

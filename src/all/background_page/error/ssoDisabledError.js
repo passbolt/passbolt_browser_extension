@@ -14,7 +14,7 @@
 class SsoDisabledError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'SsoDisabledError';
+    this.name = "SsoDisabledError";
   }
 }
 

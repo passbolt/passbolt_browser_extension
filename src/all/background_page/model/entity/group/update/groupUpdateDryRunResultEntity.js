@@ -23,11 +23,11 @@ class GroupUpdateDryRunResultEntity extends EntityV2 {
 
     // Association
     if (this._props.secrets) {
-      this._secrets = new GroupUpdateSecretsCollection(this._props.secrets, {clone: false});
+      this._secrets = new GroupUpdateSecretsCollection(this._props.secrets, { clone: false });
       delete this._props.secrets;
     }
     if (this._props.needed_secrets) {
-      this._needed_secrets = new NeededSecretsCollection(this._props.needed_secrets, {clone: false});
+      this._needed_secrets = new NeededSecretsCollection(this._props.needed_secrets, { clone: false });
       delete this._props.needed_secrets;
     }
   }
@@ -38,13 +38,13 @@ class GroupUpdateDryRunResultEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [],
-      "properties": {
+      type: "object",
+      required: [],
+      properties: {
         // Associations
-        "secrets": GroupUpdateSecretsCollection.getSchema(),
-        "needed_secrets": NeededSecretsCollection.getSchema()
-      }
+        secrets: GroupUpdateSecretsCollection.getSchema(),
+        needed_secrets: NeededSecretsCollection.getSchema(),
+      },
     };
   }
 

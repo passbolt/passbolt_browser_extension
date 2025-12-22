@@ -12,8 +12,10 @@
  * @since         5.3.2
  */
 
-const {RequestClipboardOffscreenService} = require("../serviceWorker/service/clipboard/requestClipboardOffscreenService");
+const {
+  RequestClipboardOffscreenService,
+} = require("../serviceWorker/service/clipboard/requestClipboardOffscreenService");
 
 module.exports = {
-  writeText: async data => RequestClipboardOffscreenService.writeText(data),
+  writeText: async (data) => RequestClipboardOffscreenService.writeText(data),
 };

@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
-import secrets from 'secrets-passbolt';
+import secrets from "secrets-passbolt";
 import AccountRecoveryPrivateKeyPasswordEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
@@ -41,14 +41,22 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
 
     const symmetricSecret = secrets.random(SYMMETRIC_SECRET_BITS);
     const accountRecoveryPrivateKeyDto = await this._encryptPrivateKey(symmetricSecret, decryptedPrivateKey);
-    const accountRecoveryPrivateKeyPasswordForOrganizationDto = await this._encryptPrivateKeyPasswordsForOrganizationKey(account, symmetricSecret, organizationPolicy, decryptedPrivateKey);
+    const accountRecoveryPrivateKeyPasswordForOrganizationDto =
+      await this._encryptPrivateKeyPasswordsForOrganizationKey(
+        account,
+        symmetricSecret,
+        organizationPolicy,
+        decryptedPrivateKey,
+      );
 
-    accountRecoveryPrivateKeyDto.account_recovery_private_key_passwords = [accountRecoveryPrivateKeyPasswordForOrganizationDto];
+    accountRecoveryPrivateKeyDto.account_recovery_private_key_passwords = [
+      accountRecoveryPrivateKeyPasswordForOrganizationDto,
+    ];
 
     const userSettingDto = {
       user_id: account.userId,
       status: AccountRecoveryUserSettingEntity.STATUS_APPROVED,
-      account_recovery_private_key: accountRecoveryPrivateKeyDto
+      account_recovery_private_key: accountRecoveryPrivateKeyDto,
     };
 
     return new AccountRecoveryUserSettingEntity(userSettingDto);
@@ -62,8 +70,12 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * @returns {Promise<Object>}
    */
   static async _encryptPrivateKey(symmetricSecret, decryptedPrivateKey) {
-    const userPrivateKeySymmetricEncrypted = await EncryptMessageService.encryptSymmetrically(decryptedPrivateKey.armor(), [symmetricSecret], [decryptedPrivateKey]);
-    return {data: userPrivateKeySymmetricEncrypted};
+    const userPrivateKeySymmetricEncrypted = await EncryptMessageService.encryptSymmetrically(
+      decryptedPrivateKey.armor(),
+      [symmetricSecret],
+      [decryptedPrivateKey],
+    );
+    return { data: userPrivateKeySymmetricEncrypted };
   }
 
   /**
@@ -76,11 +88,20 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * @returns {Promise<Object>}
    * @private
    */
-  static async _encryptPrivateKeyPasswordsForOrganizationKey(account, symmetricSecret, organizationPolicy, decryptedPrivateKey) {
+  static async _encryptPrivateKeyPasswordsForOrganizationKey(
+    account,
+    symmetricSecret,
+    organizationPolicy,
+    decryptedPrivateKey,
+  ) {
     const organizationPublicKey = await OpenpgpAssertion.readKeyOrFail(organizationPolicy.armoredKey);
     const privateKeyPasswordDecryptedData = this._buildPrivateKeyPasswordDecryptedData(account, symmetricSecret);
     const serializedPrivateKeyPasswordDecryptedData = JSON.stringify(privateKeyPasswordDecryptedData.toDto());
-    const privateKeyPasswordEncryptedData = await EncryptMessageService.encrypt(serializedPrivateKeyPasswordDecryptedData, organizationPublicKey, [decryptedPrivateKey]);
+    const privateKeyPasswordEncryptedData = await EncryptMessageService.encrypt(
+      serializedPrivateKeyPasswordDecryptedData,
+      organizationPublicKey,
+      [decryptedPrivateKey],
+    );
 
     return {
       data: privateKeyPasswordEncryptedData,
@@ -105,7 +126,7 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
       private_key_user_id: account.userId,
       private_key_fingerprint: account.userKeyFingerprint,
       private_key_secret: symmetricSecret,
-      created: (new Date()).toISOString()
+      created: new Date().toISOString(),
     };
 
     return new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(privateLeyPasswordDecryptedDataDto);

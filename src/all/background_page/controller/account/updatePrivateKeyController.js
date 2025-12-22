@@ -49,7 +49,7 @@ class UpdatePrivateKeyController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -61,8 +61,8 @@ class UpdatePrivateKeyController {
    * @returns {Promise<void>}
    */
   async exec(oldPassphrase, newPassphrase) {
-    if (typeof oldPassphrase !== 'string' || typeof newPassphrase !== 'string') {
-      throw new Error('The old and new passphrase have to be string');
+    if (typeof oldPassphrase !== "string" || typeof newPassphrase !== "string") {
+      throw new Error("The old and new passphrase have to be string");
     }
     const organizationSettings = await this.organisationSettingsModel.getOrFind();
     const ssoIsEnabled = organizationSettings.isPluginEnabled("sso");

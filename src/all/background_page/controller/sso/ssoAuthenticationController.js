@@ -15,7 +15,7 @@ import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
 import PopupHandlerService from "../../service/sso/popupHandlerService";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import { QuickAccessService } from "../../service/ui/quickAccess.service";
 import SsoLoginModel from "../../model/sso/ssoLoginModel";
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import SsoSettingsChangedError from "../../error/ssoSettingsChangedError";
@@ -87,15 +87,25 @@ class SsoAuthenticationController {
       const thirdPartyCode = await this.popupHandler.getSsoTokenFromThirdParty(loginUrl);
       const ssoServerData = await this.ssoKitServerPartModel.getSsoKit(clientPartSsoKit.id, userId, thirdPartyCode);
 
-      const serverKey = await crypto.subtle.importKey("jwk", ssoServerData.key, 'AES-GCM', true, ["encrypt", "decrypt"]);
-
-      const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
-      await this.popupHandler.closeHandler();
-      await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, passphrase);
-      await Promise.all([
-        PassphraseStorageService.set(passphrase, -1),
-        KeepSessionAliveService.start(),
+      const serverKey = await crypto.subtle.importKey("jwk", ssoServerData.key, "AES-GCM", true, [
+        "encrypt",
+        "decrypt",
       ]);
+
+      const passphrase = await DecryptSsoPassphraseService.decrypt(
+        clientPartSsoKit.secret,
+        clientPartSsoKit.nek,
+        serverKey,
+        clientPartSsoKit.iv1,
+        clientPartSsoKit.iv2,
+      );
+      await this.popupHandler.closeHandler();
+      await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(
+        this.account.userKeyFingerprint,
+        this.account.userPrivateArmoredKey,
+        passphrase,
+      );
+      await Promise.all([PassphraseStorageService.set(passphrase, -1), KeepSessionAliveService.start()]);
       await PostLoginService.exec();
       if (isInQuickAccessMode) {
         await this.ensureRedirectionInQuickaccessMode();
@@ -119,7 +129,7 @@ class SsoAuthenticationController {
    */
   async ensureRedirectionInQuickaccessMode() {
     try {
-      await PromiseTimeoutService.exec(this.worker.port.request('passbolt.port.check'));
+      await PromiseTimeoutService.exec(this.worker.port.request("passbolt.port.check"));
       return;
     } catch (error) {
       console.debug("The port from the quickaccess is not connected anymore");
@@ -129,9 +139,9 @@ class SsoAuthenticationController {
     // Get the current tab to add in the property of the detach quickaccess
     const tab = await BrowserTabService.getCurrent();
     const queryParameters = [
-      {name: "uiMode", value: "detached"},
-      {name: "feature", value: "login"},
-      {name: "tabId", value: tab.id}
+      { name: "uiMode", value: "detached" },
+      { name: "feature", value: "login" },
+      { name: "tabId", value: tab.id },
     ];
     await QuickAccessService.openInDetachedMode(queryParameters);
   }
@@ -142,12 +152,12 @@ class SsoAuthenticationController {
    */
   handleSpecificErrors(error) {
     switch (error.name) {
-      case 'InvalidMasterPasswordError':
-      case 'OutdatedSsoKitError': {
+      case "InvalidMasterPasswordError":
+      case "OutdatedSsoKitError": {
         SsoDataStorage.flush();
         break;
       }
-      case 'PassboltApiFetchError': {
+      case "PassboltApiFetchError": {
         const isCsrfTokenError = error?.data?.code === 403;
         if (!isCsrfTokenError) {
           SsoDataStorage.flush();
@@ -170,7 +180,7 @@ class SsoAuthenticationController {
 
     if (isInQuickAccessMode) {
       const url = `${this.account.domain}/auth/login?case=sso-login-error`;
-      await browser.tabs.create({url: url, active: true});
+      await browser.tabs.create({ url: url, active: true });
       return new SsoSettingsChangedError("The quickaccess cannot proceed with the SSO login.");
     }
 

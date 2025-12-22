@@ -11,11 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.9.0
  */
-import SubscriptionEntity from '../../model/entity/subscription/subscriptionEntity';
-import PassboltSubscriptionError from '../../error/passboltSubscriptionError';
-import SubscriptionApiService from '../api/subscription/subscriptionApiService';
-import UpdateSubscriptionEntity from '../../model/entity/subscription/update/updateSubscriptionEntity';
-
+import SubscriptionEntity from "../../model/entity/subscription/subscriptionEntity";
+import PassboltSubscriptionError from "../../error/passboltSubscriptionError";
+import SubscriptionApiService from "../api/subscription/subscriptionApiService";
+import UpdateSubscriptionEntity from "../../model/entity/subscription/update/updateSubscriptionEntity";
 
 export default class UpdateSubscriptionKeyService {
   /**
@@ -36,7 +35,7 @@ export default class UpdateSubscriptionKeyService {
    */
   async update(updateSubscriptionEntity) {
     if (!(updateSubscriptionEntity instanceof UpdateSubscriptionEntity)) {
-      throw new TypeError('updateSubscriptionEntity is not a UpdateSubscriptionEntity');
+      throw new TypeError("updateSubscriptionEntity is not a UpdateSubscriptionEntity");
     }
     try {
       const subscriptionDto = await this.subscriptionService.update(updateSubscriptionEntity.toDto());

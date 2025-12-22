@@ -13,7 +13,7 @@
  */
 
 import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 
@@ -41,10 +41,10 @@ class FindAllIdsByIsSharedWithGroupController {
   async _exec(groupId) {
     try {
       const result = await this.exec(groupId);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -65,15 +65,15 @@ class FindAllIdsByIsSharedWithGroupController {
        * 2. the metadata is encrypted with the shared‑metadata key, but this one is not yet decrypted in the session storage;
        * 3. the metadata is encrypted with the user’s private key.
        */
-      return (await this.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup(groupId))
-        .extract("id");
+      return (await this.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup(groupId)).extract("id");
     } catch (error) {
       if (!(error instanceof UserPassphraseRequiredError)) {
         throw error;
       }
-      const passphrase =  await this.getPassphraseService.getPassphrase(this.worker, 60);
-      return (await this.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup(groupId, passphrase))
-        .extract("id");
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker, 60);
+      return (
+        await this.findAndUpdateResourcesLocalStorage.findAndUpdateByIsSharedWithGroup(groupId, passphrase)
+      ).extract("id");
     }
   }
 }

@@ -16,15 +16,12 @@ import FolderEntity from "../folder/folderEntity";
 import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
 import TagEntity from "../tag/tagEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {assertType} from "../../../utils/assertions";
+import { assertType } from "../../../utils/assertions";
 
 const FILE_TYPE_KDBX = "kdbx";
 const FILE_TYPE_CSV = "csv";
 
-const SUPPORTED_FILE_TYPES = [
-  FILE_TYPE_CSV,
-  FILE_TYPE_KDBX,
-];
+const SUPPORTED_FILE_TYPES = [FILE_TYPE_CSV, FILE_TYPE_KDBX];
 
 class ImportResourcesFileEntity extends EntityV2 {
   /**
@@ -37,7 +34,11 @@ class ImportResourcesFileEntity extends EntityV2 {
       const optionsSchema = this.cachedSchema.properties.options;
       this._props.options = EntitySchema.validate(this.constructor.name, this._props.options, optionsSchema);
       if (dto.options.credentials) {
-        this._props.options.credentials = EntitySchema.validate(this.constructor.name, this._props.options.credentials, optionsSchema.properties.credentials);
+        this._props.options.credentials = EntitySchema.validate(
+          this.constructor.name,
+          this._props.options.credentials,
+          optionsSchema.properties.credentials,
+        );
       }
     }
 
@@ -54,54 +55,50 @@ class ImportResourcesFileEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "ref",
-        "file",
-        "file_type"
-      ],
-      "properties": {
-        "ref": {
-          "type": "string",
-          "pattern": /^[a-zA-Z0-9\-_]*$/
+      type: "object",
+      required: ["ref", "file", "file_type"],
+      properties: {
+        ref: {
+          type: "string",
+          pattern: /^[a-zA-Z0-9\-_]*$/,
         },
-        "file": {
-          "type": "string",
+        file: {
+          type: "string",
           //@todo replace with pattern check instead
-          "format": "x-base64"
+          format: "x-base64",
         },
-        "file_type": {
-          "type": "string",
-          "enum": SUPPORTED_FILE_TYPES
+        file_type: {
+          type: "string",
+          enum: SUPPORTED_FILE_TYPES,
         },
-        "options": {
-          "type": "object",
-          "required": [],
-          "properties": {
-            "folders": {
-              "type": "boolean"
+        options: {
+          type: "object",
+          required: [],
+          properties: {
+            folders: {
+              type: "boolean",
             },
-            "tags": {
-              "type": "boolean"
+            tags: {
+              type: "boolean",
             },
-            "credentials": {
-              "type": "object",
-              "required": [],
-              "properties": {
-                "password": {
-                  "type": "string",
-                  "nullable": true,
+            credentials: {
+              type: "object",
+              required: [],
+              properties: {
+                password: {
+                  type: "string",
+                  nullable: true,
                 },
-                "keyfile": {
-                  "type": "string",
-                  "format": "x-base64",
-                  "nullable": true,
-                }
-              }
-            }
-          }
-        }
-      }
+                keyfile: {
+                  type: "string",
+                  format: "x-base64",
+                  nullable: true,
+                },
+              },
+            },
+          },
+        },
+      },
     };
   }
 
@@ -118,24 +115,24 @@ class ImportResourcesFileEntity extends EntityV2 {
   toDto() {
     return {
       created: {
-        resourcesCount: this.importResources.items.filter(importResource => importResource.id).length,
-        foldersCount: this.importFolders.items.filter(importFolder => importFolder.id).length
+        resourcesCount: this.importResources.items.filter((importResource) => importResource.id).length,
+        foldersCount: this.importFolders.items.filter((importFolder) => importFolder.id).length,
       },
       errors: {
-        resources: this.importResourcesErrors.map(importResourceError => importResourceError.toJSON()),
-        folders: this.importFoldersErrors.map(importFolderError => importFolderError.toJSON())
+        resources: this.importResourcesErrors.map((importResourceError) => importResourceError.toJSON()),
+        folders: this.importFoldersErrors.map((importFolderError) => importFolderError.toJSON()),
       },
       warnings: {
-        resources: this.importResourcesWarnings.map(importResourcesWarning => importResourcesWarning.toJSON()),
+        resources: this.importResourcesWarnings.map((importResourcesWarning) => importResourcesWarning.toJSON()),
       },
       options: {
         folders: this.mustImportFolders,
-        tags: this.mustTag
+        tags: this.mustTag,
       },
       references: {
         folder: this.referenceFolder ? this.referenceFolder.toJSON() : null,
-        tag: this.referenceTag ? this.referenceTag.toJSON() : null
-      }
+        tag: this.referenceTag ? this.referenceTag.toJSON() : null,
+      },
     };
   }
 
@@ -220,8 +217,9 @@ class ImportResourcesFileEntity extends EntityV2 {
    * @param {Object} externalResourceDto The resource DTO
    */
   removeWarningsForResource(externalResourceDto) {
-    this._import_resources_warnings =
-      this._import_resources_warnings.filter(warning => warning.data !== externalResourceDto);
+    this._import_resources_warnings = this._import_resources_warnings.filter(
+      (warning) => warning.data !== externalResourceDto,
+    );
   }
 
   /*
@@ -373,10 +371,8 @@ class ImportResourcesFileEntity extends EntityV2 {
    * @throws {FileTypeError} If the file type is not supported
    */
   static buildImportEntity(fileType, file, options) {
-    const dateRef = (new Date()).toISOString()
-      .split('.')[0]
-      .replace(/\D/g, '');
-    const importResourcesDto = {file_type: fileType, file: file, options: options, ref: `import-${dateRef}`};
+    const dateRef = new Date().toISOString().split(".")[0].replace(/\D/g, "");
+    const importResourcesDto = { file_type: fileType, file: file, options: options, ref: `import-${dateRef}` };
     return new ImportResourcesFileEntity(importResourcesDto);
   }
 }

@@ -17,7 +17,7 @@ import MultiFactorAuthenticationModel from "../model/multiFactorAuthentication/m
  * @param {Worker} worker The worker
  * @param {ApiClientOptions} apiClientOptions The api client options
  */
-const listen = function(worker, apiClientOptions) {
+const listen = function (worker, apiClientOptions) {
   /*
    * Disable mfa for a user
    *
@@ -25,16 +25,16 @@ const listen = function(worker, apiClientOptions) {
    * @param {string} requestId The request identifier uuid
    * @param {string} userId The user uuid
    */
-  worker.port.on('passbolt.mfa.disable-for-user', async(requestId, userId) => {
+  worker.port.on("passbolt.mfa.disable-for-user", async (requestId, userId) => {
     try {
       const mfaModel = new MultiFactorAuthenticationModel(apiClientOptions);
       await mfaModel.disableForUser(userId);
-      worker.port.emit(requestId, 'SUCCESS');
+      worker.port.emit(requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 };
 
-export const MultiFactorAuthenticationEvents = {listen};
+export const MultiFactorAuthenticationEvents = { listen };

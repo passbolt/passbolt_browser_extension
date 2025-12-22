@@ -14,7 +14,7 @@
 import FindPermissionsService from "../../service/permission/findPermissionsService";
 import PermissionEntity from "../../model/entity/permission/permissionEntity";
 import FindFoldersService from "../../service/folder/findFoldersService";
-import {assertString, assertUuid} from "../../utils/assertions";
+import { assertString, assertUuid } from "../../utils/assertions";
 
 class FindAcoPermissionsForDisplayController {
   /**
@@ -47,7 +47,7 @@ class FindAcoPermissionsForDisplayController {
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

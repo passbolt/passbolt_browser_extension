@@ -11,11 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.1.0
  */
-import {assertType} from "../../utils/assertions";
-import MetadataTrustedKeyEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity";
-import MetadataKeyEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
+import { assertType } from "../../utils/assertions";
+import MetadataTrustedKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity";
+import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 
 class ConfirmMetadataKeyContentCodeService {
   constructor(worker) {
@@ -31,12 +29,16 @@ class ConfirmMetadataKeyContentCodeService {
    * @throw Error if the parameter does not match entity expected.
    */
   async requestConfirm(metadataTrustedKey, metadataKey) {
-    assertType(metadataTrustedKey, MetadataTrustedKeyEntity, 'The given metadata trusted key entity is not a MetadataTrustedKeyEntity');
-    assertType(metadataKey, MetadataKeyEntity, 'The given metadata key entity is not a MetadataKeyEntity');
+    assertType(
+      metadataTrustedKey,
+      MetadataTrustedKeyEntity,
+      "The given metadata trusted key entity is not a MetadataTrustedKeyEntity",
+    );
+    assertType(metadataKey, MetadataKeyEntity, "The given metadata key entity is not a MetadataKeyEntity");
 
     const data = {
       metadata_trusted_key: metadataTrustedKey.toDto(),
-      metadata_key: metadataKey.toContentCodeConfirmTrustRequestDto()
+      metadata_key: metadataKey.toContentCodeConfirmTrustRequestDto(),
     };
 
     return await this.worker.port.request("passbolt.metadata-key.trust-confirm", data);

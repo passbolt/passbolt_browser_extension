@@ -13,7 +13,7 @@
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import FoldersCollection from "../foldersCollection";
 import ExternalFolderEntity from "./externalFolderEntity";
-import {assertType} from "../../../../utils/assertions";
+import { assertType } from "../../../../utils/assertions";
 
 class ExternalFoldersCollection extends EntityV2Collection {
   /**
@@ -30,8 +30,8 @@ class ExternalFoldersCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": ExternalFolderEntity.getSchema(),
+      type: "array",
+      items: ExternalFolderEntity.getSchema(),
     };
   }
 
@@ -45,13 +45,14 @@ class ExternalFoldersCollection extends EntityV2Collection {
   static constructFromFoldersCollection(foldersCollection) {
     assertType(foldersCollection, FoldersCollection);
 
-    const externalFoldersDto = foldersCollection.folders.map(folderEntity => {
+    const externalFoldersDto = foldersCollection.folders.map((folderEntity) => {
       const folderParentPath = ExternalFoldersCollection.getEscapedFolderParentPath(foldersCollection, folderEntity);
       const folderParentId = folderParentPath.length ? folderEntity.folderParentId : null;
       return Object.assign(folderEntity.toDto(), {
         name: ExternalFolderEntity.escapeName(folderEntity.name),
         folder_parent_id: folderParentId,
-        folder_parent_path: folderParentPath});
+        folder_parent_path: folderParentPath,
+      });
     });
     return new ExternalFoldersCollection(externalFoldersDto);
   }
@@ -65,9 +66,10 @@ class ExternalFoldersCollection extends EntityV2Collection {
    * @private
    */
   static getEscapedFolderParentPath(foldersCollection, folderEntity) {
-    return foldersCollection.getAllParents(folderEntity).items
-      .reverse()
-      .map(folderParentEntity => ExternalFolderEntity.escapeName(folderParentEntity.name))
+    return foldersCollection
+      .getAllParents(folderEntity)
+      .items.reverse()
+      .map((folderParentEntity) => ExternalFolderEntity.escapeName(folderParentEntity.name))
       .join("/");
   }
 
@@ -81,7 +83,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
    */
   static toFoldersCollection(externalFoldersCollection) {
     const foldersCollectionDto = [];
-    externalFoldersCollection.forEach(externalFolder => {
+    externalFoldersCollection.forEach((externalFolder) => {
       const folderDto = Object.assign(externalFolder.toDto(), {
         name: ExternalFolderEntity.resolveEscapedName(externalFolder.name),
       });
@@ -103,7 +105,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
    */
   hasPath(path) {
     path = ExternalFolderEntity.sanitizePath(path);
-    return this._items.some(externalFolderEntity => externalFolderEntity.path === path);
+    return this._items.some((externalFolderEntity) => externalFolderEntity.path === path);
   }
 
   /**
@@ -112,7 +114,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
    * @return {ExternalFolderEntity|null}
    */
   getById(id) {
-    return this._items.find(externalFolderEntity => externalFolderEntity.id === id) || null;
+    return this._items.find((externalFolderEntity) => externalFolderEntity.id === id) || null;
   }
 
   /**
@@ -121,7 +123,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
    * @return {array<ExternalFolderEntity>}
    */
   getByDepth(depth) {
-    return this._items.filter(externalFolderEntity => externalFolderEntity.depth === depth);
+    return this._items.filter((externalFolderEntity) => externalFolderEntity.depth === depth);
   }
 
   /**
@@ -130,7 +132,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
    * @return {ExternalFolderEntity|null}
    */
   getByPath(path) {
-    return this._items.find(externalFolderEntity => externalFolderEntity.path === path) || null;
+    return this._items.find((externalFolderEntity) => externalFolderEntity.path === path) || null;
   }
 
   /**
@@ -142,7 +144,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
     if (!folderParentId) {
       return [];
     }
-    return this._items.filter(externalFolderEntity => externalFolderEntity.folderParentId === folderParentId);
+    return this._items.filter((externalFolderEntity) => externalFolderEntity.folderParentId === folderParentId);
   }
 
   /*
@@ -198,7 +200,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
    * @param {ExternalFolderEntity} rootFolder The folder to use as root
    */
   changeRootPath(rootFolder) {
-    this._items.forEach(folder => folder.changeRootPath(rootFolder));
+    this._items.forEach((folder) => folder.changeRootPath(rootFolder));
   }
 
   /**
@@ -208,7 +210,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
   removeByPath(path) {
     for (let i = this._items.length - 1; i >= 0; i--) {
       const externalFolderEntity = this._items[i];
-      const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, '\\$&');
+      const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, "\\$&");
       const regex = new RegExp(`^${escapedPath}($|\/)`);
       if (regex.exec(externalFolderEntity.path)) {
         this._items.splice(i, 1);

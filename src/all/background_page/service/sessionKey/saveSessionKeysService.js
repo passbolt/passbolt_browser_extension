@@ -11,16 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.1
  */
-import PassphraseStorageService from '../session_storage/passphraseStorageService';
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
-import {assertBoolean, assertString, assertType} from '../../utils/assertions';
+import { assertBoolean, assertString, assertType } from "../../utils/assertions";
 import SessionKeysBundlesApiService from "../api/sessionKey/sessionKeysBundlesApiService";
 import EncryptSessionKeysBundlesService from "./encryptSessionKeysBundlesService";
 import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection";
 import GetOrFindSessionKeysService from "./getOrFindSessionKeysService";
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
-import SessionKeysBundleDataEntity
-  from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleDataEntity";
+import SessionKeysBundleDataEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleDataEntity";
 
 class SaveSessionKeysService {
   /**
@@ -47,18 +46,25 @@ class SaveSessionKeysService {
    * @returns {Promise}
    */
   async save(sessionKeys, passphrase = null, retryUpdate = false) {
-    assertType(sessionKeys, SessionKeysCollection, "The parameter \"sessionKeys\" should be a SessionKeysCollection.");
+    assertType(sessionKeys, SessionKeysCollection, 'The parameter "sessionKeys" should be a SessionKeysCollection.');
     if (passphrase !== null) {
       assertString(passphrase, 'The parameter "passphrase" should be a string.');
     }
     assertBoolean(retryUpdate, 'The parameter "retryUpdate" should be a boolean.');
 
-    passphrase = passphrase || await PassphraseStorageService.getOrFail();
+    passphrase = passphrase || (await PassphraseStorageService.getOrFail());
     const sessionKeysBundles = await this.getOrFindSessionKeysService.getOrFindAllBundles();
     const sessionKeysBundleData = SessionKeysBundleDataEntity.createFromSessionKeys(sessionKeys);
-    const sessionKeysBundle = await this.buildOrGetAndUpdateSessionKeysBundleToSave(sessionKeysBundles, sessionKeysBundleData);
+    const sessionKeysBundle = await this.buildOrGetAndUpdateSessionKeysBundleToSave(
+      sessionKeysBundles,
+      sessionKeysBundleData,
+    );
     await this.encryptSessionKeysBundle.encryptOne(sessionKeysBundle, passphrase);
-    const savedSessionKeysBundle = await this.saveOrUpdateSessionKeysBundle(sessionKeysBundles, sessionKeysBundle, sessionKeysBundleData);
+    const savedSessionKeysBundle = await this.saveOrUpdateSessionKeysBundle(
+      sessionKeysBundles,
+      sessionKeysBundle,
+      sessionKeysBundleData,
+    );
     await this.deleteOldSessionKeysBundle(sessionKeysBundles, savedSessionKeysBundle);
     await this.sessionKeysBundlesSessionStorageService.set(sessionKeysBundles);
   }
@@ -74,7 +80,7 @@ class SaveSessionKeysService {
    */
   async buildOrGetAndUpdateSessionKeysBundleToSave(sessionKeysBundles, sessionKeysBundleData) {
     if (!sessionKeysBundles.length) {
-      return new SessionKeysBundleEntity({data: sessionKeysBundleData.toDto()});
+      return new SessionKeysBundleEntity({ data: sessionKeysBundleData.toDto() });
     }
 
     const sessionKeysBundle = sessionKeysBundles.getByLatestModified();
@@ -95,7 +101,10 @@ class SaveSessionKeysService {
   async saveOrUpdateSessionKeysBundle(sessionKeysBundles, sessionKeysBundle, sessionKeysBundleData) {
     let savedSessionKeysBundleDto;
     if (sessionKeysBundle.id) {
-      savedSessionKeysBundleDto = await this.sessionKeysBundleApiService.update(sessionKeysBundle.id, sessionKeysBundle);
+      savedSessionKeysBundleDto = await this.sessionKeysBundleApiService.update(
+        sessionKeysBundle.id,
+        sessionKeysBundle,
+      );
     } else {
       savedSessionKeysBundleDto = await this.sessionKeysBundleApiService.create(sessionKeysBundle);
     }

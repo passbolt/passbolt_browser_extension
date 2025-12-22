@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
-import {assertPassphrase} from "../../utils/assertions";
+import { assertPassphrase } from "../../utils/assertions";
 import GpgKeyError from "../../error/GpgKeyError";
 import i18n from "../../sdk/i18n";
 

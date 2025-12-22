@@ -15,7 +15,7 @@
 class BadSignatureMessageGpgKeyError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'BadSignatureMessageGpgKeyError';
+    this.name = "BadSignatureMessageGpgKeyError";
   }
 }
 

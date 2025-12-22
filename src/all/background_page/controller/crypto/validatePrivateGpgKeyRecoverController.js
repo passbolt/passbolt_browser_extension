@@ -12,10 +12,9 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import i18n from "../../sdk/i18n";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
-
 
 class ValidatePrivateGpgKeyRecoverController {
   /**
@@ -39,7 +38,7 @@ class ValidatePrivateGpgKeyRecoverController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

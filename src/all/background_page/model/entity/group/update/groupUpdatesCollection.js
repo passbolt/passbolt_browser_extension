@@ -14,7 +14,7 @@
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import GroupUpdateEntity from "./groupUpdateEntity";
 import GroupUserChangeEntity from "../../groupUser/change/groupUserChangeEntity";
-import {assertType} from "../../../../utils/assertions";
+import { assertType } from "../../../../utils/assertions";
 
 export default class GroupUpdatesCollection extends EntityV2Collection {
   /**
@@ -43,7 +43,7 @@ export default class GroupUpdatesCollection extends EntityV2Collection {
   static createFromGroupUpdateEntity(groupUpdateEntity) {
     assertType(groupUpdateEntity, GroupUpdateEntity);
 
-    const {id, name} = groupUpdateEntity;
+    const { id, name } = groupUpdateEntity;
     const allUsersSecrets = groupUpdateEntity.secrets?.toDto() || [];
     const groupsUsers = groupUpdateEntity.groupsUsers;
 
@@ -54,24 +54,23 @@ export default class GroupUpdatesCollection extends EntityV2Collection {
     for (let i = 0; i < groupsUsers.items.length; i++) {
       const groupUserChangeEntity = groupsUsers.items[i];
       const groups_users = [groupUserChangeEntity.toDto()];
-      const singleGoupUserUpdateChangeDto = {id, name, groups_users};
+      const singleGoupUserUpdateChangeDto = { id, name, groups_users };
 
       switch (groupUserChangeEntity.scenario) {
-        case (GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE): {
-          const secrets = allUsersSecrets
-            .filter(s => s.user_id === groupUserChangeEntity.userId);
+        case GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE: {
+          const secrets = allUsersSecrets.filter((s) => s.user_id === groupUserChangeEntity.userId);
 
           singleGoupUserUpdateChangeDto.secrets = secrets;
           addMemeberOperationsDto.push(singleGoupUserUpdateChangeDto);
           break;
         }
 
-        case (GroupUserChangeEntity.GROUP_USER_CHANGE_UPDATE): {
+        case GroupUserChangeEntity.GROUP_USER_CHANGE_UPDATE: {
           updateMemeberRoleOperationsDto.push(singleGoupUserUpdateChangeDto);
           break;
         }
 
-        case (GroupUserChangeEntity.GROUP_USER_CHANGE_DELETE): {
+        case GroupUserChangeEntity.GROUP_USER_CHANGE_DELETE: {
           deleteMemeberOperationsDto.push(singleGoupUserUpdateChangeDto);
           break;
         }
@@ -82,12 +81,12 @@ export default class GroupUpdatesCollection extends EntityV2Collection {
       }
     }
 
-    const groupNameUpdateOperationDto = {id, name};
+    const groupNameUpdateOperationDto = { id, name };
     return new GroupUpdatesCollection([
       groupNameUpdateOperationDto,
       ...addMemeberOperationsDto,
       ...updateMemeberRoleOperationsDto,
-      ...deleteMemeberOperationsDto
+      ...deleteMemeberOperationsDto,
     ]);
   }
 
@@ -104,8 +103,8 @@ export default class GroupUpdatesCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": GroupUpdateEntity.getSchema(),
+      type: "array",
+      items: GroupUpdateEntity.getSchema(),
     };
   }
 }

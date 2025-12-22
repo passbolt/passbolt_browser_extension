@@ -25,14 +25,14 @@ class PassphraseStorageService {
    * @return {Promise<void>}
    */
   static async set(passphrase, timeout) {
-    await navigator.locks.request(PASSPHRASE_STORAGE_KEY, async() => {
-      await browser.storage.session.set({[PASSPHRASE_STORAGE_KEY]: passphrase});
+    await navigator.locks.request(PASSPHRASE_STORAGE_KEY, async () => {
+      await browser.storage.session.set({ [PASSPHRASE_STORAGE_KEY]: passphrase });
     });
 
     PassphraseStorageService._clearFlushAlarms();
     if (timeout >= 0) {
       browser.alarms.create(PassphraseStorageService.ALARM_NAME, {
-        when: Date.now() + timeout * 1000
+        when: Date.now() + timeout * 1000,
       });
     }
   }
@@ -65,11 +65,8 @@ class PassphraseStorageService {
    * @return {Promise<void>}
    */
   static async flush() {
-    Log.write({level: 'debug', message: 'PassphraseStorageService flushed'});
-    return Promise.all([
-      PassphraseStorageService.flushPassphrase(),
-      PassphraseStorageService._clearFlushAlarms(),
-    ]);
+    Log.write({ level: "debug", message: "PassphraseStorageService flushed" });
+    return Promise.all([PassphraseStorageService.flushPassphrase(), PassphraseStorageService._clearFlushAlarms()]);
   }
 
   /**
@@ -77,7 +74,9 @@ class PassphraseStorageService {
    * @returns {Promise<void>}
    */
   static flushPassphrase() {
-    return navigator.locks.request(PASSPHRASE_STORAGE_KEY, () => browser.storage.session.remove(PASSPHRASE_STORAGE_KEY));
+    return navigator.locks.request(PASSPHRASE_STORAGE_KEY, () =>
+      browser.storage.session.remove(PASSPHRASE_STORAGE_KEY),
+    );
   }
 
   /**

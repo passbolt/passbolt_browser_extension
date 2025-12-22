@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import SetupModel from "../../model/setup/setupModel";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import WorkerService from "../../service/worker/workerService";
 import AuthVerifyServerKeyService from "../../service/api/auth/authVerifyServerKeyService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
@@ -42,10 +42,10 @@ class StartSetupController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -73,7 +73,7 @@ class StartSetupController {
   async _buildTemporaryAccountEntity() {
     const temporaryAccountDto = {
       account: this.account.toDto(AccountSetupEntity.ALL_CONTAIN_OPTIONS),
-      worker_id: this.worker.port._port.name
+      worker_id: this.worker.port._port.name,
     };
     this.temporaryAccount = new AccountTemporaryEntity(temporaryAccountDto);
   }
@@ -98,9 +98,9 @@ class StartSetupController {
    * @private
    */
   async _findAndSetAccountSetupMeta() {
-    const {user, accountRecoveryOrganizationPolicy, userPassphrasePolicies} = await this.setupModel.startSetup(
+    const { user, accountRecoveryOrganizationPolicy, userPassphrasePolicies } = await this.setupModel.startSetup(
       this.temporaryAccount.account.userId,
-      this.temporaryAccount.account.authenticationTokenToken
+      this.temporaryAccount.account.authenticationTokenToken,
     );
 
     // Associate the user meta to the account being set up.
@@ -129,7 +129,7 @@ class StartSetupController {
    * @private
    */
   async _handleUnexpectedError(error) {
-    (await WorkerService.get('SetupBootstrap', this.worker.tab.id)).port.emit('passbolt.setup-bootstrap.remove-iframe');
+    (await WorkerService.get("SetupBootstrap", this.worker.tab.id)).port.emit("passbolt.setup-bootstrap.remove-iframe");
     throw error;
   }
 }

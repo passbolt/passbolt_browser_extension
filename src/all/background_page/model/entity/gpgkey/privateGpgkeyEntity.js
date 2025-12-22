@@ -14,18 +14,17 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'PrivateGpgkey';
+const ENTITY_NAME = "PrivateGpgkey";
 
 class PrivateGpgkeyEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(privateGpgkeyDto, options = {}) {
-    super(EntitySchema.validate(
-      PrivateGpgkeyEntity.ENTITY_NAME,
-      privateGpgkeyDto,
-      PrivateGpgkeyEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(PrivateGpgkeyEntity.ENTITY_NAME, privateGpgkeyDto, PrivateGpgkeyEntity.getSchema()),
+      options,
+    );
   }
 
   /**
@@ -34,19 +33,16 @@ class PrivateGpgkeyEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "armored_key",
-        "passphrase"
-      ],
-      "properties": {
-        "armored_key": {
-          "type": "string"
+      type: "object",
+      required: ["armored_key", "passphrase"],
+      properties: {
+        armored_key: {
+          type: "string",
         },
-        "passphrase": {
-          "type": "string"
-        }
-      }
+        passphrase: {
+          type: "string",
+        },
+      },
     };
   }
   /*

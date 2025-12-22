@@ -17,8 +17,8 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import deduplicateObjects from "passbolt-styleguide/src/shared/utils/deduplicateObjects";
 
-const ENTITY_NAME = 'AccountRecoveryRequest';
-const RULE_UNIQUE_ID = 'unique_id';
+const ENTITY_NAME = "AccountRecoveryRequest";
+const RULE_UNIQUE_ID = "unique_id";
 
 /**
  * Entity Collection related to the account recovery request
@@ -29,25 +29,32 @@ class AccountRecoveryRequestsCollection extends EntityCollection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
   constructor(AccountRecoveryRequestsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      AccountRecoveryRequestsCollection.ENTITY_NAME,
-      AccountRecoveryRequestsCollectionDto,
-      AccountRecoveryRequestsCollection.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        AccountRecoveryRequestsCollection.ENTITY_NAME,
+        AccountRecoveryRequestsCollectionDto,
+        AccountRecoveryRequestsCollection.getSchema(),
+      ),
+      options,
+    );
 
     /*
      * Check if accountRecoveryRequest ids are unique
      * Why not this.push? It is faster than adding items one by one
      */
-    const ids = this._props.map(accountRecoveryRequest => accountRecoveryRequest.id);
+    const ids = this._props.map((accountRecoveryRequest) => accountRecoveryRequest.id);
     ids.sort().sort((a, b) => {
       if (a === b) {
-        throw new EntityCollectionError(0, AccountRecoveryRequestsCollection.RULE_UNIQUE_ID, `AccountRecoveryRequest id ${a} already exists.`);
+        throw new EntityCollectionError(
+          0,
+          AccountRecoveryRequestsCollection.RULE_UNIQUE_ID,
+          `AccountRecoveryRequest id ${a} already exists.`,
+        );
       }
     });
     // Directly push into the private property _items[]
-    this._props.forEach(accountRecoveryRequest => {
-      this._items.push(new AccountRecoveryRequestEntity(accountRecoveryRequest, {clone: false}));
+    this._props.forEach((accountRecoveryRequest) => {
+      this._items.push(new AccountRecoveryRequestEntity(accountRecoveryRequest, { clone: false }));
     });
 
     // We do not keep original props
@@ -61,8 +68,8 @@ class AccountRecoveryRequestsCollection extends EntityCollection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": AccountRecoveryRequestEntity.getSchema(),
+      type: "array",
+      items: AccountRecoveryRequestEntity.getSchema(),
     };
   }
 
@@ -80,7 +87,7 @@ class AccountRecoveryRequestsCollection extends EntityCollection {
    * @returns {Array<string>}
    */
   get ids() {
-    return this._items.map(r => r.id);
+    return this._items.map((r) => r.id);
   }
 
   /*
@@ -100,7 +107,7 @@ class AccountRecoveryRequestsCollection extends EntityCollection {
       return [];
     }
 
-    return deduplicateObjects(dto, 'id');
+    return deduplicateObjects(dto, "id");
   }
 
   /*
@@ -123,7 +130,11 @@ class AccountRecoveryRequestsCollection extends EntityCollection {
     for (; i < length; i++) {
       const existingResource = this.accountRecoveryRequests[i];
       if (existingResource.id && existingResource.id === accountRecoveryRequest.id) {
-        throw new EntityCollectionError(i, AccountRecoveryRequestsCollection.RULE_UNIQUE_ID, `account recovery private key password id ${accountRecoveryRequest.id} already exists.`);
+        throw new EntityCollectionError(
+          i,
+          AccountRecoveryRequestsCollection.RULE_UNIQUE_ID,
+          `account recovery private key password id ${accountRecoveryRequest.id} already exists.`,
+        );
       }
     }
   }
@@ -138,7 +149,7 @@ class AccountRecoveryRequestsCollection extends EntityCollection {
    * @param {object} accountRecoveryRequest DTO or AccountRecoveryRequestEntity
    */
   push(accountRecoveryRequest) {
-    if (!accountRecoveryRequest || typeof accountRecoveryRequest !== 'object') {
+    if (!accountRecoveryRequest || typeof accountRecoveryRequest !== "object") {
       throw new TypeError(`accountRecoveryRequestsCollection push parameter should be an object.`);
     }
     if (accountRecoveryRequest instanceof AccountRecoveryRequestEntity) {
@@ -157,7 +168,7 @@ class AccountRecoveryRequestsCollection extends EntityCollection {
    * @param accountRecoveryRequestId
    */
   remove(accountRecoveryRequestId) {
-    const i = this.items.findIndex(item => item.id === accountRecoveryRequestId);
+    const i = this.items.findIndex((item) => item.id === accountRecoveryRequestId);
     this.items.splice(i, 1);
   }
 

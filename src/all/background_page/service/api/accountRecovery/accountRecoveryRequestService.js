@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const ACCOUNT_RECOVERY_REQUEST_SERVICE_RESOURCE_NAME = '/account-recovery/requests';
+const ACCOUNT_RECOVERY_REQUEST_SERVICE_RESOURCE_NAME = "/account-recovery/requests";
 
 class AccountRecoveryRequestService extends AbstractService {
   /**
@@ -42,12 +42,7 @@ class AccountRecoveryRequestService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return [
-      "creator",
-      "creator.gpgkey",
-      'account_recovery_private_key_passwords',
-      "armored_key",
-    ];
+    return ["creator", "creator.gpgkey", "account_recovery_private_key_passwords", "armored_key"];
   }
 
   /**
@@ -56,9 +51,7 @@ class AccountRecoveryRequestService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedFiltersOptions() {
-    return [
-      'has-users',
-    ];
+    return ["has-users"];
   }
 
   /**
@@ -71,7 +64,9 @@ class AccountRecoveryRequestService extends AbstractService {
    * @public
    */
   async findById(id, contains = {}) {
-    const options = contains ? this.formatContainOptions(contains, AccountRecoveryRequestService.getSupportedContainOptions()) : null;
+    const options = contains
+      ? this.formatContainOptions(contains, AccountRecoveryRequestService.getSupportedContainOptions())
+      : null;
     const response = await this.apiClient.get(id, options);
     return response.body;
   }
@@ -88,7 +83,7 @@ class AccountRecoveryRequestService extends AbstractService {
     this.assertValidId(userId);
     this.assertValidId(authenticationTokenToken);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${id}/${userId}/${authenticationTokenToken}`);
-    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const response = await this.apiClient.fetchAndHandleResponse("GET", url);
     return response.body;
   }
 
@@ -101,8 +96,10 @@ class AccountRecoveryRequestService extends AbstractService {
    * @public
    */
   async findByUser(filters) {
-    filters = filters ? this.formatFilterOptions(filters, AccountRecoveryRequestService.getSupportedFiltersOptions()) : null;
-    const options = {...filters};
+    filters = filters
+      ? this.formatFilterOptions(filters, AccountRecoveryRequestService.getSupportedFiltersOptions())
+      : null;
+    const options = { ...filters };
     const response = await this.apiClient.findAll(options);
     return response.body;
   }

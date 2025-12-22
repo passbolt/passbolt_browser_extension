@@ -15,16 +15,12 @@ import FolderEntity from "../folder/folderEntity";
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import LoggedUserEntity from "../user/actionLog/loggedUserEntity";
 
-
-const ENTITY_NAME = 'AbstractActionLog';
+const ENTITY_NAME = "AbstractActionLog";
 
 /**
  * List of allowed foreign models on which Comments can be plugged.
  */
-const ALLOWED_FOREIGN_MODELS = [
-  ResourceEntity.ENTITY_NAME,
-  FolderEntity.ENTITY_NAME,
-];
+const ALLOWED_FOREIGN_MODELS = [ResourceEntity.ENTITY_NAME, FolderEntity.ENTITY_NAME];
 
 class AbstractActionLogEntity extends Entity {
   /**
@@ -35,7 +31,7 @@ class AbstractActionLogEntity extends Entity {
 
     // Associations
     if (this._props.creator) {
-      this._creator = new LoggedUserEntity(this._props.creator, {clone: false});
+      this._creator = new LoggedUserEntity(this._props.creator, { clone: false });
       delete this._props.creator;
     }
   }
@@ -46,33 +42,28 @@ class AbstractActionLogEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "id",
-        "action_log_id",
-        "type",
-        "creator",
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["id", "action_log_id", "type", "creator"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "action_log_id": {
-          "type": "string",
-          "format": "uuid"
+        action_log_id: {
+          type: "string",
+          format: "uuid",
         },
-        "type": {
-          "type": "string",
-          "maxLength": 100
+        type: {
+          type: "string",
+          maxLength: 100,
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
         // Associations
-        "creator": LoggedUserEntity.getSchema()
-      }
+        creator: LoggedUserEntity.getSchema(),
+      },
     };
   }
 

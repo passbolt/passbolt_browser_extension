@@ -31,17 +31,22 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
     // Should the username be validated.
     const isUsernameValidated = options?.validateUsername !== false;
 
-    super(EntitySchema.validate(
-      AccountAccountRecoveryEntity.ENTITY_NAME,
-      accountAccountRecoveryDto,
-      AccountAccountRecoveryEntity.getSchema(isUsernameValidated)
-    ), options);
+    super(
+      EntitySchema.validate(
+        AccountAccountRecoveryEntity.ENTITY_NAME,
+        accountAccountRecoveryDto,
+        AccountAccountRecoveryEntity.getSchema(isUsernameValidated),
+      ),
+      options,
+    );
 
     this.isUsernameValidated = isUsernameValidated;
 
     // Associations
     if (this._props.account_recovery_request) {
-      this._account_recovery_request = new AccountRecoveryRequestEntity(this._props.account_recovery_request, {clone: false});
+      this._account_recovery_request = new AccountRecoveryRequestEntity(this._props.account_recovery_request, {
+        clone: false,
+      });
       delete this._props.account_recovery_request;
     }
   }
@@ -52,12 +57,9 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
    * @return {Object}
    */
   static marshal(accountAccountRecoveryDto) {
-    Object.assign(
-      accountAccountRecoveryDto,
-      {
-        type: AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY
-      }
-    );
+    Object.assign(accountAccountRecoveryDto, {
+      type: AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY,
+    });
   }
 
   /**
@@ -70,27 +72,21 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
     const authenticationTokenSchema = AuthenticationTokenEntity.getSchema();
 
     const schema = {
-      "type": "object",
-      "required": [
-        "type",
-        "domain",
-        "user_id",
-        "authentication_token_token",
-        "account_recovery_request_id"
-      ],
-      "properties": {
-        ... abstractAccountEntitySchema.properties,
-        "type": {
-          "type": "string",
-          "pattern": `^${AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY}$`,
+      type: "object",
+      required: ["type", "domain", "user_id", "authentication_token_token", "account_recovery_request_id"],
+      properties: {
+        ...abstractAccountEntitySchema.properties,
+        type: {
+          type: "string",
+          pattern: `^${AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY}$`,
         },
-        "account_recovery_request_id": {
-          "type": "string",
-          "format": "uuid",
+        account_recovery_request_id: {
+          type: "string",
+          format: "uuid",
         },
-        "authentication_token_token": authenticationTokenSchema.properties.token,
-        "account_recovery_request": AccountRecoveryRequestEntity.getSchema(),
-      }
+        authentication_token_token: authenticationTokenSchema.properties.token,
+        account_recovery_request: AccountRecoveryRequestEntity.getSchema(),
+      },
     };
 
     /*
@@ -99,7 +95,7 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
      */
     if (!validateUsername) {
       schema.properties.username = {
-        "type": "string"
+        type: "string",
       };
     }
 
@@ -141,7 +137,9 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
       result.security_token = this.securityToken.toDto();
     }
     if (contains.account_recovery_request && this.accountRecoveryRequest) {
-      result.account_recovery_request = this._account_recovery_request.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
+      result.account_recovery_request = this._account_recovery_request.toDto(
+        AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS,
+      );
     }
 
     return result;
@@ -154,7 +152,7 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
   toAbortRecoverDto() {
     return {
       authentication_token: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
     };
   }
@@ -167,20 +165,20 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
     return {
       //@deprecated since v3.6.0: the expected format is authentication_token.
       authenticationtoken: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
       authentication_token: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
       gpgkey: {
-        armored_key: this.userPublicArmoredKey
+        armored_key: this.userPublicArmoredKey,
       },
       //@deprecated since v3.6.0: the `locale` field is now on the root object.
       user: {
-        locale: this.locale
+        locale: this.locale,
       },
       locale: this.locale,
-      account_recovery_request_id: this.accountRecoveryRequestId
+      account_recovery_request_id: this.accountRecoveryRequestId,
     };
   }
 
@@ -219,7 +217,11 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
    * @param {string} accountRecoveryRequestId The account recovery request id
    */
   set accountRecoveryRequestId(accountRecoveryRequestId) {
-    EntitySchema.validateProp("account_recovery_request_id", accountRecoveryRequestId, AccountAccountRecoveryEntity.getSchema().properties.account_recovery_request_id);
+    EntitySchema.validateProp(
+      "account_recovery_request_id",
+      accountRecoveryRequestId,
+      AccountAccountRecoveryEntity.getSchema().properties.account_recovery_request_id,
+    );
     this._props.account_recovery_request_id = accountRecoveryRequestId;
   }
 

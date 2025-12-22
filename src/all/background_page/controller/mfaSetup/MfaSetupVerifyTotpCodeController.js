@@ -15,7 +15,6 @@
 import MfaSetupTotpEntity from "../../model/entity/mfa/mfaSetupTotpEntity";
 import MultiFactorAuthenticationModel from "../../model/multiFactorAuthentication/multiFactorAuthenticationModel";
 
-
 class MfaSetupVerifyTotpCodeController {
   /**
    * MfaSetupVerifyTotpCodeController constructor
@@ -39,7 +38,7 @@ class MfaSetupVerifyTotpCodeController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

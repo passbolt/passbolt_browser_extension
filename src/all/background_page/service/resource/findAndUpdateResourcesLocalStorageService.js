@@ -12,13 +12,13 @@
  * @since         4.6.0
  */
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
-import {assertNumber, assertUuid} from "../../utils/assertions";
+import { assertNumber, assertUuid } from "../../utils/assertions";
 import FindResourcesService from "./findResourcesService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import DecryptMetadataService from "../metadata/decryptMetadataService";
 
-const RESOURCES_UPDATE_ALL_LS_LOCK_PREFIX = 'RESOURCES_UPDATE_LS_LOCK_';
+const RESOURCES_UPDATE_ALL_LS_LOCK_PREFIX = "RESOURCES_UPDATE_LS_LOCK_";
 
 /**
  * The service aim to find and update the resources local storage service.
@@ -51,7 +51,7 @@ class FindAndUpdateResourcesLocalStorage {
    * might be available in the passphrase session storage.
    * @return {Promise<ResourcesCollection>}
    */
-  async findAndUpdateAll({updatePeriodThreshold} = {}, passphrase = null) {
+  async findAndUpdateAll({ updatePeriodThreshold } = {}, passphrase = null) {
     assertNumber(updatePeriodThreshold, "Parameter updatePeriodThreshold should be a number.");
 
     const lockKey = `${RESOURCES_UPDATE_ALL_LS_LOCK_PREFIX}${this.account.id}`;
@@ -63,32 +63,40 @@ class FindAndUpdateResourcesLocalStorage {
     // Do not update the storage if the defined period, during which the local storage doesn't need to be refreshed, has not yet passed.
     if (updatePeriodThreshold && lastUpdateTime && Boolean(localStorageResourceCollection)) {
       if (Date.now() - lastUpdateTime < updatePeriodThreshold) {
-        return new ResourcesCollection(localStorageResourceCollection, {validate: !isRuntimeCacheInitialized});
+        return new ResourcesCollection(localStorageResourceCollection, { validate: !isRuntimeCacheInitialized });
       }
     }
 
     // If no update is in progress, refresh the local storage.
-    return await navigator.locks.request(lockKey, {ifAvailable: true}, async lock => {
+    return await navigator.locks.request(lockKey, { ifAvailable: true }, async (lock) => {
       // Lock not granted, an update is already in progress. Wait for its completion to notify the function consumer.
       if (!lock) {
-        return await navigator.locks.request(lockKey, {mode: "shared"}, async() =>
-          /*
-           * Return the data from local storage while waiting for the update in progress.
-           * @todo it does not return the latest information but the previous one.
-           */
-          new ResourcesCollection(localStorageResourceCollection, {validate: !isRuntimeCacheInitialized})
+        return await navigator.locks.request(
+          lockKey,
+          { mode: "shared" },
+          async () =>
+            /*
+             * Return the data from local storage while waiting for the update in progress.
+             * @todo it does not return the latest information but the previous one.
+             */
+            new ResourcesCollection(localStorageResourceCollection, { validate: !isRuntimeCacheInitialized }),
         );
       }
 
       // Lock is granted, retrieve all resources and update the local storage.
-      const localResourcesCollection = new ResourcesCollection(localStorageResourceCollection || [], {validate: isRuntimeCacheInitialized});
+      const localResourcesCollection = new ResourcesCollection(localStorageResourceCollection || [], {
+        validate: isRuntimeCacheInitialized,
+      });
 
       const updatedResourcesCollection = await this.findResourcesServices.findAllForLocalStorage();
       const resourceTypes = await this.resourceTypeModel.getOrFindAll();
       updatedResourcesCollection.filterByResourceTypes(resourceTypes);
       updatedResourcesCollection.setDecryptedMetadataFromCollection(localResourcesCollection);
 
-      await this.decryptMetadataService.decryptAllFromForeignModels(updatedResourcesCollection, passphrase, {ignoreDecryptionError: true, updateSessionKeys: true});
+      await this.decryptMetadataService.decryptAllFromForeignModels(updatedResourcesCollection, passphrase, {
+        ignoreDecryptionError: true,
+        updateSessionKeys: true,
+      });
       updatedResourcesCollection.filterOutMetadataEncrypted();
 
       await ResourceLocalStorage.set(updatedResourcesCollection);
@@ -109,7 +117,10 @@ class FindAndUpdateResourcesLocalStorage {
    * @throw {TypeError} If the groupId is not valid UUID
    */
   async findAndUpdateByIsSharedWithGroup(groupId, passphrase = null) {
-    const resourcesCollection = await this.findResourcesServices.findAllByIsSharedWithGroupForLocalStorage(groupId, passphrase);
+    const resourcesCollection = await this.findResourcesServices.findAllByIsSharedWithGroupForLocalStorage(
+      groupId,
+      passphrase,
+    );
     await ResourceLocalStorage.addOrReplaceResourcesCollection(resourcesCollection);
     return resourcesCollection;
   }
@@ -126,7 +137,8 @@ class FindAndUpdateResourcesLocalStorage {
     assertUuid(parentFolderId);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
 
-    const apiResourcesCollection = await this.findResourcesServices.findAllByParentFolderIdForLocalStorage(parentFolderId);
+    const apiResourcesCollection =
+      await this.findResourcesServices.findAllByParentFolderIdForLocalStorage(parentFolderId);
     apiResourcesCollection.filterByResourceTypes(resourceTypes);
 
     const apiResourcesCollectionMapIds = apiResourcesCollection.items.reduce((result, resource) => {
@@ -134,7 +146,9 @@ class FindAndUpdateResourcesLocalStorage {
       return result;
     }, {});
 
-    const localStorageResourcesCollection = new ResourcesCollection(await ResourceLocalStorage.get(), {validate: false});
+    const localStorageResourcesCollection = new ResourcesCollection(await ResourceLocalStorage.get(), {
+      validate: false,
+    });
     const knownResourcesCollectionInFolderIds = localStorageResourcesCollection.items.reduce((result, resource) => {
       if (resource.folderParentId === parentFolderId) {
         result.push(resource.id);
@@ -145,7 +159,9 @@ class FindAndUpdateResourcesLocalStorage {
     apiResourcesCollection.setDecryptedMetadataFromCollection(localStorageResourcesCollection);
     localStorageResourcesCollection.updateWithCollection(apiResourcesCollection);
 
-    const movedOrRemovedResourcesIds = knownResourcesCollectionInFolderIds.filter(id => !apiResourcesCollectionMapIds[id]);
+    const movedOrRemovedResourcesIds = knownResourcesCollectionInFolderIds.filter(
+      (id) => !apiResourcesCollectionMapIds[id],
+    );
     if (movedOrRemovedResourcesIds.length > 0) {
       const updatedResources = await this.findResourcesServices.findAllByIdsForLocalStorage(movedOrRemovedResourcesIds);
 
@@ -153,13 +169,15 @@ class FindAndUpdateResourcesLocalStorage {
       localStorageResourcesCollection.updateWithCollection(updatedResources);
 
       // These resources have been deleted (or permissions revoked) and need to be removed from the local storage.
-      const remainingResourcesIds = movedOrRemovedResourcesIds
-        .filter(id => !updatedResources.getFirstById(id));
+      const remainingResourcesIds = movedOrRemovedResourcesIds.filter((id) => !updatedResources.getFirstById(id));
 
       localStorageResourcesCollection.removeMany(remainingResourcesIds);
     }
 
-    await this.decryptMetadataService.decryptAllFromForeignModels(localStorageResourcesCollection, passphrase, {ignoreDecryptionError: true, updateSessionKeys: true});
+    await this.decryptMetadataService.decryptAllFromForeignModels(localStorageResourcesCollection, passphrase, {
+      ignoreDecryptionError: true,
+      updateSessionKeys: true,
+    });
     localStorageResourcesCollection.filterOutMetadataEncrypted();
 
     await ResourceLocalStorage.set(localStorageResourcesCollection);

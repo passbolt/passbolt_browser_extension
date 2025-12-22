@@ -27,37 +27,40 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
    * @inheritDoc
    */
   constructor(AccountEntityDto) {
-    super(EntitySchema.validate(
-      AccountTemporaryEntity.ENTITY_NAME,
-      AccountEntityDto,
-      AccountTemporaryEntity.getSchema()
-    ));
+    super(
+      EntitySchema.validate(AccountTemporaryEntity.ENTITY_NAME, AccountEntityDto, AccountTemporaryEntity.getSchema()),
+    );
 
     // Associations
     if (this._props.account) {
       switch (this._props.account.type) {
         case AccountSetupEntity.TYPE_ACCOUNT_SETUP:
-          this._account = new AccountSetupEntity(this._props.account,  {clone: false});
+          this._account = new AccountSetupEntity(this._props.account, { clone: false });
           break;
         case AccountRecoverEntity.TYPE_ACCOUNT_RECOVER:
-          this._account = new AccountRecoverEntity(this._props.account, {clone: false});
+          this._account = new AccountRecoverEntity(this._props.account, { clone: false });
           break;
         case AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY:
-          this._account = new AccountAccountRecoveryEntity(this._props.account, {clone: false});
+          this._account = new AccountAccountRecoveryEntity(this._props.account, { clone: false });
           break;
         default:
-          throw new TypeError('The account should have a known type.');
+          throw new TypeError("The account should have a known type.");
       }
       delete this._props.account;
     }
 
     if (this._props.account_recovery_organization_policy) {
-      this._account_recovery_organization_policy = new AccountRecoveryOrganizationPolicyEntity(this._props.account_recovery_organization_policy, {clone: false});
+      this._account_recovery_organization_policy = new AccountRecoveryOrganizationPolicyEntity(
+        this._props.account_recovery_organization_policy,
+        { clone: false },
+      );
       delete this._props.account_recovery_organization_policy;
     }
 
     if (this._props.user_passphrase_policies) {
-      this._user_passphrase_policies = new UserPassphrasePoliciesEntity(this._props.user_passphrase_policies, {clone: false});
+      this._user_passphrase_policies = new UserPassphrasePoliciesEntity(this._props.user_passphrase_policies, {
+        clone: false,
+      });
       delete this._props.user_passphrase_policies;
     }
   }
@@ -68,27 +71,26 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "worker_id",
-        "account"
-      ],
-      "properties": {
-        "account": {"anyOf": [
-          AccountSetupEntity.getSchema(),
-          AccountRecoverEntity.getSchema(),
-          AccountAccountRecoveryEntity.getSchema()
-        ]},
-        "passphrase": {
-          "type": "string",
+      type: "object",
+      required: ["worker_id", "account"],
+      properties: {
+        account: {
+          anyOf: [
+            AccountSetupEntity.getSchema(),
+            AccountRecoverEntity.getSchema(),
+            AccountAccountRecoveryEntity.getSchema(),
+          ],
         },
-        "worker_id": {
-          "type": "string",
-          "format": "uuid"
+        passphrase: {
+          type: "string",
         },
-        "account_recovery_organization_policy": AccountRecoveryOrganizationPolicyEntity.getSchema(),
-        "user_passphrase_policies": UserPassphrasePoliciesEntity.getSchema(),
-      }
+        worker_id: {
+          type: "string",
+          format: "uuid",
+        },
+        account_recovery_organization_policy: AccountRecoveryOrganizationPolicyEntity.getSchema(),
+        user_passphrase_policies: UserPassphrasePoliciesEntity.getSchema(),
+      },
     };
   }
 
@@ -133,7 +135,9 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
       result.worker_id = this.workerId;
     }
     if (contains.account_recovery_organization_policy && this.accountRecoveryOrganizationPolicy) {
-      result.account_recovery_organization_policy = this.accountRecoveryOrganizationPolicy.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
+      result.account_recovery_organization_policy = this.accountRecoveryOrganizationPolicy.toDto(
+        AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS,
+      );
     }
     if (contains.user_passphrase_policies && this.userPassphrasePolicies) {
       result.user_passphrase_policies = this.userPassphrasePolicies.toDto();
@@ -200,8 +204,11 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
    * @throws {TypeError} If the accountRecoveryOrganizationPolicy parameter is not a valid AccountRecoveryOrganizationPolicyEntity
    */
   set accountRecoveryOrganizationPolicy(accountRecoveryOrganizationPolicy) {
-    if (!accountRecoveryOrganizationPolicy || !(accountRecoveryOrganizationPolicy instanceof AccountRecoveryOrganizationPolicyEntity)) {
-      throw new TypeError('Failed to assert the parameter is a valid AccountRecoveryOrganizationPolicyEntity');
+    if (
+      !accountRecoveryOrganizationPolicy ||
+      !(accountRecoveryOrganizationPolicy instanceof AccountRecoveryOrganizationPolicyEntity)
+    ) {
+      throw new TypeError("Failed to assert the parameter is a valid AccountRecoveryOrganizationPolicyEntity");
     }
     this._account_recovery_organization_policy = accountRecoveryOrganizationPolicy;
   }
@@ -221,7 +228,7 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
    */
   set userPassphrasePolicies(userPassphrasePolicy) {
     if (!userPassphrasePolicy || !(userPassphrasePolicy instanceof UserPassphrasePoliciesEntity)) {
-      throw new TypeError('Failed to assert the parameter is a valid UserPassphrasePoliciesEntity');
+      throw new TypeError("Failed to assert the parameter is a valid UserPassphrasePoliciesEntity");
     }
     this._user_passphrase_policies = userPassphrasePolicy;
   }

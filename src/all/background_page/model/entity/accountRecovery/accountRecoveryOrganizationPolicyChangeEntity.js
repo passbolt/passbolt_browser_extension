@@ -30,24 +30,43 @@ class AccountRecoveryOrganizationPolicyChangeEntity extends Entity {
    * @throws {EntityValidationError} Build rule checking if the provided public key id matches the one provided as metadata.
    */
   constructor(accountRecoveryOrganizationPolicyChangeDto, options = {}) {
-    super(EntitySchema.validate(
-      AccountRecoveryOrganizationPolicyChangeEntity.ENTITY_NAME,
-      accountRecoveryOrganizationPolicyChangeDto,
-      AccountRecoveryOrganizationPolicyChangeEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        AccountRecoveryOrganizationPolicyChangeEntity.ENTITY_NAME,
+        accountRecoveryOrganizationPolicyChangeDto,
+        AccountRecoveryOrganizationPolicyChangeEntity.getSchema(),
+      ),
+      options,
+    );
 
-    if (!accountRecoveryOrganizationPolicyChangeDto.policy && !accountRecoveryOrganizationPolicyChangeDto.account_recovery_organization_public_key) {
-      throw new EntityValidationError("AccountRecoveryOrganizationPolicyChangeEntity expects a policy or an account_recovery_organization_public_key set to be valid.");
+    if (
+      !accountRecoveryOrganizationPolicyChangeDto.policy &&
+      !accountRecoveryOrganizationPolicyChangeDto.account_recovery_organization_public_key
+    ) {
+      throw new EntityValidationError(
+        "AccountRecoveryOrganizationPolicyChangeEntity expects a policy or an account_recovery_organization_public_key set to be valid.",
+      );
     }
 
-    if (accountRecoveryOrganizationPolicyChangeDto.policy === AccountRecoveryOrganizationPolicyEntity.POLICY_DISABLED && accountRecoveryOrganizationPolicyChangeDto.account_recovery_organization_public_key) {
-      throw new EntityValidationError("AccountRecoveryOrganizationPolicyChangeEntity expects not to have an account recovery organization public key if the policy type is disabled.");
+    if (
+      accountRecoveryOrganizationPolicyChangeDto.policy === AccountRecoveryOrganizationPolicyEntity.POLICY_DISABLED &&
+      accountRecoveryOrganizationPolicyChangeDto.account_recovery_organization_public_key
+    ) {
+      throw new EntityValidationError(
+        "AccountRecoveryOrganizationPolicyChangeEntity expects not to have an account recovery organization public key if the policy type is disabled.",
+      );
     }
 
     // Associations
     if (this._props.account_recovery_organization_public_key) {
-      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key, {clone: false});
-      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.public_key_id);
+      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(
+        this._props.account_recovery_organization_public_key,
+        { clone: false },
+      );
+      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(
+        this._account_recovery_organization_public_key,
+        this.public_key_id,
+      );
       delete this._props.account_recovery_organization_public_key;
     }
   }
@@ -59,12 +78,12 @@ class AccountRecoveryOrganizationPolicyChangeEntity extends Entity {
   static getSchema() {
     const accountRecoveryOrganizationPolicyEntitySchema = AccountRecoveryOrganizationPolicyEntity.getSchema();
     return {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "policy": accountRecoveryOrganizationPolicyEntitySchema.properties.policy,
-        "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
-      }
+      type: "object",
+      required: [],
+      properties: {
+        policy: accountRecoveryOrganizationPolicyEntitySchema.properties.policy,
+        account_recovery_organization_public_key: AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
+      },
     };
   }
 
@@ -96,7 +115,7 @@ class AccountRecoveryOrganizationPolicyChangeEntity extends Entity {
    */
   toJSON() {
     return this.toDto({
-      account_recovery_organization_public_key: true
+      account_recovery_organization_public_key: true,
     });
   }
 

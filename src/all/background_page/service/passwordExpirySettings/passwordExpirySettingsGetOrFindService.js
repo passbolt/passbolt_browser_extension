@@ -13,7 +13,7 @@
  */
 import PasswordExpirySettingsModel from "../../model/passwordExpiry/passwordExpirySettingsModel";
 
-export const PASSWORD_EXPIRY_SETTINGS_LOCK = 'passwordExpirySettingsLock';
+export const PASSWORD_EXPIRY_SETTINGS_LOCK = "passwordExpirySettingsLock";
 /**
  * The passwordExpirySettingsGetOrFindService perform a get or update the password expiry settings local storage
  */
@@ -31,7 +31,9 @@ class PasswordExpirySettingsGetOrFindService {
    */
   getStorageKey(account) {
     if (!account.id) {
-      throw new Error('Cannot retrieve account id, necessary to lock the password expiry settings get or find service.');
+      throw new Error(
+        "Cannot retrieve account id, necessary to lock the password expiry settings get or find service.",
+      );
     }
     return `${PASSWORD_EXPIRY_SETTINGS_LOCK}-${account.id}`;
   }
@@ -42,7 +44,10 @@ class PasswordExpirySettingsGetOrFindService {
    * @return {Promise<PasswordExpirySettingsEntity>}
    */
   async exec(refreshCache = false) {
-    return await navigator.locks.request(this.storageKey, async() => await this.passwordExpirySettingsModel.getOrFindOrDefault(refreshCache));
+    return await navigator.locks.request(
+      this.storageKey,
+      async () => await this.passwordExpirySettingsModel.getOrFindOrDefault(refreshCache),
+    );
   }
 }
 

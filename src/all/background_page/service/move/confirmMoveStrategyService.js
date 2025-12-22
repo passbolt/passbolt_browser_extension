@@ -28,8 +28,14 @@ class ConfirmMoveStrategyService {
    * @return {Promise<boolean>}
    */
   async confirm(destinationFolderId, folderId) {
-    const strategy = await this.worker.port.request('passbolt.folders.move-strategy.request', destinationFolderId, [folderId], [], []);
-    return strategy.moveOption !== 'keep';
+    const strategy = await this.worker.port.request(
+      "passbolt.folders.move-strategy.request",
+      destinationFolderId,
+      [folderId],
+      [],
+      [],
+    );
+    return strategy.moveOption !== "keep";
   }
 }
 

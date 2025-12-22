@@ -1,9 +1,9 @@
-if (!('toJSON' in Error.prototype)) {
-  Object.defineProperty(Error.prototype, 'toJSON', {
-    value: function() {
+if (!("toJSON" in Error.prototype)) {
+  Object.defineProperty(Error.prototype, "toJSON", {
+    value: function () {
       const result = {};
 
-      Object.getOwnPropertyNames(this).forEach(function(key) {
+      Object.getOwnPropertyNames(this).forEach(function (key) {
         if (typeof this[key] !== "object") {
           result[key] = this[key];
           return;
@@ -20,6 +20,6 @@ if (!('toJSON' in Error.prototype)) {
       return result;
     },
     configurable: true,
-    writable: true
+    writable: true,
   });
 }

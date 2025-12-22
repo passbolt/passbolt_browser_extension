@@ -14,28 +14,33 @@
 
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import MfaEnabledProviderEntity from './mfaEnabledProviderEntity';
+import MfaEnabledProviderEntity from "./mfaEnabledProviderEntity";
 
-const ENTITY_NAME = 'MfaCombinedEnabledProviders';
+const ENTITY_NAME = "MfaCombinedEnabledProviders";
 
 class MfaCombinedEnabledProvidersEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(mfaSettingsDto, options = {}) {
-    super(EntitySchema.validate(
-      MfaCombinedEnabledProvidersEntity.ENTITY_NAME,
-      mfaSettingsDto,
-      MfaCombinedEnabledProvidersEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        MfaCombinedEnabledProvidersEntity.ENTITY_NAME,
+        mfaSettingsDto,
+        MfaCombinedEnabledProvidersEntity.getSchema(),
+      ),
+      options,
+    );
 
     // Associations
     if (this._props.MfaOrganizationSettings) {
-      this._mfaOrganizationSettings = new MfaEnabledProviderEntity(this._props.MfaOrganizationSettings, {clone: false});
+      this._mfaOrganizationSettings = new MfaEnabledProviderEntity(this._props.MfaOrganizationSettings, {
+        clone: false,
+      });
       delete this._props.MfaOrganizationSettings;
     }
     if (this._props.MfaAccountSettings) {
-      this._mfaAccountSettings = new MfaEnabledProviderEntity(this._props.MfaAccountSettings, {clone: false});
+      this._mfaAccountSettings = new MfaEnabledProviderEntity(this._props.MfaAccountSettings, { clone: false });
       delete this._props.MfaAccountSettings;
     }
   }
@@ -46,16 +51,13 @@ class MfaCombinedEnabledProvidersEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "MfaOrganizationSettings",
-        "MfaAccountSettings"
-      ],
-      "properties": {
+      type: "object",
+      required: ["MfaOrganizationSettings", "MfaAccountSettings"],
+      properties: {
         // Associated models
-        "MfaOrganizationSettings": MfaEnabledProviderEntity.getSchema(),
-        "MfaAccountSettings": MfaEnabledProviderEntity.getSchema(),
-      }
+        MfaOrganizationSettings: MfaEnabledProviderEntity.getSchema(),
+        MfaAccountSettings: MfaEnabledProviderEntity.getSchema(),
+      },
     };
   }
 
@@ -135,7 +137,7 @@ class MfaCombinedEnabledProvidersEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {MfaOrganizationSettings: true, MfaAccountSettings: true};
+    return { MfaOrganizationSettings: true, MfaAccountSettings: true };
   }
 }
 

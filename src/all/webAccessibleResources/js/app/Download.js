@@ -14,7 +14,7 @@ import download from "downloadjs/download";
 import Port from "../lib/port";
 
 // Wait the document to be ready before executing the script given in parameter.
-const iframeReady = callback => {
+const iframeReady = (callback) => {
   if (document.readyState !== "loading") {
     callback();
   } else {
@@ -22,12 +22,12 @@ const iframeReady = callback => {
   }
 };
 
-iframeReady(async() => {
+iframeReady(async () => {
   const query = new URLSearchParams(window.location.search);
-  const portname = query.get('passbolt');
+  const portname = query.get("passbolt");
   const port = new Port(portname);
   await port.connect();
-  port.on('passbolt.file-iframe.download', (filename, content) => {
+  port.on("passbolt.file-iframe.download", (filename, content) => {
     download(content, filename, "text/plain");
   });
 });

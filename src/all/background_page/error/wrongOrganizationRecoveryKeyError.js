@@ -15,7 +15,7 @@
 class WrongOrganizationRecoveryKeyError extends Error {
   constructor(message, expectedFingerprint) {
     super(message);
-    this.name = 'WrongOrganizationRecoveryKeyError';
+    this.name = "WrongOrganizationRecoveryKeyError";
     this.expectedFingerprint = expectedFingerprint;
   }
 }

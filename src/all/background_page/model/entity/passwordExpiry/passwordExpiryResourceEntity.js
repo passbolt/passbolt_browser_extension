@@ -14,18 +14,21 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'PasswordExpiryResource';
+const ENTITY_NAME = "PasswordExpiryResource";
 
 class PasswordExpiryResourceEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(passwordExpiryResourceDto, options = {}) {
-    super(EntitySchema.validate(
-      PasswordExpiryResourceEntity.ENTITY_NAME,
-      passwordExpiryResourceDto,
-      PasswordExpiryResourceEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        PasswordExpiryResourceEntity.ENTITY_NAME,
+        passwordExpiryResourceDto,
+        PasswordExpiryResourceEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -34,38 +37,35 @@ class PasswordExpiryResourceEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "id",
-        "expired"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["id", "expired"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "expired": {
-          "type": "string",
-          "format": "date-time",
-          "nullable": true,
+        expired: {
+          type: "string",
+          format: "date-time",
+          nullable: true,
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
-        }
-      }
+        modified_by: {
+          type: "string",
+          format: "uuid",
+        },
+      },
     };
   }
 

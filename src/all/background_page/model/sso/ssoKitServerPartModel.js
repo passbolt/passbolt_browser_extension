@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 import SsoKitServerPartService from "../../service/api/sso/ssoKitServerPartService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import SsoKitServerPartEntity from "../entity/sso/ssoKitServerPartEntity";
 
 /**

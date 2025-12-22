@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import {Uuid} from "../utils/uuid";
+import { Uuid } from "../utils/uuid";
 import Validator from "validator";
 
 class GpgAuthToken {
@@ -23,12 +23,12 @@ class GpgAuthToken {
    * @throw {Error} if the token is not valid
    */
   constructor(token) {
-    if (typeof token === 'undefined') {
-      this.token = 'gpgauthv1.3.0|36|';
+    if (typeof token === "undefined") {
+      this.token = "gpgauthv1.3.0|36|";
       this.token += Uuid.get();
-      this.token += '|gpgauthv1.3.0';
+      this.token += "|gpgauthv1.3.0";
     } else {
-      const result = this.validate('token', token);
+      const result = this.validate("token", token);
       if (result === true) {
         this.token = token;
       } else {
@@ -47,25 +47,25 @@ class GpgAuthToken {
   validate(field, value) {
     let sections = [];
     switch (field) {
-      case 'token' :
-        if (typeof value === 'undefined' || value === '') {
-          return new Error('The user authentication token cannot be empty');
+      case "token":
+        if (typeof value === "undefined" || value === "") {
+          return new Error("The user authentication token cannot be empty");
         }
-        sections = value.split('|');
+        sections = value.split("|");
         if (sections.length !== 4) {
-          return new Error('The user authentication token is not in the right format');
+          return new Error("The user authentication token is not in the right format");
         }
-        if (sections[0] !== sections[3] && sections[0] !== 'gpgauthv1.3.0') {
-          return new Error('Passbolt does not support this GPGAuth version');
+        if (sections[0] !== sections[3] && sections[0] !== "gpgauthv1.3.0") {
+          return new Error("Passbolt does not support this GPGAuth version");
         }
-        if (sections[1] !== '36') {
+        if (sections[1] !== "36") {
           return new Error(`Passbolt does not support GPGAuth token nonce longer than 36 characters: ${sections[2]}`);
         }
         if (!Validator.isUUID(sections[2])) {
-          return new Error('Passbolt does not support GPGAuth token nonce that are not UUIDs');
+          return new Error("Passbolt does not support GPGAuth token nonce that are not UUIDs");
         }
         return true;
-      default :
+      default:
         return new Error(`No validation defined for field: ${field}`);
     }
   }

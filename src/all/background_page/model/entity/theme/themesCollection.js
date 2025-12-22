@@ -13,7 +13,7 @@
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import ThemeEntity from "./themeEntity";
 
-const ENTITY_NAME = 'Themes';
+const ENTITY_NAME = "Themes";
 
 class ThemesCollection extends EntityV2Collection {
   /**
@@ -46,8 +46,8 @@ class ThemesCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": ThemeEntity.getSchema(),
+      type: "array",
+      items: ThemeEntity.getSchema(),
     };
   }
 
@@ -65,8 +65,8 @@ class ThemesCollection extends EntityV2Collection {
    * @throws {EntityValidationError} If a theme already exists with the same name.
    */
   validateBuildRules(item, options = {}) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
-    this.assertNotExist("name", item._props.name, {haystackSet: options?.uniqueNamesSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
+    this.assertNotExist("name", item._props.name, { haystackSet: options?.uniqueNamesSetCache });
   }
 
   /*
@@ -81,15 +81,15 @@ class ThemesCollection extends EntityV2Collection {
   pushMany(data, entityOptions = {}, options = {}) {
     const uniqueIdsSetCache = new Set(this.extract("id"));
     const uniqueNamesSetCache = new Set(this.extract("name"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item._props.id);
       uniqueNamesSetCache.add(item._props.name);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueNamesSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache, uniqueNamesSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);

@@ -28,19 +28,21 @@ class AccountSetupEntity extends AbstractAccountEntity {
   constructor(accountSetupDto, options = {}) {
     AccountSetupEntity.marshal(accountSetupDto);
 
-    super(EntitySchema.validate(
-      AccountSetupEntity.ENTITY_NAME,
-      accountSetupDto,
-      AccountSetupEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(AccountSetupEntity.ENTITY_NAME, accountSetupDto, AccountSetupEntity.getSchema()),
+      options,
+    );
 
     // Setup account associations.
     if (this._props.account_recovery_user_setting) {
-      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {clone: false});
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(
+        this._props.account_recovery_user_setting,
+        { clone: false },
+      );
       delete this._props.account_recovery_user_setting;
     }
     if (this._props.user) {
-      this._user = new UserEntity(this._props.user, {clone: false});
+      this._user = new UserEntity(this._props.user, { clone: false });
       delete this._props.user;
     }
   }
@@ -51,12 +53,9 @@ class AccountSetupEntity extends AbstractAccountEntity {
    * @return {Object}
    */
   static marshal(accountSetupDto) {
-    Object.assign(
-      accountSetupDto,
-      {
-        type: AccountSetupEntity.TYPE_ACCOUNT_SETUP
-      }
-    );
+    Object.assign(accountSetupDto, {
+      type: AccountSetupEntity.TYPE_ACCOUNT_SETUP,
+    });
   }
 
   /**
@@ -67,24 +66,19 @@ class AccountSetupEntity extends AbstractAccountEntity {
     const abstractAccountEntitySchema = AbstractAccountEntity.getSchema();
     const authenticationTokenSchema = AuthenticationTokenEntity.getSchema();
     return {
-      "type": "object",
-      "required": [
-        "type",
-        "domain",
-        "user_id",
-        "authentication_token_token"
-      ],
-      "properties": {
-        ... abstractAccountEntitySchema.properties,
-        "type": {
-          "type": "string",
-          "pattern": `^${AccountSetupEntity.TYPE_ACCOUNT_SETUP}$`,
+      type: "object",
+      required: ["type", "domain", "user_id", "authentication_token_token"],
+      properties: {
+        ...abstractAccountEntitySchema.properties,
+        type: {
+          type: "string",
+          pattern: `^${AccountSetupEntity.TYPE_ACCOUNT_SETUP}$`,
         },
-        "authentication_token_token": authenticationTokenSchema.properties.token,
+        authentication_token_token: authenticationTokenSchema.properties.token,
         // @todo refactoring-account-recovery check if it's necessary on the react and in the bp
-        "user": UserEntity.getSchema(),
-        "account_recovery_user_setting": AccountRecoveryUserSettingEntity.getSchema(),
-      }
+        user: UserEntity.getSchema(),
+        account_recovery_user_setting: AccountRecoveryUserSettingEntity.getSchema(),
+      },
     };
   }
 
@@ -120,7 +114,9 @@ class AccountSetupEntity extends AbstractAccountEntity {
       result.security_token = this.securityToken.toDto();
     }
     if (contains.account_recovery_user_setting && this.accountRecoveryUserSetting) {
-      result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS);
+      result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto(
+        AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS,
+      );
     }
     if (contains.user && this._user) {
       result.user = this.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
@@ -137,20 +133,22 @@ class AccountSetupEntity extends AbstractAccountEntity {
     return {
       //@deprecated since v3.6.0: the expected format is authentication_token.
       authenticationtoken: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
       authentication_token: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
       gpgkey: {
-        armored_key: this.userPublicArmoredKey
+        armored_key: this.userPublicArmoredKey,
       },
       //@deprecated since v3.6.0: the `locale` field is now on the root object.
       user: {
-        locale: this.locale
+        locale: this.locale,
       },
       locale: this.locale,
-      account_recovery_user_setting: this.accountRecoveryUserSetting?.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS),
+      account_recovery_user_setting: this.accountRecoveryUserSetting?.toDto(
+        AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS,
+      ),
     };
   }
 
@@ -195,7 +193,7 @@ class AccountSetupEntity extends AbstractAccountEntity {
    */
   set user(user) {
     if (!user || !(user instanceof UserEntity)) {
-      throw new TypeError('Failed to assert the parameter is a valid UserEntity');
+      throw new TypeError("Failed to assert the parameter is a valid UserEntity");
     }
     this._user = user;
   }
@@ -214,7 +212,7 @@ class AccountSetupEntity extends AbstractAccountEntity {
    */
   set accountRecoveryUserSetting(accountRecoveryUserSetting) {
     if (!accountRecoveryUserSetting || !(accountRecoveryUserSetting instanceof AccountRecoveryUserSettingEntity)) {
-      throw new TypeError('Failed to assert the parameter is a valid AccountRecoveryUserSettingEntity');
+      throw new TypeError("Failed to assert the parameter is a valid AccountRecoveryUserSettingEntity");
     }
     this._account_recovery_user_setting = accountRecoveryUserSetting;
   }
@@ -234,7 +232,7 @@ class AccountSetupEntity extends AbstractAccountEntity {
       security_token: true,
       authentication_token_token: true,
       account_recovery_user_setting: true,
-      user: true
+      user: true,
     };
   }
 

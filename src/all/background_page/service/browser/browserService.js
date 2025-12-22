@@ -29,7 +29,9 @@ export default class BrowserService {
    * @returns {boolean}
    */
   static isChromeAndMv3() {
-    return browser.runtime.getManifest().manifest_version === 3
-      && browser.runtime.getURL("/").startsWith("chrome-extension://");
+    return (
+      browser.runtime.getManifest().manifest_version === 3 &&
+      browser.runtime.getURL("/").startsWith("chrome-extension://")
+    );
   }
 }

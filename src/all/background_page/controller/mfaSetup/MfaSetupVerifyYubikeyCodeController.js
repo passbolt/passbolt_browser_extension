@@ -15,7 +15,6 @@
 import MfaSetupYubikeyEntity from "../../model/entity/mfa/mfaSetupYubikeyEntity";
 import MultiFactorAuthenticationModel from "../../model/multiFactorAuthentication/multiFactorAuthenticationModel";
 
-
 class MfaSetupVerifyYubikeyCodeController {
   /**
    * MfaSetupVerifyYubikeyCodeController constructor
@@ -39,7 +38,7 @@ class MfaSetupVerifyYubikeyCodeController {
       this.worker.port.emit(this.requestId, "SUCCESS", response);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

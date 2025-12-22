@@ -30,11 +30,14 @@ class AccountRecoveryPrivateKeyPasswordDecryptedDataEntity extends Entity {
    * @inheritDoc
    */
   constructor(dto, options = {}) {
-    super(EntitySchema.validate(
-      AccountRecoveryPrivateKeyPasswordDecryptedDataEntity.ENTITY_NAME,
-      dto,
-      AccountRecoveryPrivateKeyPasswordDecryptedDataEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        AccountRecoveryPrivateKeyPasswordDecryptedDataEntity.ENTITY_NAME,
+        dto,
+        AccountRecoveryPrivateKeyPasswordDecryptedDataEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -43,8 +46,8 @@ class AccountRecoveryPrivateKeyPasswordDecryptedDataEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
+      type: "object",
+      required: [
         "type",
         "version",
         "domain",
@@ -53,37 +56,37 @@ class AccountRecoveryPrivateKeyPasswordDecryptedDataEntity extends Entity {
         "private_key_secret",
         "created",
       ],
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": ["account-recovery-private-key-password-decrypted-data"]
+      properties: {
+        type: {
+          type: "string",
+          enum: ["account-recovery-private-key-password-decrypted-data"],
         },
-        "version": {
-          "type": "string",
-          "enum": ["v1"]
+        version: {
+          type: "string",
+          enum: ["v1"],
         },
-        "domain": {
-          "type": "string",
+        domain: {
+          type: "string",
         },
-        "private_key_user_id": {
-          "type": "string",
-          "format": "uuid"
+        private_key_user_id: {
+          type: "string",
+          format: "uuid",
         },
-        "private_key_fingerprint": {
-          "type": "string",
-          "minLength": PRIVATE_KEY_FINGERPRINT_MIN_LENGTH,
-          "maxLength": PRIVATE_KEY_FINGERPRINT_MAX_LENGTH
+        private_key_fingerprint: {
+          type: "string",
+          minLength: PRIVATE_KEY_FINGERPRINT_MIN_LENGTH,
+          maxLength: PRIVATE_KEY_FINGERPRINT_MAX_LENGTH,
         },
-        "private_key_secret": {
-          "type": "string",
-          "minLength": PRIVATE_KEY_SECRET_MIN_LENGTH,
-          "maxLength": PRIVATE_KEY_SECRET_MAX_LENGTH
+        private_key_secret: {
+          type: "string",
+          minLength: PRIVATE_KEY_SECRET_MIN_LENGTH,
+          maxLength: PRIVATE_KEY_SECRET_MAX_LENGTH,
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-      }
+      },
     };
   }
 

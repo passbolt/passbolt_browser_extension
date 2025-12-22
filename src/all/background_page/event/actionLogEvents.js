@@ -17,7 +17,7 @@ import FindAllForActionLogController from "./findAllForActionLogController";
  * @param {Worker} worker The worker
  * @param {ApiClientOptions} apiClientOptions The api client options
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Find all action logs for a given instance
    *
@@ -25,10 +25,10 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param options {object} The options to apply to the find
    */
-  worker.port.on('passbolt.actionlogs.find-all-for', async(requestId, foreignModel, foreignId, {page, limit}) => {
+  worker.port.on("passbolt.actionlogs.find-all-for", async (requestId, foreignModel, foreignId, { page, limit }) => {
     const controller = new FindAllForActionLogController(worker, requestId, apiClientOptions, account);
-    await controller._exec(foreignModel, foreignId, {page, limit});
+    await controller._exec(foreignModel, foreignId, { page, limit });
   });
 };
 
-export const ActionLogEvents = {listen};
+export const ActionLogEvents = { listen };

@@ -15,7 +15,6 @@
 import LocaleModel from "../../model/locale/localeModel";
 import LocaleEntity from "../../model/entity/locale/localeEntity";
 
-
 class GetAndInitSetupLocaleController {
   /**
    * Constructor.
@@ -38,10 +37,10 @@ class GetAndInitSetupLocaleController {
   async _exec() {
     try {
       const result = await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -57,14 +56,15 @@ class GetAndInitSetupLocaleController {
    */
   async exec() {
     if (!this.account.locale) {
-      const detectedLocale = await this.localeModel.getSupportedLocale(navigator.language)
-        || await this.localeModel.getLocaleWithSimilarLanguage(navigator.language)
-        || await this.localeModel.getOrganizationLocale()
-        || LocaleModel.DEFAULT_LOCALE;
+      const detectedLocale =
+        (await this.localeModel.getSupportedLocale(navigator.language)) ||
+        (await this.localeModel.getLocaleWithSimilarLanguage(navigator.language)) ||
+        (await this.localeModel.getOrganizationLocale()) ||
+        LocaleModel.DEFAULT_LOCALE;
       this.account.locale = detectedLocale.locale;
     }
 
-    const locale = new LocaleEntity({locale: this.account.locale});
+    const locale = new LocaleEntity({ locale: this.account.locale });
 
     // @todo It is not the best place to initialize the background page i18next library.
     this.localeModel.initializeI18next(locale);

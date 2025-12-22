@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
@@ -36,10 +36,10 @@ class VerifyImportedKeyPassphraseController {
   async _exec(passphrase) {
     try {
       await this.exec(passphrase);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -55,7 +55,7 @@ class VerifyImportedKeyPassphraseController {
     const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
     const privateArmoredKey = temporaryAccount.account?.userPrivateArmoredKey;
     if (!privateArmoredKey) {
-      throw new Error('An account user private key is required.');
+      throw new Error("An account user private key is required.");
     }
     if (typeof passphrase !== "string") {
       throw new TypeError("The passphrase should be a string.");

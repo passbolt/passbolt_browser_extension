@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const USER_SERVICE_RESOURCE_NAME = 'users';
+const USER_SERVICE_RESOURCE_NAME = "users";
 
 class UserService extends AbstractService {
   /**
@@ -43,17 +43,17 @@ class UserService extends AbstractService {
    */
   static getSupportedContainOptions() {
     return [
-      'LastLoggedIn', // @deprecated v2.13 should use last_logged_in
-      'is_mfa_enabled',
+      "LastLoggedIn", // @deprecated v2.13 should use last_logged_in
+      "is_mfa_enabled",
       // since v3
-      'last_logged_in', // only use when v2.13 support is dropped
-      'gpgkey',
-      'groups_users',
-      'profile',
-      'role',
-      'account_recovery_user_setting',
-      'pending_account_recovery_request',
-      'missing_metadata_key_ids'
+      "last_logged_in", // only use when v2.13 support is dropped
+      "gpgkey",
+      "groups_users",
+      "profile",
+      "role",
+      "account_recovery_user_setting",
+      "pending_account_recovery_request",
+      "missing_metadata_key_ids",
     ];
   }
 
@@ -63,13 +63,7 @@ class UserService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedFiltersOptions() {
-    return [
-      'search',
-      'has-groups',
-      'has-access',
-      'is-admin',
-      'is-active'
-    ];
+    return ["search", "has-groups", "has-access", "is-admin", "is-active"];
   }
 
   /**
@@ -79,14 +73,14 @@ class UserService extends AbstractService {
    */
   static getSupportedOrdersOptions() {
     return [
-      'Profile.first_name DESC',
-      'Profile.first_name ASC',
-      'Profile.last_name DESC',
-      'Profile.last_name ASC',
-      'Profile.created DESC',
-      'Profile.created ASC',
-      'Profile.modified DESC',
-      'Profile.modified ASC'
+      "Profile.first_name DESC",
+      "Profile.first_name ASC",
+      "Profile.last_name DESC",
+      "Profile.last_name ASC",
+      "Profile.created DESC",
+      "Profile.created ASC",
+      "Profile.modified DESC",
+      "Profile.modified ASC",
     ];
   }
 
@@ -103,7 +97,7 @@ class UserService extends AbstractService {
     this.assertValidId(id);
     contains = contains ? this.formatContainOptions(contains, UserService.getSupportedContainOptions()) : null;
 
-    const options = {...contains};
+    const options = { ...contains };
     const response = await this.apiClient.get(id, options);
     return response.body;
   }
@@ -119,11 +113,11 @@ class UserService extends AbstractService {
    * @public
    */
   async findAll(contains, filters, orders) {
-    const legacyContain = UserService.remapToLegacyContain(contains);// crassette
+    const legacyContain = UserService.remapToLegacyContain(contains); // crassette
     contains = contains ? this.formatContainOptions(legacyContain, UserService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(filters, UserService.getSupportedFiltersOptions()) : null;
     orders = orders ? this.formatOrderOptions(orders, UserService.getSupportedFiltersOptions()) : null;
-    const options = {...contains, ...filters, ...orders};
+    const options = { ...contains, ...filters, ...orders };
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];
@@ -145,7 +139,7 @@ class UserService extends AbstractService {
     if (!contains) {
       return undefined;
     }
-    if (Object.prototype.hasOwnProperty.call(contains, 'last_logged_in')) {
+    if (Object.prototype.hasOwnProperty.call(contains, "last_logged_in")) {
       contains.LastLoggedIn = contains.last_logged_in;
       delete contains.last_logged_in;
     }
@@ -201,7 +195,7 @@ class UserService extends AbstractService {
     body.append("profile[avatar][file]", file, filename);
     const fetchOptions = await this.apiClient.buildFetchOptions();
     // It is required to let this property unset in order to let the browser determine it by itself and set the additional variable boundary required by the API to parse the payload.
-    delete fetchOptions.headers['content-type'];
+    delete fetchOptions.headers["content-type"];
     const response = await this.apiClient.fetchAndHandleResponse("POST", url, body, fetchOptions);
     return response.body;
   }
@@ -219,7 +213,7 @@ class UserService extends AbstractService {
    */
   async delete(userId, transfer, dryRun) {
     this.assertValidId(userId);
-    const data = transfer ? {transfer: transfer} : {};
+    const data = transfer ? { transfer: transfer } : {};
     const response = await this.apiClient.delete(userId, data, {}, dryRun);
     return response.body;
   }
@@ -234,9 +228,9 @@ class UserService extends AbstractService {
    */
   async resendInvite(username) {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover`);
-    const data = {username: username};
+    const data = { username: username };
     const bodyString = this.apiClient.buildBody(data);
-    return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    return this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
   }
 
   /**
@@ -245,7 +239,7 @@ class UserService extends AbstractService {
    */
   async keepSessionAlive() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/me`, {});
-    await this.apiClient.fetchAndHandleResponse('GET', url);
+    await this.apiClient.fetchAndHandleResponse("GET", url);
     return true;
   }
 
@@ -258,7 +252,7 @@ class UserService extends AbstractService {
   async requestHelpCredentialsLost(requestHelpDto) {
     const bodyString = this.apiClient.buildBody(requestHelpDto);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover`, {});
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
     return response.body;
   }
 }

@@ -14,7 +14,7 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import AccountRecoveryPrivateKeyPasswordsCollection from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
 import UserEntity from "../user/userEntity";
 import AccountRecoveryOrganizationPublicKeyEntity from "./accountRecoveryOrganizationPublicKeyEntity";
@@ -35,28 +35,43 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    * @throws {EntityValidationError} Build rule checking if the provided public key id matches the one provided as metadata.
    */
   constructor(accountRecoveryOrganizationPolicyDto, options = {}) {
-    super(EntitySchema.validate(
-      AccountRecoveryOrganizationPolicyEntity.ENTITY_NAME,
-      accountRecoveryOrganizationPolicyDto,
-      AccountRecoveryOrganizationPolicyEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        AccountRecoveryOrganizationPolicyEntity.ENTITY_NAME,
+        accountRecoveryOrganizationPolicyDto,
+        AccountRecoveryOrganizationPolicyEntity.getSchema(),
+      ),
+      options,
+    );
 
     // Associations
     if (this._props.account_recovery_organization_public_key) {
-      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key, {clone: false});
-      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.public_key_id);
+      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(
+        this._props.account_recovery_organization_public_key,
+        { clone: false },
+      );
+      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(
+        this._account_recovery_organization_public_key,
+        this.public_key_id,
+      );
       delete this._props.account_recovery_organization_public_key;
     }
     if (this._props.account_recovery_organization_revoked_key) {
-      this._account_recovery_organization_revoked_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_revoked_key, {clone: false});
+      this._account_recovery_organization_revoked_key = new AccountRecoveryOrganizationPublicKeyEntity(
+        this._props.account_recovery_organization_revoked_key,
+        { clone: false },
+      );
       delete this._props.account_recovery_organization_revoked_key;
     }
     if (this._props.account_recovery_private_key_passwords) {
-      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords, {clone: false});
+      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(
+        this._props.account_recovery_private_key_passwords,
+        { clone: false },
+      );
       delete this._props.account_recovery_private_key_passwords;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator, {clone: false});
+      this._creator = new UserEntity(this._props.creator, { clone: false });
       delete this._props.creator;
     }
   }
@@ -67,50 +82,48 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "policy"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["policy"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "policy": {
-          "type": "string",
-          "enum": [
+        policy: {
+          type: "string",
+          enum: [
             AccountRecoveryOrganizationPolicyEntity.POLICY_DISABLED,
             AccountRecoveryOrganizationPolicyEntity.POLICY_MANDATORY,
             AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_IN,
             AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_OUT,
-          ]
+          ],
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
-        "public_key_id": {
-          "type": "string",
-          "format": "uuid",
-          "nullable": true,
+        public_key_id: {
+          type: "string",
+          format: "uuid",
+          nullable: true,
         },
-        "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
-        "account_recovery_organization_revoked_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
-        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema(),
-        "creator": UserEntity.getSchema(),
-      }
+        account_recovery_organization_public_key: AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
+        account_recovery_organization_revoked_key: AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
+        account_recovery_private_key_passwords: AccountRecoveryPrivateKeyPasswordsCollection.getSchema(),
+        creator: UserEntity.getSchema(),
+      },
     };
   }
 
@@ -154,7 +167,7 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
       account_recovery_organization_public_key: true,
       account_recovery_organization_revoked_key: true,
       account_recovery_private_key_passwords: true,
-      creator: true
+      creator: true,
     });
   }
 
@@ -172,12 +185,22 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    * @param {string} [accountRecoveryOrganizationKeyId] optional
    * @throws {EntityValidationError} if not valid
    */
-  static assertValidAccountRecoveryOrganizationPublicKey(accountRecoveryOrganizationPublicKey, accountRecoveryOrganizationKeyId) {
+  static assertValidAccountRecoveryOrganizationPublicKey(
+    accountRecoveryOrganizationPublicKey,
+    accountRecoveryOrganizationKeyId,
+  ) {
     if (!accountRecoveryOrganizationPublicKey) {
-      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidAccountRecoveryOrganizationPublicKey expect an accountRecoveryOrganizationPublicKey.');
+      throw new EntityValidationError(
+        "AccountRecoveryOrganizationPolicyEntity assertValidAccountRecoveryOrganizationPublicKey expect an accountRecoveryOrganizationPublicKey.",
+      );
     }
-    if (accountRecoveryOrganizationKeyId && (accountRecoveryOrganizationPublicKey.id !== accountRecoveryOrganizationKeyId)) {
-      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidPermission resource id doesnt not match foreign key permission.');
+    if (
+      accountRecoveryOrganizationKeyId &&
+      accountRecoveryOrganizationPublicKey.id !== accountRecoveryOrganizationKeyId
+    ) {
+      throw new EntityValidationError(
+        "AccountRecoveryOrganizationPolicyEntity assertValidPermission resource id doesnt not match foreign key permission.",
+      );
     }
   }
 
@@ -197,22 +220,30 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
   static async assertValidCreatorGpgkey(entity) {
     const creator = entity.creator;
     if (!creator) {
-      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects a creator to be defined.');
+      throw new EntityValidationError(
+        "AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects a creator to be defined.",
+      );
     }
 
     const gpgkey = creator.gpgkey;
     if (!gpgkey) {
-      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects a creator.gpgkey to be defined.');
+      throw new EntityValidationError(
+        "AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects a creator.gpgkey to be defined.",
+      );
     }
 
     if (creator.id !== gpgkey.userId) {
-      throw new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the creator's id to match the gpgkey.user_id.");
+      throw new EntityValidationError(
+        "AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the creator's id to match the gpgkey.user_id.",
+      );
     }
 
     const key = await OpenpgpAssertion.readKeyOrFail(gpgkey.armoredKey);
     const computedFingerprint = key.getFingerprint().toUpperCase();
     if (computedFingerprint !== gpgkey.fingerprint.toUpperCase()) {
-      throw new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the gpgkey armoredKey's fingerprint to match the given fingerprint.");
+      throw new EntityValidationError(
+        "AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the gpgkey armoredKey's fingerprint to match the given fingerprint.",
+      );
     }
   }
 
@@ -243,7 +274,9 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    * @returns {string|null}
    */
   get armoredKey() {
-    return this._account_recovery_organization_public_key ? this._account_recovery_organization_public_key.armoredKey : null;
+    return this._account_recovery_organization_public_key
+      ? this._account_recovery_organization_public_key.armoredKey
+      : null;
   }
 
   /**
@@ -251,7 +284,9 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    * @returns {string|null}
    */
   get revokedKey() {
-    return this._account_recovery_organization_revoked_key ? this._account_recovery_organization_revoked_key.armoredKey : null;
+    return this._account_recovery_organization_revoked_key
+      ? this._account_recovery_organization_revoked_key.armoredKey
+      : null;
   }
 
   /**

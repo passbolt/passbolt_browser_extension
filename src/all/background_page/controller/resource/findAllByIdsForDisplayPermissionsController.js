@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.1
  */
-import {assertArrayUUID} from "../../utils/assertions";
+import { assertArrayUUID } from "../../utils/assertions";
 import FindResourcesService from "../../service/resource/findResourcesService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
@@ -39,10 +39,10 @@ class FindAllByIdsForDisplayPermissionsController {
   async _exec(resourceIds) {
     try {
       const result = await this.exec(resourceIds);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -67,7 +67,7 @@ class FindAllByIdsForDisplayPermissionsController {
       if (!(error instanceof UserPassphraseRequiredError)) {
         throw error;
       }
-      const passphrase =  await this.getPassphraseService.getPassphrase(this.worker, 60);
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker, 60);
       return this.findResourcesService.findAllByIdsForDisplayPermissions(resourceIds, passphrase);
     }
   }

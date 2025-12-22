@@ -15,24 +15,27 @@ import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/
 import GroupUserChangeEntity from "./groupUserChangeEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'GroupUserChanges';
+const ENTITY_NAME = "GroupUserChanges";
 
 class GroupUserChangesCollection extends EntityCollection {
   /**
    * @inheritDoc
    */
   constructor(groupUserChangesDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupUserChangesCollection.ENTITY_NAME,
-      groupUserChangesDto,
-      GroupUserChangesCollection.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        GroupUserChangesCollection.ENTITY_NAME,
+        groupUserChangesDto,
+        GroupUserChangesCollection.getSchema(),
+      ),
+      options,
+    );
 
     /*
      * Note: there is no "multi-item" validation
      * Collection validation will fail at the first item that doesn't validate
      */
-    this._props.forEach(groupUserChange => {
+    this._props.forEach((groupUserChange) => {
       this.push(groupUserChange);
     });
 
@@ -47,8 +50,8 @@ class GroupUserChangesCollection extends EntityCollection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": GroupUserChangeEntity.getSchema(),
+      type: "array",
+      items: GroupUserChangeEntity.getSchema(),
     };
   }
 
@@ -59,8 +62,13 @@ class GroupUserChangesCollection extends EntityCollection {
    * @param {GroupsUsersCollection} expectedSet The expected set of groups users
    */
   static createFromGroupsUsersCollectionsChanges(originalSet, expectedSet) {
-    if (!originalSet || !(originalSet instanceof GroupsUsersCollection) || !expectedSet || !(expectedSet instanceof GroupsUsersCollection)) {
-      throw new TypeError('GroupUserChangesCollection createFromGroupsUsersCollectionsChanges invalid parameters');
+    if (
+      !originalSet ||
+      !(originalSet instanceof GroupsUsersCollection) ||
+      !expectedSet ||
+      !(expectedSet instanceof GroupsUsersCollection)
+    ) {
+      throw new TypeError("GroupUserChangesCollection createFromGroupsUsersCollectionsChanges invalid parameters");
     }
     const result = new GroupUserChangesCollection([]);
 
@@ -68,12 +76,18 @@ class GroupUserChangesCollection extends EntityCollection {
     for (const updatedGroupUser of expectedSet) {
       const groupUser = originalSet.getGroupUserByUserId(updatedGroupUser.userId);
       if (!groupUser) {
-        const newChange = GroupUserChangeEntity.createFromGroupUser(updatedGroupUser, GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE);
+        const newChange = GroupUserChangeEntity.createFromGroupUser(
+          updatedGroupUser,
+          GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE,
+        );
         result.push(newChange);
       } else {
         if (updatedGroupUser.isAdmin !== groupUser.isAdmin) {
           updatedGroupUser.id = groupUser.id;
-          const newChange = GroupUserChangeEntity.createFromGroupUser(updatedGroupUser, GroupUserChangeEntity.GROUP_USER_CHANGE_UPDATE);
+          const newChange = GroupUserChangeEntity.createFromGroupUser(
+            updatedGroupUser,
+            GroupUserChangeEntity.GROUP_USER_CHANGE_UPDATE,
+          );
           result.push(newChange);
         }
       }
@@ -82,7 +96,10 @@ class GroupUserChangesCollection extends EntityCollection {
     // Find deleted groups users
     for (const originalGroupUser of originalSet) {
       if (!expectedSet.getById(originalGroupUser.id)) {
-        const newChange = GroupUserChangeEntity.createFromGroupUser(originalGroupUser, GroupUserChangeEntity.GROUP_USER_CHANGE_DELETE);
+        const newChange = GroupUserChangeEntity.createFromGroupUser(
+          originalGroupUser,
+          GroupUserChangeEntity.GROUP_USER_CHANGE_DELETE,
+        );
         result.push(newChange);
       }
     }
@@ -101,7 +118,7 @@ class GroupUserChangesCollection extends EntityCollection {
    * @param {GroupUserChangeEntity} groupUserChange DTO or GroupUserChangeEntity
    */
   push(groupUserChange) {
-    if (!groupUserChange || typeof groupUserChange !== 'object') {
+    if (!groupUserChange || typeof groupUserChange !== "object") {
       throw new TypeError(`GroupUserChangesCollection push parameter should be an object.`);
     }
     if (groupUserChange instanceof GroupUserChangeEntity) {

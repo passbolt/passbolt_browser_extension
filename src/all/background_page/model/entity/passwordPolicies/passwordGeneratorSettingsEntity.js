@@ -15,18 +15,21 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'PasswordGeneratorSettings';
+const ENTITY_NAME = "PasswordGeneratorSettings";
 
 class PasswordGeneratorSettingsEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(passwordGeneratorSettingsDto, options = {}) {
-    super(EntitySchema.validate(
-      PasswordGeneratorSettingsEntity.ENTITY_NAME,
-      passwordGeneratorSettingsDto,
-      PasswordGeneratorSettingsEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        PasswordGeneratorSettingsEntity.ENTITY_NAME,
+        passwordGeneratorSettingsDto,
+        PasswordGeneratorSettingsEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -35,8 +38,8 @@ class PasswordGeneratorSettingsEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
+      type: "object",
+      required: [
         "length",
         "mask_upper",
         "mask_lower",
@@ -52,51 +55,51 @@ class PasswordGeneratorSettingsEntity extends Entity {
         "min_length",
         "max_length",
       ],
-      "properties": {
-        "length": {
-          "type": "integer",
-          "minimum": 8,
-          "maximum": 128,
+      properties: {
+        length: {
+          type: "integer",
+          minimum: 8,
+          maximum: 128,
         },
-        "mask_upper": {
-          "type": "boolean",
+        mask_upper: {
+          type: "boolean",
         },
-        "mask_lower": {
-          "type": "boolean",
+        mask_lower: {
+          type: "boolean",
         },
-        "mask_digit": {
-          "type": "boolean",
+        mask_digit: {
+          type: "boolean",
         },
-        "mask_parenthesis": {
-          "type": "boolean",
+        mask_parenthesis: {
+          type: "boolean",
         },
-        "mask_emoji": {
-          "type": "boolean",
+        mask_emoji: {
+          type: "boolean",
         },
-        "mask_char1": {
-          "type": "boolean",
+        mask_char1: {
+          type: "boolean",
         },
-        "mask_char2": {
-          "type": "boolean",
+        mask_char2: {
+          type: "boolean",
         },
-        "mask_char3": {
-          "type": "boolean",
+        mask_char3: {
+          type: "boolean",
         },
-        "mask_char4": {
-          "type": "boolean",
+        mask_char4: {
+          type: "boolean",
         },
-        "mask_char5": {
-          "type": "boolean",
+        mask_char5: {
+          type: "boolean",
         },
-        "exclude_look_alike_chars": {
-          "type": "boolean",
+        exclude_look_alike_chars: {
+          type: "boolean",
         },
-        "min_length": {
-          "type": "integer",
+        min_length: {
+          type: "integer",
         },
-        "max_length": {
-          "type": "integer",
-        }
+        max_length: {
+          type: "integer",
+        },
       },
     };
   }
@@ -121,22 +124,25 @@ class PasswordGeneratorSettingsEntity extends Entity {
    * @returns {PasswordGeneratorSettingsEntity}
    */
   static createFromDefault(data = {}, options = {}) {
-    const defaultDto = Object.assign({
-      length: 18,
-      min_length: 8,
-      max_length: 128,
-      mask_upper: true,
-      mask_lower: true,
-      mask_digit: true,
-      mask_parenthesis: true,
-      mask_char1: true,
-      mask_char2: true,
-      mask_char3: true,
-      mask_char4: true,
-      mask_char5: true,
-      mask_emoji: false,
-      exclude_look_alike_chars: true,
-    }, data);
+    const defaultDto = Object.assign(
+      {
+        length: 18,
+        min_length: 8,
+        max_length: 128,
+        mask_upper: true,
+        mask_lower: true,
+        mask_digit: true,
+        mask_parenthesis: true,
+        mask_char1: true,
+        mask_char2: true,
+        mask_char3: true,
+        mask_char4: true,
+        mask_char5: true,
+        mask_emoji: false,
+        exclude_look_alike_chars: true,
+      },
+      data,
+    );
 
     return new PasswordGeneratorSettingsEntity(defaultDto, options);
   }

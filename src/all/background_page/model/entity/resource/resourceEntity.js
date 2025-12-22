@@ -24,15 +24,12 @@ import UserEntity from "../user/userEntity";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import CanSuggestService from "passbolt-styleguide/src/shared/services/canSuggestService/canSuggestService";
 
-const ENTITY_NAME = 'Resource';
+const ENTITY_NAME = "Resource";
 
 export const METADATA_KEY_TYPE_USER_KEY = "user_key";
 export const METADATA_KEY_TYPE_METADATA_KEY = "shared_key";
 
-const SUPPORTED_METADATA_KEY_TYPES = [
-  METADATA_KEY_TYPE_USER_KEY,
-  METADATA_KEY_TYPE_METADATA_KEY,
-];
+const SUPPORTED_METADATA_KEY_TYPES = [METADATA_KEY_TYPE_USER_KEY, METADATA_KEY_TYPE_METADATA_KEY];
 
 class ResourceEntity extends EntityV2 {
   /**
@@ -52,39 +49,39 @@ class ResourceEntity extends EntityV2 {
 
     // Associations
     if (this._props.permission) {
-      this._permission = new PermissionEntity(this._props.permission, {...options, clone: false});
+      this._permission = new PermissionEntity(this._props.permission, { ...options, clone: false });
       ResourceEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
-      this._permissions = new PermissionsCollection(this._props.permissions, {...options, clone: false});
+      this._permissions = new PermissionsCollection(this._props.permissions, { ...options, clone: false });
       ResourceEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
     if (this._props.secrets) {
-      this._secrets = new ResourceSecretsCollection(this._props.secrets, {...options, clone: false});
+      this._secrets = new ResourceSecretsCollection(this._props.secrets, { ...options, clone: false });
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
     if (this._props.favorite) {
-      this._favorite = new FavoriteEntity(this._props.favorite, {...options, clone: false});
+      this._favorite = new FavoriteEntity(this._props.favorite, { ...options, clone: false });
       ResourceEntity.assertValidFavorite(this._favorite, this.id);
       delete this._props.favorite;
     }
     if (this._props.tags) {
-      this._tags = new TagsCollection(this._props.tags, {...options, clone: false});
+      this._tags = new TagsCollection(this._props.tags, { ...options, clone: false });
       delete this._props.tags;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator, {...options, clone: false});
+      this._creator = new UserEntity(this._props.creator, { ...options, clone: false });
       delete this._props._creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
+      this._modifier = new UserEntity(this._props.modifier, { ...options, clone: false });
       delete this._props._modifier;
     }
-    if (this._props.metadata && typeof this._props.metadata !== 'string') {
-      this._metadata = new ResourceMetadataEntity(this._props.metadata, {...options, clone: false});
+    if (this._props.metadata && typeof this._props.metadata !== "string") {
+      this._metadata = new ResourceMetadataEntity(this._props.metadata, { ...options, clone: false });
       delete this._props.metadata;
     }
   }
@@ -115,83 +112,83 @@ class ResourceEntity extends EntityV2 {
   static getSchema() {
     const userSchema = UserEntity.getSchema();
     return {
-      "type": "object",
-      "required": [
-        "metadata",
-        "resource_type_id"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["metadata", "resource_type_id"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "resource_type_id": {
-          "type": "string",
-          "format": "uuid"
+        resource_type_id: {
+          type: "string",
+          format: "uuid",
         },
-        "metadata_key_id": {
-          "type": "string",
-          "format": "uuid",
-          "nullable": true
+        metadata_key_id: {
+          type: "string",
+          format: "uuid",
+          nullable: true,
         },
-        "metadata_key_type": {
-          "type": "string",
-          "enum": SUPPORTED_METADATA_KEY_TYPES,
-          "nullable": true
+        metadata_key_type: {
+          type: "string",
+          enum: SUPPORTED_METADATA_KEY_TYPES,
+          nullable: true,
         },
-        "expired": {
-          "type": "string",
-          "format": "date-time",
-          "nullable": true,
+        expired: {
+          type: "string",
+          format: "date-time",
+          nullable: true,
         },
-        "deleted": {
-          "type": "boolean"
+        deleted: {
+          type: "boolean",
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
-        "folder_parent_id": {
-          "type": "string",
-          "format": "uuid",
-          "nullable": true,
+        folder_parent_id: {
+          type: "string",
+          format: "uuid",
+          nullable: true,
         },
-        "personal": {
-          "type": "boolean",
-          "nullable": true,
+        personal: {
+          type: "boolean",
+          nullable: true,
         },
         // Associated models
-        "metadata": {"anyOf": [
-          {
-            "type": "string",
-            "pattern": /^-----BEGIN PGP MESSAGE-----\r?\n((?:[!-9;-~]+:\s?.*\r?\n)*\r?\n)((?:[A-Za-z0-9+/]{1,76}\r?\n)*)([A-Za-z0-9+/]{1,76}={0,2}\r?\n)(=[A-Za-z0-9+/]{4}\r?\n)-----END PGP MESSAGE-----\s*$/
-          },
-          ResourceMetadataEntity.getSchema()
-        ]},
-        "favorite": {
-          ...FavoriteEntity.getSchema(),
-          "nullable": true,
+        metadata: {
+          anyOf: [
+            {
+              type: "string",
+              pattern:
+                /^-----BEGIN PGP MESSAGE-----\r?\n((?:[!-9;-~]+:\s?.*\r?\n)*\r?\n)((?:[A-Za-z0-9+/]{1,76}\r?\n)*)([A-Za-z0-9+/]{1,76}={0,2}\r?\n)(=[A-Za-z0-9+/]{4}\r?\n)-----END PGP MESSAGE-----\s*$/,
+            },
+            ResourceMetadataEntity.getSchema(),
+          ],
         },
-        "permission": PermissionEntity.getSchema(), // current user permission
-        "permissions": PermissionsCollection.getSchema(), // all users permissions
-        "resource_type": ResourceTypeEntity.getSchema(),
-        "secrets": ResourceSecretsCollection.getSchema(),
-        "tags": TagsCollection.getSchema(),
-        "creator": userSchema,
-        "modifier": userSchema,
-      }
+        favorite: {
+          ...FavoriteEntity.getSchema(),
+          nullable: true,
+        },
+        permission: PermissionEntity.getSchema(), // current user permission
+        permissions: PermissionsCollection.getSchema(), // all users permissions
+        resource_type: ResourceTypeEntity.getSchema(),
+        secrets: ResourceSecretsCollection.getSchema(),
+        tags: TagsCollection.getSchema(),
+        creator: userSchema,
+        modifier: userSchema,
+      },
     };
   }
 
@@ -213,7 +210,7 @@ class ResourceEntity extends EntityV2 {
       return result;
     }
     // preserve null state
-    if (typeof this._favorite !== 'undefined' && contain.favorite) {
+    if (typeof this._favorite !== "undefined" && contain.favorite) {
       result.favorite = this._favorite === null ? null : this._favorite.toDto();
     }
     if (this._permission && contain.permission) {
@@ -264,7 +261,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
-    if (typeof this._props.deleted === 'undefined') {
+    if (typeof this._props.deleted === "undefined") {
       return null;
     }
     return this._props.deleted;
@@ -344,7 +341,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {(boolean|null)}
    */
   isPersonal() {
-    if (Object.prototype.hasOwnProperty.call(this._props, 'personal')) {
+    if (Object.prototype.hasOwnProperty.call(this._props, "personal")) {
       return this._props.personal;
     }
 
@@ -370,7 +367,7 @@ class ResourceEntity extends EntityV2 {
    */
   isShared() {
     const personal = this.isPersonal();
-    if (personal === null)  {
+    if (personal === null) {
       return null;
     }
     return !personal;
@@ -474,10 +471,12 @@ class ResourceEntity extends EntityV2 {
    */
   canMove(parentFolder, destinationFolder) {
     if (this.isReadOnly()) {
-      return ((parentFolder === null || parentFolder.isPersonal()) &&
-        (destinationFolder === null || destinationFolder.isPersonal()));
+      return (
+        (parentFolder === null || parentFolder.isPersonal()) &&
+        (destinationFolder === null || destinationFolder.isPersonal())
+      );
     }
-    return (destinationFolder === null || !destinationFolder.isReadOnly());
+    return destinationFolder === null || !destinationFolder.isReadOnly();
   }
 
   /*
@@ -509,7 +508,7 @@ class ResourceEntity extends EntityV2 {
         name: resourceDTO.name,
         username: resourceDTO.username || null,
         uris: resourceDTO.uri ? [resourceDTO.uri] : [],
-        description: resourceDTO.description || null
+        description: resourceDTO.description || null,
       };
     }
     // Remove all legacy metadata at the root object
@@ -562,7 +561,7 @@ class ResourceEntity extends EntityV2 {
    * @returns {boolean}
    */
   isFavorited() {
-    return (this.favorite === true);
+    return this.favorite === true;
   }
 
   /**
@@ -605,7 +604,7 @@ class ResourceEntity extends EntityV2 {
    * @throws {EntityValidationError} if parent id is not a valid uuid
    */
   set folderParentId(folderParentId) {
-    const propName = 'folder_parent_id';
+    const propName = "folder_parent_id";
     if (folderParentId === null) {
       this._props[propName] = null;
       return;
@@ -644,7 +643,9 @@ class ResourceEntity extends EntityV2 {
    */
   set metadata(metadata) {
     if (metadata instanceof ResourceMetadataEntity) {
-      this._metadata = new ResourceMetadataEntity(metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN), {validate: false});
+      this._metadata = new ResourceMetadataEntity(metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN), {
+        validate: false,
+      });
       delete this._props.metadata;
     } else if (typeof metadata === "object") {
       this._metadata = new ResourceMetadataEntity(metadata);
@@ -670,7 +671,11 @@ class ResourceEntity extends EntityV2 {
    * @param {string} metadataKeyType
    */
   set metadataKeyType(metadataKeyType) {
-    EntitySchema.validateProp("metadata_key_type", metadataKeyType, ResourceEntity.getSchema().properties.metadata_key_type);
+    EntitySchema.validateProp(
+      "metadata_key_type",
+      metadataKeyType,
+      ResourceEntity.getSchema().properties.metadata_key_type,
+    );
     this._props.metadata_key_type = metadataKeyType;
   }
 
@@ -708,13 +713,15 @@ class ResourceEntity extends EntityV2 {
    */
   static assertValidPermission(permission, resourceId) {
     if (!permission) {
-      throw new EntityValidationError('ResourceEntity assertValidPermission expect a permission.');
+      throw new EntityValidationError("ResourceEntity assertValidPermission expect a permission.");
     }
     if (permission.aco !== PermissionEntity.ACO_RESOURCE) {
-      throw new EntityValidationError('ResourceEntity assertValidPermission not a valid resource permission.');
+      throw new EntityValidationError("ResourceEntity assertValidPermission not a valid resource permission.");
     }
-    if (resourceId && (permission.acoForeignKey !== resourceId)) {
-      throw new EntityValidationError('ResourceEntity assertValidPermission resource id doesnt not match foreign key permission.');
+    if (resourceId && permission.acoForeignKey !== resourceId) {
+      throw new EntityValidationError(
+        "ResourceEntity assertValidPermission resource id doesnt not match foreign key permission.",
+      );
     }
   }
 
@@ -727,7 +734,7 @@ class ResourceEntity extends EntityV2 {
    */
   static assertValidPermissions(permissions, resourceId) {
     if (!permissions || !permissions.length) {
-      throw new EntityValidationError('ResourceEntity assertValidPermissions expect an array of permissions.');
+      throw new EntityValidationError("ResourceEntity assertValidPermissions expect an array of permissions.");
     }
     for (const permission of permissions) {
       ResourceEntity.assertValidPermission(permission, resourceId);
@@ -743,14 +750,16 @@ class ResourceEntity extends EntityV2 {
    */
   static assertValidSecrets(secrets, resourceId) {
     if (!secrets || !secrets.length) {
-      throw new EntityValidationError('ResourceEntity assertValidSecrets cannot be empty.');
+      throw new EntityValidationError("ResourceEntity assertValidSecrets cannot be empty.");
     }
     if (!(secrets instanceof ResourceSecretsCollection)) {
-      throw new EntityValidationError('ResourceEntity assertValidSecrets expect a ResourceSecretsCollection.');
+      throw new EntityValidationError("ResourceEntity assertValidSecrets expect a ResourceSecretsCollection.");
     }
     for (const secret of secrets) {
-      if (secret.resourceId && (secret.resourceId !== resourceId)) {
-        throw new EntityValidationError('ResourceEntity assertValidSecrets secret resourceId should match the resource id.');
+      if (secret.resourceId && secret.resourceId !== resourceId) {
+        throw new EntityValidationError(
+          "ResourceEntity assertValidSecrets secret resourceId should match the resource id.",
+        );
       }
     }
   }
@@ -764,7 +773,9 @@ class ResourceEntity extends EntityV2 {
    */
   static assertValidFavorite(favorite, resourceId) {
     if (favorite.foreignKey !== resourceId) {
-      throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign key should match the resource id.');
+      throw new EntityValidationError(
+        "ResourceEntity assertValidFavorite favorite foreign key should match the resource id.",
+      );
     }
     /*
      * if (favorite.foreignModel !== FavoriteEntity.FAVORITE_RESOURCE) {
@@ -807,7 +818,15 @@ class ResourceEntity extends EntityV2 {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {permission: true, permissions: true, secrets: true, favorite: true, tag: true, creator: true, modifier: true};
+    return {
+      permission: true,
+      permissions: true,
+      secrets: true,
+      favorite: true,
+      tag: true,
+      creator: true,
+      modifier: true,
+    };
   }
 }
 

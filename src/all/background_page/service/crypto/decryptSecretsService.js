@@ -1,4 +1,3 @@
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -13,9 +12,9 @@
  * @since         5.7.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {assertType} from '../../utils/assertions';
-import SecretEntity from 'passbolt-styleguide/src/shared/models/entity/secret/secretEntity';
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import { assertType } from "../../utils/assertions";
+import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import ResourceTypeEntity from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import DecryptMessageService from "./decryptMessageService";
@@ -53,7 +52,12 @@ export default class DecryptSecretsService {
    * @param {object} [options] The options.
    * @param {object} [options.ignoreDecryptionError=false] ignore decryption errors.
    */
-  static async decryptAllFromSecretRevisions(secretRevisionsCollection, resourceTypesCollection, userDecryptedPrivateKey,  options = {ignoreDecryptionError: false}) {
+  static async decryptAllFromSecretRevisions(
+    secretRevisionsCollection,
+    resourceTypesCollection,
+    userDecryptedPrivateKey,
+    options = { ignoreDecryptionError: false },
+  ) {
     assertType(secretRevisionsCollection, ResourceSecretRevisionsCollection);
     assertType(resourceTypesCollection, ResourceTypesCollection);
     OpenpgpAssertion.assertDecryptedPrivateKey(userDecryptedPrivateKey);
@@ -66,7 +70,7 @@ export default class DecryptSecretsService {
 
       try {
         for (let j = 0; j < secretCollections.length; j++) {
-          const secretEntity =  secretCollections.items[j];
+          const secretEntity = secretCollections.items[j];
           await DecryptSecretsService.decryptOne(secretEntity, resourceType, userDecryptedPrivateKey);
         }
       } catch (e) {
@@ -85,7 +89,7 @@ export default class DecryptSecretsService {
    * @param {GpgPrivateKey} userDecryptedPrivateKey
    * @private
    */
-  static async decryptOne(secret, resourceType, userDecryptedPrivateKey)  {
+  static async decryptOne(secret, resourceType, userDecryptedPrivateKey) {
     assertType(secret, SecretEntity);
     assertType(resourceType, ResourceTypeEntity);
     OpenpgpAssertion.assertDecryptedPrivateKey(userDecryptedPrivateKey);
@@ -98,7 +102,9 @@ export default class DecryptSecretsService {
     const decryptedData = await DecryptMessageService.decrypt(message, userDecryptedPrivateKey);
     const secretEntityClass = DecryptSecretsService.getSecretEntityClassByResourceType(resourceType);
 
-    const secretEntity = resourceType.isPasswordString() ? new secretEntityClass({password: decryptedData})  : new secretEntityClass(JSON.parse(decryptedData));
+    const secretEntity = resourceType.isPasswordString()
+      ? new secretEntityClass({ password: decryptedData })
+      : new secretEntityClass(JSON.parse(decryptedData));
     secret.data = secretEntity;
   }
 

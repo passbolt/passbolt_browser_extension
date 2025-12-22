@@ -45,7 +45,14 @@ class UserModel {
    */
   async updateLocalStorage() {
     // contain pending_account_recovery_request is only available for admin or recovery contact role
-    const contains =  {profile: true, gpgkey: false, groups_users: false, last_logged_in: true, pending_account_recovery_request: true, account_recovery_user_setting: true};
+    const contains = {
+      profile: true,
+      gpgkey: false,
+      groups_users: false,
+      last_logged_in: true,
+      pending_account_recovery_request: true,
+      account_recovery_user_setting: true,
+    };
     // Add is_mfa_enabled contain if the user account role name is admin
 
     if (this.account && this.account.roleName === RoleEntity.ROLE_ADMIN) {
@@ -79,7 +86,7 @@ class UserModel {
   async getOrFindMe(refreshCache = false) {
     let user = await UserMeSessionStorageService.get(this.account);
     if (!user || refreshCache) {
-      const contains = {profile: true, role: true, account_recovery_user_setting: true};
+      const contains = { profile: true, role: true, account_recovery_user_setting: true };
       const organizationSettings = await this.organisationSettingsModel.getOrFind();
       if (organizationSettings.isPluginEnabled("metadata")) {
         contains.missing_metadata_key_ids = true;
@@ -100,7 +107,7 @@ class UserModel {
    */
   async getOrFindAll() {
     const usersDto = await UserLocalStorage.get();
-    if (typeof usersDto !== 'undefined') {
+    if (typeof usersDto !== "undefined") {
       return new UsersCollection(usersDto);
     }
     return this.updateLocalStorage();
@@ -122,7 +129,7 @@ class UserModel {
    */
   async findOne(userId, contains, ignoreInvalidEntity) {
     const userDto = await this.userService.get(userId, contains);
-    return new UserEntity(userDto, {ignoreInvalidEntity: ignoreInvalidEntity});
+    return new UserEntity(userDto, { ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
   /**
@@ -136,7 +143,7 @@ class UserModel {
    */
   async findAll(contains, filters, orders, ignoreInvalidEntity) {
     const usersDto = await this.userService.findAll(contains, filters, orders);
-    return new UsersCollection(usersDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
+    return new UsersCollection(usersDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
   /**
@@ -148,9 +155,9 @@ class UserModel {
    */
   async findAllIdsForResourceUpdate(userId) {
     if (!Validator.isUUID(userId)) {
-      throw new TypeError('Error in find all users for users updates. The user id is not a valid uuid.');
+      throw new TypeError("Error in find all users for users updates. The user id is not a valid uuid.");
     }
-    const usersDto = await this.userService.findAll(null, {'has-access': userId});
+    const usersDto = await this.userService.findAll(null, { "has-access": userId });
     const usersCollection = new UsersCollection(usersDto);
     return usersCollection.ids;
   }
@@ -168,7 +175,7 @@ class UserModel {
    * @public
    */
   async create(userEntity) {
-    const data = userEntity.toDto({profile: {avatar: false}});
+    const data = userEntity.toDto({ profile: { avatar: false } });
     const userDto = await this.userService.create(data);
     const newUserEntity = new UserEntity(userDto);
     await UserLocalStorage.addUser(newUserEntity);
@@ -184,9 +191,9 @@ class UserModel {
    * @public
    */
   async update(userEntity, ignoreInvalidEntity) {
-    const data = userEntity.toDto({profile: {avatar: false}});
+    const data = userEntity.toDto({ profile: { avatar: false } });
     const userDto = await this.userService.update(userEntity.id, data);
-    const updatedUserEntity = new UserEntity(userDto, {ignoreInvalidEntity});
+    const updatedUserEntity = new UserEntity(userDto, { ignoreInvalidEntity });
     await UserLocalStorage.updateUser(updatedUserEntity);
     return updatedUserEntity;
   }
@@ -202,7 +209,7 @@ class UserModel {
    */
   async updateAvatar(userId, avatarUpdateEntity, ignoreInvalidEntity) {
     const userDto = await this.userService.updateAvatar(userId, avatarUpdateEntity.file, avatarUpdateEntity.filename);
-    return  new UserEntity(userDto, {ignoreInvalidEntity});
+    return new UserEntity(userDto, { ignoreInvalidEntity });
   }
 
   /**
@@ -213,7 +220,7 @@ class UserModel {
   async requestHelpCredentialsLost(account) {
     const requestHelpDto = {
       username: account.username,
-      case: "lost-passphrase"
+      case: "lost-passphrase",
     };
     await this.userService.requestHelpCredentialsLost(requestHelpDto);
   }

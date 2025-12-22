@@ -14,7 +14,9 @@
 import CreateOffscreenDocumentService from "../offscreen/createOffscreenDocumentService";
 import HandleOffscreenResponseService from "../offscreen/handleOffscreenResponseService";
 
-const {SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN} = require("../../../offscreens/service/clipboard/writeClipobardOffscreenService");
+const {
+  SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN,
+} = require("../../../offscreens/service/clipboard/writeClipobardOffscreenService");
 
 export class RequestClipboardOffscreenService {
   /**
@@ -26,13 +28,14 @@ export class RequestClipboardOffscreenService {
     await CreateOffscreenDocumentService.createIfNotExistOffscreenDocument();
 
     const requestId = crypto.randomUUID();
-    const offscreenClipboardData = {clipboardContent};
+    const offscreenClipboardData = { clipboardContent };
 
     return new Promise((resolve, reject) => {
       // Stack the response listener callbacks.
-      HandleOffscreenResponseService.setResponseCallback(requestId, {resolve, reject});
-      return RequestClipboardOffscreenService.sendWriteTextOffscreenMessage(requestId, offscreenClipboardData)
-        .catch(reject);
+      HandleOffscreenResponseService.setResponseCallback(requestId, { resolve, reject });
+      return RequestClipboardOffscreenService.sendWriteTextOffscreenMessage(requestId, offscreenClipboardData).catch(
+        reject,
+      );
     });
   }
 

@@ -14,7 +14,7 @@
 class FileFormatError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'FileFormatError';
+    this.name = "FileFormatError";
   }
 }
 

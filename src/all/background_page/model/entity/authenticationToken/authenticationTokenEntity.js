@@ -15,22 +15,25 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 
 const ENTITY_NAME = "AuthenticationToken";
 
-const AUTHENTICATION_TOKEN_TYPE_LOGIN = 'login';
-const AUTHENTICATION_TOKEN_TYPE_MFA = 'mfa';
-const AUTHENTICATION_TOKEN_TYPE_MOBILE_TRANSFER = 'mobile_transfer';
-const AUTHENTICATION_TOKEN_TYPE_RECOVER = 'recover';
-const AUTHENTICATION_TOKEN_TYPE_REGISTER = 'register';
+const AUTHENTICATION_TOKEN_TYPE_LOGIN = "login";
+const AUTHENTICATION_TOKEN_TYPE_MFA = "mfa";
+const AUTHENTICATION_TOKEN_TYPE_MOBILE_TRANSFER = "mobile_transfer";
+const AUTHENTICATION_TOKEN_TYPE_RECOVER = "recover";
+const AUTHENTICATION_TOKEN_TYPE_REGISTER = "register";
 
 class AuthenticationTokenEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(authenticationTokenDto, options = {}) {
-    super(EntitySchema.validate(
-      AuthenticationTokenEntity.ENTITY_NAME,
-      authenticationTokenDto,
-      AuthenticationTokenEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        AuthenticationTokenEntity.ENTITY_NAME,
+        authenticationTokenDto,
+        AuthenticationTokenEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -39,41 +42,39 @@ class AuthenticationTokenEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "token"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["token"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "token": {
-          "type": "string",
-          "format": "uuid"
+        token: {
+          type: "string",
+          format: "uuid",
         },
-        "active": {
-          "type": "boolean"
+        active: {
+          type: "boolean",
         },
-        "type": {
-          "type": "string",
-          "enum": [
+        type: {
+          type: "string",
+          enum: [
             AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_LOGIN,
             AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_MFA,
             AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_MOBILE_TRANSFER,
             AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_RECOVER,
             AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_REGISTER,
-          ]
+          ],
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-      }
+      },
     };
   }
 

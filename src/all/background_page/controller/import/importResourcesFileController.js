@@ -15,7 +15,7 @@ import ImportResourcesFileEntity from "../../model/entity/import/importResources
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ImportResourcesService from "../../service/resource/import/ImportResourcesService";
-import {assertBase64String} from "../../utils/assertions";
+import { assertBase64String } from "../../utils/assertions";
 import FileTypeError from "../../error/fileTypeError";
 import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
@@ -36,7 +36,6 @@ class ImportResourcesFileController {
     this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
-
   /**
    * Wrapper of exec function to run it with worker.
    * @param {string} fileType The file type.
@@ -50,7 +49,7 @@ class ImportResourcesFileController {
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -70,7 +69,7 @@ class ImportResourcesFileController {
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
-    this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t('Initialize'));
+    this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t("Initialize"));
     await this.progressService.finishStep(null, true);
 
     try {

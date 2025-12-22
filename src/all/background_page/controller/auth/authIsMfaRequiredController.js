@@ -26,9 +26,9 @@ class AuthIsMfaRequiredController {
   async _exec() {
     try {
       const isMfaRequired = await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS', isMfaRequired);
+      this.worker.port.emit(this.requestId, "SUCCESS", isMfaRequired);
     } catch (error) {
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

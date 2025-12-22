@@ -41,10 +41,10 @@ class ResourceUpdateLocalStorageController {
   async _exec(options = {}) {
     try {
       await this.exec(options);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -61,12 +61,12 @@ class ResourceUpdateLocalStorageController {
        * 2. the metadata is encrypted with the shared‑metadata key, but this one is not yet decrypted in the session storage;
        * 3. the metadata is encrypted with the user’s private key.
        */
-      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll({updatePeriodThreshold: 10000});
+      await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll({ updatePeriodThreshold: 10000 });
     } catch (error) {
       if (!(error instanceof UserPassphraseRequiredError)) {
         throw error;
       }
-      const passphrase =  await this.getPassphraseService.getPassphrase(this.worker);
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       await PassphraseStorageService.set(passphrase, 60);
       await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll({}, passphrase);
     }

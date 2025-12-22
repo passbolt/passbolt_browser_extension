@@ -12,13 +12,13 @@
  * @since         3.0.0
  */
 import React from "react";
-import {createRoot} from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import ExtAuthenticationLogin from "passbolt-styleguide/src/react-extension/ExtAuthenticationLogin";
 import Port from "../lib/port";
 
 async function main() {
   const query = new URLSearchParams(window.location.search);
-  const portname = query.get('passbolt');
+  const portname = query.get("passbolt");
   const port = new Port(portname);
   await port.connect();
   const storage = browser.storage;
@@ -26,12 +26,7 @@ async function main() {
   document.body.appendChild(domContainer);
 
   const root = createRoot(domContainer);
-  root.render(
-    <ExtAuthenticationLogin
-      port={port}
-      storage={storage}
-    />
-  );
+  root.render(<ExtAuthenticationLogin port={port} storage={storage} />);
 }
 
 main();

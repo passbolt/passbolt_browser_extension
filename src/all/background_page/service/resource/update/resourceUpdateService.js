@@ -20,7 +20,7 @@ import ResourceModel from "../../../model/resource/resourceModel";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import UserModel from "../../../model/user/userModel";
 import Keyring from "../../../model/keyring";
-import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
@@ -58,7 +58,7 @@ class ResourceUpdateService {
     const resourceEntity = new ResourceEntity(resourceDto);
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
     const resourceTypeEntity = resourceTypesCollection.getFirstById(resourceEntity.resourceTypeId);
-    const permissionsCollection =  await this.findPermissionsService.findAllByAcoForeignKey(resourceEntity.id);
+    const permissionsCollection = await this.findPermissionsService.findAllByAcoForeignKey(resourceEntity.id);
 
     // Get users ids of those who have access to the resource
     const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
@@ -116,8 +116,14 @@ class ResourceUpdateService {
   async update(resourceEntity, resourceTypeEntity, metadataDecrypted) {
     // Post data & wrap up
     await this.progressService.finishStep(i18n.t("Saving resource"), true);
-    const data = resourceTypeEntity.isV5() ? resourceEntity.toDto({secrets: true}) : resourceEntity.toV4Dto({secrets: true});
-    const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
+    const data = resourceTypeEntity.isV5()
+      ? resourceEntity.toDto({ secrets: true })
+      : resourceEntity.toV4Dto({ secrets: true });
+    const resourceDto = await this.resourceService.update(
+      resourceEntity.id,
+      data,
+      ResourceLocalStorage.DEFAULT_CONTAIN,
+    );
     const updatedResourceEntity = new ResourceEntity(resourceDto);
     // If resource v5, metadata will be returned encrypted, replace it with the original decrypted copy.
     if (!updatedResourceEntity.isMetadataDecrypted()) {
@@ -140,11 +146,11 @@ class ResourceUpdateService {
     const secrets = [];
     for (let i = 0; i < usersIds.length; i++) {
       if (Object.prototype.hasOwnProperty.call(usersIds, i)) {
-        const userId =  usersIds[i];
+        const userId = usersIds[i];
         const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
         const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
         const data = await EncryptMessageService.encrypt(plaintextDto, userPublicKey, [privateKey]);
-        secrets.push({user_id: userId, data: data});
+        secrets.push({ user_id: userId, data: data });
         await this.progressService.finishStep(i18n.t("Encrypting Secret"), true);
       }
     }

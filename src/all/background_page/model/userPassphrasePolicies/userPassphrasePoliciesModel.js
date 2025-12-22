@@ -13,7 +13,7 @@
  */
 
 import UserPassphrasePoliciesService from "../../service/api/userPassphrasePolicies/userPassphrasePoliciesService";
-import {assertType} from "../../utils/assertions";
+import { assertType } from "../../utils/assertions";
 import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
 
 class UserPassphrasePoliciesModel {
@@ -48,7 +48,11 @@ class UserPassphrasePoliciesModel {
    * @returns {Promise<UserPassphrasePoliciesEntity>}
    */
   async save(userPassphrasePoliciesEntity) {
-    assertType(userPassphrasePoliciesEntity, UserPassphrasePoliciesEntity, 'The given entity is not a UserPassphrasePoliciesEntity');
+    assertType(
+      userPassphrasePoliciesEntity,
+      UserPassphrasePoliciesEntity,
+      "The given entity is not a UserPassphrasePoliciesEntity",
+    );
     const userPassphrasePoliciesDto = await this.userPassphrasePoliciesService.create(userPassphrasePoliciesEntity);
     return UserPassphrasePoliciesEntity.createFromDefault(userPassphrasePoliciesDto);
   }

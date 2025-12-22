@@ -23,21 +23,18 @@ class NeededSecretEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "user_id",
-        "resource_id"
-      ],
-      "properties": {
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["user_id", "resource_id"],
+      properties: {
+        user_id: {
+          type: "string",
+          format: "uuid",
         },
-        "resource_id": {
-          "type": "string",
-          "format": "uuid"
-        }
-      }
+        resource_id: {
+          type: "string",
+          format: "uuid",
+        },
+      },
     };
   }
 

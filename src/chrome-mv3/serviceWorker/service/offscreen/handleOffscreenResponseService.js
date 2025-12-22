@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.3.2
  */
-import {assertUuid} from "../../../../all/background_page/utils/assertions";
-import {SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER} from "../../../offscreens/service/clipboard/writeClipobardOffscreenService";
+import { assertUuid } from "../../../../all/background_page/utils/assertions";
+import { SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER } from "../../../offscreens/service/clipboard/writeClipobardOffscreenService";
 import {
   SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_POLLING_HANDLER,
-  SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER
+  SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER,
 } from "../../../offscreens/service/network/fetchOffscreenService";
-import {SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER} from "../../../offscreens/service/offscreen/handleOffscreenRequestService";
+import { SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER } from "../../../offscreens/service/offscreen/handleOffscreenRequestService";
 import ResponseClipboardOffscreenService from "../clipboard/responseClipboardOffscreenService";
 import ResponseFetchOffscreenService from "../network/responseFetchOffscreenService";
 
@@ -34,7 +34,8 @@ export default class HandleOffscreenResponseService {
    */
   static REPONSE_HANDLE_MAP = {
     [SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER]: ResponseFetchOffscreenService.handleFetchResponse,
-    [SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER]: ResponseClipboardOffscreenService.handleClipboardResponse,
+    [SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER]:
+      ResponseClipboardOffscreenService.handleClipboardResponse,
     [SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER]: HandleOffscreenResponseService.handleOffscreenError,
   };
 
@@ -110,7 +111,9 @@ export default class HandleOffscreenResponseService {
   static _consumeRequestPromiseCallbacksOrFail(id) {
     const offscreenRequestPromiseCallback = HandleOffscreenResponseService._offscreenResponsePromisesCallbacks[id];
     if (!offscreenRequestPromiseCallback) {
-      throw new Error("HandleOffscreenResponseService: No request promise callbacks found for the given offscreen fetch request id.");
+      throw new Error(
+        "HandleOffscreenResponseService: No request promise callbacks found for the given offscreen fetch request id.",
+      );
     }
     delete HandleOffscreenResponseService._offscreenResponsePromisesCallbacks[id];
 

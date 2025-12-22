@@ -16,7 +16,6 @@ import AccountLocalStorage from "../../service/local_storage/accountLocalStorage
 import SetupModel from "../../model/setup/setupModel";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 
-
 class AbortAndInitiateNewAccountRecoveryController {
   /**
    * Constructor.
@@ -40,10 +39,10 @@ class AbortAndInitiateNewAccountRecoveryController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -53,7 +52,10 @@ class AbortAndInitiateNewAccountRecoveryController {
    */
   async exec() {
     await this.setupModel.abortRecover(this.account);
-    await AccountLocalStorage.deleteByUserIdAndType(this.account.userId, AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY);
+    await AccountLocalStorage.deleteByUserIdAndType(
+      this.account.userId,
+      AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY,
+    );
     await this.userModel.requestHelpCredentialsLost(this.account);
   }
 }

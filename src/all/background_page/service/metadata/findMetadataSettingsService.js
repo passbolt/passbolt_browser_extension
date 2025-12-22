@@ -12,8 +12,7 @@
  * @since         4.10.0
  */
 import MetadataTypesSettingsApiService from "../api/metadata/metadataTypesSettingsApiService";
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import MetadataKeysSettingsApiService from "../api/metadata/metadataKeysSettingsApiService";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 

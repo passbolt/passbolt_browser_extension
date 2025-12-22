@@ -19,14 +19,14 @@ import AuthCheckStatusController from "../controller/auth/authCheckStatusControl
  * @param {ApiClientOptions} apiClientOptions
  * @param {AccountEntity} account the user account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Whenever the in-form call-to-action status is required
    * @listens passbolt.in-form-cta.check-status
    * @param requestId {uuid} The request identifier
    * @returns {*{isAuthenticated,isMfaRequired}
    */
-  worker.port.on('passbolt.in-form-cta.check-status', async(requestId, flushCache = false) => {
+  worker.port.on("passbolt.in-form-cta.check-status", async (requestId, flushCache = false) => {
     const authIsAuthenticatedController = new AuthCheckStatusController(worker, requestId);
     await authIsAuthenticatedController._exec(flushCache);
   });
@@ -37,7 +37,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @returns {*[]|number}
    */
-  worker.port.on('passbolt.in-form-cta.suggested-resources', async requestId => {
+  worker.port.on("passbolt.in-form-cta.suggested-resources", async (requestId) => {
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.countSuggestedResourcesCount(requestId);
   });
@@ -47,10 +47,10 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.in-form-cta.execute
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.in-form-cta.execute', async requestId => {
+  worker.port.on("passbolt.in-form-cta.execute", async (requestId) => {
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.execute(requestId);
   });
 };
 
-export const InformCallToActionEvents = {listen};
+export const InformCallToActionEvents = { listen };

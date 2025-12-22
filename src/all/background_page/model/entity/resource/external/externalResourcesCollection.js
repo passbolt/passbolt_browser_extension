@@ -14,7 +14,7 @@ import ResourcesCollection from "../resourcesCollection";
 import ExternalFoldersCollection from "../../folder/external/externalFoldersCollection";
 import ExternalResourceEntity from "./externalResourceEntity";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
-import {assertType} from "../../../../utils/assertions";
+import { assertType } from "../../../../utils/assertions";
 
 class ExternalResourcesCollection extends EntityV2Collection {
   /**
@@ -39,8 +39,8 @@ class ExternalResourcesCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": ExternalResourceEntity.getSchema(),
+      type: "array",
+      items: ExternalResourceEntity.getSchema(),
     };
   }
 
@@ -67,9 +67,9 @@ class ExternalResourcesCollection extends EntityV2Collection {
     assertType(resourcesCollection, ResourcesCollection);
     assertType(externalFoldersCollection, ExternalFoldersCollection);
 
-    const externalResourcesDto = resourcesCollection.resources.map(resourceEntity => {
+    const externalResourcesDto = resourcesCollection.resources.map((resourceEntity) => {
       const externalFolderParent = externalFoldersCollection.getById(resourceEntity.folderParentId);
-      const resourceDto = resourceEntity.toDto({secrets: true, metadata: true});
+      const resourceDto = resourceEntity.toDto({ secrets: true, metadata: true });
       return ExternalResourceEntity.buildDtoFromResourceEntityDto(resourceDto, externalFolderParent);
     });
     return new ExternalResourcesCollection(externalResourcesDto);
@@ -86,7 +86,7 @@ class ExternalResourcesCollection extends EntityV2Collection {
    * @returns {Array<ResourceEntityDto>}
    */
   toResourceCollectionImportDto() {
-    return this._items.map(item => item.toResourceEntityImportDto());
+    return this._items.map((item) => item.toResourceEntityImportDto());
   }
 
   /*
@@ -101,7 +101,7 @@ class ExternalResourcesCollection extends EntityV2Collection {
    * @return {array}
    */
   getByDepth(depth) {
-    return this._items.filter(externalResource => externalResource.depth === depth);
+    return this._items.filter((externalResource) => externalResource.depth === depth);
   }
 
   /**
@@ -113,7 +113,7 @@ class ExternalResourcesCollection extends EntityV2Collection {
     if (!folderParentId) {
       return [];
     }
-    return this._items.filter(externalResource => externalResource.folderParentId === folderParentId);
+    return this._items.filter((externalResource) => externalResource.folderParentId === folderParentId);
   }
 
   /*
@@ -125,14 +125,14 @@ class ExternalResourcesCollection extends EntityV2Collection {
     const uniqueIdsOrNullSetCache = new Set(this.extract("id"));
 
     // Build rules
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsOrNullSetCache.add(item.id);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsOrNullSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsOrNullSetCache },
+      ...options,
     };
     super.pushMany(data, entityOptions, options);
   }
@@ -155,7 +155,7 @@ class ExternalResourcesCollection extends EntityV2Collection {
    * @param {ExternalFolderEntity} rootFolder The folder to use as root
    */
   changeRootPath(rootFolder) {
-    this._items.forEach(resource => resource.changeRootPath(rootFolder));
+    this._items.forEach((resource) => resource.changeRootPath(rootFolder));
   }
 
   /**
@@ -165,7 +165,7 @@ class ExternalResourcesCollection extends EntityV2Collection {
   removeByPath(path) {
     for (let i = this._items.length - 1; i >= 0; i--) {
       const externalResourceEntity = this._items[i];
-      const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, '\\$&');
+      const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, "\\$&");
       const regex = new RegExp(`^${escapedPath}\/`);
       if (regex.exec(externalResourceEntity.path)) {
         this._items.splice(i, 1);

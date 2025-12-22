@@ -27,7 +27,7 @@ class FormDataUtils {
     const formDataSerialized = [];
     for (const [key, value] of formData.entries()) {
       const formDataObject = {
-        key: key
+        key: key,
       };
       // BLOB in FormData is transformed into a File
       if (value instanceof File) {
@@ -50,13 +50,13 @@ class FormDataUtils {
    */
   static arrayToFormData(array) {
     const formData = new FormData();
-    array.forEach(data => {
+    array.forEach((data) => {
       if (data.type === FormDataUtils.TYPE_SCALAR) {
         formData.append(data.key, data.value);
       } else {
-        const base64UrlSplit = data.value.split(',');
+        const base64UrlSplit = data.value.split(",");
         const blobBase64 = base64UrlSplit[1];
-        const mimeType = base64UrlSplit[0].split(':')[1].split(';')[0];
+        const mimeType = base64UrlSplit[0].split(":")[1].split(";")[0];
         const blob = Base64Utils.base64ToBlob(blobBase64, mimeType);
         formData.append(data.key, blob, data.name);
       }

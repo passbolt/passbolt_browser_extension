@@ -12,9 +12,9 @@
  * @since         3.6.0
  */
 
-import * as openpgp from 'openpgp';
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {assertType} from "../../utils/assertions";
+import * as openpgp from "openpgp";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import { assertType } from "../../utils/assertions";
 
 class EncryptMessageService {
   /**
@@ -62,7 +62,7 @@ class EncryptMessageService {
       message: gpgMessage,
       encryptionKeys: encryptionKey,
       signingKeys: signingKeys,
-      date: options.date
+      date: options.date,
     });
   }
 }

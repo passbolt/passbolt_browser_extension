@@ -12,11 +12,11 @@
  * @since         5.5.0
  */
 import ScimSettingsEntity from "passbolt-styleguide/src/shared/models/entity/scimSettings/scimSettingsEntity";
-import {assertType} from "../../../utils/assertions";
+import { assertType } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
-const SCIM_SETTINGS_SERVICE_RESOURCE_NAME = 'scim/settings';
+const SCIM_SETTINGS_SERVICE_RESOURCE_NAME = "scim/settings";
 
 class ScimSettingsApiService extends AbstractService {
   /**

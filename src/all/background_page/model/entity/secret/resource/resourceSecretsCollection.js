@@ -15,7 +15,7 @@ import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/se
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
-const ENTITY_NAME = 'ResourceSecrets';
+const ENTITY_NAME = "ResourceSecrets";
 
 const BUILD_RULE_SAME_RESOURCE = "same_resource";
 
@@ -44,8 +44,8 @@ class ResourceSecretsCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": SecretEntity.getSchema(),
+      type: "array",
+      items: SecretEntity.getSchema(),
     };
   }
 
@@ -64,8 +64,8 @@ class ResourceSecretsCollection extends EntityV2Collection {
    * @throws {EntityValidationError} If the secret does not have the same resource id than the other secrets of the collection.
    */
   validateBuildRules(item, options) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
-    this.assertNotExist("user_id", item._props.user_id, {haystackSet: options?.uniqueUsersIdsSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
+    this.assertNotExist("user_id", item._props.user_id, { haystackSet: options?.uniqueUsersIdsSetCache });
     this.assertSameResource(item);
   }
 
@@ -119,15 +119,15 @@ class ResourceSecretsCollection extends EntityV2Collection {
   pushMany(data, entityOptions = {}, options = {}) {
     const uniqueIdsSetCache = new Set(this.extract("id"));
     const uniqueUsersIdsSetCache = new Set(this.extract("user_id"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
       uniqueUsersIdsSetCache.add(item.userId);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueUsersIdsSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache, uniqueUsersIdsSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);

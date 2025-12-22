@@ -12,7 +12,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const USER_SERVICE_RESOURCE_NAME = 'mfa';
+const USER_SERVICE_RESOURCE_NAME = "mfa";
 
 class MultiFactorAuthenticationService extends AbstractService {
   /**
@@ -47,7 +47,7 @@ class MultiFactorAuthenticationService extends AbstractService {
   async disableMfaForUser(userId) {
     this.assertValidId(userId);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/${userId}`);
-    return this.apiClient.fetchAndHandleResponse('DELETE', url);
+    return this.apiClient.fetchAndHandleResponse("DELETE", url);
   }
 
   /**
@@ -60,7 +60,7 @@ class MultiFactorAuthenticationService extends AbstractService {
    */
   async getSettings() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/select`);
-    const settings = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const settings = await this.apiClient.fetchAndHandleResponse("GET", url);
     return settings.body;
   }
 
@@ -73,7 +73,7 @@ class MultiFactorAuthenticationService extends AbstractService {
    */
   async getMfaToTpSetupInfo() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/totp`);
-    const settings = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const settings = await this.apiClient.fetchAndHandleResponse("GET", url);
     return settings.body;
   }
 
@@ -87,7 +87,7 @@ class MultiFactorAuthenticationService extends AbstractService {
   async setupTotp(body) {
     const bodyString = this.apiClient.buildBody(body);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/totp`);
-    await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
   }
 
   /**
@@ -101,9 +101,8 @@ class MultiFactorAuthenticationService extends AbstractService {
   async setupYubikey(body) {
     const bodyString = this.apiClient.buildBody(body);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/yubikey`);
-    await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
   }
-
 
   /**
    * Verify the provider
@@ -113,7 +112,7 @@ class MultiFactorAuthenticationService extends AbstractService {
    */
   async verifyProvider(provider) {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/${provider}`);
-    const result = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const result = await this.apiClient.fetchAndHandleResponse("GET", url);
     return result.body;
   }
 
@@ -125,10 +124,9 @@ class MultiFactorAuthenticationService extends AbstractService {
    */
   async removeProvider(provider) {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/${provider}`);
-    const result = await this.apiClient.fetchAndHandleResponse('DELETE', url);
+    const result = await this.apiClient.fetchAndHandleResponse("DELETE", url);
     return result.body;
   }
 }
-
 
 export default MultiFactorAuthenticationService;

@@ -12,8 +12,7 @@
  * @since         4.11.0
  */
 
-import FindAndUpdateMetadataSettingsLocalStorageService
-  from "../../service/metadata/findAndUpdateMetadataSettingsLocalStorageService";
+import FindAndUpdateMetadataSettingsLocalStorageService from "../../service/metadata/findAndUpdateMetadataSettingsLocalStorageService";
 
 class FindMetadataKeysSettingsController {
   /**
@@ -26,7 +25,10 @@ class FindMetadataKeysSettingsController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndUpdateMetadataSettingsSessionStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateMetadataSettingsSessionStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(
+      account,
+      apiClientOptions,
+    );
   }
 
   /**
@@ -36,10 +38,10 @@ class FindMetadataKeysSettingsController {
   async _exec() {
     try {
       const result = await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

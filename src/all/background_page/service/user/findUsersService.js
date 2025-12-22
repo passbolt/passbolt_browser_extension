@@ -45,11 +45,11 @@ export default class FindUsersService {
     const supportedOptions = UserService.getSupportedContainOptions();
     const supportedFilter = UserService.getSupportedFiltersOptions();
 
-    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
+    if (contains && !Object.keys(contains).every((option) => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
     }
 
-    if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
+    if (filters && !Object.keys(filters).every((filter) => supportedFilter.includes(filter))) {
       throw new Error("Unsupported filter parameter used, please check supported filters");
     }
 
@@ -63,7 +63,7 @@ export default class FindUsersService {
     };
     const usersDto = await this.userApiService.findAll(sanitizedContains, filters);
 
-    return new UsersCollection(usersDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
+    return new UsersCollection(usersDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
   /**
@@ -72,7 +72,7 @@ export default class FindUsersService {
    * @throws {CollectionValidationError} if the data returned by the API does not validate.
    */
   async findAllActive() {
-    const filters = {"is-active": true};
+    const filters = { "is-active": true };
     return this.findAll({}, filters);
   }
 
@@ -82,8 +82,8 @@ export default class FindUsersService {
    * @throws {CollectionValidationError} if the data returned by the API does not validate.
    */
   async findAllActiveWithMissingKeys() {
-    const contains = {"missing_metadata_key_ids": true};
-    const filters = {"is-active": true};
+    const contains = { missing_metadata_key_ids: true };
+    const filters = { "is-active": true };
     return this.findAll(contains, filters);
   }
 }

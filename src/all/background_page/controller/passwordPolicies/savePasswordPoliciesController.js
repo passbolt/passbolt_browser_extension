@@ -36,7 +36,7 @@ class SavePasswordPoliciesController {
       this.worker.port.emit(this.requestId, "SUCCESS", savedSettings);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

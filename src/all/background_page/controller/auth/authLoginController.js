@@ -51,10 +51,10 @@ class AuthLoginController {
   async _exec(passphrase, remember, shouldRefreshCurrentTab = false) {
     try {
       await this.exec(passphrase, remember, shouldRefreshCurrentTab);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -94,16 +94,17 @@ class AuthLoginController {
     }
 
     try {
-      await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, passphrase);
+      await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(
+        this.account.userKeyFingerprint,
+        this.account.userPrivateArmoredKey,
+        passphrase,
+      );
       /*
        * Post login operations
        * MFA may not be complete yet, so no need to preload things here
        */
       if (rememberMe) {
-        await Promise.all([
-          PassphraseStorageService.set(passphrase, -1),
-          KeepSessionAliveService.start(),
-        ]);
+        await Promise.all([PassphraseStorageService.set(passphrase, -1), KeepSessionAliveService.start()]);
       } else {
         await PassphraseStorageService.set(passphrase, 60);
       }
@@ -126,7 +127,7 @@ class AuthLoginController {
    */
   async redirectToApp() {
     const url = this.account.domain;
-    browser.tabs.update(this.worker.tab.id, {url});
+    browser.tabs.update(this.worker.tab.id, { url });
   }
 
   /**
@@ -136,7 +137,7 @@ class AuthLoginController {
    */
   async registerRememberMeOption(rememberMe) {
     const duration = rememberMe ? -1 : 0;
-    const userRememberMeLatestChoiceEntity = new UserRememberMeLatestChoiceEntity({duration});
+    const userRememberMeLatestChoiceEntity = new UserRememberMeLatestChoiceEntity({ duration });
     await this.userRememberMeLatestChoiceLocalStorage.set(userRememberMeLatestChoiceEntity);
   }
 }

@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import i18n from "../../sdk/i18n";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
-import {GPG_KEY_TYPE_RSA} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
+import { GPG_KEY_TYPE_RSA } from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
 
 class ValidatePrivateGpgKeySetupController {
   /**
@@ -39,7 +39,7 @@ class ValidatePrivateGpgKeySetupController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -77,7 +77,11 @@ class ValidatePrivateGpgKeySetupController {
 
     if (keyInfo.algorithm === GPG_KEY_TYPE_RSA) {
       if (keyInfo.length < GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE) {
-        throw new Error(i18n.t("An RSA key should have a length of {{size}} bits minimum.", {size: GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE}));
+        throw new Error(
+          i18n.t("An RSA key should have a length of {{size}} bits minimum.", {
+            size: GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE,
+          }),
+        );
       }
     } else {
       if (!keyInfo.curve) {

@@ -42,7 +42,7 @@ const register = [
   CsvDashlaneRowParser,
   CsvMozillaPlatformRowParser,
   CsvNordpassRowParser,
-  CsvLogMeOnceRowParser
+  CsvLogMeOnceRowParser,
 ];
 
 class ResourcesCsvImportParser {
@@ -71,11 +71,11 @@ class ResourcesCsvImportParser {
    * @returns {Promise<void>}
    */
   async parseImport() {
-    const {data, fields} = this.readCsv();
+    const { data, fields } = this.readCsv();
 
     const RowParser = this.getRowParser(fields);
     if (!RowParser) {
-      throw new FileFormatError('This csv format is not supported.');
+      throw new FileFormatError("This csv format is not supported.");
     }
     const externalResourcesCollection = this.parseResources(RowParser, data);
     const externalFoldersCollection = this.parseFolders(externalResourcesCollection);
@@ -91,9 +91,12 @@ class ResourcesCsvImportParser {
   readCsv() {
     const decoded = atob(this.importEntity.file);
     const csv = BinaryConvert.fromBinary(decoded);
-    const {data, meta: {fields}} = PapaParse.parse(csv, {header: true, skipEmptyLines: true});
+    const {
+      data,
+      meta: { fields },
+    } = PapaParse.parse(csv, { header: true, skipEmptyLines: true });
     // For now, no papaparse controlled errors are a blocking the import process
-    return {data: data, fields: fields};
+    return { data: data, fields: fields };
   }
 
   /**
@@ -125,9 +128,14 @@ class ResourcesCsvImportParser {
   parseResources(RowParser, data) {
     const collection = new ExternalResourcesCollection([]);
 
-    data.forEach(row => {
+    data.forEach((row) => {
       try {
-        const externalResourceEntity = RowParser.parse(row, this.importEntity, this.resourceTypesCollection, this.metadataTypesSettings);
+        const externalResourceEntity = RowParser.parse(
+          row,
+          this.importEntity,
+          this.resourceTypesCollection,
+          this.metadataTypesSettings,
+        );
         collection.push(externalResourceEntity);
       } catch (error) {
         // Remove all warnings related to this resource before adding the error
@@ -164,7 +172,7 @@ class ResourcesCsvImportParser {
    * @param {ExternalResourceEntity} externalResourceEntity
    */
   handleParseFolderValidationError(error, externalResourceEntity) {
-    const externalFolderDto = {path: externalResourceEntity.folderParentPath};
+    const externalFolderDto = { path: externalResourceEntity.folderParentPath };
     this.importEntity.importFoldersErrors.push(new ImportError("Cannot parse folder", externalFolderDto, error));
     // Move the resource at the root.
     externalResourceEntity.folderParentPath = "";
@@ -176,7 +184,7 @@ class ResourcesCsvImportParser {
    * @param {ExternalResourcesCollection} externalResourcesCollection The collection of folders
    */
   createAndChangeRootFolder(externalFoldersCollection, externalResourcesCollection) {
-    const rootFolderEntity = new ExternalFolderEntity({name: this.importEntity.ref});
+    const rootFolderEntity = new ExternalFolderEntity({ name: this.importEntity.ref });
     externalFoldersCollection.changeRootPath(rootFolderEntity);
     externalResourcesCollection.changeRootPath(rootFolderEntity);
     externalFoldersCollection.push(rootFolderEntity);

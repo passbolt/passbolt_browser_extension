@@ -14,7 +14,7 @@
 
 import i18n from "../../sdk/i18n";
 import ShareService from "../api/share/shareService";
-import {assertString, assertType, assertUuid} from "../../utils/assertions";
+import { assertString, assertType, assertUuid } from "../../utils/assertions";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import FindResourcesService from "../resource/findResourcesService";
 import FindFoldersService from "../folder/findFoldersService";
@@ -43,7 +43,10 @@ class ShareFoldersService {
     this.findFoldersService = new FindFoldersService(apiClientOptions);
     this.findResourcesService = new FindResourcesService(account, apiClientOptions);
     this.shareResourcesService = new ShareResourceService(apiClientOptions, account, progressService);
-    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(
+      account,
+      apiClientOptions,
+    );
   }
 
   /**
@@ -57,16 +60,33 @@ class ShareFoldersService {
    */
   async shareOneWithContent(folderId, permissionsChanges, passphrase) {
     assertUuid(folderId, 'The parameter "folderId" should be a UUID');
-    assertType(permissionsChanges, PermissionChangesCollection, 'The parameter "permissionChanges" should be of type PermissionChangesCollection');
+    assertType(
+      permissionsChanges,
+      PermissionChangesCollection,
+      'The parameter "permissionChanges" should be of type PermissionChangesCollection',
+    );
     assertString(passphrase, 'The parameter "passphrase" should be a string');
 
     const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(folderId);
     const resourcesToShareWithPermissions = await this.findResourcesToShareWithPermissions(folderId);
-    const folderPermissionsChanges = this.calculateFoldersPermissionChanges(folderId, permissionsChanges, foldersToShareWithPermissions);
-    const resourcesPermissionChanges = this.calculateResourcesPermissionChanges(folderId, permissionsChanges, foldersToShareWithPermissions, resourcesToShareWithPermissions);
+    const folderPermissionsChanges = this.calculateFoldersPermissionChanges(
+      folderId,
+      permissionsChanges,
+      foldersToShareWithPermissions,
+    );
+    const resourcesPermissionChanges = this.calculateResourcesPermissionChanges(
+      folderId,
+      permissionsChanges,
+      foldersToShareWithPermissions,
+      resourcesToShareWithPermissions,
+    );
     await this.saveFoldersPermissionsChanges(folderPermissionsChanges);
     if (resourcesPermissionChanges.length) {
-      await this.shareResourcesService.shareAll(resourcesToShareWithPermissions.ids, resourcesPermissionChanges, passphrase);
+      await this.shareResourcesService.shareAll(
+        resourcesToShareWithPermissions.ids,
+        resourcesPermissionChanges,
+        passphrase,
+      );
     }
     this.progressService.finishStep(i18n.t("Updating folders local storage"), true);
     await this.findAndUpdateFoldersLocalStorageService.findAndUpdateAll();
@@ -106,7 +126,7 @@ class ShareFoldersService {
     const resourcesDescendantWithOwnership = resourcesDescendant.filterByIsOwner();
     const resourcesIdsToRetrievePermissions = [...resourcesDescendantWithOwnership.ids];
 
-    if (!(resourcesIdsToRetrievePermissions?.length)) {
+    if (!resourcesIdsToRetrievePermissions?.length) {
       return new ResourcesCollection([]);
     }
 
@@ -135,9 +155,15 @@ class ShareFoldersService {
       if (folderToShare.id === folderTargetId) {
         continue;
       }
-      foldersPermissionChanges.merge(PermissionChangesCollection.reuseChanges(
-        folderToShare.permission.aco, folderToShare.id, folderToShare.permissions, permissionsChanges, folderTargetOriginalPermissions
-      ));
+      foldersPermissionChanges.merge(
+        PermissionChangesCollection.reuseChanges(
+          folderToShare.permission.aco,
+          folderToShare.id,
+          folderToShare.permissions,
+          permissionsChanges,
+          folderTargetOriginalPermissions,
+        ),
+      );
     }
 
     return foldersPermissionChanges;
@@ -158,9 +184,15 @@ class ShareFoldersService {
     const folderTargetOriginalPermissions = foldersToShare.getById(folderTargetId).permissions;
 
     for (const resourceToShare of resourcesToShare.items) {
-      resourcesPermissionsChanges.merge(PermissionChangesCollection.reuseChanges(
-        resourceToShare.permission.aco, resourceToShare.id, resourceToShare.permissions, permissionsChanges, folderTargetOriginalPermissions
-      ));
+      resourcesPermissionsChanges.merge(
+        PermissionChangesCollection.reuseChanges(
+          resourceToShare.permission.aco,
+          resourceToShare.id,
+          resourceToShare.permissions,
+          permissionsChanges,
+          folderTargetOriginalPermissions,
+        ),
+      );
     }
 
     return resourcesPermissionsChanges;
@@ -172,16 +204,24 @@ class ShareFoldersService {
    * @returns {Promise<void>}
    */
   async saveFoldersPermissionsChanges(permissionChanges) {
-    assertType(permissionChanges, PermissionChangesCollection, 'The parameter "permissionChanges" should be of type PermissionChangesCollection');
+    assertType(
+      permissionChanges,
+      PermissionChangesCollection,
+      'The parameter "permissionChanges" should be of type PermissionChangesCollection',
+    );
 
     this.progressService.finishStep(i18n.t("Sharing folders"), true);
     const foldersIds = [...new Set(permissionChanges.extract("aco_foreign_key"))];
     let sharingCounter = 0;
 
     for (const folderId of foldersIds) {
-      this.progressService.updateStepMessage(i18n.t("Sharing folders {{counter}}/{{total}}", {counter: ++sharingCounter, total: foldersIds.length}));
-      const folderPermissionChanges = permissionChanges.items.filter(permissionChange => permissionChange.acoForeignKey === folderId);
-      await this.shareService.shareFolder(folderId, {permissions: folderPermissionChanges});
+      this.progressService.updateStepMessage(
+        i18n.t("Sharing folders {{counter}}/{{total}}", { counter: ++sharingCounter, total: foldersIds.length }),
+      );
+      const folderPermissionChanges = permissionChanges.items.filter(
+        (permissionChange) => permissionChange.acoForeignKey === folderId,
+      );
+      await this.shareService.shareFolder(folderId, { permissions: folderPermissionChanges });
     }
   }
 }

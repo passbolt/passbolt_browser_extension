@@ -31,11 +31,10 @@ class AccountEntity extends AbstractAccountEntity {
     // Should the username be validated.
     const isUsernameValidated = options?.validateUsername !== false;
 
-    super(EntitySchema.validate(
-      AccountEntity.ENTITY_NAME,
-      accountDto,
-      AccountEntity.getSchema(isUsernameValidated)
-    ), options);
+    super(
+      EntitySchema.validate(AccountEntity.ENTITY_NAME, accountDto, AccountEntity.getSchema(isUsernameValidated)),
+      options,
+    );
 
     this.isUsernameValidated = isUsernameValidated;
   }
@@ -46,12 +45,9 @@ class AccountEntity extends AbstractAccountEntity {
    * @return {Object}
    */
   static marshal(accountDto) {
-    Object.assign(
-      accountDto,
-      {
-        type: AccountEntity.TYPE_ACCOUNT
-      }
-    );
+    Object.assign(accountDto, {
+      type: AccountEntity.TYPE_ACCOUNT,
+    });
   }
 
   /**
@@ -62,8 +58,8 @@ class AccountEntity extends AbstractAccountEntity {
   static getSchema(validateUsername = true) {
     const abstractAccountEntitySchema = AbstractAccountEntity.getSchema();
     const schema = {
-      "type": "object",
-      "required": [
+      type: "object",
+      required: [
         "type",
         "domain",
         "user_id",
@@ -75,17 +71,17 @@ class AccountEntity extends AbstractAccountEntity {
         "server_public_armored_key",
         "security_token",
       ],
-      "properties": {
-        ... abstractAccountEntitySchema.properties,
-        "type": {
-          "type": "string",
-          "enum": [AccountEntity.TYPE_ACCOUNT],
+      properties: {
+        ...abstractAccountEntitySchema.properties,
+        type: {
+          type: "string",
+          enum: [AccountEntity.TYPE_ACCOUNT],
         },
-        "role_name": {
+        role_name: {
           ...RoleEntity.getSchema().properties.name,
-          "nullable": true,
+          nullable: true,
         },
-      }
+      },
     };
 
     /*
@@ -94,7 +90,7 @@ class AccountEntity extends AbstractAccountEntity {
      */
     if (!validateUsername) {
       schema.properties.username = {
-        "type": "string"
+        type: "string",
       };
     }
 
@@ -142,7 +138,7 @@ class AccountEntity extends AbstractAccountEntity {
       username: this.username,
       firstname: this.firstName,
       lastname: this.lastName,
-      locale: this.locale
+      locale: this.locale,
     };
   }
 

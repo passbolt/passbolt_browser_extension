@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import AbstractService from "../abstract/abstractService";
-import {assertUuid} from "../../../utils/assertions";
+import { assertUuid } from "../../../utils/assertions";
 
-const MOVE_SERVICE_RESOURCE_NAME = 'move';
+const MOVE_SERVICE_RESOURCE_NAME = "move";
 
 class MoveService extends AbstractService {
   /**
@@ -52,7 +52,7 @@ class MoveService extends AbstractService {
 
     const url = `folder/${id}`;
     const data = {
-      folder_parent_id: destinationFolderId
+      folder_parent_id: destinationFolderId,
     };
     const response = await this.apiClient.update(url, data);
     return response.body;
@@ -74,7 +74,7 @@ class MoveService extends AbstractService {
 
     const url = `resource/${id}`;
     const data = {
-      folder_parent_id: destinationFolderId
+      folder_parent_id: destinationFolderId,
     };
     const response = await this.apiClient.update(url, data);
     return response.body;

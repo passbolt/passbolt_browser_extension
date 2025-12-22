@@ -13,18 +13,17 @@
 import AbstractActionLogEntity from "./abstractActionLogEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'DefaultActionLog';
+const ENTITY_NAME = "DefaultActionLog";
 
 class DefaultActionLogEntity extends AbstractActionLogEntity {
   /**
    * @inheritDoc
    */
   constructor(actionLog, options = {}) {
-    super(EntitySchema.validate(
-      DefaultActionLogEntity.ENTITY_NAME,
-      actionLog,
-      DefaultActionLogEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(DefaultActionLogEntity.ENTITY_NAME, actionLog, DefaultActionLogEntity.getSchema()),
+      options,
+    );
   }
 
   /*

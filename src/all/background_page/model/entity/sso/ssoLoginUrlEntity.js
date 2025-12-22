@@ -21,7 +21,7 @@ import OAuth2SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entit
 const ENTITY_NAME = "SsoLoginUrl";
 const SSO_LOGIN_SUPPORTED_URLS = {
   [AzureSsoSettingsEntity.PROVIDER_ID]: AzureSsoSettingsEntity.SUPPORTED_URLS,
-  [GoogleSsoSettingsEntity.PROVIDER_ID]: GoogleSsoSettingsEntity.SUPPORTED_URLS
+  [GoogleSsoSettingsEntity.PROVIDER_ID]: GoogleSsoSettingsEntity.SUPPORTED_URLS,
 };
 
 /**
@@ -35,11 +35,9 @@ class SsoLoginUrlEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(ssoLoginUrlDto, ssoProvider) {
-    super(EntitySchema.validate(
-      SsoLoginUrlEntity.ENTITY_NAME,
-      ssoLoginUrlDto,
-      SsoLoginUrlEntity.getSchema(ssoProvider)
-    ));
+    super(
+      EntitySchema.validate(SsoLoginUrlEntity.ENTITY_NAME, ssoLoginUrlDto, SsoLoginUrlEntity.getSchema(ssoProvider)),
+    );
   }
 
   /**
@@ -49,14 +47,14 @@ class SsoLoginUrlEntity extends Entity {
    */
   static getSchema(ssoProvider) {
     return {
-      "type": "object",
-      "required": ["url"],
-      "properties": {
-        "url": {
-          "type": "x-custom",
-          "validationCallback": url => SsoLoginUrlEntity.validateUrl(url, ssoProvider)
+      type: "object",
+      required: ["url"],
+      properties: {
+        url: {
+          type: "x-custom",
+          validationCallback: (url) => SsoLoginUrlEntity.validateUrl(url, ssoProvider),
         },
-      }
+      },
     };
   }
 
@@ -77,23 +75,23 @@ class SsoLoginUrlEntity extends Entity {
       url = new URL(value);
     } catch (error) {
       console.error(error);
-      throw new Error('The url should be a valid url.');
+      throw new Error("The url should be a valid url.");
     }
 
     if (ssoProvider === OAuth2SsoSettingsEntity.PROVIDER_ID || ssoProvider === AdfsSsoSettingsEntity.PROVIDER_ID) {
       if (url.protocol !== "https:") {
-        throw new Error('The url protocol should be HTTPS.');
+        throw new Error("The url protocol should be HTTPS.");
       }
       return;
     }
 
     if (!SSO_LOGIN_SUPPORTED_URLS[ssoProvider]) {
-      throw new Error('The url should be part of the list of supported single sign-on urls.');
+      throw new Error("The url should be part of the list of supported single sign-on urls.");
     }
 
-    const isSupportedUrl = SSO_LOGIN_SUPPORTED_URLS[ssoProvider].some(supportedUrl => url.origin === supportedUrl);
+    const isSupportedUrl = SSO_LOGIN_SUPPORTED_URLS[ssoProvider].some((supportedUrl) => url.origin === supportedUrl);
     if (!isSupportedUrl) {
-      throw new Error('The url should be part of the list of supported single sign-on urls.');
+      throw new Error("The url should be part of the list of supported single sign-on urls.");
     }
   }
 

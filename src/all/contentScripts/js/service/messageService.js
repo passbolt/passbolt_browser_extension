@@ -28,7 +28,7 @@ class MessageService {
    */
   async _onMessage(msg) {
     const eventName = msg[0];
-    if (typeof this._listeners[eventName] !== 'undefined' && this._listeners[eventName].length > 0) {
+    if (typeof this._listeners[eventName] !== "undefined" && this._listeners[eventName].length > 0) {
       const listeners = this._listeners[eventName];
       for (let i = 0; i < listeners.length; i++) {
         const listener = listeners[i];
@@ -45,12 +45,12 @@ class MessageService {
    * @param callback function
    */
   addListener(name, callback) {
-    if (typeof this._listeners[name] === 'undefined') {
+    if (typeof this._listeners[name] === "undefined") {
       this._listeners[name] = [];
     }
     this._listeners[name].push({
       name: name,
-      callback: callback
+      callback: callback,
     });
   }
 

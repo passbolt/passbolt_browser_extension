@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-import * as openpgp from 'openpgp';
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import * as openpgp from "openpgp";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
-import {assertPassphrase} from '../../utils/assertions';
+import { assertPassphrase } from "../../utils/assertions";
 
 class DecryptPrivateKeyService {
   /**
@@ -32,10 +32,10 @@ class DecryptPrivateKeyService {
     assertPassphrase(passphrase);
 
     try {
-      return (await openpgp.decryptKey({
+      return await openpgp.decryptKey({
         privateKey: privateKey,
-        passphrase: passphrase
-      }));
+        passphrase: passphrase,
+      });
     } catch (error) {
       console.error(error);
       throw new InvalidMasterPasswordError();
@@ -53,7 +53,7 @@ class DecryptPrivateKeyService {
    */
   static async decryptArmoredKey(armoredPrivateKey, passphrase) {
     const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredPrivateKey);
-    return (await DecryptPrivateKeyService.decrypt(privateKey, passphrase));
+    return await DecryptPrivateKeyService.decrypt(privateKey, passphrase);
   }
 }
 

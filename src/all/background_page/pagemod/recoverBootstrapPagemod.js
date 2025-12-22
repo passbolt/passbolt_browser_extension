@@ -13,7 +13,7 @@
  */
 import Pagemod from "./pagemod";
 import ParseRecoverUrlService from "../service/recover/parseRecoverUrlService";
-import {PortEvents} from "../event/portEvents";
+import { PortEvents } from "../event/portEvents";
 
 class RecoverBootstrap extends Pagemod {
   /**
@@ -28,17 +28,14 @@ class RecoverBootstrap extends Pagemod {
    * @inheritDoc
    */
   get contentStyleFiles() {
-    return ['webAccessibleResources/css/themes/default/ext_external.min.css'];
+    return ["webAccessibleResources/css/themes/default/ext_external.min.css"];
   }
 
   /**
    * @inheritDoc
    */
   get contentScriptFiles() {
-    return [
-      'contentScripts/js/dist/vendors.js',
-      'contentScripts/js/dist/recover.js',
-    ];
+    return ["contentScripts/js/dist/vendors.js", "contentScripts/js/dist/recover.js"];
   }
 
   /**
@@ -59,8 +56,7 @@ class RecoverBootstrap extends Pagemod {
    * @inheritDoc
    */
   async canBeAttachedTo(frameDetails) {
-    return this.assertTopFrameAttachConstraint(frameDetails)
-      && this.assertUrlAttachConstraint(frameDetails);
+    return this.assertTopFrameAttachConstraint(frameDetails) && this.assertUrlAttachConstraint(frameDetails);
   }
 
   /**

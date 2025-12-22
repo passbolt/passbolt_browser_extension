@@ -14,7 +14,7 @@
 class UserAlreadyLoggedInError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'UserAlreadyLoggedInError';
+    this.name = "UserAlreadyLoggedInError";
   }
 }
 

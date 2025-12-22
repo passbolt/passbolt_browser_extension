@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import * as openpgp from 'openpgp';
+import * as openpgp from "openpgp";
 import i18n from "../../sdk/i18n";
 import Uint8ArrayConvert from "../format/uint8ArrayConvert";
-import {assertNonEmptyString} from "../assertions";
+import { assertNonEmptyString } from "../assertions";
 
 /*
  * ==================================================
@@ -28,13 +28,13 @@ import {assertNonEmptyString} from "../assertions";
  * @throws {Error} if the armoredKey is not a string
  * @throws {Error} if the key couldn't be read
  */
-const readKeyOrFail = async armoredKey => {
+const readKeyOrFail = async (armoredKey) => {
   if (typeof armoredKey !== "string") {
     throw new Error(i18n.t("The key should be a valid openpgp armored key string."));
   }
 
   try {
-    return await openpgp.readKey({armoredKey: armoredKey});
+    return await openpgp.readKey({ armoredKey: armoredKey });
   } catch (error) {
     console.error(error);
     throw new Error(i18n.t("The key should be a valid openpgp armored key string."));
@@ -48,11 +48,11 @@ const readKeyOrFail = async armoredKey => {
  * @throws {Error} if the armoredKeys is not an array
  * @throws {Error} if one the key couldn't be read
  */
-const readAllKeysOrFail = async armoredKeys => {
+const readAllKeysOrFail = async (armoredKeys) => {
   if (!Array.isArray(armoredKeys)) {
     throw new Error(i18n.t("The keys should be an array of valid openpgp armored key strings."));
   }
-  return Promise.all(armoredKeys.map(key => readKeyOrFail(key)));
+  return Promise.all(armoredKeys.map((key) => readKeyOrFail(key)));
 };
 
 /**
@@ -63,7 +63,7 @@ const readAllKeysOrFail = async armoredKeys => {
  * @throw {Error} if session key does not validate the expected format "integer:hexadecimal-string"
  * @throw {Error} if session key cannot be read
  */
-const readSessionKeyOrFail = sessionKey => {
+const readSessionKeyOrFail = (sessionKey) => {
   assertNonEmptyString(sessionKey, "The session key should be a string.");
   if (!/^\d{1,2}:[0-9A-F]{64}$/i.test(sessionKey)) {
     throw new TypeError('The parameter session key does not match the expected format "integer:hexadecimal-string".');
@@ -73,9 +73,9 @@ const readSessionKeyOrFail = sessionKey => {
     const sessionKeySplit = sessionKey.split(":");
     const algorithm = openpgp.enums.read(openpgp.enums.symmetric, sessionKeySplit[0]);
     const data = Uint8ArrayConvert.fromHex(sessionKeySplit[1]);
-    return {data, algorithm};
+    return { data, algorithm };
   } catch (error) {
-    throw new Error("The session key should be a valid openpgp session key.", {cause: error});
+    throw new Error("The session key should be a valid openpgp session key.", { cause: error });
   }
 };
 
@@ -85,11 +85,11 @@ const readSessionKeyOrFail = sessionKey => {
  * @return {Promise<openpgp.Message>}
  * @throws {Error} if the messageis not a string
  */
-const createMessageOrFail = async message => {
+const createMessageOrFail = async (message) => {
   if (typeof message !== "string") {
     throw new Error(i18n.t("The message should be of type string."));
   }
-  return openpgp.createMessage({text: message, format: 'utf8'});
+  return openpgp.createMessage({ text: message, format: "utf8" });
 };
 
 /**
@@ -98,11 +98,11 @@ const createMessageOrFail = async message => {
  * @return {Promise<openpgp.CleartextMessage>}
  * @throws {Error} if the messageis not a string
  */
-const createCleartextMessageOrFail = async text => {
+const createCleartextMessageOrFail = async (text) => {
   if (typeof text !== "string") {
     throw new Error(i18n.t("The message should be of type string."));
   }
-  return openpgp.createCleartextMessage({text});
+  return openpgp.createCleartextMessage({ text });
 };
 
 /**
@@ -112,13 +112,13 @@ const createCleartextMessageOrFail = async text => {
  * @throws {Error} if the message is not a string
  * @throws {Error} if the message can't be parsed as an armored message
  */
-const readMessageOrFail = async message => {
+const readMessageOrFail = async (message) => {
   if (typeof message !== "string") {
     throw new Error(i18n.t("The message should be of type string."));
   }
 
   try {
-    return await openpgp.readMessage({armoredMessage: message});
+    return await openpgp.readMessage({ armoredMessage: message });
   } catch (error) {
     console.error(error);
     throw new Error(i18n.t("The message should be a valid openpgp message."));
@@ -132,13 +132,13 @@ const readMessageOrFail = async message => {
  * @throws {Error} if the message is not a string
  * @throws {Error} if the message can't be parsed as an armored message
  */
-const readClearMessageOrFail = async cleartextMessage => {
+const readClearMessageOrFail = async (cleartextMessage) => {
   if (typeof cleartextMessage !== "string") {
     throw new Error(i18n.t("The message should be of type string."));
   }
 
   try {
-    return await openpgp.readCleartextMessage({cleartextMessage});
+    return await openpgp.readCleartextMessage({ cleartextMessage });
   } catch (error) {
     console.error(error);
     throw new Error(i18n.t("The message should be a valid openpgp message."));
@@ -156,7 +156,7 @@ const readClearMessageOrFail = async cleartextMessage => {
  * @returns {void}
  * @throws {Error} if the key is not an openpgp.PublicKey or openpgp.PrivateKey
  */
-const assertKey = key => {
+const assertKey = (key) => {
   if (!(key instanceof openpgp.PublicKey) && !(key instanceof openpgp.PrivateKey)) {
     throw new Error(i18n.t("The key should be a valid openpgp key."));
   }
@@ -169,7 +169,7 @@ const assertKey = key => {
  * @throws {Error} if keys is not an array
  * @throws {Error} if one of the keys is not an openpgp.PublicKey or openpgp.PrivateKey
  */
-const assertKeys = keys => {
+const assertKeys = (keys) => {
   if (!Array.isArray(keys)) {
     throw new Error(i18n.t("The keys should be an array."));
   }
@@ -184,7 +184,7 @@ const assertKeys = keys => {
  * @returns {void}
  * @throws {Error} if the key is not an openpgp.PublicKey
  */
-const assertPublicKey = key => {
+const assertPublicKey = (key) => {
   /*
    * we need to check for an openpgp.PublicKey is it's private or not.
    * This is due to openpgp js types where an openpgp.PrivateKey is of a type openpgp.PublicKey as well
@@ -201,7 +201,7 @@ const assertPublicKey = key => {
  * @throws {Error} if keys is not an array
  * @throws {Error} if one of the keys is not openpgp.PublicKey
  */
-const assertPublicKeys = keys => {
+const assertPublicKeys = (keys) => {
   if (!Array.isArray(keys)) {
     throw new Error(i18n.t("The keys should be an array of valid openpgp public keys."));
   }
@@ -216,7 +216,7 @@ const assertPublicKeys = keys => {
  * @returns {void}
  * @throws {Error} if the key is not an openpgp.PrivateKey
  */
-const assertPrivateKey = key => {
+const assertPrivateKey = (key) => {
   // we do an extra check for key.isPrivate to keep things coherent with assertPublicKey.
   if (!(key instanceof openpgp.PrivateKey) || (key instanceof openpgp.PrivateKey && !key.isPrivate())) {
     throw new Error(i18n.t("The key should be a valid openpgp private key."));
@@ -230,7 +230,7 @@ const assertPrivateKey = key => {
  * @throws {Error} if keys is not an array
  * @throws {Error} if one of the keys is not openpgp.PrivateKey
  */
-const assertPrivateKeys = keys => {
+const assertPrivateKeys = (keys) => {
   if (!Array.isArray(keys)) {
     throw new Error(i18n.t("The keys should be an array of valid openpgp private keys."));
   }
@@ -245,7 +245,7 @@ const assertPrivateKeys = keys => {
  * @returns {void}
  * @throws {Error} if the key is not a decrypted openpgp.PrivateKey
  */
-const assertDecryptedPrivateKey = key => {
+const assertDecryptedPrivateKey = (key) => {
   assertPrivateKey(key);
   if (!key.isDecrypted()) {
     throw new Error(i18n.t("The private key should be decrypted."));
@@ -259,7 +259,7 @@ const assertDecryptedPrivateKey = key => {
  * @throws {Error} if keys is not an array
  * @throws {Error} if one of the keys is not a decrypted openpgp.PrivateKey
  */
-const assertDecryptedPrivateKeys = keys => {
+const assertDecryptedPrivateKeys = (keys) => {
   if (!Array.isArray(keys)) {
     throw new Error(i18n.t("The keys should be an array of valid decrypted openpgp private keys."));
   }
@@ -274,7 +274,7 @@ const assertDecryptedPrivateKeys = keys => {
  * @returns {void}
  * @throws {Error} if the key is not an encrypted openpgp.PrivateKey
  */
-const assertEncryptedPrivateKey = key => {
+const assertEncryptedPrivateKey = (key) => {
   assertPrivateKey(key);
   if (key.isDecrypted()) {
     throw new Error(i18n.t("The private key should be encrypted."));
@@ -288,7 +288,7 @@ const assertEncryptedPrivateKey = key => {
  * @throws {Error} if keys is not an array
  * @throws {Error} if one of the keys is not an encrypted openpgp.PrivateKey
  */
-const assertEncryptedPrivateKeys = keys => {
+const assertEncryptedPrivateKeys = (keys) => {
   if (!Array.isArray(keys)) {
     throw new Error(i18n.t("The keys should be an array of valid encrypted openpgp private keys."));
   }
@@ -303,7 +303,7 @@ const assertEncryptedPrivateKeys = keys => {
  * @returns {void}
  * @throws {Error} if the message is not an openpgp.Message
  */
-const assertMessage = message => {
+const assertMessage = (message) => {
   if (!(message instanceof openpgp.Message)) {
     throw new Error(i18n.t("The message should be a valid openpgp message."));
   }
@@ -315,7 +315,7 @@ const assertMessage = message => {
  * @returns {void}
  * @throws {Error} if the message is not an openpgp.Message decrypted
  */
-const assertDecryptedMessage = message => {
+const assertDecryptedMessage = (message) => {
   assertMessage(message);
   const packetWithSessionKey = message.packets.findPacket(openpgp.enums.packet.publicKeyEncryptedSessionKey);
   if (!packetWithSessionKey) {
@@ -334,12 +334,12 @@ const assertDecryptedMessage = message => {
  *  @throws {Error} if the session key data is not a valid Uint8Array
  *  @throws {Error} if the session key algorithm is not aes256
  */
-const assertSessionKey = sessionKey => {
-  if (!(Object.prototype.toString.call(sessionKey) === '[object Object]')) {
+const assertSessionKey = (sessionKey) => {
+  if (!(Object.prototype.toString.call(sessionKey) === "[object Object]")) {
     throw new Error("The session keys should be an object.");
   }
   // Allow only AES256 algorithm for the moment
-  if (!(sessionKey.data instanceof Uint8Array) || sessionKey.algorithm !== 'aes256') {
+  if (!(sessionKey.data instanceof Uint8Array) || sessionKey.algorithm !== "aes256") {
     throw new Error("The session keys should be a valid openpgp session key aes256.");
   }
 };
@@ -350,7 +350,7 @@ const assertSessionKey = sessionKey => {
  * @returns {void}
  * @throws {Error} if the message is not an openpgp.CleartextMessage
  */
-const assertClearMessage = message => {
+const assertClearMessage = (message) => {
   if (!(message instanceof openpgp.CleartextMessage)) {
     throw new Error(i18n.t("The message should be a valid openpgp clear text message."));
   }
@@ -362,7 +362,7 @@ const assertClearMessage = message => {
  * @returns {void}
  * @throws {Error} if the verificationResult is not an openpgp.VerificationResult
  */
-const assertVerificationResult = verificationResult => {
+const assertVerificationResult = (verificationResult) => {
   if (!(verificationResult.keyID && verificationResult.keyID instanceof Object)) {
     throw new Error(i18n.t("The verificationResult keyID should be a valid keyID Object."));
   }
@@ -398,5 +398,5 @@ export const OpenpgpAssertion = {
   createMessageOrFail,
   readAllKeysOrFail,
   readKeyOrFail,
-  readSessionKeyOrFail
+  readSessionKeyOrFail,
 };

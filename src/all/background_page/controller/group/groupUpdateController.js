@@ -33,17 +33,17 @@ class GroupsUpdateController {
 
     this.getPassphraseService = new GetPassphraseService(account);
 
-    this.progressService = new ProgressService(this.worker, i18n.t('Updating group ...'));
+    this.progressService = new ProgressService(this.worker, i18n.t("Updating group ..."));
     this.groupUpdateService = new GroupUpdateService(apiClientOptions, account, this.progressService);
   }
 
   async _exec(groupDto) {
     try {
       await this.exec(groupDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

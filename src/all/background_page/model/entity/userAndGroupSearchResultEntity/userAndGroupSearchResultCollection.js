@@ -14,7 +14,7 @@
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import UserAndGroupSearchResultEntity from "./userAndGroupSearchResultEntity";
 
-const ENTITY_NAME = 'UserAndGroupSearchResult';
+const ENTITY_NAME = "UserAndGroupSearchResult";
 
 /**
  * User and group search results collection
@@ -48,8 +48,8 @@ class UserAndGroupSearchResultsCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": UserAndGroupSearchResultEntity.getSchema(),
+      type: "array",
+      items: UserAndGroupSearchResultEntity.getSchema(),
     };
   }
 
@@ -59,7 +59,7 @@ class UserAndGroupSearchResultsCollection extends EntityV2Collection {
    * @throws {EntityValidationError} If a permission already exists with the same id.
    */
   validateBuildRules(item, options = {}) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
   }
 
   /*
@@ -73,19 +73,18 @@ class UserAndGroupSearchResultsCollection extends EntityV2Collection {
    */
   pushMany(data, entityOptions = {}, options = {}) {
     const uniqueIdsSetCache = new Set(this.extract("id"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);
   }
-
 
   /*
    * ==================================================

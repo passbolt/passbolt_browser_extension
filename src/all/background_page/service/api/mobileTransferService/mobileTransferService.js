@@ -12,7 +12,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const MOBILE_TRANSFER_SERVICE_RESOURCE_NAME = 'mobile/transfers';
+const MOBILE_TRANSFER_SERVICE_RESOURCE_NAME = "mobile/transfers";
 
 class MobileTransferService extends AbstractService {
   /**

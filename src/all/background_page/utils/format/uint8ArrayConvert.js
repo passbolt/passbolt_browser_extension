@@ -44,7 +44,7 @@ class Uint8ArrayConvert {
       }
       result.push(`${character}`);
     }
-    return result.join('').toUpperCase();
+    return result.join("").toUpperCase();
   }
 }
 

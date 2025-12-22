@@ -8,7 +8,7 @@
 class KeyIsExpiredError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'KeyIsExpiredError';
+    this.name = "KeyIsExpiredError";
   }
 }
 

@@ -35,10 +35,10 @@ class GetResourceTypesController {
   async _exec() {
     try {
       const resource = await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS', resource);
+      this.worker.port.emit(this.requestId, "SUCCESS", resource);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

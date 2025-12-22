@@ -15,7 +15,7 @@
 import FolderModel from "../../../model/folder/folderModel";
 import Keyring from "../../../model/keyring";
 import ShareModel from "../../../model/share/shareModel";
-import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import ResourceEntity from "../../../model/entity/resource/resourceEntity";
@@ -68,7 +68,10 @@ class ResourceCreateService {
     let destinationFolder;
     if (resource.folderParentId) {
       destinationFolder = await this.folderModel.findForShare(resource.folderParentId);
-      if (destinationFolder.permissions.length > 1 || destinationFolder.permissions.items[0].aroForeignKey !== this.account.userId) {
+      if (
+        destinationFolder.permissions.length > 1 ||
+        destinationFolder.permissions.items[0].aroForeignKey !== this.account.userId
+      ) {
         permissionChanges = destinationFolder.permissions;
       }
     }
@@ -86,7 +89,6 @@ class ResourceCreateService {
     return createdResource;
   }
 
-
   /**
    * Save the resource on the API.
    *
@@ -96,10 +98,10 @@ class ResourceCreateService {
    * @private
    */
   async save(resource, resourceType) {
-    await this.progressService.finishStep(i18n.t('Creating password'), true);
+    await this.progressService.finishStep(i18n.t("Creating password"), true);
 
-    const resourceDto = resourceType.isV5() ? resource.toDto({secrets: true}) : resource.toV4Dto({secrets: true});
-    const contain = {permission: true, favorite: true, tags: true, folder: true};
+    const resourceDto = resourceType.isV5() ? resource.toDto({ secrets: true }) : resource.toV4Dto({ secrets: true });
+    const contain = { permission: true, favorite: true, tags: true, folder: true };
     const newResourceDto = await this.resourceService.create(resourceDto, contain);
     return new ResourceEntity(newResourceDto);
   }
@@ -117,10 +119,10 @@ class ResourceCreateService {
     const serializedSecret = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, secretDto);
 
     // Encrypt and sign
-    await this.progressService.finishStep(i18n.t('Encrypting secret'), true);
+    await this.progressService.finishStep(i18n.t("Encrypting secret"), true);
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
     const secret = await EncryptMessageService.encrypt(serializedSecret, userPublicKey, [privateKey]);
-    resource.secrets = new ResourceSecretsCollection([{data: secret}]);
+    resource.secrets = new ResourceSecretsCollection([{ data: secret }]);
   }
 
   /**
@@ -138,17 +140,20 @@ class ResourceCreateService {
       return;
     }
     // Calculate resource creation share permission changes.
-    await this.progressService.finishStep(i18n.t('Calculate permissions'), true);
+    await this.progressService.finishStep(i18n.t("Calculate permissions"), true);
     // Whenever a resource is created into a folder, its creation will be followed by a share operation
     const permissionChanges = await this.resourceModel.calculatePermissionsChangesForCreate(resource, folder);
 
-    await this.progressService?.finishStep(i18n.t('Synchronizing keys'), true);
+    await this.progressService?.finishStep(i18n.t("Synchronizing keys"), true);
     await this.keyring.sync();
 
-    await this.progressService?.finishStep(i18n.t('Start sharing'), true);
-    const resourcesToShare = [resource.toDto({secrets: true})];
-    await this.shareModel.bulkShareResources(resourcesToShare, permissionChanges.toDto(), privateKey, async message =>
-      await this.progressService?.finishStep(message)
+    await this.progressService?.finishStep(i18n.t("Start sharing"), true);
+    const resourcesToShare = [resource.toDto({ secrets: true })];
+    await this.shareModel.bulkShareResources(
+      resourcesToShare,
+      permissionChanges.toDto(),
+      privateKey,
+      async (message) => await this.progressService?.finishStep(message),
     );
     await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
   }

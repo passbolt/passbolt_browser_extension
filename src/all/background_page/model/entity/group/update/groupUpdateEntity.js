@@ -16,26 +16,22 @@ import GroupUpdateSecretsCollection from "../../secret/groupUpdate/groupUpdateSe
 import GroupUserChangesCollection from "../../groupUser/change/groupUserChangesCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'GroupUpdate';
+const ENTITY_NAME = "GroupUpdate";
 
 class GroupUpdateEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(groupUpdateDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupUpdateEntity.ENTITY_NAME,
-      groupUpdateDto,
-      GroupUpdateEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(GroupUpdateEntity.ENTITY_NAME, groupUpdateDto, GroupUpdateEntity.getSchema()), options);
 
     // Association
     if (this._props.groups_users) {
-      this._groups_users = new GroupUserChangesCollection(this._props.groups_users, {clone: false});
+      this._groups_users = new GroupUserChangesCollection(this._props.groups_users, { clone: false });
       delete this._props.groups_users;
     }
     if (this._props.secrets) {
-      this._secrets = new GroupUpdateSecretsCollection(this._props.secrets, {clone: false});
+      this._secrets = new GroupUpdateSecretsCollection(this._props.secrets, { clone: false });
       delete this._props.secrets;
     }
   }
@@ -47,26 +43,26 @@ class GroupUpdateEntity extends Entity {
   static getSchema() {
     const groupEntitySchema = GroupEntity.getSchema();
     return {
-      "type": "object",
-      "required": [
-        "id",
-        "name"
-      ],
-      "properties": {
-        "id": groupEntitySchema.properties.id,
-        "name": groupEntitySchema.properties.name,
+      type: "object",
+      required: ["id", "name"],
+      properties: {
+        id: groupEntitySchema.properties.id,
+        name: groupEntitySchema.properties.name,
         // Associations
-        "groups_users": GroupUserChangesCollection.getSchema(),
-        "secrets": GroupUpdateSecretsCollection.getSchema()
-      }
+        groups_users: GroupUserChangesCollection.getSchema(),
+        secrets: GroupUpdateSecretsCollection.getSchema(),
+      },
     };
   }
 
   static createFromGroupsDiff(originalGroupEntity, updatedGroupEntity) {
     const id = originalGroupEntity.id;
     const name = updatedGroupEntity.name;
-    const groupsUsers = GroupUserChangesCollection.createFromGroupsUsersCollectionsChanges(originalGroupEntity.groupsUsers, updatedGroupEntity.groupsUsers);
-    const groupUpdateDto = {id: id, name: name, groups_users: groupsUsers.toDto()};
+    const groupsUsers = GroupUserChangesCollection.createFromGroupsUsersCollectionsChanges(
+      originalGroupEntity.groupsUsers,
+      updatedGroupEntity.groupsUsers,
+    );
+    const groupUpdateDto = { id: id, name: name, groups_users: groupsUsers.toDto() };
     return new GroupUpdateEntity(groupUpdateDto);
   }
 

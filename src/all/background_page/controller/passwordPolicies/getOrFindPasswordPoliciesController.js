@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.2.0
  */
-import {SecretGeneratorComplexity} from "passbolt-styleguide/src/shared/lib/SecretGenerator/SecretGeneratorComplexity";
+import { SecretGeneratorComplexity } from "passbolt-styleguide/src/shared/lib/SecretGenerator/SecretGeneratorComplexity";
 import PasswordPoliciesEntity from "../../model/entity/passwordPolicies/passwordPoliciesEntity";
 import PasswordPoliciesModel from "../../model/passwordPolicies/passwordPoliciesModel";
 
@@ -39,7 +39,7 @@ class GetOrFindPasswordPoliciesController {
       this.worker.port.emit(this.requestId, "SUCCESS", settings);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -74,10 +74,15 @@ class GetOrFindPasswordPoliciesController {
    * @private
    */
   getLowestEntropy(passwordPoliciesEntity) {
-    const passwordGeneratorEntropy = SecretGeneratorComplexity.evaluateMaxPasswordEntropy(passwordPoliciesEntity.passwordGeneratorSettings.toDto());
+    const passwordGeneratorEntropy = SecretGeneratorComplexity.evaluateMaxPasswordEntropy(
+      passwordPoliciesEntity.passwordGeneratorSettings.toDto(),
+    );
 
     const passphraseSettings = passwordPoliciesEntity.passphraseGeneratorSettings.toDto();
-    const passphraseGeneratorEntropy = SecretGeneratorComplexity.entropyPassphrase(passphraseSettings.words, passphraseSettings.word_separator);
+    const passphraseGeneratorEntropy = SecretGeneratorComplexity.entropyPassphrase(
+      passphraseSettings.words,
+      passphraseSettings.word_separator,
+    );
 
     return passwordGeneratorEntropy < passphraseGeneratorEntropy
       ? passwordGeneratorEntropy

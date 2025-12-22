@@ -13,24 +13,21 @@
 class ImportError extends Error {
   constructor(message, data, sourceError) {
     super(message);
-    this.name = 'ImportError';
+    this.name = "ImportError";
     this.data = data;
     this.sourceError = sourceError || {};
   }
 
   toJSON() {
-    const sourceError = (this.sourceError && typeof this.sourceError.toJSON === "function")
-      ? this.sourceError.toJSON()
-      : this.sourceError;
-    const data = (this.data && typeof this.data.toJSON === "function")
-      ? this.data.toJSON()
-      : this.data;
+    const sourceError =
+      this.sourceError && typeof this.sourceError.toJSON === "function" ? this.sourceError.toJSON() : this.sourceError;
+    const data = this.data && typeof this.data.toJSON === "function" ? this.data.toJSON() : this.data;
 
     return {
       name: this.name,
       message: this.message,
       data: data,
-      sourceError: sourceError
+      sourceError: sourceError,
     };
   }
 }

@@ -13,7 +13,6 @@
  */
 import userModel from "../../model/user/userModel";
 
-
 class UpdateUserLocalStorageController {
   /**
    * UpdateUserLocalStorageController constructor

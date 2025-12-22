@@ -12,8 +12,8 @@
  * @since        4.9.4
  */
 
-import {assertArray, assertNumber} from "../../utils/assertions";
-import {v4 as uuidv4} from "uuid";
+import { assertArray, assertNumber } from "../../utils/assertions";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Execute concurrently service
@@ -37,7 +37,7 @@ class ExecuteConcurrentlyService {
    * @param {Object} [options.ignoreError=false] Throw error and stop the execution.
    * @return {Promise<Array>} The results following the callbacks array order
    */
-  async execute(callbacks, concurrency, options = {ignoreError: false}) {
+  async execute(callbacks, concurrency, options = { ignoreError: false }) {
     // Don't allow to execute the service twice
     if (this.nextCallbackIndex !== 0) {
       throw new Error("ExecuteConcurrentlyService should be executed only once");

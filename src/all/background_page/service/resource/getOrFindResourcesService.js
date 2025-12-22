@@ -15,7 +15,7 @@ import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import FindAndUpdateResourcesLocalStorage from "./findAndUpdateResourcesLocalStorageService";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
-import {assertArrayUUID} from "../../utils/assertions";
+import { assertArrayUUID } from "../../utils/assertions";
 
 /**
  * The service aims to get resources from the local storage if it is set, or retrieve them from the API and
@@ -43,7 +43,7 @@ export default class GetOrFindResourcesService {
     // Return local storage data if the storage was initialized.
     if (resourcesDto) {
       // No validation if data were in runtime cache, they were validate by the one which set it.
-      return new ResourcesCollection(resourcesDto, {validate: !hasRuntimeCache});
+      return new ResourcesCollection(resourcesDto, { validate: !hasRuntimeCache });
     }
 
     // Otherwise retrieve the resources and update the local storage.

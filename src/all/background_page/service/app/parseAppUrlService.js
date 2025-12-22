@@ -34,9 +34,7 @@ class ParseAppUrlService {
     const regex = new RegExp(this.getRegex());
 
     if (!regex.test(url)) {
-      throw new Error(
-        "Cannot parse application url. The url does not match the pattern."
-      );
+      throw new Error("Cannot parse application url. The url does not match the pattern.");
     }
 
     // Sanitize domains, removed trailing "/" in order to avoid domains such as https://passbolt.dev//

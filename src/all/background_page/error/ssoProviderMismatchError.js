@@ -14,7 +14,7 @@
 class SsoProviderMismatchError extends Error {
   constructor(message, configuredProvider) {
     super(message);
-    this.name = 'SsoProviderMismatchError';
+    this.name = "SsoProviderMismatchError";
     this.configuredProvider = configuredProvider;
   }
 }

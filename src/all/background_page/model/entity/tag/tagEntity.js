@@ -14,7 +14,7 @@
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'Tag';
+const ENTITY_NAME = "Tag";
 
 class TagEntity extends EntityV2 {
   /**
@@ -31,7 +31,7 @@ class TagEntity extends EntityV2 {
    */
   marshall() {
     if (typeof this._props.is_shared === "undefined" && typeof this._props.slug === "string") {
-      this._props.is_shared = this._props.slug?.startsWith('#');
+      this._props.is_shared = this._props.slug?.startsWith("#");
     }
     super.marshall();
   }
@@ -42,24 +42,22 @@ class TagEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "slug"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["slug"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "slug": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128
+        slug: {
+          type: "string",
+          minLength: 1,
+          maxLength: 128,
         },
-        "is_shared": {
-          "type": "boolean"
-        }
-      }
+        is_shared: {
+          type: "boolean",
+        },
+      },
     };
   }
 
@@ -68,10 +66,10 @@ class TagEntity extends EntityV2 {
    */
   // eslint-disable-next-line no-unused-vars
   validateBuildRules(options = {}) {
-    if (this.slug.startsWith('#') && !this.isShared) {
+    if (this.slug.startsWith("#") && !this.isShared) {
       //@todo: refactor and improve; this can't happen as the marshalling avoids that in anyway. However the opposite could happen (isShared = true, slug doesn't start with "#").
-      const error = new EntityValidationError('Invalid tag');
-      error.addError('is_shared', 'hashtag', 'A shared tag should start with a hashtag.');
+      const error = new EntityValidationError("Invalid tag");
+      error.addError("is_shared", "hashtag", "A shared tag should start with a hashtag.");
       // @todo should throw the error, not done to not introduce a regression. todo when ignoreInvalidEntity option will be enforced on critical journey.
     }
   }

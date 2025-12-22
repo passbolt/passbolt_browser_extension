@@ -13,7 +13,7 @@
  */
 
 import ResourceModel from "../../model/resource/resourceModel";
-import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import { QuickAccessService } from "../../service/ui/quickAccess.service";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import BrowserTabService from "../../service/ui/browserTab.service";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
@@ -48,8 +48,10 @@ class InformMenuController {
   async getInitialConfiguration(requestId) {
     try {
       // Find user input type and value, resources to suggest and secret generator configuration
-      const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
-      const callToActionInput = await webIntegrationWorker.port.request('passbolt.web-integration.last-performed-call-to-action-input');
+      const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
+      const callToActionInput = await webIntegrationWorker.port.request(
+        "passbolt.web-integration.last-performed-call-to-action-input",
+      );
       const suggestedResources = await this.getOrFindResourcesService.getOrFindSuggested(this.worker.tab.url);
       const configuration = {
         inputType: callToActionInput.type,
@@ -59,7 +61,7 @@ class InformMenuController {
       this.worker.port.emit(requestId, "SUCCESS", configuration);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(requestId, 'ERROR', error);
+      this.worker.port.emit(requestId, "ERROR", error);
     }
   }
 
@@ -69,13 +71,13 @@ class InformMenuController {
    */
   async createNewCredentials(requestId) {
     const queryParameters = [
-      {name: "uiMode", value: "detached"},
-      {name: "feature", value: "create-new-credentials"},
-      {name: "tabId", value: this.worker.tab.id}
+      { name: "uiMode", value: "detached" },
+      { name: "feature", value: "create-new-credentials" },
+      { name: "tabId", value: this.worker.tab.id },
     ];
     await QuickAccessService.openInDetachedMode(queryParameters);
-    const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
-    webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
+    const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
+    webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
     this.worker.port.emit(requestId, "SUCCESS");
   }
 
@@ -85,8 +87,10 @@ class InformMenuController {
    */
   async saveCredentials(requestId) {
     // Request resource username and password to the page on which the save credentials has been initiated.
-    const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
-    const {username, password: secret_clear} = await webIntegrationWorker.port.request('passbolt.web-integration.get-credentials');
+    const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
+    const { username, password: secret_clear } = await webIntegrationWorker.port.request(
+      "passbolt.web-integration.get-credentials",
+    );
 
     // Retrieve resource name and uris from tab.
     const tab = await BrowserTabService.getCurrent();
@@ -94,20 +98,20 @@ class InformMenuController {
     const uris = [tab.url.substr(0, ResourceMetadataEntity.URI_MAX_LENGTH)];
 
     // Store the resource to save in cache.
-    const resourceDto = {name: name, username: username, uris: uris, secret_clear: secret_clear};
+    const resourceDto = { name: name, username: username, uris: uris, secret_clear: secret_clear };
     const resource = new ExternalResourceEntity(resourceDto);
     await ResourceInProgressCacheService.set(resource);
 
     // Open the quickaccess on the save credentials page.
     const quickaccessDetachModeQueryParameters = [
-      {name: "uiMode", value: "detached"},
-      {name: "feature", value: "save-credentials"},
-      {name: "tabId", value: this.worker.tab.id}
+      { name: "uiMode", value: "detached" },
+      { name: "feature", value: "save-credentials" },
+      { name: "tabId", value: this.worker.tab.id },
     ];
     await QuickAccessService.openInDetachedMode(quickaccessDetachModeQueryParameters);
 
     this.worker.port.emit(requestId, "SUCCESS");
-    webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
+    webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
   }
 
   /**
@@ -116,13 +120,13 @@ class InformMenuController {
    */
   async browseCredentials(requestId) {
     const queryParameters = [
-      {name: "uiMode", value: "detached"},
-      {name: "feature", value: "browse-credentials"},
-      {name: "tabId", value: this.worker.tab.id}
+      { name: "uiMode", value: "detached" },
+      { name: "feature", value: "browse-credentials" },
+      { name: "tabId", value: this.worker.tab.id },
     ];
     await QuickAccessService.openInDetachedMode(queryParameters);
-    const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
-    webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
+    const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
+    webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
     this.worker.port.emit(requestId, "SUCCESS");
   }
 
@@ -130,8 +134,8 @@ class InformMenuController {
    * Whenever the user intends to fille a password field in the current page
    */
   async fillPassword(requestId, password) {
-    const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
-    webIntegrationWorker.port.emit('passbolt.web-integration.fill-password', password);
+    const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
+    webIntegrationWorker.port.emit("passbolt.web-integration.fill-password", password);
     this.worker.port.emit(requestId, "SUCCESS");
   }
 
@@ -139,11 +143,10 @@ class InformMenuController {
    * Whenever the user intends to close the in-form-menu in the current page
    */
   async close(requestId) {
-    const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
-    webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
+    const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
+    webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
     this.worker.port.emit(requestId, "SUCCESS");
   }
 }
-
 
 export default InformMenuController;

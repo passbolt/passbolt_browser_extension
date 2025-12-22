@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 
 export const METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY = "metadata_keys_settings";
@@ -83,9 +82,9 @@ class MetadataKeysSettingsLocalStorage {
     if (!settings || !(settings instanceof MetadataKeysSettingsEntity)) {
       throw new TypeError("Parameter `settings` should be of key MetadataKeysSettingsEntity");
     }
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       const settingsDto = settings.toDto();
-      await this._setBrowserStorage({[this.storageKey]: settingsDto});
+      await this._setBrowserStorage({ [this.storageKey]: settingsDto });
       MetadataKeysSettingsLocalStorage._runtimeCachedData[this.account.id] = settingsDto;
     });
   }

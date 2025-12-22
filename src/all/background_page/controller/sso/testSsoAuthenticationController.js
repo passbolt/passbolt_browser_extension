@@ -14,7 +14,7 @@
 import PopupHandlerService from "../../service/sso/popupHandlerService";
 import SsoDryRunModel from "../../model/sso/ssoDryRunModel";
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 class TestSsoAuthenticationController {
   /**

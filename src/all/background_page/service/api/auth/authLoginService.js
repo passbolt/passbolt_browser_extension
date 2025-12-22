@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const AUTH_LOGIN_SERVICE_RESOURCE_NAME = 'auth/login';
+const AUTH_LOGIN_SERVICE_RESOURCE_NAME = "auth/login";
 
 class AuthLoginService extends AbstractService {
   /**
@@ -45,13 +45,13 @@ class AuthLoginService extends AbstractService {
   async loginStage1(fingerprint) {
     // Prepare request data
     const body = new FormData();
-    body.append('data[gpg_auth][keyid]', fingerprint);
+    body.append("data[gpg_auth][keyid]", fingerprint);
     const fetchOptions = await this.apiClient.buildFetchOptions();
     // It is required to let this property unset in order to let the browser determine it by itself and set the additional variable boundary required by the API to parse the payload.
-    delete fetchOptions.headers['content-type'];
+    delete fetchOptions.headers["content-type"];
     const url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
     // Send request token to the server
-    const response = await this.apiClient.sendRequest('POST', url, body, fetchOptions);
+    const response = await this.apiClient.sendRequest("POST", url, body, fetchOptions);
     await this.apiClient.parseResponseJson(response);
     return response;
   }
@@ -66,14 +66,14 @@ class AuthLoginService extends AbstractService {
   async loginStage2(userAuthToken, fingerprint) {
     // Prepare request data
     const body = new FormData();
-    body.append('data[gpg_auth][keyid]', fingerprint);
-    body.append('data[gpg_auth][user_token_result]', userAuthToken);
+    body.append("data[gpg_auth][keyid]", fingerprint);
+    body.append("data[gpg_auth][user_token_result]", userAuthToken);
     const fetchOptions = await this.apiClient.buildFetchOptions();
     // It is required to let this property unset in order to let the browser determine it by itself and set the additional variable boundary required by the API to parse the payload.
-    delete fetchOptions.headers['content-type'];
+    delete fetchOptions.headers["content-type"];
     const url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
     // Send request token to the server
-    const response = await this.apiClient.sendRequest('POST', url, body, fetchOptions);
+    const response = await this.apiClient.sendRequest("POST", url, body, fetchOptions);
     await this.apiClient.parseResponseJson(response);
     return response;
   }

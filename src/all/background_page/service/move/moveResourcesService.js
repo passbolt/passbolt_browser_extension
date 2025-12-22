@@ -16,19 +16,20 @@ import FolderModel from "../../model/folder/folderModel";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import i18n from "../../sdk/i18n";
 import FindResourcesService from "../../service/resource/findResourcesService";
-import ShareResourceService, {PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL} from "../share/shareResourceService";
-import {assertArrayUUID, assertNonEmptyArray, assertString, assertUuid} from "../../utils/assertions";
+import ShareResourceService, { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../share/shareResourceService";
+import { assertArrayUUID, assertNonEmptyArray, assertString, assertUuid } from "../../utils/assertions";
 import FindFoldersService from "../folder/findFoldersService";
 import MoveService from "../api/move/moveService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import ResourceUpdateLocalStorageService from "../resource/update/resourceUpdateLocalStorageService";
 
-export const PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL = 1 // Retrieving destination folder permissions
-  + 1 // Retrieving resources permissions
-  + 1 // Retrieving all resources parent folders permissions
-  + 1 // Calculating resources permissions changes
-  + 1 // Moving resources
-  + PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL;
+export const PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL =
+  1 + // Retrieving destination folder permissions
+  1 + // Retrieving resources permissions
+  1 + // Retrieving all resources parent folders permissions
+  1 + // Calculating resources permissions changes
+  1 + // Moving resources
+  PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL;
 
 class MoveResourcesService {
   /**
@@ -57,10 +58,10 @@ class MoveResourcesService {
    * @param {string} passphrase
    */
   async moveAll(resourcesIds, destinationFolderId, passphrase) {
-    assertNonEmptyArray(resourcesIds, 'Could not move, expecting at least a resource to be provided.');
-    assertArrayUUID(resourcesIds, 'Could not move, expecting resourcesIds to be an array of UUIDs.');
+    assertNonEmptyArray(resourcesIds, "Could not move, expecting at least a resource to be provided.");
+    assertArrayUUID(resourcesIds, "Could not move, expecting resourcesIds to be an array of UUIDs.");
     if (destinationFolderId) {
-      assertUuid(destinationFolderId, 'Could not move, expecting destinationFolderId to be a valid UUID.');
+      assertUuid(destinationFolderId, "Could not move, expecting destinationFolderId to be a valid UUID.");
     }
     if (passphrase) {
       assertString(passphrase);
@@ -110,7 +111,7 @@ class MoveResourcesService {
     this.progressService.finishStep(i18n.t("Retrieving resources permissions"), true);
 
     const resources = await this.findResourcesService.findAllByIdsWithPermissions(resourcesIds);
-    const hasMissingResources = resourcesIds.some(id => !resources.getFirstById(id));
+    const hasMissingResources = resourcesIds.some((id) => !resources.getFirstById(id));
     if (hasMissingResources) {
       throw new Error("Could not move, some resources do not exist.");
     }
@@ -143,10 +144,8 @@ class MoveResourcesService {
    * @private
    */
   filterOutResourcesThatWontMove(resources, resourcesParentFolders, destinationFolder) {
-    resources.filterByCallback(resource => {
-      const parentFolder = resource.folderParentId
-        ? resourcesParentFolders.getById(resource.folderParentId)
-        : null;
+    resources.filterByCallback((resource) => {
+      const parentFolder = resource.folderParentId ? resourcesParentFolders.getById(resource.folderParentId) : null;
 
       const canMove = resource.canMove(parentFolder, destinationFolder);
       if (!canMove) {
@@ -166,11 +165,13 @@ class MoveResourcesService {
    * @private
    */
   async calculateChanges(resources, resourcesParentFolders, destinationFolder) {
-    this.progressService.finishStep(i18n.t('Calculating resources permissions changes'), true);
+    this.progressService.finishStep(i18n.t("Calculating resources permissions changes"), true);
 
     const resultingChanges = new PermissionChangesCollection([]);
     for (const resource of resources) {
-      this.progressService.updateStepMessage(i18n.t('Calculating changes for {{name}}', {name: resource.metadata.name}));
+      this.progressService.updateStepMessage(
+        i18n.t("Calculating changes for {{name}}", { name: resource.metadata.name }),
+      );
       /*
        * A user who can update a resource can move it
        * But to change the rights they need to be owner
@@ -185,15 +186,15 @@ class MoveResourcesService {
        * - move is from a personal folder to a personal folder;
        * - move is from a personal folder to the root.
        */
-      if (resource.isShared()
-        && (destinationFolder === null || destinationFolder.isPersonal())
-        && (resource.folderParentId === null || resource.isPersonal())) {
+      if (
+        resource.isShared() &&
+        (destinationFolder === null || destinationFolder.isPersonal()) &&
+        (resource.folderParentId === null || resource.isPersonal())
+      ) {
         break;
       }
 
-      const parentFolder = resource.folderParentId
-        ? resourcesParentFolders.getById(resource.folderParentId)
-        : null;
+      const parentFolder = resource.folderParentId ? resourcesParentFolders.getById(resource.folderParentId) : null;
 
       const changes = this.resourceModel.calculatePermissionsChangesForMove(resource, parentFolder, destinationFolder);
       resultingChanges.merge(changes);
@@ -210,7 +211,7 @@ class MoveResourcesService {
    * @private
    */
   async move(resources, destinationFolderId) {
-    resources.filterByCallback(resource => {
+    resources.filterByCallback((resource) => {
       const isMoving = resource.folderParentId !== destinationFolderId;
       if (!isMoving) {
         console.debug(`Resource "${resource.id}" is already in the destination folder, skipping.`);
@@ -223,10 +224,10 @@ class MoveResourcesService {
       return;
     }
 
-    this.progressService.finishStep(i18n.t('Moving resources'), true);
+    this.progressService.finishStep(i18n.t("Moving resources"), true);
 
     for (const resource of resources) {
-      this.progressService.updateStepMessage(i18n.t('Moving {{name}}', {name: resource.metadata.name}));
+      this.progressService.updateStepMessage(i18n.t("Moving {{name}}", { name: resource.metadata.name }));
       await this.moveApiService.moveResource(resource.id, destinationFolderId);
     }
     // Update the collection with the resources updated

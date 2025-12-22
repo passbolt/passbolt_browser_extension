@@ -18,7 +18,7 @@ import PermissionsCollection from "../permission/permissionsCollection";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import UserEntity from "../user/userEntity";
 
-const ENTITY_NAME = 'Folder';
+const ENTITY_NAME = "Folder";
 const FOLDER_NAME_MIN_LENGTH = 1;
 const FOLDER_NAME_MAX_LENGTH = 256;
 
@@ -36,21 +36,21 @@ class FolderEntity extends EntityV2 {
 
     // Associations
     if (this._props.permission) {
-      this._permission = new PermissionEntity(this._props.permission, {clone: false});
+      this._permission = new PermissionEntity(this._props.permission, { clone: false });
       FolderEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
-      this._permissions = new PermissionsCollection(this._props.permissions, {clone: false});
+      this._permissions = new PermissionsCollection(this._props.permissions, { clone: false });
       FolderEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator, {...options, clone: false});
+      this._creator = new UserEntity(this._props.creator, { ...options, clone: false });
       delete this._props._creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
+      this._modifier = new UserEntity(this._props.modifier, { ...options, clone: false });
       delete this._props._modifier;
     }
   }
@@ -60,7 +60,7 @@ class FolderEntity extends EntityV2 {
    */
   marshall() {
     // if no parent id specified set it to null
-    if (!Object.prototype.hasOwnProperty.call(this._props, 'folder_parent_id')) {
+    if (!Object.prototype.hasOwnProperty.call(this._props, "folder_parent_id")) {
       this._props.folder_parent_id = null;
     }
     super.marshall();
@@ -73,50 +73,48 @@ class FolderEntity extends EntityV2 {
   static getSchema() {
     const userSchema = UserEntity.getSchema();
     return {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["name"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "folder_parent_id": {
-          "type": "string",
-          "format": "uuid",
-          "nullable": true,
+        folder_parent_id: {
+          type: "string",
+          format: "uuid",
+          nullable: true,
         },
-        "name": {
-          "type": "string",
-          "minLength": FOLDER_NAME_MIN_LENGTH,
-          "maxLength": FOLDER_NAME_MAX_LENGTH
+        name: {
+          type: "string",
+          minLength: FOLDER_NAME_MIN_LENGTH,
+          maxLength: FOLDER_NAME_MAX_LENGTH,
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "personal": {
-          "type": "boolean",
-          "nullable": true,
+        personal: {
+          type: "boolean",
+          nullable: true,
         },
-        "permission": PermissionEntity.getSchema(), // current user permission
-        "permissions": PermissionsCollection.getSchema(), // all users permissions
-        "creator": userSchema,
-        "modifier": userSchema
-      }
+        permission: PermissionEntity.getSchema(), // current user permission
+        permissions: PermissionsCollection.getSchema(), // all users permissions
+        creator: userSchema,
+        modifier: userSchema,
+      },
     };
   }
 
@@ -265,7 +263,7 @@ class FolderEntity extends EntityV2 {
    * @returns {(boolean|null)}
    */
   isPersonal() {
-    if (Object.prototype.hasOwnProperty.call(this._props, 'personal')) {
+    if (Object.prototype.hasOwnProperty.call(this._props, "personal")) {
       return this._props.personal;
     }
     if (this.permissions) {
@@ -296,13 +294,15 @@ class FolderEntity extends EntityV2 {
    */
   static assertValidPermission(permission, folderId) {
     if (!permission) {
-      throw new EntityValidationError('FolderEntity assertValidPermission expect a permission.');
+      throw new EntityValidationError("FolderEntity assertValidPermission expect a permission.");
     }
     if (permission.aco !== PermissionEntity.ACO_FOLDER) {
-      throw new EntityValidationError('FolderEntity assertValidPermission not a valid folder permission.');
+      throw new EntityValidationError("FolderEntity assertValidPermission not a valid folder permission.");
     }
     if (folderId && permission.acoForeignKey !== folderId) {
-      throw new EntityValidationError('FolderEntity assertValidPermission folder id doesnt not match foreign key permission.');
+      throw new EntityValidationError(
+        "FolderEntity assertValidPermission folder id doesnt not match foreign key permission.",
+      );
     }
   }
 
@@ -315,7 +315,7 @@ class FolderEntity extends EntityV2 {
    */
   static assertValidPermissions(permissions, folderId) {
     if (!permissions || !permissions.length) {
-      throw new EntityValidationError('FolderEntity assertValidPermissions expect an array of permissions.');
+      throw new EntityValidationError("FolderEntity assertValidPermissions expect an array of permissions.");
     }
     for (const permission of permissions) {
       FolderEntity.assertValidPermission(permission, folderId);
@@ -331,10 +331,12 @@ class FolderEntity extends EntityV2 {
    */
   static canFolderMove(folderToMove, parentFolder, destinationFolder) {
     if (folderToMove.isReadOnly()) {
-      return ((parentFolder === null || parentFolder.isPersonal()) &&
-         (destinationFolder === null || destinationFolder.isPersonal()));
+      return (
+        (parentFolder === null || parentFolder.isPersonal()) &&
+        (destinationFolder === null || destinationFolder.isPersonal())
+      );
     }
-    return (destinationFolder === null || !destinationFolder.isReadOnly());
+    return destinationFolder === null || !destinationFolder.isReadOnly();
   }
 
   /*
@@ -348,7 +350,7 @@ class FolderEntity extends EntityV2 {
    * @throws {EntityValidationError} if parent id is not a valid uuid
    */
   set folderParentId(folderParentId) {
-    const propName = 'folder_parent_id';
+    const propName = "folder_parent_id";
     if (!folderParentId) {
       this._props[propName] = null;
       return;
@@ -375,7 +377,7 @@ class FolderEntity extends EntityV2 {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {permission: true, permissions: true, creator: true, modifier: true};
+    return { permission: true, permissions: true, creator: true, modifier: true };
   }
 }
 

@@ -14,7 +14,7 @@
 import GridUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/gridUserSetting/gridUserSettingEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 
-export const RESOURCE_GRID_USER_SETTING_STORAGE_KEY = 'resourceGridUserSetting';
+export const RESOURCE_GRID_USER_SETTING_STORAGE_KEY = "resourceGridUserSetting";
 
 class ResourceGridUserSettingLocalStorage {
   /**
@@ -36,7 +36,7 @@ class ResourceGridUserSettingLocalStorage {
    */
   getStorageKey(account) {
     if (!account.id) {
-      throw new Error('Cannot retrieve account id, necessary to get the resource columns setting storage key.');
+      throw new Error("Cannot retrieve account id, necessary to get the resource columns setting storage key.");
     }
     return `${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${account.id}`;
   }
@@ -68,8 +68,8 @@ class ResourceGridUserSettingLocalStorage {
     if (!settings || !(settings instanceof GridUserSettingEntity)) {
       throw new TypeError("Parameter `settings` should be a GridUserSettingEntity.");
     }
-    await navigator.locks.request(this.storageKey, async() => {
-      await this._setBrowserStorage({[this.storageKey]: settings.toJSON()});
+    await navigator.locks.request(this.storageKey, async () => {
+      await this._setBrowserStorage({ [this.storageKey]: settings.toJSON() });
     });
   }
 
@@ -91,7 +91,7 @@ class ResourceGridUserSettingLocalStorage {
    */
   async flush() {
     const storageKey = this.storageKey;
-    await navigator.locks.request(storageKey, async() => {
+    await navigator.locks.request(storageKey, async () => {
       await browser.storage.local.remove(storageKey);
     });
   }

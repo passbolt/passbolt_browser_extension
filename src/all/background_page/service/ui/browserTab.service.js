@@ -17,7 +17,7 @@ class BrowserTabService {
    * Get the current tab
    */
   static async getCurrent() {
-    const tabs = await browser.tabs.query({active: true, currentWindow: true});
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
     return tabs[0];
   }
 
@@ -27,7 +27,7 @@ class BrowserTabService {
    */
   static async getById(id) {
     const tabs = await browser.tabs.query({});
-    return tabs.find(tab => tab.id === parseInt(id));
+    return tabs.find((tab) => tab.id === parseInt(id));
   }
 
   /**
@@ -39,7 +39,7 @@ class BrowserTabService {
    */
   static async sendMessage(worker, message, ...args) {
     const requestArgs = [message].concat(args);
-    return browser.tabs.sendMessage(worker.tabId, requestArgs, {frameId: worker.frameId});
+    return browser.tabs.sendMessage(worker.tabId, requestArgs, { frameId: worker.frameId });
   }
 
   /**

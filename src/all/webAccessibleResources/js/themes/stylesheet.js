@@ -12,7 +12,7 @@
  * @since         2.12.0
  */
 
-(function() {
+(function () {
   class Stylesheet {
     constructor() {
       this.bindCallbacks();
@@ -34,7 +34,7 @@
       if (await this.isThemeDefined()) {
         this.theme = await this.getThemeFromLocalStorage();
       } else {
-        this.mediaQueryPreferColor = window.matchMedia('(prefers-color-scheme: dark)');
+        this.mediaQueryPreferColor = window.matchMedia("(prefers-color-scheme: dark)");
         this.setThemeFromOsPreference(this.mediaQueryPreferColor);
         this.mediaQueryPreferColor.addEventListener("change", this.setThemeFromOsPreference);
       }
@@ -46,7 +46,7 @@
      * Update link reference with the theme
      */
     updateStylesWithUserPreferences() {
-      const cssInfoTag = document.querySelector('#stylesheet-manager');
+      const cssInfoTag = document.querySelector("#stylesheet-manager");
       if (!cssInfoTag) {
         return;
       }
@@ -84,7 +84,11 @@
     handleStorageChange(changes) {
       if (changes._passbolt_data && changes._passbolt_data.newValue.config) {
         const config = changes._passbolt_data.newValue.config;
-        if (config && this.theme !== config["user.settings.theme"] && this.isValidTheme(config["user.settings.theme"])) {
+        if (
+          config &&
+          this.theme !== config["user.settings.theme"] &&
+          this.isValidTheme(config["user.settings.theme"])
+        ) {
           this.theme = config["user.settings.theme"];
           this.updateStylesWithUserPreferences();
           this.mediaQueryPreferColor?.removeEventListener("change", this.setThemeFromOsPreference);
@@ -97,8 +101,8 @@
      * @returns {Promise<unknown>}
      */
     async getLocalStorage() {
-      return new Promise(resolve => {
-        chrome.storage.local.get(["_passbolt_data"], result => resolve(result));
+      return new Promise((resolve) => {
+        chrome.storage.local.get(["_passbolt_data"], (result) => resolve(result));
       });
     }
 
@@ -108,7 +112,9 @@
      */
     async getThemeFromLocalStorage() {
       const storageData = await this.getLocalStorage();
-      const {_passbolt_data: {config}} = storageData;
+      const {
+        _passbolt_data: { config },
+      } = storageData;
       return config["user.settings.theme"];
     }
 
@@ -117,9 +123,7 @@
      * @param mediaQueryPreferColor
      */
     setThemeFromOsPreference(mediaQueryPreferColor) {
-      this.theme = mediaQueryPreferColor.matches
-        ? "midgar"
-        : "default";
+      this.theme = mediaQueryPreferColor.matches ? "midgar" : "default";
       this.updateStylesWithUserPreferences();
     }
 
@@ -133,7 +137,9 @@
         return false;
       }
 
-      const {_passbolt_data: {config}} = storageData;
+      const {
+        _passbolt_data: { config },
+      } = storageData;
       const keyExists = config && "user.settings.theme" in config;
       return keyExists && this.isValidTheme(config["user.settings.theme"]);
     }
@@ -144,7 +150,7 @@
      * @returns {boolean}
      */
     isValidTheme(theme) {
-      const whitelist = ['default', 'midgar', 'solarized_light', 'solarized_dark'];
+      const whitelist = ["default", "midgar", "solarized_light", "solarized_dark"];
       return whitelist.includes(theme);
     }
   }

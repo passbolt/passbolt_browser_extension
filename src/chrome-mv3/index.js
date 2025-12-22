@@ -15,8 +15,7 @@ import PortManager from "../all/background_page/sdk/port/portManager";
 import SystemRequirementService from "../all/background_page/service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "../all/background_page/controller/extension/onExtensionInstalledController";
 import TabService from "../all/background_page/service/tab/tabService";
-import OnExtensionUpdateAvailableService
-  from "../all/background_page/service/extension/onExtensionUpdateAvailableService";
+import OnExtensionUpdateAvailableService from "../all/background_page/service/extension/onExtensionUpdateAvailableService";
 import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarmService";
 import OnStartUpService from "../all/background_page/service/extension/onStartUpService";
 import ToolbarService from "../all/background_page/service/toolbar/toolbarService";

@@ -8,7 +8,7 @@
 class ServerKeyChangedError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'ServerKeyChangedError';
+    this.name = "ServerKeyChangedError";
   }
 }
 

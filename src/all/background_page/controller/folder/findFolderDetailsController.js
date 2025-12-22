@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.9.4
  */
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import FindFoldersService from "../../service/folder/findFoldersService";
 
 class FindFolderDetailsController {
@@ -35,10 +35,10 @@ class FindFolderDetailsController {
   async _exec(folderId) {
     try {
       const result = await this.exec(folderId);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

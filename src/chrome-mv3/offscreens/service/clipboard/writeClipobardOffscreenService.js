@@ -12,7 +12,8 @@
  * @since         5.3.2
  */
 export const SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN = "clipboard-write-offscreen";
-export const SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER = "service-worker-clipboard-write-text-offscreen-response-handler";
+export const SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER =
+  "service-worker-clipboard-write-text-offscreen-response-handler";
 
 export default class WriteClipobardOffscreenService {
   /**
@@ -20,7 +21,7 @@ export default class WriteClipobardOffscreenService {
    * @param {{clipboardContent: string}} message arguments to pass to the clipboard.writeText.
    * @returns {Promise<object>}
    */
-  static async handleClipboardRequest({clipboardContent}) {
+  static async handleClipboardRequest({ clipboardContent }) {
     await WriteClipobardOffscreenService._handleClipboardWriteTextRequest(clipboardContent);
     return WriteClipobardOffscreenService._endClipboardWrite();
   }

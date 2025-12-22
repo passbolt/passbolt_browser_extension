@@ -35,14 +35,18 @@ class AuthVerifyLoginChallengeService {
     // Step 1: Get an encrypted token from the server
     const responseStage1 = await this.authLoginService.loginStage1(userFingerprint);
     // Step 2: Check headers and validate the step
-    const authStage1 = new GpgAuthHeader(responseStage1.headers, 'stage1');
+    const authStage1 = new GpgAuthHeader(responseStage1.headers, "stage1");
     // Step 3: Decrypt the user auth token
-    const encryptedUserAuthToken = authStage1.headers['x-gpgauth-user-auth-token'];
-    const token = await DecryptUserAuthTokenService.decryptToken(encryptedUserAuthToken, userPrivateArmoredKey, passphrase);
+    const encryptedUserAuthToken = authStage1.headers["x-gpgauth-user-auth-token"];
+    const token = await DecryptUserAuthTokenService.decryptToken(
+      encryptedUserAuthToken,
+      userPrivateArmoredKey,
+      passphrase,
+    );
     // Step 4: Send back the token decrypted
     const responseStage2 = await this.authLoginService.loginStage2(token, userFingerprint);
     // Step 5: Check headers and validate the step
-    new GpgAuthHeader(responseStage2.headers, 'complete');
+    new GpgAuthHeader(responseStage2.headers, "complete");
   }
 }
 

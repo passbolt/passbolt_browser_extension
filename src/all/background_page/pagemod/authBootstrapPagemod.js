@@ -12,7 +12,7 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {PortEvents} from "../event/portEvents";
+import { PortEvents } from "../event/portEvents";
 import ParseAuthUrlService from "../service/auth/parseAuthUrlService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
@@ -29,17 +29,14 @@ class AuthBootstrap extends Pagemod {
    * @inheritDoc
    */
   get contentStyleFiles() {
-    return ['webAccessibleResources/css/themes/default/ext_external.min.css'];
+    return ["webAccessibleResources/css/themes/default/ext_external.min.css"];
   }
 
   /**
    * @inheritDoc
    */
   get contentScriptFiles() {
-    return [
-      'contentScripts/js/dist/vendors.js',
-      'contentScripts/js/dist/login.js',
-    ];
+    return ["contentScripts/js/dist/vendors.js", "contentScripts/js/dist/login.js"];
   }
 
   /**
@@ -60,8 +57,7 @@ class AuthBootstrap extends Pagemod {
    * @inheritDoc
    */
   async canBeAttachedTo(frameDetails) {
-    return this.assertTopFrameAttachConstraint(frameDetails)
-      && await this.assertUrlAttachConstraint(frameDetails);
+    return this.assertTopFrameAttachConstraint(frameDetails) && (await this.assertUrlAttachConstraint(frameDetails));
   }
 
   /**

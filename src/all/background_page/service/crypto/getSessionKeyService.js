@@ -12,10 +12,9 @@
  * @since         4.10.1
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Uint8ArrayConvert from "../../utils/format/uint8ArrayConvert";
 import * as openpgp from "openpgp";
-
 
 class GetSessionKeyService {
   /**

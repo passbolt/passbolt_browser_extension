@@ -13,7 +13,7 @@
  */
 
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
-import {assertString, assertUuid} from "../../utils/assertions";
+import { assertString, assertUuid } from "../../utils/assertions";
 import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
 import DecryptSecretsService from "../crypto/decryptSecretsService";
 import FindSecretRevisionsService from "./findSecretRevisionsService";
@@ -55,7 +55,12 @@ export default class FindAndDecryptSecretRevisionsService {
     };
 
     const resourceSecretRevisions = await this.findSecretRevisionsService.findAllByResourceId(resourceId, contains);
-    await DecryptSecretsService.decryptAllFromSecretRevisions(resourceSecretRevisions, resourceTypesCollection, decryptedKey, {ignoreDecryptionError: true});
+    await DecryptSecretsService.decryptAllFromSecretRevisions(
+      resourceSecretRevisions,
+      resourceTypesCollection,
+      decryptedKey,
+      { ignoreDecryptionError: true },
+    );
     resourceSecretRevisions.filterOutItemsHavingSecretDataEncrypted();
 
     return resourceSecretRevisions;

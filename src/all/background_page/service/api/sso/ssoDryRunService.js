@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
+import { ApiClient } from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
 
-const SSO_DRY_RUN_SERVICE_RESOURCE_NAME = '/sso/${providerId}/login/dry-run';
+const SSO_DRY_RUN_SERVICE_RESOURCE_NAME = "/sso/${providerId}/login/dry-run";
 
 class SsoDryRunService {
   /**
@@ -55,7 +55,7 @@ class SsoDryRunService {
    * @private
    */
   getApiClient(providerId) {
-    if (typeof(providerId) !== "string") {
+    if (typeof providerId !== "string") {
       throw new Error("The provider identifier should be a string");
     }
 

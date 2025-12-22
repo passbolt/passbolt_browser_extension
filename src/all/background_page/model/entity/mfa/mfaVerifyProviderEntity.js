@@ -15,19 +15,17 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
-const ENTITY_NAME = 'MfaVerifyProvider';
+const ENTITY_NAME = "MfaVerifyProvider";
 
 class MfaVerifyProviderEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(setupDto, options = {}) {
-    super(EntitySchema.validate(
-      MfaVerifyProviderEntity.ENTITY_NAME,
-      setupDto,
-      MfaVerifyProviderEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(MfaVerifyProviderEntity.ENTITY_NAME, setupDto, MfaVerifyProviderEntity.getSchema()),
+      options,
+    );
   }
 
   /**
@@ -36,16 +34,14 @@ class MfaVerifyProviderEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "verified",
-      ],
-      "properties": {
-        "verified": {
-          "type": "string",
-          "format": "date-time"
+      type: "object",
+      required: ["verified"],
+      properties: {
+        verified: {
+          type: "string",
+          format: "date-time",
         },
-      }
+      },
     };
   }
 

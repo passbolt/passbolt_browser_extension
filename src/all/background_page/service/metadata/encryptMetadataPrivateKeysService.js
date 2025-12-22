@@ -11,11 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.11.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
-import MetadataPrivateKeysCollection
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeysCollection";
-import {assertType} from '../../utils/assertions';
+import MetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeysCollection";
+import { assertType } from "../../utils/assertions";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import Keyring from "../../model/keyring";
@@ -45,7 +44,11 @@ class EncryptMetadataPrivateKeysService {
    * @throws {Error} If `userPrivateKey` is not a decrypted OpenPGP private key.
    */
   async encryptOne(metadataPrivateKey, userPrivateKey = null, options = {}) {
-    assertType(metadataPrivateKey, MetadataPrivateKeyEntity, "The 'metadataPrivateKey' parameter should be of type MetadataPrivateKeysEntity.");
+    assertType(
+      metadataPrivateKey,
+      MetadataPrivateKeyEntity,
+      "The 'metadataPrivateKey' parameter should be of type MetadataPrivateKeysEntity.",
+    );
     if (typeof options?.date !== "undefined") {
       assertType(options?.date, Date, "The optional 'date' parameter should be of type Date.");
     }
@@ -59,9 +62,14 @@ class EncryptMetadataPrivateKeysService {
 
     const recipientPublicKey = await this._retrieveRecipientKey(metadataPrivateKey.userId);
     const message = JSON.stringify(metadataPrivateKey.data);
-    const encryptOptions =  {date: options?.date};
+    const encryptOptions = { date: options?.date };
     const signingKeys = userPrivateKey ? [userPrivateKey] : null;
-    metadataPrivateKey.data = await EncryptMessageService.encrypt(message, recipientPublicKey, signingKeys, encryptOptions);
+    metadataPrivateKey.data = await EncryptMessageService.encrypt(
+      message,
+      recipientPublicKey,
+      signingKeys,
+      encryptOptions,
+    );
   }
 
   /**
@@ -99,7 +107,11 @@ class EncryptMetadataPrivateKeysService {
    * @throws {Error} If `userPrivateKey` is not a decrypted OpenPGP private key.
    */
   async encryptAll(metadataPrivateKeys, userPrivateKey) {
-    assertType(metadataPrivateKeys, MetadataPrivateKeysCollection, "The 'metadataPrivateKeys' parameter should be of type MetadataPrivateKeysCollection.");
+    assertType(
+      metadataPrivateKeys,
+      MetadataPrivateKeysCollection,
+      "The 'metadataPrivateKeys' parameter should be of type MetadataPrivateKeysCollection.",
+    );
     await OpenpgpAssertion.assertDecryptedPrivateKey(userPrivateKey);
     for (const metadataPrivateKey of metadataPrivateKeys.items) {
       await this.encryptOne(metadataPrivateKey, userPrivateKey);

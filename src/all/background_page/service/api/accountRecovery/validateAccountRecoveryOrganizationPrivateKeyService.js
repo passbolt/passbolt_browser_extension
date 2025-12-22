@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import WrongOrganizationRecoveryKeyError from "../../../error/wrongOrganizationRecoveryKeyError";
 
@@ -29,14 +29,19 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
    */
   // @todo is there a key size validation
   static async validate(accountRecoveryOrganisationPolicyEntity, privateKeyEntity) {
-    const accountRecoveryPublicKey = await OpenpgpAssertion.readKeyOrFail(accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey);
+    const accountRecoveryPublicKey = await OpenpgpAssertion.readKeyOrFail(
+      accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey,
+    );
     const privateKey = await OpenpgpAssertion.readKeyOrFail(privateKeyEntity.armoredKey);
 
     const publicKeyFingerPrint = accountRecoveryPublicKey.getFingerprint().toUpperCase();
     const privateKeyFingerPrint = privateKey.getFingerprint().toUpperCase();
 
     if (publicKeyFingerPrint !== privateKeyFingerPrint) {
-      throw new WrongOrganizationRecoveryKeyError(`Error, this is not the current organization recovery key. Expected fingerprint: ${publicKeyFingerPrint}`, publicKeyFingerPrint);
+      throw new WrongOrganizationRecoveryKeyError(
+        `Error, this is not the current organization recovery key. Expected fingerprint: ${publicKeyFingerPrint}`,
+        publicKeyFingerPrint,
+      );
     }
 
     if (!privateKey.isDecrypted()) {

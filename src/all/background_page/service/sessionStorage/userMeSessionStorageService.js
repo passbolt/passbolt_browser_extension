@@ -28,7 +28,7 @@ class UserMeSessionStorageService {
    */
   static getStorageKey(account) {
     if (!account.id) {
-      throw new Error('Cannot retrieve account id, necessary to get a users me storage key.');
+      throw new Error("Cannot retrieve account id, necessary to get a users me storage key.");
     }
     return `${USER_ME_STORAGE_KEY_PREFIX}-${account.id}`;
   }
@@ -47,7 +47,7 @@ class UserMeSessionStorageService {
     try {
       storageData = await browser.storage.session.get(storageKey);
     } catch (error) {
-      throw new Error('Unable to access the user me session storage', {cause: error});
+      throw new Error("Unable to access the user me session storage", { cause: error });
     }
 
     const userMeDto = storageData?.[storageKey];
@@ -56,7 +56,7 @@ class UserMeSessionStorageService {
       try {
         return new UserEntity(userMeDto);
       } catch (error) {
-        console.debug('Unable to instantiate the user entity based on the cached user dto.', error);
+        console.debug("Unable to instantiate the user entity based on the cached user dto.", error);
       }
     }
 
@@ -72,8 +72,8 @@ class UserMeSessionStorageService {
   static async set(account, user) {
     const storageKey = this.getStorageKey(account);
 
-    await navigator.locks.request(storageKey, async() => {
-      await browser.storage.session.set({[storageKey]: user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)});
+    await navigator.locks.request(storageKey, async () => {
+      await browser.storage.session.set({ [storageKey]: user.toDto(UserEntity.ALL_CONTAIN_OPTIONS) });
     });
   }
 
@@ -85,7 +85,7 @@ class UserMeSessionStorageService {
   static async remove(account) {
     const storageKey = this.getStorageKey(account);
 
-    await navigator.locks.request(storageKey, async() => {
+    await navigator.locks.request(storageKey, async () => {
       await browser.storage.session.remove(storageKey);
     });
   }

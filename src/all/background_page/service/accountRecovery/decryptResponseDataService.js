@@ -12,10 +12,9 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
-
 
 class DecryptResponseDataService {
   /**
@@ -35,7 +34,10 @@ class DecryptResponseDataService {
   static async decrypt(response, decryptionKey, verificationUserId, verificationDomain, verificationUserPublicKey) {
     let privateKeyPasswordDecryptedDataDto;
     const responseDataMessage = await OpenpgpAssertion.readMessageOrFail(response.data);
-    const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(responseDataMessage, decryptionKey);
+    const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(
+      responseDataMessage,
+      decryptionKey,
+    );
 
     try {
       privateKeyPasswordDecryptedDataDto = JSON.parse(privateKeyPasswordDecryptedDataSerialized);
@@ -44,18 +46,25 @@ class DecryptResponseDataService {
       throw new Error("Unable to parse the decrypted response data.");
     }
 
-    const privateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(privateKeyPasswordDecryptedDataDto);
+    const privateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(
+      privateKeyPasswordDecryptedDataDto,
+    );
 
     if (privateKeyPasswordDecryptedData.privateKeyUserId !== verificationUserId) {
       throw new Error("The user id contained in the response data does not match the verification user id.");
     }
 
     if (privateKeyPasswordDecryptedData.domain !== verificationDomain) {
-      throw new Error("The domain contained in the private key password data does not match the expected target domain.");
+      throw new Error(
+        "The domain contained in the private key password data does not match the expected target domain.",
+      );
     }
 
     if (verificationUserPublicKey) {
-      if (privateKeyPasswordDecryptedData.privateKeyFingerprint !== verificationUserPublicKey.getFingerprint().toUpperCase()) {
+      if (
+        privateKeyPasswordDecryptedData.privateKeyFingerprint !==
+        verificationUserPublicKey.getFingerprint().toUpperCase()
+      ) {
         throw new Error("The response data fingerprint should match the verification fingerprint.");
       }
     }

@@ -17,12 +17,12 @@ import ExternalTotpEntity from "../../totp/externalTotpEntity";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {assertType} from "../../../../utils/assertions";
+import { assertType } from "../../../../utils/assertions";
 import IconEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
-import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
+import { SECRET_DATA_OBJECT_TYPE } from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
-const DEFAULT_RESOURCE_NAME = '(no name)';
+const DEFAULT_RESOURCE_NAME = "(no name)";
 const RESOURCE_URI_MAX_LENGTH = 1024;
 const RESOURCE_URIS_MAX_ITEMS = 32;
 
@@ -38,26 +38,25 @@ class ExternalResourceEntity extends EntityV2 {
 
     // Associations
     if (this._props.secrets) {
-      this._secrets = new ResourceSecretsCollection(this._props.secrets, {clone: false});
+      this._secrets = new ResourceSecretsCollection(this._props.secrets, { clone: false });
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
 
     if (this._props.totp) {
-      this._totp = new ExternalTotpEntity(this._props.totp, {clone: false});
+      this._totp = new ExternalTotpEntity(this._props.totp, { clone: false });
       delete this._props.totp;
     }
 
     if (this._props.icon) {
       try {
-        this._icon = new IconEntity(this._props.icon, {clone: false});
+        this._icon = new IconEntity(this._props.icon, { clone: false });
       } catch (e) {
         console.warn("The associated icon entity could not be set.", e);
       }
       delete this._props.icon;
     }
   }
-
 
   /**
    *  @inheritDoc
@@ -68,7 +67,6 @@ class ExternalResourceEntity extends EntityV2 {
       custom_fields: CustomFieldsCollection,
     };
   }
-
 
   /**
    * @inheritdoc
@@ -98,44 +96,41 @@ class ExternalResourceEntity extends EntityV2 {
     const metadataEntitySchema = ResourceMetadataEntity.getSchema();
 
     return {
-      "type": "object",
-      "required": [
-        "name",
-        "secret_clear"
-      ],
-      "properties": {
-        "id": resourceEntitySchema.properties.id,
-        "name": metadataEntitySchema.properties.name,
-        "username": metadataEntitySchema.properties.username,
-        "uris": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxLength": RESOURCE_URI_MAX_LENGTH
+      type: "object",
+      required: ["name", "secret_clear"],
+      properties: {
+        id: resourceEntitySchema.properties.id,
+        name: metadataEntitySchema.properties.name,
+        username: metadataEntitySchema.properties.username,
+        uris: {
+          type: "array",
+          items: {
+            type: "string",
+            maxLength: RESOURCE_URI_MAX_LENGTH,
           },
-          "maxItems": RESOURCE_URIS_MAX_ITEMS
+          maxItems: RESOURCE_URIS_MAX_ITEMS,
         },
-        "description": metadataEntitySchema.properties.description,
-        "secrets": resourceEntitySchema.properties.secrets,
-        "folder_parent_id": resourceEntitySchema.properties.folder_parent_id,
-        "resource_type_id": resourceEntitySchema.properties.resource_type_id,
-        "secret_clear": {
-          "type": "string"
+        description: metadataEntitySchema.properties.description,
+        secrets: resourceEntitySchema.properties.secrets,
+        folder_parent_id: resourceEntitySchema.properties.folder_parent_id,
+        resource_type_id: resourceEntitySchema.properties.resource_type_id,
+        secret_clear: {
+          type: "string",
         },
-        "totp": {
+        totp: {
           ...ExternalTotpEntity.getSchema(),
-          "nullable": true,
+          nullable: true,
         },
-        "folder_parent_path": {
-          "type": "string"
+        folder_parent_path: {
+          type: "string",
         },
-        "expired": resourceEntitySchema.properties.expired,
-        "icon": IconEntity.getSchema(),
-        "custom_fields": {
+        expired: resourceEntitySchema.properties.expired,
+        icon: IconEntity.getSchema(),
+        custom_fields: {
           ...CustomFieldsCollection.getSchema(),
-          "nullable": true,
+          nullable: true,
         },
-      }
+      },
     };
   }
 
@@ -215,7 +210,6 @@ class ExternalResourceEntity extends EntityV2 {
     return RESOURCE_URI_MAX_LENGTH;
   }
 
-
   /**
    * Returns a Resource DTO in v5 format.
    * @returns {Object}
@@ -229,7 +223,7 @@ class ExternalResourceEntity extends EntityV2 {
         uris: this.uris,
         description: this.description,
         resource_type_id: this.resourceTypeId,
-        custom_fields: this.customFields?.toMetadataDto()
+        custom_fields: this.customFields?.toMetadataDto(),
       },
       secrets: this._secrets.toDto(),
       folder_parent_id: this.folderParentId,
@@ -262,7 +256,7 @@ class ExternalResourceEntity extends EntityV2 {
     const dto = {};
 
     // Extract password if present or is defined in the resource type.
-    if (typeof this.secretClear === 'string' && resourceType.hasPassword()) {
+    if (typeof this.secretClear === "string" && resourceType.hasPassword()) {
       dto.password = this.secretClear || ""; // empty string is required to avoid crash at validation on certain resource type
     }
 

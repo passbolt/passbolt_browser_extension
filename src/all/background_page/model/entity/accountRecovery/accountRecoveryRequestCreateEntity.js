@@ -16,22 +16,25 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import AccountRecoveryRequestEntity from "./accountRecoveryRequestEntity";
 import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
 
-const ENTITY_NAME = 'AccountRecoveryRequestCreate';
+const ENTITY_NAME = "AccountRecoveryRequestCreate";
 
 class AccountRecoveryRequestCreateEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(accountRecoveryRequestCreateDto, options = {}) {
-    super(EntitySchema.validate(
-      AccountRecoveryRequestCreateEntity.ENTITY_NAME,
-      accountRecoveryRequestCreateDto,
-      AccountRecoveryRequestCreateEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        AccountRecoveryRequestCreateEntity.ENTITY_NAME,
+        accountRecoveryRequestCreateDto,
+        AccountRecoveryRequestCreateEntity.getSchema(),
+      ),
+      options,
+    );
 
     // Associations
     if (this._props.authentication_token) {
-      this._authentication_token = new AuthenticationTokenEntity(this._props.authentication_token, {clone: false});
+      this._authentication_token = new AuthenticationTokenEntity(this._props.authentication_token, { clone: false });
       delete this._props.authentication_token;
     }
   }
@@ -42,20 +45,15 @@ class AccountRecoveryRequestCreateEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "user_id",
-        "fingerprint",
-        "armored_key",
-        "authentication_token",
-      ],
-      "properties": {
-        "user_id": AccountRecoveryRequestEntity.getSchema().properties.user_id,
-        "armored_key": AccountRecoveryRequestEntity.getSchema().properties.armored_key,
-        "fingerprint": AccountRecoveryRequestEntity.getSchema().properties.fingerprint,
+      type: "object",
+      required: ["user_id", "fingerprint", "armored_key", "authentication_token"],
+      properties: {
+        user_id: AccountRecoveryRequestEntity.getSchema().properties.user_id,
+        armored_key: AccountRecoveryRequestEntity.getSchema().properties.armored_key,
+        fingerprint: AccountRecoveryRequestEntity.getSchema().properties.fingerprint,
         // Associated models
-        "authentication_token": AuthenticationTokenEntity.getSchema()
-      }
+        authentication_token: AuthenticationTokenEntity.getSchema(),
+      },
     };
   }
 
@@ -119,7 +117,7 @@ class AccountRecoveryRequestCreateEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {authentication_token: true};
+    return { authentication_token: true };
   }
 }
 

@@ -12,11 +12,10 @@
  * @since         3.0.0
  */
 import CommentEntity from "../../../model/entity/comment/commentEntity";
-import {assertNonEmptyString} from "../../../utils/assertions";
+import { assertNonEmptyString } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
-
-const COMMENT_SERVICE_RESOURCE_NAME = 'comments';
+const COMMENT_SERVICE_RESOURCE_NAME = "comments";
 
 class CommentApiService extends AbstractService {
   /**
@@ -45,7 +44,7 @@ class CommentApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return ['creator', 'modifier'];
+    return ["creator", "modifier"];
   }
 
   /**
@@ -58,15 +57,18 @@ class CommentApiService extends AbstractService {
    * @throws {Error} if options are invalid or API error
    * @public
    */
-  async findAll(foreignModel, foreignId,  contains) {
+  async findAll(foreignModel, foreignId, contains) {
     this.assertValidId(foreignId);
     this.assertValidForeignModel(foreignModel);
 
     contains = contains ? this.formatContainOptions(contains, CommentApiService.getSupportedContainOptions()) : null;
-    const urlOptions = {...contains};
+    const urlOptions = { ...contains };
 
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, urlOptions || {});
-    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const url = this.apiClient.buildUrl(
+      `${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`,
+      urlOptions || {},
+    );
+    const response = await this.apiClient.fetchAndHandleResponse("GET", url);
     if (!response.body || !response.body.length) {
       return [];
     }
@@ -91,13 +93,13 @@ class CommentApiService extends AbstractService {
     this.assertValidId(foreignId);
 
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, {});
-    const data = {content: commentDto.content};
+    const data = { content: commentDto.content };
     if (commentDto.parent_id) {
       data.parent_id = commentDto.parent_id;
     }
 
     const bodyString = this.apiClient.buildBody(data);
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
     return response.body;
   }
 

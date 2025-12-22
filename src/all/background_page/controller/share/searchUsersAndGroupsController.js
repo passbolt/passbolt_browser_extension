@@ -13,7 +13,7 @@
  */
 
 import ShareModel from "../../model/share/shareModel";
-import {assertString} from "../../utils/assertions";
+import { assertString } from "../../utils/assertions";
 
 class SearchUsersAndGroupsController {
   /**

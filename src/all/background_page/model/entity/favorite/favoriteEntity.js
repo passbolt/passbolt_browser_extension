@@ -13,8 +13,8 @@
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'Favorite';
-const FAVORITE_RESOURCE = 'Resource';
+const ENTITY_NAME = "Favorite";
+const FAVORITE_RESOURCE = "Resource";
 
 class FavoriteEntity extends EntityV2 {
   /**
@@ -23,31 +23,26 @@ class FavoriteEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "id",
-        "user_id",
-        "foreign_key",
-        "created"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["id", "user_id", "foreign_key", "created"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
+        user_id: {
+          type: "string",
+          format: "uuid",
         },
-        "foreign_key": {
-          "type": "string",
-          "format": "uuid"
+        foreign_key: {
+          type: "string",
+          format: "uuid",
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
+        created: {
+          type: "string",
+          format: "date-time",
+        },
+      },
     };
   }
 

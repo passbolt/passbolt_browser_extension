@@ -40,10 +40,10 @@ class DeleteDryRunUserController {
   async _exec(userId) {
     try {
       await this.exec(userId);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -60,7 +60,7 @@ class DeleteDryRunUserController {
     } catch (error) {
       if (error instanceof DeleteDryRunError) {
         const resourcesCollection = error.errors.resources?.sole_owner;
-        if (resourcesCollection?.items.some(resourceEntity => !resourceEntity.isMetadataDecrypted())) {
+        if (resourcesCollection?.items.some((resourceEntity) => !resourceEntity.isMetadataDecrypted())) {
           const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
           await this.decryptMetadataService.decryptAllFromForeignModels(error.errors.resources.sole_owner, passphrase);
         }

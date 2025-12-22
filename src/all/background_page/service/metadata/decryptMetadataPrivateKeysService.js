@@ -11,15 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import PassphraseStorageService from '../session_storage/passphraseStorageService';
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
 import MetadataPrivateKeyDataEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyDataEntity";
 import MetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeysCollection";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
-import {assertType} from '../../utils/assertions';
-import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
-import DecryptMessageService from '../crypto/decryptMessageService';
+import { assertType } from "../../utils/assertions";
+import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
+import DecryptMessageService from "../crypto/decryptMessageService";
 import FindSignatureService from "../crypto/findSignatureService";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
@@ -45,28 +45,43 @@ class DecryptMetadataPrivateKeysService {
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */
   async decryptOne(metadataPrivateKeyEntity, passphrase = null) {
-    assertType(metadataPrivateKeyEntity, MetadataPrivateKeyEntity, "The given entity is not a MetadataPrivateKeyEntity");
+    assertType(
+      metadataPrivateKeyEntity,
+      MetadataPrivateKeyEntity,
+      "The given entity is not a MetadataPrivateKeyEntity",
+    );
     if (metadataPrivateKeyEntity.isDecrypted) {
       return;
     }
 
     const message = await OpenpgpAssertion.readMessageOrFail(metadataPrivateKeyEntity.data);
 
-    passphrase = passphrase || await PassphraseStorageService.getOrFail();
+    passphrase = passphrase || (await PassphraseStorageService.getOrFail());
 
-    const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+    const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(
+      this.account.userPrivateArmoredKey,
+      passphrase,
+    );
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
-    const decryptedMessage = await DecryptMessageService.decrypt(message, userDecryptedPrivateArmoredKey, [userPublicKey], {
-      returnOnlyData: false,
-      throwOnInvalidSignaturesVerification: false
-    });
+    const decryptedMessage = await DecryptMessageService.decrypt(
+      message,
+      userDecryptedPrivateArmoredKey,
+      [userPublicKey],
+      {
+        returnOnlyData: false,
+        throwOnInvalidSignaturesVerification: false,
+      },
+    );
     const decryptedMetadataPrivateKeyDto = JSON.parse(decryptedMessage.data);
     const metadataPrivateKeyDataEntity = new MetadataPrivateKeyDataEntity(decryptedMetadataPrivateKeyDto);
     metadataPrivateKeyEntity.data = metadataPrivateKeyDataEntity;
 
     await this.assertFingerprintPublicAndPrivateKeysMatch(metadataPrivateKeyEntity);
 
-    const externalGpgSignature = await FindSignatureService.findSignatureForGpgKey(decryptedMessage.signatures, userPublicKey);
+    const externalGpgSignature = await FindSignatureService.findSignatureForGpgKey(
+      decryptedMessage.signatures,
+      userPublicKey,
+    );
 
     if (externalGpgSignature && externalGpgSignature.isVerified) {
       metadataPrivateKeyEntity.dataSignedByCurrentUser = externalGpgSignature.created;
@@ -85,9 +100,13 @@ class DecryptMetadataPrivateKeysService {
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */
   async decryptAll(metadataPrivateKeysCollection, passphrase = null) {
-    assertType(metadataPrivateKeysCollection, MetadataPrivateKeysCollection, "The given collection is not of the type MetadataPrivateKeysCollection");
+    assertType(
+      metadataPrivateKeysCollection,
+      MetadataPrivateKeysCollection,
+      "The given collection is not of the type MetadataPrivateKeysCollection",
+    );
 
-    passphrase = passphrase || await PassphraseStorageService.getOrFail();
+    passphrase = passphrase || (await PassphraseStorageService.getOrFail());
 
     const items = metadataPrivateKeysCollection.items;
     for (let i = 0; i < items.length; i++) {
@@ -110,15 +129,23 @@ class DecryptMetadataPrivateKeysService {
    *   given and cannot be retrieved from the session storage.
    */
   async decryptAllFromMetadataKeysCollection(metadataKeysCollection, passphrase = null) {
-    assertType(metadataKeysCollection, MetadataKeysCollection, "The given collection is not of the type MetadataKeysCollection");
+    assertType(
+      metadataKeysCollection,
+      MetadataKeysCollection,
+      "The given collection is not of the type MetadataKeysCollection",
+    );
 
     const items = metadataKeysCollection.items;
     for (let i = 0; i < items.length; i++) {
       const metadataPrivateKeysCollection = items[i].metadataPrivateKeys;
-      if (!metadataPrivateKeysCollection || !metadataPrivateKeysCollection.length || !metadataKeysCollection?.hasEncryptedKeys()) {
+      if (
+        !metadataPrivateKeysCollection ||
+        !metadataPrivateKeysCollection.length ||
+        !metadataKeysCollection?.hasEncryptedKeys()
+      ) {
         continue;
       }
-      passphrase = passphrase || await PassphraseStorageService.getOrFail();
+      passphrase = passphrase || (await PassphraseStorageService.getOrFail());
       await this.decryptAll(metadataPrivateKeysCollection, passphrase);
     }
   }
@@ -133,9 +160,16 @@ class DecryptMetadataPrivateKeysService {
   async assertFingerprintPublicAndPrivateKeysMatch(metadataPrivateKeyEntity) {
     const armoredMetadataPrivateKey = await OpenpgpAssertion.readKeyOrFail(metadataPrivateKeyEntity.data.armoredKey);
 
-    if (metadataPrivateKeyEntity.data.fingerprint.toLowerCase() !== armoredMetadataPrivateKey.getFingerprint().toLowerCase()) {
+    if (
+      metadataPrivateKeyEntity.data.fingerprint.toLowerCase() !==
+      armoredMetadataPrivateKey.getFingerprint().toLowerCase()
+    ) {
       const error = new EntityValidationError();
-      error.addError(`metadata_private_key`, 'fingerprint_match', 'The fingerprint of the metadata private key does not match the fingerprint of the entity');
+      error.addError(
+        `metadata_private_key`,
+        "fingerprint_match",
+        "The fingerprint of the metadata private key does not match the fingerprint of the entity",
+      );
       throw error;
     }
   }

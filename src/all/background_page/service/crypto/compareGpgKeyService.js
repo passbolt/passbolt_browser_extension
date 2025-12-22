@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import GetGpgKeyInfoService from "./getGpgKeyInfoService";
 
 class CompareGpgKeyService {
@@ -32,8 +32,7 @@ class CompareGpgKeyService {
 
     const keyAInfo = await GetGpgKeyInfoService.getKeyInfo(keyA);
     const keyBInfo = await GetGpgKeyInfoService.getKeyInfo(keyB);
-    return keyAInfo.fingerprint === keyBInfo.fingerprint
-      && keyAInfo.expires === keyBInfo.expires;
+    return keyAInfo.fingerprint === keyBInfo.fingerprint && keyAInfo.expires === keyBInfo.expires;
   }
 }
 

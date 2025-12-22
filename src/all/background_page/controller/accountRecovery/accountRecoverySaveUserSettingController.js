@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
@@ -20,7 +20,6 @@ import GetPassphraseService from "../../service/passphrase/getPassphraseService"
 import User from "../../model/user";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import BuildApprovedAccountRecoveryUserSettingEntityService from "../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService";
-
 
 /**
  * Controller related to the account recovery save settings
@@ -54,7 +53,7 @@ class AccountRecoverySaveUserSettingsController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -79,7 +78,7 @@ class AccountRecoverySaveUserSettingsController {
       accountRecoveryUserSettingEntity = await this.buildApprovedUserSetting(organizationPolicy);
     } else {
       const userId = User.getInstance().get().id;
-      const userSettingDto = {user_id: userId, status: AccountRecoveryUserSettingEntity.STATUS_REJECTED};
+      const userSettingDto = { user_id: userId, status: AccountRecoveryUserSettingEntity.STATUS_REJECTED };
       accountRecoveryUserSettingEntity = new AccountRecoveryUserSettingEntity(userSettingDto);
     }
 
@@ -97,7 +96,11 @@ class AccountRecoverySaveUserSettingsController {
     const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(userPrivateArmoredKey);
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, userPassphrase);
 
-    return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.account, userDecryptedPrivateKey, organizationPolicy);
+    return BuildApprovedAccountRecoveryUserSettingEntityService.build(
+      this.account,
+      userDecryptedPrivateKey,
+      organizationPolicy,
+    );
   }
 }
 

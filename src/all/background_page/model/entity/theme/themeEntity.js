@@ -13,7 +13,7 @@
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'Theme';
+const ENTITY_NAME = "Theme";
 
 class ThemeEntity extends EntityV2 {
   /**
@@ -22,21 +22,18 @@ class ThemeEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "id",
-        "name",
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["id", "name"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "name": {
-          "type": "string",
-          "pattern": /^[a-zA-Z0-9-_]*$/,
-        }
-      }
+        name: {
+          type: "string",
+          pattern: /^[a-zA-Z0-9-_]*$/,
+        },
+      },
     };
   }
 

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import Lock from "../../../background_page/utils/lock";
 
 class Port {
@@ -25,7 +25,7 @@ class Port {
     this.onConnectErrorHandler = {};
     if (typeof name === "undefined") {
       throw Error("A port name is required.");
-    } else if (typeof name  !== "string") {
+    } else if (typeof name !== "string") {
       throw Error("The port name should be a valid string.");
     }
 
@@ -38,9 +38,11 @@ class Port {
    */
   connect() {
     let resolver;
-    const promise = new Promise(resolve => { resolver = resolve; });
+    const promise = new Promise((resolve) => {
+      resolver = resolve;
+    });
     try {
-      this._port = browser.runtime.connect({name: this._name});
+      this._port = browser.runtime.connect({ name: this._name });
     } catch (error) {
       /**
        * Error happen only if there is no listener in the service worker or if the context is invalidated by an update
@@ -67,7 +69,7 @@ class Port {
       this._connected = false;
     });
 
-    this._port.onMessage.addListener(msg => {
+    this._port.onMessage.addListener((msg) => {
       this._onMessage(msg);
     });
   }
@@ -115,7 +117,7 @@ class Port {
     this._listeners[name].push({
       name: name,
       callback: callback,
-      once: once
+      once: once,
     });
   }
 
@@ -169,9 +171,9 @@ class Port {
        * Or if a progress notification is sent.
        */
       this.once(requestId, (status, ...callbackArgs) => {
-        if (status === 'SUCCESS') {
+        if (status === "SUCCESS") {
           resolve.apply(null, callbackArgs);
-        } else if (status === 'ERROR') {
+        } else if (status === "ERROR") {
           reject.apply(null, callbackArgs);
         }
       });

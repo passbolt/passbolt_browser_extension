@@ -15,7 +15,7 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'PassphraseGeneratorSettings';
+const ENTITY_NAME = "PassphraseGeneratorSettings";
 
 const PASSPHRASE_WORDS_UPPERCASE = "uppercase";
 const PASSPHRASE_WORDS_LOWERCASE = "lowercase";
@@ -26,11 +26,14 @@ class PassphraseGeneratorSettingsEntity extends Entity {
    * @inheritDoc
    */
   constructor(passphraseGeneratorSettingsDto, options = {}) {
-    super(EntitySchema.validate(
-      PassphraseGeneratorSettingsEntity.ENTITY_NAME,
-      passphraseGeneratorSettingsDto,
-      PassphraseGeneratorSettingsEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        PassphraseGeneratorSettingsEntity.ENTITY_NAME,
+        passphraseGeneratorSettingsDto,
+        PassphraseGeneratorSettingsEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -39,39 +42,29 @@ class PassphraseGeneratorSettingsEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "words",
-        "word_separator",
-        "word_case",
-        "min_words",
-        "max_words",
-      ],
-      "properties": {
-        "words": {
-          "type": "integer",
-          "minimum": 4,
-          "maximum": 40,
+      type: "object",
+      required: ["words", "word_separator", "word_case", "min_words", "max_words"],
+      properties: {
+        words: {
+          type: "integer",
+          minimum: 4,
+          maximum: 40,
         },
-        "word_separator": {
-          "type": "string",
-          "maxLength": 10,
+        word_separator: {
+          type: "string",
+          maxLength: 10,
         },
-        "word_case": {
-          "type": "string",
-          "enum": [
-            PASSPHRASE_WORDS_UPPERCASE,
-            PASSPHRASE_WORDS_LOWERCASE,
-            PASSPHRASE_WORDS_CAMELCASE,
-          ]
+        word_case: {
+          type: "string",
+          enum: [PASSPHRASE_WORDS_UPPERCASE, PASSPHRASE_WORDS_LOWERCASE, PASSPHRASE_WORDS_CAMELCASE],
         },
-        "min_words": {
-          "type": "integer",
+        min_words: {
+          type: "integer",
         },
-        "max_words": {
-          "type": "integer",
-        }
-      }
+        max_words: {
+          type: "integer",
+        },
+      },
     };
   }
 
@@ -95,13 +88,16 @@ class PassphraseGeneratorSettingsEntity extends Entity {
    * @returns {PassphraseGeneratorSettingsEntity}
    */
   static createFromDefault(data = {}, options = {}) {
-    const defaultDto = Object.assign({
-      words: 9,
-      min_words: 4,
-      max_words: 40,
-      word_separator: " ",
-      word_case: PASSPHRASE_WORDS_LOWERCASE,
-    }, data);
+    const defaultDto = Object.assign(
+      {
+        words: 9,
+        min_words: 4,
+        max_words: 40,
+        word_separator: " ",
+        word_case: PASSPHRASE_WORDS_LOWERCASE,
+      },
+      data,
+    );
 
     return new PassphraseGeneratorSettingsEntity(defaultDto, options);
   }

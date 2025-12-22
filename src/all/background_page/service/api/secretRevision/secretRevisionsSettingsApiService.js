@@ -12,14 +12,14 @@
  * @since         5.7.0
  */
 
-import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
-import {assertType} from "../../../utils/assertions";
+import { ApiClient } from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
+import { assertType } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import SecretRevisionsSettingsEntity from "passbolt-styleguide/src/shared/models/entity/secretRevision/secretRevisionsSettingsEntity";
 
-const SECRET_REVISION_SETTINGS_SERVICE_RESOURCE_NAME = 'secret-revisions/settings';
-const SECRET_REVISION_SETTINGS_SERVICE_DELETE_RESOURCE_NAME = 'secret-revisions';
+const SECRET_REVISION_SETTINGS_SERVICE_RESOURCE_NAME = "secret-revisions/settings";
+const SECRET_REVISION_SETTINGS_SERVICE_DELETE_RESOURCE_NAME = "secret-revisions";
 
 export default class SecretRevisionsSettingsApiService extends AbstractService {
   /**

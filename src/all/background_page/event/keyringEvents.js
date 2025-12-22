@@ -12,7 +12,7 @@ import DownloadUserPublicKeyController from "../controller/crypto/downloadUserPu
 import DownloadUserPrivateKeyController from "../controller/crypto/downloadUserPrivateKeyController";
 import GetUserPrivateKeyController from "../controller/crypto/getUserPrivateKeyController";
 
-const listen = function(worker, _, account) {
+const listen = function (worker, _, account) {
   /*
    * ==================================================================================
    *  Get Key info events
@@ -26,7 +26,7 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    * @param userId {string} The user identifier
    */
-  worker.port.on('passbolt.keyring.get-public-key-info-by-user', async(requestId, userId) => {
+  worker.port.on("passbolt.keyring.get-public-key-info-by-user", async (requestId, userId) => {
     const controller = new GetUserKeyInfoController(worker, requestId);
     await controller._exec(userId);
   });
@@ -38,7 +38,7 @@ const listen = function(worker, _, account) {
    * @param {uuid} requestId The request identifier
    * @param {string} armoredKey The armored key to get info from
    */
-  worker.port.on('passbolt.keyring.get-key-info', async(requestId, armoredKey) => {
+  worker.port.on("passbolt.keyring.get-key-info", async (requestId, armoredKey) => {
     const controller = new GetKeyInfoController(worker, requestId);
     await controller._exec(armoredKey);
   });
@@ -56,7 +56,7 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase to check
    */
-  worker.port.on('passbolt.keyring.private.checkpassphrase', async(requestId, passphrase) => {
+  worker.port.on("passbolt.keyring.private.checkpassphrase", async (requestId, passphrase) => {
     const controller = new CheckPassphraseController(worker, requestId);
     await controller._exec(passphrase);
   });
@@ -73,7 +73,7 @@ const listen = function(worker, _, account) {
    * @listens passbolt.keyring.download-my-public-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.keyring.download-my-public-key', async requestId => {
+  worker.port.on("passbolt.keyring.download-my-public-key", async (requestId) => {
     const controller = new DownloadUserPublicKeyController(worker, requestId);
     await controller._exec();
   });
@@ -84,7 +84,7 @@ const listen = function(worker, _, account) {
    * @listens passbolt.keyring.download-my-private-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.keyring.download-my-private-key', async requestId => {
+  worker.port.on("passbolt.keyring.download-my-private-key", async (requestId) => {
     const controller = new DownloadUserPrivateKeyController(worker, requestId, account);
     await controller._exec();
   });
@@ -95,10 +95,9 @@ const listen = function(worker, _, account) {
    * @listens passbolt.keyring.get-private-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.keyring.get-private-key', async requestId => {
+  worker.port.on("passbolt.keyring.get-private-key", async (requestId) => {
     const controller = new GetUserPrivateKeyController(worker, requestId, account);
     await controller._exec();
   });
 };
-export const KeyringEvents = {listen};
-
+export const KeyringEvents = { listen };

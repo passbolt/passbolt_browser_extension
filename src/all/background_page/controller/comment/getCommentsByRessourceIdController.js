@@ -25,7 +25,7 @@ class GetCommentsByRessourceController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.commentService =  new CommentService(apiClientOptions);
+    this.commentService = new CommentService(apiClientOptions);
   }
 
   /**
@@ -65,4 +65,3 @@ class GetCommentsByRessourceController {
 }
 
 export default GetCommentsByRessourceController;
-

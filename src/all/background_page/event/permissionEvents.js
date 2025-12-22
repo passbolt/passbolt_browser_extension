@@ -20,7 +20,7 @@ import FindAcoPermissionsForDisplayController from "../controller/permission/Fin
  * @param {ApiClientOptions} apiClientOptions
  * @param {AccountEntity} account the user account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Find a resource with complete permissions
    *
@@ -28,10 +28,10 @@ const listen = function(worker, apiClientOptions, account) {
    * @param acoId {uuid} The aco id
    * @param acoType {string} The aco type (Resource or Folder)
    */
-  worker.port.on('passbolt.permissions.find-aco-permissions-for-display', async(requestId, acoId, acoType) => {
+  worker.port.on("passbolt.permissions.find-aco-permissions-for-display", async (requestId, acoId, acoType) => {
     const controller = new FindAcoPermissionsForDisplayController(worker, requestId, apiClientOptions, account);
     await controller._exec(acoId, acoType);
   });
 };
 
-export const PermissionEvents = {listen};
+export const PermissionEvents = { listen };

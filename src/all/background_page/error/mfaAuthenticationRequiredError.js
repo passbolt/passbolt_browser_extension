@@ -13,9 +13,9 @@ class MfaAuthenticationRequiredError extends Error {
    * @param {object} errors details
    */
   constructor(message, details) {
-    message = message || i18n.t('MFA authentication is required.');
+    message = message || i18n.t("MFA authentication is required.");
     super(message);
-    this.name = 'MfaAuthenticationRequiredError';
+    this.name = "MfaAuthenticationRequiredError";
     this.details = details;
   }
 }

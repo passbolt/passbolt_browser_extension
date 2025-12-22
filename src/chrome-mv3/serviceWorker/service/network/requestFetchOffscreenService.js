@@ -14,12 +14,12 @@
 import FormDataUtils from "../../../../all/background_page/utils/format/formDataUtils";
 import {
   FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA,
-  FETCH_OFFSCREEN_DATA_TYPE_JSON
+  FETCH_OFFSCREEN_DATA_TYPE_JSON,
 } from "../../../offscreens/service/network/fetchOffscreenService";
 import CreateOffscreenDocumentService from "../offscreen/createOffscreenDocumentService";
 import HandleOffscreenResponseService from "../offscreen/handleOffscreenResponseService";
 
-const {SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} = require("../../../offscreens/service/network/fetchOffscreenService");
+const { SEND_MESSAGE_TARGET_FETCH_OFFSCREEN } = require("../../../offscreens/service/network/fetchOffscreenService");
 
 export const IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY = "IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY";
 
@@ -38,7 +38,7 @@ export class RequestFetchOffscreenService {
    * @returns {Promise<unknown>}
    */
   static async fetch(resource, options) {
-    const fetchStrategy = await RequestFetchOffscreenService.isFetchOffscreenPreferred()
+    const fetchStrategy = (await RequestFetchOffscreenService.isFetchOffscreenPreferred())
       ? RequestFetchOffscreenService.fetchOffscreen
       : RequestFetchOffscreenService.fetchNative;
 
@@ -53,7 +53,9 @@ export class RequestFetchOffscreenService {
   static async isFetchOffscreenPreferred() {
     if (RequestFetchOffscreenService.isFetchOffscreenPreferredCache === null) {
       const storageData = await browser.storage.session.get(IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY);
-      RequestFetchOffscreenService.isFetchOffscreenPreferredCache = Boolean(storageData?.[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]);
+      RequestFetchOffscreenService.isFetchOffscreenPreferredCache = Boolean(
+        storageData?.[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY],
+      );
     }
 
     return RequestFetchOffscreenService.isFetchOffscreenPreferredCache;
@@ -74,7 +76,10 @@ export class RequestFetchOffscreenService {
       if (!navigator.onLine) {
         throw new Error("RequestFetchOffscreenService::fetchNative: offline error.");
       }
-      console.error("RequestFetchOffscreenService::fetchNative: An error occurred while using the native fetch API, fallback on offscreen strategy until browser restart.", error);
+      console.error(
+        "RequestFetchOffscreenService::fetchNative: An error occurred while using the native fetch API, fallback on offscreen strategy until browser restart.",
+        error,
+      );
       RequestFetchOffscreenService.markFetchOffscreenStrategyAsPreferred();
       return await RequestFetchOffscreenService.fetchOffscreen(resource, options);
     }
@@ -95,9 +100,8 @@ export class RequestFetchOffscreenService {
 
     return new Promise((resolve, reject) => {
       // Stack the response listener callbacks.
-      HandleOffscreenResponseService.setResponseCallback(requestId, {resolve, reject});
-      return RequestFetchOffscreenService.sendOffscreenMessage(requestId, offscreenFetchData)
-        .catch(reject);
+      HandleOffscreenResponseService.setResponseCallback(requestId, { resolve, reject });
+      return RequestFetchOffscreenService.sendOffscreenMessage(requestId, offscreenFetchData).catch(reject);
     });
   }
 
@@ -116,16 +120,16 @@ export class RequestFetchOffscreenService {
       const formDataSerialized = await FormDataUtils.formDataToArray(fetchOptions.body);
       options.body = {
         data: formDataSerialized,
-        dataType: FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA
+        dataType: FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA,
       };
     } else {
       options.body = {
         data: fetchOptions.body,
-        dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON
+        dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON,
       };
     }
 
-    return {resource, options};
+    return { resource, options };
   }
 
   /**
@@ -151,6 +155,8 @@ export class RequestFetchOffscreenService {
    */
   static async markFetchOffscreenStrategyAsPreferred() {
     RequestFetchOffscreenService.isFetchOffscreenPreferredCache = true;
-    await browser.storage.session.set({[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: RequestFetchOffscreenService.isFetchOffscreenPreferredCache});
+    await browser.storage.session.set({
+      [IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: RequestFetchOffscreenService.isFetchOffscreenPreferredCache,
+    });
   }
 }

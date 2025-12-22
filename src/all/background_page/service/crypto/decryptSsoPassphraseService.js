@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {Buffer} from 'buffer';
-import OutdatedSsoKitError from '../../error/outdatedSsoKitError';
+import { Buffer } from "buffer";
+import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
 import {
   assertBase64String,
   assertNonExtractableSsoKey,
   assertExtractableSsoKey,
-  assertValidInitialisationVector
-} from '../../utils/assertions';
+  assertValidInitialisationVector,
+} from "../../utils/assertions";
 
 class DecryptSsoPassphraseService {
   /**
@@ -38,14 +38,14 @@ class DecryptSsoPassphraseService {
     assertValidInitialisationVector(iv1);
     assertValidInitialisationVector(iv2);
 
-    const buffer = Buffer.from(base64Text, 'base64');
+    const buffer = Buffer.from(base64Text, "base64");
     const firstDecryptionAlgorithm = {
       name: ek.algorithm.name,
-      iv: iv2
+      iv: iv2,
     };
     const secondDecryptionAlgorithm = {
       name: nek.algorithm.name,
-      iv: iv1
+      iv: iv1,
     };
 
     let firstDecryptionBuffer = null;

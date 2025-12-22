@@ -16,7 +16,7 @@ import FavoriteEntity from "../../model/entity/favorite/favoriteEntity";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import ResourceModel from "../../model/resource/resourceModel";
 import FavoriteApiService from "../../service/api/favorite/favoriteApiService";
-import {assertType, assertUuid} from "../../utils/assertions";
+import { assertType, assertUuid } from "../../utils/assertions";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 
 export default class FavoriteResourceService {
@@ -40,7 +40,7 @@ export default class FavoriteResourceService {
    */
   async addResourceToFavorite(resourceId) {
     assertUuid(resourceId);
-    const foreignKey = 'Resource';
+    const foreignKey = "Resource";
     const favoriteDto = await this.favoriteApiService.create(foreignKey, resourceId);
     const favoriteEntity = new FavoriteEntity(favoriteDto);
     await this.updateFavoriteLocally(resourceId, favoriteEntity);

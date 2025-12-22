@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.1
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import PassphraseStorageService from '../session_storage/passphraseStorageService';
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
 import SessionKeysBundleDataEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleDataEntity";
 import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
-import {assertType} from '../../utils/assertions';
-import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
-import DecryptMessageService from '../crypto/decryptMessageService';
+import { assertType } from "../../utils/assertions";
+import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
+import DecryptMessageService from "../crypto/decryptMessageService";
 import Logger from "passbolt-styleguide/src/shared/utils/logger";
 
 class DecryptSessionKeysBundlesService {
@@ -48,8 +48,11 @@ class DecryptSessionKeysBundlesService {
       return;
     }
 
-    passphrase = passphrase || await PassphraseStorageService.getOrFail();
-    const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+    passphrase = passphrase || (await PassphraseStorageService.getOrFail());
+    const userDecryptedPrivateArmoredKey = await DecryptPrivateKeyService.decryptArmoredKey(
+      this.account.userPrivateArmoredKey,
+      passphrase,
+    );
 
     try {
       const message = await OpenpgpAssertion.readMessageOrFail(sessionKeysBundleEntity.data);
@@ -58,7 +61,7 @@ class DecryptSessionKeysBundlesService {
       sessionKeysBundleEntity.data = new SessionKeysBundleDataEntity(decryptedSessionKeysBundleDto);
     } catch (error) {
       const errorMessage = `Unable to decrypt the metadata session key bundle (${sessionKeysBundleEntity?.id}) using the user key.`;
-      this.handleError(new Error(errorMessage, {cause: error}));
+      this.handleError(new Error(errorMessage, { cause: error }));
     }
   }
 
@@ -74,9 +77,13 @@ class DecryptSessionKeysBundlesService {
    * @throws {UserPassphraseRequiredError} if the `passphrase` is not set and cannot be retrieved.
    */
   async decryptAll(sessionKeysBundlesCollection, passphrase = null) {
-    assertType(sessionKeysBundlesCollection, SessionKeysBundlesCollection, "The given collection is not of the type SessionKeysBundlesCollection");
+    assertType(
+      sessionKeysBundlesCollection,
+      SessionKeysBundlesCollection,
+      "The given collection is not of the type SessionKeysBundlesCollection",
+    );
 
-    passphrase = passphrase || await PassphraseStorageService.getOrFail();
+    passphrase = passphrase || (await PassphraseStorageService.getOrFail());
 
     const items = sessionKeysBundlesCollection.items;
     for (let i = 0; i < items.length; i++) {

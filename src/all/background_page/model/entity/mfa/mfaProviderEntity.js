@@ -15,8 +15,7 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
-const ENTITY_NAME = 'MfaProviderEntity';
+const ENTITY_NAME = "MfaProviderEntity";
 const YUBIKEY = "yubikey";
 const TOTP = "totp";
 const DUO = "duo";
@@ -26,11 +25,7 @@ class MfaProviderEntity extends Entity {
    * @inheritDoc
    */
   constructor(providerDto, options = {}) {
-    super(EntitySchema.validate(
-      MfaProviderEntity.ENTITY_NAME,
-      providerDto,
-      MfaProviderEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(MfaProviderEntity.ENTITY_NAME, providerDto, MfaProviderEntity.getSchema()), options);
   }
 
   /**
@@ -39,20 +34,14 @@ class MfaProviderEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "provider",
-      ],
-      "properties": {
-        "provider": {
-          "type": "string",
-          "enum": [
-            YUBIKEY,
-            TOTP,
-            DUO
-          ]
+      type: "object",
+      required: ["provider"],
+      properties: {
+        provider: {
+          type: "string",
+          enum: [YUBIKEY, TOTP, DUO],
         },
-      }
+      },
     };
   }
   /*

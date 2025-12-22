@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
+import { ApiClient } from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
 import Validator from "validator";
 
 class AbstractService {
@@ -38,12 +38,12 @@ class AbstractService {
        * Trigger error if other formats are used
        * for example {user: {profile: true}} instead of {'user':true, 'user.profile': true}
        */
-      if (typeof item !== 'string') {
+      if (typeof item !== "string") {
         const details = JSON.stringify(contain);
         throw new TypeError(`Invalid contain ${details}, items should be a string.`);
       }
       if (supportedOptions.includes(item)) {
-        result[`contain[${item}]`] = contain[item] ? '1' : '0';
+        result[`contain[${item}]`] = contain[item] ? "1" : "0";
       }
     }
     return result;
@@ -61,9 +61,9 @@ class AbstractService {
     const result = {};
     for (const item in filter) {
       if (Object.prototype.hasOwnProperty.call(filter, item) && supportedOptions.includes(item)) {
-        if (typeof filter[item] === 'boolean') {
-          result[`filter[${item}]`] = (filter[item] ? '1' : '0');
-        } else if (typeof filter[item] === 'string') {
+        if (typeof filter[item] === "boolean") {
+          result[`filter[${item}]`] = filter[item] ? "1" : "0";
+        } else if (typeof filter[item] === "string") {
           result[`filter[${item}]`] = filter[item];
         } else if (Array.isArray(filter[item])) {
           result[`filter[${item}][]`] = filter[item];
@@ -101,7 +101,7 @@ class AbstractService {
    * @public
    */
   assertValidId(id) {
-    if (!id || typeof id !== 'string' || !Validator.isUUID(id)) {
+    if (!id || typeof id !== "string" || !Validator.isUUID(id)) {
       throw new TypeError(`Service error. The id '${id}' is not a valid uuid.`);
     }
   }

@@ -32,4 +32,3 @@ class PromiseTimeoutService {
 }
 
 export default PromiseTimeoutService;
-

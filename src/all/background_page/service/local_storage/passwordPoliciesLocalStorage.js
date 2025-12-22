@@ -14,7 +14,7 @@
 import Log from "../../model/log";
 import PasswordPoliciesEntity from "../../model/entity/passwordPolicies/passwordPoliciesEntity";
 
-export const PASSWORD_POLICIES_LOCAL_STORAGE_KEY = 'passwordPolicies';
+export const PASSWORD_POLICIES_LOCAL_STORAGE_KEY = "passwordPolicies";
 
 class PasswordPoliciesLocalStorage {
   /**
@@ -33,7 +33,7 @@ class PasswordPoliciesLocalStorage {
    */
   getStorageKey(account) {
     if (!account.id) {
-      throw new Error('Cannot retrieve account id, necessary to get a rbac storage key.');
+      throw new Error("Cannot retrieve account id, necessary to get a rbac storage key.");
     }
     return `${PASSWORD_POLICIES_LOCAL_STORAGE_KEY}-${account.id}`;
   }
@@ -44,7 +44,7 @@ class PasswordPoliciesLocalStorage {
    * @return {Promise<void>}
    */
   async flush() {
-    Log.write({level: 'debug', message: 'PasswordPoliciesLocalStorage flushed'});
+    Log.write({ level: "debug", message: "PasswordPoliciesLocalStorage flushed" });
     return await browser.storage.local.remove(this.storageKey);
   }
 
@@ -67,9 +67,9 @@ class PasswordPoliciesLocalStorage {
   async set(passwordPoliciesEntity) {
     PasswordPoliciesLocalStorage.assertEntityBeforeSave(passwordPoliciesEntity);
 
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       const passwordPoliciesDto = passwordPoliciesEntity.toDto(PasswordPoliciesEntity.ALL_CONTAIN_OPTIONS);
-      await browser.storage.local.set({[this.storageKey]: passwordPoliciesDto});
+      await browser.storage.local.set({ [this.storageKey]: passwordPoliciesDto });
     });
   }
 
@@ -87,10 +87,10 @@ class PasswordPoliciesLocalStorage {
    */
   static assertEntityBeforeSave(passwordPoliciesEntity) {
     if (!passwordPoliciesEntity) {
-      throw new TypeError('PasswordPoliciesLocalStorage expects a PasswordPoliciesEntity to be set');
+      throw new TypeError("PasswordPoliciesLocalStorage expects a PasswordPoliciesEntity to be set");
     }
     if (!(passwordPoliciesEntity instanceof PasswordPoliciesEntity)) {
-      throw new TypeError('PasswordPoliciesLocalStorage expects an object of type PasswordPoliciesEntity');
+      throw new TypeError("PasswordPoliciesLocalStorage expects an object of type PasswordPoliciesEntity");
     }
   }
 }

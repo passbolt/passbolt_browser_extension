@@ -15,7 +15,7 @@ import ResourceService from "../api/resource/resourceService";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
-import {assertArrayUUID, assertUuid} from "../../utils/assertions";
+import { assertArrayUUID, assertUuid } from "../../utils/assertions";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import splitBySize from "../../utils/array/splitBySize";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
@@ -51,7 +51,7 @@ export default class FindResourcesService {
     this.assertFilters(filters);
 
     const resourcesDto = await this.resourceService.findAll(contains, filters);
-    return new ResourcesCollection(resourcesDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
+    return new ResourcesCollection(resourcesDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
   /**
@@ -65,11 +65,11 @@ export default class FindResourcesService {
 
     // We split the requests in chunks in order to avoid any too long url error.
     const resourcesIdsChunks = splitBySize(resourcesIds, 80);
-    const callbacks = resourcesIdsChunks.map(resourceIds => {
+    const callbacks = resourcesIdsChunks.map((resourceIds) => {
       const filter = {
-        "has-id": resourceIds
+        "has-id": resourceIds,
       };
-      return async() => await this.findAll(contains, filter, ignoreInvalidEntity);
+      return async () => await this.findAll(contains, filter, ignoreInvalidEntity);
     });
 
     // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
@@ -77,7 +77,7 @@ export default class FindResourcesService {
     const arrayOfCollection = await executeConcurrentlyService.execute(callbacks, 5);
     const resourcesCollection = new ResourcesCollection();
 
-    arrayOfCollection.forEach(collection => {
+    arrayOfCollection.forEach((collection) => {
       resourcesCollection._items = resourcesCollection._items.concat(collection._items);
     });
     return resourcesCollection;
@@ -99,11 +99,17 @@ export default class FindResourcesService {
    * @returns {Promise<ResourcesCollection>}
    */
   async findAllByIsSharedWithGroupForLocalStorage(groupId, passphrase = null) {
-    const resources = await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
+    const resources = await this.findAll(
+      ResourceLocalStorage.DEFAULT_CONTAIN,
+      { "is-shared-with-group": groupId },
+      true,
+    );
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
 
-    await this.decryptMetadataService.decryptAllFromForeignModels(resources, passphrase, {ignoreDecryptionError: true});
+    await this.decryptMetadataService.decryptAllFromForeignModels(resources, passphrase, {
+      ignoreDecryptionError: true,
+    });
     resources.filterOutMetadataEncrypted();
 
     return resources;
@@ -118,9 +124,9 @@ export default class FindResourcesService {
     assertArrayUUID(resourcesIds);
 
     const contains = {
-      "secret": true
+      secret: true,
     };
-    const resources =  await this.findAllByIds(resourcesIds, contains);
+    const resources = await this.findAllByIds(resourcesIds, contains);
     await this.decryptMetadataService.decryptAllFromForeignModels(resources);
 
     return resources;
@@ -135,8 +141,8 @@ export default class FindResourcesService {
     assertArrayUUID(resourcesIds);
 
     const contains = {
-      "permission": true,
-      "permissions": true,
+      permission: true,
+      permissions: true,
     };
 
     return this.findAllByIds(resourcesIds, contains);
@@ -153,7 +159,7 @@ export default class FindResourcesService {
     assertArrayUUID(resourcesIds);
 
     const contains = {
-      "permission": true,
+      permission: true,
       "permissions.user.profile": true,
       "permissions.group": true,
     };
@@ -172,8 +178,8 @@ export default class FindResourcesService {
   async findAllForDecrypt(resourcesIds) {
     assertArrayUUID(resourcesIds);
 
-    const contains = {'secret': true};
-    const resourceCollection =  await this.findAllByIds(resourcesIds, contains);
+    const contains = { secret: true };
+    const resourceCollection = await this.findAllByIds(resourcesIds, contains);
 
     return resourceCollection;
   }
@@ -189,7 +195,7 @@ export default class FindResourcesService {
     assertUuid(resourceId);
     this.assertContains(contains);
 
-    const resourcesDto  = await this.resourceService.get(resourceId, contains);
+    const resourcesDto = await this.resourceService.get(resourceId, contains);
 
     return new ResourceEntity(resourcesDto);
   }
@@ -231,7 +237,7 @@ export default class FindResourcesService {
    */
   async findAllByParentFolderIdForLocalStorage(parentFolderId) {
     assertUuid(parentFolderId);
-    const filters = {"has-parent": parentFolderId};
+    const filters = { "has-parent": parentFolderId };
     return await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, filters, true);
   }
 
@@ -242,7 +248,7 @@ export default class FindResourcesService {
    */
   assertContains(contains) {
     const supportedOptions = ResourceService.getSupportedContainOptions();
-    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
+    if (contains && !Object.keys(contains).every((option) => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
     }
   }
@@ -254,7 +260,7 @@ export default class FindResourcesService {
    */
   assertFilters(filters) {
     const supportedFilter = ResourceService.getSupportedFiltersOptions();
-    if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
+    if (filters && !Object.keys(filters).every((filter) => supportedFilter.includes(filter))) {
       throw new Error("Unsupported filter parameter used, please check supported filters");
     }
   }

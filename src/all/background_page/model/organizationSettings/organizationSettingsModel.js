@@ -38,7 +38,7 @@ class OrganizationSettingsModel {
    */
   static set(settings) {
     if (!(settings instanceof OrganizationSettingsEntity)) {
-      throw new Error('The settings should be an instance of OrganizationSettingsEntity');
+      throw new Error("The settings should be an instance of OrganizationSettingsEntity");
     }
     _settings = settings;
   }
@@ -82,8 +82,7 @@ class OrganizationSettingsModel {
       organizationSettingsDto = await this.organizationSettingsService.find();
     } catch (error) {
       // When the cloud organization is disabled or not found, the cloud API returns a 403.
-      if (error instanceof PassboltApiFetchError
-        && error?.data?.code === 403) {
+      if (error instanceof PassboltApiFetchError && error?.data?.code === 403) {
         organizationSettingsDto = OrganizationSettingsEntity.disabledOrganizationSettings;
       }
     }

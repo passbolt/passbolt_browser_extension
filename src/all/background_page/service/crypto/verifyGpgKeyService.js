@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class VerifyGpgKeyService {
   /**
@@ -26,7 +26,7 @@ class VerifyGpgKeyService {
     OpenpgpAssertion.assertKeys(verifyingKeys);
 
     const result = await keyToVerify.verifyAllUsers(verifyingKeys);
-    const signaturesVerifiedCount = result.filter(item => item.valid).length;
+    const signaturesVerifiedCount = result.filter((item) => item.valid).length;
     return signaturesVerifiedCount === verifyingKeys.length;
   }
 }

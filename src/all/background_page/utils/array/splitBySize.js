@@ -17,13 +17,14 @@
  * @param {int} size The size of the chunk
  * @returns {array<array>}
  */
-const splitBySize = (arr, size) => arr.reduce((chunks, el, i) => {
-  if (i % size) {
-    chunks[chunks.length - 1].push(el);
-  } else {
-    chunks.push([el]);
-  }
-  return chunks;
-}, []);
+const splitBySize = (arr, size) =>
+  arr.reduce((chunks, el, i) => {
+    if (i % size) {
+      chunks[chunks.length - 1].push(el);
+    } else {
+      chunks.push([el]);
+    }
+    return chunks;
+  }, []);
 
 export default splitBySize;

@@ -20,22 +20,22 @@ import LocaleEntity from "../model/entity/locale/localeEntity";
  * @param {Worker} worker
  * @param {ApiClientOptions} apiClientOptions the api client options
  */
-const listen = function(worker, apiClientOptions) {
+const listen = function (worker, apiClientOptions) {
   /*
    * Get locale language
    *
    * @listens passbolt.locale.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.locale.get', async requestId => {
+  worker.port.on("passbolt.locale.get", async (requestId) => {
     const getLocaleController = new GetLocaleController(worker, apiClientOptions);
 
     try {
       const localeEntity = await getLocaleController.getLocale();
-      worker.port.emit(requestId, 'SUCCESS', localeEntity);
+      worker.port.emit(requestId, "SUCCESS", localeEntity);
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 
@@ -45,17 +45,17 @@ const listen = function(worker, apiClientOptions) {
    * @listens passbolt.locale.language.update
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.locale.update-user-locale', async(requestId, localeDto) => {
+  worker.port.on("passbolt.locale.update-user-locale", async (requestId, localeDto) => {
     const localeModel = new LocaleModel(apiClientOptions);
     try {
       const localeToUpdateEntity = new LocaleEntity(localeDto);
       await localeModel.updateUserLocale(localeToUpdateEntity);
-      worker.port.emit(requestId, 'SUCCESS');
+      worker.port.emit(requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 };
 
-export const LocaleEvents = {listen};
+export const LocaleEvents = { listen };

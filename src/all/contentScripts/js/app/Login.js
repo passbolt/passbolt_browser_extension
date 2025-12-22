@@ -12,7 +12,7 @@
  * @since        3.0.0
  */
 import React from "react";
-import {createRoot} from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import ExtBootstrapLogin from "passbolt-styleguide/src/react-extension/ExtBootstrapLogin";
 import Port from "../../../webAccessibleResources/js/lib/port";
 import MessageService from "../service/messageService";
@@ -23,7 +23,7 @@ async function main() {
   // Port connection
   const port = new Port(self.portname);
   // Emit a success if the port is still connected
-  port.on("passbolt.port.check", requestId => port.emit(requestId, "SUCCESS"));
+  port.on("passbolt.port.check", (requestId) => port.emit(requestId, "SUCCESS"));
   await port.connect();
   // Message listener
   const messageService = new MessageService();
@@ -35,12 +35,7 @@ async function main() {
   document.body.appendChild(domContainer);
 
   const root = createRoot(domContainer);
-  root.render(
-    <ExtBootstrapLogin
-      port={port}
-      browserExtensionUrl={browserExtensionUrl}
-    />
-  );
+  root.render(<ExtBootstrapLogin port={port} browserExtensionUrl={browserExtensionUrl} />);
 }
 
 main();

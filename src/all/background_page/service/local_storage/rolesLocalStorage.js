@@ -17,7 +17,7 @@ import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/r
 import Lock from "../../utils/lock";
 const lock = new Lock();
 
-const ROLES_LOCAL_STORAGE_KEY = 'roles';
+const ROLES_LOCAL_STORAGE_KEY = "roles";
 
 class RolesLocalStorage {
   /**
@@ -27,7 +27,7 @@ class RolesLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
-    Log.write({level: 'debug', message: 'RolesLocalStorage flushed'});
+    Log.write({ level: "debug", message: "RolesLocalStorage flushed" });
     return await browser.storage.local.remove(ROLES_LOCAL_STORAGE_KEY);
   }
 
@@ -39,7 +39,7 @@ class RolesLocalStorage {
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    const {roles} = await browser.storage.local.get([ROLES_LOCAL_STORAGE_KEY]);
+    const { roles } = await browser.storage.local.get([ROLES_LOCAL_STORAGE_KEY]);
     return roles;
   }
 
@@ -53,14 +53,14 @@ class RolesLocalStorage {
     const roles = [];
     if (rolesCollection) {
       if (!(rolesCollection instanceof RolesCollection)) {
-        throw new TypeError('RolesLocalStorage::set expects a RolesCollection');
+        throw new TypeError("RolesLocalStorage::set expects a RolesCollection");
       }
       for (const roleEntity of rolesCollection) {
         RolesLocalStorage.assertEntityBeforeSave(roleEntity);
         roles.push(roleEntity.toDto());
       }
     }
-    await browser.storage.local.set({roles: roles});
+    await browser.storage.local.set({ roles: roles });
     lock.release();
   }
 
@@ -72,7 +72,7 @@ class RolesLocalStorage {
    */
   static async getResourceById(id) {
     const roles = await RolesLocalStorage.get();
-    return roles.find(item => item.id === id);
+    return roles.find((item) => item.id === id);
   }
 
   /*
@@ -89,13 +89,13 @@ class RolesLocalStorage {
    */
   static assertEntityBeforeSave(roleEntity) {
     if (!roleEntity) {
-      throw new TypeError('RolesLocalStorage expects a RoleEntity to be set');
+      throw new TypeError("RolesLocalStorage expects a RoleEntity to be set");
     }
     if (!(roleEntity instanceof RoleEntity)) {
-      throw new TypeError('RolesLocalStorage expects an object of type RoleEntity');
+      throw new TypeError("RolesLocalStorage expects an object of type RoleEntity");
     }
     if (!roleEntity.id) {
-      throw new TypeError('RolesLocalStorage expects RoleEntity id to be set');
+      throw new TypeError("RolesLocalStorage expects RoleEntity id to be set");
     }
   }
 }

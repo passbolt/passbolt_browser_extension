@@ -11,18 +11,18 @@ function LocalStorage() {
   this._data = {};
 }
 
-LocalStorage.prototype.init = function() {
+LocalStorage.prototype.init = function () {
   const _this = this;
   /*
    * Load the passbolt local storage.
    * Data are serialized in the local storage.
    */
   return new Promise((resolve, reject) => {
-    _this._storage.get('_passbolt_data', items => {
-      if (typeof chrome.runtime.lastError !== 'undefined' && chrome.runtime.lastError !== null) {
+    _this._storage.get("_passbolt_data", (items) => {
+      if (typeof chrome.runtime.lastError !== "undefined" && chrome.runtime.lastError !== null) {
         reject(chrome.runtime.lastError);
       } else {
-        if (typeof items._passbolt_data !== 'undefined') {
+        if (typeof items._passbolt_data !== "undefined") {
           _this._data = JSON.parse(JSON.stringify(items._passbolt_data));
         }
       }
@@ -35,9 +35,9 @@ LocalStorage.prototype.init = function() {
  * Save cached _data into chrome.storage
  * @private
  */
-LocalStorage.prototype._store = function() {
-  this._storage.set({'_passbolt_data': this._data}, () => {
-    if (typeof chrome.runtime.lastError !== 'undefined' && chrome.runtime.lastError !== null) {
+LocalStorage.prototype._store = function () {
+  this._storage.set({ _passbolt_data: this._data }, () => {
+    if (typeof chrome.runtime.lastError !== "undefined" && chrome.runtime.lastError !== null) {
       console.error(chrome.runtime.lastError.message);
     }
   });
@@ -50,9 +50,9 @@ LocalStorage.prototype._store = function() {
  * @param key string
  * @returns {*} or null
  */
-LocalStorage.prototype.getItem = function(key) {
+LocalStorage.prototype.getItem = function (key) {
   const item = this._data[key];
-  if (typeof item === 'undefined') {
+  if (typeof item === "undefined") {
     return null;
   }
   return item;
@@ -63,7 +63,7 @@ LocalStorage.prototype.getItem = function(key) {
  * @param key
  * @param value
  */
-LocalStorage.prototype.setItem = function(key, value) {
+LocalStorage.prototype.setItem = function (key, value) {
   this._data[key] = value;
   this._store();
 };
@@ -72,8 +72,8 @@ LocalStorage.prototype.setItem = function(key, value) {
  * Remove an item
  * @param keyStr
  */
-LocalStorage.prototype.removeItem = function(key, subkey) {
-  if (typeof subkey === 'undefined') {
+LocalStorage.prototype.removeItem = function (key, subkey) {
+  if (typeof subkey === "undefined") {
     delete this._data[key];
   } else {
     delete this._data[key][subkey];

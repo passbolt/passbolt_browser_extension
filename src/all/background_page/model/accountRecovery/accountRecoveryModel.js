@@ -97,7 +97,8 @@ class AccountRecoveryModel {
    * @return {Promise<AccountRecoveryPrivateKeyPasswordsCollection>}
    */
   async findAccountRecoveryPrivateKeyPasswords() {
-    const accountRecoveryPrivateKeyPasswordsCollectionDto = await this.accountRecoveryPrivateKeyPasswordService.findAll();
+    const accountRecoveryPrivateKeyPasswordsCollectionDto =
+      await this.accountRecoveryPrivateKeyPasswordService.findAll();
     return new AccountRecoveryPrivateKeyPasswordsCollection(accountRecoveryPrivateKeyPasswordsCollectionDto);
   }
 
@@ -108,8 +109,11 @@ class AccountRecoveryModel {
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
   async saveUserSetting(accountRecoveryUserSetting) {
-    const accountRecoveryUserSettingDto = accountRecoveryUserSetting.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS);
-    const savedAccountRecoveryUserSettingDto = await this.accountRecoveryUserService.saveUserSetting(accountRecoveryUserSettingDto);
+    const accountRecoveryUserSettingDto = accountRecoveryUserSetting.toDto(
+      AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS,
+    );
+    const savedAccountRecoveryUserSettingDto =
+      await this.accountRecoveryUserService.saveUserSetting(accountRecoveryUserSettingDto);
     return new AccountRecoveryUserSettingEntity(savedAccountRecoveryUserSettingDto);
   }
 
@@ -120,8 +124,11 @@ class AccountRecoveryModel {
    * @returns {Promise<AccountRecoveryOrganizationPolicyEntity>}
    */
   async saveOrganizationPolicy(accountRecoveryOrganizationPolicyEntity) {
-    const accountRecoveryPolicyDto = accountRecoveryOrganizationPolicyEntity.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
-    const savedAccountRecoveryPolicyDto = await this.accountRecoveryOrganizationPolicyService.saveOrganizationPolicy(accountRecoveryPolicyDto);
+    const accountRecoveryPolicyDto = accountRecoveryOrganizationPolicyEntity.toDto(
+      AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS,
+    );
+    const savedAccountRecoveryPolicyDto =
+      await this.accountRecoveryOrganizationPolicyService.saveOrganizationPolicy(accountRecoveryPolicyDto);
     return new AccountRecoveryOrganizationPolicyEntity(savedAccountRecoveryPolicyDto);
   }
 
@@ -133,7 +140,8 @@ class AccountRecoveryModel {
    */
   async saveReview(accountRecoveryResponseEntity) {
     const accountRecoveryResponseDto = accountRecoveryResponseEntity.toDto();
-    const savedAccountRecoveryResponseDto = await this.accountRecoveryResponseService.saveReview(accountRecoveryResponseDto);
+    const savedAccountRecoveryResponseDto =
+      await this.accountRecoveryResponseService.saveReview(accountRecoveryResponseDto);
     return new AccountRecoveryResponseEntity(savedAccountRecoveryResponseDto);
   }
 
@@ -173,7 +181,12 @@ class AccountRecoveryModel {
     if (!Validator.isUUID(authenticationTokenToken)) {
       throw new TypeError(`authenticationTokenToken should be a valid uuid.`);
     }
-    const accountRecoveryRequestDto = await this.accountRecoveryRequestService.findRequestByIdAndUserIdAndAuthenticationToken(requestId, userId, authenticationTokenToken);
+    const accountRecoveryRequestDto =
+      await this.accountRecoveryRequestService.findRequestByIdAndUserIdAndAuthenticationToken(
+        requestId,
+        userId,
+        authenticationTokenToken,
+      );
     return new AccountRecoveryRequestEntity(accountRecoveryRequestDto);
   }
 }

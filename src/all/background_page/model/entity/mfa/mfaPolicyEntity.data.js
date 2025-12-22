@@ -12,13 +12,12 @@
  * @since         3.11.0
  */
 
-import MfaPolicyEntity from './mfaPolicyEntity';
+import MfaPolicyEntity from "./mfaPolicyEntity";
 
 export const defaultMfaPolicy = (data = {}) => {
   const defaultData = {
-    "policy": MfaPolicyEntity.OPTIN,
-    "remember_me_for_a_month":  false
+    policy: MfaPolicyEntity.OPTIN,
+    remember_me_for_a_month: false,
   };
   return Object.assign(defaultData, data);
 };
-

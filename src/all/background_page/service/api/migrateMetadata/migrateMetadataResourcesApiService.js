@@ -13,7 +13,7 @@
  */
 
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
-import {assertType} from "../../../utils/assertions";
+import { assertType } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
@@ -36,9 +36,7 @@ class MigrateMetadataResourcesApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return [
-      "permissions",
-    ];
+    return ["permissions"];
   }
 
   /**
@@ -47,9 +45,7 @@ class MigrateMetadataResourcesApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedFiltersOptions() {
-    return [
-      'is-shared',
-    ];
+    return ["is-shared"];
   }
 
   /**
@@ -60,11 +56,15 @@ class MigrateMetadataResourcesApiService extends AbstractService {
    * @public
    */
   async findAll(contains = {}, filters = {}) {
-    assertType(contains, Object, 'The given contains is not an Object');
-    contains = contains ? this.formatContainOptions(contains, MigrateMetadataResourcesApiService.getSupportedContainOptions()) : null;
-    filters = filters ? this.formatFilterOptions(filters, MigrateMetadataResourcesApiService.getSupportedFiltersOptions()) : null;
+    assertType(contains, Object, "The given contains is not an Object");
+    contains = contains
+      ? this.formatContainOptions(contains, MigrateMetadataResourcesApiService.getSupportedContainOptions())
+      : null;
+    filters = filters
+      ? this.formatFilterOptions(filters, MigrateMetadataResourcesApiService.getSupportedFiltersOptions())
+      : null;
 
-    const options = {...contains, ...filters};
+    const options = { ...contains, ...filters };
     const response = await this.apiClient.findAll(options);
     return new PassboltResponseEntity(response);
   }
@@ -77,11 +77,19 @@ class MigrateMetadataResourcesApiService extends AbstractService {
    * @public
    */
   async migrate(resourcesCollection, contains = {}, filters = {}) {
-    assertType(resourcesCollection, ResourcesCollection, 'The given resourcesCollection is not a valid ResourcesCollection');
-    contains = contains ? this.formatContainOptions(contains, MigrateMetadataResourcesApiService.getSupportedContainOptions()) : null;
-    filters = filters ? this.formatFilterOptions(filters, MigrateMetadataResourcesApiService.getSupportedFiltersOptions()) : null;
+    assertType(
+      resourcesCollection,
+      ResourcesCollection,
+      "The given resourcesCollection is not a valid ResourcesCollection",
+    );
+    contains = contains
+      ? this.formatContainOptions(contains, MigrateMetadataResourcesApiService.getSupportedContainOptions())
+      : null;
+    filters = filters
+      ? this.formatFilterOptions(filters, MigrateMetadataResourcesApiService.getSupportedFiltersOptions())
+      : null;
 
-    const options = {...contains, ...filters};
+    const options = { ...contains, ...filters };
     const response = await this.apiClient.create(resourcesCollection.toDto(), options);
     return new PassboltResponseEntity(response);
   }

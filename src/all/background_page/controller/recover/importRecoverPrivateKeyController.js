@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import GpgKeyError from "../../error/GpgKeyError";
 import i18n from "../../sdk/i18n";
 import AuthVerifyServerChallengeService from "../../service/auth/authVerifyServerChallengeService";
@@ -39,10 +39,10 @@ class ImportRecoverPrivateKeyController {
   async _exec(armoredKey) {
     try {
       await this.exec(armoredKey);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -75,7 +75,7 @@ class ImportRecoverPrivateKeyController {
    */
   async _assertImportKeyOwnedByUser(fingerprint, serverPublicArmoredKey) {
     if (!serverPublicArmoredKey) {
-      throw new Error('The server public key should have been provided before importing a private key');
+      throw new Error("The server public key should have been provided before importing a private key");
     }
 
     try {
@@ -83,7 +83,7 @@ class ImportRecoverPrivateKeyController {
     } catch (error) {
       console.error(error);
       // @todo Handle not controlled errors, such as timeout error...
-      throw new GpgKeyError(i18n.t('This key does not match any account.'));
+      throw new GpgKeyError(i18n.t("This key does not match any account."));
     }
   }
 }

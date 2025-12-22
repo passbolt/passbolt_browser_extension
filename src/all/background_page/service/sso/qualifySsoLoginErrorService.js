@@ -38,7 +38,10 @@ class QualifySsoLoginErrorService {
 
     if (ssoSettings.provider !== localSsoKit.provider) {
       // there is a provider set so it means an admin changed the SSO provider
-      return new SsoProviderMismatchError("The request SSO provider is not corresponding to the configured one", ssoSettings.provider);
+      return new SsoProviderMismatchError(
+        "The request SSO provider is not corresponding to the configured one",
+        ssoSettings.provider,
+      );
     }
 
     // This means both configured provider and local provider are the same which should not happen in this scenario

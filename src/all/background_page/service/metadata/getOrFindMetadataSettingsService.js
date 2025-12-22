@@ -13,11 +13,9 @@
  */
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
 import FindAndUpdateMetadataSettingsLocalStorageService from "./findAndUpdateMetadataSettingsLocalStorageService";
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSettingsLocalStorage";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 
 /**
  * The service aims to get metadata settings from the local storage, or to retrieve them from the API and store them in the local storage.
@@ -29,7 +27,10 @@ export default class GetOrFindMetadataSettingsService {
    * @param {ApiClientOptions} apiClientOptions The api client options
    */
   constructor(account, apiClientOptions) {
-    this.findAndUpdateMetadataSettingsLocalStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateMetadataSettingsLocalStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(
+      account,
+      apiClientOptions,
+    );
     this.metadataTypesSettingsLocalStorage = new MetadataTypesSettingsLocalStorage(account);
     this.metadataKeysSettingsLocalStorage = new MetadataKeysSettingsLocalStorage(account);
   }

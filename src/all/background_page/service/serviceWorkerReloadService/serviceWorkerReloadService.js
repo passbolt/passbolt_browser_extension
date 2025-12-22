@@ -38,7 +38,7 @@ export default class ServiceWorkerReloadService {
     const lastUpdateTime = new Date(parseInt(lastUpdateTimestamp, 10));
     const now = new Date();
 
-    const isReloadNecessary = (now - lastUpdateTime) < TIME_THRESHOLD_IN_MS;
+    const isReloadNecessary = now - lastUpdateTime < TIME_THRESHOLD_IN_MS;
     if (!isReloadNecessary) {
       return;
     }

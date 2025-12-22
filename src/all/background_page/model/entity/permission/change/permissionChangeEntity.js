@@ -15,22 +15,24 @@ import PermissionEntity from "../permissionEntity";
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
-const ENTITY_NAME = 'PermissionChange';
-const PERMISSION_CHANGE_CREATE = 'create';
-const PERMISSION_CHANGE_DELETE = 'delete';
-const PERMISSION_CHANGE_UPDATE = 'update';
+const ENTITY_NAME = "PermissionChange";
+const PERMISSION_CHANGE_CREATE = "create";
+const PERMISSION_CHANGE_DELETE = "delete";
+const PERMISSION_CHANGE_UPDATE = "update";
 
 class PermissionChangeEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(permissionChangesDto, options = {}) {
-    super(EntitySchema.validate(
-      PermissionChangeEntity.ENTITY_NAME,
-      permissionChangesDto,
-      PermissionChangeEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        PermissionChangeEntity.ENTITY_NAME,
+        permissionChangesDto,
+        PermissionChangeEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -42,20 +44,20 @@ class PermissionChangeEntity extends Entity {
     const schema = PermissionEntity.getSchema();
     const whitelistProps = schema.required;
     const extendedSchema = {
-      "type": "object",
-      "required": schema.required,
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: schema.required,
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "delete": {
-          "type": "boolean",
-        }
-      }
+        delete: {
+          type: "boolean",
+        },
+      },
     };
 
-    whitelistProps.forEach(prop => {
+    whitelistProps.forEach((prop) => {
       extendedSchema.properties[prop] = schema.properties[prop];
     });
 
@@ -72,7 +74,7 @@ class PermissionChangeEntity extends Entity {
    */
   static createFromPermission(permission, operation) {
     if (!permission || !(permission instanceof PermissionEntity)) {
-      throw new TypeError('PermissionChangeEntity createFromPermission expect a permission entity.');
+      throw new TypeError("PermissionChangeEntity createFromPermission expect a permission entity.");
     }
     const changeDto = {
       aco: permission.aco,
@@ -87,19 +89,19 @@ class PermissionChangeEntity extends Entity {
         break;
       case PermissionChangeEntity.PERMISSION_CHANGE_UPDATE:
         if (!permission.id) {
-          throw new TypeError('PermissionChangeEntity createFromPermission update expect a permission id.');
+          throw new TypeError("PermissionChangeEntity createFromPermission update expect a permission id.");
         }
         changeDto.id = permission.id;
         break;
       case PermissionChangeEntity.PERMISSION_CHANGE_DELETE:
         if (!permission.id) {
-          throw new TypeError('PermissionChangeEntity createFromPermission delete expect a permission id.');
+          throw new TypeError("PermissionChangeEntity createFromPermission delete expect a permission id.");
         }
         changeDto.id = permission.id;
         changeDto.delete = true;
         break;
       default:
-        throw new TypeError('PermissionChangeEntity createFromPermission unsupported operation');
+        throw new TypeError("PermissionChangeEntity createFromPermission unsupported operation");
     }
     return new PermissionChangeEntity(changeDto);
   }
@@ -124,7 +126,7 @@ class PermissionChangeEntity extends Entity {
       aro_foreign_key: this.aroForeignKey,
       aco: aco,
       aco_foreign_key: acoForeignKey,
-      type: this.type
+      type: this.type,
     });
   }
 
@@ -186,7 +188,7 @@ class PermissionChangeEntity extends Entity {
    * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
-    if (typeof this._props.delete === 'undefined') {
+    if (typeof this._props.delete === "undefined") {
       return null;
     }
     return this._props.delete;

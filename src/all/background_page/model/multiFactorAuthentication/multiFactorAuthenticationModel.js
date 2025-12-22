@@ -13,9 +13,9 @@
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import MultiFactorAuthenticationService from "../../service/api/multiFactorAuthentication/multiFactorAuthenticationService";
 import UserEntity from "../entity/user/userEntity";
-import MultiFactorAuthenticationPolicyService from '../../service/api/multiFactorAuthentication/multiFactorAuthenticationPolicyService';
-import MfaPolicyEntity from '../entity/mfa/mfaPolicyEntity';
-import MfaCombinedEnabledProvidersEntity from '../entity/mfa/mfaCombinedEnabledProvidersEntity';
+import MultiFactorAuthenticationPolicyService from "../../service/api/multiFactorAuthentication/multiFactorAuthenticationPolicyService";
+import MfaPolicyEntity from "../entity/mfa/mfaPolicyEntity";
+import MfaCombinedEnabledProvidersEntity from "../entity/mfa/mfaCombinedEnabledProvidersEntity";
 import MfaVerifyProviderEntity from "../entity/mfa/mfaVerifyProviderEntity";
 import MfaTotpSetupInfoEntity from "../entity/mfa/mfaTotpSetupInfoEntity";
 
@@ -108,7 +108,7 @@ class MultiFactorAuthenticationModel {
    * @public
    */
   async verifyProvider(providerEntity) {
-    const result =  await this.multiFactorAuthenticationService.verifyProvider(providerEntity.provider);
+    const result = await this.multiFactorAuthenticationService.verifyProvider(providerEntity.provider);
     return new MfaVerifyProviderEntity(result);
   }
 

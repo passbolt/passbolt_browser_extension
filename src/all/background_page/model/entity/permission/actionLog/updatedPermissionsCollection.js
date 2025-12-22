@@ -15,9 +15,9 @@ import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstr
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
-const ENTITY_NAME = 'UpdatedPermissions';
+const ENTITY_NAME = "UpdatedPermissions";
 
-const RULE_UNIQUE_ID = 'unique_id';
+const RULE_UNIQUE_ID = "unique_id";
 
 class UpdatedPermissionsCollection extends EntityCollection {
   /**
@@ -25,18 +25,21 @@ class UpdatedPermissionsCollection extends EntityCollection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
   constructor(updatedPermissionsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      UpdatedPermissionsCollection.ENTITY_NAME,
-      updatedPermissionsCollectionDto,
-      UpdatedPermissionsCollection.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        UpdatedPermissionsCollection.ENTITY_NAME,
+        updatedPermissionsCollectionDto,
+        UpdatedPermissionsCollection.getSchema(),
+      ),
+      options,
+    );
 
     /*
      * Note: there is no "multi-item" validation
      * Collection validation will fail at the first item that doesn't validate
      */
-    this._props.forEach(updatedPermissionDto => {
-      const updatePermissionEntity = new UpdatedPermissionEntity(updatedPermissionDto, {clone: false});
+    this._props.forEach((updatedPermissionDto) => {
+      const updatePermissionEntity = new UpdatedPermissionEntity(updatedPermissionDto, { clone: false });
       this.push(updatePermissionEntity);
     });
 
@@ -51,8 +54,8 @@ class UpdatedPermissionsCollection extends EntityCollection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": UpdatedPermissionEntity.getSchema()
+      type: "array",
+      items: UpdatedPermissionEntity.getSchema(),
     };
   }
 
@@ -70,7 +73,7 @@ class UpdatedPermissionsCollection extends EntityCollection {
    * @returns {Array<string>}
    */
   get ids() {
-    return this._items.map(r => r.id);
+    return this._items.map((r) => r.id);
   }
 
   /*
@@ -93,7 +96,11 @@ class UpdatedPermissionsCollection extends EntityCollection {
     for (let i = 0; i < length; i++) {
       const existingUpdatedPermission = this.updatedPermissions[i];
       if (existingUpdatedPermission.id && existingUpdatedPermission.id === updatedPermission.id) {
-        throw new EntityCollectionError(i, UpdatedPermissionsCollection.RULE_UNIQUE_ID, `Updated permission id ${updatedPermission.id} already exists.`);
+        throw new EntityCollectionError(
+          i,
+          UpdatedPermissionsCollection.RULE_UNIQUE_ID,
+          `Updated permission id ${updatedPermission.id} already exists.`,
+        );
       }
     }
   }
@@ -109,7 +116,7 @@ class UpdatedPermissionsCollection extends EntityCollection {
    * @param {object} updatedPermission DTO or UpdatedPermissionEntity
    */
   push(updatedPermission) {
-    if (!updatedPermission || typeof updatedPermission !== 'object') {
+    if (!updatedPermission || typeof updatedPermission !== "object") {
       throw new TypeError(`UpdatePermissionsCollection push parameter should be an object.`);
     }
     if (updatedPermission instanceof UpdatedPermissionEntity) {

@@ -24,7 +24,7 @@ class FindAccountTemporaryService {
   static async exec(workerId) {
     const temporaryAccount = await AccountTemporarySessionStorageService.get(workerId);
     if (!temporaryAccount) {
-      throw new Error(i18n.t('You have already started the process on another tab.'));
+      throw new Error(i18n.t("You have already started the process on another tab."));
     }
     return temporaryAccount;
   }

@@ -12,7 +12,6 @@
  * @since         3.9.0
  */
 
-
 class CryptoRandomValuesService {
   /**
    * Get a random value

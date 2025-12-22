@@ -14,7 +14,7 @@
 
 import AbstractService from "../abstract/abstractService";
 import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
-import {assertType, assertUuid} from "../../../utils/assertions";
+import { assertType, assertUuid } from "../../../utils/assertions";
 
 const SESSION_KEYS_BUNDLES_API_SERVICE_RESOURCE_NAME = "metadata/session-keys";
 
@@ -49,7 +49,11 @@ class SessionKeysBundlesApiService extends AbstractService {
    * @returns {Promise<Object>}
    */
   async create(sessionKeysBundleEntity) {
-    assertType(sessionKeysBundleEntity, SessionKeysBundleEntity, "The parameter 'sessionKeysBundleEntity' should be a SessionKeysBundleEntity");
+    assertType(
+      sessionKeysBundleEntity,
+      SessionKeysBundleEntity,
+      "The parameter 'sessionKeysBundleEntity' should be a SessionKeysBundleEntity",
+    );
     const response = await this.apiClient.create(sessionKeysBundleEntity.toDto());
     return response.body;
   }
@@ -73,7 +77,11 @@ class SessionKeysBundlesApiService extends AbstractService {
    */
   async update(id, sessionKeysBundleEntity) {
     assertUuid(id, "The parameter 'id' should be a UUID.");
-    assertType(sessionKeysBundleEntity, SessionKeysBundleEntity, "The parameter 'sessionKeysBundleEntity' should be a SessionKeysBundleEntity");
+    assertType(
+      sessionKeysBundleEntity,
+      SessionKeysBundleEntity,
+      "The parameter 'sessionKeysBundleEntity' should be a SessionKeysBundleEntity",
+    );
     const response = await this.apiClient.update(id, sessionKeysBundleEntity);
     return response.body;
   }

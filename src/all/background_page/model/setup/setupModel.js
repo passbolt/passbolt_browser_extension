@@ -59,13 +59,15 @@ class SetupModel {
       user = new UserEntity(userDto);
     }
     if (accountRecoveryOrganizationPolicyDto) {
-      accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+      accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(
+        accountRecoveryOrganizationPolicyDto,
+      );
     }
     if (userPassphrasePoliciesDto) {
       userPassphrasePolicies = new UserPassphrasePoliciesEntity(userPassphrasePoliciesDto);
     }
 
-    return {user, accountRecoveryOrganizationPolicy, userPassphrasePolicies};
+    return { user, accountRecoveryOrganizationPolicy, userPassphrasePolicies };
   }
 
   /**
@@ -99,7 +101,7 @@ class SetupModel {
       userPassphrasePolicies = new UserPassphrasePoliciesEntity(userPassphrasePoliciesDto);
     }
 
-    return {user, userPassphrasePolicies};
+    return { user, userPassphrasePolicies };
   }
 
   /**

@@ -14,9 +14,9 @@
 
 import User from "../model/user";
 import GetExtensionVersionController from "../controller/extension/getExtensionVersionController";
-import {Config} from "../model/config";
+import { Config } from "../model/config";
 
-const listen = function(worker) {
+const listen = function (worker) {
   /*
    * Read configuration variable.
    *
@@ -24,8 +24,8 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    * @param name {string} Variable name to obtain
    */
-  worker.port.on('passbolt.config.read', (requestId, name) => {
-    worker.port.emit(requestId, 'SUCCESS', Config.read(name));
+  worker.port.on("passbolt.config.read", (requestId, name) => {
+    worker.port.emit(requestId, "SUCCESS", Config.read(name));
   });
 
   /*
@@ -35,12 +35,12 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    * @param names {array} Variable names to obtain
    */
-  worker.port.on('passbolt.config.readAll', (requestId, names) => {
+  worker.port.on("passbolt.config.readAll", (requestId, names) => {
     const conf = {};
     for (const i in names) {
       conf[names[i]] = Config.read(names[i]);
     }
-    worker.port.emit(requestId, 'SUCCESS', conf);
+    worker.port.emit(requestId, "SUCCESS", conf);
   });
 
   /*
@@ -49,9 +49,9 @@ const listen = function(worker) {
    * @listens passbolt.addon.is-configured
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.is-configured', requestId => {
+  worker.port.on("passbolt.addon.is-configured", (requestId) => {
     const user = User.getInstance();
-    worker.port.emit(requestId, 'SUCCESS', user.isValid());
+    worker.port.emit(requestId, "SUCCESS", user.isValid());
   });
 
   /*
@@ -61,14 +61,14 @@ const listen = function(worker) {
    * @listens passbolt.addon.check-domain
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.check-domain', requestId => {
-    const trustedDomain = Config.read('user.settings.trustedDomain');
-    if (typeof trustedDomain === 'undefined' || trustedDomain == '') {
-      worker.port.emit(requestId, 'SUCCESS', false);
+  worker.port.on("passbolt.addon.check-domain", (requestId) => {
+    const trustedDomain = Config.read("user.settings.trustedDomain");
+    if (typeof trustedDomain === "undefined" || trustedDomain == "") {
+      worker.port.emit(requestId, "SUCCESS", false);
     }
 
     const domainOk = worker.tab.url.startsWith(trustedDomain);
-    worker.port.emit(requestId, 'SUCCESS', domainOk);
+    worker.port.emit(requestId, "SUCCESS", domainOk);
   });
 
   /*
@@ -77,9 +77,9 @@ const listen = function(worker) {
    * @listens passbolt.addon.get-domain
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.get-domain', requestId => {
-    const trustedDomain = Config.read('user.settings.trustedDomain');
-    worker.port.emit(requestId, 'SUCCESS', trustedDomain);
+  worker.port.on("passbolt.addon.get-domain", (requestId) => {
+    const trustedDomain = Config.read("user.settings.trustedDomain");
+    worker.port.emit(requestId, "SUCCESS", trustedDomain);
   });
 
   /*
@@ -88,7 +88,7 @@ const listen = function(worker) {
    * @listens passbolt.addon.get-version
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.get-version', async requestId => {
+  worker.port.on("passbolt.addon.get-version", async (requestId) => {
     const controller = new GetExtensionVersionController(worker, requestId);
     await controller._exec();
   });
@@ -99,8 +99,8 @@ const listen = function(worker) {
    * @listens passbolt.addon.get-url
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.get-url', requestId => {
-    worker.port.emit(requestId, 'SUCCESS', chrome.runtime.getURL(''));
+  worker.port.on("passbolt.addon.get-url", (requestId) => {
+    worker.port.emit(requestId, "SUCCESS", chrome.runtime.getURL(""));
   });
 };
-export const ConfigEvents = {listen};
+export const ConfigEvents = { listen };

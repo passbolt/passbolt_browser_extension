@@ -11,8 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {Buffer} from "buffer";
-import {assertExtractableSsoKey, assertNonExtractableSsoKey, assertValidInitialisationVector} from "../../utils/assertions";
+import { Buffer } from "buffer";
+import {
+  assertExtractableSsoKey,
+  assertNonExtractableSsoKey,
+  assertValidInitialisationVector,
+} from "../../utils/assertions";
 
 class EncryptSsoPassphraseService {
   /**
@@ -35,17 +39,17 @@ class EncryptSsoPassphraseService {
 
     const firstEncryptionAlgorithm = {
       name: nek.algorithm.name,
-      iv: iv1
+      iv: iv1,
     };
 
     const secondEncryptionAlgorithm = {
       name: ek.algorithm.name,
-      iv: iv2
+      iv: iv2,
     };
 
     const firstEncryption = await crypto.subtle.encrypt(firstEncryptionAlgorithm, nek, buffer);
     const cipheredBuffer = await crypto.subtle.encrypt(secondEncryptionAlgorithm, ek, firstEncryption);
-    return Buffer.from(cipheredBuffer).toString('base64');
+    return Buffer.from(cipheredBuffer).toString("base64");
   }
 }
 

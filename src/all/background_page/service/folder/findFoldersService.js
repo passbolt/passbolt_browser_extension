@@ -15,7 +15,7 @@
 import FolderService from "../api/folder/folderService";
 import FolderLocalStorage from "../local_storage/folderLocalStorage";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
-import {assertArrayUUID, assertBoolean, assertUuid} from "../../utils/assertions";
+import { assertArrayUUID, assertBoolean, assertUuid } from "../../utils/assertions";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import splitBySize from "../../utils/array/splitBySize";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
@@ -43,7 +43,7 @@ export default class FindFoldersService {
     assertUuid(id);
     const supportedContain = FolderService.getSupportedContainOptions();
 
-    if (contains && !Object.keys(contains).every(option => supportedContain.includes(option))) {
+    if (contains && !Object.keys(contains).every((option) => supportedContain.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
     }
 
@@ -59,7 +59,11 @@ export default class FindFoldersService {
   async findByIdWithPermissions(id) {
     //Assert
     assertUuid(id);
-    const foldersDto = await this.findById(id, {'permissions.user.profile': true, 'permissions.group': true, 'permission': true});
+    const foldersDto = await this.findById(id, {
+      "permissions.user.profile": true,
+      "permissions.group": true,
+      permission: true,
+    });
     return new FolderEntity(foldersDto);
   }
 
@@ -71,7 +75,7 @@ export default class FindFoldersService {
   async findByIdWithCreatorAndModifier(id) {
     //Assert
     assertUuid(id);
-    const foldersDto = await this.findById(id, {creator: true, modifier: true});
+    const foldersDto = await this.findById(id, { creator: true, modifier: true });
     return new FolderEntity(foldersDto);
   }
 
@@ -87,18 +91,18 @@ export default class FindFoldersService {
     const supportedContain = FolderService.getSupportedContainOptions();
     const supportedFilter = FolderService.getSupportedFiltersOptions();
 
-    if (contains && !Object.keys(contains).every(option => supportedContain.includes(option))) {
+    if (contains && !Object.keys(contains).every((option) => supportedContain.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
     }
 
-    if (filters && !Object.keys(filters).every(filter => supportedFilter.includes(filter))) {
+    if (filters && !Object.keys(filters).every((filter) => supportedFilter.includes(filter))) {
       throw new Error("Unsupported filters parameter used, please check supported filters");
     }
 
     assertBoolean(options?.ignoreInvalidEntity);
 
     const foldersDto = await this.folderService.findAll(contains, filters);
-    return new FoldersCollection(foldersDto, {clone: false, ignoreInvalidEntity: options?.ignoreInvalidEntity});
+    return new FoldersCollection(foldersDto, { clone: false, ignoreInvalidEntity: options?.ignoreInvalidEntity });
   }
 
   /**
@@ -106,7 +110,7 @@ export default class FindFoldersService {
    * @returns {Promise<FoldersCollection>}
    */
   async findAllForLocalStorage() {
-    return this.findAll(FolderLocalStorage.DEFAULT_CONTAIN, null, {ignoreInvalidEntity: true});
+    return this.findAll(FolderLocalStorage.DEFAULT_CONTAIN, null, { ignoreInvalidEntity: true });
   }
 
   /**
@@ -120,11 +124,11 @@ export default class FindFoldersService {
 
     // We split the requests in chunks in order to avoid any too long url error.
     const foldersIdsChunks = splitBySize(foldersIds, 80);
-    const callbacks = foldersIdsChunks.map(foldersIds => {
+    const callbacks = foldersIdsChunks.map((foldersIds) => {
       const filter = {
-        "has-id": foldersIds
+        "has-id": foldersIds,
       };
-      return async() => await this.findAll(contains, filter);
+      return async () => await this.findAll(contains, filter);
     });
 
     // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
@@ -132,7 +136,7 @@ export default class FindFoldersService {
     const foldersBatches = await executeConcurrentlyService.execute(callbacks, 5);
     const folders = new FoldersCollection();
 
-    foldersBatches.forEach(foldersBatch => {
+    foldersBatches.forEach((foldersBatch) => {
       folders._items = folders._items.concat(foldersBatch._items);
     });
 
@@ -149,8 +153,8 @@ export default class FindFoldersService {
     assertArrayUUID(foldersIds);
 
     const contains = {
-      "permission": true,
-      "permissions": true,
+      permission: true,
+      permissions: true,
     };
 
     return this.findAllByIds(foldersIds, contains);

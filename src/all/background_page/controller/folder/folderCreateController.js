@@ -15,7 +15,6 @@ import FolderModel from "../../model/folder/folderModel";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 
-
 class FolderCreateController {
   /**
    * Constructor
@@ -29,7 +28,7 @@ class FolderCreateController {
     this.worker = worker;
     this.requestId = requestId;
     this.folderModel = new FolderModel(clientOptions, account);
-    this.progressService = new ProgressService(this.worker, i18n.t('Creating folder...'));
+    this.progressService = new ProgressService(this.worker, i18n.t("Creating folder..."));
   }
 
   /**
@@ -52,17 +51,17 @@ class FolderCreateController {
          * TODO ask if they want to keep the original permission?
          * TODO a remember me option to skip confirmation dialog
          */
-        await this.progressService.finishStep(i18n.t('Fetching parent permissions'), true);
+        await this.progressService.finishStep(i18n.t("Fetching parent permissions"), true);
         const targetFolder = await this.folderModel.findForShare(folderEntity.folderParentId);
 
-        await this.progressService.finishStep(i18n.t('Saving permissions...'), true);
+        await this.progressService.finishStep(i18n.t("Saving permissions..."), true);
         const changes = await this.folderModel.calculatePermissionsChangesForCreate(folderEntity, targetFolder);
         if (changes) {
           await this.folderModel.share(folderEntity, changes);
         }
       }
 
-      await this.progressService.finishStep(i18n.t('Done!'), true);
+      await this.progressService.finishStep(i18n.t("Done!"), true);
       await this.progressService.close();
       return folderEntity;
     } catch (error) {

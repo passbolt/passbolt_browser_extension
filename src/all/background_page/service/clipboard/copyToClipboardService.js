@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.3.2
  */
-import {assertString} from "../../utils/assertions";
+import { assertString } from "../../utils/assertions";
 import BrowserService from "../browser/browserService";
 import ClipboardProviderService from "./clipboardProviderService";
 
@@ -42,7 +42,7 @@ export default class CopyToClipboardService {
     await this.clipboard.writeText(data);
 
     await browser.alarms.create(CopyToClipboardService.ALARM_NAME, {
-      when: Date.now() + CLIPBOARD_TEMPORARY_CONTENT_FLUSH_DELAY_IN_SECOND * 1000
+      when: Date.now() + CLIPBOARD_TEMPORARY_CONTENT_FLUSH_DELAY_IN_SECOND * 1000,
     });
   }
 
@@ -95,9 +95,7 @@ export default class CopyToClipboardService {
    * @private
    */
   _getContentToFlushClipboard() {
-    return BrowserService.isFirefox()
-      ? ""
-      : "\x00";
+    return BrowserService.isFirefox() ? "" : "\x00";
   }
 
   /**

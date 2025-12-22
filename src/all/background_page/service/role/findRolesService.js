@@ -34,10 +34,13 @@ export default class FindRolesService {
    * @param {boolean?} [options.ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<RolesCollection>}
    */
-  async findAll(options = {ignoreInvalidEntity: false}) {
+  async findAll(options = { ignoreInvalidEntity: false }) {
     const rolesDto = await this.roleApiService.findAll();
     const ignoreInvalidEntity = Boolean(options.ignoreInvalidEntity);
-    const rolesCollection = new RolesCollection(rolesDto.body, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
+    const rolesCollection = new RolesCollection(rolesDto.body, {
+      clone: false,
+      ignoreInvalidEntity: ignoreInvalidEntity,
+    });
     rolesCollection.filterOutGuestRole();
 
     return rolesCollection;

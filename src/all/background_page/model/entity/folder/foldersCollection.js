@@ -15,8 +15,8 @@ import FolderEntity from "./folderEntity";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
-const ENTITY_NAME = 'Folders';
-const RULE_UNIQUE_ID = 'unique_id';
+const ENTITY_NAME = "Folders";
+const RULE_UNIQUE_ID = "unique_id";
 
 class FoldersCollection extends EntityV2Collection {
   /**
@@ -43,8 +43,8 @@ class FoldersCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": FolderEntity.getSchema(),
+      type: "array",
+      items: FolderEntity.getSchema(),
     };
   }
 
@@ -54,7 +54,7 @@ class FoldersCollection extends EntityV2Collection {
    * @throws {EntityValidationError} If a folder already exists with the same id.
    */
   validateBuildRules(item, options) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
   }
 
   /*
@@ -91,7 +91,7 @@ class FoldersCollection extends EntityV2Collection {
    * @returns {Array} of ids
    */
   get ids() {
-    return this._items.map(folder => folder.id);
+    return this._items.map((folder) => folder.id);
   }
 
   /**
@@ -99,7 +99,7 @@ class FoldersCollection extends EntityV2Collection {
    * @returns {Array} of ids
    */
   get folderParentIds() {
-    return this._items.map(folder => folder.folderParentIds);
+    return this._items.map((folder) => folder.folderParentIds);
   }
 
   /*
@@ -114,7 +114,10 @@ class FoldersCollection extends EntityV2Collection {
    * @returns {FoldersCollection}
    */
   filterByIsOwner() {
-    return new FoldersCollection(this._items.filter(f => f.isOwner()), {validate: false});
+    return new FoldersCollection(
+      this._items.filter((f) => f.isOwner()),
+      { validate: false },
+    );
   }
 
   /*
@@ -128,7 +131,7 @@ class FoldersCollection extends EntityV2Collection {
    * @returns {FolderEntity} FolderEntity or undefined
    */
   getById(id) {
-    return this._items.find(folder => folder.id === id);
+    return this._items.find((folder) => folder.id === id);
   }
 
   /**
@@ -150,7 +153,7 @@ class FoldersCollection extends EntityV2Collection {
    * @returns {FoldersCollection} outputCollection final
    */
   static getAllChildren(parentId, inputCollection, outputCollection) {
-    const children = inputCollection.folders.filter(item => item.folderParentId === parentId);
+    const children = inputCollection.folders.filter((item) => item.folderParentId === parentId);
     if (children.length) {
       try {
         outputCollection.pushMany(children);
@@ -161,8 +164,8 @@ class FoldersCollection extends EntityV2Collection {
          * skip...
          */
       }
-      const childrenIds = children.map(child => child.id);
-      childrenIds.forEach(id => FoldersCollection.getAllChildren(id, inputCollection, outputCollection));
+      const childrenIds = children.map((child) => child.id);
+      childrenIds.forEach((id) => FoldersCollection.getAllChildren(id, inputCollection, outputCollection));
     }
     return outputCollection;
   }
@@ -174,9 +177,9 @@ class FoldersCollection extends EntityV2Collection {
    */
   getFolderPath(folderId) {
     if (folderId === null) {
-      return '/';
+      return "/";
     }
-    const folder = this.folders.find(item => item.id === folderId);
+    const folder = this.folders.find((item) => item.id === folderId);
     if (!folder) {
       let msg = `FoldersCollection::getAllParentsAsPath the folder is missing in the inputCollection.`;
       msg += `(id: ${folderId})`;
@@ -184,7 +187,10 @@ class FoldersCollection extends EntityV2Collection {
     }
     const parents = this.getAllParents(folder);
     parents.unshift(folder);
-    return `/${(parents.folders.map(folder => folder.name)).reverse().join('/')}`;
+    return `/${parents.folders
+      .map((folder) => folder.name)
+      .reverse()
+      .join("/")}`;
   }
 
   /**
@@ -207,7 +213,7 @@ class FoldersCollection extends EntityV2Collection {
    */
   static getAllParents(folder, inputCollection, outputCollection) {
     if (folder.folderParentId !== null) {
-      const parent = inputCollection.folders.find(item => item.id === folder.folderParentId);
+      const parent = inputCollection.folders.find((item) => item.id === folder.folderParentId);
       if (parent !== undefined) {
         outputCollection.push(parent);
         FoldersCollection.getAllParents(parent, inputCollection, outputCollection);
@@ -227,14 +233,14 @@ class FoldersCollection extends EntityV2Collection {
    */
   pushMany(data, entityOptions = {}, options = {}) {
     const uniqueIdsSetCache = new Set(this.extract("id"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);
@@ -274,7 +280,11 @@ class FoldersCollection extends EntityV2Collection {
     for (; i < length; i++) {
       const existingFolder = this.folders[i];
       if (existingFolder.id && existingFolder.id === folderEntity.id) {
-        throw new EntityCollectionError(i, FoldersCollection.RULE_UNIQUE_ID, `Folder id ${folderEntity.id} already exists.`);
+        throw new EntityCollectionError(
+          i,
+          FoldersCollection.RULE_UNIQUE_ID,
+          `Folder id ${folderEntity.id} already exists.`,
+        );
       }
     }
   }

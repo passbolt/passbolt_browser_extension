@@ -36,10 +36,10 @@ export default class EnableEncryptedMetadataForExistingInstanceController {
   async _exec() {
     try {
       const result = await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

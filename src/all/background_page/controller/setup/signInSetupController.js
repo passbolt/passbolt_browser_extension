@@ -46,7 +46,7 @@ class SignInSetupController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -70,7 +70,11 @@ class SignInSetupController {
     await this.checkPassphraseService.checkPassphrase(temporaryAccount.passphrase);
     await this.updateSsoCredentialsService.forceUpdateSsoKit(temporaryAccount.passphrase);
 
-    await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(temporaryAccount.account.userKeyFingerprint, temporaryAccount.account.userPrivateArmoredKey, temporaryAccount.passphrase);
+    await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(
+      temporaryAccount.account.userKeyFingerprint,
+      temporaryAccount.account.userPrivateArmoredKey,
+      temporaryAccount.passphrase,
+    );
     if (rememberMe) {
       await Promise.all([
         PassphraseStorageService.set(temporaryAccount.passphrase, -1),

@@ -12,28 +12,32 @@
  * @since         5.1.0
  */
 
-import * as openpgp from 'openpgp';
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import * as openpgp from "openpgp";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import ExternalGpgSignatureEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgSignatureEntity";
 import Uint8ArrayConvert from "../../utils/format/uint8ArrayConvert";
 
 class FindSignatureService {
-/**
- * Finds the signature for a given GPG key within an array of signatures.
- *
- * @param {Array<openpgp.VerificationResult>} verificationResults - An array of verified signatures to search through.
- * @param {openpgp.PublicKey|openpgp.PrivateKey} verifiedKey - The GPG key (public or private) to find the signature for.
- * @returns {ExternalGpgSignatureEntity} The signature entity corresponding to the verified key.
- */
+  /**
+   * Finds the signature for a given GPG key within an array of signatures.
+   *
+   * @param {Array<openpgp.VerificationResult>} verificationResults - An array of verified signatures to search through.
+   * @param {openpgp.PublicKey|openpgp.PrivateKey} verifiedKey - The GPG key (public or private) to find the signature for.
+   * @returns {ExternalGpgSignatureEntity} The signature entity corresponding to the verified key.
+   */
   static async findSignatureForGpgKey(verificationResults, verifiedKey) {
-    verificationResults.forEach(async verificationResult => await OpenpgpAssertion.assertVerificationResult(verificationResult));
+    verificationResults.forEach(
+      async (verificationResult) => await OpenpgpAssertion.assertVerificationResult(verificationResult),
+    );
     OpenpgpAssertion.assertKey(verifiedKey);
 
     for (const verificationResult of verificationResults) {
       const signature = await verificationResult.signature;
 
       const signatureKeyFingerprint = signature.packets.findPacket(openpgp.enums.packet.signature)?.issuerFingerprint;
-      if (!signatureKeyFingerprint) { return; }
+      if (!signatureKeyFingerprint) {
+        return;
+      }
 
       const signatureKeyFingerprintHex = Uint8ArrayConvert.toHex(signatureKeyFingerprint).toLowerCase();
       if (verifiedKey.getFingerprint().toLowerCase() === signatureKeyFingerprintHex) {

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import {Config} from "../config";
+import { Config } from "../config";
 import Validator from "validator";
 
 /**
@@ -44,19 +44,19 @@ class UserSettings {
    */
   validateField(field, value) {
     switch (field) {
-      case 'securityToken':
+      case "securityToken":
         this.validateSecurityToken(value);
         break;
-      case 'domain':
+      case "domain":
         this.validateDomain(value);
         break;
-      case 'theme':
+      case "theme":
         this.validateTheme(value);
         break;
-      case 'locale':
+      case "locale":
         this.validateLocale(value);
         break;
-      default :
+      default:
         throw new Error(`No validation defined for field: ${field}.`);
     }
   }
@@ -70,32 +70,32 @@ class UserSettings {
    * @private
    */
   validateSecurityToken(token) {
-    if ((typeof token === 'undefined')) {
-      throw Error('A token cannot be empty.');
+    if (typeof token === "undefined") {
+      throw Error("A token cannot be empty.");
     }
 
-    if (typeof token.code === 'undefined' || token.code === '') {
-      throw Error('A token code cannot be empty.');
+    if (typeof token.code === "undefined" || token.code === "") {
+      throw Error("A token code cannot be empty.");
     }
 
     if (!Validator.isAscii(token.code)) {
-      throw new Error('The token code should only contain ASCII characters.');
+      throw new Error("The token code should only contain ASCII characters.");
     }
 
     if (!Validator.isLength(token.code, 3, 3)) {
-      throw Error('The token code should only contain 3 characters.');
+      throw Error("The token code should only contain 3 characters.");
     }
 
-    if (typeof token.color === 'undefined' || token.color === '') {
-      throw Error('The token color cannot be empty.');
+    if (typeof token.color === "undefined" || token.color === "") {
+      throw Error("The token color cannot be empty.");
     }
 
     if (!Validator.isHexColor(token.color)) {
       throw Error(`This is not a valid token color: ${token.color}.`);
     }
 
-    if (typeof token.textcolor === 'undefined' || token.textcolor === '') {
-      throw Error('The token text color cannot be empty.');
+    if (typeof token.textcolor === "undefined" || token.textcolor === "") {
+      throw Error("The token text color cannot be empty.");
     }
 
     if (!Validator.isHexColor(token.textcolor)) {
@@ -112,11 +112,11 @@ class UserSettings {
    * @returns {void}
    */
   validateDomain(domain) {
-    if ((typeof domain === 'undefined' || domain === '')) {
-      throw new Error('A domain cannot be empty');
+    if (typeof domain === "undefined" || domain === "") {
+      throw new Error("A domain cannot be empty");
     }
     const validatorOptions = {
-      protocols: ['http', 'https'],
+      protocols: ["http", "https"],
       require_protocol: true,
       require_tld: false,
       allow_fragments: false,
@@ -124,7 +124,7 @@ class UserSettings {
       disallow_auth: true,
     };
     if (!Validator.isURL(domain, validatorOptions)) {
-      throw new Error('The trusted domain url is not valid.');
+      throw new Error("The trusted domain url is not valid.");
     }
   }
 
@@ -136,9 +136,9 @@ class UserSettings {
    * @returns {void}
    */
   validateTheme(theme) {
-    const whitelist = ['default', 'midgar', 'solarized_light', 'solarized_dark'];
+    const whitelist = ["default", "midgar", "solarized_light", "solarized_dark"];
     if (whitelist.indexOf(theme) === -1) {
-      throw new Error('The theme is not valid.');
+      throw new Error("The theme is not valid.");
     }
   }
 
@@ -152,7 +152,7 @@ class UserSettings {
   validateLocale(locale) {
     const regex = new RegExp("^[a-z]{2}-[A-Z]{2}$");
     if (!locale.match(regex)) {
-      throw new Error('The locale is not valid.');
+      throw new Error("The locale is not valid.");
     }
   }
 
@@ -165,8 +165,8 @@ class UserSettings {
    * @throw Error if the secret is not valid
    */
   validate(settings, fields) {
-    if (typeof fields === 'undefined') {
-      fields = ['securityToken', 'domain'];
+    if (typeof fields === "undefined") {
+      fields = ["securityToken", "domain"];
     }
 
     const errors = [];
@@ -183,7 +183,7 @@ class UserSettings {
 
     if (errors.length > 0) {
       // Return exception with details in validationErrors.
-      const e = new Error('settings could not be validated');
+      const e = new Error("settings could not be validated");
       // Add validation errors to the error object.
       e.validationErrors = errors;
       throw e;
@@ -200,14 +200,16 @@ class UserSettings {
    */
   getSecurityToken() {
     const token = {};
-    token.code = Config.read('user.settings.securityToken.code');
-    token.color = Config.read('user.settings.securityToken.color');
-    token.textcolor = Config.read('user.settings.securityToken.textColor');
+    token.code = Config.read("user.settings.securityToken.code");
+    token.color = Config.read("user.settings.securityToken.color");
+    token.textcolor = Config.read("user.settings.securityToken.textColor");
 
-    if ((typeof token.code === 'undefined') ||
-      (typeof token.color === 'undefined') ||
-      (typeof token.textcolor === 'undefined')) {
-      throw new Error('Security token is not set');
+    if (
+      typeof token.code === "undefined" ||
+      typeof token.color === "undefined" ||
+      typeof token.textcolor === "undefined"
+    ) {
+      throw new Error("Security token is not set");
     }
     return token;
   }
@@ -221,9 +223,9 @@ class UserSettings {
    */
   setSecurityToken(token) {
     this.validateSecurityToken(token);
-    Config.write('user.settings.securityToken.code', token.code);
-    Config.write('user.settings.securityToken.color', token.color);
-    Config.write('user.settings.securityToken.textColor', token.textcolor);
+    Config.write("user.settings.securityToken.code", token.code);
+    Config.write("user.settings.securityToken.color", token.color);
+    Config.write("user.settings.securityToken.textColor", token.textcolor);
 
     return true;
   }
@@ -236,7 +238,7 @@ class UserSettings {
    */
   setDomain(domain) {
     this.validateDomain(domain);
-    return Config.write('user.settings.trustedDomain', domain);
+    return Config.write("user.settings.trustedDomain", domain);
   }
 
   /**
@@ -246,9 +248,9 @@ class UserSettings {
    * @throw {Error} if the trusted domain is not set
    */
   getDomain() {
-    const domain = Config.read('user.settings.trustedDomain');
-    if (typeof domain === 'undefined') {
-      throw new Error('Trusted domain is not set');
+    const domain = Config.read("user.settings.trustedDomain");
+    if (typeof domain === "undefined") {
+      throw new Error("Trusted domain is not set");
     }
     return domain;
   }
@@ -261,7 +263,7 @@ class UserSettings {
    */
   setTheme(theme) {
     this.validateTheme(theme);
-    return Config.write('user.settings.theme', theme);
+    return Config.write("user.settings.theme", theme);
   }
 
   /**
@@ -271,9 +273,9 @@ class UserSettings {
    * @throw Error if the theme is not set
    */
   getTheme() {
-    const theme = Config.read('user.settings.theme');
-    if (typeof theme === 'undefined') {
-      throw new Error('The user has no selected themes.');
+    const theme = Config.read("user.settings.theme");
+    if (typeof theme === "undefined") {
+      throw new Error("The user has no selected themes.");
     }
     return theme;
   }
@@ -287,7 +289,7 @@ class UserSettings {
    */
   async setLocale(locale) {
     this.validateLocale(locale);
-    return Config.write('user.settings.locale', locale);
+    return Config.write("user.settings.locale", locale);
   }
 
   /**
@@ -297,9 +299,9 @@ class UserSettings {
    * @throw Error if the locale is not set
    */
   getLocale() {
-    const locale = Config.read('user.settings.locale');
-    if (typeof locale === 'undefined') {
-      throw new Error('The user has no locale language.');
+    const locale = Config.read("user.settings.locale");
+    if (typeof locale === "undefined") {
+      throw new Error("The user has no locale language.");
     }
     return locale;
   }
@@ -312,18 +314,15 @@ class UserSettings {
    */
   get(fields) {
     const settings = {};
-    const settingsDefaultFields = [
-      'domain',
-      'securityToken'
-    ];
+    const settingsDefaultFields = ["domain", "securityToken"];
 
-    if (typeof fields === 'undefined') {
+    if (typeof fields === "undefined") {
       fields = settingsDefaultFields;
     }
-    if (fields.indexOf('domain') !== -1) {
+    if (fields.indexOf("domain") !== -1) {
       settings.domain = this.getDomain();
     }
-    if (fields.indexOf('securityToken') !== -1) {
+    if (fields.indexOf("securityToken") !== -1) {
       settings.securityToken = this.getSecurityToken();
     }
 
@@ -337,8 +336,8 @@ class UserSettings {
    * @throw Error if settings is empty or doesn't validate
    */
   set(settings) {
-    if (typeof settings === 'undefined') {
-      throw new Error('UserSettings cannot be empty');
+    if (typeof settings === "undefined") {
+      throw new Error("UserSettings cannot be empty");
     }
     this.setSecurityToken(settings.securityToken);
     this.setDomain(settings.domain);
@@ -352,7 +351,7 @@ class UserSettings {
    * @return void
    */
   setDefaults() {
-    this.setTheme('default');
+    this.setTheme("default");
   }
 
   /**
@@ -376,18 +375,18 @@ class UserSettings {
     // Get remote account settings (all)
     const url = `${this.getDomain()}/account/settings.json` + `?api-version=v2`;
     const response = await fetchStrategy(url, {
-      method: 'GET',
-      credentials: 'include',
+      method: "GET",
+      credentials: "include",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
     });
     const json = await response.json();
 
     // Check response status
     if (!response.ok) {
-      let msg = 'Could not synchronize the account settings. The server responded with an error.';
+      let msg = "Could not synchronize the account settings. The server responded with an error.";
       if (json.header.msg) {
         msg += ` ${json.header.msg}`;
       }
@@ -395,22 +394,22 @@ class UserSettings {
       throw new Error(msg);
     }
     if (!json.header) {
-      throw new Error('Could not synchronize account settings. The server response header is missing.');
+      throw new Error("Could not synchronize account settings. The server response header is missing.");
     }
     if (!json.body) {
-      throw new Error('Could not synchronize account settings. The server response body is missing.');
+      throw new Error("Could not synchronize account settings. The server response body is missing.");
     }
 
     // Store all the new properties and associated values.
     let props, i;
     for (i in json.body) {
       props = json.body[i];
-      if (typeof props.property !== 'undefined') {
+      if (typeof props.property !== "undefined") {
         switch (props.property) {
-          case 'theme':
+          case "theme":
             this.setTheme(props.value);
             break;
-          case 'locale':
+          case "locale":
             this.setLocale(props.value);
             break;
           default:

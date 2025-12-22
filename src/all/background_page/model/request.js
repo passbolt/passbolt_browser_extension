@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
-class Request { }
+class Request {}
 
 /**
  * Set a fetch request options CSRF header.
@@ -19,11 +19,11 @@ class Request { }
  * @param {User} user The user who is at the origin of the request
  * @return {object} The updated fetch options
  */
-Request.setCsrfHeader = function(fetchOptions, user) {
+Request.setCsrfHeader = function (fetchOptions, user) {
   fetchOptions = fetchOptions || {};
   const csrfToken = user.getCsrfToken();
   if (csrfToken) {
-    Request.setHeader(fetchOptions, 'X-CSRF-Token', csrfToken);
+    Request.setHeader(fetchOptions, "X-CSRF-Token", csrfToken);
   }
   return fetchOptions;
 };
@@ -33,7 +33,7 @@ Request.setCsrfHeader = function(fetchOptions, user) {
  * @param {object} fetchOptions The fetch options
  * @return {object} The updated fetch options
  */
-Request.setHeader = function(fetchOptions, key, value) {
+Request.setHeader = function (fetchOptions, key, value) {
   fetchOptions = fetchOptions || {};
   fetchOptions.headers = fetchOptions.headers || {};
   fetchOptions.headers[key] = value;

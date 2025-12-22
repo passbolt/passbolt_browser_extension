@@ -12,7 +12,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const RESOURCE_SERVICE_RESOURCE_NAME = 'resources';
+const RESOURCE_SERVICE_RESOURCE_NAME = "resources";
 
 class ResourceService extends AbstractService {
   /**
@@ -43,19 +43,19 @@ class ResourceService extends AbstractService {
   static getSupportedContainOptions() {
     return [
       // create
-      'creator',
-      'favorite',
-      'modifier',
-      'secret',
-      'permission',
+      "creator",
+      "favorite",
+      "modifier",
+      "secret",
+      "permission",
       // find all
-      'permissions',
-      'permissions.user.profile',
-      'permissions.group',
+      "permissions",
+      "permissions.user.profile",
+      "permissions.group",
       // if tag plugin
-      'tag',
+      "tag",
       // resource types - since v3
-      'resource-type'
+      "resource-type",
     ];
   }
 
@@ -66,13 +66,13 @@ class ResourceService extends AbstractService {
    */
   static getSupportedFiltersOptions() {
     return [
-      'is-favorite',
-      'is-shared-with-group',
-      'is-owned-by-me',
-      'is-shared-with-me',
-      'has-id',
+      "is-favorite",
+      "is-shared-with-group",
+      "is-owned-by-me",
+      "is-shared-with-me",
+      "has-id",
       // if tag plugin
-      'has-tag',
+      "has-tag",
       "has-parent",
     ];
   }
@@ -83,10 +83,7 @@ class ResourceService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedOrdersOptions() {
-    return [
-      'Resource.modified DESC',
-      'Resource.modified ASC',
-    ];
+    return ["Resource.modified DESC", "Resource.modified ASC"];
   }
 
   /**
@@ -119,7 +116,7 @@ class ResourceService extends AbstractService {
     contains = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(filters, ResourceService.getSupportedFiltersOptions()) : null;
     orders = orders ? this.formatOrderOptions(orders, ResourceService.getSupportedFiltersOptions()) : null;
-    const options = {...contains, ...filters, ...orders};
+    const options = { ...contains, ...filters, ...orders };
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];

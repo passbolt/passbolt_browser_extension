@@ -36,7 +36,7 @@ export default class BrowserExtensionUpdatedLocalStorage {
    */
   async flush() {
     await browser.storage.local.remove(this.storageKey);
-    console.debug('BrowserExtensionUpdatedLocalStorage flushed');
+    console.debug("BrowserExtensionUpdatedLocalStorage flushed");
   }
 
   /**
@@ -59,8 +59,8 @@ export default class BrowserExtensionUpdatedLocalStorage {
       throw new TypeError("Parameter `timestamp` should be of type number");
     }
 
-    await navigator.locks.request(this.storageKey, async() => {
-      await browser.storage.local.set({[this.storageKey]: timestamp});
+    await navigator.locks.request(this.storageKey, async () => {
+      await browser.storage.local.set({ [this.storageKey]: timestamp });
     });
   }
 }

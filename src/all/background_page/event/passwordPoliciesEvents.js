@@ -21,21 +21,21 @@ import SavePasswordPoliciesController from "../controller/passwordPolicies/saveP
  * @param {ApiClientOptions} apiClientOptions the api client options
  * @param {AccountEntity} account the user account
  */
-const listen = function(worker, apiClientOptions, account) {
-  worker.port.on('passbolt.password-policies.get', async requestId => {
+const listen = function (worker, apiClientOptions, account) {
+  worker.port.on("passbolt.password-policies.get", async (requestId) => {
     const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.password-policies.save', async(requestId, passwordSettingsDto) => {
+  worker.port.on("passbolt.password-policies.save", async (requestId, passwordSettingsDto) => {
     const controller = new SavePasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec(passwordSettingsDto);
   });
 
-  worker.port.on('passbolt.password-policies.get-admin-settings', async requestId => {
+  worker.port.on("passbolt.password-policies.get-admin-settings", async (requestId) => {
     const controller = new FindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
 };
 
-export const PasswordPoliciesEvents = {listen};
+export const PasswordPoliciesEvents = { listen };

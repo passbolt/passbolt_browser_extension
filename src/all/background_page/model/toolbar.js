@@ -10,7 +10,7 @@ import User from "./user";
  * Toolbar constructor.
  * @constructor
  */
-const Toolbar = function() {};
+const Toolbar = function () {};
 
 /**
  * Get the toolbar url, that will be used when the user click
@@ -21,13 +21,12 @@ const Toolbar = function() {};
  * - Plugin installed and configured, return the passbolt url.
  * @return {string}
  */
-Toolbar.getToolbarUrl = function() {
+Toolbar.getToolbarUrl = function () {
   const user = User.getInstance();
 
   return user.isValid()
     ? user.settings.getDomain() // The plugin is installed and configured
-    : 'https://www.passbolt.com/start'; // The plugin is installed but not configured
+    : "https://www.passbolt.com/start"; // The plugin is installed but not configured
 };
-
 
 export default Toolbar;

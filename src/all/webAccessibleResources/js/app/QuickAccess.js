@@ -18,22 +18,22 @@ import Port from "../lib/port";
 
 async function main() {
   const query = new URLSearchParams(window.location.search);
-  const portname = query.get('passbolt');
+  const portname = query.get("passbolt");
   const port = new Port(portname);
   await port.connect();
 
   // Emit a success if the port is still connected
-  port.on("passbolt.port.check", requestId => port.emit(requestId, "SUCCESS"));
+  port.on("passbolt.port.check", (requestId) => port.emit(requestId, "SUCCESS"));
 
   const storage = browser.storage;
-  const domContainer = document.querySelector('#quickaccess-container');
+  const domContainer = document.querySelector("#quickaccess-container");
   // Extract parameters from the url.
   const urlSearchParams = new URLSearchParams(window.location.search);
   const bootstrapFeature = urlSearchParams.get("feature");
   const bootstrapRequestId = urlSearchParams.get("requestId");
-  const openerTabId = urlSearchParams.get('tabId');
-  const detached = urlSearchParams.get('uiMode') === "detached";
-  const extQuickaccessProps = {port, storage, bootstrapFeature, bootstrapRequestId, openerTabId, detached};
+  const openerTabId = urlSearchParams.get("tabId");
+  const detached = urlSearchParams.get("uiMode") === "detached";
+  const extQuickaccessProps = { port, storage, bootstrapFeature, bootstrapRequestId, openerTabId, detached };
 
   // TODO: update to createRoot for react 18 when ready
   /* eslint-disable react/no-deprecated */

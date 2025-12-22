@@ -32,10 +32,10 @@ export default class RedirectToAdminWorkspaceController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -45,6 +45,6 @@ export default class RedirectToAdminWorkspaceController {
    */
   async exec() {
     const url = `${this.account.domain}/app/administration`;
-    chrome.tabs.update(this.worker.tab.id, {url});
+    chrome.tabs.update(this.worker.tab.id, { url });
   }
 }

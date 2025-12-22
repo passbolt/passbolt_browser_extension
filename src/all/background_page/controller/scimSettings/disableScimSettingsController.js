@@ -13,7 +13,7 @@
  */
 
 import DisableScimSettingsService from "../../service/scimSettings/disableScimSettingsService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 class DisableScimSettingsController {
   /**
@@ -35,10 +35,10 @@ class DisableScimSettingsController {
   async _exec(id) {
     try {
       const result = await this.exec(id);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

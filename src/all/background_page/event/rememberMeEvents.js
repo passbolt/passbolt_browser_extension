@@ -14,16 +14,16 @@
 
 import GetUserRememberMeLatestChoiceController from "../controller/rememberMe/getUserRememberMeLatestChoiceController";
 
-const listen = function(worker, _, account) {
+const listen = function (worker, _, account) {
   /*
    * Get the last rememberMe choice made by the user
    *
    * @listens passbolt.remember-me.get-user-latest-choice
    */
-  worker.port.on('passbolt.remember-me.get-user-latest-choice', async requestId => {
+  worker.port.on("passbolt.remember-me.get-user-latest-choice", async (requestId) => {
     const controller = new GetUserRememberMeLatestChoiceController(worker, requestId, account);
     await controller._exec();
   });
 };
 
-export const RememberMeEvents = {listen};
+export const RememberMeEvents = { listen };

@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
@@ -55,7 +55,7 @@ class RecoverAccountController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -75,7 +75,11 @@ class RecoverAccountController {
     }
 
     const request = await this._findAndAssertRequest(this.temporaryAccount.account);
-    const recoveredArmoredPrivateKey = await this._recoverPrivateKey(request.accountRecoveryPrivateKey, request.accountRecoveryResponses.items[0], passphrase);
+    const recoveredArmoredPrivateKey = await this._recoverPrivateKey(
+      request.accountRecoveryPrivateKey,
+      request.accountRecoveryResponses.items[0],
+      passphrase,
+    );
     await this._completeRecover(recoveredArmoredPrivateKey);
     const account = await this._addRecoveredAccountToStorage(this.temporaryAccount.account);
     this._updateWorkerAccount(account);
@@ -98,11 +102,13 @@ class RecoverAccountController {
     const accountRecoveryRequest = await this.accountRecoveryModel.findRequestByIdAndUserIdAndAuthenticationToken(
       account.accountRecoveryRequestId,
       account.userId,
-      account.authenticationTokenToken
+      account.authenticationTokenToken,
     );
 
     if (accountRecoveryRequest.id !== account.accountRecoveryRequestId) {
-      throw new Error("The account recovery request id should match the request id associated to the account being recovered.");
+      throw new Error(
+        "The account recovery request id should match the request id associated to the account being recovered.",
+      );
     }
 
     if (!accountRecoveryRequest.accountRecoveryPrivateKey) {
@@ -135,9 +141,17 @@ class RecoverAccountController {
      * @todo Additional check could be done to ensure the recovered key is the same than the one the user was previously using.
      *   If the user is in the case lost passphrase, a key should still be referenced in the storage of the extension.
      */
-    const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, requestPrivateKeyDecrypted, this.temporaryAccount.account.userId, this.temporaryAccount.account.domain);
+    const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(
+      response,
+      requestPrivateKeyDecrypted,
+      this.temporaryAccount.account.userId,
+      this.temporaryAccount.account.domain,
+    );
     const privateKeyData = await OpenpgpAssertion.readMessageOrFail(privateKey.data);
-    const decryptedRecoveredPrivateArmoredKey = await DecryptMessageService.decryptSymmetrically(privateKeyData, privateKeyPasswordDecryptedData.privateKeySecret);
+    const decryptedRecoveredPrivateArmoredKey = await DecryptMessageService.decryptSymmetrically(
+      privateKeyData,
+      privateKeyPasswordDecryptedData.privateKeySecret,
+    );
     const decryptedRecoveredPrivateKey = await OpenpgpAssertion.readKeyOrFail(decryptedRecoveredPrivateArmoredKey);
     return EncryptPrivateKeyService.encrypt(decryptedRecoveredPrivateKey, passphrase);
   }

@@ -16,7 +16,7 @@ import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/enti
 import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
 import UserEntity from "../user/userEntity";
 
-const ENTITY_NAME = 'Group';
+const ENTITY_NAME = "Group";
 const GROUP_NAME_MIN_LENGTH = 1;
 const GROUP_NAME_MAX_LENGTH = 255;
 
@@ -29,19 +29,19 @@ class GroupEntity extends EntityV2 {
 
     // Association
     if (this._props.groups_users) {
-      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {...options, clone: false});
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users, { ...options, clone: false });
       delete this._props.groups_users;
     }
     if (this._props.my_group_user) {
-      this._my_group_user = new GroupUserEntity(this._props.my_group_user, {...options, clone: false});
+      this._my_group_user = new GroupUserEntity(this._props.my_group_user, { ...options, clone: false });
       delete this._props.my_group_user;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator, {...options, clone: false});
+      this._creator = new UserEntity(this._props.creator, { ...options, clone: false });
       delete this._props.creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
+      this._modifier = new UserEntity(this._props.modifier, { ...options, clone: false });
       delete this._props.modifier;
     }
   }
@@ -52,45 +52,43 @@ class GroupEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["name"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "name": {
-          "type": "string",
-          "minLength": GROUP_NAME_MIN_LENGTH,
-          "maxLength": GROUP_NAME_MAX_LENGTH
+        name: {
+          type: "string",
+          minLength: GROUP_NAME_MIN_LENGTH,
+          maxLength: GROUP_NAME_MAX_LENGTH,
         },
-        "deleted": {
-          "type": "boolean"
+        deleted: {
+          type: "boolean",
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
         // Associations
-        "groups_users": GroupsUsersCollection.getSchema(),
-        "my_group_user": GroupUserEntity.getSchema(),
-        "creator": UserEntity.getSchema(),
-        "modifier": UserEntity.getSchema()
-      }
+        groups_users: GroupsUsersCollection.getSchema(),
+        my_group_user: GroupUserEntity.getSchema(),
+        creator: UserEntity.getSchema(),
+        modifier: UserEntity.getSchema(),
+      },
     };
   }
 
@@ -150,10 +148,10 @@ class GroupEntity extends EntityV2 {
    */
   static get ALL_CONTAIN_OPTIONS() {
     return {
-      'creator': UserEntity.ALL_CONTAIN_OPTIONS,
-      'modifier': UserEntity.ALL_CONTAIN_OPTIONS,
-      'groups_users': GroupUserEntity.ALL_CONTAIN_OPTIONS,
-      'my_group_user': GroupUserEntity.ALL_CONTAIN_OPTIONS,
+      creator: UserEntity.ALL_CONTAIN_OPTIONS,
+      modifier: UserEntity.ALL_CONTAIN_OPTIONS,
+      groups_users: GroupUserEntity.ALL_CONTAIN_OPTIONS,
+      my_group_user: GroupUserEntity.ALL_CONTAIN_OPTIONS,
     };
   }
 

@@ -40,4 +40,3 @@ export default class FindMetadataMigrateResourcesService {
     return apiResponse.header.pagination;
   }
 }
-

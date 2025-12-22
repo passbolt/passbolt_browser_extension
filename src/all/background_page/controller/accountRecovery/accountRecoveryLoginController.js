@@ -54,10 +54,10 @@ class AccountRecoveryLoginController {
   async _exec(passphrase, remember, shouldRefreshCurrentTab = false) {
     try {
       await this.exec(passphrase, remember, shouldRefreshCurrentTab);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -96,16 +96,17 @@ class AccountRecoveryLoginController {
     }
 
     try {
-      await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(temporaryAccount.account.userKeyFingerprint, temporaryAccount.account.userPrivateArmoredKey, passphrase);
+      await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(
+        temporaryAccount.account.userKeyFingerprint,
+        temporaryAccount.account.userPrivateArmoredKey,
+        passphrase,
+      );
       /*
        * Post login operations
        * MFA may not be complete yet, so no need to preload things here
        */
       if (rememberMe) {
-        await Promise.all([
-          PassphraseStorageService.set(passphrase, -1),
-          KeepSessionAliveService.start(),
-        ]);
+        await Promise.all([PassphraseStorageService.set(passphrase, -1), KeepSessionAliveService.start()]);
       } else {
         await PassphraseStorageService.set(passphrase, 60);
       }
@@ -117,10 +118,12 @@ class AccountRecoveryLoginController {
       }
     }
 
-
     await this.redirectToApp(temporaryAccount.account.domain);
     // Remove from the local storage the account recovery used to initiate/complete the account recovery.
-    await AccountLocalStorage.deleteByUserIdAndType(temporaryAccount.account.userId, AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY);
+    await AccountLocalStorage.deleteByUserIdAndType(
+      temporaryAccount.account.userId,
+      AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY,
+    );
     // Remove account temporary when an account recovery process is finished
     await AccountTemporarySessionStorageService.remove();
   }
@@ -131,7 +134,7 @@ class AccountRecoveryLoginController {
    * @returns {Promise<void>}
    */
   async redirectToApp(url) {
-    browser.tabs.update(this.worker.tab.id, {url});
+    browser.tabs.update(this.worker.tab.id, { url });
   }
 
   /**
@@ -141,7 +144,7 @@ class AccountRecoveryLoginController {
    */
   async registerRememberMeOption(rememberMe) {
     const duration = rememberMe ? -1 : 0;
-    const userRememberMeLatestChoiceEntity = new UserRememberMeLatestChoiceEntity({duration});
+    const userRememberMeLatestChoiceEntity = new UserRememberMeLatestChoiceEntity({ duration });
     await this.userRememberMeLatestChoiceLocalStorage.set(userRememberMeLatestChoiceEntity);
   }
 }

@@ -36,13 +36,13 @@ class FindAllForActionLogController {
    * @param {number} options.limit The limit of activities per page
    * @returns {Promise<void>}
    */
-  async _exec(foreignModel, foreignId, {page, limit}) {
+  async _exec(foreignModel, foreignId, { page, limit }) {
     try {
-      const result = await this.exec(foreignModel, foreignId, {page, limit});
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      const result = await this.exec(foreignModel, foreignId, { page, limit });
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -50,7 +50,7 @@ class FindAllForActionLogController {
    * Find all action logs
    * @returns {Promise<*>}
    */
-  async exec(foreignModel, foreignId, {page, limit}) {
+  async exec(foreignModel, foreignId, { page, limit }) {
     return this.findAllForActionLogService.findAllFor(foreignModel, foreignId, page, limit);
   }
 }

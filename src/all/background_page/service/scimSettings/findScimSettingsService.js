@@ -38,4 +38,3 @@ class FindScimSettingsService {
 }
 
 export default FindScimSettingsService;
-

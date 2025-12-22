@@ -14,7 +14,7 @@
 
 import AbstractService from "../abstract/abstractService";
 
-export const SUBSCRIPTION_API_SERVICE_RESOURCE_NAME = 'ee/subscription';
+export const SUBSCRIPTION_API_SERVICE_RESOURCE_NAME = "ee/subscription";
 
 class SubscriptionApiService extends AbstractService {
   /**

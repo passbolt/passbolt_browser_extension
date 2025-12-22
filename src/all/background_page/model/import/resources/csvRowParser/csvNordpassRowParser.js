@@ -22,26 +22,26 @@ class CsvNordpassRowParser extends AbstractCsvRowParser {
    */
   static get mapping() {
     return {
-      "name": "name",
-      "uris": "url",
-      "username": "username",
-      "secret_clear": "password",
-      "description": "note",
-      "cardholdername": "cardholername",
-      "cardnumber": "cardnumber",
-      "cvc": "cvc",
-      "expirydate": "expirydate",
-      "zipcode": "zipcode",
-      "folder_parent_path": "folder",
-      "full_name": "full_name",
-      "phone_number": "phone_number",
-      "email": "email",
-      "address1": "address1",
-      "address2": "address2",
-      "city": "city",
-      "country": "country",
-      "state": "state",
-      "type": "type",
+      name: "name",
+      uris: "url",
+      username: "username",
+      secret_clear: "password",
+      description: "note",
+      cardholdername: "cardholername",
+      cardnumber: "cardnumber",
+      cvc: "cvc",
+      expirydate: "expirydate",
+      zipcode: "zipcode",
+      folder_parent_path: "folder",
+      full_name: "full_name",
+      phone_number: "phone_number",
+      email: "email",
+      address1: "address1",
+      address2: "address2",
+      city: "city",
+      country: "country",
+      state: "state",
+      type: "type",
     };
   }
 
@@ -71,12 +71,27 @@ class CsvNordpassRowParser extends AbstractCsvRowParser {
     if (!resourceType) {
       resourceType = ResourcesTypeImportParser.findPartialResourceType(resourceTypesCollection, scores);
       if (resourceType) {
-        importEntity.importResourcesWarnings.push(new ImportError("Resource partially imported", externalResourceDto, new Error("We used the closest resource type supported.")));
+        importEntity.importResourcesWarnings.push(
+          new ImportError(
+            "Resource partially imported",
+            externalResourceDto,
+            new Error("We used the closest resource type supported."),
+          ),
+        );
       }
       if (!resourceType) {
         //Fallback default content type not supported
-        resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, metadataTypesSettings);
-        importEntity.importResourcesWarnings.push(new ImportError("Imported with default content type", externalResourceDto, new Error("No resource type associated to this row.")));
+        resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(
+          resourceTypesCollection,
+          metadataTypesSettings,
+        );
+        importEntity.importResourcesWarnings.push(
+          new ImportError(
+            "Imported with default content type",
+            externalResourceDto,
+            new Error("No resource type associated to this row."),
+          ),
+        );
       }
     }
 

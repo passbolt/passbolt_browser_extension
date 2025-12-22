@@ -12,7 +12,7 @@
  * @since         4.0.0
  */
 
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import ScriptExecution from "../sdk/scriptExecution";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../model/entity/worker/workerEntity";
@@ -98,7 +98,7 @@ class Pagemod {
       name: this.appName,
       tabId: tabId,
       frameId: frameId,
-      status: WorkerEntity.STATUS_WAITING_CONNECTION
+      status: WorkerEntity.STATUS_WAITING_CONNECTION,
     };
     await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
     // a helper to handle insertion of scripts, variables and css in target page
@@ -119,7 +119,7 @@ class Pagemod {
   async attachEvents(port) {
     const tab = port._port.sender.tab;
     for (const event of this.events) {
-      await event.listen({port: port, tab: tab, name: this.appName});
+      await event.listen({ port: port, tab: tab, name: this.appName });
     }
   }
 }

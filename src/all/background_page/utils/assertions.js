@@ -12,7 +12,7 @@
  * @since         3.10.0
  */
 import Validator from "validator";
-import {ValidatorRule} from "./validatorRules";
+import { ValidatorRule } from "./validatorRules";
 
 const UUID_REGEXP = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
 
@@ -33,7 +33,7 @@ export const assertUuid = (uuidString, errorMessage = "The given parameter is no
  * @param {string<base64>} base64String the parameter to validate
  * @throws {Error} if the parameter is not valid
  */
-export const assertBase64String = base64String => {
+export const assertBase64String = (base64String) => {
   if (!Validator.isBase64(base64String)) {
     throw new Error("The given parameter is not a valid base64 string");
   }
@@ -44,9 +44,9 @@ export const assertBase64String = base64String => {
  * @param {string} string the parameter to validate
  * @throws {Error} if the parameter is not valid
  */
-export const assertPassphrase = string => {
+export const assertPassphrase = (string) => {
   if (!ValidatorRule.isUtf8Extended(string)) {
-    throw new Error('The given parameter should be a valid UTF8 string.');
+    throw new Error("The given parameter should be a valid UTF8 string.");
   }
 };
 
@@ -56,13 +56,13 @@ export const assertPassphrase = string => {
  * @throws {Error} if the parameter is not valid
  * @private
  */
-const assertSsoKey = ssoKey => {
+const assertSsoKey = (ssoKey) => {
   if (!(ssoKey instanceof CryptoKey)) {
     throw new Error("The given parameter is not a CryptoKey");
   }
 
   const algorithm = ssoKey.algorithm;
-  if (algorithm.name !== 'AES-GCM') {
+  if (algorithm.name !== "AES-GCM") {
     throw new Error("The given key should use the algorithm 'AES-GCM'");
   }
 
@@ -72,9 +72,7 @@ const assertSsoKey = ssoKey => {
 
   const capabilities = ssoKey.usages;
   const areCapabilitiesValid =
-    capabilities.length === 2
-    && capabilities.includes("encrypt")
-    && capabilities.includes("decrypt");
+    capabilities.length === 2 && capabilities.includes("encrypt") && capabilities.includes("decrypt");
 
   if (!areCapabilitiesValid) {
     throw new Error("The given key should be usable for encryption and decryption only");
@@ -86,7 +84,7 @@ const assertSsoKey = ssoKey => {
  * @param {CryptoKey} nonExtractableKey the parameter to validate
  * @throws {Error} if the parameter is not valid
  */
-export const assertNonExtractableSsoKey = nonExtractableKey => {
+export const assertNonExtractableSsoKey = (nonExtractableKey) => {
   assertSsoKey(nonExtractableKey);
 
   if (nonExtractableKey.extractable) {
@@ -99,7 +97,7 @@ export const assertNonExtractableSsoKey = nonExtractableKey => {
  * @param {CryptoKey} extractableKey the parameter to validate
  * @throws {Error} if the parameter is not valid
  */
-export const assertExtractableSsoKey = extractableKey => {
+export const assertExtractableSsoKey = (extractableKey) => {
   assertSsoKey(extractableKey);
 
   if (!extractableKey.extractable) {
@@ -112,7 +110,7 @@ export const assertExtractableSsoKey = extractableKey => {
  * @param {Uint8Array} initialisationVector the parameter to validate
  * @throws {Error} if the parameter is not valid
  */
-export const assertValidInitialisationVector = initialisationVector => {
+export const assertValidInitialisationVector = (initialisationVector) => {
   if (!(initialisationVector instanceof Uint8Array)) {
     throw new Error("The given initialisation vector should be a Uint8Array");
   }
@@ -129,7 +127,7 @@ export const assertValidInitialisationVector = initialisationVector => {
  * @throws {Error} if the parameter is not valid
  */
 export const assertString = (str, errorMessage = "The given parameter is not a valid string") => {
-  if (typeof str !== 'string' && !(str instanceof String)) {
+  if (typeof str !== "string" && !(str instanceof String)) {
     throw new Error(errorMessage);
   }
 };
@@ -167,7 +165,11 @@ export const assertType = (object, expectedType, errorMessage = "The given data 
  * @param {string} [errorMessage] the message to throw withing the Error if any
  * @throws {TypeError} if the parameter is not valid
  */
-export const assertAnyTypeOf = (object, expectedTypes, errorMessage = "The given data is not of any of the expected type") => {
+export const assertAnyTypeOf = (
+  object,
+  expectedTypes,
+  errorMessage = "The given data is not of any of the expected type",
+) => {
   for (let i = 0; i < expectedTypes.length; i++) {
     if (object instanceof expectedTypes[i]) {
       return;
@@ -184,7 +186,7 @@ export const assertAnyTypeOf = (object, expectedTypes, errorMessage = "The given
  * @throws {TypeError} if the parameter is not valid
  */
 export const assertBoolean = (value, errorMessage = "The given parameter is not a valid boolean") => {
-  if (typeof value !== 'undefined' && typeof value !== 'boolean') {
+  if (typeof value !== "undefined" && typeof value !== "boolean") {
     throw new TypeError(errorMessage);
   }
 };
@@ -222,9 +224,9 @@ export const assertNonEmptyArray = (data, errorMessage = "The given parameter is
 export const assertArrayUUID = (data, errorMessage = "The given parameter is not a valid array of uuid") => {
   try {
     assertArray(data);
-    data.forEach(entry => assertUuid(entry));
+    data.forEach((entry) => assertUuid(entry));
   } catch (error) {
-    throw new TypeError(errorMessage, {cause: error});
+    throw new TypeError(errorMessage, { cause: error });
   }
 };
 
@@ -236,7 +238,7 @@ export const assertArrayUUID = (data, errorMessage = "The given parameter is not
  * @throws {TypeError} if the parameter is not valid
  */
 export const assertNumber = (value, errorMessage = "The given parameter is not a valid number") => {
-  if (typeof value !== 'undefined' && typeof value !== 'number') {
+  if (typeof value !== "undefined" && typeof value !== "number") {
     throw new TypeError(errorMessage);
   }
 };

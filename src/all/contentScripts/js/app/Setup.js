@@ -12,7 +12,7 @@
  * @since        3.0.0
  */
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import ExtBootstrapSetup from "passbolt-styleguide/src/react-extension/ExtBootstrapSetup";
 import Port from "../../../webAccessibleResources/js/lib/port";
 import MessageService from "../service/messageService";
@@ -34,9 +34,8 @@ async function main() {
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
 
-  // TODO: update to createRoot for react 18 when ready
-  /* eslint-disable react/no-deprecated */
-  ReactDOM.render(<ExtBootstrapSetup port={port} browserExtensionUrl={browserExtensionUrl} />, domContainer);
+  const root = createRoot(domContainer);
+  root.render(<ExtBootstrapSetup port={port} browserExtensionUrl={browserExtensionUrl} />);
 }
 
 main();

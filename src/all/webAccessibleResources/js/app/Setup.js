@@ -12,7 +12,7 @@
  * @since         3.0.0
  */
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import ExtAuthenticationSetup from "passbolt-styleguide/src/react-extension/ExtAuthenticationSetup";
 import Port from "../lib/port";
 
@@ -24,9 +24,8 @@ async function main() {
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
 
-  // TODO: update to createRoot for react 18 when ready
-  /* eslint-disable react/no-deprecated */
-  ReactDOM.render(React.createElement(ExtAuthenticationSetup, { port: port }), domContainer);
+  const root = createRoot(domContainer);
+  root.render(<ExtAuthenticationSetup port={port} />);
 }
 
 main();

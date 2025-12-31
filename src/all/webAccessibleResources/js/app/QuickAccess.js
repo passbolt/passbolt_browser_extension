@@ -12,7 +12,7 @@
  * @since         3.2.0
  */
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import ExtQuickAccess from "passbolt-styleguide/src/react-quickaccess/ExtQuickAccess";
 import Port from "../lib/port";
 
@@ -33,11 +33,18 @@ async function main() {
   const bootstrapRequestId = urlSearchParams.get("requestId");
   const openerTabId = urlSearchParams.get("tabId");
   const detached = urlSearchParams.get("uiMode") === "detached";
-  const extQuickaccessProps = { port, storage, bootstrapFeature, bootstrapRequestId, openerTabId, detached };
 
-  // TODO: update to createRoot for react 18 when ready
-  /* eslint-disable react/no-deprecated */
-  ReactDOM.render(React.createElement(ExtQuickAccess, extQuickaccessProps), domContainer);
+  const root = createRoot(domContainer);
+  root.render(
+    <ExtQuickAccess
+      port={port}
+      storage={storage}
+      bootstrapFeature={bootstrapFeature}
+      bootstrapRequestId={bootstrapRequestId}
+      openerTabId={openerTabId}
+      detached={detached}
+    />,
+  );
 }
 
 main();

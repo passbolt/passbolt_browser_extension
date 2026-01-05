@@ -386,6 +386,7 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          'mkdir -p ' + path.dist_firefox,
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
           'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + manifestVersion + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
           'rm -f ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
@@ -398,6 +399,7 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          'mkdir -p ' + path.dist_firefox,
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
           'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + manifestVersion + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + ".zip'"
@@ -412,6 +414,7 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          'mkdir -p ' + path.dist_chromium_mv2,
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv2 + 'passbolt-' + pkg.version + '-debug.crx',
           'rm -f ' + path.dist_chromium_mv2 + 'passbolt-latest@passbolt.com.crx',
           'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.dist_chromium_mv2 + 'passbolt-latest@passbolt.com.crx'
@@ -422,6 +425,7 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          'mkdir -p ' + path.dist_chromium_mv2,
           'zip -q -1 -r ' + path.dist_chromium_mv2 + 'passbolt-' + pkg.version + '.zip ' + path.build,
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv2 + 'passbolt-' + pkg.version + '.crx ',
           "echo '\nZip and Crx files generated in " + path.dist_chromium_mv2 + "'"
@@ -435,6 +439,7 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          'mkdir -p ' + path.dist_chromium_mv3,
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv3 + 'passbolt-' + pkg.version + '-debug.crx',
           'rm -f ' + path.dist_chromium_mv3 + 'passbolt-latest@passbolt.com.crx',
           'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.dist_chromium_mv3 + 'passbolt-latest@passbolt.com.crx'
@@ -445,6 +450,7 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          'mkdir -p ' + path.dist_chromium_mv3,
           'zip -q -1 -r ' + path.dist_chromium_mv3 + 'passbolt-' + pkg.version + '.zip ' + path.build,
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv3 + 'passbolt-' + pkg.version + '.crx ',
           "echo '\nZip and Crx files generated in " + path.dist_chromium_mv3 + "'"

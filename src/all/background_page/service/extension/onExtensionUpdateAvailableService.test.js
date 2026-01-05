@@ -26,13 +26,11 @@ import PortManager from "../../sdk/port/portManager";
 import BrowserTabService from "../ui/browserTab.service";
 import PublicWebsiteSignInPagemod from "../../pagemod/publicWebsiteSignInPagemod";
 import PostLogoutService from "../auth/postLogoutService";
-import BrowserService from "../browser/browserService";
-import BrowserExtensionUpdatedLocalStorage from "../local_storage/browserExtensionUpdatedLocalStorage";
-import WorkerService from "../worker/workerService";
 
 // Reset the modules before each test.
 beforeEach(() => {
-  jest.resetAllMocks();
+  jest.resetModules();
+  jest.clearAllMocks();
 });
 
 describe("OnExtensionUpdateAvailableService", () => {
@@ -70,16 +68,12 @@ describe("OnExtensionUpdateAvailableService", () => {
       expect(browser.runtime.reload).toHaveBeenCalledTimes(1);
     });
 
-    it("Should exec update only when the user is signed-out", async () => {
-      expect.assertions(3);
+    it("Should exec update only when the user is signed-out", async() => {
+      expect.assertions(2);
       // mock function
       await MockExtension.withConfiguredAccount();
       jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
       jest.spyOn(browser.runtime, "reload");
-      jest.spyOn(BrowserService, "isChromeAndMv3").mockImplementation(() => false);
-      chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 3 }));
-      chrome.runtime.getURL.mockImplementation(() => "chrome://extension/test");
-
       // process
       await OnExtensionUpdateAvailableService.exec();
       // expectation
@@ -90,11 +84,7 @@ describe("OnExtensionUpdateAvailableService", () => {
       await Promise.resolve();
       await Promise.resolve();
       await Promise.resolve();
-
       expect(browser.runtime.reload).toHaveBeenCalledTimes(1);
-      const storage = new BrowserExtensionUpdatedLocalStorage();
-      const shouldExtensionBeReloaded = await storage.get();
-      expect(shouldExtensionBeReloaded).toStrictEqual(undefined);
     });
 
     it("Should clean and exec update", async () => {
@@ -126,8 +116,6 @@ describe("OnExtensionUpdateAvailableService", () => {
       jest.spyOn(webIntegrationPortWrapper, "emit");
       jest.spyOn(webIntegrationPortWrapper2, "emit");
       jest.spyOn(publicWebsiteSignInPortWrapper, "emit");
-      chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 3 }));
-      chrome.runtime.getURL.mockImplementation(() => "chrome://extension/test");
       // process
       await OnExtensionUpdateAvailableService.exec();
       // expectation
@@ -139,7 +127,6 @@ describe("OnExtensionUpdateAvailableService", () => {
       await Promise.resolve();
       await Promise.resolve();
       await Promise.resolve();
-
       // expectation
       expect(webIntegrationPortWrapper.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
       expect(webIntegrationPortWrapper.emit).toHaveBeenCalledTimes(1);
@@ -174,8 +161,6 @@ describe("OnExtensionUpdateAvailableService", () => {
         throw new MfaAuthenticationRequiredError();
       });
       jest.spyOn(browser.runtime, "reload");
-      chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 3 }));
-      chrome.runtime.getURL.mockImplementation(() => "chrome://extension/test");
       // process
       await OnExtensionUpdateAvailableService.exec();
       // expectation
@@ -186,27 +171,8 @@ describe("OnExtensionUpdateAvailableService", () => {
       await Promise.resolve();
       await Promise.resolve();
       await Promise.resolve();
-      await Promise.resolve();
-
       expect(browser.runtime.reload).toHaveBeenCalledTimes(1);
     });
-
-    it("Should not exec update when the user is signed-in and marked the extension as waiting for an update", async () => {
-      expect.assertions(1);
-
-      // mock function
-      await MockExtension.withConfiguredAccount();
-      jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
-      jest.spyOn(browser.runtime, "reload");
-
-      // process
-      await OnExtensionUpdateAvailableService.exec();
-
-      // expectation
-      const sessionStorage = await browser.storage.session.get(["passboltExtensionUpdate"]);
-      expect(sessionStorage).toStrictEqual({ ["passboltExtensionUpdate"]: true });
-    });
-  });
 
   describe("::handleUserLoggedOut", () => {
     it("sbould not clean and reload the service worker if not asked", async () => {

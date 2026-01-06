@@ -19,13 +19,14 @@ import Port from "../lib/port";
 async function main() {
   const query = new URLSearchParams(window.location.search);
   const portname = query.get("passbolt");
+  const applicationId = query.get("applicationId");
   const port = new Port(portname);
   await port.connect();
   const domContainer = document.createElement("div");
 
   document.body.appendChild(domContainer);
   const root = createRoot(domContainer);
-  root.render(<ExtInFormCallToAction port={port} />);
+  root.render(<ExtInFormCallToAction port={port} applicationId={applicationId} />);
 }
 
 main();

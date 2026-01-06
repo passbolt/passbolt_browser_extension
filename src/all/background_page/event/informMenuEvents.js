@@ -17,6 +17,7 @@ import AutofillController from "../controller/autofill/AutofillController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getOrFindMetadataKeysSettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
+import IsApplicationOverlaidController from "../controller/applicationOverlaid/IsApplicationOverlaidController";
 
 /**
  * Listens the inform menu events
@@ -136,6 +137,17 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.metadata.get-or-find-metadata-types-settings", async (requestId) => {
     const controller = new GetOrFindMetadataTypesController(worker, requestId, apiClientOptions, account);
     await controller._exec();
+  });
+
+  /*
+   * Whenever the in-form menu is application overlaid
+   * @listens passbolt.in-form-menu.is-application-overlaid
+   * @param requestId {uuid} The request identifier
+   * @param applicationId {uuid} The application id
+   */
+  worker.port.on("passbolt.in-form-menu.is-application-overlaid", async (requestId, applicationId) => {
+    const controller = new IsApplicationOverlaidController(worker, requestId);
+    await controller._exec(applicationId);
   });
 };
 

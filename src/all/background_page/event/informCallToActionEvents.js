@@ -12,6 +12,7 @@
  */
 import InformCallToActionController from "../controller/informCallToActionController/informCallToActionController";
 import AuthCheckStatusController from "../controller/auth/authCheckStatusController";
+import IsApplicationOverlaidController from "../controller/applicationOverlaid/IsApplicationOverlaidController";
 
 /**
  * Listens the inform call to action events
@@ -50,6 +51,17 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.in-form-cta.execute", async (requestId) => {
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.execute(requestId);
+  });
+
+  /*
+   * Whenever the in-form call-to-action is application overlaid
+   * @listens passbolt.in-form-cta.is-application-overlaid
+   * @param requestId {uuid} The request identifier
+   * @param applicationId {uuid} The application id
+   */
+  worker.port.on("passbolt.in-form-cta.is-application-overlaid", async (requestId, applicationId) => {
+    const controller = new IsApplicationOverlaidController(worker, requestId);
+    await controller._exec(applicationId);
   });
 };
 

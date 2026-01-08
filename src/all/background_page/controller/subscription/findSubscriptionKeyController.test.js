@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.9.0
  */
-
+import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+
 import FindSubscriptionKeyController from "./findSubscriptionKeyController";
-import SubscriptionEntity from "../../model/entity/subscription/subscriptionEntity";
 import { KEY_DTO } from "./findSubscriptionKeyController.test.data";
 
 beforeEach(() => {

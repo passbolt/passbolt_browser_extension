@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.8.0
  */
-
+import PassboltBadResponseError from "passbolt-styleguide/src/shared/lib/Error/PassboltBadResponseError";
+import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
 import { enableFetchMocks } from "jest-fetch-mock";
 enableFetchMocks();
 
 import SubscriptionApiService, { SUBSCRIPTION_API_SERVICE_RESOURCE_NAME } from "./subscriptionApiService";
 import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
-import PassboltBadResponseError from "passbolt-styleguide/src/shared/lib/Error/PassboltBadResponseError";
-import SubscriptionEntity from "../../../model/entity/subscription/subscriptionEntity";
+
 import { API_CLIENT_OPTIONS, KEY_DTO } from "./subscriptionApiService.test.data";
 
 describe("SubscriptionApiService", () => {

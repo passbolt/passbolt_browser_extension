@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.9.0
  */
-import SubscriptionEntity from "../../model/entity/subscription/subscriptionEntity";
+import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
 import PassboltSubscriptionError from "../../error/passboltSubscriptionError";
 import SubscriptionApiService from "../api/subscription/subscriptionApiService";
 

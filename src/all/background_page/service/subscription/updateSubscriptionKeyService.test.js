@@ -12,15 +12,14 @@
  * @since         5.9.0
  */
 import { enableFetchMocks } from "jest-fetch-mock";
+
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
-import SubscriptionEntity from "../../model/entity/subscription/subscriptionEntity";
+import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
+
 import PassboltSubscriptionError from "../../error/passboltSubscriptionError";
 import UpdateSubscriptionKeyService from "./updateSubscriptionKeyService";
 import { API_CLIENT_OPTIONS, NEW_KEY, NEW_KEY_DTO, UPDATED_KEY_DTO } from "./updateSubscriptionKeyService.test.data";
-
-beforeEach(() => {
-  enableFetchMocks();
-});
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("UpdateSubscriptionKeyService", () => {
   /**
@@ -29,6 +28,7 @@ describe("UpdateSubscriptionKeyService", () => {
   let service;
 
   beforeEach(() => {
+    enableFetchMocks();
     service = new UpdateSubscriptionKeyService(API_CLIENT_OPTIONS);
   });
 
@@ -68,7 +68,7 @@ describe("UpdateSubscriptionKeyService", () => {
         }
       });
 
-      it("should throw a TypeError if the returned entity is missing required properties", async () => {
+      it("should throw a EntityValidationError if the returned entity is missing required properties", async () => {
         expect.assertions(2);
 
         const errorMessage = "an error occurred";
@@ -81,8 +81,8 @@ describe("UpdateSubscriptionKeyService", () => {
         try {
           await service.update(NEW_KEY_DTO);
         } catch (error) {
-          expect(error).toBeInstanceOf(TypeError);
-          expect(error.message).toEqual("Could not validate entity Subscription. No data provided.");
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.message).toEqual("Could not validate entity SubscriptionEntity.");
         }
       });
     });

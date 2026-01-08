@@ -13,19 +13,18 @@
  */
 import { enableFetchMocks } from "jest-fetch-mock";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
+
 import FindSubscriptionKeyService from "./findSubscriptionKeyService";
 import PassboltSubscriptionError from "../../error/passboltSubscriptionError";
-import SubscriptionEntity from "../../model/entity/subscription/subscriptionEntity";
 import { API_CLIENT_OPTIONS, KEY, KEY_DTO } from "./findSubscriptionKeyService.test.data";
-
-beforeEach(() => {
-  enableFetchMocks();
-});
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("FindSubscriptionKeyService", () => {
   let service;
 
   beforeEach(() => {
+    enableFetchMocks();
     service = new FindSubscriptionKeyService(API_CLIENT_OPTIONS);
   });
 
@@ -65,7 +64,7 @@ describe("FindSubscriptionKeyService", () => {
         }
       });
 
-      it("should throw a TypeError if the returned entity is missing required properties", async () => {
+      it("should throw a EntityValidationError if the returned entity is missing required properties", async () => {
         expect.assertions(2);
 
         const errorMessage = "an error occurred";
@@ -78,8 +77,8 @@ describe("FindSubscriptionKeyService", () => {
         try {
           await service.find();
         } catch (error) {
-          expect(error).toBeInstanceOf(TypeError);
-          expect(error.message).toEqual("Could not validate entity Subscription. No data provided.");
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.message).toEqual("Could not validate entity SubscriptionEntity.");
         }
       });
     });

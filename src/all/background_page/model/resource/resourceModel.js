@@ -168,26 +168,6 @@ class ResourceModel {
 
   /*
    * ==============================================================
-   *  Finders / remote calls
-   * ==============================================================
-   */
-  /**
-   * Find all
-   *
-   * @param {Object} [contains] optional example: {permissions: true}
-   * @param {Object} [filters] optional
-   * @param {Object} [orders] optional
-   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
-   * @returns {Promise<ResourcesCollection>}
-   */
-  async findAll(contains, filters, orders, ignoreInvalidEntity) {
-    let resourcesDto = await this.resourceService.findAll(contains, filters, orders);
-    resourcesDto = await this.keepResourcesSupported(resourcesDto);
-    return new ResourcesCollection(resourcesDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
-  }
-
-  /*
-   * ==============================================================
    *  CRUD
    * ==============================================================
    */

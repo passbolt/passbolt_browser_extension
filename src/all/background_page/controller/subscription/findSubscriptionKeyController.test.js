@@ -13,9 +13,9 @@
  */
 import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockSubscription } from "passbolt-styleguide/src/react-extension/components/Administration/DisplaySubscriptionKey/DisplaySubscriptionKey.test.data";
 
 import FindSubscriptionKeyController from "./findSubscriptionKeyController";
-import { KEY_DTO } from "./findSubscriptionKeyController.test.data";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -26,7 +26,7 @@ describe("FindSubscriptionKeyController", () => {
     it("should find subscription key", async () => {
       expect.assertions(2);
 
-      const entity = new SubscriptionEntity(KEY_DTO);
+      const entity = new SubscriptionEntity(mockSubscription);
       const controller = new FindSubscriptionKeyController(null, null, defaultApiClientOptions());
       jest.spyOn(controller.findSubscriptionService, "find").mockResolvedValue(entity);
 

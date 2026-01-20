@@ -12,9 +12,11 @@
  * @since         5.9.0
  */
 
+import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockSubscriptionUpdated } from "passbolt-styleguide/src/react-extension/components/Administration/DisplaySubscriptionKey/DisplaySubscriptionKey.test.data";
+
 import UpdateSubscriptionKeyController from "./updateSubscriptionKeyController";
-import { NEW_KEY_DTO, UPDATED_KEY_DTO } from "./updateSubscriptionKeyController.test.data";
 
 describe("UpdteSubscriptionKeyController", () => {
   describe("::exec", () => {
@@ -22,11 +24,13 @@ describe("UpdteSubscriptionKeyController", () => {
       expect.assertions(2);
 
       const controller = new UpdateSubscriptionKeyController(null, null, defaultApiClientOptions());
-      jest.spyOn(controller.updateSubscriptionService, "update").mockResolvedValue(UPDATED_KEY_DTO);
+      jest
+        .spyOn(controller.updateSubscriptionService, "update")
+        .mockResolvedValue(new SubscriptionEntity(mockSubscriptionUpdated));
 
-      const result = await controller.exec(NEW_KEY_DTO);
+      const result = await controller.exec({ data: mockSubscriptionUpdated.data });
 
-      expect(result).toEqual(UPDATED_KEY_DTO);
+      expect(result).toEqual(new SubscriptionEntity(mockSubscriptionUpdated));
       expect(controller.updateSubscriptionService.update).toHaveBeenCalledTimes(1);
     });
 
@@ -37,7 +41,7 @@ describe("UpdteSubscriptionKeyController", () => {
       const controller = new UpdateSubscriptionKeyController(null, null, defaultApiClientOptions());
       jest.spyOn(controller.updateSubscriptionService, "update").mockRejectedValue(expectedError);
 
-      await expect(controller.exec(NEW_KEY_DTO)).rejects.toStrictEqual(expectedError);
+      await expect(controller.exec({ data: mockSubscriptionUpdated.data })).rejects.toStrictEqual(expectedError);
     });
   });
 });

@@ -14,10 +14,11 @@
 import { enableFetchMocks } from "jest-fetch-mock";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockSubscription } from "passbolt-styleguide/src/react-extension/components/Administration/DisplaySubscriptionKey/DisplaySubscriptionKey.test.data";
 
 import FindSubscriptionKeyService from "./findSubscriptionKeyService";
 import PassboltSubscriptionError from "../../error/passboltSubscriptionError";
-import { API_CLIENT_OPTIONS, KEY, KEY_DTO } from "./findSubscriptionKeyService.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("FindSubscriptionKeyService", () => {
@@ -25,7 +26,7 @@ describe("FindSubscriptionKeyService", () => {
 
   beforeEach(() => {
     enableFetchMocks();
-    service = new FindSubscriptionKeyService(API_CLIENT_OPTIONS);
+    service = new FindSubscriptionKeyService(defaultApiClientOptions());
   });
 
   afterEach(() => {
@@ -36,12 +37,12 @@ describe("FindSubscriptionKeyService", () => {
     it("should return the subscription key", async () => {
       expect.assertions(2);
 
-      jest.spyOn(service.subscriptionService, "find").mockResolvedValue(KEY_DTO);
+      jest.spyOn(service.subscriptionService, "find").mockResolvedValue(mockSubscription);
 
       const subscriptionKey = await service.find();
 
       expect(subscriptionKey).toBeInstanceOf(SubscriptionEntity);
-      expect(subscriptionKey._props.data).toEqual(KEY);
+      expect(subscriptionKey._props.data).toEqual(mockSubscription.data);
     });
 
     describe("Payment required error", () => {
@@ -51,7 +52,7 @@ describe("FindSubscriptionKeyService", () => {
         const errorMessage = "an error occurred";
         const error = new PassboltApiFetchError(errorMessage, {
           code: 402,
-          body: KEY_DTO,
+          body: mockSubscription,
         });
 
         jest.spyOn(service.subscriptionService, "find").mockRejectedValue(error);

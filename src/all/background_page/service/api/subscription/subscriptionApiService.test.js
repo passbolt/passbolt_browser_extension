@@ -11,15 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.8.0
  */
+import { enableFetchMocks } from "jest-fetch-mock";
+
+import {
+  mockSubscription,
+  mockSubscriptionUpdated,
+} from "passbolt-styleguide/src/react-extension/components/Administration/DisplaySubscriptionKey/DisplaySubscriptionKey.test.data";
 import PassboltBadResponseError from "passbolt-styleguide/src/shared/lib/Error/PassboltBadResponseError";
 import SubscriptionEntity from "passbolt-styleguide/src/shared/models/entity/subscription/subscriptionEntity";
-import { enableFetchMocks } from "jest-fetch-mock";
-enableFetchMocks();
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 import SubscriptionApiService, { SUBSCRIPTION_API_SERVICE_RESOURCE_NAME } from "./subscriptionApiService";
 import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
-
-import { API_CLIENT_OPTIONS, KEY_DTO } from "./subscriptionApiService.test.data";
 
 describe("SubscriptionApiService", () => {
   /**
@@ -28,8 +31,9 @@ describe("SubscriptionApiService", () => {
   let service;
 
   beforeEach(() => {
+    enableFetchMocks();
     fetch.resetMocks();
-    service = new SubscriptionApiService(API_CLIENT_OPTIONS);
+    service = new SubscriptionApiService(defaultApiClientOptions());
   });
 
   it("Should return the expected resource name", () => {
@@ -40,7 +44,7 @@ describe("SubscriptionApiService", () => {
     it("Should get the key from the API", async () => {
       expect.assertions(2);
 
-      const subscriptionEntity = new SubscriptionEntity(KEY_DTO);
+      const subscriptionEntity = new SubscriptionEntity(mockSubscription);
 
       fetch.doMockOnceIf(new RegExp(`/${SUBSCRIPTION_API_SERVICE_RESOURCE_NAME}/key`), async () =>
         mockApiResponse(subscriptionEntity),
@@ -65,17 +69,13 @@ describe("SubscriptionApiService", () => {
     it("Should get update the key", async () => {
       expect.assertions(2);
 
-      const newKey = "a new perfectly valid subscription key";
-      const subscriptionEntity = new SubscriptionEntity({
-        ...KEY_DTO,
-        data: newKey,
-      });
+      const subscriptionEntity = new SubscriptionEntity(mockSubscriptionUpdated);
 
       fetch.doMockOnceIf(new RegExp(`/${SUBSCRIPTION_API_SERVICE_RESOURCE_NAME}/key`), async () =>
         mockApiResponse(subscriptionEntity),
       );
 
-      const result = await service.update(newKey);
+      const result = await service.update(mockSubscriptionUpdated.data);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(result).toEqual(subscriptionEntity.toDto());
     });

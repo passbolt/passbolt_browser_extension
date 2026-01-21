@@ -14,12 +14,15 @@
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import PasswordExpiryResourcesCollection from "./passwordExpiryResourcesCollection";
-import {defaultPasswordExpiryCollectionDto} from "./passwordExpiryResourceCollection.test.data";
-import {defaultPasswordExpiryResourceDto} from "./passwordExpiryResourceEntity.test.data";
+import { defaultPasswordExpiryCollectionDto } from "./passwordExpiryResourceCollection.test.data";
+import { defaultPasswordExpiryResourceDto } from "./passwordExpiryResourceEntity.test.data";
 
 describe("PasswordExpiryResource Collection", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(PasswordExpiryResourcesCollection.ENTITY_NAME, PasswordExpiryResourcesCollection.getSchema());
+    EntitySchema.validateSchema(
+      PasswordExpiryResourcesCollection.ENTITY_NAME,
+      PasswordExpiryResourcesCollection.getSchema(),
+    );
   });
 
   it("constructor works if valid minimal DTO is provided", () => {

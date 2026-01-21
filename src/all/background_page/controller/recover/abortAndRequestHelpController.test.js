@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {initialAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { initialAccountRecoverDto } from "../../model/entity/account/accountRecoverEntity.test.data";
 import AbortAndRequestHelp from "./abortAndRequestHelpController";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
@@ -26,13 +26,19 @@ beforeEach(() => {
 
 describe("AbortAndRequestHelpController", () => {
   describe("AbortAndRequestHelpController::exec", () => {
-    it("Should request help to an administrator and abort the recover request.", async() => {
+    it("Should request help to an administrator and abort the recover request.", async () => {
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new AbortAndRequestHelp({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new AbortAndRequestHelp(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       // Mock the API response.
-      const mockApiFetch = fetch.doMockOnceIf(new RegExp(`/setup/recover/abort/${account.userId}.json`), () => mockApiResponse());
+      const mockApiFetch = fetch.doMockOnceIf(new RegExp(`/setup/recover/abort/${account.userId}.json`), () =>
+        mockApiResponse(),
+      );
 
       await controller.exec();
 
@@ -41,8 +47,12 @@ describe("AbortAndRequestHelpController", () => {
       expect(mockApiFetch).toHaveBeenCalled();
     });
 
-    it("Should raise an error if no account has been found.", async() => {
-      const controller = new AbortAndRequestHelp({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+    it("Should raise an error if no account has been found.", async () => {
+      const controller = new AbortAndRequestHelp(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
       expect.assertions(1);
       try {
         await controller.exec();

@@ -15,9 +15,8 @@
  * @since         3.2.0
  */
 import LocaleModel from "../../model/locale/localeModel";
-import {Config} from "../../model/config";
+import { Config } from "../../model/config";
 import LocaleEntity from "../../model/entity/locale/localeEntity";
-
 
 class GetLocaleController {
   /**
@@ -39,14 +38,12 @@ class GetLocaleController {
    */
   async getLocale() {
     let userLocale;
-    const userSettingsLocale = await Config.read('user.settings.locale');
+    const userSettingsLocale = await Config.read("user.settings.locale");
     if (userSettingsLocale) {
-      userLocale = new LocaleEntity({locale: userSettingsLocale});
+      userLocale = new LocaleEntity({ locale: userSettingsLocale });
     }
 
-    const locale = userLocale
-      || await this.localeModel.getOrganizationLocale()
-      || LocaleModel.DEFAULT_LOCALE;
+    const locale = userLocale || (await this.localeModel.getOrganizationLocale()) || LocaleModel.DEFAULT_LOCALE;
 
     // @todo It is not the best place to initialize the background page i18next library.
     this.localeModel.initializeI18next(locale);

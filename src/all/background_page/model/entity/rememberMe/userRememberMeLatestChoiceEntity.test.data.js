@@ -14,7 +14,7 @@
 
 export const defaultRememberMeLatestChoiceDto = (data = {}) => {
   const defaultData = {
-    duration: 0
+    duration: 0,
   };
   return Object.assign(defaultData, data);
 };

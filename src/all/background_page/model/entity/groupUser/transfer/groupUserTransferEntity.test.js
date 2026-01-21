@@ -14,7 +14,7 @@
 import GroupUserTransferEntity from "./groupUserTransferEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultUserTransferDto} from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
+import { defaultUserTransferDto } from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
 
 describe("GroupUser transfer entity", () => {
   describe("::getSchema", () => {

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.1
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
@@ -22,7 +22,7 @@ import i18n from "../../sdk/i18n";
 import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import GroupUpdateSecretsCollection from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
-import {assertString, assertType} from "../../utils/assertions";
+import { assertString, assertType } from "../../utils/assertions";
 import GroupUpdatesCollection from "../../model/entity/group/update/groupUpdatesCollection";
 import GroupLocalStorage from "../local_storage/groupLocalStorage";
 import GroupApiService from "../api/group/groupApiService";
@@ -67,7 +67,7 @@ class GroupUpdateService {
     const originalGroupEntity = await this.groupModel.getById(updatedGroupEntity.id);
     const groupUpdateEntity = GroupUpdateEntity.createFromGroupsDiff(originalGroupEntity, updatedGroupEntity);
 
-    this.progressService.start(PROGRESS_GOAL, i18n.t('Initialize'));
+    this.progressService.start(PROGRESS_GOAL, i18n.t("Initialize"));
 
     const groupUpdateDryRunResultEntity = await this.simulateUpdateGroup(groupUpdateEntity);
     const shouldEncryptSecrets = groupUpdateDryRunResultEntity.neededSecrets.length > 0;
@@ -118,7 +118,7 @@ class GroupUpdateService {
   async encryptSecrets(privateKey, neededSecretsCollection, decryptedSecrets) {
     const groupUpdateSecrets = new GroupUpdateSecretsCollection([]);
 
-    this.progressService.finishStep(i18n.t('Synchronizing keyring'), true);
+    this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
     const usersPublicKeys = await this.retrieveAndReadUserPublicKeys(neededSecretsCollection);
 
     const collectionLength = neededSecretsCollection.length;
@@ -127,10 +127,14 @@ class GroupUpdateService {
       const user_id = neededSecret.userId;
       const resource_id = neededSecret.resourceId;
 
-      await this.progressService.updateStepMessage(i18n.t('Encrypting {{counter}}/{{total}}', {counter: i + 1, total: collectionLength}));
-      const data = await EncryptMessageService.encrypt(decryptedSecrets[resource_id], usersPublicKeys[user_id], [privateKey]);
+      await this.progressService.updateStepMessage(
+        i18n.t("Encrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }),
+      );
+      const data = await EncryptMessageService.encrypt(decryptedSecrets[resource_id], usersPublicKeys[user_id], [
+        privateKey,
+      ]);
 
-      const secret = new SecretEntity({resource_id, user_id, data});
+      const secret = new SecretEntity({ resource_id, user_id, data });
       groupUpdateSecrets.push(secret);
     }
 
@@ -152,7 +156,9 @@ class GroupUpdateService {
       const secret = secretsCollection.items[i];
       const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
 
-      this.progressService.updateStepMessage(i18n.t('Decrypting {{counter}}/{{total}}', {counter: i + 1, total: collectionLength}));
+      this.progressService.updateStepMessage(
+        i18n.t("Decrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }),
+      );
       result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
     }
 
@@ -171,14 +177,15 @@ class GroupUpdateService {
     const operationCount = groupUpdateSingleOperationList.length;
 
     for (let i = 0; i < operationCount; i++) {
-      const progressMessage = i === 0
-        ? i18n.t("Updating group metadata") //first operation is always the group name update, guaranteed by `createFromGroupUpdateEntity`
-        : i18n.t("Updating group member {{counter}}/{{total}}", {counter: i, total: operationCount - 1});
+      const progressMessage =
+        i === 0
+          ? i18n.t("Updating group metadata") //first operation is always the group name update, guaranteed by `createFromGroupUpdateEntity`
+          : i18n.t("Updating group member {{counter}}/{{total}}", { counter: i, total: operationCount - 1 });
 
       this.progressService.updateStepMessage(progressMessage);
       const groupUpdateOperation = groupUpdateSingleOperationList.items[i];
       const groupDto = await this.groupApiService.update(groupUpdateOperation.id, groupUpdateOperation.toDto());
-      const updatedGroupEntity = new GroupEntity(groupDto, {ignoreInvalidEntity: true});
+      const updatedGroupEntity = new GroupEntity(groupDto, { ignoreInvalidEntity: true });
       await this.groupLocalStorage.updateGroup(updatedGroupEntity);
     }
   }

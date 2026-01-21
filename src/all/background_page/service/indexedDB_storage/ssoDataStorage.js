@@ -15,7 +15,7 @@ import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntit
 
 const DB_VERSION = 1;
 const DB_NAME = "sso_kit_db";
-const SSO_KEYS_OBECT_STORE = 'sso_kit';
+const SSO_KEYS_OBECT_STORE = "sso_kit";
 
 class SsoDataStorage {
   /**
@@ -84,15 +84,15 @@ class SsoDataStorage {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open(DB_NAME, DB_VERSION);
 
-      openRequest.onupgradeneeded = e => {
+      openRequest.onupgradeneeded = (e) => {
         const db = e.target.result;
         console.log(`Upgrading SSO IndexedDB from version ${e.oldVersion} to version ${e.newVersion}.`);
 
         if (e.oldVersion < 1) {
           const objectStore = db.createObjectStore(SSO_KEYS_OBECT_STORE, {
-            keyPath: 'pk_id',
+            keyPath: "pk_id",
           });
-          objectStore.createIndex("sso_kit", "sso_kit", {unique: true});
+          objectStore.createIndex("sso_kit", "sso_kit", { unique: true });
         }
 
         console.log("SSO IndexedDB upgrade completed.");
@@ -102,7 +102,7 @@ class SsoDataStorage {
         resolve(openRequest.result);
       };
 
-      openRequest.onerror = event => {
+      openRequest.onerror = (event) => {
         console.error("Database failed to open");
         console.error(event);
         reject();
@@ -131,10 +131,10 @@ class SsoDataStorage {
    */
   static async getSsoData(dbHandler) {
     return new Promise((resolve, reject) => {
-      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readonly');
+      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], "readonly");
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
       const cursor = objectStore.openCursor();
-      cursor.onsuccess = e => {
+      cursor.onsuccess = (e) => {
         const cursor = e.target.result;
 
         if (!cursor) {
@@ -152,7 +152,7 @@ class SsoDataStorage {
         }
       };
 
-      cursor.onerror = e => {
+      cursor.onerror = (e) => {
         console.error("An error occured when trying to open the IndexDb cursor:", e);
         reject();
       };
@@ -168,7 +168,7 @@ class SsoDataStorage {
    */
   static async clearData(dbHandler) {
     return new Promise((resolve, reject) => {
-      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
+      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], "readwrite");
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
       const objectStoreRequest = objectStore.clear();
 
@@ -177,7 +177,7 @@ class SsoDataStorage {
         resolve();
       };
 
-      objectStoreRequest.onerror = event => {
+      objectStoreRequest.onerror = (event) => {
         console.error(`The IndexedDB transaction couldn't be opened to clear the data`);
         console.error(event);
         reject();
@@ -195,11 +195,11 @@ class SsoDataStorage {
    */
   static async storeData(dbHandler, ssoKitClientPartEntity) {
     return new Promise((resolve, reject) => {
-      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
+      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], "readwrite");
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
 
       const ssoKit = ssoKitClientPartEntity.toDbSerializableObject();
-      const addRequest = objectStore.add({pk_id: 1, sso_kit: ssoKit});
+      const addRequest = objectStore.add({ pk_id: 1, sso_kit: ssoKit });
 
       addRequest.onsuccess = () => {
         console.log("New SSO client data stored successfully");
@@ -210,7 +210,7 @@ class SsoDataStorage {
         resolve();
       };
 
-      transaction.onerror = event => {
+      transaction.onerror = (event) => {
         console.error(`The IndexedDB transaction couldn't be opened to add new data`);
         console.error(event);
         reject();
@@ -229,11 +229,11 @@ class SsoDataStorage {
   static async updateSsoDataWithId(dbHandler, ssoKitId) {
     const ssoData = await this.getSsoData(dbHandler);
     return new Promise((resolve, reject) => {
-      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
+      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], "readwrite");
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
 
-      const newSsoKit = Object.assign({}, ssoData.toDbSerializableObject(), {id: ssoKitId});
-      const putRequest = objectStore.put({pk_id: 1, sso_kit: newSsoKit});
+      const newSsoKit = Object.assign({}, ssoData.toDbSerializableObject(), { id: ssoKitId });
+      const putRequest = objectStore.put({ pk_id: 1, sso_kit: newSsoKit });
 
       putRequest.onsuccess = () => {
         console.log("The SSO Kit identifier has been updated successfully");
@@ -244,7 +244,7 @@ class SsoDataStorage {
         resolve();
       };
 
-      transaction.onerror = event => {
+      transaction.onerror = (event) => {
         console.error(`The IndexedDB transaction couldn't be opened to updated the SSO Kit`);
         console.error(event);
         reject();
@@ -263,11 +263,11 @@ class SsoDataStorage {
   static async updateSsoDataWithProvider(dbHandler, provider) {
     const ssoData = await this.getSsoData(dbHandler);
     return new Promise((resolve, reject) => {
-      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
+      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], "readwrite");
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
 
-      const newSsoKit = Object.assign({}, ssoData.toDbSerializableObject(), {provider});
-      const putRequest = objectStore.put({pk_id: 1, sso_kit: newSsoKit});
+      const newSsoKit = Object.assign({}, ssoData.toDbSerializableObject(), { provider });
+      const putRequest = objectStore.put({ pk_id: 1, sso_kit: newSsoKit });
 
       putRequest.onsuccess = () => {
         console.log("The SSO provider has been updated successfully");
@@ -278,7 +278,7 @@ class SsoDataStorage {
         resolve();
       };
 
-      transaction.onerror = event => {
+      transaction.onerror = (event) => {
         console.error(`The IndexedDB transaction couldn't be opened to updated the SSO Kit`);
         console.error(event);
         reject();

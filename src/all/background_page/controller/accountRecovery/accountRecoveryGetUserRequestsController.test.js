@@ -12,12 +12,12 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {v4 as uuidv4} from "uuid";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { v4 as uuidv4 } from "uuid";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountRecoveryGetUserRequestsController from "./accountRecoveryGetUserRequestsController";
-import {pendingAccountRecoveryRequestDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import { pendingAccountRecoveryRequestDto } from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import AccountRecoveryRequestEntity from "../../model/entity/accountRecovery/accountRecoveryRequestEntity";
 
 beforeEach(() => {
@@ -26,15 +26,15 @@ beforeEach(() => {
 
 describe("AccountRecoveryGetUserRequestsController", () => {
   describe("AccountRecoveryGetUserRequestsController::exec", () => {
-    it("Should retrieve the user's account recovery requests.", async() => {
+    it("Should retrieve the user's account recovery requests.", async () => {
       // Mock API fetch account recovery requests response.
       const userId = uuidv4();
       const mockApiResult = [
-        pendingAccountRecoveryRequestDto({user_id: userId}),
-        pendingAccountRecoveryRequestDto({user_id: userId})
+        pendingAccountRecoveryRequestDto({ user_id: userId }),
+        pendingAccountRecoveryRequestDto({ user_id: userId }),
       ];
-      fetch.doMock(req => {
-        const queryString = (new URL(req.url)).search;
+      fetch.doMock((req) => {
+        const queryString = new URL(req.url).search;
         const params = new URLSearchParams(queryString);
         const hasUsersFilter = params.get("filter[has-users][]");
         expect(hasUsersFilter).toBe(userId);
@@ -47,11 +47,13 @@ describe("AccountRecoveryGetUserRequestsController", () => {
       expect.assertions(3);
       const items = accountRecoveryRequests.items;
       expect(items).toHaveLength(2);
-      const accountRecoveryOrganizationPolicyDto = accountRecoveryRequests.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
+      const accountRecoveryOrganizationPolicyDto = accountRecoveryRequests.toDto(
+        AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS,
+      );
       expect(accountRecoveryOrganizationPolicyDto).toEqual(mockApiResult);
     });
 
-    it("Should return an empty collection if the users has no account recovery requests.", async() => {
+    it("Should return an empty collection if the users has no account recovery requests.", async () => {
       // Mock API fetch account recovery requests response.
       const userId = uuidv4();
       const mockApiResult = [];
@@ -65,7 +67,7 @@ describe("AccountRecoveryGetUserRequestsController", () => {
       expect(items).toHaveLength(0);
     });
 
-    it("Should throw an error if the provider user id is not valid.", async() => {
+    it("Should throw an error if the provider user id is not valid.", async () => {
       const userId = "invalid uuid";
 
       const controller = new AccountRecoveryGetUserRequestsController(null, null, defaultApiClientOptions());

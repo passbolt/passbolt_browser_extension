@@ -16,12 +16,12 @@ import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abs
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 
-const ENTITY_NAME = 'Permissions';
+const ENTITY_NAME = "Permissions";
 
-const RULE_UNIQUE_ID = 'unique_id';
-const RULE_UNIQUE_ARO = 'unique_aro';
-const RULE_SAME_ACO = 'same_aco';
-const RULE_ONE_OWNER = 'owner';
+const RULE_UNIQUE_ID = "unique_id";
+const RULE_UNIQUE_ARO = "unique_aro";
+const RULE_SAME_ACO = "same_aco";
+const RULE_ONE_OWNER = "owner";
 
 class PermissionsCollection extends EntityV2Collection {
   /**
@@ -90,8 +90,8 @@ class PermissionsCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": PermissionEntity.getSchema(),
+      type: "array",
+      items: PermissionEntity.getSchema(),
     };
   }
 
@@ -105,8 +105,10 @@ class PermissionsCollection extends EntityV2Collection {
    */
   validateBuildRules(item, options = {}) {
     this.assertItemSameAco(item);
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
-    this.assertNotExist("aro_foreign_key", item._props.aro_foreign_key, {haystackSet: options?.uniqueAroForeignKeysSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
+    this.assertNotExist("aro_foreign_key", item._props.aro_foreign_key, {
+      haystackSet: options?.uniqueAroForeignKeysSetCache,
+    });
   }
 
   /**
@@ -139,13 +141,13 @@ class PermissionsCollection extends EntityV2Collection {
       return;
     }
 
-    const hasOwnerPermission = this.items.some(permission => permission.isOwner());
+    const hasOwnerPermission = this.items.some((permission) => permission.isOwner());
     if (hasOwnerPermission) {
       return;
     }
 
     const collectionValidationError = new CollectionValidationError();
-    const message = 'Permission collection should contain at least one owner.';
+    const message = "Permission collection should contain at least one owner.";
     collectionValidationError.addCollectionValidationError(PermissionsCollection.RULE_ONE_OWNER, message);
     throw collectionValidationError;
   }
@@ -169,7 +171,7 @@ class PermissionsCollection extends EntityV2Collection {
    * @returns {boolean} True if the collection contains at least one group permission, false otherwise
    */
   get hasGroupPermission() {
-    return this._items.some(permission => permission.aro === PermissionEntity.ARO_GROUP);
+    return this._items.some((permission) => permission.aro === PermissionEntity.ARO_GROUP);
   }
 
   /*
@@ -184,7 +186,7 @@ class PermissionsCollection extends EntityV2Collection {
    * @returns {(PermissionEntity|undefined)} if a match is found in collection
    */
   getByAroMatchingPermission(permission) {
-    return this._items.find(existingPermission => PermissionEntity.isAroMatching(existingPermission, permission));
+    return this._items.find((existingPermission) => PermissionEntity.isAroMatching(existingPermission, permission));
   }
 
   /**
@@ -195,7 +197,7 @@ class PermissionsCollection extends EntityV2Collection {
    * @returns {(PermissionEntity|undefined)} if a match is found in collection
    */
   getByAro(aro, aroForeignKey) {
-    return this._items.find(permission => permission.aro === aro && permission.aroForeignKey === aroForeignKey);
+    return this._items.find((permission) => permission.aro === aro && permission.aroForeignKey === aroForeignKey);
   }
 
   /*
@@ -212,15 +214,15 @@ class PermissionsCollection extends EntityV2Collection {
     const assertAtLeastOneOwner = entityOptions?.assertAtLeastOneOwner ?? true;
     const uniqueIdsSetCache = new Set(this.extract("id"));
     const uniqueAroForeignKeysSetCache = new Set(this.extract("aro_foreign_key"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
       uniqueAroForeignKeysSetCache.add(item.aroForeignKey);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueAroForeignKeysSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache, uniqueAroForeignKeysSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);
@@ -239,9 +241,10 @@ class PermissionsCollection extends EntityV2Collection {
   addOrReplace(permission) {
     permission = this.buildOrCloneEntity(permission);
 
-    const permissionToReplaceIndex = this.items.findIndex(item =>
-      (!item.id || !permission._props.id || item.id === permission._props.id)
-        && (PermissionEntity.isAcoAndAroMatching(item, permission))
+    const permissionToReplaceIndex = this.items.findIndex(
+      (item) =>
+        (!item.id || !permission._props.id || item.id === permission._props.id) &&
+        PermissionEntity.isAcoAndAroMatching(item, permission),
     );
 
     // No matching item, add the permission to the collection.
@@ -283,7 +286,7 @@ class PermissionsCollection extends EntityV2Collection {
    * @return {PermissionsCollection} set3
    */
   static sum(set1, set2, assertAtLeastOneOwner = true) {
-    const set3 = new PermissionsCollection(set1.toDto(), {assertAtLeastOneOwner: false});
+    const set3 = new PermissionsCollection(set1.toDto(), { assertAtLeastOneOwner: false });
     set2.items.forEach((set2Permission, index) => {
       try {
         set3.addOrReplace(set2Permission);
@@ -307,7 +310,7 @@ class PermissionsCollection extends EntityV2Collection {
    * @return {PermissionsCollection} set3
    */
   static diff(set1, set2, assertAtLeastOneOwner = true) {
-    const set3 = new PermissionsCollection([], {assertAtLeastOneOwner: false});
+    const set3 = new PermissionsCollection([], { assertAtLeastOneOwner: false });
     for (const permission of set1) {
       if (!set2.containAtLeastPermission(permission.aro, permission.aroForeignKey, permission.type)) {
         set3.push(permission);
@@ -345,7 +348,7 @@ class PermissionsCollection extends EntityV2Collection {
    * @return {PermissionsCollection}
    */
   cloneForAco(aco, acoId, assertAtLeastOneOwner = true) {
-    const permissions = new PermissionsCollection([], {assertAtLeastOneOwner: false});
+    const permissions = new PermissionsCollection([], { assertAtLeastOneOwner: false });
     for (const parentPermission of this.permissions) {
       const clone = parentPermission.copyForAnotherAco(aco, acoId);
       permissions.addOrReplace(clone);

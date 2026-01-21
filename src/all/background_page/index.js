@@ -18,7 +18,7 @@ import PostLogoutService from "./service/auth/postLogoutService";
 import OnStartUpService from "./service/extension/onStartUpService";
 import ToolbarService from "./service/toolbar/toolbarService";
 
-const main = async() => {
+const main = async () => {
   /**
    * Load all system requirement
    */
@@ -32,7 +32,7 @@ const main = async() => {
  * Check and process event if the user is authenticated
  * @return {Promise<void>}
  */
-const checkAndProcessIfUserAuthenticated = async() => {
+const checkAndProcessIfUserAuthenticated = async () => {
   const user = User.getInstance();
   // Check if user is valid
   if (!user.isValid()) {
@@ -46,7 +46,7 @@ const checkAndProcessIfUserAuthenticated = async() => {
   } catch (error) {
     console.error(error);
     // Service is unavailable, do nothing...
-    Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
+    Log.write({ level: "debug", message: "The Service is unavailable to check if the user is authenticated" });
     return;
   }
 

@@ -13,12 +13,12 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import GetOrFindRolesService from "./getOrFindRolesService";
 import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";
-import {defaultApiClientOptions} from 'passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data';
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import RolesLocalStorage from "../local_storage/rolesLocalStorage";
-import {rolesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection.test.data";
+import { rolesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection.test.data";
 
 jest.useFakeTimers();
 
@@ -33,12 +33,14 @@ describe("GetOrFindRolesService", () => {
   const apiClientOptions = defaultApiClientOptions();
 
   describe("::getOrFindAll", () => {
-    it("retrieves roles from the API when the local storage is not initialized", async() => {
+    it("retrieves roles from the API when the local storage is not initialized", async () => {
       expect.assertions(2);
 
       const rolesCollection = new RolesCollection(rolesCollectionDto);
       const service = new GetOrFindRolesService(account, apiClientOptions);
-      jest.spyOn(service.findAndUpdateRolesLocalStorage, "findAndUpdateAll").mockImplementation(async() => rolesCollection);
+      jest
+        .spyOn(service.findAndUpdateRolesLocalStorage, "findAndUpdateAll")
+        .mockImplementation(async () => rolesCollection);
 
       const result = await service.getOrFindAll();
 
@@ -46,7 +48,7 @@ describe("GetOrFindRolesService", () => {
       expect(result).toStrictEqual(rolesCollection);
     });
 
-    it("retrieves roles from the local storage when it is initialised.", async() => {
+    it("retrieves roles from the local storage when it is initialised.", async () => {
       expect.assertions(2);
 
       const rolesCollection = new RolesCollection(rolesCollectionDto);

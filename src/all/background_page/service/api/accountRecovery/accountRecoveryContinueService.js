@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const ACCOUNT_RECOVERY_CONTINUE_SERVICE_RESOURCE_NAME = '/account-recovery/continue';
+const ACCOUNT_RECOVERY_CONTINUE_SERVICE_RESOURCE_NAME = "/account-recovery/continue";
 
 class AccountRecoveryContinueService extends AbstractService {
   /**

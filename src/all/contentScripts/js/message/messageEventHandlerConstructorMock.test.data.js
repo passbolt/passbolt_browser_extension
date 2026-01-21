@@ -13,6 +13,5 @@
  */
 
 export class ControllerMessageEventHandlerConstructorMock {
-  exec() {
-  }
+  exec() {}
 }

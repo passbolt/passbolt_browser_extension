@@ -13,7 +13,7 @@
  */
 
 import ExternalServiceUnavailableError from "../../error/externalServiceUnavailableError";
-import ExternalServiceError from '../../error/externalServiceError';
+import ExternalServiceError from "../../error/externalServiceError";
 import jsSHA from "jssha";
 
 class PownedPasswordService {
@@ -26,15 +26,15 @@ class PownedPasswordService {
    */
   static async checkIfPasswordIsPowned(password) {
     const prefixLength = 5;
-    const apiUrl = 'https://api.pwnedpasswords.com/range/';
-    if (typeof password !== 'string') {
-      const err = new Error('Input password must be a string.');
+    const apiUrl = "https://api.pwnedpasswords.com/range/";
+    if (typeof password !== "string") {
+      const err = new Error("Input password must be a string.");
       return Promise.reject(err);
     }
 
-    const shaObj = new jsSHA('SHA-1', 'TEXT');
+    const shaObj = new jsSHA("SHA-1", "TEXT");
     shaObj.update(password);
-    const hashedPassword = shaObj.getHash('HEX');
+    const hashedPassword = shaObj.getHash("HEX");
     const hashedPasswordPrefix = hashedPassword.substr(0, prefixLength);
     const hashedPasswordSuffix = hashedPassword.substr(prefixLength);
     const url = apiUrl + hashedPasswordPrefix;
@@ -52,12 +52,14 @@ class PownedPasswordService {
     }
     const data = await response.text();
 
-    return data
-      .split('\n')
-      .map(line => line.split(':'))
-      .filter(filtered => filtered[0].toLowerCase() === hashedPasswordSuffix)
-      .map(mapped => Number(mapped[1]))
-      .shift() || 0;
+    return (
+      data
+        .split("\n")
+        .map((line) => line.split(":"))
+        .filter((filtered) => filtered[0].toLowerCase() === hashedPasswordSuffix)
+        .map((mapped) => Number(mapped[1]))
+        .shift() || 0
+    );
   }
 }
 

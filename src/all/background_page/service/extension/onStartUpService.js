@@ -14,9 +14,9 @@
  * On start up extension
  */
 import storage from "../../sdk/storage";
-import {Config} from "../../model/config";
+import { Config } from "../../model/config";
 import LocalStorageService from "../localStorage/localStorageService";
-import {BrowserExtensionIconService} from "../ui/browserExtensionIcon.service";
+import { BrowserExtensionIconService } from "../ui/browserExtensionIcon.service";
 import User from "../../model/user";
 
 class OnStartUpService {

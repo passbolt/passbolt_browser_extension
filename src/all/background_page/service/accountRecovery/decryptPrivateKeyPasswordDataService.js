@@ -13,8 +13,7 @@
  */
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class DecryptPrivateKeyPasswordDataService {
   /**
@@ -32,7 +31,13 @@ class DecryptPrivateKeyPasswordDataService {
    * @throw {Error} If the user id contained in the decrypted private key password data does not match the verification user id.
    * @throw {Error} If the fingerprint contained in the decrypted private key password data does not match the verification fingerprint.
    */
-  static async decrypt(privateKeyPassword, decryptionKey, verificationDomain, verificationUserId, verificationUserPublicKey) {
+  static async decrypt(
+    privateKeyPassword,
+    decryptionKey,
+    verificationDomain,
+    verificationUserId,
+    verificationUserPublicKey,
+  ) {
     let privateKeyPasswordDecryptedDataDto;
 
     if (decryptionKey.getFingerprint().toUpperCase() !== privateKeyPassword.recipientFingerprint) {
@@ -41,7 +46,10 @@ class DecryptPrivateKeyPasswordDataService {
 
     // @todo verify the signature on the password: can be the user itself while performing the setup or the admin while rotating the ork.
     const privateKeyPasswordMessage = await OpenpgpAssertion.readMessageOrFail(privateKeyPassword.data);
-    const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(privateKeyPasswordMessage, decryptionKey);
+    const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(
+      privateKeyPasswordMessage,
+      decryptionKey,
+    );
 
     try {
       privateKeyPasswordDecryptedDataDto = JSON.parse(privateKeyPasswordDecryptedDataSerialized);
@@ -50,21 +58,34 @@ class DecryptPrivateKeyPasswordDataService {
       throw new Error("Unable to parse the decrypted private key password data.");
     }
 
-    const privateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(privateKeyPasswordDecryptedDataDto);
+    const privateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(
+      privateKeyPasswordDecryptedDataDto,
+    );
 
     if (privateKeyPasswordDecryptedData.domain !== verificationDomain) {
-      console.debug("The decrypted private key password data domain does not match the organization domain: ", ({privateKeyPasswordId: privateKeyPassword.id, userId: privateKeyPasswordDecryptedData.privateKeyUserId, domain: privateKeyPasswordDecryptedData.domain}));
-      throw new Error("The domain contained in the private key password data does not match the expected target domain.");
+      console.debug("The decrypted private key password data domain does not match the organization domain: ", {
+        privateKeyPasswordId: privateKeyPassword.id,
+        userId: privateKeyPasswordDecryptedData.privateKeyUserId,
+        domain: privateKeyPasswordDecryptedData.domain,
+      });
+      throw new Error(
+        "The domain contained in the private key password data does not match the expected target domain.",
+      );
     }
 
     if (verificationUserId) {
       if (privateKeyPasswordDecryptedData.privateKeyUserId !== verificationUserId) {
-        throw new Error("The user id contained in the private key password data does not match the private key target used id.");
+        throw new Error(
+          "The user id contained in the private key password data does not match the private key target used id.",
+        );
       }
     }
 
     if (verificationUserPublicKey) {
-      if (privateKeyPasswordDecryptedData.privateKeyFingerprint !== verificationUserPublicKey.getFingerprint().toUpperCase()) {
+      if (
+        privateKeyPasswordDecryptedData.privateKeyFingerprint !==
+        verificationUserPublicKey.getFingerprint().toUpperCase()
+      ) {
         throw new Error("The private key password data fingerprint should match the user public fingerprint.");
       }
     }

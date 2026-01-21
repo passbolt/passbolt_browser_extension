@@ -12,20 +12,19 @@
  * @since         4.4.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultMfaProviderData} from "../../model/entity/mfa/mfaProviderEntity.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultMfaProviderData } from "../../model/entity/mfa/mfaProviderEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import MfaSetupVerifyProviderController from "./MfaSetupVerifyProviderController";
-import {defaultVerifyProviderData} from "../../model/entity/mfa/mfaVerifyProviderEntity.test.data";
+import { defaultVerifyProviderData } from "../../model/entity/mfa/mfaVerifyProviderEntity.test.data";
 import MfaProviderEntity from "../../model/entity/mfa/mfaProviderEntity";
 import MfaVerifyProviderEntity from "../../model/entity/mfa/mfaVerifyProviderEntity";
 
 beforeEach(() => {
   enableFetchMocks();
 });
-
 
 describe("MfaSetupVerifyProviderController", () => {
   let controller;
@@ -34,7 +33,7 @@ describe("MfaSetupVerifyProviderController", () => {
     controller = new MfaSetupVerifyProviderController(null, null, defaultApiClientOptions());
   });
 
-  it("Should retrieve the verify date from totp", async() => {
+  it("Should retrieve the verify date from totp", async () => {
     expect.assertions(2);
     jest.spyOn(controller.multiFactorAuthenticationModel, "verifyProvider");
 
@@ -46,14 +45,14 @@ describe("MfaSetupVerifyProviderController", () => {
     expect(result).toEqual(new MfaVerifyProviderEntity(defaultVerifyProviderData()));
   });
 
-  it("Should validate the mfa provider with entity", async() => {
+  it("Should validate the mfa provider with entity", async () => {
     expect.assertions(2);
 
     try {
       await controller.exec({});
     } catch (error) {
       expect(error).toBeInstanceOf(EntityValidationError);
-      expect(error.hasError('provider', 'required')).toBeTruthy();
+      expect(error.hasError("provider", "required")).toBeTruthy();
     }
   });
 });

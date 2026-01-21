@@ -12,12 +12,12 @@
  * @since         3.6.1
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import AuthVerifyServerChallengeService from "./authVerifyServerChallengeService";
-import {defaultGpgAuthTokenVerifyHeadersDto} from "../../model/gpgAuthHeader.test.data";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
+import { defaultGpgAuthTokenVerifyHeadersDto } from "../../model/gpgAuthHeader.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 beforeEach(() => {
   jest.resetModules();
@@ -26,46 +26,59 @@ beforeEach(() => {
 
 describe("AuthVerifyServerKeyController", () => {
   describe("AuthVerifyServerKeyController::exec", () => {
-    it("Should verify the server successfully.", async() => {
+    it("Should verify the server successfully.", async () => {
       expect.assertions(1);
       // Mock account.
       const account = new AccountEntity(defaultAccountDto());
 
       const service = new AuthVerifyServerChallengeService(defaultApiClientOptions());
       jest.spyOn(service.authVerifyServerKeyService, "verify").mockImplementationOnce(() => ({
-        headers: defaultGpgAuthTokenVerifyHeadersDto({token: service.gpgAuthToken.token}),
-        body: {}
+        headers: defaultGpgAuthTokenVerifyHeadersDto({ token: service.gpgAuthToken.token }),
+        body: {},
       }));
 
-      const promise = service.verifyAndValidateServerChallenge(account.userKeyFingerprint, account.serverPublicArmoredKey);
+      const promise = service.verifyAndValidateServerChallenge(
+        account.userKeyFingerprint,
+        account.serverPublicArmoredKey,
+      );
       await expect(promise).resolves.not.toThrow();
     });
 
-    it("Should throw a server error if the server token is not the same", async() => {
+    it("Should throw a server error if the server token is not the same", async () => {
       expect.assertions(1);
       // Mock account.
-      const account = new AccountEntity(defaultAccountDto({server_public_armored_key: pgpKeys.server.public}));
+      const account = new AccountEntity(defaultAccountDto({ server_public_armored_key: pgpKeys.server.public }));
 
       const service = new AuthVerifyServerChallengeService(defaultApiClientOptions());
       jest.spyOn(service.authVerifyServerKeyService, "verify").mockImplementationOnce(() => ({
         headers: defaultGpgAuthTokenVerifyHeadersDto(),
-        body: {}
+        body: {},
       }));
 
-      const promise = service.verifyAndValidateServerChallenge(account.userKeyFingerprint, account.serverPublicArmoredKey);
-      await expect(promise).rejects.toThrowError(new Error('The server was unable to prove it can use the advertised OpenPGP key.'));
+      const promise = service.verifyAndValidateServerChallenge(
+        account.userKeyFingerprint,
+        account.serverPublicArmoredKey,
+      );
+      await expect(promise).rejects.toThrowError(
+        new Error("The server was unable to prove it can use the advertised OpenPGP key."),
+      );
     });
 
-    it("Should throw a server error if the server cannot be verified", async() => {
+    it("Should throw a server error if the server cannot be verified", async () => {
       expect.assertions(1);
       // Mock account.
-      const account = new AccountEntity(defaultAccountDto({server_public_armored_key: pgpKeys.server.public}));
+      const account = new AccountEntity(defaultAccountDto({ server_public_armored_key: pgpKeys.server.public }));
 
       const service = new AuthVerifyServerChallengeService(defaultApiClientOptions());
-      jest.spyOn(service.authVerifyServerKeyService, "verify").mockImplementationOnce(() => { throw Error('Unknown error'); });
+      jest.spyOn(service.authVerifyServerKeyService, "verify").mockImplementationOnce(() => {
+        throw Error("Unknown error");
+      });
 
-      const promise = service.verifyAndValidateServerChallenge(account.userKeyFingerprint, account.serverPublicArmoredKey);
-      await expect(promise).rejects.toThrowError(new Error('Unknown error'));
+      const promise = service.verifyAndValidateServerChallenge(
+        account.userKeyFingerprint,
+        account.serverPublicArmoredKey,
+      );
+      await expect(promise).rejects.toThrowError(new Error("Unknown error"));
     });
   });
 });

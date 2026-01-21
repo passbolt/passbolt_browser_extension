@@ -36,10 +36,10 @@ class UpdateUserController {
   async _exec(userDto) {
     try {
       const updatedUser = await this.exec(userDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS', updatedUser);
+      this.worker.port.emit(this.requestId, "SUCCESS", updatedUser);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

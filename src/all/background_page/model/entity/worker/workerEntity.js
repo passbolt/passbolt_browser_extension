@@ -14,22 +14,18 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'Worker';
+const ENTITY_NAME = "Worker";
 
-const STATUS_WAITING_CONNECTION = 'waiting_connection';
-const STATUS_CONNECTED = 'connected';
-const STATUS_RECONNECTING = 'reconnecting';
+const STATUS_WAITING_CONNECTION = "waiting_connection";
+const STATUS_CONNECTED = "connected";
+const STATUS_RECONNECTING = "reconnecting";
 
 class WorkerEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(workerDto, options = {}) {
-    super(EntitySchema.validate(
-      WorkerEntity.ENTITY_NAME,
-      workerDto,
-      WorkerEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(WorkerEntity.ENTITY_NAME, workerDto, WorkerEntity.getSchema()), options);
   }
 
   /**
@@ -38,33 +34,28 @@ class WorkerEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "id",
-        "tabId",
-        "name",
-        "status"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["id", "tabId", "name", "status"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "tabId": {
-          "type": "integer",
+        tabId: {
+          type: "integer",
         },
-        "frameId": {
-          "type": "integer",
-          "nullable": true,
+        frameId: {
+          type: "integer",
+          nullable: true,
         },
-        "name": {
-          "type": "string",
+        name: {
+          type: "string",
         },
-        "status": {
-          "type": "string",
-          "enum": [this.STATUS_WAITING_CONNECTION, this.STATUS_CONNECTED, this.STATUS_RECONNECTING]
-        }
-      }
+        status: {
+          type: "string",
+          enum: [this.STATUS_WAITING_CONNECTION, this.STATUS_CONNECTED, this.STATUS_RECONNECTING],
+        },
+      },
     };
   }
 
@@ -94,7 +85,7 @@ class WorkerEntity extends Entity {
    * @returns {integer|null} id
    */
   get frameId() {
-    if (typeof this._props.frameId !== 'undefined') {
+    if (typeof this._props.frameId !== "undefined") {
       return this._props.frameId;
     }
     return null;

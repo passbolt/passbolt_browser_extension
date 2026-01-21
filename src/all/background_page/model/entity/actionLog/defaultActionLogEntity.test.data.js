@@ -11,24 +11,26 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.4.0
  */
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 export const defaultData = {
-  "id": uuidv4(),
-  "action_log_id": uuidv4(),
-  "type": "Resources.created",
-  "creator": {
-    "id": uuidv4(),
-    "username": "ada@passbolt.com",
-    "profile": {
-      "first_name": "Ada",
-      "last_name": "Lovelace",
-      "avatar": {
-        "url": {
-          "medium": "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.a99472d5.png",
-          "small": "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.65a0ba70.png"
-        }
-      }
+  id: uuidv4(),
+  action_log_id: uuidv4(),
+  type: "Resources.created",
+  creator: {
+    id: uuidv4(),
+    username: "ada@passbolt.com",
+    profile: {
+      first_name: "Ada",
+      last_name: "Lovelace",
+      avatar: {
+        url: {
+          medium:
+            "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.a99472d5.png",
+          small:
+            "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.65a0ba70.png",
+        },
+      },
     },
-  }
+  },
 };

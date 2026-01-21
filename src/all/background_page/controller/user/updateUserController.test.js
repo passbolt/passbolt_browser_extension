@@ -12,14 +12,14 @@
  * @since         4.4.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import UpdateUserController from "./updateUserController";
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import UserEntity from "../../model/entity/user/userEntity";
@@ -34,18 +34,18 @@ describe("UpdateUserController", () => {
     accountDto.role_name = RoleEntity.ROLE_ADMIN;
     const account = new AccountEntity(accountDto);
 
-    it("Should update the user given the DTO", async() => {
+    it("Should update the user given the DTO", async () => {
       expect.assertions(2);
 
       const expectedDto = defaultUserDto({
-        "disabled": new Date().toISOString().split('.')[0],
+        disabled: new Date().toISOString().split(".")[0],
       });
 
       const expectedRequestDto = JSON.parse(JSON.stringify(expectedDto));
       delete expectedRequestDto.role;
       delete expectedRequestDto.profile.avatar;
 
-      fetch.doMockOnceIf(new RegExp(`/users/${expectedDto.id}.json`), async req => {
+      fetch.doMockOnceIf(new RegExp(`/users/${expectedDto.id}.json`), async (req) => {
         const body = JSON.parse(await req.text());
         expect(body).toStrictEqual(expectedRequestDto);
         return mockApiResponse(expectedDto);
@@ -56,11 +56,11 @@ describe("UpdateUserController", () => {
       expect(resultingEntity).toStrictEqual(new UserEntity(expectedDto));
     });
 
-    it("Should throw an error if the user entity cannot validate", async() => {
+    it("Should throw an error if the user entity cannot validate", async () => {
       expect.assertions(1);
 
       const wrongDto = defaultUserDto({
-        "disabled": true,
+        disabled: true,
       });
 
       const controller = new UpdateUserController(null, null, defaultApiClientOptions(), account);
@@ -71,11 +71,13 @@ describe("UpdateUserController", () => {
       }
     });
 
-    it("Should throw an error if something wrong happens on the API", async() => {
+    it("Should throw an error if something wrong happens on the API", async () => {
       expect.assertions(1);
 
       const dto = defaultUserDto();
-      fetch.doMockOnceIf(new RegExp(`/users/${dto.id}.json`), async() => mockApiResponseError(500, "Something went wrong"));
+      fetch.doMockOnceIf(new RegExp(`/users/${dto.id}.json`), async () =>
+        mockApiResponseError(500, "Something went wrong"),
+      );
 
       const controller = new UpdateUserController(null, null, defaultApiClientOptions(), account);
       try {

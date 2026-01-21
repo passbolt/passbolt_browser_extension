@@ -16,7 +16,7 @@ import WorkerEntity from "../../model/entity/worker/workerEntity";
 import Validator from "validator";
 const lock = new Lock();
 
-const WORKERS_STORAGE_KEY = 'workers';
+const WORKERS_STORAGE_KEY = "workers";
 const LIMIT_WORKERS_BY_TAB = 100;
 
 class WorkersSessionStorage {
@@ -28,7 +28,7 @@ class WorkersSessionStorage {
    * If storage is not set, undefined will be returned.
    */
   async getWorkers() {
-    const {workers} = await browser.storage.session.get(WORKERS_STORAGE_KEY);
+    const { workers } = await browser.storage.session.get(WORKERS_STORAGE_KEY);
     return workers || [];
   }
 
@@ -42,7 +42,7 @@ class WorkersSessionStorage {
     if (!Validator.isUUID(id)) {
       throw new TypeError("The worker id should be a valid uuid.");
     }
-    const findById = workers => workers.find(worker => worker.id === id);
+    const findById = (workers) => workers.find((worker) => worker.id === id);
     return this.getWorkers().then(findById);
   }
 
@@ -53,7 +53,7 @@ class WorkersSessionStorage {
    * @return {Promise<object>} worker dto object
    */
   getWorkersByTabId(tabId) {
-    const filterByTabId = workers => workers.filter(worker => worker.tabId === tabId);
+    const filterByTabId = (workers) => workers.filter((worker) => worker.tabId === tabId);
     return this.getWorkers().then(filterByTabId);
   }
 
@@ -64,7 +64,7 @@ class WorkersSessionStorage {
    * @return {Promise<array>} Array of worker dto object
    */
   getWorkersByNames(workerNames) {
-    const filterByName = workers => workers.filter(worker => workerNames.includes(worker.name));
+    const filterByName = (workers) => workers.filter((worker) => workerNames.includes(worker.name));
     return this.getWorkers().then(filterByName);
   }
 
@@ -76,7 +76,8 @@ class WorkersSessionStorage {
    * @return {object} worker dto object
    */
   getWorkersByNameAndTabId(name, tabId) {
-    const filterByNameAndTabId = workers => workers.filter(worker => worker.name === name && worker.tabId === tabId);
+    const filterByNameAndTabId = (workers) =>
+      workers.filter((worker) => worker.name === name && worker.tabId === tabId);
     return this.getWorkers().then(filterByNameAndTabId);
   }
 
@@ -87,9 +88,8 @@ class WorkersSessionStorage {
    */
   async getWorkerOnMainFrame(tabId) {
     const workers = await this.getWorkersByTabId(tabId);
-    return workers.find(worker => worker.frameId === 0);
+    return workers.find((worker) => worker.frameId === 0);
   }
-
 
   /**
    * Add a worker in the session storage
@@ -103,7 +103,7 @@ class WorkersSessionStorage {
       const workers = await this.getWorkers();
       if (!this.IsExceedNumberWorkersByTabId(workers, workerEntity.tabId)) {
         workers.push(workerEntity.toDto());
-        await browser.storage.session.set({workers});
+        await browser.storage.session.set({ workers });
       } else {
         throw new Error(`The extension port limit is exceeded on tab ${workerEntity.tabId}`);
       }
@@ -120,7 +120,7 @@ class WorkersSessionStorage {
    * @constructor
    */
   IsExceedNumberWorkersByTabId(workers, tabId, limit = LIMIT_WORKERS_BY_TAB) {
-    return workers.filter(worker => worker.tabId === tabId).length >= limit;
+    return workers.filter((worker) => worker.tabId === tabId).length >= limit;
   }
 
   /**
@@ -134,12 +134,12 @@ class WorkersSessionStorage {
     try {
       this.assertEntityBeforeSave(workerEntity);
       const workers = await this.getWorkers();
-      const workerIndex = workers.findIndex(item => item.id === workerEntity.id);
+      const workerIndex = workers.findIndex((item) => item.id === workerEntity.id);
       if (workerIndex === -1) {
-        throw new Error('The worker could not be found in the session storage');
+        throw new Error("The worker could not be found in the session storage");
       }
       workers[workerIndex] = workerEntity.toDto();
-      await browser.storage.session.set({workers});
+      await browser.storage.session.set({ workers });
     } finally {
       lock.release();
     }
@@ -154,9 +154,9 @@ class WorkersSessionStorage {
     await lock.acquire();
     try {
       const workers = await this.getWorkers();
-      const keepWorkerNotInTabId = worker => worker.tabId !== tabId;
+      const keepWorkerNotInTabId = (worker) => worker.tabId !== tabId;
       const workersToKeep = workers.filter(keepWorkerNotInTabId);
-      await browser.storage.session.set({workers: workersToKeep});
+      await browser.storage.session.set({ workers: workersToKeep });
     } finally {
       lock.release();
     }
@@ -174,9 +174,9 @@ class WorkersSessionStorage {
     await lock.acquire();
     try {
       const workers = await this.getWorkers();
-      const keepWorkerNotInTabId = worker => worker.id !== id;
+      const keepWorkerNotInTabId = (worker) => worker.id !== id;
       const workersToKeep = workers.filter(keepWorkerNotInTabId);
-      await browser.storage.session.set({workers: workersToKeep});
+      await browser.storage.session.set({ workers: workersToKeep });
     } finally {
       lock.release();
     }
@@ -190,7 +190,7 @@ class WorkersSessionStorage {
     const workers = [];
     await lock.acquire();
     try {
-      await browser.storage.session.set({workers});
+      await browser.storage.session.set({ workers });
     } finally {
       lock.release();
     }
@@ -205,10 +205,10 @@ class WorkersSessionStorage {
    */
   assertEntityBeforeSave(workerEntity) {
     if (!workerEntity) {
-      throw new TypeError('WorkerSessionStorage expects a WorkerEntity to be set');
+      throw new TypeError("WorkerSessionStorage expects a WorkerEntity to be set");
     }
     if (!(workerEntity instanceof WorkerEntity)) {
-      throw new TypeError('WorkerSessionStorage expects an object of type WorkerEntity');
+      throw new TypeError("WorkerSessionStorage expects an object of type WorkerEntity");
     }
   }
 }

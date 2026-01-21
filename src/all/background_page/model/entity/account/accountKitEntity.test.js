@@ -14,8 +14,8 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountKitEntity from "./accountKitEntity";
-import {defaultAccountDto} from "./accountEntity.test.data";
-import {expectedKeys} from "./accountKitEntity.test.data";
+import { defaultAccountDto } from "./accountEntity.test.data";
+import { expectedKeys } from "./accountKitEntity.test.data";
 import AbstractAccountEntity from "./abstractAccountEntity";
 
 describe("AccountKitEntity", () => {
@@ -38,14 +38,14 @@ describe("AccountKitEntity", () => {
         new AccountKitEntity(dto);
       } catch (error) {
         expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('domain', 'required')).toBeTruthy();
-        expect(error.hasError('user_id', 'required')).toBeTruthy();
-        expect(error.hasError('username', 'required')).toBeTruthy();
-        expect(error.hasError('first_name', 'required')).toBeTruthy();
-        expect(error.hasError('last_name', 'required')).toBeTruthy();
-        expect(error.hasError('user_private_armored_key', 'required')).toBeTruthy();
-        expect(error.hasError('server_public_armored_key', 'required')).toBeTruthy();
-        expect(error.hasError('security_token', 'required')).toBeTruthy();
+        expect(error.hasError("domain", "required")).toBeTruthy();
+        expect(error.hasError("user_id", "required")).toBeTruthy();
+        expect(error.hasError("username", "required")).toBeTruthy();
+        expect(error.hasError("first_name", "required")).toBeTruthy();
+        expect(error.hasError("last_name", "required")).toBeTruthy();
+        expect(error.hasError("user_private_armored_key", "required")).toBeTruthy();
+        expect(error.hasError("server_public_armored_key", "required")).toBeTruthy();
+        expect(error.hasError("security_token", "required")).toBeTruthy();
       }
     });
 
@@ -64,23 +64,23 @@ describe("AccountKitEntity", () => {
 
     it("it should not validate the server private key if the key is higher than 50000", () => {
       expect.assertions(2);
-      const dto = defaultAccountDto({server_public_armored_key: 'a'.repeat(50001)});
+      const dto = defaultAccountDto({ server_public_armored_key: "a".repeat(50001) });
       try {
         new AccountKitEntity(dto);
       } catch (error) {
         expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('server_public_armored_key', 'maxLength')).toBeTruthy();
+        expect(error.hasError("server_public_armored_key", "maxLength")).toBeTruthy();
       }
     });
 
     it("it should not validate the user private key if the key is higher than 50000", () => {
       expect.assertions(2);
-      const dto = defaultAccountDto({user_private_armored_key: 'a'.repeat(50001)});
+      const dto = defaultAccountDto({ user_private_armored_key: "a".repeat(50001) });
       try {
         new AccountKitEntity(dto);
       } catch (error) {
         expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('user_private_armored_key', 'maxLength')).toBeTruthy();
+        expect(error.hasError("user_private_armored_key", "maxLength")).toBeTruthy();
       }
     });
   });

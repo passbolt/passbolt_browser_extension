@@ -71,8 +71,9 @@ class PagemodManager {
    * @returns {Promise<Pagemod>}
    */
   async getPagemodThatCanBeAttachedTo(frameDetails) {
-    const canAttachPagemod = pagemod => pagemod.canBeAttachedTo(frameDetails);
-    const findPagemodThatCanBeAttachedTo = canAttachPagemodsResults => this.pagemods.find((pagemod, index) => canAttachPagemodsResults[index]);
+    const canAttachPagemod = (pagemod) => pagemod.canBeAttachedTo(frameDetails);
+    const findPagemodThatCanBeAttachedTo = (canAttachPagemodsResults) =>
+      this.pagemods.find((pagemod, index) => canAttachPagemodsResults[index]);
     // Keep only one pagemod that can be attached.
     return Promise.all(this.pagemods.map(canAttachPagemod)).then(findPagemodThatCanBeAttachedTo);
   }
@@ -94,7 +95,7 @@ class PagemodManager {
    * @returns {*}
    */
   findPagemodByAppName(appName) {
-    return this.pagemods.find(pagemod => pagemod.appName === appName);
+    return this.pagemods.find((pagemod) => pagemod.appName === appName);
   }
 
   /**
@@ -104,7 +105,7 @@ class PagemodManager {
    */
   async hasPagemodMatchUrlToReload(url) {
     for (const pagemod of this.pagemods) {
-      if (pagemod.mustReloadOnExtensionUpdate && await pagemod.assertUrlAttachConstraint({url})) {
+      if (pagemod.mustReloadOnExtensionUpdate && (await pagemod.assertUrlAttachConstraint({ url }))) {
         return true;
       }
     }

@@ -14,7 +14,7 @@
 import AbstractAccountEntity from "./abstractAccountEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {StubAbstractAccountEntity, defaultAbstractAccountDto} from "./abstractAccountEntity.test.data";
+import { StubAbstractAccountEntity, defaultAbstractAccountDto } from "./abstractAccountEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("AbstractAccountEntity", () => {
@@ -40,19 +40,23 @@ describe("AbstractAccountEntity", () => {
     });
 
     it("validates user_key_fingerprint property", () => {
-      const successScenario = [
-        {scenario: "a valid fingerprint", value: "ABCD".repeat(10)},
-      ];
+      const successScenario = [{ scenario: "a valid fingerprint", value: "ABCD".repeat(10) }];
 
       const failingScenario = [
-        {scenario: "non hexadecimal fingerprint character set", value: "GHIJ".repeat(10)},
-        {scenario: "wrong fingerprint character case set", value: "abcd".repeat(10)},
+        { scenario: "non hexadecimal fingerprint character set", value: "GHIJ".repeat(10) },
+        { scenario: "wrong fingerprint character case set", value: "abcd".repeat(10) },
       ];
 
       assertEntityProperty.string(StubAbstractAccountEntity, "user_key_fingerprint");
       assertEntityProperty.minLength(StubAbstractAccountEntity, "user_key_fingerprint", 40);
       assertEntityProperty.maxLength(StubAbstractAccountEntity, "user_key_fingerprint", 40);
-      assertEntityProperty.assert(StubAbstractAccountEntity, "user_key_fingerprint", successScenario, failingScenario, "pattern");
+      assertEntityProperty.assert(
+        StubAbstractAccountEntity,
+        "user_key_fingerprint",
+        successScenario,
+        failingScenario,
+        "pattern",
+      );
       assertEntityProperty.notRequired(StubAbstractAccountEntity, "user_key_fingerprint");
     });
 
@@ -99,11 +103,13 @@ describe("AbstractAccountEntity", () => {
     });
 
     it("validates security_token property", () => {
-      const securityTokenGenerator = ({code = "Abc", color = "#abcdef", textcolor = "#abcdef"} = {}) => ({code, color, textcolor});
+      const securityTokenGenerator = ({ code = "Abc", color = "#abcdef", textcolor = "#abcdef" } = {}) => ({
+        code,
+        color,
+        textcolor,
+      });
 
-      const successScenario = [
-        {scenario: "a valid security token", value: securityTokenGenerator()},
-      ];
+      const successScenario = [{ scenario: "a valid security token", value: securityTokenGenerator() }];
 
       const failScenarios = [
         assertEntityProperty.SCENARIO_STRING,
@@ -111,15 +117,18 @@ describe("AbstractAccountEntity", () => {
         assertEntityProperty.SCENARIO_OBJECT,
         assertEntityProperty.SCENARIO_ARRAY,
         assertEntityProperty.SCENARIO_TRUE,
-        {scenario: "an invalid security token code", value: securityTokenGenerator({code: ";;;", color: "redish", textcolor: "greenish"})},
+        {
+          scenario: "an invalid security token code",
+          value: securityTokenGenerator({ code: ";;;", color: "redish", textcolor: "greenish" }),
+        },
       ];
 
-      successScenario.forEach(test => {
-        const dto = {security_token: test.value};
+      successScenario.forEach((test) => {
+        const dto = { security_token: test.value };
         expect(() => new StubAbstractAccountEntity(dto)).not.toThrow();
       });
-      failScenarios.forEach(test => {
-        const dto = {security_token: test.value};
+      failScenarios.forEach((test) => {
+        const dto = { security_token: test.value };
         expect(() => new StubAbstractAccountEntity(dto)).toThrow(EntityValidationError);
       });
     });

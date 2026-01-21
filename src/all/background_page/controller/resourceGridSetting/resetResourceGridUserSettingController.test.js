@@ -12,10 +12,10 @@
  * @since         5.0.0
  */
 
-import {RESOURCE_GRID_USER_SETTING_STORAGE_KEY} from "../../service/local_storage/ressourceGridSettingLocalStorage";
+import { RESOURCE_GRID_USER_SETTING_STORAGE_KEY } from "../../service/local_storage/ressourceGridSettingLocalStorage";
 import ResetResourceGridUserSettingController from "./resetResourceGridUserSettingController";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 beforeEach(() => {
   jest.resetModules();
@@ -24,14 +24,16 @@ beforeEach(() => {
 
 describe("ResetResourceColumnsSettingController", () => {
   describe("::exec", () => {
-    it("Should flush the resource columns settings in the local storage.", async() => {
+    it("Should flush the resource columns settings in the local storage.", async () => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
       jest.spyOn(browser.storage.local, "remove");
       const controller = new ResetResourceGridUserSettingController(null, null, account);
       await controller.exec();
 
-      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(
+        `${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${account.id}`,
+      );
     });
   });
 });

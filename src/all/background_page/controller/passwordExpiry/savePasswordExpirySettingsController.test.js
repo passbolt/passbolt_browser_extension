@@ -12,33 +12,36 @@
  * @since         4.4.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import SavePasswordExpirySettingsController from "./savePasswordExpirySettingsController";
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
-import {defaultPasswordExpiryProSettingsDto, defaultPasswordExpirySettingsDto, defaultPasswordExpirySettingsDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
+import {
+  defaultPasswordExpiryProSettingsDto,
+  defaultPasswordExpirySettingsDto,
+  defaultPasswordExpirySettingsDtoFromApi,
+} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
-import {defaultCeOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
-
 
 describe("SavePasswordExpirySettingsController", () => {
   let account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  it("Should save the given dto on the API using PasswordExpirySettingsEntity", async() => {
+  it("Should save the given dto on the API using PasswordExpirySettingsEntity", async () => {
     expect.assertions(2);
 
     const dtoToSave = defaultPasswordExpirySettingsDto();
@@ -46,9 +49,8 @@ describe("SavePasswordExpirySettingsController", () => {
     const expectedEntity = new PasswordExpirySettingsEntity(expectedDto);
     const organizationSettings = defaultCeOrganizationSettings();
 
-    jest.spyOn(OrganizationSettingsService.prototype, "find")
-      .mockImplementation(() => organizationSettings);
-    fetch.doMockOnceIf(/password-expiry\/settings\.json/, async request => {
+    jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
+    fetch.doMockOnceIf(/password-expiry\/settings\.json/, async (request) => {
       const body = JSON.parse(await request.text());
       expect(body).toStrictEqual(dtoToSave);
       return mockApiResponse(expectedDto);
@@ -59,31 +61,35 @@ describe("SavePasswordExpirySettingsController", () => {
     expect(result).toStrictEqual(expectedEntity);
   });
 
-  it("Should save the given dto on the API using PasswordExpiryProSettingsEntity", async() => {
+  it("Should save the given dto on the API using PasswordExpiryProSettingsEntity", async () => {
     expect.assertions(2);
 
     const dtoToSave = defaultPasswordExpiryProSettingsDto();
     const expectedDto = defaultPasswordExpirySettingsDtoFromApi(dtoToSave);
     const expectedEntity = new PasswordExpiryProSettingsEntity(expectedDto);
 
-    fetch.doMockOnceIf(/password-expiry\/settings\.json/, async request => {
+    fetch.doMockOnceIf(/password-expiry\/settings\.json/, async (request) => {
       const body = JSON.parse(await request.text());
       expect(body).toStrictEqual(dtoToSave);
       return mockApiResponse(expectedDto);
     });
 
     const controller = new SavePasswordExpirySettingsController(null, null, account, apiClientOptions);
-    jest.spyOn(controller.organisationSettingsModel, "getOrFind").mockImplementation(() => (Promise.resolve({
-      isPluginEnabled: () => true
-    })));
-    jest.spyOn(controller.passwordExpirySettingsModel.organisationSettingsModel, "getOrFind").mockImplementation(() => (Promise.resolve({
-      isPluginEnabled: () => true
-    })));
+    jest.spyOn(controller.organisationSettingsModel, "getOrFind").mockImplementation(() =>
+      Promise.resolve({
+        isPluginEnabled: () => true,
+      }),
+    );
+    jest.spyOn(controller.passwordExpirySettingsModel.organisationSettingsModel, "getOrFind").mockImplementation(() =>
+      Promise.resolve({
+        isPluginEnabled: () => true,
+      }),
+    );
     const result = await controller.exec(dtoToSave);
     expect(result).toStrictEqual(expectedEntity);
   });
 
-  it("Should throw an exception if something wrong happens on the API", async() => {
+  it("Should throw an exception if something wrong happens on the API", async () => {
     expect.assertions(1);
 
     fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => mockApiResponseError(500, "Something went wrong"));
@@ -93,9 +99,11 @@ describe("SavePasswordExpirySettingsController", () => {
     await expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltApiFetchError);
   });
 
-  it("Should return the default value if something goes when requesting the API", async() => {
+  it("Should return the default value if something goes when requesting the API", async () => {
     expect.assertions(1);
-    fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => { throw new Error("Something went wrong"); });
+    fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => {
+      throw new Error("Something went wrong");
+    });
 
     const dto = defaultPasswordExpirySettingsDto();
     const controller = new SavePasswordExpirySettingsController(null, null, account, apiClientOptions);

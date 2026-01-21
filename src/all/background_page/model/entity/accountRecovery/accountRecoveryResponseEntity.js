@@ -14,7 +14,7 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'AccountRecoveryResponse';
+const ENTITY_NAME = "AccountRecoveryResponse";
 const STATUS_REJECTED = "rejected";
 const STATUS_APPROVED = "approved";
 const RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY = "AccountRecoveryOrganizationKey";
@@ -24,11 +24,14 @@ class AccountRecoveryResponseEntity extends Entity {
    * @inheritDoc
    */
   constructor(accountRecoveryResponseDto, options = {}) {
-    super(EntitySchema.validate(
-      AccountRecoveryResponseEntity.ENTITY_NAME,
-      accountRecoveryResponseDto,
-      AccountRecoveryResponseEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        AccountRecoveryResponseEntity.ENTITY_NAME,
+        accountRecoveryResponseDto,
+        AccountRecoveryResponseEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -37,54 +40,49 @@ class AccountRecoveryResponseEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "account_recovery_request_id",
-        "responder_foreign_key",
-        "responder_foreign_model",
-        "status"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["account_recovery_request_id", "responder_foreign_key", "responder_foreign_model", "status"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "account_recovery_request_id": {
-          "type": "string",
-          "format": "uuid"
+        account_recovery_request_id: {
+          type: "string",
+          format: "uuid",
         },
-        "responder_foreign_key": {
-          "type": "string",
-          "format": "uuid"
+        responder_foreign_key: {
+          type: "string",
+          format: "uuid",
         },
-        "responder_foreign_model": {
-          "type": "string",
-          "enum": [this.RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY]
+        responder_foreign_model: {
+          type: "string",
+          enum: [this.RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY],
         },
-        "data": {
-          "type": "string",
+        data: {
+          type: "string",
         },
-        "status": {
-          "type": "string",
-          "enum": [this.STATUS_REJECTED, this.STATUS_APPROVED]
+        status: {
+          type: "string",
+          enum: [this.STATUS_REJECTED, this.STATUS_APPROVED],
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
-      }
+      },
     };
   }
 

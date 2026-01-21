@@ -15,28 +15,24 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'transfer';
+const ENTITY_NAME = "transfer";
 
-const TRANSFER_STATUS_START = 'start';
-const TRANSFER_STATUS_IN_PROGRESS = 'in progress';
-const TRANSFER_STATUS_COMPLETE = 'complete';
-const TRANSFER_STATUS_CANCEL = 'cancel';
-const TRANSFER_STATUS_ERROR = 'error';
+const TRANSFER_STATUS_START = "start";
+const TRANSFER_STATUS_IN_PROGRESS = "in progress";
+const TRANSFER_STATUS_COMPLETE = "complete";
+const TRANSFER_STATUS_CANCEL = "cancel";
+const TRANSFER_STATUS_ERROR = "error";
 
 class TransferEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(transferDto, options = {}) {
-    super(EntitySchema.validate(
-      TransferEntity.ENTITY_NAME,
-      transferDto,
-      TransferEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(TransferEntity.ENTITY_NAME, transferDto, TransferEntity.getSchema()), options);
 
     // Associations
     if (this._props.authentication_token) {
-      this._authentication_token = new AuthenticationTokenEntity(this._props.authentication_token, {clone: false});
+      this._authentication_token = new AuthenticationTokenEntity(this._props.authentication_token, { clone: false });
       delete this._props.authentication_token;
     }
   }
@@ -47,49 +43,47 @@ class TransferEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        'total_pages'
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["total_pages"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
+        user_id: {
+          type: "string",
+          format: "uuid",
         },
-        "hash": {
-          "type": "string"
+        hash: {
+          type: "string",
         },
-        "current_page": {
-          "type": "integer"
+        current_page: {
+          type: "integer",
         },
-        "total_pages": {
-          "type": "integer"
+        total_pages: {
+          type: "integer",
         },
-        "status": {
-          "type": "string",
-          "enum": [
+        status: {
+          type: "string",
+          enum: [
             TransferEntity.TRANSFER_STATUS_START,
             TransferEntity.TRANSFER_STATUS_COMPLETE,
             TransferEntity.TRANSFER_STATUS_IN_PROGRESS,
             TransferEntity.TRANSFER_STATUS_ERROR,
-            TransferEntity.TRANSFER_STATUS_CANCEL
-          ]
+            TransferEntity.TRANSFER_STATUS_CANCEL,
+          ],
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
         // Associated models
-        "authentication_token": AuthenticationTokenEntity.getSchema(),
-      }
+        authentication_token: AuthenticationTokenEntity.getSchema(),
+      },
     };
   }
 
@@ -128,7 +122,7 @@ class TransferEntity extends Entity {
    */
   static get ALL_CONTAIN_OPTIONS() {
     return {
-      'authentication_token': true,
+      authentication_token: true,
     };
   }
 

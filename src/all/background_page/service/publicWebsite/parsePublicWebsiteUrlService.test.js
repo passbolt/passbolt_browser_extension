@@ -18,11 +18,11 @@ import ParsePublicWebsiteUrlService from "./parsePublicWebsiteUrlService";
 describe("ParsePublicWebsiteUrlService", () => {
   describe("ParsePublicWebsiteUrlService:parse", () => {
     each([
-      {scenario: "Passbolt website home page", url: "https://www.passbolt.com"},
-      {scenario: "Passbolt website random page", url: "https://www.passbolt.com/roadmap"},
-      {scenario: "Passbolt website home page and hash", url: "https://www.passbolt.com#hash"},
-      {scenario: "Passbolt website random page and hash", url: "https://www.passbolt.com/roadmap#hash"},
-    ]).describe("should parse", _props => {
+      { scenario: "Passbolt website home page", url: "https://www.passbolt.com" },
+      { scenario: "Passbolt website random page", url: "https://www.passbolt.com/roadmap" },
+      { scenario: "Passbolt website home page and hash", url: "https://www.passbolt.com#hash" },
+      { scenario: "Passbolt website random page and hash", url: "https://www.passbolt.com/roadmap#hash" },
+    ]).describe("should parse", (_props) => {
       it(`should parse: ${_props.scenario}`, () => {
         const parseResult = ParsePublicWebsiteUrlService.regex.test(_props.url);
         expect.assertions(1);
@@ -31,13 +31,13 @@ describe("ParsePublicWebsiteUrlService", () => {
     });
 
     each([
-      {scenario: "No domain given", url: "www.passbolt.com"},
-      {scenario: "Not in https", url: "http://www.passbolt.com"},
-      {scenario: "From the blog", url: "https://blog.passbolt.com"},
-      {scenario: "Domain look alike attack", url: "https://www.passbolt.com.attacker.com"},
-      {scenario: "Domain look alike as parameter attack", url: "https://www.attacker.com?https://www.passbolt.com"},
-      {scenario: "Domain look alike as hash attack", url: "https://www.attacker.com#https://www.passbolt.com"},
-    ]).describe("should not parse", _props => {
+      { scenario: "No domain given", url: "www.passbolt.com" },
+      { scenario: "Not in https", url: "http://www.passbolt.com" },
+      { scenario: "From the blog", url: "https://blog.passbolt.com" },
+      { scenario: "Domain look alike attack", url: "https://www.passbolt.com.attacker.com" },
+      { scenario: "Domain look alike as parameter attack", url: "https://www.attacker.com?https://www.passbolt.com" },
+      { scenario: "Domain look alike as hash attack", url: "https://www.attacker.com#https://www.passbolt.com" },
+    ]).describe("should not parse", (_props) => {
       it(`should not parse: ${_props.scenario}`, () => {
         const parseResult = ParsePublicWebsiteUrlService.regex.test(_props.url);
         expect.assertions(1);

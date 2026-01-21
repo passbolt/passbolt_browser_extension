@@ -23,7 +23,7 @@ class GroupDeleteTransferEntity extends EntityV2 {
 
     // Association
     if (this._props.owners) {
-      this._owners = new PermissionTransfersCollection(this._props.owners, {clone: false});
+      this._owners = new PermissionTransfersCollection(this._props.owners, { clone: false });
       delete this._props.owners;
     }
   }
@@ -39,13 +39,11 @@ class GroupDeleteTransferEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "owners"
-      ],
-      "properties": {
-        "owners": PermissionTransfersCollection.getSchema()
-      }
+      type: "object",
+      required: ["owners"],
+      properties: {
+        owners: PermissionTransfersCollection.getSchema(),
+      },
     };
   }
 

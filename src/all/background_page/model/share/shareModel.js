@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.6.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import ShareService from "../../service/api/share/shareService";
 import UserAndGroupSearchResultsCollection from "../entity/userAndGroupSearchResultEntity/userAndGroupSearchResultCollection";
-import {assertString} from "../../utils/assertions";
+import { assertString } from "../../utils/assertions";
 
 class ShareModel {
   /**
@@ -42,11 +42,11 @@ class ShareModel {
     const resourcesSecrets = await this.bulkShareEncrypt(resources, resourcesNewUsers, privateKey, progressCallback);
     for (const resourceId in resourcesChanges) {
       if (Object.prototype.hasOwnProperty.call(resourcesChanges, resourceId)) {
-        const resource = resources.find(resource => resource.id === resourceId);
+        const resource = resources.find((resource) => resource.id === resourceId);
         const permissions = resourcesChanges[resourceId];
         const secrets = resourcesSecrets[resourceId] || [];
         progressCallback(`Sharing password ${resource.metadata.name}`);
-        await this.shareService.shareResource(resourceId, {permissions: permissions, secrets: secrets});
+        await this.shareService.shareResource(resourceId, { permissions: permissions, secrets: secrets });
       }
     }
   }
@@ -62,7 +62,7 @@ class ShareModel {
       const permissions = changesCollection.filterByAcoForeignKey(folderEntity.id);
       if (permissions && permissions.length) {
         await progressCallback(`Updating folder ${folderEntity.name} permissions`);
-        await this.shareService.shareFolder(folderEntity.id, {permissions: permissions.toDto()});
+        await this.shareService.shareFolder(folderEntity.id, { permissions: permissions.toDto() });
       }
     }
   }
@@ -75,15 +75,15 @@ class ShareModel {
    */
   bulkShareAggregateChanges(acos, changes) {
     if (!acos || !Array.isArray(acos) || !acos.length) {
-      throw new TypeError('bulkShareAggregateChanges expect an array of ACOs');
+      throw new TypeError("bulkShareAggregateChanges expect an array of ACOs");
     }
     if (!changes || !Array.isArray(changes) || !changes.length) {
-      throw new TypeError('bulkShareAggregateChanges expect an array of changes');
+      throw new TypeError("bulkShareAggregateChanges expect an array of changes");
     }
 
     const acosChanges = {};
-    acos.forEach(aco => {
-      const acoChanges = changes.filter(change => change.aco_foreign_key === aco.id);
+    acos.forEach((aco) => {
+      const acoChanges = changes.filter((change) => change.aco_foreign_key === aco.id);
       if (acoChanges.length) {
         acosChanges[aco.id] = acoChanges;
       }
@@ -103,7 +103,7 @@ class ShareModel {
     const usersToEncryptFor = {};
 
     for (const resourceId in resourcesChanges) {
-      const resource = resources.find(resource => resource.id === resourceId);
+      const resource = resources.find((resource) => resource.id === resourceId);
       progressCallback(`Validating share operation for ${resource.metadata.name}`);
       const simulateResult = await this.shareService.simulateShareResource(resourceId, resourcesChanges[resourceId]);
       const simulateAddedUsers = simulateResult.changes.added;
@@ -135,13 +135,13 @@ class ShareModel {
     const secrets = {};
 
     for (const resourceId in resourcesNewUsers) {
-      const resource = resources.find(resource => resource.id === resourceId);
+      const resource = resources.find((resource) => resource.id === resourceId);
       const originalMessage = await OpenpgpAssertion.readMessageOrFail(resource.secrets[0].data);
       const users = resourcesNewUsers[resourceId];
       progressCallback(`Encrypting for ${resource.metadata.name}`);
       if (users && users.length) {
         const message = await DecryptMessageService.decrypt(originalMessage, privateKey);
-        const encryptAllData = users.reduce((carry, userId) => [...carry, {userId: userId, message: message}], []);
+        const encryptAllData = users.reduce((carry, userId) => [...carry, { userId: userId, message: message }], []);
 
         const result = [];
         for (const i in encryptAllData) {
@@ -152,7 +152,7 @@ class ShareModel {
           result.push({
             resource_id: resourceId,
             user_id: data.userId,
-            data: messageEncrypted
+            data: messageEncrypted,
           });
         }
 

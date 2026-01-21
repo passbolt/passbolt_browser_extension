@@ -15,7 +15,7 @@
 import FindAndUpdateSessionKeysSessionStorageService from "./findAndUpdateSessionKeysSessionStorageService";
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
 import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
-import {assertArrayUUID, assertNonEmptyString} from "../../utils/assertions";
+import { assertArrayUUID, assertNonEmptyString } from "../../utils/assertions";
 import SessionKeysCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysCollection";
 
 /**
@@ -42,7 +42,7 @@ export default class GetOrFindSessionKeysService {
     const hasRuntimeCache = this.sessionKeysBundlesSessionStorageService.hasCachedData();
     const sessionKeysBundles = await this.sessionKeysBundlesSessionStorageService.get();
     if (sessionKeysBundles) {
-      return new SessionKeysBundlesCollection(sessionKeysBundles, {validate: !hasRuntimeCache});
+      return new SessionKeysBundlesCollection(sessionKeysBundles, { validate: !hasRuntimeCache });
     }
 
     return this.findAndUpdateSessionKeysService.findAndUpdateAllBundles(passphrase);
@@ -64,7 +64,10 @@ export default class GetOrFindSessionKeysService {
     const recentSessionKeysCollection = sessionKeysBundlesCollection.items[0].data.sessionKeys;
     // Concatenate all session keys from the most recent one and validate integrity and ignore invalid
     for (let i = 1; i < sessionKeysBundlesCollection.length; i++) {
-      recentSessionKeysCollection.pushMany(sessionKeysBundlesCollection.items[i].data.sessionKeys.items, {validate: false, ignoreInvalidEntity: true});
+      recentSessionKeysCollection.pushMany(sessionKeysBundlesCollection.items[i].data.sessionKeys.items, {
+        validate: false,
+        ignoreInvalidEntity: true,
+      });
     }
     return recentSessionKeysCollection;
   }

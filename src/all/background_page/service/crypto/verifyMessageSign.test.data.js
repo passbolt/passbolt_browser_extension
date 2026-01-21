@@ -12,20 +12,23 @@
  * @since         4.3.0
  */
 
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import SignMessageService from "./signMessageService";
-import * as openpgp from 'openpgp';
+import * as openpgp from "openpgp";
 
+export const defaultData = (data = {}) =>
+  Object.assign(
+    {
+      message: "text to sign",
+      privateKey: pgpKeys.admin.private_decrypted,
+    },
+    data,
+  );
 
-export const defaultData = (data = {}) => Object.assign({
-  message: 'text to sign',
-  privateKey: pgpKeys.admin.private_decrypted
-}, data);
-
-export const signedMessage = async(data = {}) => {
-  const {message, privateKey} = defaultData(data);
-  const messageToSign = await openpgp.createMessage({text: message});
+export const signedMessage = async (data = {}) => {
+  const { message, privateKey } = defaultData(data);
+  const messageToSign = await openpgp.createMessage({ text: message });
   const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(privateKey);
 
   const signedMessage = await SignMessageService.signMessage(messageToSign, [adminDecryptedKey]);
@@ -33,9 +36,9 @@ export const signedMessage = async(data = {}) => {
   return signedMessage;
 };
 
-export const signedClearMessage = async(data = {}) => {
-  const {message, privateKey} = defaultData(data);
-  const messageToSign = await openpgp.createCleartextMessage({text: message});
+export const signedClearMessage = async (data = {}) => {
+  const { message, privateKey } = defaultData(data);
+  const messageToSign = await openpgp.createCleartextMessage({ text: message });
   const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(privateKey);
 
   const signedClearMessage = await SignMessageService.signClearMessage(messageToSign, [adminDecryptedKey]);

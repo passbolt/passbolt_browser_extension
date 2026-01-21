@@ -13,16 +13,26 @@
 import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
 import ExternalResourceEntity from "../../entity/resource/external/externalResourceEntity";
 import ImportError from "../../../error/importError";
-import * as kdbxweb from 'kdbxweb';
+import * as kdbxweb from "kdbxweb";
 import ExternalTotpEntity from "../../entity/totp/externalTotpEntity";
 import ResourcesTypeImportParser from "./resourcesTypeImportParser";
-import {ICON_TYPE_KEEPASS_ICON_SET} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
-import {CUSTOM_FIELD_TYPE} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldEntity";
-import {v4 as uuidv4} from "uuid";
-import {RESOURCE_TYPE_VERSION_5} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import { ICON_TYPE_KEEPASS_ICON_SET } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
+import { CUSTOM_FIELD_TYPE } from "passbolt-styleguide/src/shared/models/entity/customField/customFieldEntity";
+import { v4 as uuidv4 } from "uuid";
+import { RESOURCE_TYPE_VERSION_5 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
-const KDBX_SUPPORTED_FIELDS = ['Title', 'URL', 'UserName', 'Notes', 'otp', 'TimeOtp-Secret-Base32', 'TimeOtp-Algorithm', 'TimeOtp-Length', 'TimeOtp-Period', 'Password'];
-
+const KDBX_SUPPORTED_FIELDS = [
+  "Title",
+  "URL",
+  "UserName",
+  "Notes",
+  "otp",
+  "TimeOtp-Secret-Base32",
+  "TimeOtp-Algorithm",
+  "TimeOtp-Length",
+  "TimeOtp-Period",
+  "Password",
+];
 
 class ResourcesKdbxImportParser {
   /**
@@ -80,7 +90,7 @@ class ResourcesKdbxImportParser {
   parseFolder(kdbxGroup) {
     const externalFolderDto = {
       name: ExternalFolderEntity.escapeName(kdbxGroup.name),
-      folder_parent_path: this.getKdbxEntryPath(kdbxGroup)
+      folder_parent_path: this.getKdbxEntryPath(kdbxGroup),
     };
 
     try {
@@ -98,7 +108,7 @@ class ResourcesKdbxImportParser {
    * @returns {array<KdbxGroup>}
    */
   getGroupChildrenGroups(kdbxGroup) {
-    return kdbxGroup.groups.filter(kdbxGroup => kdbxGroup.parentGroup.id === kdbxGroup.id);
+    return kdbxGroup.groups.filter((kdbxGroup) => kdbxGroup.parentGroup.id === kdbxGroup.id);
   }
 
   /**
@@ -107,7 +117,7 @@ class ResourcesKdbxImportParser {
    * @returns {array<KdbxEntry>}
    */
   getGroupChildrenEntries(kdbxGroup) {
-    return kdbxGroup.entries.filter(kdbxEntry => kdbxEntry.parentGroup.id === kdbxGroup.id);
+    return kdbxGroup.entries.filter((kdbxEntry) => kdbxEntry.parentGroup.id === kdbxGroup.id);
   }
 
   /**
@@ -118,10 +128,13 @@ class ResourcesKdbxImportParser {
   getKdbxEntryPath(kdbxEntry) {
     let ancestors = [];
     if (kdbxEntry.parentGroup) {
-      const getAncestors = group => group.parentGroup ? [...getAncestors(group.parentGroup), ExternalFolderEntity.escapeName(group.name)] : [ExternalFolderEntity.escapeName(group.name)];
+      const getAncestors = (group) =>
+        group.parentGroup
+          ? [...getAncestors(group.parentGroup), ExternalFolderEntity.escapeName(group.name)]
+          : [ExternalFolderEntity.escapeName(group.name)];
       ancestors = getAncestors(kdbxEntry.parentGroup);
     }
-    return ancestors.join('/');
+    return ancestors.join("/");
   }
 
   /**
@@ -131,16 +144,16 @@ class ResourcesKdbxImportParser {
    */
   parseResource(kdbxEntry) {
     const externalResourceDto = {
-      name: kdbxEntry.fields.get('Title') ? kdbxEntry.fields.get('Title').trim() : "",
-      username: kdbxEntry.fields.get('UserName') ? kdbxEntry.fields.get('UserName').trim() : "",
-      description: kdbxEntry.fields.get('Notes') ? kdbxEntry.fields.get('Notes').trim() : "",
+      name: kdbxEntry.fields.get("Title") ? kdbxEntry.fields.get("Title").trim() : "",
+      username: kdbxEntry.fields.get("UserName") ? kdbxEntry.fields.get("UserName").trim() : "",
+      description: kdbxEntry.fields.get("Notes") ? kdbxEntry.fields.get("Notes").trim() : "",
       folder_parent_path: this.getKdbxEntryPath(kdbxEntry),
-      secret_clear: '', // By default a secret can be null
+      secret_clear: "", // By default a secret can be null
       expired: kdbxEntry.times.expires ? kdbxEntry.times.expiryTime?.toISOString() : null,
     };
 
-    if (typeof kdbxEntry.fields.get('Password') === 'object') {
-      externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();
+    if (typeof kdbxEntry.fields.get("Password") === "object") {
+      externalResourceDto.secret_clear = kdbxEntry.fields.get("Password").getText();
     }
     try {
       this.parseUris(kdbxEntry, externalResourceDto);
@@ -172,7 +185,9 @@ class ResourcesKdbxImportParser {
     } catch (error) {
       // Remove all warnings related to this resource before adding the error
       this.importEntity.removeWarningsForResource(externalResourceDto);
-      this.importEntity.importResourcesErrors.push(new ImportError("Cannot parse resource", externalResourceDto, error));
+      this.importEntity.importResourcesErrors.push(
+        new ImportError("Cannot parse resource", externalResourceDto, error),
+      );
     }
   }
 
@@ -184,18 +199,17 @@ class ResourcesKdbxImportParser {
    * @return {void}
    */
   parseUris(kdbxEntry, externalResourceDto) {
-    const uri = kdbxEntry.fields.get('URL') ? kdbxEntry.fields.get('URL').trim() : "";
+    const uri = kdbxEntry.fields.get("URL") ? kdbxEntry.fields.get("URL").trim() : "";
     const additionalUris = [uri];
 
     let additionalEntriesUris = [...kdbxEntry.fields.entries()]
-      .filter(([key]) => key.startsWith('KP2A_URL'))
-      .map(([, value]) => (value));
+      .filter(([key]) => key.startsWith("KP2A_URL"))
+      .map(([, value]) => value);
 
     if (additionalEntriesUris.length > 31) {
-      this.importEntity.importResourcesWarnings.push(new ImportError(
-        "Resource has more than 32 URIs, only the first 32 will be imported",
-        externalResourceDto
-      ));
+      this.importEntity.importResourcesWarnings.push(
+        new ImportError("Resource has more than 32 URIs, only the first 32 will be imported", externalResourceDto),
+      );
     }
     additionalEntriesUris = additionalEntriesUris.slice(0, 31);
 
@@ -214,7 +228,7 @@ class ResourcesKdbxImportParser {
    * @returns {void}
    */
   parseIcon(kdbxEntry, externalResourceDto) {
-    if ((kdbxEntry.bgColor || kdbxEntry.icon)) {
+    if (kdbxEntry.bgColor || kdbxEntry.icon) {
       externalResourceDto.icon = {};
 
       if (kdbxEntry.icon) {
@@ -238,13 +252,13 @@ class ResourcesKdbxImportParser {
   parseCustomFields(kdbxEntry, externalResourceDto) {
     const customFields = [];
     kdbxEntry.fields.forEach((value, key) => {
-      if (!KDBX_SUPPORTED_FIELDS.includes(key) && !key.startsWith('KP2A_URL')) {
-        const customFieldValue = typeof value === 'string' ? value : value.getText();
+      if (!KDBX_SUPPORTED_FIELDS.includes(key) && !key.startsWith("KP2A_URL")) {
+        const customFieldValue = typeof value === "string" ? value : value.getText();
         customFields.push({
           id: uuidv4(),
           type: CUSTOM_FIELD_TYPE.TEXT,
           metadata_key: key,
-          secret_value: customFieldValue
+          secret_value: customFieldValue,
         });
       }
     });
@@ -262,12 +276,15 @@ class ResourcesKdbxImportParser {
    * @returns {void}
    */
   parseTotp(kdbxEntry, externalResourceDto) {
-    if (kdbxEntry.fields.get('otp')) {
-      const totpUrl = typeof kdbxEntry.fields.get('otp') === 'object' ? kdbxEntry.fields.get('otp').getText() : kdbxEntry.fields.get('otp');
+    if (kdbxEntry.fields.get("otp")) {
+      const totpUrl =
+        typeof kdbxEntry.fields.get("otp") === "object"
+          ? kdbxEntry.fields.get("otp").getText()
+          : kdbxEntry.fields.get("otp");
       const totpUrlDecoded = new URL(decodeURIComponent(totpUrl));
       const totp = ExternalTotpEntity.createTotpFromUrl(totpUrlDecoded);
       externalResourceDto.totp = totp.toDto();
-    } else if (typeof kdbxEntry.fields.get('TimeOtp-Secret-Base32') === 'object') {
+    } else if (typeof kdbxEntry.fields.get("TimeOtp-Secret-Base32") === "object") {
       const totp = ExternalTotpEntity.createTotpFromKdbxWindows(kdbxEntry.fields);
       externalResourceDto.totp = totp.toDto();
     }
@@ -290,11 +307,18 @@ class ResourcesKdbxImportParser {
 
     resourceType = ResourcesTypeImportParser.findPartialResourceType(this.resourceTypesCollection, scores);
     if (resourceType) {
-      this.importEntity.importResourcesWarnings.push(new ImportError("Resource partially imported", externalResourceDto));
+      this.importEntity.importResourcesWarnings.push(
+        new ImportError("Resource partially imported", externalResourceDto),
+      );
     } else {
       //Fallback default content type not supported
-      resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(this.resourceTypesCollection, this.metadataTypesSettings);
-      this.importEntity.importResourcesWarnings.push(new ImportError("Content type not supported but imported with default resource type", externalResourceDto));
+      resourceType = ResourcesTypeImportParser.fallbackDefaulResourceType(
+        this.resourceTypesCollection,
+        this.metadataTypesSettings,
+      );
+      this.importEntity.importResourcesWarnings.push(
+        new ImportError("Content type not supported but imported with default resource type", externalResourceDto),
+      );
     }
     return resourceType;
   }
@@ -305,7 +329,7 @@ class ResourcesKdbxImportParser {
    * @param {ExternalResourcesCollection} externalResourcesCollection The collection of folders
    */
   createAndChangeRootFolder() {
-    const rootFolderEntity = new ExternalFolderEntity({name: this.importEntity.ref});
+    const rootFolderEntity = new ExternalFolderEntity({ name: this.importEntity.ref });
     this.importEntity.importFolders.changeRootPath(rootFolderEntity);
     this.importEntity.importResources.changeRootPath(rootFolderEntity);
     this.importEntity.importFolders.push(rootFolderEntity);

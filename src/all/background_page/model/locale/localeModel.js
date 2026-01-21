@@ -13,11 +13,10 @@
  */
 import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
 import AccountSettingsService from "../../service/api/accountSettings/accountSettingsService";
-import {Config} from "../config";
+import { Config } from "../config";
 import i18n from "../../sdk/i18n";
 import LocaleEntity from "../entity/locale/localeEntity";
 import LocalesCollection from "../entity/locale/localesCollection";
-
 
 class LocaleModel {
   /**
@@ -26,8 +25,8 @@ class LocaleModel {
    */
   static get DEFAULT_LOCALE() {
     return new LocaleEntity({
-      locale: 'en-UK',
-      label: 'English'
+      locale: "en-UK",
+      label: "English",
     });
   }
 
@@ -57,7 +56,7 @@ class LocaleModel {
    */
   async initializeI18next(localeEntity) {
     const supportedLocales = await this.getSupportedOrganizationLocales();
-    const supportedLocalesId = supportedLocales.locales.map(supportedLocale => supportedLocale.locale);
+    const supportedLocalesId = supportedLocales.locales.map((supportedLocale) => supportedLocale.locale);
     i18n.init(localeEntity.locale, supportedLocalesId);
   }
 
@@ -99,7 +98,7 @@ class LocaleModel {
    */
   async getSupportedLocale(locale) {
     const supportedLocales = await this.getSupportedOrganizationLocales();
-    return supportedLocales.locales.find(supportedLocale => supportedLocale.locale === locale);
+    return supportedLocales.locales.find((supportedLocale) => supportedLocale.locale === locale);
   }
 
   /**
@@ -109,9 +108,11 @@ class LocaleModel {
    * @returns {string}
    */
   async getLocaleWithSimilarLanguage(locale) {
-    const localeNonExplicitLanguage = locale.split('-')[0];
+    const localeNonExplicitLanguage = locale.split("-")[0];
     const supportedLocales = await this.getSupportedOrganizationLocales();
-    return supportedLocales.locales.find(supportedLocale => localeNonExplicitLanguage === supportedLocale.locale.split('-')[0]);
+    return supportedLocales.locales.find(
+      (supportedLocale) => localeNonExplicitLanguage === supportedLocale.locale.split("-")[0],
+    );
   }
 
   /*
@@ -130,7 +131,7 @@ class LocaleModel {
    */
   async updateUserLocale(localeEntity) {
     await this.accountSettingsService.updateLocale(localeEntity.locale);
-    Config.write('user.settings.locale', localeEntity.locale);
+    Config.write("user.settings.locale", localeEntity.locale);
   }
 }
 

@@ -28,7 +28,7 @@ class PostLogoutService {
   static async exec() {
     await PostLogoutService.sendLogoutEventForWorkers();
     await LocalStorageService.flush();
-    await (new CopyToClipboardService()).flushTemporaryContentIfAny();
+    await new CopyToClipboardService().flushTemporaryContentIfAny();
     await StartLoopAuthSessionCheckService.clearAlarm();
     toolbarService.handleUserLoggedOut();
     resourceInProgressCacheService.reset();
@@ -40,7 +40,10 @@ class PostLogoutService {
    * @return {Promise<void>}
    */
   static async sendLogoutEventForWorkers() {
-    await WorkerService.emitOnWorkersWithName('passbolt.auth.after-logout', [AppPagemod.appName, InformCallToActionPagemod.appName]);
+    await WorkerService.emitOnWorkersWithName("passbolt.auth.after-logout", [
+      AppPagemod.appName,
+      InformCallToActionPagemod.appName,
+    ]);
   }
 }
 

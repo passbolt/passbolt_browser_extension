@@ -4,17 +4,17 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import {Config} from "./config";
+import { Config } from "./config";
 import UserSettings from "./userSettings/userSettings";
-import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
+import { ApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import Validator from "validator";
-import {ValidatorRule} from "../utils/validatorRules";
+import { ValidatorRule } from "../utils/validatorRules";
 
 /**
  * @deprecated
  * The class that deals with users.
  */
-const User = (function() {
+const User = function () {
   // see model/settings
   this.settings = new UserSettings();
 
@@ -34,9 +34,9 @@ const User = (function() {
    * @returns {object} The user in case of success
    * @throw Error if the user is not valid
    */
-  this.validate = function(user, fields) {
-    if (typeof fields === 'undefined') {
-      fields = ['id', 'username', 'firstname', 'lastname'];
+  this.validate = function (user, fields) {
+    if (typeof fields === "undefined") {
+      fields = ["id", "username", "firstname", "lastname"];
     }
 
     const errors = [];
@@ -53,7 +53,7 @@ const User = (function() {
 
     if (errors.length > 0) {
       // Return exception with details in validationErrors.
-      const e = new Error('user could not be validated');
+      const e = new Error("user could not be validated");
       // Add validation errors to the error object.
       e.validationErrors = errors;
       throw e;
@@ -71,33 +71,33 @@ const User = (function() {
    * @throw Error if the field is not valid
    * @private
    */
-  this.__validate = function(field, value) {
+  this.__validate = function (field, value) {
     switch (field) {
-      case 'firstname':
-        if (typeof value === 'undefined' || value === '') {
-          throw new Error('The first name cannot be empty');
+      case "firstname":
+        if (typeof value === "undefined" || value === "") {
+          throw new Error("The first name cannot be empty");
         }
         if (!ValidatorRule.isUtf8(value)) {
-          throw new Error('The first name should be a valid UTF8 string');
+          throw new Error("The first name should be a valid UTF8 string");
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error('The first name length should be maximum 255 characters.');
+          throw new Error("The first name length should be maximum 255 characters.");
         }
         break;
-      case 'lastname':
-        if (typeof value === 'undefined' || value === '') {
-          throw new Error('The last name cannot be empty');
+      case "lastname":
+        if (typeof value === "undefined" || value === "") {
+          throw new Error("The last name cannot be empty");
         }
         if (!ValidatorRule.isUtf8(value)) {
-          throw new Error('The last name should be a valid UTF8 string');
+          throw new Error("The last name should be a valid UTF8 string");
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error('The last name length should be maximum 255 characters.');
+          throw new Error("The last name length should be maximum 255 characters.");
         }
         break;
-      case 'username':
-        if (typeof value === 'undefined' || value === '') {
-          throw new Error('The username cannot be empty');
+      case "username":
+        if (typeof value === "undefined" || value === "") {
+          throw new Error("The username cannot be empty");
         }
         /*
          * @deprecated the username could be validated using a custom application setting.
@@ -105,18 +105,18 @@ const User = (function() {
          * user is retrieved from or saved in the local storage.
          */
         if (!ValidatorRule.isUtf8(value)) {
-          throw new Error('The username should be a valid email address');
+          throw new Error("The username should be a valid email address");
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error('The username length should be maximum 255 characters.');
+          throw new Error("The username length should be maximum 255 characters.");
         }
         break;
-      case 'id':
-        if (typeof value === 'undefined' || value === '') {
-          throw new Error('The user id cannot be empty');
+      case "id":
+        if (typeof value === "undefined" || value === "") {
+          throw new Error("The user id cannot be empty");
         }
         if (!Validator.isUUID(value)) {
-          throw new Error('The user id should be a valid UUID');
+          throw new Error("The user id should be a valid UUID");
         }
         break;
       default:
@@ -133,13 +133,12 @@ const User = (function() {
    * @return {bool}
    * @throw Error if the firsname or the lastname are not valid
    */
-  this.setName = function(firstname, lastname) {
-    this.__validate('firstname', firstname);
-    this.__validate('lastname', lastname);
+  this.setName = function (firstname, lastname) {
+    this.__validate("firstname", firstname);
+    this.__validate("lastname", lastname);
     this._user.lastname = lastname;
     this._user.firstname = firstname;
-    return (Config.write('user.firstname', firstname)
-      && Config.write('user.lastname', lastname));
+    return Config.write("user.firstname", firstname) && Config.write("user.lastname", lastname);
   };
 
   /**
@@ -149,10 +148,10 @@ const User = (function() {
    * @return {bool}
    * @throw Error if the username is not valid
    */
-  this.setUsername = function(username) {
-    this.__validate('username', username);
+  this.setUsername = function (username) {
+    this.__validate("username", username);
     this._user.username = username;
-    return (Config.write('user.username', username));
+    return Config.write("user.username", username);
   };
 
   /**
@@ -162,10 +161,10 @@ const User = (function() {
    * @return {bool}
    * @throw Error if the user id is not valid
    */
-  this.setId = function(id) {
-    this.__validate('id', id);
+  this.setId = function (id) {
+    this.__validate("id", id);
     this._user.id = id;
-    return (Config.write('user.id', id));
+    return Config.write("user.id", id);
   };
 
   /**
@@ -175,15 +174,15 @@ const User = (function() {
    * @return {object} The user
    * @throw Error if the user information are not valid
    */
-  this.set = function(user) {
-    if (typeof user === 'undefined') {
-      throw new Error('The user cannot be empty');
+  this.set = function (user) {
+    if (typeof user === "undefined") {
+      throw new Error("The user cannot be empty");
     }
     this.setId(user.id);
     this.setUsername(user.username);
     this.setName(user.firstname, user.lastname);
 
-    if (typeof user.settings !== 'undefined') {
+    if (typeof user.settings !== "undefined") {
       this.settings.set(user.settings);
     }
 
@@ -205,9 +204,9 @@ const User = (function() {
    * @return {object}
    * @throw Error if the user or the setting are not valid
    */
-  this.get = function(data) {
+  this.get = function (data) {
     try {
-      if (typeof data !== 'undefined' && typeof data.user !== 'undefined') {
+      if (typeof data !== "undefined" && typeof data.user !== "undefined") {
         this._getLocal(data.user);
       } else {
         this._getLocal();
@@ -215,9 +214,9 @@ const User = (function() {
       const user = this._user;
 
       // Get settings according to data provided.
-      if (typeof data !== 'undefined' && typeof data.user !== 'undefined' && typeof data.settings !== 'undefined') {
+      if (typeof data !== "undefined" && typeof data.user !== "undefined" && typeof data.settings !== "undefined") {
         user.settings = this.settings.get(data.settings);
-      } else if (typeof data === 'undefined') {
+      } else if (typeof data === "undefined") {
         // If no data is provided, get everything.
         user.settings = this.settings.get();
       }
@@ -225,7 +224,7 @@ const User = (function() {
       return user;
     } catch (error) {
       console.error(error);
-      throw new Error('The user is not set');
+      throw new Error("The user is not set");
     }
   };
 
@@ -237,17 +236,12 @@ const User = (function() {
    * @return {object}
    * @throw Exception in case a data doesn't validate before being returned
    */
-  this._getLocal = function(fields) {
+  this._getLocal = function (fields) {
     // Default data to return for user.
-    const userDefaultFields = [
-      "id",
-      "username",
-      "firstname",
-      "lastname"
-    ];
+    const userDefaultFields = ["id", "username", "firstname", "lastname"];
 
     // If data is not provided as a parameter, we use default data.
-    if (typeof fields === 'undefined') {
+    if (typeof fields === "undefined") {
       fields = userDefaultFields;
     }
 
@@ -261,7 +255,7 @@ const User = (function() {
       } catch (error) {
         console.error(error);
         this._user[varName] = {};
-        throw new Error('The user is not set');
+        throw new Error("The user is not set");
       }
     }
 
@@ -273,7 +267,7 @@ const User = (function() {
    *
    * @returns {boolean}
    */
-  this.isValid = function() {
+  this.isValid = function () {
     try {
       this.get();
     } catch (error) {
@@ -287,9 +281,10 @@ const User = (function() {
    * Retrieve and the store the user csrf token.
    * @return {Promise<void>}
    */
-  this.retrieveAndStoreCsrfToken = async function() {
-    const url = this.settings.getDomain().slice(-1) === "/" ? this.settings.getDomain() : `${this.settings.getDomain()}/`;
-    const csrfToken = await browser.cookies.get({name: "csrfToken", url: url});
+  this.retrieveAndStoreCsrfToken = async function () {
+    const url =
+      this.settings.getDomain().slice(-1) === "/" ? this.settings.getDomain() : `${this.settings.getDomain()}/`;
+    const csrfToken = await browser.cookies.get({ name: "csrfToken", url: url });
     this.setCsrfToken(csrfToken?.value);
   };
 
@@ -298,7 +293,7 @@ const User = (function() {
    *
    * @return {string}
    */
-  this.getCsrfToken = function() {
+  this.getCsrfToken = function () {
     return this._csrfToken;
   };
 
@@ -307,7 +302,7 @@ const User = (function() {
    *
    * @returns {Promise<string>}
    */
-  this.getOrFetchCsrfToken = async function() {
+  this.getOrFetchCsrfToken = async function () {
     if (!this._csrfToken) {
       await this.retrieveAndStoreCsrfToken();
     }
@@ -319,7 +314,7 @@ const User = (function() {
    *
    * @param {string} csrfToken The csrf token to set
    */
-  this.setCsrfToken = function(csrfToken) {
+  this.setCsrfToken = function (csrfToken) {
     this._csrfToken = csrfToken;
   };
 
@@ -327,21 +322,20 @@ const User = (function() {
    * Return API Client options such as Domain.
    * @return {ApiClientOptions} apiClientOptions
    */
-  this.getApiClientOptions = async function() {
-    return new ApiClientOptions()
-      .setBaseUrl(this.settings.getDomain());
+  this.getApiClientOptions = async function () {
+    return new ApiClientOptions().setBaseUrl(this.settings.getDomain());
   };
 
   /**
    * Update the security token
    * @param token {{code: string, color: string, textColor: string}} The security token
    */
-  this.updateSecurityToken = async function(token) {
+  this.updateSecurityToken = async function (token) {
     this.settings.setSecurityToken(token);
   };
-});
+};
 
-const UserSingleton = (function() {
+const UserSingleton = (function () {
   let instance;
 
   function createInstance() {
@@ -349,7 +343,7 @@ const UserSingleton = (function() {
   }
 
   return {
-    getInstance: function() {
+    getInstance: function () {
       if (!instance) {
         instance = createInstance();
       }

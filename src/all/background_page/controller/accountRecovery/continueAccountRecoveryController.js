@@ -56,7 +56,10 @@ class ContinueAccountRecoveryController {
   async exec() {
     try {
       const accountTemporary = await this._buildTemporaryAccountEntity();
-      await this.accountRecoveryModel.continue(accountTemporary.account.userId, accountTemporary.account.authenticationTokenToken);
+      await this.accountRecoveryModel.continue(
+        accountTemporary.account.userId,
+        accountTemporary.account.authenticationTokenToken,
+      );
       await AccountTemporarySessionStorageService.set(accountTemporary);
     } catch (error) {
       /*
@@ -64,7 +67,9 @@ class ContinueAccountRecoveryController {
        * Stop the account recovery process and destroy the iframe, the application served by the API will handle the user
        * from here.
        */
-      (await WorkerService.get('AccountRecoveryBootstrap', this.worker.tab.id)).port.emit('passbolt.account-recovery-bootstrap.remove-iframe');
+      (await WorkerService.get("AccountRecoveryBootstrap", this.worker.tab.id)).port.emit(
+        "passbolt.account-recovery-bootstrap.remove-iframe",
+      );
       throw error;
     }
   }
@@ -77,7 +82,7 @@ class ContinueAccountRecoveryController {
   async _buildTemporaryAccountEntity() {
     const accountTemporaryDto = {
       account: this.account.toDto(AccountAccountRecoveryEntity.ALL_CONTAIN_OPTIONS),
-      worker_id: this.worker.port._port.name
+      worker_id: this.worker.port._port.name,
     };
     return new AccountTemporaryEntity(accountTemporaryDto);
   }

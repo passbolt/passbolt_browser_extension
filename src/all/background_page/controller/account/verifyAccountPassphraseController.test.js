@@ -14,12 +14,12 @@
 import VerifyAccountPassphraseController from "./verifyAccountPassphraseController";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 describe("VerifyAccountPassphraseController", () => {
   describe("VerifyAccountPassphraseController::exec", () => {
-    it("Should pass if the passphrase is correct.", async() => {
+    it("Should pass if the passphrase is correct.", async () => {
       const account = new AccountEntity(defaultAccountDto());
       const controller = new VerifyAccountPassphraseController(null, null, account);
 

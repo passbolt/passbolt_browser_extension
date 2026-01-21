@@ -13,8 +13,8 @@
  */
 
 import ResponseClipboardOffscreenService from "./responseClipboardOffscreenService";
-import {defaultClipboardWriteResponseMessage} from "./responseClipboardOffscreenService.test.data";
-import {defaultCallbacks} from "../network/responseFetchOffscreenService.test.data";
+import { defaultClipboardWriteResponseMessage } from "./responseClipboardOffscreenService.test.data";
+import { defaultCallbacks } from "../network/responseFetchOffscreenService.test.data";
 
 describe("ResponseClipboardOffscreenService", () => {
   describe("::handleClipboardResponse", () => {
@@ -24,7 +24,7 @@ describe("ResponseClipboardOffscreenService", () => {
       const id = crypto.randomUUID();
       const callbacks = defaultCallbacks();
 
-      const message = defaultClipboardWriteResponseMessage({id});
+      const message = defaultClipboardWriteResponseMessage({ id });
       ResponseClipboardOffscreenService.handleClipboardResponse(message, callbacks);
 
       expect(callbacks.resolve).toHaveBeenCalledTimes(1);

@@ -11,33 +11,39 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.1.0
  */
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
 import AccountEntity from "../../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
-import {decryptedMetadataPrivateKeyDto, defaultMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
+import {
+  decryptedMetadataPrivateKeyDto,
+  defaultMetadataPrivateKeyDto,
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 import MetadataPrivateKeyApiService from "./metadataPrivateKeyApiService";
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
-import {shareMetadataPrivateKeysWithDecryptedKeyDtos, shareMetadataPrivateKeysWithEncryptedKeyDtos} from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection.test.data";
+import {
+  shareMetadataPrivateKeysWithDecryptedKeyDtos,
+  shareMetadataPrivateKeysWithEncryptedKeyDtos,
+} from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection.test.data";
 import ShareMetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
 
 describe("metadataPrivateKeyApiService", () => {
   let apiClientOptions;
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
     const account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  describe('::update', () => {
-    it("Save the new metadata private key on the API.", async() => {
+  describe("::update", () => {
+    it("Save the new metadata private key on the API.", async () => {
       expect.assertions(2);
 
       const encryptedMetadataPrivateKeyDto = defaultMetadataPrivateKeyDto();
 
-      fetch.doMockOnceIf(new RegExp(`/metadata/keys/private/${encryptedMetadataPrivateKeyDto.id}`), async req => {
+      fetch.doMockOnceIf(new RegExp(`/metadata/keys/private/${encryptedMetadataPrivateKeyDto.id}`), async (req) => {
         expect(req.method).toEqual("PUT");
         return mockApiResponse(encryptedMetadataPrivateKeyDto);
       });
@@ -49,7 +55,7 @@ describe("metadataPrivateKeyApiService", () => {
       expect(resultDto).toEqual(encryptedMetadataPrivateKeyDto);
     });
 
-    it("throws an invalid parameter error if the settings parameter is not valid", async() => {
+    it("throws an invalid parameter error if the settings parameter is not valid", async () => {
       expect.assertions(1);
 
       const service = new MetadataPrivateKeyApiService(apiClientOptions);
@@ -57,7 +63,7 @@ describe("metadataPrivateKeyApiService", () => {
       await expect(() => service.update(42)).rejects.toThrow(TypeError);
     });
 
-    it("throws an error if the metadata private key is decrypted", async() => {
+    it("throws an error if the metadata private key is decrypted", async () => {
       expect.assertions(1);
 
       const decryptedMetadataPrivateKey = decryptedMetadataPrivateKeyDto();
@@ -69,13 +75,13 @@ describe("metadataPrivateKeyApiService", () => {
     });
   });
 
-  describe('::create', () => {
-    it("Share the metadata private keys with the user on the API.", async() => {
+  describe("::create", () => {
+    it("Share the metadata private keys with the user on the API.", async () => {
       expect.assertions(1);
 
       const shareMetadataPrivateKeysDtos = shareMetadataPrivateKeysWithEncryptedKeyDtos();
 
-      fetch.doMockOnceIf(new RegExp(`/metadata/keys/private`), async req => {
+      fetch.doMockOnceIf(new RegExp(`/metadata/keys/private`), async (req) => {
         expect(req.method).toEqual("POST");
         return mockApiResponse(shareMetadataPrivateKeysDtos);
       });
@@ -85,7 +91,7 @@ describe("metadataPrivateKeyApiService", () => {
       await service.create(entity);
     });
 
-    it("throws an invalid parameter error if the settings parameter is not valid", async() => {
+    it("throws an invalid parameter error if the settings parameter is not valid", async () => {
       expect.assertions(1);
 
       const service = new MetadataPrivateKeyApiService(apiClientOptions);
@@ -93,7 +99,7 @@ describe("metadataPrivateKeyApiService", () => {
       await expect(() => service.create(42)).rejects.toThrow(TypeError);
     });
 
-    it("throws an error if the metadataPrivateKey is decrypted", async() => {
+    it("throws an error if the metadataPrivateKey is decrypted", async () => {
       expect.assertions(1);
 
       const decryptedMetadataPrivateKey = shareMetadataPrivateKeysWithDecryptedKeyDtos();

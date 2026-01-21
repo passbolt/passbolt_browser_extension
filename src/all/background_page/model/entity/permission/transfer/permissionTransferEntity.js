@@ -22,21 +22,21 @@ class PermissionTransferEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
+      type: "object",
+      required: [
         "id", // Permission ID to promote to permission
         "aco_foreign_key", // Resource or Folder UUID
       ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "aco_foreign_key": {
-          "type": "string",
-          "format": "uuid"
+        aco_foreign_key: {
+          type: "string",
+          format: "uuid",
         },
-      }
+      },
     };
   }
 

@@ -29,7 +29,7 @@ export default class ResponseFetchOffscreenService {
   static handleFetchResponse(message, callbacks) {
     ResponseFetchOffscreenService.assertMessage(message);
 
-    const {type, data} = message;
+    const { type, data } = message;
 
     if (type === FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS) {
       callbacks.resolve(ResponseFetchOffscreenService.buildFetchResponse(data));
@@ -47,7 +47,9 @@ export default class ResponseFetchOffscreenService {
    */
   static assertMessage(message) {
     if (!FETCH_OFFSCREEN_RESPONSE_TYPES.includes(message?.type)) {
-      throw new Error(`ResponseFetchOffscreenService: message.type should be one of the following ${FETCH_OFFSCREEN_RESPONSE_TYPES.join(", ")}.`);
+      throw new Error(
+        `ResponseFetchOffscreenService: message.type should be one of the following ${FETCH_OFFSCREEN_RESPONSE_TYPES.join(", ")}.`,
+      );
     }
 
     if (!(message?.data instanceof Object)) {

@@ -23,7 +23,7 @@ beforeEach(() => {
 
 describe("PassphraseStorageService", () => {
   describe("PassphraseStorageService::init", () => {
-    it("should flush the storage during initialization", async() => {
+    it("should flush the storage during initialization", async () => {
       expect.assertions(1);
       const spyOnFlush = jest.spyOn(PassphraseStorageService, "flush");
       await PassphraseStorageService.flush();
@@ -33,7 +33,7 @@ describe("PassphraseStorageService", () => {
   });
 
   describe("PassphraseStorageService::set", () => {
-    it("Should register the given passphrase on the storage without time limit", async() => {
+    it("Should register the given passphrase on the storage without time limit", async () => {
       expect.assertions(4);
       const spyOnStorageSet = jest.spyOn(browser.storage.session, "set");
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
@@ -43,14 +43,14 @@ describe("PassphraseStorageService", () => {
       await PassphraseStorageService.set(passphrase, -1);
 
       expect(spyOnStorageSet).toHaveBeenCalledTimes(1);
-      expect(spyOnStorageSet).toHaveBeenCalledWith({passphrase: passphrase});
+      expect(spyOnStorageSet).toHaveBeenCalledWith({ passphrase: passphrase });
 
       //Called 2 times: at init and during the ::set
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(2);
       expect(spyOnAlarmClear).toHaveBeenCalledWith("PassphraseStorageFlush");
     });
 
-    it("Should register the given passphrase on the storage with a time limit", async() => {
+    it("Should register the given passphrase on the storage with a time limit", async () => {
       expect.assertions(11);
       const spyOnStorageSet = jest.spyOn(browser.storage.session, "set");
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
@@ -58,7 +58,7 @@ describe("PassphraseStorageService", () => {
       const spyOnAlarmListeners = jest.spyOn(browser.alarms.onAlarm, "addListener");
       const spyOnFlush = jest.spyOn(PassphraseStorageService, "flush");
 
-      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
+      browser.alarms.onAlarm.addListener(async (alarm) => await PassphraseStorageService.handleFlushEvent(alarm));
 
       await PassphraseStorageService.flush();
       expect(spyOnFlush).toHaveBeenCalledTimes(1);
@@ -70,7 +70,7 @@ describe("PassphraseStorageService", () => {
       await PassphraseStorageService.set(passphrase, 30);
 
       expect(spyOnStorageSet).toHaveBeenCalledTimes(1);
-      expect(spyOnStorageSet).toHaveBeenCalledWith({passphrase: passphrase});
+      expect(spyOnStorageSet).toHaveBeenCalledWith({ passphrase: passphrase });
 
       //Called 2 times: at init and during the ::set
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(2);
@@ -91,7 +91,7 @@ describe("PassphraseStorageService", () => {
   });
 
   describe("PassphraseStorageService::get", () => {
-    it("should return the stored passphrase", async() => {
+    it("should return the stored passphrase", async () => {
       expect.assertions(2);
 
       await PassphraseStorageService.flush();
@@ -106,10 +106,10 @@ describe("PassphraseStorageService", () => {
       expect(storedPassphrase).toBe(passphrase);
     });
 
-    it("should return null after the delay is passed", async() => {
+    it("should return null after the delay is passed", async () => {
       expect.assertions(3);
 
-      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
+      browser.alarms.onAlarm.addListener(async (alarm) => await PassphraseStorageService.handleFlushEvent(alarm));
 
       await PassphraseStorageService.flush();
 
@@ -130,7 +130,7 @@ describe("PassphraseStorageService", () => {
   });
 
   describe("PassphraseStorageService::getOrFail", () => {
-    it("returns the stored passphrase", async() => {
+    it("returns the stored passphrase", async () => {
       expect.assertions(1);
       const passphrase = "This is a very strong passphrase";
       await PassphraseStorageService.set(passphrase);
@@ -138,7 +138,7 @@ describe("PassphraseStorageService", () => {
       expect(storedPassphrase).toBe(passphrase);
     });
 
-    it("throw an error if no passphrase is stored", async() => {
+    it("throw an error if no passphrase is stored", async () => {
       expect.assertions(1);
       await PassphraseStorageService.flush();
       await expect(() => PassphraseStorageService.getOrFail()).rejects.toThrow(UserPassphraseRequiredError);
@@ -146,13 +146,13 @@ describe("PassphraseStorageService", () => {
   });
 
   describe("PassphraseStorageService::flushPassphrase", () => {
-    it("should remove the registered passphrase without changing the alarms", async() => {
+    it("should remove the registered passphrase without changing the alarms", async () => {
       expect.assertions(6);
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       const spyOnAlarmListeners = jest.spyOn(browser.alarms.onAlarm, "addListener");
 
-      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
+      browser.alarms.onAlarm.addListener(async (alarm) => await PassphraseStorageService.handleFlushEvent(alarm));
 
       await PassphraseStorageService.flush();
 
@@ -180,7 +180,7 @@ describe("PassphraseStorageService", () => {
   });
 
   describe("PassphraseStorageService::flush", () => {
-    it("should remove the passphrase from the storage", async() => {
+    it("should remove the passphrase from the storage", async () => {
       expect.assertions(2);
 
       await PassphraseStorageService.flush();
@@ -197,14 +197,14 @@ describe("PassphraseStorageService", () => {
       expect(flushedPassphrase).toBeNull();
     });
 
-    it("should remove the passphrase from the storage and remove the timers and listeners", async() => {
+    it("should remove the passphrase from the storage and remove the timers and listeners", async () => {
       expect.assertions(6);
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       const spyOnAlarmListeners = jest.spyOn(browser.alarms.onAlarm, "addListener");
       const spyOnAlarmRemoveListeners = jest.spyOn(browser.alarms.onAlarm, "removeListener");
 
-      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
+      browser.alarms.onAlarm.addListener(async (alarm) => await PassphraseStorageService.handleFlushEvent(alarm));
 
       await PassphraseStorageService.flush();
 

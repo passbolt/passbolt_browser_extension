@@ -45,7 +45,7 @@ class HasSsoLoginErrorController {
    */
   async exec() {
     const url = new URL(this.worker.tab.url);
-    const errorCase = url.searchParams.get('case') || null;
+    const errorCase = url.searchParams.get("case") || null;
     return errorCase === SSO_LOGIN_ERROR_CASE;
   }
 }

@@ -14,7 +14,7 @@
 import ResourceService from "../../api/resource/resourceService";
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import i18n from "../../../sdk/i18n";
-import {assertArrayUUID} from "../../../utils/assertions";
+import { assertArrayUUID } from "../../../utils/assertions";
 import ExecuteConcurrentlyService from "../../execute/executeConcurrentlyService";
 class DeleteResourceService {
   /**
@@ -42,12 +42,14 @@ class DeleteResourceService {
      */
     this.progressService.finishStep(i18n.t("Deleting Resource(s)"), true);
     let deleteCounter = 0;
-    const deleteCallBacks = resourceId => {
-      this.progressService.updateStepMessage(i18n.t("Deleting resource(s) {{counter}}/{{total}}", {counter: ++deleteCounter, total: resourceIds.length}));
+    const deleteCallBacks = (resourceId) => {
+      this.progressService.updateStepMessage(
+        i18n.t("Deleting resource(s) {{counter}}/{{total}}", { counter: ++deleteCounter, total: resourceIds.length }),
+      );
       return this.resourceService.delete(resourceId);
     };
 
-    const callbacks = resourceIds.map(resourceId => () => deleteCallBacks(resourceId));
+    const callbacks = resourceIds.map((resourceId) => () => deleteCallBacks(resourceId));
     const executeConcurrentlyService = new ExecuteConcurrentlyService();
     await executeConcurrentlyService.execute(callbacks, 5);
 
@@ -55,6 +57,5 @@ class DeleteResourceService {
     await ResourceLocalStorage.deleteResources(resourceIds);
   }
 }
-
 
 export default DeleteResourceService;

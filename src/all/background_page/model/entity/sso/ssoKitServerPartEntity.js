@@ -17,7 +17,7 @@ import Validator from "validator";
 
 const ENTITY_NAME = "SsoKitServerPartEntity";
 const JWK_ALGORITHM_AES_256_BITS = "A256GCM";
-import {Buffer} from 'buffer';
+import { Buffer } from "buffer";
 
 /**
  * Entity related to the account recovery organization policy
@@ -27,11 +27,14 @@ class SsoKitServerPartEntity extends Entity {
    * @inheritDoc
    */
   constructor(ssoUserServerDataDto, options = {}) {
-    super(EntitySchema.validate(
-      SsoKitServerPartEntity.ENTITY_NAME,
-      ssoUserServerDataDto,
-      SsoKitServerPartEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        SsoKitServerPartEntity.ENTITY_NAME,
+        ssoUserServerDataDto,
+        SsoKitServerPartEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -40,38 +43,38 @@ class SsoKitServerPartEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": ["data"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["data"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
+        user_id: {
+          type: "string",
+          format: "uuid",
         },
-        "data": {
-          "type": "x-custom",
-          "validationCallback": SsoKitServerPartEntity.validateData
+        data: {
+          type: "x-custom",
+          validationCallback: SsoKitServerPartEntity.validateData,
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
-      }
+      },
     };
   }
 
@@ -103,28 +106,26 @@ class SsoKitServerPartEntity extends Entity {
     const deserializedKey = JSON.parse(Buffer.from(value, "base64").toString());
 
     if (deserializedKey.alg !== JWK_ALGORITHM_AES_256_BITS) {
-      throw new TypeError('The SSO server key should use the algorithm AES 256 bits');
+      throw new TypeError("The SSO server key should use the algorithm AES 256 bits");
     }
 
     if (!deserializedKey.ext) {
-      throw new TypeError('The SSO server key should be extractable');
+      throw new TypeError("The SSO server key should be extractable");
     }
 
     if (deserializedKey.kty !== "oct") {
-      throw new TypeError('The SSO server key type should be an octect sequence');
+      throw new TypeError("The SSO server key type should be an octect sequence");
     }
 
     if (typeof deserializedKey.k !== "string") {
-      throw new TypeError('The SSO server key data should be a string');
+      throw new TypeError("The SSO server key data should be a string");
     }
 
     const usages = deserializedKey.key_ops;
-    const areUsagesValid = usages.length === 2
-      && usages.includes("encrypt")
-      && usages.includes("decrypt");
+    const areUsagesValid = usages.length === 2 && usages.includes("encrypt") && usages.includes("decrypt");
 
     if (!areUsagesValid) {
-      throw new TypeError('The SSO server key be usable for and only for encryption and decryption');
+      throw new TypeError("The SSO server key be usable for and only for encryption and decryption");
     }
   }
 

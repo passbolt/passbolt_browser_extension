@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const ORGANIZATION_SETTINGS_SERVICE_RESOURCE_NAME = 'settings';
+const ORGANIZATION_SETTINGS_SERVICE_RESOURCE_NAME = "settings";
 
 class OrganizationSettingsService extends AbstractService {
   /**
@@ -49,7 +49,7 @@ class OrganizationSettingsService extends AbstractService {
     body.serverTimeDiff = null;
     if (response.header.servertime) {
       const currentTime = new Date();
-      body.serverTimeDiff = (response.header.servertime * 1000) - currentTime.getTime();
+      body.serverTimeDiff = response.header.servertime * 1000 - currentTime.getTime();
     }
     return body;
   }

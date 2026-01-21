@@ -21,14 +21,14 @@ import RolesUpdateLocalStorageController from "../controller/role/rolesUpdateLoc
  * @param {ApiClientOptions} apiClientOptions the api client options
  * @param {AccountEntity} the currently signed in user account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Get the roles from the local storage.
    *
    * @listens passbolt.role.get-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.role.get-all', async requestId => {
+  worker.port.on("passbolt.role.get-all", async (requestId) => {
     const controller = new FindAllRoleController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
@@ -39,10 +39,10 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.role.update-local-storage
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.role.update-local-storage', async requestId => {
+  worker.port.on("passbolt.role.update-local-storage", async (requestId) => {
     const controller = new RolesUpdateLocalStorageController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 };
 
-export const RoleEvents = {listen};
+export const RoleEvents = { listen };

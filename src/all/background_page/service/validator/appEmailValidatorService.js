@@ -33,8 +33,7 @@ export default class AppEmailValidatorService {
    * @returns {boolean}
    */
   static validate(value) {
-    return AppEmailValidatorService.getValidator()
-      .validate(value);
+    return AppEmailValidatorService.getValidator().validate(value);
   }
 
   /**
@@ -48,9 +47,7 @@ export default class AppEmailValidatorService {
   static getValidator() {
     const appSettings = OrganizationSettingsModel.get();
 
-    if (appSettings
-      && appSettings instanceof OrganizationSettingsEntity
-      && appSettings.emailValidateRegex) {
+    if (appSettings && appSettings instanceof OrganizationSettingsEntity && appSettings.emailValidateRegex) {
       return new IsRegexValidator(appSettings.emailValidateRegex);
     }
 

@@ -15,7 +15,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import MfaTotpSetupInfoEntity from "./mfaTotpSetupInfoEntity";
-import {defaultTotpQrCodeData} from "./mfaTotpSetupInfoEntity.test.data";
+import { defaultTotpQrCodeData } from "./mfaTotpSetupInfoEntity.test.data";
 
 describe("MfaTotpSetupInfoEntity", () => {
   it("schema must validate", () => {
@@ -37,31 +37,35 @@ describe("MfaTotpSetupInfoEntity", () => {
       new MfaTotpSetupInfoEntity({});
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('otpProvisioningUri', 'required')).toBe(true);
+      expect(error.hasError("otpProvisioningUri", "required")).toBe(true);
     }
   });
   it("constructor returns validation error if properties is not a valid type", () => {
     expect.assertions(2);
 
     try {
-      new MfaTotpSetupInfoEntity(defaultTotpQrCodeData({
-        otpProvisioningUri: null,
-      }));
+      new MfaTotpSetupInfoEntity(
+        defaultTotpQrCodeData({
+          otpProvisioningUri: null,
+        }),
+      );
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('otpProvisioningUri', 'type')).toBe(true);
+      expect(error.hasError("otpProvisioningUri", "type")).toBe(true);
     }
   });
   it("constructor returns validation error if uri does not match the pattern", () => {
     expect.assertions(2);
 
     try {
-      new MfaTotpSetupInfoEntity(defaultTotpQrCodeData({
-        otpProvisioningUri: "test",
-      }));
+      new MfaTotpSetupInfoEntity(
+        defaultTotpQrCodeData({
+          otpProvisioningUri: "test",
+        }),
+      );
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.hasError('otpProvisioningUri', 'pattern')).toBe(true);
+      expect(error.hasError("otpProvisioningUri", "pattern")).toBe(true);
     }
   });
 });

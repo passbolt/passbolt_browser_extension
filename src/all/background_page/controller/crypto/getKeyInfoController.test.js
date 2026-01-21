@@ -13,11 +13,11 @@
  */
 
 import GetKeyInfoController from "./getKeyInfoController";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {adaExternalPrivateGpgKeyEntityDto} from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { adaExternalPrivateGpgKeyEntityDto } from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity.test.data";
 
 describe("GetKeyInfoController", () => {
-  it("Should return the key info.", async() => {
+  it("Should return the key info.", async () => {
     expect.assertions(1);
     const controller = new GetKeyInfoController();
     const externalGpgKeyEntity = await controller.exec(pgpKeys.ada.private);
@@ -30,7 +30,7 @@ describe("GetKeyInfoController", () => {
     expect(externalGpgKeyEntityDto).toStrictEqual(expectedExternalGpgKeyEntityDto);
   });
 
-  it("Should throw an error if no key is provided", async() => {
+  it("Should throw an error if no key is provided", async () => {
     expect.assertions(1);
     const controller = new GetKeyInfoController();
     const externalGpgKeyEntityPromise = controller.exec();

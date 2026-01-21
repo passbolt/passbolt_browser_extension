@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-import * as openpgp from 'openpgp';
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import * as openpgp from "openpgp";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class DecryptMessageService {
   /**
@@ -30,11 +30,11 @@ class DecryptMessageService {
     }
     OpenpgpAssertion.assertMessage(message);
 
-    const {data: decryptedMessage, signatures} = await openpgp.decrypt({
+    const { data: decryptedMessage, signatures } = await openpgp.decrypt({
       message: message,
       passwords: [password],
       verificationKeys: verificationKeys,
-      expectSigned: Boolean(verificationKeys)
+      expectSigned: Boolean(verificationKeys),
     });
 
     if (verificationKeys) {
@@ -59,11 +59,11 @@ class DecryptMessageService {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertSessionKey(sessionKey);
 
-    const {data: decryptedMessage, signatures} = await openpgp.decrypt({
+    const { data: decryptedMessage, signatures } = await openpgp.decrypt({
       message: message,
       sessionKeys: sessionKey,
       verificationKeys: verificationKeys,
-      expectSigned: Boolean(verificationKeys)
+      expectSigned: Boolean(verificationKeys),
     });
 
     if (verificationKeys) {
@@ -88,7 +88,8 @@ class DecryptMessageService {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertDecryptedPrivateKey(decryptionKey);
 
-    const throwOnInvalidSignaturesVerification = options?.throwOnInvalidSignaturesVerification !== false && Boolean(verificationKeys);
+    const throwOnInvalidSignaturesVerification =
+      options?.throwOnInvalidSignaturesVerification !== false && Boolean(verificationKeys);
     const returnOnlyData = options?.returnOnlyData !== false;
 
     if (verificationKeys) {
@@ -99,7 +100,7 @@ class DecryptMessageService {
       message: message,
       decryptionKeys: decryptionKey,
       verificationKeys: verificationKeys,
-      expectSigned: throwOnInvalidSignaturesVerification
+      expectSigned: throwOnInvalidSignaturesVerification,
     });
 
     if (throwOnInvalidSignaturesVerification) {
@@ -128,7 +129,7 @@ class DecryptMessageService {
      * So here, basically we expect to have an exception to be thrown if one of the
      * expected signature is not ok.
      */
-    const verificationPromises = signatures.map(signature => signature.verified);
+    const verificationPromises = signatures.map((signature) => signature.verified);
     await Promise.all(verificationPromises);
   }
 }

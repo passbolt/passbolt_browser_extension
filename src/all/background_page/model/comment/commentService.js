@@ -14,7 +14,7 @@
 import CommentEntity from "../entity/comment/commentEntity";
 import CommentsCollection from "../entity/comment/commentsCollection";
 import CommentApiService from "../../service/api/comment/commentApiService";
-import {assertType, assertUuid} from "../../utils/assertions";
+import { assertType, assertUuid } from "../../utils/assertions";
 
 class CommentService {
   /**
@@ -36,8 +36,11 @@ class CommentService {
    */
   async findAllByResourceId(resourceId) {
     assertUuid(resourceId);
-    const foreignKey = 'Resource';
-    const commentsDtos = await this.commentApiService.findAll(foreignKey, resourceId, {creator: true, modifier: false});
+    const foreignKey = "Resource";
+    const commentsDtos = await this.commentApiService.findAll(foreignKey, resourceId, {
+      creator: true,
+      modifier: false,
+    });
     return new CommentsCollection(commentsDtos);
   }
 
@@ -49,7 +52,7 @@ class CommentService {
    */
   async create(commentEntity) {
     assertType(commentEntity, CommentEntity, "The parameter 'commentEntity' should be a CommentEntity");
-    const commentDto = await this.commentApiService.create(commentEntity.toDto({creator: false, modifier: false}));
+    const commentDto = await this.commentApiService.create(commentEntity.toDto({ creator: false, modifier: false }));
     return new CommentEntity(commentDto);
   }
 

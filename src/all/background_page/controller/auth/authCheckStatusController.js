@@ -28,10 +28,10 @@ class AuthCheckStatusController {
   async _exec(flushCache = true) {
     try {
       const authStatus = await this.exec(flushCache);
-      this.worker.port.emit(this.requestId, 'SUCCESS', authStatus);
+      this.worker.port.emit(this.requestId, "SUCCESS", authStatus);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

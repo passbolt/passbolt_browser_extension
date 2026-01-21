@@ -29,12 +29,10 @@ class GetGpgKeyCreationDateService {
       organizationSettings = await organizationSettingsModel.getOrFind();
     } catch (e) {
       console.error(e);
-      return (new Date()).getTime();
+      return new Date().getTime();
     }
 
-    return organizationSettings.isServerInPast()
-      ? organizationSettings.serverTime
-      : (new Date()).getTime();
+    return organizationSettings.isServerInPast() ? organizationSettings.serverTime : new Date().getTime();
   }
 }
 

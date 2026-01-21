@@ -14,7 +14,7 @@ import AbstractActionLogEntity from "./abstractActionLogEntity";
 import UpdatedPermissionsCollection from "../permission/actionLog/updatedPermissionsCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'PermissionsUpdatedActionLog';
+const ENTITY_NAME = "PermissionsUpdatedActionLog";
 
 /**
  * Supported action log types
@@ -26,11 +26,14 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
    * @inheritDoc
    */
   constructor(actionLog, options = {}) {
-    super(EntitySchema.validate(
-      PermissionsUpdatedActionLogEntity.ENTITY_NAME,
-      actionLog,
-      PermissionsUpdatedActionLogEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        PermissionsUpdatedActionLogEntity.ENTITY_NAME,
+        actionLog,
+        PermissionsUpdatedActionLogEntity.getSchema(),
+      ),
+      options,
+    );
 
     // Associations
     let permissionsAddedDto = [];
@@ -50,9 +53,9 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
       }
       delete this._props.data;
     }
-    this._permissionsAdded = new UpdatedPermissionsCollection(permissionsAddedDto, {clone: false});
-    this._permissionsUpdated = new UpdatedPermissionsCollection(permissionsUpdatedDto, {clone: false});
-    this._permissionsRemoved = new UpdatedPermissionsCollection(permissionsRemovedDto, {clone: false});
+    this._permissionsAdded = new UpdatedPermissionsCollection(permissionsAddedDto, { clone: false });
+    this._permissionsUpdated = new UpdatedPermissionsCollection(permissionsUpdatedDto, { clone: false });
+    this._permissionsRemoved = new UpdatedPermissionsCollection(permissionsRemovedDto, { clone: false });
 
     this._permissionsAdded.sort();
     this._permissionsUpdated.sort();
@@ -67,22 +70,22 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
     const schema = AbstractActionLogEntity.getSchema();
     schema.required = [...schema.required, "data"];
     schema.properties.type = {
-      "type": "string",
-      "enum": PermissionsUpdatedActionLogEntity.ALLOWED_TYPES
+      type: "string",
+      enum: PermissionsUpdatedActionLogEntity.ALLOWED_TYPES,
     };
     schema.properties.data = {
-      "type": "object",
-      "required": ["permissions"],
-      "properties": {
-        "permissions": {
-          "type": "object",
-          "properties": {
-            "added": UpdatedPermissionsCollection.getSchema(),
-            "updated": UpdatedPermissionsCollection.getSchema(),
-            "removed": UpdatedPermissionsCollection.getSchema()
-          }
-        }
-      }
+      type: "object",
+      required: ["permissions"],
+      properties: {
+        permissions: {
+          type: "object",
+          properties: {
+            added: UpdatedPermissionsCollection.getSchema(),
+            updated: UpdatedPermissionsCollection.getSchema(),
+            removed: UpdatedPermissionsCollection.getSchema(),
+          },
+        },
+      },
     };
     return schema;
   }
@@ -106,7 +109,7 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
         added: this.permissionsAdded.toDto(),
         updated: this.permissionsUpdated.toDto(),
         removed: this.permissionsRemoved.toDto(),
-      }
+      },
     };
 
     return result;
@@ -169,9 +172,7 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
    * @returns {[string]} List of allowed action logs types
    */
   static get ALLOWED_TYPES() {
-    return [
-      TYPE_PERMISSIONS_UPDATED
-    ];
+    return [TYPE_PERMISSIONS_UPDATED];
   }
 }
 

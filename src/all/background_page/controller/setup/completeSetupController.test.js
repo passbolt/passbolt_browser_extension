@@ -12,15 +12,15 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import CompleteSetupController from "./completeSetupController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {withSecurityTokenAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { withSecurityTokenAccountSetupDto } from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import User from "../../model/user";
 import Keyring from "../../model/keyring";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 // Reset the modules before each test.
@@ -30,10 +30,14 @@ beforeEach(() => {
 
 describe("CompleteSetupController", () => {
   describe("CompleteSetupController::exec", () => {
-    it("Should complete the setup.", async() => {
+    it("Should complete the setup.", async () => {
       const account = new AccountSetupEntity(withSecurityTokenAccountSetupDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new CompleteSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new CompleteSetupController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
@@ -62,10 +66,14 @@ describe("CompleteSetupController", () => {
       expect(keyringPublicFingerprint).toStrictEqual(keyringPrivateFingerprint);
     });
 
-    it("Should not add the account to the local storage if the complete API request fails.", async() => {
+    it("Should not add the account to the local storage if the complete API request fails.", async () => {
       const account = new AccountSetupEntity(withSecurityTokenAccountSetupDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new CompleteSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new CompleteSetupController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       // Mock API complete request.
       fetch.doMockOnce(() => Promise.reject());
@@ -77,8 +85,12 @@ describe("CompleteSetupController", () => {
       expect(() => User.getInstance().get()).toThrow("The user is not set");
     });
 
-    it("Should raise an error if no account has been found.", async() => {
-      const controller = new CompleteSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+    it("Should raise an error if no account has been found.", async () => {
+      const controller = new CompleteSetupController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
       expect.assertions(1);
       try {
         await controller.exec();

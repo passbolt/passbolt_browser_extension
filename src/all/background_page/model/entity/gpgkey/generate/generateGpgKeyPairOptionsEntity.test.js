@@ -17,12 +17,13 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import OrganizationSettingsModel from "../../../organizationSettings/organizationSettingsModel";
 import OrganizationSettingsEntity from "../../organizationSettings/organizationSettingsEntity";
-import {
-  customEmailValidationProOrganizationSettings
-} from "../../organizationSettings/organizationSettingsEntity.test.data";
+import { customEmailValidationProOrganizationSettings } from "../../organizationSettings/organizationSettingsEntity.test.data";
 import GenerateGpgKeyPairOptionsEntity from "./generateGpgKeyPairOptionsEntity";
-import {defaultDto, minimalDto} from "./generateGpgKeyPairOptionsEntity.test.data";
-import {defaultUserKeyPoliciesSettingsDto, rsaUserKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
+import { defaultDto, minimalDto } from "./generateGpgKeyPairOptionsEntity.test.data";
+import {
+  defaultUserKeyPoliciesSettingsDto,
+  rsaUserKeyPoliciesSettingsDto,
+} from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
 import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
 
 beforeEach(() => {
@@ -32,7 +33,10 @@ beforeEach(() => {
 describe("GenerateGpgKeyPairOptionsEntity", () => {
   describe("::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(GenerateGpgKeyPairOptionsEntity.ENTITY_NAME, GenerateGpgKeyPairOptionsEntity.getSchema());
+      EntitySchema.validateSchema(
+        GenerateGpgKeyPairOptionsEntity.ENTITY_NAME,
+        GenerateGpgKeyPairOptionsEntity.getSchema(),
+      );
     });
 
     it("validates name property", () => {
@@ -52,14 +56,10 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
 
     it("validates type property", () => {
       assertEntityProperty.string(GenerateGpgKeyPairOptionsEntity, "type");
-      assertEntityProperty.enumeration(
-        GenerateGpgKeyPairOptionsEntity,
-        "type",
-        [
-          GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA,
-          GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC,
-        ]
-      );
+      assertEntityProperty.enumeration(GenerateGpgKeyPairOptionsEntity, "type", [
+        GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA,
+        GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC,
+      ]);
     });
 
     it("validates keySize property", () => {
@@ -69,7 +69,9 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
 
     it("validates curve property", () => {
       assertEntityProperty.string(GenerateGpgKeyPairOptionsEntity, "curve");
-      assertEntityProperty.enumeration(GenerateGpgKeyPairOptionsEntity, "curve", [GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519]);
+      assertEntityProperty.enumeration(GenerateGpgKeyPairOptionsEntity, "curve", [
+        GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519,
+      ]);
       assertEntityProperty.notRequired(GenerateGpgKeyPairOptionsEntity, "curve");
     });
   });
@@ -135,7 +137,11 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
       });
 
       const expectedError = new EntityValidationError();
-      expectedError.addError("keySize", "unwanted_keySize", "The keySize should not be set with the type is set to 'ecc'");
+      expectedError.addError(
+        "keySize",
+        "unwanted_keySize",
+        "The keySize should not be set with the type is set to 'ecc'",
+      );
       expect(() => new GenerateGpgKeyPairOptionsEntity(dto)).toThrow(expectedError);
     });
 
@@ -143,7 +149,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
       expect.assertions(1);
       const organizationSettings = customEmailValidationProOrganizationSettings();
       OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
-      const dto = defaultDto({email: "ada@passbolt.c"});
+      const dto = defaultDto({ email: "ada@passbolt.c" });
       const entity = new GenerateGpgKeyPairOptionsEntity(dto);
       expect(entity.email).toEqual("ada@passbolt.c");
     });
@@ -189,7 +195,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
 
     it("::userId returns {name, email}", () => {
       expect.assertions(1);
-      expect(entity.userId).toStrictEqual({name: dto.name, email: dto.email});
+      expect(entity.userId).toStrictEqual({ name: dto.name, email: dto.email });
     });
 
     it("::name returns name", () => {
@@ -210,7 +216,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
     it("::date returns provided date if set", () => {
       expect.assertions(1);
       const now = Date.now();
-      const e = new GenerateGpgKeyPairOptionsEntity(defaultDto({date: now}));
+      const e = new GenerateGpgKeyPairOptionsEntity(defaultDto({ date: now }));
       expect(e.date.getTime()).toBe(now);
     });
 
@@ -221,7 +227,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
       const result = e.toGenerateOpenpgpKeyDto();
 
       expect(result).toStrictEqual({
-        userIDs: [{name: dto.name, email: dto.email}],
+        userIDs: [{ name: dto.name, email: dto.email }],
         rsaBits: e.rsaBits,
         passphrase: dto.passphrase,
         type: e.type,
@@ -238,7 +244,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
       const result = e.toGenerateOpenpgpKeyDto();
 
       expect(result).toStrictEqual({
-        userIDs: [{name: dto.name, email: dto.email}],
+        userIDs: [{ name: dto.name, email: dto.email }],
         curve: "ed25519",
         passphrase: dto.passphrase,
         type: e.type,

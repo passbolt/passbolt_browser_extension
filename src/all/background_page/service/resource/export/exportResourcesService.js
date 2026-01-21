@@ -67,14 +67,19 @@ class ExportResourcesService {
   async prepareExportContent(exportResourcesFileEntity, passphrase) {
     const progressGoals = exportResourcesFileEntity.resourcesIds.length + 2; // 1 (initialize & find secrets) + #secrets (to encrypt) + 1 (Complete operation)
     this.progressService.updateGoals(progressGoals);
-    await this.progressService.finishStep(i18n.t('Initialize'), true);
+    await this.progressService.finishStep(i18n.t("Initialize"), true);
 
     const foldersCollection = await this.folderModel.getAllByIds(exportResourcesFileEntity.foldersIds);
     const exportFoldersCollection = ExternalFoldersCollection.constructFromFoldersCollection(foldersCollection);
-    const resourcesCollection = await this.findResourcesService.findAllForDecrypt(exportResourcesFileEntity.resourcesIds);
+    const resourcesCollection = await this.findResourcesService.findAllForDecrypt(
+      exportResourcesFileEntity.resourcesIds,
+    );
     await this.decryptMetadataService.decryptAllFromForeignModels(resourcesCollection, passphrase);
 
-    const exportResourcesCollection = ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, exportFoldersCollection);
+    const exportResourcesCollection = ExternalResourcesCollection.constructFromResourcesCollection(
+      resourcesCollection,
+      exportFoldersCollection,
+    );
     exportResourcesFileEntity.exportFolders = exportFoldersCollection;
     exportResourcesFileEntity.exportResources = exportResourcesCollection;
   }
@@ -89,13 +94,22 @@ class ExportResourcesService {
   async decryptSecrets(exportResourcesFileEntity, privateKey) {
     let i = 0;
 
-    const resourceTypesCollection  = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
     for (const exportResourceEntity of exportResourcesFileEntity.exportResources.items) {
       i++;
-      await this.progressService.finishStep(i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportResourcesFileEntity.exportResources.items.length}));
-      const type = resourceTypesCollection.getFirst('id', exportResourceEntity.resourceTypeId);
-      const secretSchema =  type?.definition?.secret;
-      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(exportResourceEntity.secrets.items[0], secretSchema, privateKey);
+      await this.progressService.finishStep(
+        i18n.t("Decrypting {{counter}}/{{total}}", {
+          counter: i,
+          total: exportResourcesFileEntity.exportResources.items.length,
+        }),
+      );
+      const type = resourceTypesCollection.getFirst("id", exportResourceEntity.resourceTypeId);
+      const secretSchema = type?.definition?.secret;
+      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(
+        exportResourceEntity.secrets.items[0],
+        secretSchema,
+        privateKey,
+      );
       exportResourceEntity.secretClear = plaintextSecret.password || "";
       exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description || "";
       if (plaintextSecret.totp) {
@@ -115,9 +129,11 @@ class ExportResourcesService {
    */
   buildCustomFieldWithSecretDto(exportResourceEntity, plaintextSecret) {
     const customFieldsDto = [];
-    exportResourceEntity.customFields?.items?.forEach(customField => {
+    exportResourceEntity.customFields?.items?.forEach((customField) => {
       const customFieldDto = customField.toDto();
-      const secret = plaintextSecret.customFields.find(customFieldSecret => customFieldSecret.id === customFieldDto.id);
+      const secret = plaintextSecret.customFields.find(
+        (customFieldSecret) => customFieldSecret.id === customFieldDto.id,
+      );
       customFieldDto.secret_value = secret?.secret_value;
       customFieldsDto.push(new CustomFieldEntity(customFieldDto));
     });

@@ -12,7 +12,7 @@
  * @since         4.3.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import PlaintextEntity from "../../model/entity/plaintext/plaintextEntity";
 
@@ -42,7 +42,7 @@ class DecryptAndParseResourceSecretService {
    * @private
    */
   static async parse(decryptedSecretMessage, schema) {
-    if (schema.type === 'string') {
+    if (schema.type === "string") {
       return PlaintextEntity.createFromLegacyPlaintextSecret(decryptedSecretMessage);
     }
 
@@ -51,10 +51,10 @@ class DecryptAndParseResourceSecretService {
       secretDto = JSON.parse(decryptedSecretMessage);
     } catch (error) {
       console.error(error);
-      throw new Error('Unable to parse the secret.');
+      throw new Error("Unable to parse the secret.");
     }
 
-    return new PlaintextEntity(secretDto, {schema});
+    return new PlaintextEntity(secretDto, { schema });
   }
 }
 

@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const SECRET_SERVICE_RESOURCE_NAME = 'secrets/resource';
+const SECRET_SERVICE_RESOURCE_NAME = "secrets/resource";
 
 class SecretService extends AbstractService {
   /**

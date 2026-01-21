@@ -16,7 +16,7 @@ import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/en
 import GenerateMetadataKeyService from "./generateMetadataKeyService";
 import CreateMetadataKeyService from "./createMetadataKeyService";
 import SaveMetadataSettingsService from "./saveMetadataSettingsService";
-import {assertString} from "../../utils/assertions";
+import { assertString } from "../../utils/assertions";
 import FindMetadataGettingStartedSettingsService from "passbolt-styleguide/src/shared/services/metadata/findMetadataGettingStartedSettingsService";
 
 /**

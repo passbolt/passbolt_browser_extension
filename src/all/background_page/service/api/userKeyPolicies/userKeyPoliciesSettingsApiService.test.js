@@ -12,21 +12,21 @@
  * @since         5.1.1
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
 import UserKeyPoliciesSettingsApiService from "./userKeyPoliciesSettingsApiService";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultUserKeyPoliciesSettingsDto} from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
-import {v4 as uuidV4} from "uuid";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultUserKeyPoliciesSettingsDto } from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
+import { v4 as uuidV4 } from "uuid";
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.clearAllMocks();
   enableFetchMocks();
 });
 
 describe("UserGpgKeyPolicieesSettingsApiService", () => {
-  describe('::findSettingsAsGuest', () => {
-    it("retrieves the settings from API", async() => {
+  describe("::findSettingsAsGuest", () => {
+    it("retrieves the settings from API", async () => {
       expect.assertions(1);
 
       const apiResponse = defaultUserKeyPoliciesSettingsDto();
@@ -42,14 +42,14 @@ describe("UserGpgKeyPolicieesSettingsApiService", () => {
       expect(resultDto).toStrictEqual(apiResponse);
     });
 
-    it("should call the API with the right parameters", async() => {
+    it("should call the API with the right parameters", async () => {
       expect.assertions(2);
 
       const userId = uuidV4();
       const authenticationToken = uuidV4();
       const apiResponse = defaultUserKeyPoliciesSettingsDto();
 
-      fetch.doMockOnceIf(/setup\/user-key-policies\/settings/, async req => {
+      fetch.doMockOnceIf(/setup\/user-key-policies\/settings/, async (req) => {
         const url = new URL(req.url);
         expect(url.searchParams.get("user_id")).toStrictEqual(userId);
         expect(url.searchParams.get("token")).toStrictEqual(authenticationToken);
@@ -62,7 +62,7 @@ describe("UserGpgKeyPolicieesSettingsApiService", () => {
       await service.findSettingsAsGuest(userId, authenticationToken);
     });
 
-    it("throws an error if the userId is not a valid UUID", async() => {
+    it("throws an error if the userId is not a valid UUID", async () => {
       expect.assertions(1);
 
       const apiClientOptions = defaultApiClientOptions();
@@ -74,7 +74,7 @@ describe("UserGpgKeyPolicieesSettingsApiService", () => {
       await expect(() => service.findSettingsAsGuest(userId, authenticationToken)).rejects.toThrow();
     });
 
-    it("throws an error if the authenticationToken is not a valid UUID", async() => {
+    it("throws an error if the authenticationToken is not a valid UUID", async () => {
       expect.assertions(1);
 
       const apiClientOptions = defaultApiClientOptions();

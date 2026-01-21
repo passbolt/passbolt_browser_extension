@@ -17,7 +17,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import PasswordGeneratorSettingsEntity from "./passwordGeneratorSettingsEntity";
 import PassphraseGeneratorSettingsEntity from "./passphraseGeneratorSettingsEntity";
 
-const ENTITY_NAME = 'PasswordPolicies';
+const ENTITY_NAME = "PasswordPolicies";
 
 const POLICY_PASSPHRASE = "passphrase";
 const POLICY_PASSWORD = "password";
@@ -27,19 +27,28 @@ class PasswordPoliciesEntity extends Entity {
    * @inheritDoc
    */
   constructor(passwordPoliciesDto, options = {}) {
-    super(EntitySchema.validate(
-      PasswordPoliciesEntity.ENTITY_NAME,
-      passwordPoliciesDto,
-      PasswordPoliciesEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        PasswordPoliciesEntity.ENTITY_NAME,
+        passwordPoliciesDto,
+        PasswordPoliciesEntity.getSchema(),
+      ),
+      options,
+    );
 
     // Associations
     if (this._props.password_generator_settings) {
-      this._password_generator_settings = PasswordGeneratorSettingsEntity.createFromDefault(this._props.password_generator_settings, {clone: false});
+      this._password_generator_settings = PasswordGeneratorSettingsEntity.createFromDefault(
+        this._props.password_generator_settings,
+        { clone: false },
+      );
       delete this._props.password_generator_settings;
     }
     if (this._props.passphrase_generator_settings) {
-      this._passphrase_generator_settings = PassphraseGeneratorSettingsEntity.createFromDefault(this._props.passphrase_generator_settings, {clone: false});
+      this._passphrase_generator_settings = PassphraseGeneratorSettingsEntity.createFromDefault(
+        this._props.passphrase_generator_settings,
+        { clone: false },
+      );
       delete this._props.passphrase_generator_settings;
     }
   }
@@ -50,50 +59,47 @@ class PasswordPoliciesEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
+      type: "object",
+      required: [
         "default_generator",
         "external_dictionary_check",
         "password_generator_settings",
-        "passphrase_generator_settings"
+        "passphrase_generator_settings",
       ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid",
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "external_dictionary_check": {
-          "type": "boolean"
+        external_dictionary_check: {
+          type: "boolean",
         },
-        "default_generator": {
-          "type": "string",
-          "enum": [
-            POLICY_PASSWORD,
-            POLICY_PASSPHRASE,
-          ]
+        default_generator: {
+          type: "string",
+          enum: [POLICY_PASSWORD, POLICY_PASSPHRASE],
         },
-        "password_generator_settings": PasswordGeneratorSettingsEntity.getSchema(),
-        "passphrase_generator_settings": PassphraseGeneratorSettingsEntity.getSchema(),
-        "source": {
-          "type": "string",
+        password_generator_settings: PasswordGeneratorSettingsEntity.getSchema(),
+        passphrase_generator_settings: PassphraseGeneratorSettingsEntity.getSchema(),
+        source: {
+          type: "string",
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
-      }
+      },
     };
   }
 
@@ -176,8 +182,12 @@ class PasswordPoliciesEntity extends Entity {
    * @returns {PasswordPoliciesEntity}
    */
   static createFromDefault(data = {}) {
-    const passwordGeneratorSettings = PasswordGeneratorSettingsEntity.createFromDefault(data?.password_generator_settings);
-    const passphraseGeneratorSettings = PassphraseGeneratorSettingsEntity.createFromDefault(data?.passphrase_generator_settings);
+    const passwordGeneratorSettings = PasswordGeneratorSettingsEntity.createFromDefault(
+      data?.password_generator_settings,
+    );
+    const passphraseGeneratorSettings = PassphraseGeneratorSettingsEntity.createFromDefault(
+      data?.passphrase_generator_settings,
+    );
 
     delete data?.password_generator_settings;
     delete data?.passphrase_generator_settings;
@@ -191,9 +201,7 @@ class PasswordPoliciesEntity extends Entity {
 
     //ensures the generator type is an existing one, take the default otherwise
     if (data?.default_generator) {
-      data.default_generator = data.default_generator === POLICY_PASSPHRASE
-        ? POLICY_PASSPHRASE
-        : POLICY_PASSWORD;
+      data.default_generator = data.default_generator === POLICY_PASSPHRASE ? POLICY_PASSPHRASE : POLICY_PASSWORD;
     }
 
     const dto = Object.assign(defaultData, data);

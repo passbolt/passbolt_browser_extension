@@ -12,34 +12,38 @@
  * @since         5.7.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultSecretRevisionsSettingsDto} from "passbolt-styleguide/src/shared/models/entity/secretRevision/secretRevisionsSettingsEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultSecretRevisionsSettingsDto } from "passbolt-styleguide/src/shared/models/entity/secretRevision/secretRevisionsSettingsEntity.test.data";
 import SecretRevisionsSettingsEntity from "passbolt-styleguide/src/shared/models/entity/secretRevision/secretRevisionsSettingsEntity";
 import SaveSecretRevisionsSettingsController from "./saveSecretRevisionsSettingsController";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("SaveSecretRevisionsSettingsController", () => {
   describe("::exec", () => {
-    it("should save the given secret revisions settings onto the API through the dedicated service", async() => {
+    it("should save the given secret revisions settings onto the API through the dedicated service", async () => {
       expect.assertions(3);
 
       const secretRevisionsSettingsDto = defaultSecretRevisionsSettingsDto();
       const secretRevisionsSettingsEntity = new SecretRevisionsSettingsEntity(secretRevisionsSettingsDto);
       const controller = new SaveSecretRevisionsSettingsController(null, null, defaultApiClientOptions());
-      jest.spyOn(controller.saveSecretRevisionsSettingsService, "saveSettings").mockResolvedValue(secretRevisionsSettingsEntity);
+      jest
+        .spyOn(controller.saveSecretRevisionsSettingsService, "saveSettings")
+        .mockResolvedValue(secretRevisionsSettingsEntity);
 
       const result = await controller.exec(secretRevisionsSettingsDto);
       const expectedEntity = new SecretRevisionsSettingsEntity(secretRevisionsSettingsDto);
 
       expect(result).toEqual(expectedEntity);
       expect(controller.saveSecretRevisionsSettingsService.saveSettings).toHaveBeenCalledTimes(1);
-      expect(controller.saveSecretRevisionsSettingsService.saveSettings).toHaveBeenCalledWith(secretRevisionsSettingsEntity);
+      expect(controller.saveSecretRevisionsSettingsService.saveSettings).toHaveBeenCalledWith(
+        secretRevisionsSettingsEntity,
+      );
     });
 
-    it("should throw an error if the entity does not validate", async() => {
+    it("should throw an error if the entity does not validate", async () => {
       expect.assertions(1);
 
-      const dto = defaultSecretRevisionsSettingsDto({id: 42});
+      const dto = defaultSecretRevisionsSettingsDto({ id: 42 });
       const controller = new SaveSecretRevisionsSettingsController(null, null, defaultApiClientOptions());
 
       try {
@@ -49,12 +53,14 @@ describe("SaveSecretRevisionsSettingsController", () => {
       }
     });
 
-    it("should not catch errors and let them being thrown if something wrong happened", async() => {
+    it("should not catch errors and let them being thrown if something wrong happened", async () => {
       expect.assertions(1);
 
       const expectedError = new Error("Something went wrong!");
       const controller = new SaveSecretRevisionsSettingsController(null, null, defaultApiClientOptions());
-      jest.spyOn(controller.saveSecretRevisionsSettingsService, "saveSettings").mockImplementation(() => { throw expectedError; });
+      jest.spyOn(controller.saveSecretRevisionsSettingsService, "saveSettings").mockImplementation(() => {
+        throw expectedError;
+      });
 
       try {
         await controller.exec(defaultSecretRevisionsSettingsDto());

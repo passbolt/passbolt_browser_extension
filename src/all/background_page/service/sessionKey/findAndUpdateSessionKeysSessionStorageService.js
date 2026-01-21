@@ -12,8 +12,7 @@
  * @since         4.10.1
  */
 import FindSessionKeysService from "./findSessionKeysService";
-import SessionKeysBundlesCollection
-  from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
+import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
 import SessionKeysBundlesSessionStorageStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
 
 const FIND_AND_UPDATE_SESSION_KEYS_SS_LOCK_PREFIX = "FIND_AND_UPDATE_SESSION_KEYS_SS_LOCK-";
@@ -43,12 +42,17 @@ export default class FindAndUpdateSessionKeysSessionStorageService {
     const lockKey = `${FIND_AND_UPDATE_SESSION_KEYS_SS_LOCK_PREFIX}${this.account.id}`;
 
     // If no update is in progress, refresh the session storage.
-    return await navigator.locks.request(lockKey, {ifAvailable: true}, async lock => {
+    return await navigator.locks.request(lockKey, { ifAvailable: true }, async (lock) => {
       // Lock not granted, an update is already in progress. Wait for its completion and return the value of the session storage.
       if (!lock) {
         const hasRuntimeCache = this.sessionKeysBundlesSessionStorageService.hasCachedData();
-        return await navigator.locks.request(lockKey, {mode: "shared"}, async() =>
-          new SessionKeysBundlesCollection(await this.sessionKeysBundlesSessionStorageService.get(), {validate: !hasRuntimeCache})
+        return await navigator.locks.request(
+          lockKey,
+          { mode: "shared" },
+          async () =>
+            new SessionKeysBundlesCollection(await this.sessionKeysBundlesSessionStorageService.get(), {
+              validate: !hasRuntimeCache,
+            }),
         );
       }
 

@@ -13,7 +13,7 @@
  */
 import Log from "../../model/log";
 
-const AUTH_STATUS_STORAGE_KEY = 'auth_status';
+const AUTH_STATUS_STORAGE_KEY = "auth_status";
 
 class AuthStatusLocalStorage {
   /**
@@ -30,7 +30,7 @@ class AuthStatusLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
-    Log.write({level: 'debug', message: 'AuthStatusLocalStorage flushed'});
+    Log.write({ level: "debug", message: "AuthStatusLocalStorage flushed" });
     return await browser.storage.local.remove(this.storageKey);
   }
 
@@ -57,12 +57,12 @@ class AuthStatusLocalStorage {
    * @return {Promise<void>}
    */
   static async set(isAuthenticated, isMfaRequired) {
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       const auth_status = {
         isAuthenticated: Boolean(isAuthenticated),
         isMfaRequired: Boolean(isMfaRequired),
       };
-      await browser.storage.local.set({[this.storageKey]: auth_status});
+      await browser.storage.local.set({ [this.storageKey]: auth_status });
     });
   }
 }

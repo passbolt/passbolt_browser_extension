@@ -18,10 +18,10 @@ import PostLogoutService from "../auth/postLogoutService";
 jest.useFakeTimers();
 
 const fakeResourceDto = {
-  "name": "",
-  "username": "",
-  "uri": "",
-  "secret_clear": ""
+  name: "",
+  username: "",
+  uri: "",
+  secret_clear: "",
 };
 
 // Reset the modules before each test.
@@ -32,7 +32,7 @@ beforeEach(() => {
 });
 
 describe("ResourceInProgressCache service", () => {
-  it("should trigger a reset after a logout", async() => {
+  it("should trigger a reset after a logout", async () => {
     expect.assertions(5);
     const spyOnStorageSet = jest.spyOn(browser.storage.session, "set");
     const spy = jest.spyOn(ResourceInProgressCacheService, "reset");
@@ -43,13 +43,13 @@ describe("ResourceInProgressCache service", () => {
     await ResourceInProgressCacheService.set(fakeResource);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spyOnStorageSet).toHaveBeenCalledTimes(1);
-    expect(spyOnStorageSet).toHaveBeenCalledWith({resourceInProgress: fakeResource.toDto()});
+    expect(spyOnStorageSet).toHaveBeenCalledWith({ resourceInProgress: fakeResource.toDto() });
 
     await PostLogoutService.exec();
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
-  it("should do a reset after a period of time", async() => {
+  it("should do a reset after a period of time", async () => {
     expect.assertions(6);
     const spy = jest.spyOn(ResourceInProgressCacheService, "reset");
     jest.spyOn(global, "setTimeout");
@@ -71,7 +71,7 @@ describe("ResourceInProgressCache service", () => {
     expect(global.clearTimeout).toHaveBeenCalledTimes(2);
   });
 
-  it("should do a reset after having consumed the cached resource", async() => {
+  it("should do a reset after having consumed the cached resource", async () => {
     expect.assertions(3);
     const spy = jest.spyOn(ResourceInProgressCacheService, "reset");
     const fakeResource = new ExternalResourceEntity(fakeResourceDto);
@@ -85,7 +85,7 @@ describe("ResourceInProgressCache service", () => {
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
-  it("should have cleared the cached memory after a reset", async() => {
+  it("should have cleared the cached memory after a reset", async () => {
     expect.assertions(3);
     const fakeResource = new ExternalResourceEntity(fakeResourceDto);
 

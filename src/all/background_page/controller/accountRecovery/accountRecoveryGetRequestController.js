@@ -61,7 +61,7 @@ class AccountRecoveryGetRequestController {
       throw new Error("The account recovery request should be a valid uuid.");
     }
 
-    const contains = {"creator": true, "creator.gpgkey": true};
+    const contains = { creator: true, "creator.gpgkey": true };
     return this.accountRecoveryModel.findRequestById(accountRecoverRequestId, contains);
   }
 }

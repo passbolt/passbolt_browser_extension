@@ -11,15 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.12.0
  */
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import UpdateAllResourceTypesDeletedStatusController from "./updateAllResourceTypesDeletedStatusController";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("UpdateAllResourceTypesDeletedStatusController", () => {
   describe("::exec", () => {
-    it("Should throw an error if the given parameter is not a valid resourceTypesCollection dto.", async() => {
+    it("Should throw an error if the given parameter is not a valid resourceTypesCollection dto.", async () => {
       expect.assertions(1);
 
       const controller = new UpdateAllResourceTypesDeletedStatusController(null, null, defaultApiClientOptions());
@@ -27,7 +27,7 @@ describe("UpdateAllResourceTypesDeletedStatusController", () => {
       expect(() => controller.exec("42")).rejects.toThrow(EntityValidationError);
     });
 
-    it("Should call for updating the resource types given a collection.", async() => {
+    it("Should call for updating the resource types given a collection.", async () => {
       expect.assertions(2);
 
       const resourceTypesDto = resourceTypesCollectionDto();
@@ -37,7 +37,9 @@ describe("UpdateAllResourceTypesDeletedStatusController", () => {
 
       await controller.exec(resourceTypesDto);
       expect(controller.updateResourceTypesService.updateAllDeletedStatus).toHaveBeenCalledTimes(1);
-      expect(controller.updateResourceTypesService.updateAllDeletedStatus).toHaveBeenCalledWith(new ResourceTypesCollection(resourceTypesDto));
+      expect(controller.updateResourceTypesService.updateAllDeletedStatus).toHaveBeenCalledWith(
+        new ResourceTypesCollection(resourceTypesDto),
+      );
     });
   });
 });

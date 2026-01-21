@@ -22,7 +22,7 @@ class GenerateSsoKeyService {
   static async generateSsoKey(extractable = false) {
     const algorithm = {
       name: "AES-GCM",
-      length: 256
+      length: 256,
     };
     const capabilities = ["encrypt", "decrypt"];
     return await crypto.subtle.generateKey(algorithm, extractable, capabilities);

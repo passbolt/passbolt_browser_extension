@@ -12,32 +12,32 @@
  * @since         4.3.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import FindSecretByResourceIdController from "./findSecretByResourceIdController";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {readSecret} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { readSecret } from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {
   plaintextSecretPasswordDescriptionTotpDto,
-  plaintextSecretPasswordAndDescriptionDto, plaintextSecretTotpDto
+  plaintextSecretPasswordAndDescriptionDto,
+  plaintextSecretTotpDto,
 } from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {v4 as uuidv4} from "uuid";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { v4 as uuidv4 } from "uuid";
 import {
   TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
   TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
-  TEST_RESOURCE_TYPE_PASSWORD_STRING, TEST_RESOURCE_TYPE_TOTP
+  TEST_RESOURCE_TYPE_PASSWORD_STRING,
+  TEST_RESOURCE_TYPE_TOTP,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {
-  resourceTypesCollectionDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import PlaintextEntity from "../../model/entity/plaintext/plaintextEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {adminAccountDto, defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { adminAccountDto, defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 
 beforeEach(() => {
@@ -48,12 +48,15 @@ jest.mock("../../service/passphrase/getPassphraseService");
 
 describe("SecretDecryptController", () => {
   describe("FindSecretByResourceIdController::exec", () => {
-    it("Decrypt successfully a resource with encrypted description.", async() => {
+    it("Decrypt successfully a resource with encrypted description.", async () => {
       const account = new AccountEntity(defaultAccountDto());
       const user = await MockExtension.withConfiguredAccount();
       const resourceId = uuidv4();
       const plaintextSecretDto = plaintextSecretPasswordAndDescriptionDto();
-      const encryptedSecretData = await EncryptMessageService.encrypt(JSON.stringify(plaintextSecretDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public));
+      const encryptedSecretData = await EncryptMessageService.encrypt(
+        JSON.stringify(plaintextSecretDto),
+        await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public),
+      );
       const secretDto = readSecret({
         user_id: user.id,
         resource_id: resourceId,
@@ -79,12 +82,15 @@ describe("SecretDecryptController", () => {
       expect(plaintextSecret.password).toEqual(plaintextSecretDto.password);
     });
 
-    it("Decrypt successfully a resource with password string.", async() => {
+    it("Decrypt successfully a resource with password string.", async () => {
       const account = new AccountEntity(defaultAccountDto());
       const user = await MockExtension.withConfiguredAccount();
       const resourceId = uuidv4();
       const password = "secret-password";
-      const encryptedSecretData = await EncryptMessageService.encrypt(password, await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public));
+      const encryptedSecretData = await EncryptMessageService.encrypt(
+        password,
+        await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public),
+      );
       const secretDto = readSecret({
         user_id: user.id,
         resource_id: resourceId,
@@ -110,12 +116,15 @@ describe("SecretDecryptController", () => {
       expect(plaintextSecret.password).toEqual(password);
     });
 
-    it("Decrypt successfully a resource with encrypted description and TOTP.", async() => {
+    it("Decrypt successfully a resource with encrypted description and TOTP.", async () => {
       const account = new AccountEntity(adminAccountDto());
       await MockExtension.withConfiguredAccount(pgpKeys.admin);
       const resourceId = uuidv4();
       const plaintextSecretDto = plaintextSecretPasswordDescriptionTotpDto();
-      const encryptedSecretData = await EncryptMessageService.encrypt(JSON.stringify(plaintextSecretDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
+      const encryptedSecretData = await EncryptMessageService.encrypt(
+        JSON.stringify(plaintextSecretDto),
+        await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public),
+      );
       const secretDto = readSecret({
         user_id: account.userId,
         resource_id: resourceId,
@@ -146,12 +155,15 @@ describe("SecretDecryptController", () => {
       expect(plaintextSecret.totp.period).toEqual(plaintextSecretDto.totp.period);
     });
 
-    it("Decrypt successfully a resource TOTP.", async() => {
+    it("Decrypt successfully a resource TOTP.", async () => {
       const account = new AccountEntity(adminAccountDto());
       await MockExtension.withConfiguredAccount(pgpKeys.admin);
       const resourceId = uuidv4();
       const plaintextSecretDto = plaintextSecretTotpDto();
-      const encryptedSecretData = await EncryptMessageService.encrypt(JSON.stringify(plaintextSecretDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
+      const encryptedSecretData = await EncryptMessageService.encrypt(
+        JSON.stringify(plaintextSecretDto),
+        await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public),
+      );
       const secretDto = readSecret({
         user_id: account.userId,
         resource_id: resourceId,

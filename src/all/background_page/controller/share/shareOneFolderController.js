@@ -16,7 +16,7 @@ import PermissionChangesCollection from "../../model/entity/permission/change/pe
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import ShareFoldersService from "../../service/share/shareFoldersService";
-import {assertArray, assertNonEmptyArray, assertUuid} from "../../utils/assertions";
+import { assertArray, assertNonEmptyArray, assertUuid } from "../../utils/assertions";
 import GetOrFindFoldersService from "../../service/folder/getOrFindFoldersService";
 import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
@@ -47,10 +47,10 @@ class ShareOneFolderController {
   async _exec(folderId, permissionsChanges) {
     try {
       await this.exec(folderId, permissionsChanges);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -71,7 +71,7 @@ class ShareOneFolderController {
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
     const folder = (await this.getOrFindFoldersService.getOrFindAll()).getById(folderId);
-    this.progressService.title = i18n.t('Sharing folder {{name}}', {name: folder.name});
+    this.progressService.title = i18n.t("Sharing folder {{name}}", { name: folder.name });
     /*
      * 14 steps are required to share a folder and its content:
      * - Retrieving folders permissions
@@ -90,11 +90,11 @@ class ShareOneFolderController {
      * - Updating folders local storage
      */
     const goals = 14;
-    this.progressService.start(goals, i18n.t('Initialize'));
+    this.progressService.start(goals, i18n.t("Initialize"));
 
     try {
       await this.shareFoldersService.shareOneWithContent(folderId, permissionChanges, passphrase);
-      this.progressService.finishStep(i18n.t('Done!'), true);
+      this.progressService.finishStep(i18n.t("Done!"), true);
     } finally {
       this.progressService.close();
     }

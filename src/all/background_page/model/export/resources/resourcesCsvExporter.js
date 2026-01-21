@@ -37,7 +37,7 @@ const register = [
   CsvSafariRowComposer,
   CsvDashlaneRowComposer,
   CsvNordpassRowComposer,
-  CsvLogMeOnceRowComposer
+  CsvLogMeOnceRowComposer,
 ];
 
 class ResourcesCsvExporter {
@@ -64,14 +64,14 @@ class ResourcesCsvExporter {
   async export() {
     const RowComposer = this.getRowComposer();
     if (!RowComposer) {
-      throw new FileFormatError('This csv format is not supported.');
+      throw new FileFormatError("This csv format is not supported.");
     }
     const data = this.exportResources(RowComposer);
     // Insert the header manually, Papaparse doesn't insert it if there is not content to write.
     const headerColumns = Object.values(RowComposer.mapping);
     let file = `"${headerColumns.join('","')}"\r\n`;
     // Unparse the content and add it to the result.
-    file = file + PapaParse.unparse(data, {header: false, quotes: true, columns: headerColumns});
+    file = file + PapaParse.unparse(data, { header: false, quotes: true, columns: headerColumns });
     this.exportEntity.file = file;
   }
 
@@ -80,7 +80,7 @@ class ResourcesCsvExporter {
    * @returns {Class|null} Return the row composer call or null if no match
    */
   getRowComposer() {
-    return register.find(rowComposer => rowComposer.format === this.exportEntity.format) || null;
+    return register.find((rowComposer) => rowComposer.format === this.exportEntity.format) || null;
   }
 
   /**

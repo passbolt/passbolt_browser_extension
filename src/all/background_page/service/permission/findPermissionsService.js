@@ -12,9 +12,8 @@
  * @since         4.10.0
  */
 import PermissionService from "../api/permission/permissionService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import PermissionsCollection from "../../model/entity/permission/permissionsCollection";
-
 
 class FindPermissionsService {
   /**
@@ -37,7 +36,10 @@ class FindPermissionsService {
    */
   async findAllByAcoForeignKeyForDisplay(resourceId) {
     assertUuid(resourceId, `Service error. The id '${resourceId}' is not a valid uuid.`);
-    const permissionsCollectionDto = await this.permissionService.findAllByAcoForeignKey(resourceId, FindPermissionsService.DEFAULT_CONTAIN);
+    const permissionsCollectionDto = await this.permissionService.findAllByAcoForeignKey(
+      resourceId,
+      FindPermissionsService.DEFAULT_CONTAIN,
+    );
     const collection = new PermissionsCollection(permissionsCollectionDto);
     collection.sort();
     return collection;
@@ -64,7 +66,7 @@ class FindPermissionsService {
    * @returns {Object}
    */
   static get DEFAULT_CONTAIN() {
-    return {"user": true, "user.profile": true, "group": true};
+    return { user: true, "user.profile": true, group: true };
   }
 }
 

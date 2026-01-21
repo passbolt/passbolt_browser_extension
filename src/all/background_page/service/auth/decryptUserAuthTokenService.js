@@ -12,7 +12,7 @@
  * @since         4.7.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import GpgAuthToken from "../../model/gpgAuthToken";

@@ -15,10 +15,10 @@
 export const defaultDryRunResponse = (data = {}) => {
   const defaultData = {
     SecretsNeeded: [],
-    Secrets: []
+    Secrets: [],
   };
 
   return {
-    "dry-run": Object.assign(defaultData, data)
+    "dry-run": Object.assign(defaultData, data),
   };
 };

@@ -12,14 +12,14 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {UserEvents} from "../event/userEvents";
-import {KeyringEvents} from "../event/keyringEvents";
-import {AuthEvents} from "../event/authEvents";
-import {ConfigEvents} from "../event/configEvents";
-import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
-import {LocaleEvents} from "../event/localeEvents";
+import { UserEvents } from "../event/userEvents";
+import { KeyringEvents } from "../event/keyringEvents";
+import { AuthEvents } from "../event/authEvents";
+import { ConfigEvents } from "../event/configEvents";
+import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { LocaleEvents } from "../event/localeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import {RememberMeEvents} from "../event/rememberMeEvents";
+import { RememberMeEvents } from "../event/rememberMeEvents";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
 class Auth extends Pagemod {
@@ -42,7 +42,7 @@ class Auth extends Pagemod {
       AuthEvents,
       OrganizationSettingsEvents,
       LocaleEvents,
-      RememberMeEvents
+      RememberMeEvents,
     ];
   }
 
@@ -55,7 +55,7 @@ class Auth extends Pagemod {
       const account = await GetActiveAccountService.get();
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
-        event.listen({port, tab}, apiClientOptions, account);
+        event.listen({ port, tab }, apiClientOptions, account);
       }
     } catch (error) {
       /*
@@ -63,7 +63,7 @@ class Auth extends Pagemod {
        * The following controllers won't work as expected:
        * - RequestHelpCredentialsLostController
        */
-      console.error('authPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error("authPagemod::attach legacy account cannot be retrieved, please contact your administrator.");
       console.error(error);
     }
   }

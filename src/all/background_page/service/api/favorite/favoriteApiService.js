@@ -14,7 +14,7 @@
 import AbstractService from "../abstract/abstractService";
 import FavoriteEntity from "../../../model/entity/favorite/favoriteEntity";
 
-const FAVORITE_API_SERVICE_RESOURCE_NAME = 'favorites';
+const FAVORITE_API_SERVICE_RESOURCE_NAME = "favorites";
 
 class FavoriteApiService extends AbstractService {
   /**
@@ -50,7 +50,7 @@ class FavoriteApiService extends AbstractService {
     this.assertValidForeignModel(foreignModel);
     this.assertValidId(foreignId);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, {});
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url);
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url);
     return response.body;
   }
 
@@ -76,7 +76,7 @@ class FavoriteApiService extends AbstractService {
    * @public
    */
   assertValidForeignModel(foreignModel) {
-    if (!foreignModel || typeof foreignModel !== 'string') {
+    if (!foreignModel || typeof foreignModel !== "string") {
       throw new TypeError(`Favorite foreign model should be a valid string.`);
     }
     if (!FavoriteEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {

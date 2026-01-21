@@ -32,18 +32,18 @@ class FileService {
       mimeType = "text/plain";
     }
 
-    content = new Blob([content], {type: mimeType});
+    content = new Blob([content], { type: mimeType });
     const dataUrl = await this.blobToDataURL(content);
 
     if (chrome.downloads) {
       const scriptExecution = new ScriptExecution(tabId);
       // With MV3 API, it's not possible anymore to use the function URL.createObjectURL or URL.revokeObjectURL
       const url = await scriptExecution.injectBase64UrlToCreateObjectURL(dataUrl);
-      await browser.downloads.download({url, filename});
+      await browser.downloads.download({ url, filename });
       scriptExecution.injectURLToRevoke(url);
     } else {
-      const fileWorker = await WorkerService.get('FileIframe', tabId);
-      fileWorker.port.emit('passbolt.file-iframe.download', filename, dataUrl);
+      const fileWorker = await WorkerService.get("FileIframe", tabId);
+      fileWorker.port.emit("passbolt.file-iframe.download", filename, dataUrl);
     }
   }
 
@@ -54,9 +54,9 @@ class FileService {
    * @return {Promise}
    */
   static blobToDataURL(blob) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const a = new FileReader();
-      a.onload = function(e) {
+      a.onload = function (e) {
         resolve(e.target.result);
       };
       a.readAsDataURL(blob);

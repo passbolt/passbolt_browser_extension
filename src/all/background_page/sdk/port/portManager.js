@@ -50,15 +50,19 @@ class PortManager {
        * If a port is already connected and is still in memory it should not be registered again
        * In the MV3 case the memory is flushed when the service worker is down so the port should be able to reconnect
        */
-      if (!this.isPortExist(port.name) && await this.isKnownPortSender(workerEntity, port.sender)) {
+      if (!this.isPortExist(port.name) && (await this.isKnownPortSender(workerEntity, port.sender))) {
         await this.updateWorkerStatus(workerEntity);
         await this.registerAndAttachEvent(port, workerEntity.name);
       } else {
-        console.debug(`A known port has been denied connection or reconnection with name=${port.name}, tabUrl=${port.sender.tab.url}, tabId=${port.sender.tab.id}, frameId=${port.sender.frameId}`);
+        console.debug(
+          `A known port has been denied connection or reconnection with name=${port.name}, tabUrl=${port.sender.tab.url}, tabId=${port.sender.tab.id}, frameId=${port.sender.frameId}`,
+        );
       }
     } else {
       // If there is no worker associate to this port
-      console.debug(`An unknown port has been denied connection with name=${port.name}, tabUrl=${port.sender.tab.url}, tabId=${port.sender.tab.id}, frameId=${port.sender.frameId}`);
+      console.debug(
+        `An unknown port has been denied connection with name=${port.name}, tabUrl=${port.sender.tab.url}, tabId=${port.sender.tab.id}, frameId=${port.sender.frameId}`,
+      );
     }
   }
 
@@ -102,7 +106,7 @@ class PortManager {
     const portWrapper = new Port(port);
     this.registerPort(portWrapper);
     await PagemodManager.attachEventToPort(portWrapper, name);
-    portWrapper.emit('passbolt.port.ready');
+    portWrapper.emit("passbolt.port.ready");
   }
 
   /**
@@ -179,7 +183,7 @@ class PortManager {
       throw new Error("The tab identifier should be a valid integer.");
     }
     const workers = await WorkersSessionStorage.getWorkersByTabId(tabId);
-    workers.forEach(worker => this.removePort(worker.id, removeInfo));
+    workers.forEach((worker) => this.removePort(worker.id, removeInfo));
     await WorkersSessionStorage.deleteByTabId(tabId);
   }
 }

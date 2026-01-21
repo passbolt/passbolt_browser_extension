@@ -14,7 +14,7 @@
 import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 class ResourceTypeModel {
   /**
@@ -48,7 +48,7 @@ class ResourceTypeModel {
    */
   async getOrFindAll() {
     const resourceTypeDtos = await ResourceTypeLocalStorage.get();
-    if (typeof resourceTypeDtos !== 'undefined') {
+    if (typeof resourceTypeDtos !== "undefined") {
       return new ResourceTypesCollection(resourceTypeDtos);
     }
     return this.updateLocalStorage();
@@ -61,10 +61,10 @@ class ResourceTypeModel {
    * @returns {Promise<Object|undefined>}
    */
   async getSecretSchemaById(resourceTypeId) {
-    assertUuid(resourceTypeId, 'The resource type id should be a valid UUID');
+    assertUuid(resourceTypeId, "The resource type id should be a valid UUID");
 
     const types = await this.getOrFindAll();
-    const type = types.getFirst('id', resourceTypeId);
+    const type = types.getFirst("id", resourceTypeId);
     return type?.definition?.secret;
   }
 }

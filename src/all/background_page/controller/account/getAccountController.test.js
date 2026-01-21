@@ -13,13 +13,13 @@
  */
 
 import GetAccountController from "./getAccountController";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
-import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
+import { defaultAccountAccountRecoveryDto } from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
-import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
-import {withSecurityTokenAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
+import { withSecurityTokenAccountRecoverDto } from "../../model/entity/account/accountRecoverEntity.test.data";
+import { withSecurityTokenAccountSetupDto } from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
 describe("GetAccountController", () => {
@@ -36,7 +36,7 @@ describe("GetAccountController", () => {
       expect(accountDto.security_token).toEqual(expectAccount.securityToken.toDto());
     };
 
-    it("Should retrieve the account being used by the worker.", async() => {
+    it("Should retrieve the account being used by the worker.", async () => {
       const storedAccountDto = defaultAccountDto();
       const storedAccount = new AccountEntity(storedAccountDto);
       const controller = new GetAccountController(null, null, storedAccount);
@@ -48,7 +48,7 @@ describe("GetAccountController", () => {
       expect(accountDto.user_private_armored_key).toBeUndefined();
     });
 
-    it("Should retrieve the account being setup by the worker.", async() => {
+    it("Should retrieve the account being setup by the worker.", async () => {
       const storedAccountDto = withSecurityTokenAccountSetupDto();
       const storedAccount = new AccountSetupEntity(storedAccountDto);
       const controller = new GetAccountController(null, null, storedAccount);
@@ -61,7 +61,7 @@ describe("GetAccountController", () => {
       expect(accountDto.authentication_token_token).toBeUndefined();
     });
 
-    it("Should retrieve the account being recovered by the worker.", async() => {
+    it("Should retrieve the account being recovered by the worker.", async () => {
       const storedAccountDto = withSecurityTokenAccountRecoverDto();
       const storedAccount = new AccountRecoverEntity(storedAccountDto);
       const controller = new GetAccountController(null, null, storedAccount);
@@ -74,7 +74,7 @@ describe("GetAccountController", () => {
       expect(accountDto.authentication_token_token).toBeUndefined();
     });
 
-    it("Should retrieve the account completing the account recovery used by the worker.", async() => {
+    it("Should retrieve the account completing the account recovery used by the worker.", async () => {
       const storedAccountDto = defaultAccountAccountRecoveryDto();
       const storedAccount = new AccountAccountRecoveryEntity(storedAccountDto);
       const controller = new GetAccountController(null, null, storedAccount);

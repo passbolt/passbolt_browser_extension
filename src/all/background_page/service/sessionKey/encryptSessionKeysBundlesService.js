@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.1
  */
-import PassphraseStorageService from '../session_storage/passphraseStorageService';
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import SessionKeysBundleEntity from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundleEntity";
-import {assertString, assertType} from '../../utils/assertions';
-import DecryptPrivateKeyService from '../crypto/decryptPrivateKeyService';
+import { assertString, assertType } from "../../utils/assertions";
+import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import EncryptMessageService from "../crypto/encryptMessageService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class EncryptSessionKeysBundlesService {
   /**
@@ -35,7 +35,11 @@ class EncryptSessionKeysBundlesService {
    * @returns {Promise<void>}
    */
   async encryptOne(sessionKeysBundle, passphrase = null) {
-    assertType(sessionKeysBundle, SessionKeysBundleEntity, "The parameter \"sessionKeysBundle\" should be a SessionKeysBundleEntity.");
+    assertType(
+      sessionKeysBundle,
+      SessionKeysBundleEntity,
+      'The parameter "sessionKeysBundle" should be a SessionKeysBundleEntity.',
+    );
     if (passphrase !== null) {
       assertString(passphrase, 'The parameter "passphrase" should be a string.');
     }
@@ -44,9 +48,12 @@ class EncryptSessionKeysBundlesService {
       throw new TypeError("The session key bundle should be decrypted.");
     }
 
-    passphrase = passphrase || await PassphraseStorageService.getOrFail();
+    passphrase = passphrase || (await PassphraseStorageService.getOrFail());
 
-    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(
+      this.account.userPrivateArmoredKey,
+      passphrase,
+    );
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
     const message = JSON.stringify(sessionKeysBundle.data.toDto());
     sessionKeysBundle.data = await EncryptMessageService.encrypt(message, userPublicKey, [userDecryptedPrivateKey]);

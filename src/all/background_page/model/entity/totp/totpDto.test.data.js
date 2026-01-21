@@ -22,7 +22,7 @@ export const defaultTotpDto = (data = {}) => {
     secret_key: "DAV3DS4ERAAF5QGH",
     period: 30,
     digits: 6,
-    algorithm: "SHA1"
+    algorithm: "SHA1",
   };
 
   return Object.assign(defaultData, data);

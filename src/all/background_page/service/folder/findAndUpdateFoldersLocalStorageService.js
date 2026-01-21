@@ -12,11 +12,11 @@
  * @since         4.9.4
  */
 import FindFoldersService from "./findFoldersService";
-import {assertNumber} from "../../utils/assertions";
+import { assertNumber } from "../../utils/assertions";
 import FolderLocalStorage from "../local_storage/folderLocalStorage";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 
-const FOLDERS_UPDATE_ALL_LS_LOCK_PREFIX = 'FOLDERS_UPDATE_LS_LOCK_';
+const FOLDERS_UPDATE_ALL_LS_LOCK_PREFIX = "FOLDERS_UPDATE_LS_LOCK_";
 
 /**
  * The service aim to update the folders local storage service.
@@ -44,7 +44,7 @@ class FindAndUpdateFoldersLocalStorageService {
    * @param {number} [updatePeriodThreshold] Do not update the local storage if the threshold is not overdue.
    * @return {Promise<FoldersCollection>}
    */
-  async findAndUpdateAll({updatePeriodThreshold} = {}) {
+  async findAndUpdateAll({ updatePeriodThreshold } = {}) {
     assertNumber(updatePeriodThreshold, "Parameter updatePeriodThreshold should be a number.");
 
     const lockKey = `${FOLDERS_UPDATE_ALL_LS_LOCK_PREFIX}${this.account.id}`;
@@ -55,15 +55,19 @@ class FindAndUpdateFoldersLocalStorageService {
     // Do not update the storage if the defined period, during which the local storage doesn't need to be refreshed, has not yet passed.
     if (updatePeriodThreshold && lastUpdateTime && Boolean(foldersDto)) {
       if (Date.now() - lastUpdateTime < updatePeriodThreshold) {
-        return new FoldersCollection(foldersDto, {validate: !isRuntimeCacheInitialized});
+        return new FoldersCollection(foldersDto, { validate: !isRuntimeCacheInitialized });
       }
     }
 
     // If no update is in progress, refresh the local storage.
-    return await navigator.locks.request(lockKey, {ifAvailable: true}, async lock => {
+    return await navigator.locks.request(lockKey, { ifAvailable: true }, async (lock) => {
       // Lock not granted, an update is already in progress. Wait for its completion to notify the function consumer.
       if (!lock) {
-        return navigator.locks.request(lockKey, {mode: "shared"}, async() => new FoldersCollection(await FolderLocalStorage.get(), {validate: false}));
+        return navigator.locks.request(
+          lockKey,
+          { mode: "shared" },
+          async () => new FoldersCollection(await FolderLocalStorage.get(), { validate: false }),
+        );
       }
 
       // Lock is granted, retrieve all folders and update the local storage.

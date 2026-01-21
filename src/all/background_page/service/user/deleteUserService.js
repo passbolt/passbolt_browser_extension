@@ -12,7 +12,7 @@
  * @since         5.4.0
  */
 import UserService from "../api/user/userService";
-import {assertType, assertUuid} from "../../utils/assertions";
+import { assertType, assertUuid } from "../../utils/assertions";
 import DeleteDryRunError from "../../error/deleteDryRunError";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import UserDeleteTransferEntity from "../../model/entity/user/transfer/userDeleteTransferEntity";
@@ -47,7 +47,7 @@ export default class DeleteUserService {
    * @throws {Error} if the data returned by the API is not a PassboltApiFetchError with error code 400 and groups, resources or folders to transfer.
    */
   async deleteDryRun(userId) {
-    assertUuid(userId, "The parameter \"userId\" should be a UUID");
+    assertUuid(userId, 'The parameter "userId" should be a UUID');
     try {
       await this.userServiceApi.delete(userId, {}, true);
     } catch (error) {
@@ -64,9 +64,9 @@ export default class DeleteUserService {
    * @throws {Error} if the data returned by the API is not a PassboltApiFetchError with error code 400 and groups, resources or folders to transfer.
    */
   async delete(userId, transfer) {
-    assertUuid(userId, "The parameter \"userId\" should be a UUID");
+    assertUuid(userId, 'The parameter "userId" should be a UUID');
     if (transfer !== null) {
-      assertType(transfer, UserDeleteTransferEntity, 'The `transfer` parameter should be a UserDeleteTransferEntity.');
+      assertType(transfer, UserDeleteTransferEntity, "The `transfer` parameter should be a UserDeleteTransferEntity.");
     }
     try {
       const deleteData = transfer ? transfer.toDto() : {};

@@ -17,12 +17,12 @@ import AppInitController from "./appInitController";
 import User from "../../model/user";
 import SsoKitTemporaryStorageService from "../../service/session_storage/ssoKitTemporaryStorageService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
-import {v4 as uuid} from "uuid";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
+import { v4 as uuid } from "uuid";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { generateSsoKitServerData } from "../../model/entity/sso/ssoKitServerPart.test.data";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
-import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
+import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 
 beforeEach(() => {
@@ -31,7 +31,7 @@ beforeEach(() => {
 
 describe("AppInitController", () => {
   describe("AppInitController::main", () => {
-    it("Should sync the user.", async() => {
+    it("Should sync the user.", async () => {
       expect.assertions(2);
       await MockExtension.withConfiguredAccount();
       const userInstance = User.getInstance();
@@ -46,13 +46,15 @@ describe("AppInitController", () => {
       expect(SsoDataStorage.updateLocalKitIdWith).not.toHaveBeenCalled();
     });
 
-    it("Should call for the user default settings if the sync fails.", async() => {
+    it("Should call for the user default settings if the sync fails.", async () => {
       expect.assertions(2);
       await MockExtension.withConfiguredAccount();
       const userInstance = User.getInstance();
       const spyOnUserSetDefaults = jest.spyOn(userInstance.settings, "setDefaults");
 
-      jest.spyOn(userInstance.settings, "sync").mockImplementation(async() => { throw new Error("This is really bad"); });
+      jest.spyOn(userInstance.settings, "sync").mockImplementation(async () => {
+        throw new Error("This is really bad");
+      });
       jest.spyOn(SsoKitTemporaryStorageService, "getAndFlush").mockImplementation(() => null);
 
       const controller = new AppInitController();
@@ -62,24 +64,24 @@ describe("AppInitController", () => {
       expect(SsoDataStorage.updateLocalKitIdWith).not.toHaveBeenCalled();
     });
 
-    it("Should sync the SSO kit if any.", async() => {
+    it("Should sync the SSO kit if any.", async () => {
       expect.assertions(3);
       await MockExtension.withConfiguredAccount();
 
-      const ssoClientKitDto = await clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
+      const ssoClientKitDto = await clientSsoKit({ provider: AzureSsoSettingsEntity.PROVIDER_ID });
       delete ssoClientKitDto.id; // let's ensure there is no id for this test
       const storedSsoKit = new SsoKitClientPartEntity(ssoClientKitDto);
       SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
 
       const userInstance = User.getInstance();
-      const storedServerSsoKit = {data: await generateSsoKitServerData({})};
-      const ssoKitServerResponse = Object.assign({}, storedServerSsoKit, {id: uuid()});
+      const storedServerSsoKit = { data: await generateSsoKitServerData({}) };
+      const ssoKitServerResponse = Object.assign({}, storedServerSsoKit, { id: uuid() });
 
-      jest.spyOn(userInstance.settings, "sync").mockImplementation(async() => null);
-      jest.spyOn(SsoKitTemporaryStorageService, "getAndFlush").mockImplementation(async() => storedServerSsoKit);
+      jest.spyOn(userInstance.settings, "sync").mockImplementation(async () => null);
+      jest.spyOn(SsoKitTemporaryStorageService, "getAndFlush").mockImplementation(async () => storedServerSsoKit);
 
-      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
-      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), async req => {
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
+      fetch.doMockOnceIf(new RegExp("/sso/keys.json"), async (req) => {
         const body = JSON.parse(await req.text());
         expect(body).toStrictEqual(storedServerSsoKit);
         return mockApiResponse(ssoKitServerResponse);
@@ -88,7 +90,10 @@ describe("AppInitController", () => {
       const controller = new AppInitController();
       await controller.main();
 
-      const expectedSsoKitClientPartEntity = new SsoKitClientPartEntity({...ssoClientKitDto, id: ssoKitServerResponse.id});
+      const expectedSsoKitClientPartEntity = new SsoKitClientPartEntity({
+        ...ssoClientKitDto,
+        id: ssoKitServerResponse.id,
+      });
 
       expect(SsoDataStorage.updateLocalKitIdWith).toHaveBeenCalledTimes(1);
       expect(SsoDataStorage.updateLocalKitIdWith).toHaveBeenCalledWith(expectedSsoKitClientPartEntity);

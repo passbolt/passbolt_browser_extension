@@ -12,15 +12,15 @@
  * @since         5.3.2
  */
 
-import {v4 as uuidv4} from 'uuid';
-import CopyTemporarilyToClipboardController from './copyTemporarilyToClipboardController';
+import { v4 as uuidv4 } from "uuid";
+import CopyTemporarilyToClipboardController from "./copyTemporarilyToClipboardController";
 
-describe('CopyTemporarilyToClipboardController', () => {
-  describe('constructor', () => {
-    it('should set the worker and requestId properties', () => {
+describe("CopyTemporarilyToClipboardController", () => {
+  describe("constructor", () => {
+    it("should set the worker and requestId properties", () => {
       expect.assertions(2);
 
-      const worker = {port: {}};
+      const worker = { port: {} };
       const requestId = uuidv4();
       const controller = new CopyTemporarilyToClipboardController(worker, requestId);
 
@@ -29,8 +29,8 @@ describe('CopyTemporarilyToClipboardController', () => {
     });
   });
 
-  describe('exec', () => {
-    it('should call copyTemporarily of the right service', async() => {
+  describe("exec", () => {
+    it("should call copyTemporarily of the right service", async () => {
       expect.assertions(2);
 
       const toCopy = "text";

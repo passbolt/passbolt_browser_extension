@@ -10,14 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import ResourceEntity from "../../../model/entity/resource/resourceEntity";
-import FolderEntity from "../../../model/entity/folder/folderEntity";
 import AbstractService from "../abstract/abstractService";
-import {assertUuid} from "../../../utils/assertions";
+import { assertUuid } from "../../../utils/assertions";
 
-const MOVE_SERVICE_RESOURCE_NAME = 'move';
-const MOVE_SERVICE_FOREIGN_MODEL_FOLDER = 'Folder';
-const MOVE_SERVICE_FOREIGN_MODEL_RESOURCE = 'Resource';
+const MOVE_SERVICE_RESOURCE_NAME = "move";
 
 class MoveService extends AbstractService {
   /**
@@ -41,26 +37,23 @@ class MoveService extends AbstractService {
   }
 
   /**
-   * Move an entity in a user tree.
+   * Move a folder.
    *
-   * @param {ResourceEntity|FolderEntity} entity The entity to move
-   * @throws {TypeError} if entity is not a ResourceEntity or FolderEntity
-   * @returns {Promise<*>}
+   * @param {string} id The folder id.
+   * @param {string} destinationFolderId The destination folder parent id.
+   * @returns {Promise<void>}
    * @public
    */
-  async move(entity) {
-    let foreignModel;
-
-    if (entity instanceof FolderEntity) {
-      foreignModel = MOVE_SERVICE_FOREIGN_MODEL_FOLDER;
-    } else if (entity instanceof ResourceEntity) {
-      foreignModel = MOVE_SERVICE_FOREIGN_MODEL_RESOURCE;
-    } else {
-      throw new TypeError("The entity must be a FolderEntity or a ResourceEntity");
+  async moveFolder(id, destinationFolderId) {
+    assertUuid(id, "The parameter 'id' should be a UUID.");
+    if (destinationFolderId !== null) {
+      assertUuid(destinationFolderId, "The parameter 'destinationFolderId' should be a UUID or null.");
     }
 
-    const url = `${foreignModel.toLowerCase()}/${entity.id}`;
-    const data = entity.toDto();
+    const url = `folder/${id}`;
+    const data = {
+      folder_parent_id: destinationFolderId,
+    };
     const response = await this.apiClient.update(url, data);
     return response.body;
   }
@@ -81,7 +74,7 @@ class MoveService extends AbstractService {
 
     const url = `resource/${id}`;
     const data = {
-      folder_parent_id: destinationFolderId
+      folder_parent_id: destinationFolderId,
     };
     const response = await this.apiClient.update(url, data);
     return response.body;

@@ -12,6 +12,7 @@
  */
 import InformCallToActionController from "../controller/informCallToActionController/informCallToActionController";
 import AuthCheckStatusController from "../controller/auth/authCheckStatusController";
+import IsApplicationOverlaidController from "../controller/applicationOverlaid/IsApplicationOverlaidController";
 
 /**
  * Listens the inform call to action events
@@ -19,14 +20,14 @@ import AuthCheckStatusController from "../controller/auth/authCheckStatusControl
  * @param {ApiClientOptions} apiClientOptions
  * @param {AccountEntity} account the user account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Whenever the in-form call-to-action status is required
    * @listens passbolt.in-form-cta.check-status
    * @param requestId {uuid} The request identifier
    * @returns {*{isAuthenticated,isMfaRequired}
    */
-  worker.port.on('passbolt.in-form-cta.check-status', async(requestId, flushCache = false) => {
+  worker.port.on("passbolt.in-form-cta.check-status", async (requestId, flushCache = false) => {
     const authIsAuthenticatedController = new AuthCheckStatusController(worker, requestId);
     await authIsAuthenticatedController._exec(flushCache);
   });
@@ -37,7 +38,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @returns {*[]|number}
    */
-  worker.port.on('passbolt.in-form-cta.suggested-resources', async requestId => {
+  worker.port.on("passbolt.in-form-cta.suggested-resources", async (requestId) => {
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.countSuggestedResourcesCount(requestId);
   });
@@ -47,10 +48,21 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.in-form-cta.execute
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.in-form-cta.execute', async requestId => {
+  worker.port.on("passbolt.in-form-cta.execute", async (requestId) => {
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.execute(requestId);
   });
+
+  /*
+   * Whenever the in-form call-to-action is application overlaid
+   * @listens passbolt.in-form-cta.is-application-overlaid
+   * @param requestId {uuid} The request identifier
+   * @param applicationId {uuid} The application id
+   */
+  worker.port.on("passbolt.in-form-cta.is-application-overlaid", async (requestId, applicationId) => {
+    const controller = new IsApplicationOverlaidController(worker, requestId);
+    await controller._exec(applicationId);
+  });
 };
 
-export const InformCallToActionEvents = {listen};
+export const InformCallToActionEvents = { listen };

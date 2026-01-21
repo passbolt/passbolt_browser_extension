@@ -12,7 +12,7 @@
  * @since         4.9.4
  */
 
-import {defaultGroupSearchResultDto, defaultUserSearchResultDto} from "./userAndGroupSearchResultEntity.test.data";
+import { defaultGroupSearchResultDto, defaultUserSearchResultDto } from "./userAndGroupSearchResultEntity.test.data";
 
 /**
  * Build dtos.

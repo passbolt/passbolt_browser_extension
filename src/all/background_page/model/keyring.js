@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import {OpenpgpAssertion} from "../utils/openpgp/openpgpAssertions";
-import {Uuid} from "../utils/uuid";
+import { OpenpgpAssertion } from "../utils/openpgp/openpgpAssertions";
+import { Uuid } from "../utils/uuid";
 import UserSettings from "./userSettings/userSettings";
 import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import GetGpgKeyInfoService from "../service/crypto/getGpgKeyInfoService";
@@ -23,15 +23,15 @@ import Validator from "validator";
  * Constants
  * @type {string}
  */
-const PUBLIC_HEADER = '-----BEGIN PGP PUBLIC KEY BLOCK-----';
-const PUBLIC_FOOTER = '-----END PGP PUBLIC KEY BLOCK-----';
-const PRIVATE_HEADER = '-----BEGIN PGP PRIVATE KEY BLOCK-----';
-const PRIVATE_FOOTER = '-----END PGP PRIVATE KEY BLOCK-----';
-const PUBLIC = 'PUBLIC';
-const PRIVATE = 'PRIVATE';
-const MY_KEY_ID = 'MY_KEY_ID';
-const STORAGE_KEY_PUBLIC = 'passbolt-public-gpgkeys';
-const STORAGE_KEY_PRIVATE = 'passbolt-private-gpgkeys';
+const PUBLIC_HEADER = "-----BEGIN PGP PUBLIC KEY BLOCK-----";
+const PUBLIC_FOOTER = "-----END PGP PUBLIC KEY BLOCK-----";
+const PRIVATE_HEADER = "-----BEGIN PGP PRIVATE KEY BLOCK-----";
+const PRIVATE_FOOTER = "-----END PGP PRIVATE KEY BLOCK-----";
+const PUBLIC = "PUBLIC";
+const PRIVATE = "PRIVATE";
+const MY_KEY_ID = "MY_KEY_ID";
+const STORAGE_KEY_PUBLIC = "passbolt-public-gpgkeys";
+const STORAGE_KEY_PRIVATE = "passbolt-private-gpgkeys";
 
 /**
  * The class that deals with Passbolt Keyring.
@@ -89,11 +89,11 @@ class Keyring {
    */
   async importPublic(armoredPublicKey, userId) {
     // Check user id
-    if (typeof userId === 'undefined') {
-      throw new Error('The user id is undefined');
+    if (typeof userId === "undefined") {
+      throw new Error("The user id is undefined");
     }
     if (!Validator.isUUID(userId)) {
-      throw new Error('The user id is not valid');
+      throw new Error("The user id is not valid");
     }
 
     /*
@@ -216,7 +216,7 @@ class Keyring {
    * @returns {Promise<int>} number of updated keys
    */
   async sync() {
-    const latestSync = storage.getItem('latestSync');
+    const latestSync = storage.getItem("latestSync");
 
     // Get the latest keys changes from the backend.
     const userSettings = new UserSettings();
@@ -228,12 +228,12 @@ class Keyring {
     }
 
     const fetchOptions = {
-      method: 'GET',
-      credentials: 'include',
+      method: "GET",
+      credentials: "include",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
     };
     // eslint-disable-next-line no-undef
     const fetchStrategy = typeof customApiClientFetch !== "undefined" ? customApiClientFetch : fetch;
@@ -244,7 +244,7 @@ class Keyring {
 
     // Check response status
     if (!response.ok) {
-      let msg = 'Could not synchronize the keyring. The server responded with an error.';
+      let msg = "Could not synchronize the keyring. The server responded with an error.";
       if (json.header.msg) {
         msg += ` ${json.header.msg}`;
       }
@@ -253,10 +253,10 @@ class Keyring {
     }
     // Update the latest synced time.
     if (!json.header) {
-      throw new Error('Could not synchronize the keyring. The server response header is missing.');
+      throw new Error("Could not synchronize the keyring. The server response header is missing.");
     }
     if (!json.body) {
-      throw new Error('Could not synchronize the keyring. The server response body is missing.');
+      throw new Error("Could not synchronize the keyring. The server response body is missing.");
     }
 
     // Store all the new keys in the keyring.
@@ -270,9 +270,9 @@ class Keyring {
     }
     await Promise.all(imports);
 
-    storage.setItem('latestSync', json.header.servertime);
+    storage.setItem("latestSync", json.header.servertime);
 
-    return (json.body.length);
+    return json.body.length;
   }
 
   /*
@@ -290,9 +290,9 @@ class Keyring {
    */
   store(type, keys) {
     if (type !== Keyring.PUBLIC && type !== Keyring.PRIVATE) {
-      throw new Error('Key type is incorrect');
+      throw new Error("Key type is incorrect");
     }
-    const key = (type === Keyring.PRIVATE) ? Keyring.STORAGE_KEY_PRIVATE : Keyring.STORAGE_KEY_PUBLIC;
+    const key = type === Keyring.PRIVATE ? Keyring.STORAGE_KEY_PRIVATE : Keyring.STORAGE_KEY_PUBLIC;
     storage.setItem(key, JSON.stringify(keys));
   }
 
@@ -331,7 +331,7 @@ class Keyring {
    *  Default Keyring.PUBLIC.
    */
   flush(type) {
-    if (typeof type === 'undefined') {
+    if (typeof type === "undefined") {
       type = Keyring.PUBLIC;
     }
 
@@ -345,7 +345,7 @@ class Keyring {
      * Removed latestSync variable.
      * We consider that the keyring has never been synced.
      */
-    storage.removeItem('latestSync');
+    storage.removeItem("latestSync");
   }
 
   /*

@@ -39,10 +39,10 @@ class CompleteRecoverController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -54,7 +54,9 @@ class CompleteRecoverController {
    */
   async exec() {
     const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
-    const accountRecovered = new AccountEntity(temporaryAccount.account.toDto(AccountRecoverEntity.ALL_CONTAIN_OPTIONS));
+    const accountRecovered = new AccountEntity(
+      temporaryAccount.account.toDto(AccountRecoverEntity.ALL_CONTAIN_OPTIONS),
+    );
     await this.setupModel.completeRecover(temporaryAccount.account);
     await this.accountModel.add(accountRecovered);
   }

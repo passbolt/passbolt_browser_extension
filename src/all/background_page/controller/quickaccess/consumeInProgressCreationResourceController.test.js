@@ -14,11 +14,11 @@
 import ConsumeInProgressCreationResourceController from "./consumeInProgressCreationResourceController";
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
-import {defaultExternalResourceDto} from "../../model/entity/resource/external/externalResourceEntity.test.data";
+import { defaultExternalResourceDto } from "../../model/entity/resource/external/externalResourceEntity.test.data";
 
 describe("ConsumeInProgressCreationResourceController", () => {
   describe("::exec", () => {
-    it("should return the resource in cache and clear the cache", async() => {
+    it("should return the resource in cache and clear the cache", async () => {
       expect.assertions(3);
 
       const fakeResource = new ExternalResourceEntity(defaultExternalResourceDto());

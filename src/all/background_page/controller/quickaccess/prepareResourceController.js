@@ -33,10 +33,10 @@ class PrepareResourceController {
   async _exec() {
     try {
       const result = await this.exec.apply(this, arguments);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -53,11 +53,9 @@ class PrepareResourceController {
     }
 
     // Retrieve resource name and uri from tab.
-    const tab = tabId
-      ? await BrowserTabService.getById(tabId)
-      : await BrowserTabService.getCurrent();
+    const tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();
 
-    return {name: tab.title, uris: [tab.url]};
+    return { name: tab.title, uris: [tab.url] };
   }
 }
 

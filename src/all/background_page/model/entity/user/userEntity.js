@@ -20,7 +20,7 @@ import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import AppEmailValidatorService from "../../../service/validator/appEmailValidatorService";
 
-const ENTITY_NAME = 'User';
+const ENTITY_NAME = "User";
 
 class UserEntity extends EntityV2 {
   /**
@@ -31,27 +31,33 @@ class UserEntity extends EntityV2 {
 
     // Associations
     if (this._props.profile) {
-      this._profile = new ProfileEntity(this._props.profile, {...options, clone: false});
+      this._profile = new ProfileEntity(this._props.profile, { ...options, clone: false });
       delete this._props.profile;
     }
     if (this._props.role) {
-      this._role = new RoleEntity(this._props.role, {...options, clone: false});
+      this._role = new RoleEntity(this._props.role, { ...options, clone: false });
       delete this._props.role;
     }
     if (this._props.gpgkey) {
-      this._gpgkey = new GpgkeyEntity(this._props.gpgkey, {...options, clone: false});
+      this._gpgkey = new GpgkeyEntity(this._props.gpgkey, { ...options, clone: false });
       delete this._props.gpgkey;
     }
     if (this._props.groups_users) {
-      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {...options, clone: false});
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users, { ...options, clone: false });
       delete this._props.groups_users;
     }
     if (this._props.account_recovery_user_setting) {
-      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {...options, clone: false});
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(
+        this._props.account_recovery_user_setting,
+        { ...options, clone: false },
+      );
       delete this._props.account_recovery_user_setting;
     }
     if (this._props.pending_account_recovery_request) {
-      this._pending_account_recovery_request = new PendingAccountRecoveryRequestEntity(this._props.pending_account_recovery_request, {...options, clone: false});
+      this._pending_account_recovery_request = new PendingAccountRecoveryRequestEntity(
+        this._props.pending_account_recovery_request,
+        { ...options, clone: false },
+      );
       delete this._props.pending_account_recovery_request;
     }
   }
@@ -73,72 +79,72 @@ class UserEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
+      type: "object",
+      required: [
         "username",
         // "role_id",
       ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "role_id": {
-          "type": "string",
-          "format": "uuid"
+        role_id: {
+          type: "string",
+          format: "uuid",
         },
-        "username": {
-          "type": "string",
-          "custom": AppEmailValidatorService.validate
+        username: {
+          type: "string",
+          custom: AppEmailValidatorService.validate,
         },
-        "active": {
-          "type": "boolean"
+        active: {
+          type: "boolean",
         },
-        "deleted": {
-          "type": "boolean"
+        deleted: {
+          type: "boolean",
         },
-        "disabled": {
-          "type": "string",
-          "format": "date-time",
-          "nullable": true,
+        disabled: {
+          type: "string",
+          format: "date-time",
+          nullable: true,
         },
-        "missing_metadata_key_ids": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "uuid"
+        missing_metadata_key_ids: {
+          type: "array",
+          items: {
+            type: "string",
+            format: "uuid",
           },
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "last_logged_in": {
-          "type": "string",
-          "format": "date-time",
-          "nullable": true,
+        last_logged_in: {
+          type: "string",
+          format: "date-time",
+          nullable: true,
         },
-        "is_mfa_enabled": {
-          "type": "boolean",
-          "nullable": true,
+        is_mfa_enabled: {
+          type: "boolean",
+          nullable: true,
         },
-        "locale": {
-          "type": "string",
-          "pattern": /^[a-z]{2}-[A-Z]{2}$/,
-          "nullable": true,
+        locale: {
+          type: "string",
+          pattern: /^[a-z]{2}-[A-Z]{2}$/,
+          nullable: true,
         },
         // Associated models
-        "role": RoleEntity.getSchema(),
-        "profile": ProfileEntity.getSchema(),
-        "gpgkey": GpgkeyEntity.getSchema(),
-        "groups_users": GroupsUsersCollection.getSchema(),
-        "account_recovery_user_setting": AccountRecoveryUserSettingEntity.getSchema(),
-        "pending_account_recovery_request": PendingAccountRecoveryRequestEntity.getSchema()
-      }
+        role: RoleEntity.getSchema(),
+        profile: ProfileEntity.getSchema(),
+        gpgkey: GpgkeyEntity.getSchema(),
+        groups_users: GroupsUsersCollection.getSchema(),
+        account_recovery_user_setting: AccountRecoveryUserSettingEntity.getSchema(),
+        pending_account_recovery_request: PendingAccountRecoveryRequestEntity.getSchema(),
+      },
     };
   }
 
@@ -224,7 +230,7 @@ class UserEntity extends EntityV2 {
    * @returns {(boolean|null)} true if user completed the setup
    */
   get isActive() {
-    if (typeof this._props.active === 'undefined') {
+    if (typeof this._props.active === "undefined") {
       return null;
     }
     return this._props.active;
@@ -235,7 +241,7 @@ class UserEntity extends EntityV2 {
    * @returns {(boolean|null)} true if user is deleted
    */
   get isDeleted() {
-    if (typeof this._props.deleted === 'undefined') {
+    if (typeof this._props.deleted === "undefined") {
       return null;
     }
     return this._props.deleted;
@@ -278,7 +284,7 @@ class UserEntity extends EntityV2 {
    * @returns {(boolean|null)} true if mfa is enabled
    */
   get isMfaEnabled() {
-    if (typeof this._props.is_mfa_enabled === 'undefined') {
+    if (typeof this._props.is_mfa_enabled === "undefined") {
       return null;
     }
     return this._props.is_mfa_enabled;
@@ -315,10 +321,11 @@ class UserEntity extends EntityV2 {
   static get ALL_CONTAIN_OPTIONS() {
     return {
       profile: ProfileEntity.ALL_CONTAIN_OPTIONS,
-      role: true, gpgkey: true,
+      role: true,
+      gpgkey: true,
       groups_users: true,
       account_recovery_user_setting: true,
-      pending_account_recovery_request: true
+      pending_account_recovery_request: true,
     };
   }
 

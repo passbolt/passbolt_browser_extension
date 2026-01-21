@@ -13,14 +13,17 @@
  */
 import GroupUserTransfersCollection from "./groupUserTransfersCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultUserTransferDto} from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
+import { defaultUserTransferDto } from "passbolt-styleguide/src/shared/models/entity/group/groupTransfer.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultUserTransfersCollectionDto} from "passbolt-styleguide/src/shared/models/entity/group/groupUserTransfersCollection.test.data";
+import { defaultUserTransfersCollectionDto } from "passbolt-styleguide/src/shared/models/entity/group/groupUserTransfersCollection.test.data";
 
 describe("GroupUser transfer entity", () => {
   describe("::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(GroupUserTransfersCollection.constructor.name, GroupUserTransfersCollection.getSchema());
+      EntitySchema.validateSchema(
+        GroupUserTransfersCollection.constructor.name,
+        GroupUserTransfersCollection.getSchema(),
+      );
     });
 
     it("validates collection is an array", () => {
@@ -42,7 +45,7 @@ describe("GroupUser transfer entity", () => {
     });
   });
   describe("GroupUserTransfersCollection:pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const groupUserTransfersCount = 10_000;
       const dtos = defaultUserTransfersCollectionDto(groupUserTransfersCount);
 

@@ -11,28 +11,28 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.7.0
  */
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 export const defaultThemeDto = (data = {}) => ({
-  "id": uuidv4(),
-  "name": "default",
+  id: uuidv4(),
+  name: "default",
   ...data,
 });
 
 export const midgarThemeDto = (data = {}) => ({
-  "id": uuidv4(),
-  "name": "midgar",
+  id: uuidv4(),
+  name: "midgar",
   ...data,
 });
 
 export const solarisedThemeDto = (data = {}) => ({
-  "id": uuidv4(),
-  "name": "solarised",
+  id: uuidv4(),
+  name: "solarised",
   ...data,
 });
 
 export const solarisedDarkThemeDto = (data = {}) => ({
-  "id": uuidv4(),
-  "name": "solarised_dark",
+  id: uuidv4(),
+  name: "solarised_dark",
   ...data,
 });

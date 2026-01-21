@@ -11,11 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
+
 import AbstractService from "../abstract/abstractService";
 
-const SUBSCRIPTION_SERVICE_RESOURCE_NAME = 'ee/subscription';
+export const SUBSCRIPTION_API_SERVICE_RESOURCE_NAME = "ee/subscription";
 
-class SubscriptionService extends AbstractService {
+class SubscriptionApiService extends AbstractService {
   /**
    * Constructor
    *
@@ -23,7 +24,7 @@ class SubscriptionService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, SubscriptionService.RESOURCE_NAME);
+    super(apiClientOptions, SubscriptionApiService.RESOURCE_NAME);
   }
 
   /**
@@ -33,14 +34,14 @@ class SubscriptionService extends AbstractService {
    * @public
    */
   static get RESOURCE_NAME() {
-    return SUBSCRIPTION_SERVICE_RESOURCE_NAME;
+    return SUBSCRIPTION_API_SERVICE_RESOURCE_NAME;
   }
 
   /**
    * Get the subscription
    *
    * @throws {Error} if API call fails, service unreachable, etc.
-   * @returns {Object} subscriptionDto
+   * @returns {Promise<Object>} subscriptionDto
    */
   async find() {
     const response = await this.apiClient.get("key");
@@ -50,9 +51,9 @@ class SubscriptionService extends AbstractService {
   /**
    * Update the subscription
    *
-   * @param keyDto the new subscription key
+   * @param {SubscriptionEntity} keyDto the new subscription key entity
    * @throws {Error} if API call fails, service unreachable, etc.
-   * @returns {Object} subscriptionDto
+   * @returns {Promise<Object>} subscriptionDto
    */
   async update(keyDto) {
     const response = await this.apiClient.update("key", keyDto);
@@ -60,4 +61,4 @@ class SubscriptionService extends AbstractService {
   }
 }
 
-export default SubscriptionService;
+export default SubscriptionApiService;

@@ -38,7 +38,7 @@ class DeletePasswordExpirySettingsController {
       this.worker.port.emit(this.requestId, "SUCCESS", settings);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

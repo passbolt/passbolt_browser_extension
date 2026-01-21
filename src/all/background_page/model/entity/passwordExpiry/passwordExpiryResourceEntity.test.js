@@ -13,8 +13,8 @@
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import PasswordExpiryResourceEntity from "./passwordExpiryResourceEntity";
-import {defaultPasswordExpiryResourceDto} from "./passwordExpiryResourceEntity.test.data";
-import {v4 as uuid} from "uuid";
+import { defaultPasswordExpiryResourceDto } from "./passwordExpiryResourceEntity.test.data";
+import { v4 as uuid } from "uuid";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("PasswordExpiryResource entity", () => {
@@ -29,13 +29,16 @@ describe("PasswordExpiryResource entity", () => {
     });
 
     it("validates expires property", () => {
-      const successScenarios = [
-        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
+      const successScenarios = [...assertEntityProperty.SUCCESS_DATETIME_SCENARIO, assertEntityProperty.SCENARIO_NULL];
       const failingScenarios = assertEntityProperty.FAIL_DATETIME_SCENARIO;
 
-      assertEntityProperty.assert(PasswordExpiryResourceEntity, "expired", successScenarios, failingScenarios, "format");
+      assertEntityProperty.assert(
+        PasswordExpiryResourceEntity,
+        "expired",
+        successScenarios,
+        failingScenarios,
+        "format",
+      );
       assertEntityProperty.required(PasswordExpiryResourceEntity, "expired");
     });
 
@@ -80,7 +83,7 @@ describe("PasswordExpiryResource entity", () => {
       created: "2023-05-06T10:05:46+00:00",
       created_by: uuid(),
       modified: "2023-06-06T10:05:46+00:00",
-      modified_by: uuid()
+      modified_by: uuid(),
     };
 
     const entity = new PasswordExpiryResourceEntity(expectedDto);

@@ -15,7 +15,6 @@
 import MfaProviderEntity from "../../model/entity/mfa/mfaProviderEntity";
 import MultiFactorAuthenticationModel from "../../model/multiFactorAuthentication/multiFactorAuthenticationModel";
 
-
 class MfaSetupRemoveProviderController {
   /**
    * MfaSetupVerifyOtpCodeController constructor
@@ -39,7 +38,7 @@ class MfaSetupRemoveProviderController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

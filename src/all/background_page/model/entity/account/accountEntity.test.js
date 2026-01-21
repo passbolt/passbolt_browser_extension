@@ -16,7 +16,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountEntity from "./accountEntity";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultAccountDto} from "./accountEntity.test.data";
+import { defaultAccountDto } from "./accountEntity.test.data";
 
 describe("AccountEntity", () => {
   describe("AccountEntity::getSchema", () => {
@@ -36,13 +36,11 @@ describe("AccountEntity", () => {
     });
 
     it("validates user_key_fingerprint property", () => {
-      const successScenario = [
-        {scenario: "a valid fingerprint", value: "ABCD".repeat(10)},
-      ];
+      const successScenario = [{ scenario: "a valid fingerprint", value: "ABCD".repeat(10) }];
 
       const failingScenario = [
-        {scenario: "non hexadecimal fingerprint character set", value: "GHIJ".repeat(10)},
-        {scenario: "wrong fingerprint character case set", value: "abcd".repeat(10)},
+        { scenario: "non hexadecimal fingerprint character set", value: "GHIJ".repeat(10) },
+        { scenario: "wrong fingerprint character case set", value: "abcd".repeat(10) },
       ];
 
       assertEntityProperty.string(AccountEntity, "user_key_fingerprint");
@@ -96,11 +94,13 @@ describe("AccountEntity", () => {
 
     it("validates security_token property", () => {
       //@todo: refactor security_token scenarios to put it on assertEntityProperty
-      const securityTokenGenerator = ({code = "Abc", color = "#abcdef", textcolor = "#abcdef"} = {}) => ({code, color, textcolor});
+      const securityTokenGenerator = ({ code = "Abc", color = "#abcdef", textcolor = "#abcdef" } = {}) => ({
+        code,
+        color,
+        textcolor,
+      });
 
-      const successScenarios = [
-        {scenario: "a valid security token", value: securityTokenGenerator()},
-      ];
+      const successScenarios = [{ scenario: "a valid security token", value: securityTokenGenerator() }];
 
       const failingScenarios = [
         assertEntityProperty.SCENARIO_STRING,
@@ -108,18 +108,18 @@ describe("AccountEntity", () => {
         assertEntityProperty.SCENARIO_OBJECT,
         assertEntityProperty.SCENARIO_ARRAY,
         assertEntityProperty.SCENARIO_TRUE,
-        {scenario: "an invalid security token code", value: securityTokenGenerator({code: ";;;"})},
-        {scenario: "an invalid security token color", value: securityTokenGenerator({color: "redish"})},
-        {scenario: "an invalid security token textcolor", value: securityTokenGenerator({textcolor: "greenish"})},
+        { scenario: "an invalid security token code", value: securityTokenGenerator({ code: ";;;" }) },
+        { scenario: "an invalid security token color", value: securityTokenGenerator({ color: "redish" }) },
+        { scenario: "an invalid security token textcolor", value: securityTokenGenerator({ textcolor: "greenish" }) },
       ];
 
-      successScenarios.forEach(test => {
+      successScenarios.forEach((test) => {
         const dto = defaultAccountDto();
         dto.security_token = test.value;
         expect(() => new AccountEntity(dto)).not.toThrow();
       });
 
-      failingScenarios.forEach(test => {
+      failingScenarios.forEach((test) => {
         const dto = defaultAccountDto();
         dto.security_token = test.value;
         expect(() => new AccountEntity(dto)).toThrow(EntityValidationError);
@@ -128,10 +128,10 @@ describe("AccountEntity", () => {
 
     it("validates role_name property", () => {
       const successScenarios = [
-        {scenario: "valid role 'user'", value: 'user'},
-        {scenario: "valid role 'admin'", value: 'admin'},
-        {scenario: "valid role 'guest'", value: 'user'},
-        {scenario: "valid role 'custom'", value: 'custom'},
+        { scenario: "valid role 'user'", value: "user" },
+        { scenario: "valid role 'admin'", value: "admin" },
+        { scenario: "valid role 'guest'", value: "user" },
+        { scenario: "valid role 'custom'", value: "custom" },
       ];
 
       const failingScenarios = [
@@ -158,19 +158,19 @@ describe("AccountEntity", () => {
 
     it("it should validate the username by default", () => {
       expect.assertions(2);
-      const dto = defaultAccountDto({username: 'invalid-username'});
+      const dto = defaultAccountDto({ username: "invalid-username" });
       try {
         new AccountEntity(dto);
       } catch (error) {
         expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.hasError('username', 'custom')).toBeTruthy();
+        expect(error.hasError("username", "custom")).toBeTruthy();
       }
     });
 
     it("it should not validate the username if requested", () => {
       expect.assertions(2);
-      const dto = defaultAccountDto({username: 'invalid-username'});
-      const entity = new AccountEntity(dto, {validateUsername: false});
+      const dto = defaultAccountDto({ username: "invalid-username" });
+      const entity = new AccountEntity(dto, { validateUsername: false });
       expect(entity).toBeInstanceOf(AccountEntity);
       expect(entity.isUsernameValidated).toBeFalsy();
     });
@@ -180,16 +180,16 @@ describe("AccountEntity", () => {
     it("should return the expected properties.", () => {
       expect.assertions(2);
       const expectedKeys = [
-        'type',
-        'domain',
-        'user_id',
-        'user_key_fingerprint',
-        'user_public_armored_key',
-        'server_public_armored_key',
-        'username',
-        'first_name',
-        'last_name',
-        'locale'
+        "type",
+        "domain",
+        "user_id",
+        "user_key_fingerprint",
+        "user_public_armored_key",
+        "server_public_armored_key",
+        "username",
+        "first_name",
+        "last_name",
+        "locale",
       ];
 
       const dto = defaultAccountDto();
@@ -203,22 +203,22 @@ describe("AccountEntity", () => {
     it("it should return the user private key if requested", () => {
       expect.assertions(2);
       const expectedKeys = [
-        'type',
-        'domain',
-        'user_id',
-        'user_key_fingerprint',
-        'user_public_armored_key',
-        'server_public_armored_key',
-        'username',
-        'first_name',
-        'last_name',
-        'locale',
-        'user_private_armored_key'
+        "type",
+        "domain",
+        "user_id",
+        "user_key_fingerprint",
+        "user_public_armored_key",
+        "server_public_armored_key",
+        "username",
+        "first_name",
+        "last_name",
+        "locale",
+        "user_private_armored_key",
       ];
 
       const dto = defaultAccountDto();
       const entity = new AccountEntity(dto);
-      const resultDto = entity.toDto({user_private_armored_key: true});
+      const resultDto = entity.toDto({ user_private_armored_key: true });
       const keys = Object.keys(resultDto);
       expect(Object.keys(resultDto).length).toBe(11);
       expect(keys).toEqual(expectedKeys);
@@ -227,22 +227,22 @@ describe("AccountEntity", () => {
     it("it should return the user security token if requested", () => {
       expect.assertions(2);
       const expectedKeys = [
-        'type',
-        'domain',
-        'user_id',
-        'user_key_fingerprint',
-        'user_public_armored_key',
-        'server_public_armored_key',
-        'username',
-        'first_name',
-        'last_name',
-        'locale',
-        'security_token'
+        "type",
+        "domain",
+        "user_id",
+        "user_key_fingerprint",
+        "user_public_armored_key",
+        "server_public_armored_key",
+        "username",
+        "first_name",
+        "last_name",
+        "locale",
+        "security_token",
       ];
 
       const dto = defaultAccountDto();
       const entity = new AccountEntity(dto);
-      const resultDto = entity.toDto({security_token: true});
+      const resultDto = entity.toDto({ security_token: true });
       const keys = Object.keys(resultDto);
       expect(Object.keys(resultDto).length).toBe(11);
       expect(keys).toEqual(expectedKeys);

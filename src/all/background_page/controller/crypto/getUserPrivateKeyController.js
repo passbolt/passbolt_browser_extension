@@ -41,7 +41,7 @@ class GetUserPrivateKeyController {
       this.worker.port.emit(this.requestId, "SUCCESS", armoredEncryptedPrivateKey);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
   /**
@@ -54,7 +54,7 @@ class GetUserPrivateKeyController {
     const keyring = new Keyring();
     const privateKeyInfo = keyring.findPrivate();
     if (!privateKeyInfo) {
-      throw new GpgKeyError(i18n.t('Private key not found.'));
+      throw new GpgKeyError(i18n.t("Private key not found."));
     }
     return privateKeyInfo.armoredKey;
   }

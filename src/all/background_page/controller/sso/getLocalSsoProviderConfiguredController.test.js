@@ -14,11 +14,11 @@
 import "../../../../../test/mocks/mockSsoDataStorage";
 import GetLocalSsoProviderConfiguredController from "./getLocalSsoProviderConfiguredController";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
-import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
+import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
 
 describe("GetLocalSsoProviderConfiguredController", () => {
   describe("GetLocalSsoProviderConfiguredController::exec", () => {
-    it("Should return the local SSO kit.", async() => {
+    it("Should return the local SSO kit.", async () => {
       expect.assertions(1);
       const ssoLocalKit = await clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
@@ -28,7 +28,7 @@ describe("GetLocalSsoProviderConfiguredController", () => {
       expect(provider).toStrictEqual(ssoLocalKit.provider);
     });
 
-    it("Should return null if no local SSO kit has been built.", async() => {
+    it("Should return null if no local SSO kit has been built.", async () => {
       expect.assertions(1);
       SsoDataStorage.setMockedData(null);
 
@@ -37,9 +37,9 @@ describe("GetLocalSsoProviderConfiguredController", () => {
       expect(provider).toBeNull();
     });
 
-    it("Should return null if the local SSO kit is not complete.", async() => {
+    it("Should return null if the local SSO kit is not complete.", async () => {
       expect.assertions(1);
-      const ssoLocalKit = await clientSsoKit({id: null});
+      const ssoLocalKit = await clientSsoKit({ id: null });
       SsoDataStorage.setMockedData(ssoLocalKit);
 
       const controller = new GetLocalSsoProviderConfiguredController();

@@ -9,17 +9,17 @@
  * Open an url in a new tab.
  * @param url {string} The url to open
  */
-const open = function(url) {
-  chrome.tabs.create({url: url});
+const open = function (url) {
+  chrome.tabs.create({ url: url });
 };
 
 /**
  * Get the active tab url.
  * @return {string}
  */
-const getActiveTabUrl = function() {
-  return new Promise(resolve => {
-    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+const getActiveTabUrl = function () {
+  return new Promise((resolve) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       resolve(tabs[0].url);
     });
   });
@@ -29,9 +29,9 @@ const getActiveTabUrl = function() {
  * Set the active tab url.
  * @param url {string} The url to go to
  */
-const setActiveTabUrl = function(url) {
+const setActiveTabUrl = function (url) {
   if (url) {
-    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs[0];
 
       /*
@@ -40,11 +40,11 @@ const setActiveTabUrl = function(url) {
        * since it's added again by chrome.tabs.update
        */
       const replaceStr = `chrome-extension://${chrome.runtime.id}/`;
-      url = url.replace(replaceStr, '');
+      url = url.replace(replaceStr, "");
 
-      chrome.tabs.update(tab.id, {url: url});
+      chrome.tabs.update(tab.id, { url: url });
     });
   }
 };
 
-export const TabController = {open, getActiveTabUrl, setActiveTabUrl};
+export const TabController = { open, getActiveTabUrl, setActiveTabUrl };

@@ -16,7 +16,6 @@ import AccountLocalStorage from "../local_storage/accountLocalStorage";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import ParseAccountRecoveryUrlService from "./parseAccountRecoveryUrlService";
 
-
 class GetRequestLocalAccountService {
   /**
    * Get account recovery temporary account matching continue url.
@@ -30,19 +29,26 @@ class GetRequestLocalAccountService {
     const {
       domain: domain,
       user_id: userId,
-      authentication_token_token: authenticationTokenToken
+      authentication_token_token: authenticationTokenToken,
     } = ParseAccountRecoveryUrlService.parse(continueUrl);
 
-    const accountDto = await AccountLocalStorage.getAccountByUserIdAndType(userId, AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY);
+    const accountDto = await AccountLocalStorage.getAccountByUserIdAndType(
+      userId,
+      AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY,
+    );
     if (!accountDto) {
-      throw new Error('No account found for the given user in the local storage.');
+      throw new Error("No account found for the given user in the local storage.");
     }
 
-    const account = new AccountAccountRecoveryEntity(accountDto, {validateUsername: false});
-    if (account.domain !== domain
-      || account.authenticationTokenToken !== authenticationTokenToken
-      || account.userId !== userId) {
-      throw new Error('The account found in the local storage does not match the account recovery request url parameters.');
+    const account = new AccountAccountRecoveryEntity(accountDto, { validateUsername: false });
+    if (
+      account.domain !== domain ||
+      account.authenticationTokenToken !== authenticationTokenToken ||
+      account.userId !== userId
+    ) {
+      throw new Error(
+        "The account found in the local storage does not match the account recovery request url parameters.",
+      );
     }
 
     return account;

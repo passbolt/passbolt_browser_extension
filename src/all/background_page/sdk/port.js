@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 import Log from "../model/log";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 class Port {
   /**
@@ -19,7 +19,7 @@ class Port {
     this._listeners = {};
     this._disconnectListeners = {};
     this._port = port;
-    this._port.onMessage.addListener(msg => {
+    this._port.onMessage.addListener((msg) => {
       this._onMessage(msg);
     });
     this._port.onDisconnect.addListener(() => this._onDisconnect());
@@ -30,7 +30,7 @@ class Port {
    * @private
    */
   _onDisconnect() {
-    const applyAndDeleteDisconnectListener = requestId => {
+    const applyAndDeleteDisconnectListener = (requestId) => {
       this._disconnectListeners[requestId]?.apply();
       delete this._disconnectListeners[requestId];
     };
@@ -80,7 +80,7 @@ class Port {
     this._listeners[name].push({
       name: name,
       callback: callback,
-      once: once
+      once: once,
     });
   }
 
@@ -111,7 +111,7 @@ class Port {
    */
   emit(...requestArgs) {
     const message = JSON.stringify(requestArgs);
-    Log.write({level: 'debug', message: `Port emit @ message: ${message}`});
+    Log.write({ level: "debug", message: `Port emit @ message: ${message}` });
     this._port.postMessage(message);
   }
 
@@ -143,9 +143,9 @@ class Port {
        * Or if a progress notification is sent.
        */
       this.once(requestId, (status, ...callbackArgs) => {
-        if (status === 'SUCCESS') {
+        if (status === "SUCCESS") {
           resolve.apply(null, callbackArgs);
-        } else if (status === 'ERROR') {
+        } else if (status === "ERROR") {
           reject.apply(null, callbackArgs);
         }
         delete this._disconnectListeners[requestId];

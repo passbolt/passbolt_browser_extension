@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {createAccountRecoveryOrganizationPublicKeyDto} from "./accountRecoveryOrganizationPublicKeyEntity.test.data";
+import { createAccountRecoveryOrganizationPublicKeyDto } from "./accountRecoveryOrganizationPublicKeyEntity.test.data";
 
 export const changeToADisabledAccountRecoveryOrganizationPolicyDto = (data = {}) => {
   const defaultData = {
@@ -29,7 +29,6 @@ export const changeAnEnabledAccountRecoveryOrganizationPolicyTypeDto = (data = {
 
   return Object.assign(defaultData, data);
 };
-
 
 // Enabled account recovery organization policy
 

@@ -14,7 +14,7 @@
 import GroupsCollection from "../model/entity/group/groupsCollection";
 import ResourcesCollection from "../model/entity/resource/resourcesCollection";
 import FoldersCollection from "../model/entity/folder/foldersCollection";
-import './error.js';
+import "./error.js";
 
 class DeleteDryRunError extends Error {
   /**
@@ -24,7 +24,7 @@ class DeleteDryRunError extends Error {
    */
   constructor(message, errors) {
     super(message);
-    this.name = 'DeleteDryRunError';
+    this.name = "DeleteDryRunError";
     this.errors = {};
 
     /*
@@ -33,24 +33,24 @@ class DeleteDryRunError extends Error {
      */
     if (errors.groups && errors.groups.sole_manager) {
       this.errors.groups = {
-        sole_manager: new GroupsCollection(errors.groups.sole_manager)
+        sole_manager: new GroupsCollection(errors.groups.sole_manager),
       };
     }
     if (errors.resources && errors.resources.sole_owner) {
       this.errors.resources = {
-        sole_owner: new ResourcesCollection(errors.resources.sole_owner)
+        sole_owner: new ResourcesCollection(errors.resources.sole_owner),
       };
     }
     if (errors.folders && errors.folders.sole_owner) {
       this.errors.folders = {
-        sole_owner: new FoldersCollection(errors.folders.sole_owner)
+        sole_owner: new FoldersCollection(errors.folders.sole_owner),
       };
     }
 
     // There should be at least some errors
     if (!this.errors.folders && !this.errors.resources && !this.errors.groups) {
       console.error(this);
-      throw new TypeError('Invalid user deletion error. There should be at least some error details.');
+      throw new TypeError("Invalid user deletion error. There should be at least some error details.");
     }
   }
 
@@ -60,17 +60,17 @@ class DeleteDryRunError extends Error {
 
     if (this.errors.groups && this.errors.groups.sole_manager) {
       result.errors.groups = {
-        sole_manager: this.errors.groups.sole_manager.toJSON()
+        sole_manager: this.errors.groups.sole_manager.toJSON(),
       };
     }
     if (this.errors.resources && this.errors.resources.sole_owner) {
       result.errors.resources = {
-        sole_owner: this.errors.resources.sole_owner.toJSON()
+        sole_owner: this.errors.resources.sole_owner.toJSON(),
       };
     }
     if (this.errors.folders && this.errors.folders.sole_owner) {
       result.errors.folders = {
-        sole_owner: this.errors.folders.sole_owner.toJSON()
+        sole_owner: this.errors.folders.sole_owner.toJSON(),
       };
     }
 

@@ -12,7 +12,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const FOLDER_SERVICE_RESOURCE_NAME = 'folders';
+const FOLDER_SERVICE_RESOURCE_NAME = "folders";
 
 class FolderService extends AbstractService {
   /**
@@ -49,7 +49,7 @@ class FolderService extends AbstractService {
       "permission",
       "permissions",
       "permissions.user.profile",
-      "permissions.group"
+      "permissions.group",
     ];
   }
 
@@ -100,7 +100,7 @@ class FolderService extends AbstractService {
   async findAll(contains, filters) {
     contains = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(filters, FolderService.getSupportedFiltersOptions()) : null;
-    const options = {...contains, ...filters};
+    const options = { ...contains, ...filters };
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];
@@ -183,14 +183,14 @@ class FolderService extends AbstractService {
     }
 
     const url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
-    foldersIds.forEach(folderId => {
+    foldersIds.forEach((folderId) => {
       url.searchParams.append(`filter[has-id][]`, folderId);
     });
-    url.searchParams.append('contain[permission]', '1');
-    url.searchParams.append('contain[permissions.user.profile]', '1');
-    url.searchParams.append('contain[permissions.group]', '1');
+    url.searchParams.append("contain[permission]", "1");
+    url.searchParams.append("contain[permissions.user.profile]", "1");
+    url.searchParams.append("contain[permissions.group]", "1");
 
-    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const response = await this.apiClient.fetchAndHandleResponse("GET", url);
     return response.body;
   }
 }

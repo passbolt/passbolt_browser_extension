@@ -12,32 +12,64 @@
  * @since         4.10.1
  */
 
-import {v4 as uuidv4} from "uuid";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from '../../../../../../test/mocks/mockApiResponse';
+import { v4 as uuidv4 } from "uuid";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
 import AccountEntity from "../../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
 import MoveService from "./moveService";
 
 describe("MoveService", () => {
   let apiClientOptions, account;
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  describe('::moveResource', () => {
-    it("Move a resource on the API.", async() => {
-      expect.assertions(1);
+  describe("::moveFolder", () => {
+    it("Move a folder on the API.", async () => {
+      expect.assertions(2);
+
+      const folderId = uuidv4();
+      const destinationFolderId = uuidv4();
+
+      fetch.doMockOnceIf(new RegExp(`/move\/folder\/${folderId}\.json`), async (req) => {
+        expect(req.method).toEqual("PUT");
+        const body = await req.json();
+        expect(body).toEqual({ folder_parent_id: destinationFolderId });
+        return mockApiResponse({});
+      });
+
+      const service = new MoveService(apiClientOptions);
+      await service.moveFolder(folderId, destinationFolderId);
+    });
+
+    it("throws an invalid parameter error if the `id` or `destinationFolderId` parameter is not valid", async () => {
+      expect.assertions(2);
+
+      const service = new MoveService(apiClientOptions);
+
+      await expect(() => service.moveFolder(42)).rejects.toThrow("The parameter 'id' should be a UUID.");
+      await expect(() => service.moveFolder(uuidv4(), 42)).rejects.toThrow(
+        "The parameter 'destinationFolderId' should be a UUID or null.",
+      );
+    });
+  });
+
+  describe("::moveResource", () => {
+    it("Move a resource on the API.", async () => {
+      expect.assertions(2);
 
       const resourceId = uuidv4();
       const destinationFolderId = uuidv4();
 
-      fetch.doMockOnceIf(new RegExp(`/move\/resource\/${resourceId}\.json`), async req => {
+      fetch.doMockOnceIf(new RegExp(`/move\/resource\/${resourceId}\.json`), async (req) => {
         expect(req.method).toEqual("PUT");
+        const body = await req.json();
+        expect(body).toEqual({ folder_parent_id: destinationFolderId });
         return mockApiResponse({});
       });
 
@@ -45,13 +77,15 @@ describe("MoveService", () => {
       await service.moveResource(resourceId, destinationFolderId);
     });
 
-    it("throws an invalid parameter error if the `id` or `destinationFolderId` parameter is not valid", async() => {
+    it("throws an invalid parameter error if the `id` or `destinationFolderId` parameter is not valid", async () => {
       expect.assertions(2);
 
       const service = new MoveService(apiClientOptions);
 
       await expect(() => service.moveResource(42)).rejects.toThrow("The parameter 'id' should be a UUID.");
-      await expect(() => service.moveResource(uuidv4(), 42)).rejects.toThrow("The parameter 'destinationFolderId' should be a UUID or null.");
+      await expect(() => service.moveResource(uuidv4(), 42)).rejects.toThrow(
+        "The parameter 'destinationFolderId' should be a UUID or null.",
+      );
     });
   });
 });

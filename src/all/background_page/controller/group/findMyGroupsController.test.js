@@ -12,17 +12,17 @@
  * @since         4.9.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultGroupsDtos} from "../../model/entity/group/groupsCollection.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultGroupsDtos } from "../../model/entity/group/groupsCollection.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import FindMyGroupsController from "./findMyGroupsController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GroupsCollection from "../../model/entity/group/groupsCollection";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import FindGroupsService from "../../service/group/findGroupsService";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 describe("FindMyGroupsController", () => {
   let controller;
@@ -36,14 +36,14 @@ describe("FindMyGroupsController", () => {
   });
 
   describe("FindMyGroupsController::exec", () => {
-    it("Should return groups the current user is member of", async() => {
+    it("Should return groups the current user is member of", async () => {
       expect.assertions(3);
       const userInfo = pgpKeys.ada;
       await MockExtension.withConfiguredAccount(userInfo);
 
       const usersGroups = defaultGroupsDtos();
 
-      fetch.doMockOnceIf(/groups.json/, async request => {
+      fetch.doMockOnceIf(/groups.json/, async (request) => {
         const url = new URL(request.url);
         const hasUsers = url.searchParams.get("filter[has-users]");
 

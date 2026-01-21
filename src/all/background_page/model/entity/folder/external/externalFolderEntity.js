@@ -37,18 +37,16 @@ class ExternalFolderEntity extends EntityV2 {
   static getSchema() {
     const folderEntitySchema = FolderEntity.getSchema();
     return {
-      "type": "object",
-      "required": [
-        "name",
-      ],
-      "properties": {
-        "id": folderEntitySchema.properties.id,
-        "name": folderEntitySchema.properties.name,
-        "folder_parent_id": folderEntitySchema.properties.folder_parent_id,
-        "folder_parent_path": {
-          "type": "string"
-        }
-      }
+      type: "object",
+      required: ["name"],
+      properties: {
+        id: folderEntitySchema.properties.id,
+        name: folderEntitySchema.properties.name,
+        folder_parent_id: folderEntitySchema.properties.folder_parent_id,
+        folder_parent_path: {
+          type: "string",
+        },
+      },
     };
   }
 
@@ -62,7 +60,7 @@ class ExternalFolderEntity extends EntityV2 {
     const chunks = ExternalFolderEntity.splitFolderPath(path);
     const externalFolderDto = {
       name: chunks.pop(),
-      folder_parent_path: chunks.join('/')
+      folder_parent_path: chunks.join("/"),
     };
     return new ExternalFolderEntity(externalFolderDto);
   }
@@ -82,9 +80,9 @@ class ExternalFolderEntity extends EntityV2 {
   static sanitizePath(path) {
     path = path || "";
     return path
-      .replace(/^(\/{2,})|(\/{2,})$/g, '/') //replace any group of starting or ending slash by a single slash
-      .replace(/^(\/(?! ))|((?<! )\/)$/g, '') //remove starting '/' not followed by a space or an ending '/' not preceded by a space
-      .replace(/(?<! )(\/{2,})(?! )/g, '/'); //replace any group of multiple / that are not prefixed or suffixed by a space
+      .replace(/^(\/{2,})|(\/{2,})$/g, "/") //replace any group of starting or ending slash by a single slash
+      .replace(/^(\/(?! ))|((?<! )\/)$/g, "") //remove starting '/' not followed by a space or an ending '/' not preceded by a space
+      .replace(/(?<! )(\/{2,})(?! )/g, "/"); //replace any group of multiple / that are not prefixed or suffixed by a space
   }
 
   /**
@@ -107,9 +105,9 @@ class ExternalFolderEntity extends EntityV2 {
     name = name || "";
     return name
       .trim()
-      .replace(/^\//, '/ ') // replace a starting '/' by '/ '
-      .replace(/\/$/, ' /') // replace an ending '/' by ' /'
-      .replace(/(.)\/(.)/g, '$1 / $2'); //replace all "middle" '/' by ' / '
+      .replace(/^\//, "/ ") // replace a starting '/' by '/ '
+      .replace(/\/$/, " /") // replace an ending '/' by ' /'
+      .replace(/(.)\/(.)/g, "$1 / $2"); //replace all "middle" '/' by ' / '
   }
 
   /**
@@ -122,7 +120,7 @@ class ExternalFolderEntity extends EntityV2 {
    */
   static resolveEscapedName(name) {
     name = name || "";
-    return name.replace(/ \/ | \/|\/ /g, '/'); //replace any ' / ', ' /', '/ ' (slash with spaces) by a single '/'
+    return name.replace(/ \/ | \/|\/ /g, "/"); //replace any ' / ', ' /', '/ ' (slash with spaces) by a single '/'
   }
 
   /*

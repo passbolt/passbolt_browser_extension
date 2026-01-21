@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.9.4
  */
-import FindAndUpdateFoldersLocalStorageService
-  from "../../service/folder/findAndUpdateFoldersLocalStorageService";
+import FindAndUpdateFoldersLocalStorageService from "../../service/folder/findAndUpdateFoldersLocalStorageService";
 
 class UpdateAllFolderLocalStorageController {
   /**
@@ -26,7 +25,10 @@ class UpdateAllFolderLocalStorageController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(
+      account,
+      apiClientOptions,
+    );
   }
 
   /**
@@ -36,10 +38,10 @@ class UpdateAllFolderLocalStorageController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -48,7 +50,7 @@ class UpdateAllFolderLocalStorageController {
    * @returns {Promise<void>}
    */
   async exec() {
-    await this.findAndUpdateFoldersLocalStorageService.findAndUpdateAll({updatePeriodThreshold: 10000});
+    await this.findAndUpdateFoldersLocalStorageService.findAndUpdateAll({ updatePeriodThreshold: 10000 });
   }
 }
 

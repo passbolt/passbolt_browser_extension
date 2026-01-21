@@ -18,19 +18,19 @@ import CancelClipboardContentFlushController from "../controller/clipboard/cance
  * Listens the web integration events
  * @param worker
  */
-const listen = function(worker) {
+const listen = function (worker) {
   /*
    * Whenever the auto-save is required
    * @listens passbolt.web-integration.autosave
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.web-integration.autosave', async resourceToSave => {
+  worker.port.on("passbolt.web-integration.autosave", async (resourceToSave) => {
     const webIntegrationController = new WebIntegrationController(worker);
     await webIntegrationController.autosave(resourceToSave);
   });
 
   /** Whenever the in-form-menu or in-call-to-action are removed */
-  worker.port.on('passbolt.port.disconnect', async applicationName => {
+  worker.port.on("passbolt.port.disconnect", async (applicationName) => {
     const removePortController = new RemovePortController(worker);
     await removePortController._exec(applicationName);
   });
@@ -40,10 +40,10 @@ const listen = function(worker) {
    * @listens passbolt.clipboard.cancel-content-flush
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.clipboard.cancel-content-flush', async requestId => {
+  worker.port.on("passbolt.clipboard.cancel-content-flush", async (requestId) => {
     const clipboardController = new CancelClipboardContentFlushController(worker, requestId);
     await clipboardController._exec();
   });
 };
 
-export const WebIntegrationEvents = {listen};
+export const WebIntegrationEvents = { listen };

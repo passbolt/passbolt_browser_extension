@@ -22,7 +22,7 @@ async function main() {
   // Port connection
   const port = new Port(self.portname);
   // Emit a success if the port is still connected
-  port.on("passbolt.port.check", requestId => port.emit(requestId, "SUCCESS"));
+  port.on("passbolt.port.check", (requestId) => port.emit(requestId, "SUCCESS"));
   await port.connect();
   // Message listener
   const messageService = new MessageService();
@@ -36,7 +36,10 @@ async function main() {
   document.body.appendChild(domContainer);
   // TODO: update to createRoot for react 18 when ready
   /* eslint-disable react/no-deprecated */
-  ReactDOM.render(<ExtBootstrapApp port={port} storage={storage} browserExtensionUrl={browserExtensionUrl}/>, domContainer);
+  ReactDOM.render(
+    <ExtBootstrapApp port={port} storage={storage} browserExtensionUrl={browserExtensionUrl} />,
+    domContainer,
+  );
 }
 
 main();

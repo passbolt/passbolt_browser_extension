@@ -36,7 +36,7 @@ class GetAccountController {
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -47,7 +47,7 @@ class GetAccountController {
    */
   async exec() {
     // Ensure the account information returned to the content code doesn't include sensitive data.
-    const contains = {security_token: true};
+    const contains = { security_token: true };
     return this.account.toDto(contains);
   }
 }

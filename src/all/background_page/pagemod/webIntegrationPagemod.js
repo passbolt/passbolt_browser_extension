@@ -12,10 +12,10 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {ConfigEvents} from "../event/configEvents";
-import {WebIntegrationEvents} from "../event/webIntegrationEvents";
-import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
-import {PortEvents} from "../event/portEvents";
+import { ConfigEvents } from "../event/configEvents";
+import { WebIntegrationEvents } from "../event/webIntegrationEvents";
+import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { PortEvents } from "../event/portEvents";
 import ParseWebIntegrationUrlService from "../service/webIntegration/parseWebIntegrationUrlService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
@@ -40,8 +40,8 @@ class WebIntegration extends Pagemod {
    */
   get contentScriptFiles() {
     return [
-      'contentScripts/js/dist/browser-integration/vendors.js',
-      'contentScripts/js/dist/browser-integration/browser-integration.js'
+      "contentScripts/js/dist/browser-integration/vendors.js",
+      "contentScripts/js/dist/browser-integration/browser-integration.js",
     ];
   }
 
@@ -49,20 +49,14 @@ class WebIntegration extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [
-      ConfigEvents,
-      WebIntegrationEvents,
-      OrganizationSettingsEvents,
-      PortEvents,
-    ];
+    return [ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents, PortEvents];
   }
 
   /**
    * @inheritDoc
    */
   async canBeAttachedTo(frameDetails) {
-    return this.assertTopFrameAttachConstraint(frameDetails)
-      && await this.assertUrlAttachConstraint(frameDetails);
+    return this.assertTopFrameAttachConstraint(frameDetails) && (await this.assertUrlAttachConstraint(frameDetails));
   }
 
   /**

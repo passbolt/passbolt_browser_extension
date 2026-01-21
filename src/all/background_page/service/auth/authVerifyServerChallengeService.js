@@ -1,5 +1,5 @@
 import GpgAuthToken from "../../model/gpgAuthToken";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import GpgAuthHeader from "../../model/gpgAuthHeader";
 import AuthVerifyServerKeyService from "../api/auth/authVerifyServerKeyService";
@@ -41,11 +41,11 @@ class AuthVerifyServerChallengeService {
     // Step 2: Send the token encrypted to the server
     const response = await this.authVerifyServerKeyService.verify(userFingerprint, encryptedToken);
     // Step 3: Verify and validate the response headers
-    const auth = new GpgAuthHeader(response.headers, 'verify');
+    const auth = new GpgAuthHeader(response.headers, "verify");
     // Step 4: Verify and validate that the token received is the same
-    const verifyToken = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
+    const verifyToken = new GpgAuthToken(auth.headers["x-gpgauth-verify-response"]);
     if (verifyToken.token !== this.gpgAuthToken.token) {
-      throw new Error('The server was unable to prove it can use the advertised OpenPGP key.');
+      throw new Error("The server was unable to prove it can use the advertised OpenPGP key.");
     }
   }
 }

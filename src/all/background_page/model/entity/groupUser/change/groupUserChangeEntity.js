@@ -14,21 +14,20 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'GroupUser';
-const GROUP_USER_CHANGE_CREATE = 'create';
-const GROUP_USER_CHANGE_DELETE = 'delete';
-const GROUP_USER_CHANGE_UPDATE = 'update';
+const ENTITY_NAME = "GroupUser";
+const GROUP_USER_CHANGE_CREATE = "create";
+const GROUP_USER_CHANGE_DELETE = "delete";
+const GROUP_USER_CHANGE_UPDATE = "update";
 
 class GroupUserChangeEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(groupUserChangesDto, options = {}) {
-    super(EntitySchema.validate(
-      GroupUserChangeEntity.ENTITY_NAME,
-      groupUserChangesDto,
-      GroupUserChangeEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(GroupUserChangeEntity.ENTITY_NAME, groupUserChangesDto, GroupUserChangeEntity.getSchema()),
+      options,
+    );
   }
 
   /**
@@ -40,16 +39,16 @@ class GroupUserChangeEntity extends Entity {
     const schema = GroupUserEntity.getSchema();
     const whitelistProps = ["id", "user_id", "is_admin"];
     const extendedSchema = {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "delete": {
-          "type": "boolean",
-        }
-      }
+      type: "object",
+      required: [],
+      properties: {
+        delete: {
+          type: "boolean",
+        },
+      },
     };
 
-    whitelistProps.forEach(prop => {
+    whitelistProps.forEach((prop) => {
       extendedSchema.properties[prop] = schema.properties[prop];
     });
 
@@ -66,13 +65,13 @@ class GroupUserChangeEntity extends Entity {
    */
   static createFromGroupUser(groupUser, operation) {
     if (!groupUser || !(groupUser instanceof GroupUserEntity)) {
-      throw new TypeError('GroupUserChangeEntity createFromGroupUser expect a GroupUser entity.');
+      throw new TypeError("GroupUserChangeEntity createFromGroupUser expect a GroupUser entity.");
     }
     const changeDto = {};
     switch (operation) {
       case GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE:
         if (!groupUser.userId) {
-          throw new TypeError('GroupUserChangeEntity createFromGroupUser update expect a group user user_id.');
+          throw new TypeError("GroupUserChangeEntity createFromGroupUser update expect a group user user_id.");
         }
         changeDto.user_id = groupUser.userId;
         changeDto.is_admin = groupUser.isAdmin;
@@ -80,20 +79,20 @@ class GroupUserChangeEntity extends Entity {
         break;
       case GroupUserChangeEntity.GROUP_USER_CHANGE_UPDATE:
         if (!groupUser.id) {
-          throw new TypeError('GroupUserChangeEntity createFromGroupUser update expect a group user id.');
+          throw new TypeError("GroupUserChangeEntity createFromGroupUser update expect a group user id.");
         }
         changeDto.id = groupUser.id;
         changeDto.is_admin = groupUser.isAdmin;
         break;
       case GroupUserChangeEntity.GROUP_USER_CHANGE_DELETE:
         if (!groupUser.id) {
-          throw new TypeError('GroupUserChangeEntity createFromGroupUser delete expect a group user id.');
+          throw new TypeError("GroupUserChangeEntity createFromGroupUser delete expect a group user id.");
         }
         changeDto.id = groupUser.id;
         changeDto.delete = true;
         break;
       default:
-        throw new TypeError('GroupUserChangeEntity createFromGroupUser unsupported operation');
+        throw new TypeError("GroupUserChangeEntity createFromGroupUser unsupported operation");
     }
     return new GroupUserChangeEntity(changeDto);
   }
@@ -133,7 +132,7 @@ class GroupUserChangeEntity extends Entity {
    * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
-    if (typeof this._props.delete === 'undefined') {
+    if (typeof this._props.delete === "undefined") {
       return null;
     }
     return this._props.delete;

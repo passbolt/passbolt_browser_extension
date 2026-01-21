@@ -12,8 +12,7 @@
  * @since         4.11.0
  */
 import SaveMetadataSettingsService from "../../service/metadata/saveMetadataSettingsService";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 import FindMetadataSettingsService from "../../service/metadata/findMetadataSettingsService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 
@@ -40,10 +39,10 @@ class SaveMetadataKeysSettingsController {
   async _exec() {
     try {
       const result = await this.exec.apply(this, arguments);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

@@ -14,28 +14,30 @@
 import {
   temporaryAccountRecoveryAccountDto,
   temporaryRecoverAccountDto,
-  temporarySetupAccountDto
+  temporarySetupAccountDto,
 } from "../../model/entity/account/accountTemporaryEntity.test.data";
 import AccountTemporarySessionStorageService from "./accountTemporarySessionStorageService";
 import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
 
 describe("AccountTemporarySessionStorage", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     await browser.storage.session.clear();
   });
 
   describe("AccountTemporarySessionStorage::set", () => {
-    it("Should set AccountTemporary in storage session", async() => {
+    it("Should set AccountTemporary in storage session", async () => {
       expect.assertions(1);
       // data mocked
       const accountTemporaryEntity = new AccountTemporaryEntity(temporarySetupAccountDto());
       // process
       await AccountTemporarySessionStorageService.set(accountTemporaryEntity);
       // expectations
-      expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity.workerId)).toEqual(accountTemporaryEntity);
+      expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity.workerId)).toEqual(
+        accountTemporaryEntity,
+      );
     });
 
-    it("Should set AccountTemporary and keep only the last one in storage session", async() => {
+    it("Should set AccountTemporary and keep only the last one in storage session", async () => {
       expect.assertions(3);
       // data mocked
       const accountTemporaryEntity = new AccountTemporaryEntity(temporarySetupAccountDto());
@@ -48,10 +50,12 @@ describe("AccountTemporarySessionStorage", () => {
       // expectations
       expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity.workerId)).toEqual(null);
       expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity2.workerId)).toEqual(null);
-      expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity3.workerId)).toEqual(accountTemporaryEntity3);
+      expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity3.workerId)).toEqual(
+        accountTemporaryEntity3,
+      );
     });
 
-    it("Should not set the session storage if the account is not an AccountTemporaryEntity", async() => {
+    it("Should not set the session storage if the account is not an AccountTemporaryEntity", async () => {
       expect.assertions(3);
       // data mocked
       const accountTemporaryEntity = new AccountTemporaryEntity(temporarySetupAccountDto());
@@ -62,7 +66,9 @@ describe("AccountTemporarySessionStorage", () => {
         await AccountTemporarySessionStorageService.set(accountTemporaryEntity2);
       } catch (error) {
         // expectations
-        expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity.workerId)).toEqual(accountTemporaryEntity);
+        expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity.workerId)).toEqual(
+          accountTemporaryEntity,
+        );
         expect(await AccountTemporarySessionStorageService.get(accountTemporaryEntity2)).toEqual(null);
         expect(error.message).toEqual("The account is not an AccountTemporaryEntity, storage has not been set");
       }
@@ -70,18 +76,22 @@ describe("AccountTemporarySessionStorage", () => {
   });
 
   describe("AccountTemporarySessionStorage::get", () => {
-    it("Should get an AccountTemporary if present", async() => {
+    it("Should get an AccountTemporary if present", async () => {
       expect.assertions(1);
       // data mocked
       const accountTemporaryEntity = new AccountTemporaryEntity(temporarySetupAccountDto());
       // process
       await AccountTemporarySessionStorageService.set(accountTemporaryEntity);
-      const accountTemporaryEntityStored = await AccountTemporarySessionStorageService.get(accountTemporaryEntity.workerId);
+      const accountTemporaryEntityStored = await AccountTemporarySessionStorageService.get(
+        accountTemporaryEntity.workerId,
+      );
       // expectations
-      expect(accountTemporaryEntity.toDto(AccountTemporaryEntity.ALL_CONTAIN_OPTIONS)).toStrictEqual(accountTemporaryEntityStored.toDto(AccountTemporaryEntity.ALL_CONTAIN_OPTIONS));
+      expect(accountTemporaryEntity.toDto(AccountTemporaryEntity.ALL_CONTAIN_OPTIONS)).toStrictEqual(
+        accountTemporaryEntityStored.toDto(AccountTemporaryEntity.ALL_CONTAIN_OPTIONS),
+      );
     });
 
-    it("Should return null if the AccountTemporary doesn't exist", async() => {
+    it("Should return null if the AccountTemporary doesn't exist", async () => {
       expect.assertions(1);
       // data mocked
       const accountTemporaryEntity = new AccountTemporaryEntity(temporarySetupAccountDto());
@@ -94,14 +104,16 @@ describe("AccountTemporarySessionStorage", () => {
   });
 
   describe("AccountTemporarysSessionStorage::remove", () => {
-    it("Should remove AccountTemporary", async() => {
+    it("Should remove AccountTemporary", async () => {
       expect.assertions(1);
       // data mocked
       const accountTemporaryEntity = new AccountTemporaryEntity(temporarySetupAccountDto());
       await AccountTemporarySessionStorageService.set(accountTemporaryEntity);
       // process
       await AccountTemporarySessionStorageService.remove();
-      const accountTemporaryEntityStored = await AccountTemporarySessionStorageService.get(accountTemporaryEntity.workerId);
+      const accountTemporaryEntityStored = await AccountTemporarySessionStorageService.get(
+        accountTemporaryEntity.workerId,
+      );
       // expectations
       expect(accountTemporaryEntityStored).toEqual(null);
     });

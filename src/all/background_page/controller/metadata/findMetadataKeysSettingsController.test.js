@@ -13,39 +13,42 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import FindMetadataKeysSettingsController
-  from "./findMetadataKeysSettingsController";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
-import {
-  defaultMetadataKeysSettingsDto
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import FindMetadataKeysSettingsController from "./findMetadataKeysSettingsController";
+import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 
 describe("FindMetadataKeysSettingsController", () => {
   let controller, account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
     controller = new FindMetadataKeysSettingsController(null, null, apiClientOptions, account);
   });
 
   describe("::exec", () => {
-    it("find metadata keys settings and update session storage.", async() => {
+    it("find metadata keys settings and update session storage.", async () => {
       expect.assertions(4);
 
       const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
-      jest.spyOn(controller.findAndUpdateMetadataSettingsSessionStorageService.findMetadataSettingsService, "findKeysSettings")
+      jest
+        .spyOn(
+          controller.findAndUpdateMetadataSettingsSessionStorageService.findMetadataSettingsService,
+          "findKeysSettings",
+        )
         .mockImplementationOnce(() => new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
 
       const metadataKeysSettings = await controller.exec();
 
-      expect(controller.findAndUpdateMetadataSettingsSessionStorageService.findMetadataSettingsService.findKeysSettings).toHaveBeenCalled();
+      expect(
+        controller.findAndUpdateMetadataSettingsSessionStorageService.findMetadataSettingsService.findKeysSettings,
+      ).toHaveBeenCalled();
       expect(metadataKeysSettings).toBeInstanceOf(MetadataKeysSettingsEntity);
       expect(metadataKeysSettings.toDto()).toEqual(metadataKeysSettingsDto);
-      const storageValue = await controller.findAndUpdateMetadataSettingsSessionStorageService.metadataKeysSettingsLocalStorage.get();
+      const storageValue =
+        await controller.findAndUpdateMetadataSettingsSessionStorageService.metadataKeysSettingsLocalStorage.get();
       expect(storageValue).toEqual(metadataKeysSettingsDto);
     });
   });

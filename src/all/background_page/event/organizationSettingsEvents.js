@@ -14,8 +14,7 @@
 import User from "../model/user";
 import OrganizationSettingsModel from "../model/organizationSettings/organizationSettingsModel";
 
-
-const listen = function(worker) {
+const listen = function (worker) {
   /*
    * Get the organization settings.
    *
@@ -23,16 +22,16 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    * @param refreshCache {boolean} Should refresh the cache, default true
    */
-  worker.port.on('passbolt.organization-settings.get', async(requestId, refreshCache = true) => {
+  worker.port.on("passbolt.organization-settings.get", async (requestId, refreshCache = true) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
       const organizationSettings = await organizationSettingsModel.getOrFind(refreshCache);
-      worker.port.emit(requestId, 'SUCCESS', organizationSettings);
+      worker.port.emit(requestId, "SUCCESS", organizationSettings);
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 };
-export const OrganizationSettingsEvents = {listen};
+export const OrganizationSettingsEvents = { listen };

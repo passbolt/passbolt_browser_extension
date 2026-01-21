@@ -12,19 +12,19 @@
  */
 import CsvKdbxRowComposer from "./csvKdbxRowComposer";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
-import {defaultTotpDto} from "../../../entity/totp/totpDto.test.data";
+import { defaultTotpDto } from "../../../entity/totp/totpDto.test.data";
 
 describe("CsvKdbxComposer", () => {
   it("can compose kdbx csv row", () => {
     expect.assertions(8);
     const dto = {
-      "name": "Password 1",
-      "username": "Username 1",
-      "uris": ["https://url1.com"],
-      "secret_clear": "Secret 1",
-      "description": "Description 1",
-      "folder_parent_path": "Folder 1",
-      "totp": defaultTotpDto(),
+      name: "Password 1",
+      username: "Username 1",
+      uris: ["https://url1.com"],
+      secret_clear: "Secret 1",
+      description: "Description 1",
+      folder_parent_path: "Folder 1",
+      totp: defaultTotpDto(),
     };
     const externalResourceEntity = new ExternalResourceEntity(dto);
     const csvRow = CsvKdbxRowComposer.compose(externalResourceEntity);
@@ -35,20 +35,22 @@ describe("CsvKdbxComposer", () => {
     expect(csvRow.Password).toEqual(externalResourceEntity.secretClear);
     expect(csvRow.Notes).toEqual(externalResourceEntity.description);
     expect(csvRow.Group).toEqual(externalResourceEntity.folderParentPath);
-    expect(csvRow.TOTP).toEqual("otpauth://totp/Password%201%3AUsername%201?secret=DAV3DS4ERAAF5QGH&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30");
+    expect(csvRow.TOTP).toEqual(
+      "otpauth://totp/Password%201%3AUsername%201?secret=DAV3DS4ERAAF5QGH&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30",
+    );
   });
 
   it("can compose kdbx csv row with secret key lowercase and space", () => {
     expect.assertions(8);
     const dto = {
-      "name": "Password 1",
-      "username": "Username 1",
+      name: "Password 1",
+      username: "Username 1",
 
-      "uris": ["https://url1.com"],
-      "secret_clear": "Secret 1",
-      "description": "Description 1",
-      "folder_parent_path": "Folder 1",
-      "totp": defaultTotpDto({secret_key: "this is a secret!_"}),
+      uris: ["https://url1.com"],
+      secret_clear: "Secret 1",
+      description: "Description 1",
+      folder_parent_path: "Folder 1",
+      totp: defaultTotpDto({ secret_key: "this is a secret!_" }),
     };
     const externalResourceEntity = new ExternalResourceEntity(dto);
     const csvRow = CsvKdbxRowComposer.compose(externalResourceEntity);
@@ -60,6 +62,8 @@ describe("CsvKdbxComposer", () => {
     expect(csvRow.Password).toEqual(externalResourceEntity.secretClear);
     expect(csvRow.Notes).toEqual(externalResourceEntity.description);
     expect(csvRow.Group).toEqual(externalResourceEntity.folderParentPath);
-    expect(csvRow.TOTP).toEqual("otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30");
+    expect(csvRow.TOTP).toEqual(
+      "otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30",
+    );
   });
 });

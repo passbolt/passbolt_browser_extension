@@ -12,9 +12,11 @@
  * @since         5.3.2
  */
 
-import FetchOffscreenService, {SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} from "../network/fetchOffscreenService";
-import WriteClipobardOffscreenService, {SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN} from "../clipboard/writeClipobardOffscreenService";
-import {assertUuid} from "../../../../all/background_page/utils/assertions";
+import FetchOffscreenService, { SEND_MESSAGE_TARGET_FETCH_OFFSCREEN } from "../network/fetchOffscreenService";
+import WriteClipobardOffscreenService, {
+  SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN,
+} from "../clipboard/writeClipobardOffscreenService";
+import { assertUuid } from "../../../../all/background_page/utils/assertions";
 
 export const SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER = "service-worker-offscreen-error-response-handler";
 
@@ -69,7 +71,7 @@ export default class HandleOffscreenRequestService {
     await chrome.runtime.sendMessage({
       id: id,
       target: SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER,
-      data: {error: JSON.stringify(error, Object.getOwnPropertyNames(error))},
+      data: { error: JSON.stringify(error, Object.getOwnPropertyNames(error)) },
     });
   }
 

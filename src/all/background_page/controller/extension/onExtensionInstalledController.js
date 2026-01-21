@@ -20,9 +20,9 @@ import ParseRecoverUrlService from "../../service/recover/parseRecoverUrlService
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 import User from "../../model/user";
 import Log from "../../model/log";
-import {BrowserExtensionIconService} from "../../service/ui/browserExtensionIcon.service";
+import { BrowserExtensionIconService } from "../../service/ui/browserExtensionIcon.service";
 import storage from "../../sdk/storage";
-import {Config} from "../../model/config";
+import { Config } from "../../model/config";
 import AuthModel from "../../model/auth/authModel";
 import AppBootstrapPagemod from "../../pagemod/appBootstrapPagemod";
 
@@ -62,7 +62,7 @@ class OnExtensionInstalledController {
    */
   static async onInstall() {
     // Apply on tabs that match the regex
-    await browser.tabs.query({currentWindow: true}).then(updateTabMatchUrl).then(closeTabWebStore);
+    await browser.tabs.query({ currentWindow: true }).then(updateTabMatchUrl).then(closeTabWebStore);
   }
 
   /**
@@ -93,7 +93,10 @@ class OnExtensionInstalledController {
     } catch (error) {
       console.error(error);
       // Service is unavailable, do nothing...
-      Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
+      Log.write({
+        level: "debug",
+        message: "Could not check if the user is authenticated, the service is unavailable.",
+      });
       return;
     }
     // Do nothing if user is not authenticated
@@ -133,7 +136,10 @@ class OnExtensionInstalledController {
     } catch (error) {
       console.error(error);
       // Service is unavailable, do nothing...
-      Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
+      Log.write({
+        level: "debug",
+        message: "Could not check if the user is authenticated, the service is unavailable.",
+      });
       return;
     }
 
@@ -150,18 +156,20 @@ class OnExtensionInstalledController {
  * @param tabs
  * @returns {Promise<unknown[]>}
  */
-const updateTabMatchUrl = tabs => Promise.all(tabs.map(tab => {
-  if (tab && (ParseSetupUrlService.test(tab.url) || ParseRecoverUrlService.test(tab.url))) {
-    const url = new URL(tab.url);
-    url.searchParams.set('first-install', 1);
-    return browser.tabs.update(tab.id, {
-      url: url.href,
-      active: true
-    });
-  }
-  return tab;
-}));
-
+const updateTabMatchUrl = (tabs) =>
+  Promise.all(
+    tabs.map((tab) => {
+      if (tab && (ParseSetupUrlService.test(tab.url) || ParseRecoverUrlService.test(tab.url))) {
+        const url = new URL(tab.url);
+        url.searchParams.set("first-install", 1);
+        return browser.tabs.update(tab.id, {
+          url: url.href,
+          active: true,
+        });
+      }
+      return tab;
+    }),
+  );
 
 /**
  * Find the tab web store and close it
@@ -169,17 +177,16 @@ const updateTabMatchUrl = tabs => Promise.all(tabs.map(tab => {
  * @param tabs
  * @returns {Promise<unknown[]>}
  */
-const closeTabWebStore = tabs => {
+const closeTabWebStore = (tabs) => {
   const urlWebStoreRegex = `https:\/\/(chromewebstore.google.com|addons.mozilla.org)\/(.*)\/passbolt`;
-  return Promise.all(tabs.map(tab => tab.url.match(urlWebStoreRegex) ? browser.tabs.remove(tab.id) : tab));
+  return Promise.all(tabs.map((tab) => (tab.url.match(urlWebStoreRegex) ? browser.tabs.remove(tab.id) : tab)));
 };
-
 
 /**
  * Reload the tabs that match passsbolt app url
  * @param tabs
  */
-const reloadTabsMatchPassboltAppUrl = async tabs => {
+const reloadTabsMatchPassboltAppUrl = async (tabs) => {
   for (const tab of tabs) {
     if (await AppBootstrapPagemod.assertUrlAttachConstraint(tab)) {
       browser.tabs.reload(tab.id);
@@ -191,7 +198,7 @@ const reloadTabsMatchPassboltAppUrl = async tabs => {
  * Reload the tabs that match pagemod url
  * @param tabs
  */
-const reloadTabsMatchPagemodUrl = async tabs => {
+const reloadTabsMatchPagemodUrl = async (tabs) => {
   for (const tab of tabs) {
     if (await PagemodManager.hasPagemodMatchUrlToReload(tab.url)) {
       browser.tabs.reload(tab.id);
@@ -200,7 +207,7 @@ const reloadTabsMatchPagemodUrl = async tabs => {
       const frameDetails = {
         frameId: 0,
         tabId: tab.id,
-        url: tab.url
+        url: tab.url,
       };
       WebNavigationService.exec(frameDetails);
     }

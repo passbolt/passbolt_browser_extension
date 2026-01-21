@@ -23,11 +23,14 @@ describe("Group user change entity", () => {
   describe("Construct group user change entity from group user", () => {
     it("construct group user change entity for a create operation from a group user", () => {
       const groupUserToAddDto = {
-        "user_id": "f848277c-5398-58f8-a82a-72397af2d450",
-        "is_admin": true
+        user_id: "f848277c-5398-58f8-a82a-72397af2d450",
+        is_admin: true,
       };
       const groupUserToAddEntity = new GroupUserEntity(groupUserToAddDto);
-      const groupUserChangeToAddEntity = GroupUserChangeEntity.createFromGroupUser(groupUserToAddEntity, GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE);
+      const groupUserChangeToAddEntity = GroupUserChangeEntity.createFromGroupUser(
+        groupUserToAddEntity,
+        GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE,
+      );
       expect(groupUserChangeToAddEntity.id).toBeNull();
       expect(groupUserChangeToAddEntity.userId).toEqual(groupUserToAddDto.user_id);
       expect(groupUserChangeToAddEntity.isAdmin).toEqual(groupUserToAddDto.is_admin);
@@ -37,12 +40,15 @@ describe("Group user change entity", () => {
 
     it("construct group user change entity for an update operation from a group user", () => {
       const groupUserToUpdateDto = {
-        "id": "49a7cdf0-9786-4f26-a98a-e3f935d50d04",
-        "user_id": "f848277c-5398-58f8-a82a-72397af2d450",
-        "is_admin": true
+        id: "49a7cdf0-9786-4f26-a98a-e3f935d50d04",
+        user_id: "f848277c-5398-58f8-a82a-72397af2d450",
+        is_admin: true,
       };
       const groupUserToUpdateEntity = new GroupUserEntity(groupUserToUpdateDto);
-      const groupUserChangeToUpdateEntity = GroupUserChangeEntity.createFromGroupUser(groupUserToUpdateEntity, GroupUserChangeEntity.GROUP_USER_CHANGE_UPDATE);
+      const groupUserChangeToUpdateEntity = GroupUserChangeEntity.createFromGroupUser(
+        groupUserToUpdateEntity,
+        GroupUserChangeEntity.GROUP_USER_CHANGE_UPDATE,
+      );
       expect(groupUserChangeToUpdateEntity.id).toEqual(groupUserToUpdateDto.id);
       expect(groupUserChangeToUpdateEntity.userId).toBeNull();
       expect(groupUserChangeToUpdateEntity.isAdmin).toEqual(groupUserToUpdateDto.is_admin);
@@ -52,12 +58,15 @@ describe("Group user change entity", () => {
 
     it("construct group user change entity for a delete operation from a group user", () => {
       const groupUserToDeleteDto = {
-        "id": "49a7cdf0-9786-4f26-a98a-e3f935d50d04",
-        "user_id": "f848277c-5398-58f8-a82a-72397af2d450",
-        "is_admin": true
+        id: "49a7cdf0-9786-4f26-a98a-e3f935d50d04",
+        user_id: "f848277c-5398-58f8-a82a-72397af2d450",
+        is_admin: true,
       };
       const groupUserToDeleteEntity = new GroupUserEntity(groupUserToDeleteDto);
-      const groupUserChangeToDeleteEntity = GroupUserChangeEntity.createFromGroupUser(groupUserToDeleteEntity, GroupUserChangeEntity.GROUP_USER_CHANGE_DELETE);
+      const groupUserChangeToDeleteEntity = GroupUserChangeEntity.createFromGroupUser(
+        groupUserToDeleteEntity,
+        GroupUserChangeEntity.GROUP_USER_CHANGE_DELETE,
+      );
       expect(groupUserChangeToDeleteEntity.id).toEqual(groupUserToDeleteDto.id);
       expect(groupUserChangeToDeleteEntity.userId).toBeNull();
       expect(groupUserChangeToDeleteEntity.isAdmin).toBeNull();

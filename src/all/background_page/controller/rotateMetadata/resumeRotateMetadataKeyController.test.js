@@ -12,22 +12,27 @@
  * @since         5.6.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 import ResumeRotateMetadataKeyController from "./resumeRotateMetadataKeyController";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
-import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
+import { defaultMetadataKeyDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 
 describe("ResumeRotateMetadataKeyController", () => {
   describe("::exec", () => {
-    it("Resume rotation of the metadata key.", async() => {
+    it("Resume rotation of the metadata key.", async () => {
       expect.assertions(4);
 
       const passphrase = "ada@passbolt.com";
-      const worker = {port: new MockPort()};
-      const controller = new ResumeRotateMetadataKeyController(worker, null, defaultApiClientOptions(), new AccountEntity(defaultAccountDto()));
+      const worker = { port: new MockPort() };
+      const controller = new ResumeRotateMetadataKeyController(
+        worker,
+        null,
+        defaultApiClientOptions(),
+        new AccountEntity(defaultAccountDto()),
+      );
 
       jest.spyOn(controller.rotateMetadataKeyService, "resumeRotate").mockReturnValue();
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockReturnValue(passphrase);
@@ -39,7 +44,11 @@ describe("ResumeRotateMetadataKeyController", () => {
       await controller.exec(metadataKeyEntity);
 
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
-      expect(controller.rotateMetadataKeyService.resumeRotate).toHaveBeenNthCalledWith(1,  metadataKeyEntity, passphrase);
+      expect(controller.rotateMetadataKeyService.resumeRotate).toHaveBeenNthCalledWith(
+        1,
+        metadataKeyEntity,
+        passphrase,
+      );
       expect(controller.progressService.start).toHaveBeenNthCalledWith(1, 4, "Resume rotating metadata key");
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
     });

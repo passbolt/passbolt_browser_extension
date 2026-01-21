@@ -14,7 +14,7 @@
 
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import MetadataKeysApiService from "../api/metadata/metadataKeysApiService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
@@ -39,11 +39,11 @@ class FindMetadataKeysService {
    */
   async findAll(contains = {}, filters = {}) {
     const supportedOptions = MetadataKeysApiService.getSupportedContainOptions();
-    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
+    if (contains && !Object.keys(contains).every((option) => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
     }
     const supportedFilters = MetadataKeysApiService.getSupportedFiltersOptions();
-    if (filters && !Object.keys(filters).every(filter => supportedFilters.includes(filter))) {
+    if (filters && !Object.keys(filters).every((filter) => supportedFilters.includes(filter))) {
       throw new Error("Unsupported filter parameter used, please check supported filters");
     }
 
@@ -65,8 +65,8 @@ class FindMetadataKeysService {
    * @public
    */
   async findAllForSessionStorage() {
-    const contains = {metadata_private_keys: true, creator: true, "creator.profile": true};
-    const filters = {deleted: false};
+    const contains = { metadata_private_keys: true, creator: true, "creator.profile": true };
+    const filters = { deleted: false };
     const metadataKeys = await this.findAll(contains, filters);
     metadataKeys.filterOutMissingMetadataPrivateKeys();
     return metadataKeys;
@@ -78,7 +78,7 @@ class FindMetadataKeysService {
    * @public
    */
   findAllNonDeleted() {
-    return this.findAll({}, {deleted: false});
+    return this.findAll({}, { deleted: false });
   }
 
   /**
@@ -93,7 +93,11 @@ class FindMetadataKeysService {
 
         if (publicMetadataKey.getFingerprint().toLowerCase() !== metadataKey.fingerprint.toLowerCase()) {
           const error = new EntityValidationError();
-          error.addError(`metadata_public_keys.${index}.fingerprint`, 'fingerprint_match', 'The fingerprint of the metadata armored public key does not match the entity fingerprint');
+          error.addError(
+            `metadata_public_keys.${index}.fingerprint`,
+            "fingerprint_match",
+            "The fingerprint of the metadata armored public key does not match the entity fingerprint",
+          );
           throw error;
         }
       } catch (error) {

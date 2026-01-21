@@ -17,7 +17,7 @@ import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity
 
 const METADATA_SETUP_RESOURCE_NAME = "metadata/setup/";
 
-export default class MetadataSetupSettingsApiService extends AbstractService  {
+export default class MetadataSetupSettingsApiService extends AbstractService {
   /**
    * @constructor
    * @param {ApiClientOptions} apiClientOptions

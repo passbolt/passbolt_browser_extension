@@ -39,16 +39,18 @@ export default class FindAndUpdateRolesLocalStorageService {
     const lockKey = `${FIND_AND_UPDATE_ROLES_LS_LOCK_PREFIX}${this.account.id}`;
 
     // If no update is in progress, refresh the local storage.
-    return await navigator.locks.request(lockKey, {ifAvailable: true}, async lock => {
+    return await navigator.locks.request(lockKey, { ifAvailable: true }, async (lock) => {
       // Lock not granted, an update is already in progress. Wait for its completion and return the value of the local storage.
       if (!lock) {
-        return await navigator.locks.request(lockKey, {mode: "shared"}, async() =>
-          new RolesCollection(await RolesLocalStorage.get())
+        return await navigator.locks.request(
+          lockKey,
+          { mode: "shared" },
+          async () => new RolesCollection(await RolesLocalStorage.get()),
         );
       }
 
       // Lock is granted, retrieve the roles collection and update the local storage.
-      const rolesCollection = await this.findRolesService.findAll({ignoreInvalidEntity: true});
+      const rolesCollection = await this.findRolesService.findAll({ ignoreInvalidEntity: true });
 
       await RolesLocalStorage.set(rolesCollection);
       return rolesCollection;

@@ -14,12 +14,12 @@
 
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import UserModel from "../../model/user/userModel";
-import {assertString, assertUuid} from "../../utils/assertions";
+import { assertString, assertUuid } from "../../utils/assertions";
 import MetadataPrivateKeyApiService from "../api/metadata/metadataPrivateKeyApiService";
 import ShareMetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 import EncryptMetadataPrivateKeysService from "./encryptMetadataPrivateKeysService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import Keyring from "../../model/keyring";
 import UserLocalStorage from "../local_storage/userLocalStorage";
@@ -73,7 +73,7 @@ export default class ShareMetadataKeyPrivateService {
     const metadataKeysCollection = await this.getOrFindMetadataKeysService.getOrFindAll(passphrase);
     await this.keyring.sync();
 
-    const promises = missingMetadataKeysIds.map(async missingMetadataKeyId => {
+    const promises = missingMetadataKeysIds.map(async (missingMetadataKeyId) => {
       const missingMetadataKey = metadataKeysCollection.getFirst("id", missingMetadataKeyId);
 
       if (!missingMetadataKey) {
@@ -82,9 +82,10 @@ export default class ShareMetadataKeyPrivateService {
 
       let decryptedUserPrivateKey = null;
       if (missingMetadataKey.metadataPrivateKeys.items[0].dataSignedByCurrentUser) {
-        decryptedUserPrivateKey =  await this._getDecryptedPrivateKey(passphrase);
+        decryptedUserPrivateKey = await this._getDecryptedPrivateKey(passphrase);
       }
-      const clonedSharedMetadataPrivateKey = await missingMetadataKey.metadataPrivateKeys.items[0].cloneForSharing(userId);
+      const clonedSharedMetadataPrivateKey =
+        await missingMetadataKey.metadataPrivateKeys.items[0].cloneForSharing(userId);
 
       await this.encryptMetadataPrivateKeysService.encryptOne(clonedSharedMetadataPrivateKey, decryptedUserPrivateKey);
       shareMetadataPrivateKeysCollection.push(clonedSharedMetadataPrivateKey);
@@ -98,7 +99,9 @@ export default class ShareMetadataKeyPrivateService {
 
     await this.metadataPrivateKeyApiService.create(shareMetadataPrivateKeysCollection);
     const sharedMetadataKeysIds = shareMetadataPrivateKeysCollection.extract("metadata_key_id");
-    missingMetadataKeysIds = missingMetadataKeysIds.filter(missingMetadataKey => !sharedMetadataKeysIds.includes(missingMetadataKey));
+    missingMetadataKeysIds = missingMetadataKeysIds.filter(
+      (missingMetadataKey) => !sharedMetadataKeysIds.includes(missingMetadataKey),
+    );
     targettedUser.missingMetadataKeysIds = missingMetadataKeysIds;
     await UserLocalStorage.updateUser(targettedUser);
   }
@@ -118,7 +121,7 @@ export default class ShareMetadataKeyPrivateService {
     }
 
     const users = await this.findUsersService.findAllActiveWithMissingKeys();
-    users.filterByCallback(user => user.missingMetadataKeysIds.length > 0);
+    users.filterByCallback((user) => user.missingMetadataKeysIds.length > 0);
     if (users.length === 0) {
       return;
     }
@@ -126,7 +129,11 @@ export default class ShareMetadataKeyPrivateService {
     await this.keyring.sync();
     const shareMetadataPrivateKeysCollection = await this._getMetadataPrivateKeys(passphrase);
     const decryptedUserPrivateKey = await this._getDecryptedPrivateKey(passphrase);
-    const shareMetadataPrivateKeysUsersCollection = await this._buildMetadataKeyForUsers(users, shareMetadataPrivateKeysCollection, decryptedUserPrivateKey);
+    const shareMetadataPrivateKeysUsersCollection = await this._buildMetadataKeyForUsers(
+      users,
+      shareMetadataPrivateKeysCollection,
+      decryptedUserPrivateKey,
+    );
     if (shareMetadataPrivateKeysUsersCollection.length > 0) {
       await this.metadataPrivateKeyApiService.create(shareMetadataPrivateKeysUsersCollection);
     }
@@ -173,7 +180,10 @@ export default class ShareMetadataKeyPrivateService {
       for (const metadataPrivateKey of metadataPrivateKeysCollection) {
         const clonedSharedMetadataPrivateKey = await metadataPrivateKey.cloneForSharing(user.id);
         if (metadataPrivateKey.dataSignedByCurrentUser) {
-          await this.encryptMetadataPrivateKeysService.encryptOne(clonedSharedMetadataPrivateKey, decryptedUserPrivateKey);
+          await this.encryptMetadataPrivateKeysService.encryptOne(
+            clonedSharedMetadataPrivateKey,
+            decryptedUserPrivateKey,
+          );
         } else {
           await this.encryptMetadataPrivateKeysService.encryptOne(clonedSharedMetadataPrivateKey, null);
         }

@@ -13,7 +13,7 @@
  */
 
 import PasswordExpirySettingsService from "../../service/api/passwordExpiry/passwordExpirySettingsService";
-import {assertType, assertUuid} from "../../utils/assertions";
+import { assertType, assertUuid } from "../../utils/assertions";
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
 import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
@@ -71,9 +71,17 @@ class PasswordExpirySettingsModel {
     const organizationSettings = await this.organisationSettingsModel.getOrFind();
     const isAdvancedSettingsEnable = organizationSettings.isPluginEnabled("passwordExpiryPolicies");
     if (!isAdvancedSettingsEnable) {
-      assertType(passwordExpirySettingsEntity, PasswordExpirySettingsEntity, 'The given entity is not a PasswordExpirySettingsEntity');
+      assertType(
+        passwordExpirySettingsEntity,
+        PasswordExpirySettingsEntity,
+        "The given entity is not a PasswordExpirySettingsEntity",
+      );
     } else {
-      assertType(passwordExpirySettingsEntity, PasswordExpiryProSettingsEntity, 'The given entity is not a PasswordExpiryProSettingsEntity');
+      assertType(
+        passwordExpirySettingsEntity,
+        PasswordExpiryProSettingsEntity,
+        "The given entity is not a PasswordExpiryProSettingsEntity",
+      );
     }
     const passwordExpirySettingsDto = await this.passwordExpirySettingsService.create(passwordExpirySettingsEntity);
     const passwordExpirySettingsEntityUpdated = await this.createFromDefault(passwordExpirySettingsDto);

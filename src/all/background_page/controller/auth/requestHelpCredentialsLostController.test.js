@@ -12,12 +12,12 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { withSecurityTokenAccountRecoverDto } from "../../model/entity/account/accountRecoverEntity.test.data";
 import RequestHelpCredentialsLostController from "./requestHelpCredentialsLostController";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -25,12 +25,12 @@ beforeEach(() => {
 
 describe("RequestHelpCredentialsLostController", () => {
   describe("RequestHelpCredentialsLostController::exec", () => {
-    it("Should request help to an administrator.", async() => {
+    it("Should request help to an administrator.", async () => {
       const account = new AccountEntity(withSecurityTokenAccountRecoverDto());
       const controller = new RequestHelpCredentialsLostController(null, null, defaultApiClientOptions(), account);
 
       // Mock the API response.
-      const mockApiFetch = fetch.doMockOnceIf(new RegExp('/users/recover.json'), () => mockApiResponse());
+      const mockApiFetch = fetch.doMockOnceIf(new RegExp("/users/recover.json"), () => mockApiResponse());
 
       await controller.exec();
 

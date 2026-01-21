@@ -29,4 +29,3 @@ describe("hasUserPostponedUserSettingInvitationController", () => {
     expect(setValue).toBe(true);
   });
 });
-

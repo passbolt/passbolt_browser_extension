@@ -37,103 +37,103 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import RedirectToAdminWorkspaceController from "../controller/auth/redirectToAdminWorkspaceController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 
-const listen = function(worker, apiClientOptions, account) {
-  worker.port.on('passbolt.setup.is-first-install', async requestId => {
+const listen = function (worker, apiClientOptions, account) {
+  worker.port.on("passbolt.setup.is-first-install", async (requestId) => {
     const controller = new IsExtensionFirstInstallController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.organization-settings.get', async requestId => {
+  worker.port.on("passbolt.organization-settings.get", async (requestId) => {
     const controller = new GetOrganizationSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.setup.start', async requestId => {
+  worker.port.on("passbolt.setup.start", async (requestId) => {
     const controller = new StartSetupController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.setup.get-and-init-locale', async requestId => {
+  worker.port.on("passbolt.setup.get-and-init-locale", async (requestId) => {
     const controller = new GetAndInitSetupLocaleController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.setup.update-locale', async(requestId, localeDto) => {
+  worker.port.on("passbolt.setup.update-locale", async (requestId, localeDto) => {
     const controller = new SetSetupLocaleController(worker, requestId, apiClientOptions, account);
     await controller._exec(localeDto);
   });
 
-  worker.port.on('passbolt.setup.generate-key', async(requestId, generateGpgKeyDto) => {
+  worker.port.on("passbolt.setup.generate-key", async (requestId, generateGpgKeyDto) => {
     const controller = new GenerateSetupKeyPairController(worker, requestId, apiClientOptions);
     await controller._exec(generateGpgKeyDto);
   });
 
-  worker.port.on('passbolt.setup.download-recovery-kit', async requestId => {
+  worker.port.on("passbolt.setup.download-recovery-kit", async (requestId) => {
     const controller = new DownloadRecoveryKitController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.setup.get-account-recovery-organization-policy', async requestId => {
+  worker.port.on("passbolt.setup.get-account-recovery-organization-policy", async (requestId) => {
     const controller = new GetAccountRecoveryOrganizationPolicyController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.setup.set-account-recovery-user-setting', async(requestId, status) => {
+  worker.port.on("passbolt.setup.set-account-recovery-user-setting", async (requestId, status) => {
     const controller = new SetSetupAccountRecoveryUserSettingController(worker, requestId);
     await controller._exec(status);
   });
 
-  worker.port.on('passbolt.setup.import-key', async(requestId, armoredKey) => {
+  worker.port.on("passbolt.setup.import-key", async (requestId, armoredKey) => {
     const controller = new ImportSetupPrivateKeyController(worker, requestId, apiClientOptions);
     await controller._exec(armoredKey);
   });
 
-  worker.port.on('passbolt.setup.verify-passphrase', async(requestId, passphrase) => {
+  worker.port.on("passbolt.setup.verify-passphrase", async (requestId, passphrase) => {
     const controller = new VerifyImportedKeyPassphraseController(worker, requestId);
     await controller._exec(passphrase);
   });
 
-  worker.port.on('passbolt.setup.set-security-token', async(requestId, securityTokenDto) => {
+  worker.port.on("passbolt.setup.set-security-token", async (requestId, securityTokenDto) => {
     const controller = new SetSetupSecurityTokenController(worker, requestId);
     await controller._exec(securityTokenDto);
   });
 
-  worker.port.on('passbolt.setup.complete', async requestId => {
+  worker.port.on("passbolt.setup.complete", async (requestId) => {
     const controller = new CompleteSetupController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.keyring.get-key-info', async(requestId, armoredKey) => {
+  worker.port.on("passbolt.keyring.get-key-info", async (requestId, armoredKey) => {
     const controller = new GetKeyInfoController(worker, requestId);
     await controller._exec(armoredKey);
   });
 
-  worker.port.on('passbolt.setup.sign-in', async(requestId, rememberMe) => {
+  worker.port.on("passbolt.setup.sign-in", async (requestId, rememberMe) => {
     const controller = new SignInSetupController(worker, requestId, apiClientOptions);
     await controller._exec(rememberMe);
   });
 
-  worker.port.on('passbolt.setup.validate-private-key', async(requestId, key) => {
+  worker.port.on("passbolt.setup.validate-private-key", async (requestId, key) => {
     const controller = new ValidatePrivateGpgKeySetupController(worker, requestId);
     await controller._exec(key);
   });
 
-  worker.port.on('passbolt.setup.get-user-passphrase-policies', async requestId => {
+  worker.port.on("passbolt.setup.get-user-passphrase-policies", async (requestId) => {
     const controller = new GetUserPassphrasePoliciesController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.tab.reload', async requestId => {
+  worker.port.on("passbolt.tab.reload", async (requestId) => {
     const controller = new ReloadTabController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.metadata.find-setup-settings', async requestId => {
+  worker.port.on("passbolt.metadata.find-setup-settings", async (requestId) => {
     const controller = new FindMetadataSetupSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.metadata.enable', async requestId => {
+  worker.port.on("passbolt.metadata.enable", async (requestId) => {
     /*
      * The global account at this stage is an `AccountSetupEntity` that is tempered as this process is run after the sign-in
      * So, to addresse the enablement of the metadata in the Setup app, we need to get a `AccountEntity` instead.
@@ -150,7 +150,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.post-login-redirect
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.post-login-redirect', async requestId => {
+  worker.port.on("passbolt.auth.post-login-redirect", async (requestId) => {
     const controller = new RedirectPostLoginController(worker, requestId, account);
     await controller._exec();
   });
@@ -161,7 +161,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.post-login-redirect-to-admin-workspace
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on("passbolt.auth.post-login-redirect-to-admin-workspace", async requestId => {
+  worker.port.on("passbolt.auth.post-login-redirect-to-admin-workspace", async (requestId) => {
     const controller = new RedirectToAdminWorkspaceController(worker, requestId, account);
     await controller._exec();
   });
@@ -172,9 +172,9 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.users.find-logged-in-user
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.users.find-logged-in-user', async requestId => {
+  worker.port.on("passbolt.users.find-logged-in-user", async (requestId) => {
     const controller = new GetOrFindLoggedInUserController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 };
-export const SetupEvents = {listen};
+export const SetupEvents = { listen };

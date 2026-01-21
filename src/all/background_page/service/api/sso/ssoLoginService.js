@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
+import { ApiClient } from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
 
-const SSO_USER_DATA_SERVICE_RESOURCE_NAME = '/sso/${providerId}/login';
+const SSO_USER_DATA_SERVICE_RESOURCE_NAME = "/sso/${providerId}/login";
 
 class SsoLoginService {
   /**
@@ -54,7 +54,7 @@ class SsoLoginService {
    * @private
    */
   getApiClient(providerId) {
-    if (typeof(providerId) !== "string") {
+    if (typeof providerId !== "string") {
       throw new Error("The provider identifier should be a string");
     }
 

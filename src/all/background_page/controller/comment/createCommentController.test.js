@@ -12,17 +12,17 @@
  * @since         3.8.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import CreateCommentController from "./createCommentController";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import CommentService from "../../model/comment/commentService";
-import {defaultCommentDto} from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
+import { defaultCommentDto } from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
 
-beforeEach(async() =>  {
+beforeEach(async () => {
   enableFetchMocks();
   fetch.resetMocks();
   await MockExtension.withConfiguredAccount();
@@ -35,15 +35,16 @@ const fetchCommentsMock = () => {
 };
 const mockedWorker = {
   port: {
-    emit: jest.fn()
-  }
+    emit: jest.fn(),
+  },
 };
 describe("CreateCommentController", () => {
   const validationError = new EntityValidationError("Could not validate entity CommentEntity.");
-  const expectInvalidField = (controller, mockCreation) => expect(controller.exec(mockCreation)).rejects.toThrowError(validationError);
+  const expectInvalidField = (controller, mockCreation) =>
+    expect(controller.exec(mockCreation)).rejects.toThrowError(validationError);
 
   describe("CreateCommentController::constructor", () => {
-    it("Should init all properties.", async() => {
+    it("Should init all properties.", async () => {
       const requestId = uuidv4();
       const apiClientOption = defaultApiClientOptions();
       const controller = new CreateCommentController(mockedWorker, requestId, apiClientOption);
@@ -56,7 +57,7 @@ describe("CreateCommentController", () => {
     });
   });
   describe("CreateCommentController::exec", () => {
-    it("Should create the comment and send the result back.", async() => {
+    it("Should create the comment and send the result back.", async () => {
       fetchCommentsMock();
       const controller = new CreateCommentController(null, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller.commentService, "create");
@@ -68,9 +69,11 @@ describe("CreateCommentController", () => {
       //We expect the function findAllByResourceId to be called with resourceId
       expect(spy).toHaveBeenCalled();
     });
-    it("Should raise an error if service is unavailable", async() => {
+    it("Should raise an error if service is unavailable", async () => {
       const mockedError = new TypeError("Unable to reach the server, an unexpected error occurred");
-      fetch.doMock(() => { throw mockedError; });
+      fetch.doMock(() => {
+        throw mockedError;
+      });
       const controller = new CreateCommentController(mockedWorker, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller.commentService, "create");
 
@@ -79,7 +82,7 @@ describe("CreateCommentController", () => {
       await expect(controller.exec(mockApiCreation)).rejects.toThrowError(mockedError);
       expect(spy).toHaveBeenCalled();
     });
-    it("Should raise error if user_id is missing.", async() => {
+    it("Should raise error if user_id is missing.", async () => {
       const mockCreation = Object.assign({}, mockApiCreation);
       delete mockCreation.user_id;
       const controller = new CreateCommentController(null, null, defaultApiClientOptions());
@@ -88,10 +91,12 @@ describe("CreateCommentController", () => {
 
       expectInvalidField(controller, mockCreation);
     });
-    it("Should raise an error if user is offline", async() => {
+    it("Should raise an error if user is offline", async () => {
       navigator.onLine = false;
       const mockedError = new TypeError("Unable to reach the server, you are not connected to the network");
-      fetch.doMock(() => { throw mockedError; });
+      fetch.doMock(() => {
+        throw mockedError;
+      });
       const controller = new CreateCommentController(mockedWorker, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller.commentService, "create");
 

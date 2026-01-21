@@ -11,18 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.1.0
  */
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AuthModel from "../../model/auth/authModel";
 import AuthLogoutService from "passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService";
 import PostLogoutService from "../../service/auth/postLogoutService";
 
-beforeEach(async() => {
+beforeEach(async () => {
   jest.clearAllMocks();
 });
 
 describe("AuthModel", () => {
   describe("AuthModel::logout", () => {
-    it("Should call the AuthLogoutService to logout and dispatch a logout event", async() => {
+    it("Should call the AuthLogoutService to logout and dispatch a logout event", async () => {
       expect.assertions(2);
       const apiClientOptions = defaultApiClientOptions();
       const model = new AuthModel(apiClientOptions);

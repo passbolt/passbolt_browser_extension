@@ -12,16 +12,16 @@
  * @since         4.3.0
  */
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import ExportDesktopAccountController from "./exportDesktopAccountController";
-import {requestId, worker} from "./exportDesktopAccountController.test.data";
+import { requestId, worker } from "./exportDesktopAccountController.test.data";
 import FileService from "../../service/file/fileService";
 import GetLegacyAccountService from "../../service/account/getLegacyAccountService";
-import {Buffer} from 'buffer';
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { Buffer } from "buffer";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import SignMessageService from "../../service/crypto/signMessageService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 describe("ExportDesktopAccountController", () => {
   const account = new AccountEntity(defaultAccountDto());
@@ -34,7 +34,7 @@ describe("ExportDesktopAccountController", () => {
   });
 
   describe("ExportDesktopAccountController::exec", () => {
-    it("Should request the passphrase before any other action.", async() => {
+    it("Should request the passphrase before any other action.", async () => {
       expect.assertions(3);
       //Simulate an error to check is the other methods have not been called
       jest.spyOn(controller.getPassphraseService, "requestPassphrase").mockRejectedValue(() => new Error());
@@ -48,22 +48,29 @@ describe("ExportDesktopAccountController", () => {
       expect(controller.desktopTransferModel.getAccountKit).not.toHaveBeenCalled();
       expect(FileService.saveFile).not.toHaveBeenCalled();
     });
-    it("Should save the signed account kit.", async() => {
+    it("Should save the signed account kit.", async () => {
       expect.assertions(5);
 
       let resultSignedAccountKit;
       jest.spyOn(DecryptPrivateKeyService, "decrypt");
       jest.spyOn(SignMessageService, "signClearMessage");
-      jest.spyOn(FileService, "saveFile").mockImplementation(jest.fn((_, content) => {
-        resultSignedAccountKit = content;
-      }));
+      jest.spyOn(FileService, "saveFile").mockImplementation(
+        jest.fn((_, content) => {
+          resultSignedAccountKit = content;
+        }),
+      );
 
       await controller.exec();
 
       expect(SignMessageService.signClearMessage).toHaveBeenCalled();
       expect(DecryptPrivateKeyService.decrypt).toHaveBeenCalled();
       expect(controller.desktopTransferModel.getAccountKit).toHaveBeenCalled();
-      expect(FileService.saveFile).toHaveBeenCalledWith("account-kit.passbolt", expect.anything(), "application/passbolt", worker.tab.id);
+      expect(FileService.saveFile).toHaveBeenCalledWith(
+        "account-kit.passbolt",
+        expect.anything(),
+        "application/passbolt",
+        worker.tab.id,
+      );
       // Assert the account kit output.
       const signedResultAccountKit = Buffer.from(resultSignedAccountKit, "base64").toString();
       const serializedResultAccountKit = await OpenpgpAssertion.readClearMessageOrFail(signedResultAccountKit);
@@ -73,7 +80,7 @@ describe("ExportDesktopAccountController", () => {
   });
 
   describe("ExportDesktopAccountController::_exec", () => {
-    it("Should call exec method.", async() => {
+    it("Should call exec method.", async () => {
       expect.assertions(1);
       jest.spyOn(controller, "exec");
 
@@ -82,23 +89,21 @@ describe("ExportDesktopAccountController", () => {
       expect(controller.exec).toHaveBeenCalled();
     });
 
-    it("Should emit success when the file is downloaded.", async() => {
+    it("Should emit success when the file is downloaded.", async () => {
       expect.assertions(1);
       await controller._exec();
 
-      expect(worker.port.emit).toHaveBeenCalledWith(requestId, 'SUCCESS');
+      expect(worker.port.emit).toHaveBeenCalledWith(requestId, "SUCCESS");
     });
 
-
-    it("Should emit error when an error occured.", async() => {
+    it("Should emit error when an error occured.", async () => {
       expect.assertions(1);
-      const error = new Error('Cannot download');
+      const error = new Error("Cannot download");
       controller.getPassphraseService.requestPassphrase.mockRejectedValue(error);
 
       await controller._exec();
 
-      expect(worker.port.emit).toHaveBeenCalledWith(requestId, 'ERROR', error);
+      expect(worker.port.emit).toHaveBeenCalledWith(requestId, "ERROR", error);
     });
   });
 });
-

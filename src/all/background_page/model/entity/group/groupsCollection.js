@@ -14,10 +14,10 @@
 import GroupEntity from "./groupEntity";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
-const ENTITY_NAME = 'Groups';
+const ENTITY_NAME = "Groups";
 
-const RULE_UNIQUE_ID = 'unique_id';
-const RULE_UNIQUE_GROUP_NAME = 'unique_group_name';
+const RULE_UNIQUE_ID = "unique_id";
+const RULE_UNIQUE_GROUP_NAME = "unique_group_name";
 
 class GroupsCollection extends EntityV2Collection {
   /**
@@ -49,8 +49,8 @@ class GroupsCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": GroupEntity.getSchema(),
+      type: "array",
+      items: GroupEntity.getSchema(),
     };
   }
 
@@ -62,8 +62,8 @@ class GroupsCollection extends EntityV2Collection {
    * @throws {EntityValidationError} If a group already exists with the same name.
    */
   validateBuildRules(item, options) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
-    this.assertNotExist("name", item._props.name, {haystackSet: options?.uniqueNamesSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
+    this.assertNotExist("name", item._props.name, { haystackSet: options?.uniqueNamesSetCache });
   }
 
   /*
@@ -78,15 +78,15 @@ class GroupsCollection extends EntityV2Collection {
   pushMany(data, entityOptions = {}, options = {}) {
     const uniqueIdsSetCache = new Set(this.extract("id"));
     const uniqueNamesSetCache = new Set(this.extract("name"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
       uniqueNamesSetCache.add(item.name);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueNamesSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache, uniqueNamesSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);
@@ -111,7 +111,7 @@ class GroupsCollection extends EntityV2Collection {
    * @returns {Array<string>}
    */
   get ids() {
-    return this._items.map(r => r.id);
+    return this._items.map((r) => r.id);
   }
 
   /**
@@ -119,7 +119,7 @@ class GroupsCollection extends EntityV2Collection {
    * @param groupId
    */
   remove(groupId) {
-    const i = this.items.findIndex(item => item.id === groupId);
+    const i = this.items.findIndex((item) => item.id === groupId);
     this.items.splice(i, 1);
   }
 

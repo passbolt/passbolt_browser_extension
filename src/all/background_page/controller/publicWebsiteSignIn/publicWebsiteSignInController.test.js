@@ -14,7 +14,7 @@
 
 import PublicWebsiteSignInController from "./publicWebsiteSignInController";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 beforeEach(() => {
   jest.resetModules();
@@ -25,21 +25,21 @@ beforeEach(() => {
 
 describe("PublicWebsiteSignInController", () => {
   // Mock the chrome locale
-  jest.spyOn(chrome.tabs, 'update');
+  jest.spyOn(chrome.tabs, "update");
 
   describe("PublicWebsiteSignInController::redirectToPassboltDomainUrl", () => {
-    it("Should redirect to the passbolt domain url.", async() => {
+    it("Should redirect to the passbolt domain url.", async () => {
       const worker = {
         tab: {
-          id: 1
-        }
+          id: 1,
+        },
       };
       const account = new AccountEntity(defaultAccountDto());
       const controller = new PublicWebsiteSignInController(worker, "requestId", account);
       controller.exec();
 
       expect.assertions(1);
-      expect(chrome.tabs.update).toHaveBeenCalledWith(1, {"url": "https://passbolt.local"});
+      expect(chrome.tabs.update).toHaveBeenCalledWith(1, { url: "https://passbolt.local" });
     });
   });
 });

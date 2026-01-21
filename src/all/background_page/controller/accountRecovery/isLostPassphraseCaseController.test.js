@@ -13,14 +13,13 @@
  */
 import IsLostPassphraseCaseController from "./isLostPassphraseCaseController";
 
-
 describe("IsLostPassphraseCaseController", () => {
   describe("IsLostPassphraseCaseController::exec", () => {
-    it("Should return false if no case given in url parameter.", async() => {
+    it("Should return false if no case given in url parameter.", async () => {
       const mockedWorker = {
         tab: {
-          url: "https://www.passbolt.test/setup/recover/8c55bdd1-faca-4324-b58b-8f19de62d46e/c57b7cb1-18ab-4224-bf06-4aa3217dffd8"
-        }
+          url: "https://www.passbolt.test/setup/recover/8c55bdd1-faca-4324-b58b-8f19de62d46e/c57b7cb1-18ab-4224-bf06-4aa3217dffd8",
+        },
       };
       const controller = new IsLostPassphraseCaseController(mockedWorker);
       const check = await controller.exec();
@@ -29,11 +28,11 @@ describe("IsLostPassphraseCaseController", () => {
       await expect(check).toEqual(false);
     });
 
-    it("Should return false if it's not a 'lost-passphrase' case.", async() => {
+    it("Should return false if it's not a 'lost-passphrase' case.", async () => {
       const mockedWorker = {
         tab: {
-          url: "https://www.passbolt.test/setup/recover/8c55bdd1-faca-4324-b58b-8f19de62d46e/c57b7cb1-18ab-4224-bf06-4aa3217dffd8?case=bidule"
-        }
+          url: "https://www.passbolt.test/setup/recover/8c55bdd1-faca-4324-b58b-8f19de62d46e/c57b7cb1-18ab-4224-bf06-4aa3217dffd8?case=bidule",
+        },
       };
       const controller = new IsLostPassphraseCaseController(mockedWorker);
       const check = await controller.exec();
@@ -42,11 +41,11 @@ describe("IsLostPassphraseCaseController", () => {
       await expect(check).toEqual(false);
     });
 
-    it("Should return true if it's a 'lost-passphrase' case.", async() => {
+    it("Should return true if it's a 'lost-passphrase' case.", async () => {
       const mockedWorker = {
         tab: {
-          url: "https://www.passbolt.test/setup/recover/8c55bdd1-faca-4324-b58b-8f19de62d46e/c57b7cb1-18ab-4224-bf06-4aa3217dffd8?case=lost-passphrase"
-        }
+          url: "https://www.passbolt.test/setup/recover/8c55bdd1-faca-4324-b58b-8f19de62d46e/c57b7cb1-18ab-4224-bf06-4aa3217dffd8?case=lost-passphrase",
+        },
       };
       const controller = new IsLostPassphraseCaseController(mockedWorker);
       const check = await controller.exec();

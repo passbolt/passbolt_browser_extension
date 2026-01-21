@@ -13,7 +13,6 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
 const ENTITY_NAME = "UpdateSubscription";
 
 class UpdateSubscriptionEntity extends Entity {
@@ -21,11 +20,14 @@ class UpdateSubscriptionEntity extends Entity {
    * @inheritDoc
    */
   constructor(subscriptionDto, options = {}) {
-    super(EntitySchema.validate(
-      UpdateSubscriptionEntity.ENTITY_NAME,
-      subscriptionDto,
-      UpdateSubscriptionEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        UpdateSubscriptionEntity.ENTITY_NAME,
+        subscriptionDto,
+        UpdateSubscriptionEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -34,15 +36,13 @@ class UpdateSubscriptionEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "data"
-      ],
-      "properties": {
-        "data": {
-          "type": "string"
-        }
-      }
+      type: "object",
+      required: ["data"],
+      properties: {
+        data: {
+          type: "string",
+        },
+      },
     };
   }
 

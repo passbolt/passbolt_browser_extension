@@ -17,15 +17,15 @@ export const simulateShareSecretsChangesDto = (addedUserIds = [], removedUserIds
     changes: {
       added: [],
       removed: [],
-    }
+    },
   };
 
   if (addedUserIds.length > 0) {
-    data.changes.added = addedUserIds.map(userId => ({User: {id: userId}}));
+    data.changes.added = addedUserIds.map((userId) => ({ User: { id: userId } }));
   }
 
   if (removedUserIds.length > 0) {
-    data.changes.removed = removedUserIds.map(userId => ({User: {id: userId}}));
+    data.changes.removed = removedUserIds.map((userId) => ({ User: { id: userId } }));
   }
 
   return data;

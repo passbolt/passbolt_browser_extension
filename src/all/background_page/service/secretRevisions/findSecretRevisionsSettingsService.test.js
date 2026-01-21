@@ -12,20 +12,20 @@
  * @since         5.7.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SecretRevisionsSettingsEntity from "passbolt-styleguide/src/shared/models/entity/secretRevision/secretRevisionsSettingsEntity";
-import {defaultSecretRevisionsSettingsDto} from "passbolt-styleguide/src/shared/models/entity/secretRevision/secretRevisionsSettingsEntity.test.data";
+import { defaultSecretRevisionsSettingsDto } from "passbolt-styleguide/src/shared/models/entity/secretRevision/secretRevisionsSettingsEntity.test.data";
 import FindSecretRevisionsSettingsService from "./findSecretRevisionsSettingsService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
 describe("FindSecretRevisionsSettingsService", () => {
   describe("::findSettings", () => {
-    it("should call the api service and return an entity", async() => {
+    it("should call the api service and return an entity", async () => {
       expect.assertions(2);
 
       const dto = defaultSecretRevisionsSettingsDto();
       const apiClientOptions = defaultApiClientOptions();
-      const mockPassboltResponse = new PassboltResponseEntity({header: {}, body: dto});
+      const mockPassboltResponse = new PassboltResponseEntity({ header: {}, body: dto });
 
       const service = new FindSecretRevisionsSettingsService(apiClientOptions);
       jest.spyOn(service.secretRevisionsSettingsApiService, "findSettings").mockReturnValue(mockPassboltResponse);
@@ -35,14 +35,16 @@ describe("FindSecretRevisionsSettingsService", () => {
       expect(result.toDto()).toStrictEqual(dto);
     });
 
-    it("should call the api service and return an entity event if the API returns nothing", async() => {
+    it("should call the api service and return an entity event if the API returns nothing", async () => {
       expect.assertions(2);
 
       const defaultDto = SecretRevisionsSettingsEntity.createFromDefault().toDto();
       const apiClientOptions = defaultApiClientOptions();
 
       const service = new FindSecretRevisionsSettingsService(apiClientOptions);
-      jest.spyOn(service.secretRevisionsSettingsApiService, "findSettings").mockImplementation(() => { throw new Error(); });
+      jest.spyOn(service.secretRevisionsSettingsApiService, "findSettings").mockImplementation(() => {
+        throw new Error();
+      });
       const result = await service.findSettings();
 
       expect(result).toBeInstanceOf(SecretRevisionsSettingsEntity);

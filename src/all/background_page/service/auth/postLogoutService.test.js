@@ -14,12 +14,12 @@
 
 import PostLogoutService from "./postLogoutService";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
-import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
+import { readWorker } from "../../model/entity/worker/workerEntity.test.data";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import AppPagemod from "../../pagemod/appPagemod";
 import BrowserTabService from "../ui/browserTab.service";
 import PortManager from "../../sdk/port/portManager";
-import {mockPort} from "../../sdk/port/portManager.test.data";
+import { mockPort } from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
 import LocalStorageService from "../localStorage/localStorageService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
@@ -34,14 +34,14 @@ describe("PostLogoutService", () => {
   });
 
   describe("PostLogoutService:exec", () => {
-    it("Should send message to awake port and send post logout event", async() => {
+    it("Should send message to awake port and send post logout event", async () => {
       expect.assertions(5);
       // data mocked
       const worker = readWorker();
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
-      const worker2 = readWorker({name: AppPagemod.appName});
+      const worker2 = readWorker({ name: AppPagemod.appName });
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker2));
-      const appPort = mockPort({name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId});
+      const appPort = mockPort({ name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId });
       const appPortWrapper = new Port(appPort);
 
       // function mocked
@@ -56,12 +56,12 @@ describe("PostLogoutService", () => {
       // expectations
       expect(BrowserTabService.sendMessage).toHaveBeenCalledTimes(1);
       expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker2, "passbolt.port.connect", worker2.id);
-      expect(appPortWrapper.emit).toHaveBeenCalledWith('passbolt.auth.after-logout');
+      expect(appPortWrapper.emit).toHaveBeenCalledWith("passbolt.auth.after-logout");
       expect(appPortWrapper.emit).toHaveBeenCalledTimes(1);
       expect(LocalStorageService.flush).toHaveBeenCalled();
     });
 
-    it("Should not send messages if no workers needs to receive post logout event", async() => {
+    it("Should not send messages if no workers needs to receive post logout event", async () => {
       expect.assertions(3);
       // data mocked
       const worker = readWorker();
@@ -84,7 +84,7 @@ describe("PostLogoutService", () => {
       expect(LocalStorageService.flush).toHaveBeenCalled();
     });
 
-    it("Should call all services that needs to run processes on logout", async() => {
+    it("Should call all services that needs to run processes on logout", async () => {
       expect.assertions(6);
       jest.spyOn(PortManager, "isPortExist").mockImplementation(() => false);
       jest.spyOn(LocalStorageService, "flush");

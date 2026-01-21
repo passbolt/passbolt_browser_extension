@@ -15,8 +15,8 @@
 import DesktopTransferModel from "./desktopTransferModel";
 import GetLegacyAccountService from "../../service/account/getLegacyAccountService";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {expectedKeys} from "../entity/account/accountKitEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { expectedKeys } from "../entity/account/accountKitEntity.test.data";
 
 describe("DesktopTransferModel", () => {
   const account = new AccountEntity(defaultAccountDto());
@@ -27,7 +27,7 @@ describe("DesktopTransferModel", () => {
   });
 
   describe("ExportDesktopAccountController::exec", () => {
-    it("Should export account kit with user private key and security token.", async() => {
+    it("Should export account kit with user private key and security token.", async () => {
       expect.assertions(11);
 
       const accountKit = (await model.getAccountKit(account)).toDto();
@@ -47,4 +47,3 @@ describe("DesktopTransferModel", () => {
     });
   });
 });
-

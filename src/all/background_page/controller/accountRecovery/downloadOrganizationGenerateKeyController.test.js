@@ -13,7 +13,7 @@
  */
 import DownloadOrganizationGeneratedKey from "./downloadOrganizationGenerateKeyController";
 import FileService from "../../service/file/fileService";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 beforeEach(() => {
   jest.useFakeTimers(); //avoid shift of a few seconds crashing the tests.
@@ -21,24 +21,29 @@ beforeEach(() => {
 
 describe("DownloadOrganizationGeneratedKey", () => {
   describe("::exec", () => {
-    it("Should call for file service to trigger a download with the right information.", async() => {
+    it("Should call for file service to trigger a download with the right information.", async () => {
       expect.assertions(2);
       const armoredPrivateKey = pgpKeys.account_recovery_organization.private;
       const now = new Date().toISOString().slice(0, 10);
       const keyId = pgpKeys.account_recovery_organization.key_id;
       const expectedFilename = `organization-recovery-private-key_${now}_${keyId}.asc`;
 
-      const mockedWorker = {tab: {id: "tabID"}};
+      const mockedWorker = { tab: { id: "tabID" } };
       const controller = new DownloadOrganizationGeneratedKey(mockedWorker);
       jest.spyOn(FileService, "saveFile").mockImplementation(() => {});
 
       await controller.exec(armoredPrivateKey);
 
       expect(FileService.saveFile).toHaveBeenCalledTimes(1);
-      expect(FileService.saveFile).toHaveBeenCalledWith(expectedFilename, armoredPrivateKey, "text/plain", mockedWorker.tab.id);
+      expect(FileService.saveFile).toHaveBeenCalledWith(
+        expectedFilename,
+        armoredPrivateKey,
+        "text/plain",
+        mockedWorker.tab.id,
+      );
     });
 
-    it("Should throw an error if the given string is not a valid open pgp key.", async() => {
+    it("Should throw an error if the given string is not a valid open pgp key.", async () => {
       expect.assertions(1);
       const controller = new DownloadOrganizationGeneratedKey();
       await expect(() => controller.exec("test")).rejects.toThrowError();

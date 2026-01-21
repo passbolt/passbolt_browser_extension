@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import FindAndUpdateMetadataSettingsLocalStorageService
-  from "../../service/metadata/findAndUpdateMetadataSettingsLocalStorageService";
+import FindAndUpdateMetadataSettingsLocalStorageService from "../../service/metadata/findAndUpdateMetadataSettingsLocalStorageService";
 
 class FindMetadataTypesSettingsController {
   /**
@@ -25,7 +24,10 @@ class FindMetadataTypesSettingsController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndUpdateMetadataSettingsLocalStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateMetadataSettingsLocalStorageService = new FindAndUpdateMetadataSettingsLocalStorageService(
+      account,
+      apiClientOptions,
+    );
   }
 
   /**
@@ -35,10 +37,10 @@ class FindMetadataTypesSettingsController {
   async _exec() {
     try {
       const result = await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

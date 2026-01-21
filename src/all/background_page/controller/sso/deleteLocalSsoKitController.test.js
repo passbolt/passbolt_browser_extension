@@ -17,7 +17,7 @@ import DeleteLocalSsoKitController from "./deleteLocalSsoKitController";
 
 describe("DeleteLocalSsoKitController", () => {
   describe("DeleteLocalSsoKitController::exec", () => {
-    it("Should flush the SSO data stroage", async() => {
+    it("Should flush the SSO data stroage", async () => {
       expect.assertions(1);
 
       const controller = new DeleteLocalSsoKitController();

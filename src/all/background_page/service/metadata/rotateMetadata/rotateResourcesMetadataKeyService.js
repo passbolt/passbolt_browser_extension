@@ -12,8 +12,7 @@
  * @since         5.6.0
  */
 
-
-import {assertString} from "../../../utils/assertions";
+import { assertString } from "../../../utils/assertions";
 import i18n from "../../../sdk/i18n";
 import EncryptMetadataService from "../encryptMetadataService";
 import MetadataRotateKeysResourcesApiService from "../../api/metadata/metadataRotateKeysResourcesApiService";
@@ -72,7 +71,7 @@ export default class RotateResourcesMetadataKeyService {
    * @throws {TypeError} if the `metadataKeyPair` argument is not of type ExternalGpgKeyPairEntity
    * @throws {TypeError} if passphrase argument is not a string
    */
-  async rotate(passphrase, replayOptions = {count: 0}) {
+  async rotate(passphrase, replayOptions = { count: 0 }) {
     assertString(passphrase);
     await this._runReplayableProcess(() => this._rotateResources(passphrase), replayOptions);
   }
@@ -85,14 +84,19 @@ export default class RotateResourcesMetadataKeyService {
    */
   async _rotateResources(passphrase) {
     let resourcePage = 0;
-    this.progressService.finishStep(i18n.t('Retrieving resources'));
+    this.progressService.finishStep(i18n.t("Retrieving resources"));
     let passboltResponseEntity = await this.metadataRotateKeysResourcesApiService.findAll();
     const totalPagesCount = passboltResponseEntity.header.pagination.pageCount;
     this.progressService.updateGoals(totalPagesCount + this.progressService.goals); // total pages + previous goals
     let resourcesCollection = new ResourcesCollection(passboltResponseEntity.body);
 
     while (resourcesCollection.length > 0) {
-      this.progressService.finishStep(i18n.t('Rotating resources metadata page {{number}}/{{totalPagesCount}}', {number: ++resourcePage, totalPagesCount: totalPagesCount}));
+      this.progressService.finishStep(
+        i18n.t("Rotating resources metadata page {{number}}/{{totalPagesCount}}", {
+          number: ++resourcePage,
+          totalPagesCount: totalPagesCount,
+        }),
+      );
       await this.decryptMetadataService.decryptAllFromForeignModels(resourcesCollection, passphrase);
       await this.encryptMetadataService.encryptAllFromForeignModels(resourcesCollection, passphrase);
       passboltResponseEntity = await this.metadataRotateKeysResourcesApiService.rotate(resourcesCollection);

@@ -18,21 +18,21 @@ import ChangeThemeEntity from "../model/entity/theme/change/ChangeThemeEntity";
  * @param {Worker} worker
  * @param {ApiClientOptions} apiClientOptions the api client options
  */
-const listen = function(worker, apiClientOptions) {
+const listen = function (worker, apiClientOptions) {
   /*
    * Find all themes
    *
    * @listens passbolt.themes.find-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.themes.find-all', async requestId => {
+  worker.port.on("passbolt.themes.find-all", async (requestId) => {
     try {
       const themeModel = new ThemeModel(apiClientOptions);
       const themes = await themeModel.findAll();
-      worker.port.emit(requestId, 'SUCCESS', themes);
+      worker.port.emit(requestId, "SUCCESS", themes);
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 
@@ -42,17 +42,17 @@ const listen = function(worker, apiClientOptions) {
    * @listens passbolt.themes.change
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.themes.change', async(requestId, name) => {
+  worker.port.on("passbolt.themes.change", async (requestId, name) => {
     try {
       const themeModel = new ThemeModel(apiClientOptions);
-      const changeThemeEntity = new ChangeThemeEntity({name: name});
+      const changeThemeEntity = new ChangeThemeEntity({ name: name });
       await themeModel.change(changeThemeEntity);
-      worker.port.emit(requestId, 'SUCCESS');
+      worker.port.emit(requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 };
 
-export const ThemeEvents = {listen};
+export const ThemeEvents = { listen };

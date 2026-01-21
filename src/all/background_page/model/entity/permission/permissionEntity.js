@@ -16,14 +16,14 @@ import UserEntity from "../user/userEntity";
 import Validator from "validator";
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
-const ENTITY_NAME = 'Permission';
+const ENTITY_NAME = "Permission";
 const PERMISSION_OWNER = 15;
 const PERMISSION_UPDATE = 7;
 const PERMISSION_READ = 1;
-const ARO_GROUP = 'Group';
-const ARO_USER = 'User';
-const ACO_RESOURCE = 'Resource';
-const ACO_FOLDER = 'Folder';
+const ARO_GROUP = "Group";
+const ARO_USER = "User";
+const ACO_RESOURCE = "Resource";
+const ACO_FOLDER = "Folder";
 
 class PermissionEntity extends EntityV2 {
   /**
@@ -34,11 +34,11 @@ class PermissionEntity extends EntityV2 {
 
     // Associated models
     if (this._props.user) {
-      this._user = new UserEntity(this._props.user, {...options, clone: false});
+      this._user = new UserEntity(this._props.user, { ...options, clone: false });
       delete this._props.user;
     }
     if (this._props.group) {
-      this._group = new GroupEntity(this._props.group, {...options, clone: false});
+      this._group = new GroupEntity(this._props.group, { ...options, clone: false });
       delete this._props.group;
     }
   }
@@ -50,57 +50,45 @@ class PermissionEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "aco",
-        "aro",
-        "aco_foreign_key",
-        "aro_foreign_key",
-        "type"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["aco", "aro", "aco_foreign_key", "aro_foreign_key", "type"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "aco": {
-          "type": "string",
-          "enum": [
-            PermissionEntity.ACO_FOLDER,
-            PermissionEntity.ACO_RESOURCE
-          ]
+        aco: {
+          type: "string",
+          enum: [PermissionEntity.ACO_FOLDER, PermissionEntity.ACO_RESOURCE],
         },
-        "aco_foreign_key": {
-          "type": "string",
-          "format": "uuid"
+        aco_foreign_key: {
+          type: "string",
+          format: "uuid",
         },
-        "aro": {
-          "type": "string",
-          "enum": [
-            PermissionEntity.ARO_GROUP,
-            PermissionEntity.ARO_USER
-          ]
+        aro: {
+          type: "string",
+          enum: [PermissionEntity.ARO_GROUP, PermissionEntity.ARO_USER],
         },
-        "aro_foreign_key": {
-          "type": "string",
-          "format": "uuid"
+        aro_foreign_key: {
+          type: "string",
+          format: "uuid",
         },
-        "type": {
-          "type": "integer",
-          "enum": PermissionEntity.PERMISSION_TYPES
+        type: {
+          type: "integer",
+          enum: PermissionEntity.PERMISSION_TYPES,
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
         // Associated models
-        "user": UserEntity.getSchema(),
-        "group": GroupEntity.getSchema()
-      }
+        user: UserEntity.getSchema(),
+        group: GroupEntity.getSchema(),
+      },
     };
   }
 
@@ -199,7 +187,7 @@ class PermissionEntity extends EntityV2 {
    * @returns {boolean}
    */
   isOwner() {
-    return (this.type === PermissionEntity.PERMISSION_OWNER);
+    return this.type === PermissionEntity.PERMISSION_OWNER;
   }
 
   /*
@@ -276,7 +264,7 @@ class PermissionEntity extends EntityV2 {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {user: {profile: {avatar: true}}, group: true};
+    return { user: { profile: { avatar: true } }, group: true };
   }
 
   /**
@@ -284,11 +272,7 @@ class PermissionEntity extends EntityV2 {
    * @returns {number[]}
    */
   static get PERMISSION_TYPES() {
-    return [
-      PermissionEntity.PERMISSION_READ,
-      PermissionEntity.PERMISSION_UPDATE,
-      PermissionEntity.PERMISSION_OWNER
-    ];
+    return [PermissionEntity.PERMISSION_READ, PermissionEntity.PERMISSION_UPDATE, PermissionEntity.PERMISSION_OWNER];
   }
 
   /*
@@ -325,7 +309,7 @@ class PermissionEntity extends EntityV2 {
    */
   set id(id) {
     if (!Validator.isUUID(id)) {
-      throw new TypeError('The permission id should be a valid UUID.');
+      throw new TypeError("The permission id should be a valid UUID.");
     }
     this._props.id = id;
   }
@@ -338,7 +322,7 @@ class PermissionEntity extends EntityV2 {
    */
   set type(type) {
     if (!type || !PermissionEntity.PERMISSION_TYPES.includes(type)) {
-      throw new TypeError('The type should be a valid integer.');
+      throw new TypeError("The type should be a valid integer.");
     }
     this._props.type = type;
   }
@@ -355,7 +339,7 @@ class PermissionEntity extends EntityV2 {
    */
   static assertIsPermission(permission) {
     if (!permission || !(permission instanceof PermissionEntity)) {
-      throw new TypeError('Failed to assert the parameter is a valid permission');
+      throw new TypeError("Failed to assert the parameter is a valid permission");
     }
   }
 
@@ -384,7 +368,7 @@ class PermissionEntity extends EntityV2 {
    */
   static isIdMatching(p1, p2) {
     PermissionEntity.assertArePermissions(p1, p2);
-    return (p1.id === p2.id);
+    return p1.id === p2.id;
   }
 
   /**
@@ -396,7 +380,7 @@ class PermissionEntity extends EntityV2 {
    */
   static isAroMatching(p1, p2) {
     PermissionEntity.assertArePermissions(p1, p2);
-    return (p1.aro === p2.aro && p1.aroForeignKey === p2.aroForeignKey);
+    return p1.aro === p2.aro && p1.aroForeignKey === p2.aroForeignKey;
   }
 
   /**
@@ -408,7 +392,7 @@ class PermissionEntity extends EntityV2 {
    */
   static isAcoMatching(p1, p2) {
     PermissionEntity.assertArePermissions(p1, p2);
-    return (p1.aco === p2.aco && p1.acoForeignKey === p2.acoForeignKey);
+    return p1.aco === p2.aco && p1.acoForeignKey === p2.acoForeignKey;
   }
 
   /**
@@ -420,7 +404,7 @@ class PermissionEntity extends EntityV2 {
    */
   static isAcoAndAroMatching(p1, p2) {
     PermissionEntity.assertArePermissions(p1, p2);
-    return (PermissionEntity.isAcoMatching(p1, p2) && PermissionEntity.isAroMatching(p1, p2));
+    return PermissionEntity.isAcoMatching(p1, p2) && PermissionEntity.isAroMatching(p1, p2);
   }
 
   /**
@@ -433,7 +417,7 @@ class PermissionEntity extends EntityV2 {
    */
   static isTypeMatching(p1, p2) {
     PermissionEntity.assertArePermissions(p1, p2);
-    return (p1.type === p2.type);
+    return p1.type === p2.type;
   }
 
   /**
@@ -457,7 +441,7 @@ class PermissionEntity extends EntityV2 {
    */
   static getHighestPermissionType(p1, p2) {
     PermissionEntity.assertArePermissions(p1, p2);
-    return (p1.type > p2.type) ? p1.type : p2.type;
+    return p1.type > p2.type ? p1.type : p2.type;
   }
 
   /**
@@ -470,7 +454,7 @@ class PermissionEntity extends EntityV2 {
    */
   static getHighestPermission(p1, p2) {
     PermissionEntity.assertArePermissions(p1, p2);
-    return (p1.type > p2.type) ? p1 : p2;
+    return p1.type > p2.type ? p1 : p2;
   }
 
   /*
@@ -493,7 +477,7 @@ class PermissionEntity extends EntityV2 {
       aro_foreign_key: this.aroForeignKey,
       aco: aco,
       aco_foreign_key: acoForeignKey,
-      type: this.type
+      type: this.type,
     });
   }
 }

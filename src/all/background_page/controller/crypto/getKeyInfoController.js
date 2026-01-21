@@ -12,10 +12,9 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
-
 
 class GetKeyInfoController {
   /**
@@ -40,7 +39,7 @@ class GetKeyInfoController {
       this.worker.port.emit(this.requestId, "SUCCESS", externalGpgKeyEntity);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -52,7 +51,7 @@ class GetKeyInfoController {
    */
   async exec(armoredKey) {
     if (!armoredKey) {
-      throw new Error('An armored key must be provided');
+      throw new Error("An armored key must be provided");
     }
 
     const key = await OpenpgpAssertion.readKeyOrFail(armoredKey);

@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.4.0
  */
-import PasswordExpirySettingsGetOrFindService
-  from "../../service/passwordExpirySettings/passwordExpirySettingsGetOrFindService";
+import PasswordExpirySettingsGetOrFindService from "../../service/passwordExpirySettings/passwordExpirySettingsGetOrFindService";
 
 class GetOrFindPasswordExpirySettingsController {
   /**
@@ -39,7 +38,7 @@ class GetOrFindPasswordExpirySettingsController {
       this.worker.port.emit(this.requestId, "SUCCESS", settings);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

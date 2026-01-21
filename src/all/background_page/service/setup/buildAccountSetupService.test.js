@@ -30,7 +30,8 @@ describe("BuildAccountSetupService", () => {
     });
 
     it("should build.", () => {
-      const url = "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0";
+      const url =
+        "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0";
       expect.assertions(5);
       const accountSetup = BuildAccountSetupService.buildFromSetupUrl(url);
       expect(accountSetup).toBeInstanceOf(AccountSetupEntity);

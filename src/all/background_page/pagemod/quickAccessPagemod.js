@@ -12,23 +12,23 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {AuthEvents} from "../event/authEvents";
-import {ConfigEvents} from "../event/configEvents";
-import {KeyringEvents} from "../event/keyringEvents";
-import {QuickAccessEvents} from "../event/quickAccessEvents";
-import {GroupEvents} from "../event/groupEvents";
-import {TagEvents} from "../event/tagEvents";
-import {ResourceEvents} from "../event/resourceEvents";
-import {SecretEvents} from "../event/secretEvents";
-import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
-import {TabEvents} from "../event/tabEvents";
-import {LocaleEvents} from "../event/localeEvents";
-import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
-import {RememberMeEvents} from "../event/rememberMeEvents";
-import {ResourceTypeEvents} from "../event/resourceTypeEvents";
+import { AuthEvents } from "../event/authEvents";
+import { ConfigEvents } from "../event/configEvents";
+import { KeyringEvents } from "../event/keyringEvents";
+import { QuickAccessEvents } from "../event/quickAccessEvents";
+import { GroupEvents } from "../event/groupEvents";
+import { TagEvents } from "../event/tagEvents";
+import { ResourceEvents } from "../event/resourceEvents";
+import { SecretEvents } from "../event/secretEvents";
+import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { TabEvents } from "../event/tabEvents";
+import { LocaleEvents } from "../event/localeEvents";
+import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
+import { RememberMeEvents } from "../event/rememberMeEvents";
+import { ResourceTypeEvents } from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
-import {AccountEvents} from "../event/accountEvents";
+import { AccountEvents } from "../event/accountEvents";
 
 class QuickAccess extends Pagemod {
   /**
@@ -58,7 +58,7 @@ class QuickAccess extends Pagemod {
       PownedPasswordEvents,
       RememberMeEvents,
       ResourceTypeEvents,
-      AccountEvents
+      AccountEvents,
     ];
   }
 
@@ -72,11 +72,13 @@ class QuickAccess extends Pagemod {
       apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     } catch (error) {
       //Ensure the application does not crash completely if the legacy account cannot be retrieved
-      console.error('quickaccessPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error(
+        "quickaccessPagemod::attach legacy account cannot be retrieved, please contact your administrator.",
+      );
       console.error(error);
     }
 
-    const worker = {port: port, tab: port._port.sender.tab, name: this.appName};
+    const worker = { port: port, tab: port._port.sender.tab, name: this.appName };
     for (const event of this.events) {
       event.listen(worker, apiClientOptions, account);
     }

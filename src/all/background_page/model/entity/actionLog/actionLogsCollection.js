@@ -17,9 +17,9 @@ import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstr
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
-const ENTITY_NAME = 'ActionLogs';
+const ENTITY_NAME = "ActionLogs";
 
-const RULE_UNIQUE_ID = 'unique_id';
+const RULE_UNIQUE_ID = "unique_id";
 
 class ActionLogsCollection extends EntityCollection {
   /**
@@ -27,18 +27,21 @@ class ActionLogsCollection extends EntityCollection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
   constructor(actionLogsCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      ActionLogsCollection.ENTITY_NAME,
-      actionLogsCollectionDto,
-      ActionLogsCollection.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        ActionLogsCollection.ENTITY_NAME,
+        actionLogsCollectionDto,
+        ActionLogsCollection.getSchema(),
+      ),
+      options,
+    );
 
     /*
      * Note: there is no "multi-item" validation
      * Collection validation will fail at the first item that doesn't validate
      */
-    this._props.forEach(actionLog => {
-      const actionLogEntity = this.constructActionLogEntityFromDto(actionLog, {clone: false});
+    this._props.forEach((actionLog) => {
+      const actionLogEntity = this.constructActionLogEntityFromDto(actionLog, { clone: false });
       this.push(actionLogEntity);
     });
 
@@ -53,8 +56,8 @@ class ActionLogsCollection extends EntityCollection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": AbstractActionLogEntity.getSchema()
+      type: "array",
+      items: AbstractActionLogEntity.getSchema(),
     };
   }
 
@@ -86,7 +89,7 @@ class ActionLogsCollection extends EntityCollection {
    * @returns {Array<string>}
    */
   get ids() {
-    return this._items.map(item => item.id);
+    return this._items.map((item) => item.id);
   }
 
   /*
@@ -110,7 +113,11 @@ class ActionLogsCollection extends EntityCollection {
     for (; i < length; i++) {
       const existingActionLog = this.actionLogs[i];
       if (existingActionLog.id && existingActionLog.id === actionLog.id) {
-        throw new EntityCollectionError(i, ActionLogsCollection.RULE_UNIQUE_ID, `Action log id ${actionLog.id} already exists.`);
+        throw new EntityCollectionError(
+          i,
+          ActionLogsCollection.RULE_UNIQUE_ID,
+          `Action log id ${actionLog.id} already exists.`,
+        );
       }
     }
   }
@@ -126,7 +133,7 @@ class ActionLogsCollection extends EntityCollection {
    * @param {object} actionLog DTO or AbstractActionLogEntity
    */
   push(actionLog) {
-    if (!actionLog || typeof actionLog !== 'object') {
+    if (!actionLog || typeof actionLog !== "object") {
       throw new TypeError(`ActionLogsCollection push parameter should be an object.`);
     }
     if (actionLog instanceof AbstractActionLogEntity) {

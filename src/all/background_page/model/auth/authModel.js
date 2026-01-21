@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import AuthLogoutService from 'passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService';
-import PostLogoutService from '../../service/auth/postLogoutService';
+import AuthLogoutService from "passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService";
+import PostLogoutService from "../../service/auth/postLogoutService";
 
 class AuthModel {
   /**

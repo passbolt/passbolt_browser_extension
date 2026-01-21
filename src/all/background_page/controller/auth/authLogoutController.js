@@ -35,10 +35,10 @@ class AuthLogoutController {
   async _exec(withRedirection) {
     try {
       await this.exec(withRedirection);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -55,7 +55,7 @@ class AuthLogoutController {
     }
 
     const url = this.apiClientOptions.getBaseUrl().toString();
-    await browser.tabs.update(this.worker.tab.id, {url});
+    await browser.tabs.update(this.worker.tab.id, { url });
   }
 }
 

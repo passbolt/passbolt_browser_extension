@@ -20,9 +20,8 @@ import MoveService from "../../service/api/move/moveService";
 import FolderService from "../../service/api/folder/folderService";
 import ShareService from "../../service/api/share/shareService";
 import splitBySize from "../../utils/array/splitBySize";
-import FindAndUpdateFoldersLocalStorageService
-  from "../../service/folder/findAndUpdateFoldersLocalStorageService";
-import {assertUuid} from "../../utils/assertions";
+import FindAndUpdateFoldersLocalStorageService from "../../service/folder/findAndUpdateFoldersLocalStorageService";
+import { assertUuid } from "../../utils/assertions";
 
 const BULK_OPERATION_SIZE = 5;
 
@@ -38,7 +37,10 @@ class FolderModel {
     this.folderService = new FolderService(apiClientOptions);
     this.moveService = new MoveService(apiClientOptions);
     this.shareService = new ShareService(apiClientOptions);
-    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(account, apiClientOptions);
+    this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(
+      account,
+      apiClientOptions,
+    );
   }
 
   /*
@@ -72,7 +74,7 @@ class FolderModel {
     const foldersDto = await FolderLocalStorage.get();
     if (foldersDto) {
       const inputCollection = new FoldersCollection(foldersDto);
-      inputCollection.items.forEach(folderDto => {
+      inputCollection.items.forEach((folderDto) => {
         if (folderIds.includes(folderDto.id)) {
           outputCollection.push(folderDto);
         }
@@ -155,24 +157,24 @@ class FolderModel {
    * @returns {PermissionChangesCollection}
    */
   calculatePermissionsChangesForMove(folderEntity, parentFolder, destFolder) {
-    let remainingPermissions = new PermissionsCollection([], {assertAtLeastOneOwner: false});
+    let remainingPermissions = new PermissionsCollection([], { assertAtLeastOneOwner: false });
 
     // Remove permissions from parent if any
     if (parentFolder) {
       if (!folderEntity.permissions || !parentFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsChangesForMove requires permissions to be set.');
+        throw new TypeError("Resource model calculatePermissionsChangesForMove requires permissions to be set.");
       }
       remainingPermissions = PermissionsCollection.diff(folderEntity.permissions, parentFolder.permissions, false);
     }
     // Add parent permissions
-    let permissionsFromParent = new PermissionsCollection([], {assertAtLeastOneOwner: false});
+    let permissionsFromParent = new PermissionsCollection([], { assertAtLeastOneOwner: false });
     if (destFolder) {
       if (!destFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
+        throw new TypeError(
+          "Resource model calculatePermissionsChangesForMove requires destination permissions to be set.",
+        );
       }
-      permissionsFromParent = destFolder.permissions.cloneForAco(
-        PermissionEntity.ACO_FOLDER, folderEntity.id, false
-      );
+      permissionsFromParent = destFolder.permissions.cloneForAco(PermissionEntity.ACO_FOLDER, folderEntity.id, false);
     }
 
     const newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
@@ -181,13 +183,15 @@ class FolderModel {
        * If the move is toward the root
        * Reuse highest permission
        */
-      newPermissions.addOrReplace(new PermissionEntity({
-        aco: PermissionEntity.ACO_FOLDER,
-        aco_foreign_key: folderEntity.id,
-        aro: folderEntity.permission.aro,
-        aro_foreign_key: folderEntity.permission.aroForeignKey,
-        type: PermissionEntity.PERMISSION_OWNER,
-      }));
+      newPermissions.addOrReplace(
+        new PermissionEntity({
+          aco: PermissionEntity.ACO_FOLDER,
+          aco_foreign_key: folderEntity.id,
+          aro: folderEntity.permission.aro,
+          aro_foreign_key: folderEntity.permission.aroForeignKey,
+          type: PermissionEntity.PERMISSION_OWNER,
+        }),
+      );
     }
     newPermissions.assertAtLeastOneOwner();
     return PermissionChangesCollection.calculateChanges(folderEntity.permissions, newPermissions);
@@ -207,7 +211,9 @@ class FolderModel {
     let changes = null;
     if (folderEntity.folderParentId) {
       if (!destFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
+        throw new TypeError(
+          "Resource model calculatePermissionsChangesForMove requires destination permissions to be set.",
+        );
       }
       const currentPermissions = new PermissionsCollection([folderEntity.permission]);
       const targetPermissions = destFolder.permissions.cloneForAco(PermissionEntity.ACO_FOLDER, folderEntity.id);
@@ -228,7 +234,7 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async create(folderEntity) {
-    const folderDto = await this.folderService.create(folderEntity.toDto(), {permission: true});
+    const folderDto = await this.folderService.create(folderEntity.toDto(), { permission: true });
     const updatedFolderEntity = new FolderEntity(folderDto);
     await FolderLocalStorage.addFolder(updatedFolderEntity);
     return updatedFolderEntity;
@@ -245,7 +251,7 @@ class FolderModel {
     const folderDto = await FolderLocalStorage.getFolderById(folderId);
     const folderEntity = new FolderEntity(folderDto);
     folderEntity.folderParentId = folderParentId;
-    await this.moveService.move(folderEntity);
+    await this.moveService.moveFolder(folderId, folderParentId);
     // TODO update modified date
     await FolderLocalStorage.updateFolder(folderEntity);
 
@@ -259,7 +265,7 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async update(folderEntity) {
-    const folderDto = await this.folderService.update(folderEntity.id, folderEntity.toDto(), {permission: true});
+    const folderDto = await this.folderService.update(folderEntity.id, folderEntity.toDto(), { permission: true });
     const updatedFolderEntity = new FolderEntity(folderDto);
     await FolderLocalStorage.updateFolder(updatedFolderEntity);
     return updatedFolderEntity;
@@ -274,8 +280,8 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async share(folderEntity, changesCollection, updateStorage) {
-    await this.shareService.shareFolder(folderEntity.id, {permissions: changesCollection.toDto()});
-    if (typeof updateStorage === 'undefined' || updateStorage) {
+    await this.shareService.shareFolder(folderEntity.id, { permissions: changesCollection.toDto() });
+    if (typeof updateStorage === "undefined" || updateStorage) {
       /*
        * update storage in case the folder becomes non visible to current user
        * TODO: optimize update only the given folder when user lost access
@@ -317,18 +323,18 @@ class FolderModel {
     const chunks = splitBySize(collection.folders, BULK_OPERATION_SIZE);
     for (const chunkIndex in chunks) {
       const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async(folderEntity, mapIndex) => {
-        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
+      const promises = chunk.map(async (folderEntity, mapIndex) => {
+        const collectionIndex = chunkIndex * BULK_OPERATION_SIZE + mapIndex;
         return this._bulkCreate_createFolder(folderEntity, collectionIndex, callbacks);
       });
 
       const bulkPromises = await Promise.allSettled(promises);
-      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
+      const intermediateResult = bulkPromises.map((promiseResult) => promiseResult.value);
       result = [...result, ...intermediateResult];
     }
 
     // Insert the created folders into the local storage
-    const createdFolders = result.filter(row => row instanceof FolderEntity);
+    const createdFolders = result.filter((row) => row instanceof FolderEntity);
     await FolderLocalStorage.addFolders(createdFolders);
 
     return result;
@@ -354,7 +360,7 @@ class FolderModel {
        * but we don't add the folder entity in the local storage just yet,
        * we wait until all folders are created in order to speed things up
        */
-      const folderDto = await this.folderService.create(folderEntity.toDto(), {permission: true});
+      const folderDto = await this.folderService.create(folderEntity.toDto(), { permission: true });
       const createdFolderEntity = new FolderEntity(folderDto);
       successCallback(createdFolderEntity, collectionIndex);
       return createdFolderEntity;

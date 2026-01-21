@@ -45,7 +45,7 @@ class CheckAuthStatusService {
     }
 
     await AuthStatusLocalStorage.set(isAuthenticated, isMfaRequired);
-    return {isAuthenticated, isMfaRequired};
+    return { isAuthenticated, isMfaRequired };
   }
 }
 

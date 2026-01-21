@@ -12,13 +12,13 @@
  * @since         4.0.0
  */
 import SystemRequirementService from "./systemRequirementService";
-import {Config} from "../../model/config";
+import { Config } from "../../model/config";
 import Log from "../../model/log";
 import storage from "../../sdk/storage";
 
 describe("SystemRequirementService", () => {
   describe("SystemRequirementService::get", () => {
-    it("Should initialize the configuration", async() => {
+    it("Should initialize the configuration", async () => {
       expect.assertions(4);
       // spy on
       jest.spyOn(storage, "init");
@@ -31,7 +31,7 @@ describe("SystemRequirementService", () => {
       expect(storage.init).toHaveBeenCalled();
       expect(Config.init).toHaveBeenCalled();
       expect(Log.init).toHaveBeenCalled();
-      expect(storage.getItem).toHaveBeenCalledWith('config');
+      expect(storage.getItem).toHaveBeenCalledWith("config");
     });
   });
 });

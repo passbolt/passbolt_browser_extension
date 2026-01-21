@@ -64,7 +64,7 @@ class AutofillController {
    */
   async exec(resourceId, tabId) {
     // WebIntegration Worker
-    const webIntegrationWorker = await WorkerService.get('WebIntegration', tabId);
+    const webIntegrationWorker = await WorkerService.get("WebIntegration", tabId);
     try {
       const passphrase = await this.getPassphrase();
       // Get the resource, decrypt the resources password and requests to fill the credentials
@@ -72,13 +72,17 @@ class AutofillController {
       const secret = await this.findSecretService.findByResourceId(resourceId);
       const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(secret, secretSchema, privateKey);
+      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(
+        secret,
+        secretSchema,
+        privateKey,
+      );
       const username = resource.metadata?.username || "";
       const password = plaintextSecret?.password;
-      this.fillCredential(webIntegrationWorker, {username, password});
+      this.fillCredential(webIntegrationWorker, { username, password });
     } finally {
       if (this.isInformMenuWorker) {
-        webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
+        webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
       }
     }
   }
@@ -125,11 +129,16 @@ class AutofillController {
   fillCredential(webIntegrationWorker, credential) {
     // TODO Should use the same method to autofill in the future
     if (this.isInformMenuWorker) {
-      webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', credential);
+      webIntegrationWorker.port.emit("passbolt.web-integration.fill-credentials", credential);
     } else if (this.isQuickAccessWorker) {
       // Get the url from the worker port to have the tab url for the quickaccess
       const url = webIntegrationWorker.port._port.sender.url;
-      webIntegrationWorker.port.request('passbolt.quickaccess.fill-form', credential.username, credential.password, url);
+      webIntegrationWorker.port.request(
+        "passbolt.quickaccess.fill-form",
+        credential.username,
+        credential.password,
+        url,
+      );
     }
   }
 }

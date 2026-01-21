@@ -13,7 +13,7 @@
  */
 import Log from "../../model/log";
 
-export const PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY = 'passwordExpirySettings';
+export const PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY = "passwordExpirySettings";
 
 class PasswordExpirySettingsLocalStorage {
   /**
@@ -32,7 +32,7 @@ class PasswordExpirySettingsLocalStorage {
    */
   getStorageKey(account) {
     if (!account.id) {
-      throw new Error('Cannot retrieve account id, necessary to get the password expiry settings storage key.');
+      throw new Error("Cannot retrieve account id, necessary to get the password expiry settings storage key.");
     }
     return `${PASSWORD_EXPIRY_SETTINGS_LOCAL_STORAGE_KEY}-${account.id}`;
   }
@@ -43,7 +43,7 @@ class PasswordExpirySettingsLocalStorage {
    * @return {Promise<void>}
    */
   async flush() {
-    Log.write({level: 'debug', message: 'PasswordExpirySettingsLocalStorage flushed'});
+    Log.write({ level: "debug", message: "PasswordExpirySettingsLocalStorage flushed" });
     return await browser.storage.local.remove(this.storageKey);
   }
 
@@ -64,8 +64,8 @@ class PasswordExpirySettingsLocalStorage {
    * @return {void}
    */
   async set(passwordExpirySettings) {
-    await navigator.locks.request(this.storageKey, async() => {
-      await browser.storage.local.set({[this.storageKey]: passwordExpirySettings});
+    await navigator.locks.request(this.storageKey, async () => {
+      await browser.storage.local.set({ [this.storageKey]: passwordExpirySettings });
     });
   }
 }

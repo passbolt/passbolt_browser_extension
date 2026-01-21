@@ -14,7 +14,7 @@
 import UserEntity from "./userEntity";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
-const ENTITY_NAME = 'Users';
+const ENTITY_NAME = "Users";
 
 class UsersCollection extends EntityV2Collection {
   /**
@@ -45,8 +45,8 @@ class UsersCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": UserEntity.getSchema(),
+      type: "array",
+      items: UserEntity.getSchema(),
     };
   }
 
@@ -58,8 +58,8 @@ class UsersCollection extends EntityV2Collection {
    * @throws {EntityValidationError} If a user already exists with the same username.
    */
   validateBuildRules(item, options) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
-    this.assertNotExist("username", item._props.username, {haystackSet: options?.uniqueUsernamesSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
+    this.assertNotExist("username", item._props.username, { haystackSet: options?.uniqueUsernamesSetCache });
   }
 
   /*
@@ -81,7 +81,7 @@ class UsersCollection extends EntityV2Collection {
    * @returns {Array<string>}
    */
   get ids() {
-    return this._items.map(r => r.id);
+    return this._items.map((r) => r.id);
   }
 
   /*
@@ -97,15 +97,15 @@ class UsersCollection extends EntityV2Collection {
   pushMany(data, entityOptions = {}, options = {}) {
     const uniqueIdsSetCache = new Set(this.extract("id"));
     const uniqueUsernamesSetCache = new Set(this.extract("username"));
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
       uniqueUsernamesSetCache.add(item.username);
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueUsernamesSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache, uniqueUsernamesSetCache },
+      ...options,
     };
 
     super.pushMany(data, entityOptions, options);
@@ -116,7 +116,7 @@ class UsersCollection extends EntityV2Collection {
    * @param userId
    */
   remove(userId) {
-    const i = this.items.findIndex(item => item.id === userId);
+    const i = this.items.findIndex((item) => item.id === userId);
     this.items.splice(i, 1);
   }
 

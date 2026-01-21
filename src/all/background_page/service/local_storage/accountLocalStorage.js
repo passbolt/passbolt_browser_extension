@@ -16,7 +16,7 @@ import AwaitLock from "await-lock";
 
 const lock = new AwaitLock();
 
-const ACCOUNTS_LOCAL_STORAGE_KEY = 'accounts';
+const ACCOUNTS_LOCAL_STORAGE_KEY = "accounts";
 
 class AccountLocalStorage {
   /**
@@ -27,7 +27,7 @@ class AccountLocalStorage {
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    const {accounts} = await browser.storage.local.get([ACCOUNTS_LOCAL_STORAGE_KEY]);
+    const { accounts } = await browser.storage.local.get([ACCOUNTS_LOCAL_STORAGE_KEY]);
     return accounts || [];
   }
 
@@ -40,7 +40,7 @@ class AccountLocalStorage {
    */
   static async getAccountByUserIdAndType(userId, type) {
     const accounts = await AccountLocalStorage.get();
-    return accounts.find(item => item.user_id === userId && item.type === type);
+    return accounts.find((item) => item.user_id === userId && item.type === type);
   }
 
   /**
@@ -49,14 +49,14 @@ class AccountLocalStorage {
    */
   static async add(accountEntity) {
     if (!(accountEntity instanceof AbstractAccountEntity)) {
-      throw new TypeError('ResourceLocalStorage::add expects an AccountEntity');
+      throw new TypeError("ResourceLocalStorage::add expects an AccountEntity");
     }
 
     await lock.acquireAsync();
     try {
       const accounts = await AccountLocalStorage.get();
       accounts.push(accountEntity.toDto(AccountLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({[ACCOUNTS_LOCAL_STORAGE_KEY]: accounts});
+      await browser.storage.local.set({ [ACCOUNTS_LOCAL_STORAGE_KEY]: accounts });
       lock.release();
     } catch (error) {
       lock.release();
@@ -74,8 +74,8 @@ class AccountLocalStorage {
     try {
       const accounts = await AccountLocalStorage.get();
       if (accounts) {
-        const filteredAccounts = accounts.filter(item => item.user_id !== userId || item.type !== type);
-        await browser.storage.local.set({[ACCOUNTS_LOCAL_STORAGE_KEY]: filteredAccounts});
+        const filteredAccounts = accounts.filter((item) => item.user_id !== userId || item.type !== type);
+        await browser.storage.local.set({ [ACCOUNTS_LOCAL_STORAGE_KEY]: filteredAccounts });
       }
       lock.release();
     } catch (error) {

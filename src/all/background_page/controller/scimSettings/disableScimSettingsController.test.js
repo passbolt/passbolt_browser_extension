@@ -14,8 +14,8 @@
 
 import expect from "expect";
 import DisableScimSettingsController from "./disableScimSettingsController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {v4 as uuidv4} from "uuid";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { v4 as uuidv4 } from "uuid";
 
 describe("DisableScimSettingsController", () => {
   let apiClientOptions, controller;
@@ -26,10 +26,10 @@ describe("DisableScimSettingsController", () => {
   });
 
   describe("::exec", () => {
-    it("should disable SCIM settings", async() => {
+    it("should disable SCIM settings", async () => {
       expect.assertions(2);
       const id = uuidv4();
-      const expectedResult = {success: true};
+      const expectedResult = { success: true };
       jest.spyOn(controller.disableScimSettingsService, "disable").mockResolvedValue(expectedResult);
 
       const result = await controller.exec(id);
@@ -38,7 +38,7 @@ describe("DisableScimSettingsController", () => {
       expect(controller.disableScimSettingsService.disable).toHaveBeenCalledWith(id);
     });
 
-    it("should handle errors when disabling SCIM settings", async() => {
+    it("should handle errors when disabling SCIM settings", async () => {
       expect.assertions(2);
       const error = new Error("Failed to disable SCIM settings");
       const id = uuidv4();

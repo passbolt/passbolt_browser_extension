@@ -13,71 +13,71 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { adminAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "./buildApiClientOptionsService";
 
 describe("BuildAccountApiClientOptionsService", () => {
-  it("BuildAccountApiClientOptionsService:buildFromAccount", async() => {
+  it("BuildAccountApiClientOptionsService:buildFromAccount", async () => {
     expect.assertions(3);
     // data
     const csrfToken = "csrf-token";
     const account = new AccountEntity(adminAccountDto());
     // mocked function
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: csrfToken }));
     // execution
     const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(account.domain));
-    expect(headers).toStrictEqual({"X-CSRF-Token": csrfToken});
-    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${account.domain}/`});
+    expect(headers).toStrictEqual({ "X-CSRF-Token": csrfToken });
+    expect(browser.cookies.get).toHaveBeenCalledWith({ name: "csrfToken", url: `${account.domain}/` });
   });
 
-  it("BuildAccountApiClientOptionsService:buildFromDomain with no subdomain", async() => {
+  it("BuildAccountApiClientOptionsService:buildFromDomain with no subdomain", async () => {
     expect.assertions(3);
     // data
     const csrfToken = "csrf-token";
     const domain = "https://passbolt.local";
     // mocked function
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: csrfToken }));
     // execution
     const apiClientOptions = BuildApiClientOptionsService.buildFromDomain(domain);
     const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(headers).toStrictEqual({"X-CSRF-Token": csrfToken});
-    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${domain}/`});
+    expect(headers).toStrictEqual({ "X-CSRF-Token": csrfToken });
+    expect(browser.cookies.get).toHaveBeenCalledWith({ name: "csrfToken", url: `${domain}/` });
   });
 
-  it("BuildAccountApiClientOptionsService:buildFromDomain with slash at the end of a trusted domain", async() => {
+  it("BuildAccountApiClientOptionsService:buildFromDomain with slash at the end of a trusted domain", async () => {
     expect.assertions(3);
     // data
     const csrfToken = "csrf-token";
     const domain = "https://passbolt.local/";
     // mocked function
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: csrfToken }));
     // execution
     const apiClientOptions = BuildApiClientOptionsService.buildFromDomain(domain);
     const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(headers).toStrictEqual({"X-CSRF-Token": csrfToken});
-    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: domain});
+    expect(headers).toStrictEqual({ "X-CSRF-Token": csrfToken });
+    expect(browser.cookies.get).toHaveBeenCalledWith({ name: "csrfToken", url: domain });
   });
 
-  it("BuildAccountApiClientOptionsService:buildFromDomain with subdomain", async() => {
+  it("BuildAccountApiClientOptionsService:buildFromDomain with subdomain", async () => {
     expect.assertions(3);
     // data
     const csrfToken = "csrf-token";
     const domain = "https://passbolt.local/test";
     // mocked function
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: csrfToken }));
     // execution
     const apiClientOptions = BuildApiClientOptionsService.buildFromDomain(domain);
     const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(headers).toStrictEqual({"X-CSRF-Token": csrfToken});
-    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${domain}/`});
+    expect(headers).toStrictEqual({ "X-CSRF-Token": csrfToken });
+    expect(browser.cookies.get).toHaveBeenCalledWith({ name: "csrfToken", url: `${domain}/` });
   });
 });

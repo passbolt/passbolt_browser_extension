@@ -19,7 +19,7 @@ import GenerateSsoIvService from "../crypto/generateSsoIvService";
 import GenerateSsoKeyService from "../crypto/generateSsoKeyService";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import SsoKitTemporaryStorageService from "../session_storage/ssoKitTemporaryStorageService";
-import {Buffer} from 'buffer';
+import { Buffer } from "buffer";
 
 class GenerateSsoKitService {
   /**
@@ -55,12 +55,12 @@ class GenerateSsoKitService {
     const iv2 = GenerateSsoIvService.generateIv();
 
     const secret = await EncryptSsoPassphraseService.encrypt(passphrase, nek, extractableKey, iv1, iv2);
-    const ssoKitClientPartEntity = new SsoKitClientPartEntity({nek, iv1, iv2, secret, provider});
+    const ssoKitClientPartEntity = new SsoKitClientPartEntity({ nek, iv1, iv2, secret, provider });
 
     const exportedKey = await crypto.subtle.exportKey("jwk", extractableKey);
     const serializedKey = Buffer.from(JSON.stringify(exportedKey)).toString("base64");
     const ssoKitServerPartEntity = new SsoKitServerPartEntity({
-      data: serializedKey
+      data: serializedKey,
     });
 
     return {

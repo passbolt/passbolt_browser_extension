@@ -12,12 +12,12 @@
  * @since         3.6.0
  */
 
-import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { v4 as uuidv4 } from "uuid";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 // Create account recovery organization public key
 
-export const createAccountRecoveryOrganizationPublicKeyDto = data => {
+export const createAccountRecoveryOrganizationPublicKeyDto = (data) => {
   const defaultData = {
     armored_key: pgpKeys.account_recovery_organization.public,
     fingerprint: pgpKeys.account_recovery_organization.fingerprint,
@@ -26,13 +26,13 @@ export const createAccountRecoveryOrganizationPublicKeyDto = data => {
   return Object.assign(defaultData, data || {});
 };
 
-export const defaultAccountRecoveryOrganizationPublicKeyDto = data => {
+export const defaultAccountRecoveryOrganizationPublicKeyDto = (data) => {
   const defaultData = createAccountRecoveryOrganizationPublicKeyDto({
     id: uuidv4(),
     created_by: uuidv4(),
     modified_by: uuidv4(),
     created: "2022-01-13T13:19:04.661Z",
-    modified: "2022-01-13T13:19:04.661Z"
+    modified: "2022-01-13T13:19:04.661Z",
   });
 
   return Object.assign(defaultData, data || {});
@@ -40,7 +40,7 @@ export const defaultAccountRecoveryOrganizationPublicKeyDto = data => {
 
 // Create account recovery organization public key with alternative key
 
-export const createAlternativeAccountRecoveryOrganizationPublicKeyDto = data => {
+export const createAlternativeAccountRecoveryOrganizationPublicKeyDto = (data) => {
   const defaultData = {
     armored_key: pgpKeys.account_recovery_organization_alternative.public,
     fingerprint: pgpKeys.account_recovery_organization_alternative.fingerprint,
@@ -49,13 +49,13 @@ export const createAlternativeAccountRecoveryOrganizationPublicKeyDto = data => 
   return Object.assign(defaultData, data || {});
 };
 
-export const alternativeAccountRecoveryOrganizationPublicKeyDto = data => {
+export const alternativeAccountRecoveryOrganizationPublicKeyDto = (data) => {
   const defaultData = createAccountRecoveryOrganizationPublicKeyDto({
     id: uuidv4(),
     created_by: uuidv4(),
     modified_by: uuidv4(),
     created: "2022-01-13T13:19:04.661Z",
-    modified: "2022-01-13T13:19:04.661Z"
+    modified: "2022-01-13T13:19:04.661Z",
   });
 
   return Object.assign(defaultData, data || {});
@@ -63,7 +63,7 @@ export const alternativeAccountRecoveryOrganizationPublicKeyDto = data => {
 
 // Create revoked account recovery organization public key
 
-export const createRevokedAccountRecoveryOrganizationPublicKeyDto = data => {
+export const createRevokedAccountRecoveryOrganizationPublicKeyDto = (data) => {
   const defaultData = {
     armored_key: pgpKeys.account_recovery_organization.revoked,
     fingerprint: pgpKeys.account_recovery_organization.fingerprint,
@@ -72,13 +72,13 @@ export const createRevokedAccountRecoveryOrganizationPublicKeyDto = data => {
   return Object.assign(defaultData, data || {});
 };
 
-export const revokedAccountRecoveryOrganizationPublicKeyDto = data => {
+export const revokedAccountRecoveryOrganizationPublicKeyDto = (data) => {
   const defaultData = createRevokedAccountRecoveryOrganizationPublicKeyDto({
     id: uuidv4(),
     created_by: uuidv4(),
     modified_by: uuidv4(),
     created: "2022-01-13T13:19:04.661Z",
-    modified: "2022-01-13T13:19:04.661Z"
+    modified: "2022-01-13T13:19:04.661Z",
   });
 
   return Object.assign(defaultData, data || {});

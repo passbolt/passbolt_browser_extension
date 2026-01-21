@@ -36,7 +36,7 @@ class PostLoginService {
    * @return {Promise<void>}
    */
   static async sendLoginEventForWorkers() {
-    await WorkerService.emitOnWorkersWithName('passbolt.auth.after-login', [InformCallToActionPagemod.appName]);
+    await WorkerService.emitOnWorkersWithName("passbolt.auth.after-login", [InformCallToActionPagemod.appName]);
   }
 }
 

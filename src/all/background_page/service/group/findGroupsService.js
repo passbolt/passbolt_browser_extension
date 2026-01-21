@@ -13,7 +13,7 @@
  */
 
 import GroupsCollection from "../../model/entity/group/groupsCollection";
-import {assertBoolean, assertType} from "../../utils/assertions";
+import { assertBoolean, assertType } from "../../utils/assertions";
 import GroupApiService from "../api/group/groupApiService";
 import User from "../../model/user";
 
@@ -49,7 +49,7 @@ export default class FindGroupsService {
     }
     assertBoolean(ignoreInvalidEntity);
     const groupsDto = await this.groupApiService.findAll(contains, filters, orders);
-    return new GroupsCollection(groupsDto, {clone: false, ignoreInvalidEntity: ignoreInvalidEntity});
+    return new GroupsCollection(groupsDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
   /**
@@ -71,7 +71,7 @@ export default class FindGroupsService {
    * @returns {Promise<GroupsCollection>}
    */
   async findAllForLocalStorage() {
-    const contains = {groups_users: true, my_group_user: true, modifier: false};
+    const contains = { groups_users: true, my_group_user: true, modifier: false };
     return await this.findAll(contains, null, null, true);
   }
 }

@@ -45,8 +45,10 @@ class AccountTemporarySessionStorageService {
   static async set(account) {
     // Prevent any wrong data set in the session storage
     if (account instanceof AccountTemporaryEntity) {
-      await navigator.locks.request(ACCOUNT_TEMPORARY_KEY, async() => {
-        await browser.storage.session.set({[ACCOUNT_TEMPORARY_KEY]: account.toDto(AccountTemporaryEntity.ALL_CONTAIN_OPTIONS)});
+      await navigator.locks.request(ACCOUNT_TEMPORARY_KEY, async () => {
+        await browser.storage.session.set({
+          [ACCOUNT_TEMPORARY_KEY]: account.toDto(AccountTemporaryEntity.ALL_CONTAIN_OPTIONS),
+        });
       });
     } else {
       throw new Error("The account is not an AccountTemporaryEntity, storage has not been set");
@@ -58,7 +60,7 @@ class AccountTemporarySessionStorageService {
    * @returns {Promise<void>}
    */
   static async remove() {
-    await navigator.locks.request(ACCOUNT_TEMPORARY_KEY, async() => {
+    await navigator.locks.request(ACCOUNT_TEMPORARY_KEY, async () => {
       await browser.storage.session.remove(ACCOUNT_TEMPORARY_KEY);
     });
   }

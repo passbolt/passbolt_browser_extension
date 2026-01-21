@@ -13,7 +13,7 @@
  */
 import GetDecryptedUserPrivateKeyService from "./getDecryptedUserPrivateKeyService";
 import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import Keyring from "../../model/keyring";
 
 const mockedFindPrivate = jest.spyOn(Keyring.prototype, "findPrivate");
@@ -21,17 +21,21 @@ const mockedFindPrivate = jest.spyOn(Keyring.prototype, "findPrivate");
 describe("GetDecryptedUserPrivateKey service", () => {
   const key = pgpKeys.ada;
 
-  it("should return the current users' private key decrypted", async() => {
-    expect.assertions(3);
-    mockedFindPrivate.mockImplementation(() => new ExternalGpgKeyEntity({armored_key: key.private}));
+  it(
+    "should return the current users' private key decrypted",
+    async () => {
+      expect.assertions(3);
+      mockedFindPrivate.mockImplementation(() => new ExternalGpgKeyEntity({ armored_key: key.private }));
 
-    const decryptedKey = await GetDecryptedUserPrivateKeyService.getKey(key.passphrase);
-    expect(decryptedKey.isPrivate()).toBe(true);
-    expect(decryptedKey.isDecrypted()).toBe(true);
-    expect(decryptedKey.getFingerprint().toUpperCase()).toBe(key.fingerprint);
-  }, 10 * 1000);
+      const decryptedKey = await GetDecryptedUserPrivateKeyService.getKey(key.passphrase);
+      expect(decryptedKey.isPrivate()).toBe(true);
+      expect(decryptedKey.isDecrypted()).toBe(true);
+      expect(decryptedKey.getFingerprint().toUpperCase()).toBe(key.fingerprint);
+    },
+    10 * 1000,
+  );
 
-  it("should throw an Error if the private key can't be find", async() => {
+  it("should throw an Error if the private key can't be find", async () => {
     expect.assertions(1);
     mockedFindPrivate.mockImplementation(() => null);
 

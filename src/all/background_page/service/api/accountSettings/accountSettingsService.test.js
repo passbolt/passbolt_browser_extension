@@ -12,11 +12,15 @@
  * @since         5.8.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountSettingsService from "./accountSettingsService";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../../test/mocks/mockApiResponse";
-import {accountSettingsService_midgarThemeDto, accountSettingsService_themesDto, accountSettingsService_localeDto} from "./accountSettingsService.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
+import {
+  accountSettingsService_midgarThemeDto,
+  accountSettingsService_themesDto,
+  accountSettingsService_localeDto,
+} from "./accountSettingsService.test.data";
 
 describe("accountSettingsService", () => {
   let service;
@@ -28,11 +32,14 @@ describe("accountSettingsService", () => {
   });
 
   describe("::updateTheme", () => {
-    it("should update the theme value to $expectedUpdateThemeName", async() => {
+    it("should update the theme value to $expectedUpdateThemeName", async () => {
       expect.assertions(1);
 
       const expectedUpdateThemeName = "midgar";
-      fetch.doMockOnceIf(new RegExp('/settings/themes'), async() => await mockApiResponse(accountSettingsService_midgarThemeDto()));
+      fetch.doMockOnceIf(
+        new RegExp("/settings/themes"),
+        async () => await mockApiResponse(accountSettingsService_midgarThemeDto()),
+      );
       const receivedUpdateThemeName = await service.updateTheme(expectedUpdateThemeName);
 
       expect(receivedUpdateThemeName.value).toBe(expectedUpdateThemeName);
@@ -40,11 +47,11 @@ describe("accountSettingsService", () => {
   });
 
   describe("::findAllThemes", () => {
-    it("should return all available themes", async() => {
+    it("should return all available themes", async () => {
       expect.assertions(1);
 
       const expectedThemes = accountSettingsService_themesDto();
-      fetch.doMockOnceIf(new RegExp('/settings/themes'), async() => await mockApiResponse(expectedThemes));
+      fetch.doMockOnceIf(new RegExp("/settings/themes"), async () => await mockApiResponse(expectedThemes));
       const result = await service.findAllThemes();
 
       expect(result).toEqual(expectedThemes);
@@ -52,11 +59,14 @@ describe("accountSettingsService", () => {
   });
 
   describe("::updateLocale", () => {
-    it("should update the locale value", async() => {
+    it("should update the locale value", async () => {
       expect.assertions(1);
 
       const expectedLocale = "en-UK";
-      fetch.doMockOnceIf(new RegExp('/settings/locales'), async() => await mockApiResponse(accountSettingsService_localeDto()));
+      fetch.doMockOnceIf(
+        new RegExp("/settings/locales"),
+        async () => await mockApiResponse(accountSettingsService_localeDto()),
+      );
       const result = await service.updateLocale(expectedLocale);
 
       expect(result.value).toBe(expectedLocale);

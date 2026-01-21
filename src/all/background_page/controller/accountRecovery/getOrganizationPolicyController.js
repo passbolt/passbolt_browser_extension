@@ -13,7 +13,6 @@
  */
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 
-
 class GetOrganizationPolicyController {
   /**
    * Constructor
@@ -38,7 +37,7 @@ class GetOrganizationPolicyController {
       this.worker.port.emit(this.requestId, "SUCCESS", accountRecoveryOrganizationPolicy);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -48,7 +47,7 @@ class GetOrganizationPolicyController {
    * @return {Promise<AccountRecoveryOrganizationPolicyEntity|null>}
    */
   async exec() {
-    const contains = {'creator': true, 'creator.gpgkey': true};
+    const contains = { creator: true, "creator.gpgkey": true };
     return this.accountRecoveryModel.findOrganizationPolicy(contains);
   }
 }

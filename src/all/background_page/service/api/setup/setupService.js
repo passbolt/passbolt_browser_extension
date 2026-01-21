@@ -12,7 +12,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const SETUP_SERVICE_RESOURCE_NAME = 'setup';
+const SETUP_SERVICE_RESOURCE_NAME = "setup";
 
 class SetupService extends AbstractService {
   /**
@@ -46,7 +46,7 @@ class SetupService extends AbstractService {
     this.assertValidId(userId);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/complete/${userId}`, {});
     const bodyString = this.apiClient.buildBody(completeDto);
-    return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    return this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
   }
 
   /**
@@ -60,7 +60,7 @@ class SetupService extends AbstractService {
     this.assertValidId(userId);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover/complete/${userId}`, {});
     const bodyString = this.apiClient.buildBody(completeDto);
-    return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    return this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
   }
 
   /**
@@ -74,7 +74,7 @@ class SetupService extends AbstractService {
     this.assertValidId(userId);
     this.assertValidId(token);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/start/${userId}/${token}`, {});
-    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const response = await this.apiClient.fetchAndHandleResponse("GET", url);
     return response.body;
   }
 
@@ -89,7 +89,7 @@ class SetupService extends AbstractService {
     this.assertValidId(userId);
     this.assertValidId(token);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover/start/${userId}/${token}`, {});
-    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const response = await this.apiClient.fetchAndHandleResponse("GET", url);
     return response.body;
   }
 
@@ -104,7 +104,7 @@ class SetupService extends AbstractService {
     this.assertValidId(userId);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover/abort/${userId}`, {});
     const bodyString = this.apiClient.buildBody(abortDto);
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
     return response.body;
   }
 }

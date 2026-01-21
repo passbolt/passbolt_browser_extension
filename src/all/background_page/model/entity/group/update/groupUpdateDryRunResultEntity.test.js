@@ -13,14 +13,16 @@
 import GroupUpdateDryRunResultEntity from "./groupUpdateDryRunResultEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultNeededSecretDto} from "passbolt-styleguide/src/shared/models/entity/secret/neededSecretEntity.test.data";
-import {minimalDto} from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
-
+import { defaultNeededSecretDto } from "passbolt-styleguide/src/shared/models/entity/secret/neededSecretEntity.test.data";
+import { minimalDto } from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity.test.data";
 
 describe("Group update dry run result entity", () => {
   describe("::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(GroupUpdateDryRunResultEntity.constructor.name, GroupUpdateDryRunResultEntity.getSchema());
+      EntitySchema.validateSchema(
+        GroupUpdateDryRunResultEntity.constructor.name,
+        GroupUpdateDryRunResultEntity.getSchema(),
+      );
     });
     it("validates secrets property", () => {
       assertEntityProperty.array(GroupUpdateDryRunResultEntity, "secrets");
@@ -43,7 +45,7 @@ describe("Group update dry run result entity", () => {
     it("constructor works if valid DTO is provided", () => {
       expect.assertions(5);
 
-      const dto = {needed_secrets: [defaultNeededSecretDto()], secrets: [minimalDto()]};
+      const dto = { needed_secrets: [defaultNeededSecretDto()], secrets: [minimalDto()] };
       const groupUpdateDryRunResultEntity = new GroupUpdateDryRunResultEntity(dto);
 
       expect(groupUpdateDryRunResultEntity.toDto()).toEqual(dto);

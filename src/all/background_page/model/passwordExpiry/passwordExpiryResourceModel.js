@@ -13,7 +13,7 @@
  */
 
 import PasswordExpiryResourceService from "../../service/api/passwordExpiry/passwordExpiryResourceService";
-import {assertType} from "../../utils/assertions";
+import { assertType } from "../../utils/assertions";
 import PasswordExpiryResourcesCollection from "../entity/passwordExpiry/passwordExpiryResourcesCollection";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 
@@ -34,7 +34,11 @@ class PasswordExpiryResourceModel {
    * @returns {Promise<void|Error>}
    */
   async update(collection) {
-    assertType(collection, PasswordExpiryResourcesCollection, 'The given entity is not a PasswordExpiryResourceCollection');
+    assertType(
+      collection,
+      PasswordExpiryResourcesCollection,
+      "The given entity is not a PasswordExpiryResourceCollection",
+    );
     try {
       await this.passwordExpiryResourceService.update(collection.toDto());
       // Insert the updated resources expiry date in the local storage

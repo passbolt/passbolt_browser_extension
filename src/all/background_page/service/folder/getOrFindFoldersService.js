@@ -14,7 +14,7 @@
 import FindAndUpdateFoldersLocalStorageService from "./findAndUpdateFoldersLocalStorageService";
 import FolderLocalStorage from "../local_storage/folderLocalStorage";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 /**
  * The service aims to get folders from the local storage if it is set, or retrieve them from the API and
@@ -41,7 +41,7 @@ export default class GetOrFindFoldersService {
     // Return local storage data if the storage was initialized.
     if (foldersDto) {
       // No validation is required if the data is in the runtime cache, as validation was done by the process that set the cache.
-      return new FoldersCollection(foldersDto, {validate: !hasRuntimeCache});
+      return new FoldersCollection(foldersDto, { validate: !hasRuntimeCache });
     }
 
     // Otherwise retrieve the folders and update the local storage.

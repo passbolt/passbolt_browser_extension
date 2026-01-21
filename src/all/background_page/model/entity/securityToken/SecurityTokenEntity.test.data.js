@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 
-export const defaultSecurityTokenDto = data => {
+export const defaultSecurityTokenDto = (data) => {
   const defaultData = {
-    "code": data?.code || "HGA",
-    "color": data?.color || "#8bc34a",
-    "textcolor": data?.textcolor || "#000000",
+    code: data?.code || "HGA",
+    color: data?.color || "#8bc34a",
+    textcolor: data?.textcolor || "#000000",
   };
 
   return Object.assign(defaultData, data || {});

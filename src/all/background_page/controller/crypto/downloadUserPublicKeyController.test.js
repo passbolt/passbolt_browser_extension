@@ -16,27 +16,27 @@ import DownloadUserPublicKeyController from "./downloadUserPublicKeyController";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import GpgKeyError from "../../error/GpgKeyError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import FileService from "../../service/file/fileService";
 
 const mockedSaveFile = jest.spyOn(FileService, "saveFile");
 
 const expectedTabId = "tabIdentifier";
-const mockedWorker = {tab: {id: expectedTabId}};
+const mockedWorker = { tab: { id: expectedTabId } };
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 describe("DownloadUserPublicKeyController", () => {
-  it(`Should trigegr a file download with the public key`, async() => {
+  it(`Should trigegr a file download with the public key`, async () => {
     expect.assertions(7);
     await MockExtension.withConfiguredAccount();
     const controller = new DownloadUserPublicKeyController(mockedWorker, null);
     const privateKey = pgpKeys.ada;
 
-    mockedSaveFile.mockImplementation(async(fileName, fileContent, fileContentType, workerTabId) => {
+    mockedSaveFile.mockImplementation(async (fileName, fileContent, fileContentType, workerTabId) => {
       expect(fileName).toBe("passbolt_public.asc");
       expect(fileContentType).toBe("text/plain");
       expect(workerTabId).toBe(expectedTabId);
@@ -53,7 +53,7 @@ describe("DownloadUserPublicKeyController", () => {
     expect(mockedSaveFile).toHaveBeenCalledTimes(1);
   });
 
-  it(`Should throw an exception if the user's private key can't be found`, async() => {
+  it(`Should throw an exception if the user's private key can't be found`, async () => {
     expect.assertions(2);
     MockExtension.withMissingPrivateKeyAccount();
     const controller = new DownloadUserPublicKeyController(mockedWorker, null);

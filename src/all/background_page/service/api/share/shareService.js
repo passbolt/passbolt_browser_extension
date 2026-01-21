@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {assertString} from "../../../utils/assertions";
+import { assertString } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
-const SHARE_SERVICE_RESOURCE_NAME = 'share';
+const SHARE_SERVICE_RESOURCE_NAME = "share";
 
 class ShareService extends AbstractService {
   /**
@@ -32,9 +32,7 @@ class ShareService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedSearchArosFiltersOptions() {
-    return [
-      'search',
-    ];
+    return ["search"];
   }
 
   /**
@@ -43,11 +41,7 @@ class ShareService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedSearchArosContainOptions() {
-    return [
-      "profile",
-      "user_count",
-      "role"
-    ];
+    return ["profile", "user_count", "role"];
   }
 
   /**
@@ -90,8 +84,8 @@ class ShareService extends AbstractService {
    */
   async simulateShareResource(resourceId, permissions) {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/simulate/resource/${resourceId}`, {});
-    const body = this.apiClient.buildBody({permissions: permissions});
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url, body);
+    const body = this.apiClient.buildBody({ permissions: permissions });
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url, body);
     return response.body;
   }
 
@@ -116,9 +110,9 @@ class ShareService extends AbstractService {
    */
   async searchUsersAndGroups(keyword, contains) {
     assertString(keyword, "keyword is not a valid string");
-    const filter = this.formatFilterOptions({search: keyword}, ShareService.getSupportedSearchArosFiltersOptions());
+    const filter = this.formatFilterOptions({ search: keyword }, ShareService.getSupportedSearchArosFiltersOptions());
     contains = this.formatContainOptions(contains, ShareService.getSupportedSearchArosContainOptions());
-    const options = {...filter, ...contains};
+    const options = { ...filter, ...contains };
     const url = "search-aros";
     const response = await this.apiClient.get(url, options);
     return response.body;

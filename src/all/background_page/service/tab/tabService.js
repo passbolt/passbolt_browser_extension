@@ -32,19 +32,19 @@ class TabService {
    */
   static async exec(tabId, changeInfo, tab) {
     // ignore loading requests
-    if (changeInfo.status !== 'complete') {
+    if (changeInfo.status !== "complete") {
       return;
     }
 
     // ignore about:blank urls they can not be interacted with anyway
-    if (tab.url === 'about:blank') {
+    if (tab.url === "about:blank") {
       return;
     }
     /*
      * We can't insert scripts if the url is not https or http
      * as this is not allowed, instead we insert the scripts manually in the background page if needed
      */
-    if (!(tab?.url?.startsWith('http://') || tab?.url?.startsWith('https://'))) {
+    if (!(tab?.url?.startsWith("http://") || tab?.url?.startsWith("https://"))) {
       return;
     }
 
@@ -75,7 +75,9 @@ class TabService {
        * 300ms, treat the last tabs onUpdated event and trigger a pagemod identification process on it.
        */
       if (workerEntity.isWaitingConnection || workerEntity.isReconnecting) {
-        console.debug(`TabService::exec(id: ${tabId}): Waiting content script port initial connection or reconnection.`);
+        console.debug(
+          `TabService::exec(id: ${tabId}): Waiting content script port initial connection or reconnection.`,
+        );
         await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(workerEntity);
         return;
       }
@@ -84,7 +86,8 @@ class TabService {
        * If a port associated to this worker still exists in memory, try to connect to the content script application
        * that opened it.
        */
-      if (PortManager.isPortExist(worker.id)) { // Port exists in runtime memory.
+      if (PortManager.isPortExist(worker.id)) {
+        // Port exists in runtime memory.
         const port = PortManager.getPortById(workerEntity.id);
         /*
          * Only try to connect with the content script application if the origin of the tab url is similar to the
@@ -93,11 +96,16 @@ class TabService {
          */
         if (hasUrlSameOrigin(port._port.sender.url, tab.url)) {
           try {
-            await PromiseTimeoutService.exec(port.request('passbolt.port.check'));
-            console.debug(`TabService::exec(id: ${tabId}):  Content script application acknowledged presence on worker runtime memory port.`);
+            await PromiseTimeoutService.exec(port.request("passbolt.port.check"));
+            console.debug(
+              `TabService::exec(id: ${tabId}):  Content script application acknowledged presence on worker runtime memory port.`,
+            );
             return;
           } catch (error) {
-            console.debug(`TabService::exec(id: ${tabId}): No content script application acknowledged presence on worker runtime memory port.`, error);
+            console.debug(
+              `TabService::exec(id: ${tabId}): No content script application acknowledged presence on worker runtime memory port.`,
+              error,
+            );
           }
         }
       } else {
@@ -113,7 +121,10 @@ class TabService {
           console.debug(`TabService::exec(id: ${tabId}): A content script application reconnected its port.`);
           return;
         } catch (error) {
-          console.debug(`TabService::exec(id: ${tabId}): No content script application was able to reconnect its port.`, error);
+          console.debug(
+            `TabService::exec(id: ${tabId}): No content script application was able to reconnect its port.`,
+            error,
+          );
         }
       }
     }
@@ -135,7 +146,7 @@ function mappingFrameDetailsFromTab(tab) {
     // Mapping the tab info as a frame details to be compliant with webNavigation API
     frameId: 0,
     tabId: tab.id,
-    url: tab.url
+    url: tab.url,
   };
 }
 

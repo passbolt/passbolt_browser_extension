@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const AUTH_VERIFY_SERVER_KEY_SERVICE_RESOURCE_NAME = 'auth/verify';
+const AUTH_VERIFY_SERVER_KEY_SERVICE_RESOURCE_NAME = "auth/verify";
 
 class AuthVerifyServerKeyService extends AbstractService {
   /**
@@ -51,10 +51,10 @@ class AuthVerifyServerKeyService extends AbstractService {
    * @returns {{armored_key: string, fingerprint: string}}
    */
   mapGetServerKey(data) {
-    const {keydata, fingerprint} = data;
+    const { keydata, fingerprint } = data;
     return {
       armored_key: keydata,
-      fingerprint: fingerprint
+      fingerprint: fingerprint,
     };
   }
 
@@ -64,13 +64,13 @@ class AuthVerifyServerKeyService extends AbstractService {
    */
   async verify(fingerprint, serverVerifyToken) {
     const body = new FormData();
-    body.append('data[gpg_auth][keyid]', fingerprint);
-    body.append('data[gpg_auth][server_verify_token]', serverVerifyToken);
+    body.append("data[gpg_auth][keyid]", fingerprint);
+    body.append("data[gpg_auth][server_verify_token]", serverVerifyToken);
     const fetchOptions = await this.apiClient.buildFetchOptions();
     // It is required to let this property unset in order to let the browser determine it by itself and set the additional variable boundary required by the API to parse the payload.
-    delete fetchOptions.headers['content-type'];
+    delete fetchOptions.headers["content-type"];
     const url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
-    const response = await this.apiClient.sendRequest('POST', url, body, fetchOptions);
+    const response = await this.apiClient.sendRequest("POST", url, body, fetchOptions);
     await this.apiClient.parseResponseJson(response);
     return response;
   }

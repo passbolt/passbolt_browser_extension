@@ -15,7 +15,7 @@ import Log from "../../model/log";
 import RbacEntity from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity";
 import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection";
 
-export const RBACS_LOCAL_STORAGE_KEY = 'rbac';
+export const RBACS_LOCAL_STORAGE_KEY = "rbac";
 
 class RbacsLocalStorage {
   /**
@@ -34,7 +34,7 @@ class RbacsLocalStorage {
    */
   getStorageKey(account) {
     if (!account.id) {
-      throw new Error('Cannot retrieve account id, necessary to get a rbac storage key.');
+      throw new Error("Cannot retrieve account id, necessary to get a rbac storage key.");
     }
     return `${RBACS_LOCAL_STORAGE_KEY}-${account.id}`;
   }
@@ -45,7 +45,7 @@ class RbacsLocalStorage {
    * @return {Promise<void>}
    */
   async flush() {
-    Log.write({level: 'debug', message: 'RbacLocalStorage flushed'});
+    Log.write({ level: "debug", message: "RbacLocalStorage flushed" });
     return await browser.storage.local.remove(this.storageKey);
   }
 
@@ -66,18 +66,18 @@ class RbacsLocalStorage {
    * @return {Promise<void>}
    */
   async set(rbacsCollection) {
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       const rbacs = [];
       if (rbacsCollection) {
         if (!(rbacsCollection instanceof RbacsCollection)) {
-          throw new TypeError('RbacsLocalStorage::set expects a RbacsCollection');
+          throw new TypeError("RbacsLocalStorage::set expects a RbacsCollection");
         }
         for (const rbacEntity of rbacsCollection) {
           RbacsLocalStorage.assertEntityBeforeSave(rbacEntity);
           rbacs.push(rbacEntity.toDto(RbacEntity.ALL_CONTAIN_OPTIONS));
         }
       }
-      await browser.storage.local.set({[this.storageKey]: rbacs});
+      await browser.storage.local.set({ [this.storageKey]: rbacs });
     });
   }
 
@@ -95,13 +95,13 @@ class RbacsLocalStorage {
    */
   static assertEntityBeforeSave(rbacEntity) {
     if (!rbacEntity) {
-      throw new TypeError('RolesLocalStorage expects a RbacEntity to be set');
+      throw new TypeError("RolesLocalStorage expects a RbacEntity to be set");
     }
     if (!(rbacEntity instanceof RbacEntity)) {
-      throw new TypeError('RolesLocalStorage expects an object of type RbacEntity');
+      throw new TypeError("RolesLocalStorage expects an object of type RbacEntity");
     }
     if (!rbacEntity.id) {
-      throw new TypeError('RolesLocalStorage expects RbacEntity id to be set');
+      throw new TypeError("RolesLocalStorage expects RbacEntity id to be set");
     }
   }
 }

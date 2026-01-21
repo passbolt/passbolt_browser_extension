@@ -12,19 +12,19 @@
  * @since         5.7.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import DeleteSecretRevisionsSettingsService from "./deleteSecretRevisionsSettingsService";
 
 describe("DeleteSecretRevisionsSettingsService", () => {
   describe("::deleteSettings", () => {
-    it("should call the api service", async() => {
+    it("should call the api service", async () => {
       expect.assertions(1);
 
       const settingsId = uuidv4();
       const apiClientOptions = defaultApiClientOptions();
-      const mockPassboltResponse = new PassboltResponseEntity({header: {}, body: null});
+      const mockPassboltResponse = new PassboltResponseEntity({ header: {}, body: null });
 
       const service = new DeleteSecretRevisionsSettingsService(apiClientOptions);
       jest.spyOn(service.secretRevisionsSettingsApiService, "delete").mockReturnValue(mockPassboltResponse);
@@ -33,13 +33,15 @@ describe("DeleteSecretRevisionsSettingsService", () => {
       expect(service.secretRevisionsSettingsApiService.delete).toHaveBeenCalledTimes(1);
     });
 
-    it("should not catch errors and let it throw if something wrong happens", async() => {
+    it("should not catch errors and let it throw if something wrong happens", async () => {
       expect.assertions(1);
 
       const apiClientOptions = defaultApiClientOptions();
 
       const service = new DeleteSecretRevisionsSettingsService(apiClientOptions);
-      jest.spyOn(service.secretRevisionsSettingsApiService, "delete").mockImplementation(() => { throw new Error(); });
+      jest.spyOn(service.secretRevisionsSettingsApiService, "delete").mockImplementation(() => {
+        throw new Error();
+      });
 
       await expect(() => service.deleteSettings()).rejects.toThrowError();
     });

@@ -20,11 +20,10 @@ class SecurityTokenEntity extends Entity {
    * @inheritDoc
    */
   constructor(securityTokenDto, options = {}) {
-    super(EntitySchema.validate(
-      SecurityTokenEntity.ENTITY_NAME,
-      securityTokenDto,
-      SecurityTokenEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(SecurityTokenEntity.ENTITY_NAME, securityTokenDto, SecurityTokenEntity.getSchema()),
+      options,
+    );
   }
 
   /**
@@ -33,26 +32,22 @@ class SecurityTokenEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "code",
-        "color",
-        "textcolor"
-      ],
-      "properties": {
-        "code": {
-          "type": "string",
-          "pattern": /^[a-zA-Z0-9-_]{3}$/
+      type: "object",
+      required: ["code", "color", "textcolor"],
+      properties: {
+        code: {
+          type: "string",
+          pattern: /^[a-zA-Z0-9-_]{3}$/,
         },
-        "color": {
-          "type": "string",
-          "format": "x-hex-color"
+        color: {
+          type: "string",
+          format: "x-hex-color",
         },
-        "textcolor": {
-          "type": "string",
-          "format": "x-hex-color"
-        }
-      }
+        textcolor: {
+          type: "string",
+          format: "x-hex-color",
+        },
+      },
     };
   }
 

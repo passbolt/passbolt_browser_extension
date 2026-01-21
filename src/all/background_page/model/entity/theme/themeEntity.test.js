@@ -14,7 +14,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import ThemeEntity from "./themeEntity";
-import {defaultThemeDto} from "./themeEntity.test.data";
+import { defaultThemeDto } from "./themeEntity.test.data";
 
 describe("Theme entity", () => {
   it("schema must validate", () => {
@@ -46,14 +46,14 @@ describe("Theme entity", () => {
     expect.assertions(2);
     try {
       new ThemeEntity({
-        "id": "🏆‍️",
-        "name": "🏆‍",
+        id: "🏆‍️",
+        name: "🏆‍",
       });
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        id: {format: 'The id is not a valid uuid.'},
-        name: {pattern: 'The name is not valid.'},
+        id: { format: "The id is not a valid uuid." },
+        name: { pattern: "The name is not valid." },
       });
     }
   });

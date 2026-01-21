@@ -27,7 +27,7 @@ class SsoKitTemporaryStorageService {
   static async set(serverPartSsoKit) {
     await lock.acquire();
     try {
-      await browser.storage.session.set({[SSO_KIT_STORAGE_KEY]: serverPartSsoKit.toDto()});
+      await browser.storage.session.set({ [SSO_KIT_STORAGE_KEY]: serverPartSsoKit.toDto() });
     } catch (e) {
       lock.release();
       throw e;
@@ -52,7 +52,7 @@ class SsoKitTemporaryStorageService {
       const entity = new SsoKitServerPartEntity(ssoKitServerPartDto);
 
       // Flush the data in any case
-      Log.write({level: 'debug', message: 'SsoKitTemporaryStorageService flushed'});
+      Log.write({ level: "debug", message: "SsoKitTemporaryStorageService flushed" });
       await browser.storage.session.remove(SSO_KIT_STORAGE_KEY);
       lock.release();
       return entity;
@@ -69,7 +69,7 @@ class SsoKitTemporaryStorageService {
   static async flush() {
     await lock.acquire();
     try {
-      Log.write({level: 'debug', message: 'SsoKitTemporaryStorageService flushed'});
+      Log.write({ level: "debug", message: "SsoKitTemporaryStorageService flushed" });
       await browser.storage.session.remove(SSO_KIT_STORAGE_KEY);
     } catch (e) {
       lock.release();

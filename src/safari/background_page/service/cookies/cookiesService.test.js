@@ -316,5 +316,30 @@ describe("CookieService", () => {
         expect(cookieList[i]).toStrictEqual(cookies[i]);
       }
     });
+
+    it("should handle cookies with Expires containing commas in dates", () => {
+      expect.assertions(4);
+      const service = new CookiesService("https://www.passbolt.com");
+      const cookieString = "session=abc; Expires=Thu, 19 Nov 2026 08:52:00 GMT; Path=/; Secure, csrfToken=xyz123; Expires=Fri, 20 Nov 2026 08:52:00 GMT; Path=/";
+
+      const cookieList = service.splitMultiCookieString(cookieString);
+      expect(cookieList).toHaveLength(2);
+      expect(cookieList[0]).toContain("session=abc");
+      expect(cookieList[0]).toContain("Expires=Thu, 19 Nov 2026");
+      expect(cookieList[1]).toContain("csrfToken=xyz123");
+    });
+
+    it("should not create cookies where Expires becomes the cookie name", () => {
+      expect.assertions(4);
+      const service = new CookiesService("https://www.passbolt.com");
+      const cookieString = "PHPSESSID=abc; path=/; Expires=Thu, 19 Nov 1981 08:52:00 GMT; HttpOnly, csrfToken=xyz; path=/; secure";
+
+      const cookieList = service.deserialisedCookie(cookieString);
+
+      expect(cookieList).toHaveLength(2);
+      expect(cookieList.every(c => c.name !== "Expires")).toBe(true);
+      expect(cookieList[0].name).toBe("PHPSESSID");
+      expect(cookieList[1].name).toBe("csrfToken");
+    });
   });
 });

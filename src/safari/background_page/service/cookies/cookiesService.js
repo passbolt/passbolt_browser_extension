@@ -139,46 +139,38 @@ export class CookiesService {
   }
 
   /**
-   * A string with multiple cookies inside will separate cookies with ',', however the attribute `Expires` does have ',' in its value and needs specifc treatment.
+   * Split a combined Set-Cookie header string into individual cookie strings.
+   * Handles commas in Expires dates (e.g., "Thu, 01 Jan 2027 00:00:00 GMT").
    * @param {string} multipleCookieString
    * @returns {Array<string>}
    * @private
    */
   splitMultiCookieString(multipleCookieString) {
     const cookieStrings = [];
-    let cookieStringBuffer = "";
-    let isInExpiresAttribute = false;
-    let alreadyFoundCommaInDate = false;
+    let currentCookie = "";
+    let i = 0;
 
-    for (let i = 0; i < multipleCookieString.length; i++) {
-      const currentChar = multipleCookieString[i];
-
-      /*
-       * here's the multi-cookie separator but it could also be the Expires date
-       * It could be also the cookie separator with the Expiry date as the last attribute where ',' has been read already
-       */
-      if ((currentChar === "," && !isInExpiresAttribute) || (currentChar === "," && isInExpiresAttribute && alreadyFoundCommaInDate)) {
-        // we were not currently in the Expires attribute, so it's a cookie separation
-        cookieStrings.push(cookieStringBuffer.trim());
-        cookieStringBuffer = "";
-        alreadyFoundCommaInDate = false;
-        continue;
-      } else if (currentChar === "," && isInExpiresAttribute && !alreadyFoundCommaInDate) {
-        alreadyFoundCommaInDate = true;
+    while (i < multipleCookieString.length) {
+      // Check for cookie boundary: ", " followed by a valid cookie name and "="
+      if (multipleCookieString[i] === "," && multipleCookieString[i + 1] === " ") {
+        const remainder = multipleCookieString.substring(i + 2);
+        /*
+         * Cookie names are tokens: alphanumeric plus - and _
+         * Must be followed by = to be a new cookie (not a date continuation)
+         */
+        if (/^[a-zA-Z0-9_-]+=/.test(remainder)) {
+          cookieStrings.push(currentCookie.trim());
+          currentCookie = "";
+          i += 2; // Skip ", "
+          continue;
+        }
       }
-
-      if (currentChar === ";") {
-        // it's the attribute separator, we could enter in the Expires attribute section
-        const parsingAttributes = multipleCookieString.substring(i + 1);
-        const attributeName = parsingAttributes.trim().toLowerCase();
-        isInExpiresAttribute = attributeName.startsWith("expires");
-      }
-
-      cookieStringBuffer += currentChar;
+      currentCookie += multipleCookieString[i];
+      i++;
     }
 
-    if (cookieStringBuffer !== "") {
-      cookieStrings.push(cookieStringBuffer.trim());
+    if (currentCookie.trim()) {
+      cookieStrings.push(currentCookie.trim());
     }
 
     return cookieStrings;

@@ -25,7 +25,7 @@ import Cocoa
 import SafariServices
 import WebKit
 
-let extensionBundleIdentifier = "com.passbolt.Passbolt-Safari-Extension.Extension"
+let extensionBundleIdentifier = "com.passbolt.safari.Extension"
 
 class ViewController: NSViewController, WKNavigationDelegate, WKScriptMessageHandler {
 

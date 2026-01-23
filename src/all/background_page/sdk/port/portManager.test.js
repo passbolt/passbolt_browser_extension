@@ -92,7 +92,11 @@ describe("PortManager", () => {
       });
       delete port.sender.tab;
       // mock functions
-      jest.spyOn(browser.runtime, "getURL").mockImplementationOnce(() => "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess");
+      jest
+        .spyOn(browser.runtime, "getURL")
+        .mockImplementationOnce(
+          () => "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess",
+        );
       jest.spyOn(PagemodManager, "attachEventToPort");
       // process
       try {

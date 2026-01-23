@@ -31,7 +31,7 @@ export class SendNativeMessageService {
      * At some point, without limitations, the native application is not started or shut down during its preocessing
      * and as a result, the messaging is failing and some process does not work in the app.
      */
-    return await navigator.locks.request(action, async() => SendNativeMessageService._exec(action, args));
+    return await navigator.locks.request(action, async () => SendNativeMessageService._exec(action, args));
   }
 
   /**
@@ -42,7 +42,7 @@ export class SendNativeMessageService {
    * @private
    */
   static async _exec(action, args) {
-    const message = {action, ...args};
+    const message = { action, ...args };
     //@note: SAFARI_APP_ID is actually ignored when used by Safari. It is sill set here to respect `sendNativeMessage` standard.
     const resp = await chrome.runtime.sendNativeMessage(SAFARI_APP_ID, message);
 

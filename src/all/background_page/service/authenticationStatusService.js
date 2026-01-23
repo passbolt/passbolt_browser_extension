@@ -18,7 +18,7 @@ import PassboltBadResponseError from "../error/passboltBadResponseError";
 import GetActiveAccountService from "./account/getActiveAccountService";
 import BuildApiClientOptionsService from "./account/buildApiClientOptionsService";
 
-const AUTH_RESOURCE_NAME = '/auth';
+const AUTH_RESOURCE_NAME = "/auth";
 const MFA_VERIFY_ERROR_REGEXP = /mfa\/verify\/error\.json$/;
 
 class AuthenticationStatusService {

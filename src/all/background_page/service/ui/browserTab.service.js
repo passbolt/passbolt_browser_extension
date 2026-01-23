@@ -12,7 +12,7 @@
  * @since         3.4.0
  */
 
-import {assertNumber} from "../../utils/assertions";
+import { assertNumber } from "../../utils/assertions";
 import Validator from "validator";
 
 class BrowserTabService {
@@ -83,7 +83,7 @@ class BrowserTabService {
       throw new Error("Cannot open tab due to an invalid URL");
     }
 
-    await browser.tabs.create({url});
+    await browser.tabs.create({ url });
   }
 }
 

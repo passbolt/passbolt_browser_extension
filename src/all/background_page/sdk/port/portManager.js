@@ -77,7 +77,7 @@ class PortManager {
       return false;
     }
 
-    const quickAppUrl = await browser.runtime.getURL('/webAccessibleResources/quickaccess.html');
+    const quickAppUrl = await browser.runtime.getURL("/webAccessibleResources/quickaccess.html");
     const isPortUrlAQuickAppUrl = sender.url.startsWith(quickAppUrl);
     return isPortUrlAQuickAppUrl;
   }

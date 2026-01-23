@@ -12,7 +12,7 @@
  * @since         5.7.0
  */
 import BrowserTabService from "../../service/ui/browserTab.service";
-import {assertString} from "../../utils/assertions";
+import { assertString } from "../../utils/assertions";
 
 export default class OpenTabController {
   /**

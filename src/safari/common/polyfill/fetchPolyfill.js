@@ -12,9 +12,9 @@
  * @since         5.7.0
  */
 
-const {default: FormDataUtils} = require("../../../all/background_page/utils/format/formDataUtils");
-const {CookiesService} = require("../../background_page/service/cookies/cookiesService");
-const {SendNativeMessageService} = require("../../background_page/service/nativeMessage/sendNativeMessageService");
+const { default: FormDataUtils } = require("../../../all/background_page/utils/format/formDataUtils");
+const { CookiesService } = require("../../background_page/service/cookies/cookiesService");
+const { SendNativeMessageService } = require("../../background_page/service/nativeMessage/sendNativeMessageService");
 
 class FetchSafariPolyfill {
   /**
@@ -27,7 +27,10 @@ class FetchSafariPolyfill {
     const cookieService = new CookiesService(resource);
     const requestOptions = await FetchSafariPolyfill.prepareOptions(options, cookieService);
 
-    const appResponse = await SendNativeMessageService.sendNativeMessage("fetch", {resource: resource, options: requestOptions});
+    const appResponse = await SendNativeMessageService.sendNativeMessage("fetch", {
+      resource: resource,
+      options: requestOptions,
+    });
     const fetchResponse = await FetchSafariPolyfill.getProcessedAppResponse(appResponse, cookieService);
 
     return fetchResponse;
@@ -41,11 +44,10 @@ class FetchSafariPolyfill {
    * @private
    */
   static async prepareOptions(options, cookieService) {
-    const bodyData = options.body instanceof FormData
-      ? await FormDataUtils.formDataToString(options.body)
-      : options.body;
+    const bodyData =
+      options.body instanceof FormData ? await FormDataUtils.formDataToString(options.body) : options.body;
 
-    const requestOptions = {...options, body: bodyData};
+    const requestOptions = { ...options, body: bodyData };
 
     if (options.credentials === "include") {
       requestOptions.cookies = await cookieService.getSerialisedCookies();
@@ -63,8 +65,8 @@ class FetchSafariPolyfill {
    * @private
    */
   static async getProcessedAppResponse(appResponse, cookieService) {
-    const {headers, body} = appResponse.httpResponse;
-    const httpHeaders = {...headers};
+    const { headers, body } = appResponse.httpResponse;
+    const httpHeaders = { ...headers };
 
     httpHeaders.statusText = httpHeaders.status;
     httpHeaders.status = httpHeaders.code || body.header.code;

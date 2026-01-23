@@ -15,9 +15,9 @@ import CloseActiveTabController from "./closeActiveTabController";
 
 describe("CloseActiveTabController", () => {
   describe("::exec", () => {
-    it("Should close the tab", async() => {
-      const tab = {id: 1};
-      const controller = new CloseActiveTabController({tab: tab}, null);
+    it("Should close the tab", async () => {
+      const tab = { id: 1 };
+      const controller = new CloseActiveTabController({ tab: tab }, null);
       jest.spyOn(browser.tabs, "remove");
 
       expect.assertions(1);

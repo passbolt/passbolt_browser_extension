@@ -96,54 +96,54 @@ describe("BrowserTabService", () => {
       expect(browser.tabs.reload).toHaveBeenCalledWith(tab.id);
     });
 
-    it("Should assert its parameter", async() => {
+    it("Should assert its parameter", async () => {
       expect.assertions(1);
       // mock data
-      const tab = {id: "1"};
+      const tab = { id: "1" };
       // process
       await expect(() => BrowserTabService.reloadTab(tab.id)).rejects.toThrowError();
     });
   });
 
   describe("BrowserTabService::closeTab", () => {
-    it("Should close the tab by id", async() => {
+    it("Should close the tab by id", async () => {
       expect.assertions(1);
       // mock data
-      const tab = {id: 1};
+      const tab = { id: 1 };
       // mock functions
-      jest.spyOn(browser.tabs, 'remove');
+      jest.spyOn(browser.tabs, "remove");
       // process
       await BrowserTabService.closeTab(tab.id);
       // expectations
       expect(browser.tabs.remove).toHaveBeenCalledWith(tab.id);
     });
 
-    it("Should assert its parameter", async() => {
+    it("Should assert its parameter", async () => {
       expect.assertions(1);
       // mock data
-      const tab = {id: "1"};
+      const tab = { id: "1" };
       // process
       await expect(() => BrowserTabService.closeTab(tab.id)).rejects.toThrowError();
     });
   });
 
   describe("BrowserTabService::openTab", () => {
-    it("Should open a new tab given a URL", async() => {
+    it("Should open a new tab given a URL", async () => {
       expect.assertions(1);
       // mock data
       const url = "https://www.passbolt.com";
       // mock functions
-      jest.spyOn(browser.tabs, 'create');
+      jest.spyOn(browser.tabs, "create");
       // process
       await BrowserTabService.openTab(url);
       // expectations
-      expect(browser.tabs.create).toHaveBeenCalledWith({url});
+      expect(browser.tabs.create).toHaveBeenCalledWith({ url });
     });
 
-    it("Should throw an error if the URL is not valid", async() => {
+    it("Should throw an error if the URL is not valid", async () => {
       expect.assertions(4);
       // mock functions
-      jest.spyOn(browser.tabs, 'create');
+      jest.spyOn(browser.tabs, "create");
 
       await expect(() => BrowserTabService.openTab(null)).rejects.toThrowError();
       await expect(() => BrowserTabService.openTab("url")).rejects.toThrowError();

@@ -22,12 +22,12 @@ beforeEach(() => {
 
 describe("FileService", () => {
   describe("::saveFile", () => {
-    it("save file with Safari", async() => {
+    it("save file with Safari", async () => {
       expect.assertions(1);
 
       // function mocked
       chrome.runtime.sendNativeMessage = jest.fn();
-      chrome.runtime.sendNativeMessage.mockImplementation(() => ({success: true}));
+      chrome.runtime.sendNativeMessage.mockImplementation(() => ({ success: true }));
 
       // process
       await FileService.saveFile("filename", "Text", null, null);
@@ -37,7 +37,7 @@ describe("FileService", () => {
         action: "save-file",
         filename: "filename",
         mimeType: "text/plain",
-        base64Data: "VGV4dA=="
+        base64Data: "VGV4dA==",
       };
 
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedArgument);

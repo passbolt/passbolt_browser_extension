@@ -12,13 +12,8 @@
  * @since         5.7.0
  */
 
-import {CookiesService} from "./cookiesService";
-import {
-  fullSessionCookie,
-  fullThemeCookie,
-  simpleSessionCookie,
-  simpleThemeCookie
-} from "./cookiesService.test.data";
+import { CookiesService } from "./cookiesService";
+import { fullSessionCookie, fullThemeCookie, simpleSessionCookie, simpleThemeCookie } from "./cookiesService.test.data";
 
 beforeEach(() => {
   jest.resetAllMocks();
@@ -26,7 +21,7 @@ beforeEach(() => {
 
 describe("CookieService", () => {
   describe("::getSerialisedCookies", () => {
-    it("should serialize the given set of cookies", async() => {
+    it("should serialize the given set of cookies", async () => {
       expect.assertions(1);
       const cookie1 = {
         name: "session",
@@ -53,7 +48,7 @@ describe("CookieService", () => {
   });
 
   describe("::updateCookiesWithSetCookieHeader", () => {
-    it("should call for chrome.cookies.set with the given cookie", async() => {
+    it("should call for chrome.cookies.set with the given cookie", async () => {
       expect.assertions(2);
 
       jest.spyOn(chrome.cookies, "set").mockImplementation(() => {});
@@ -73,11 +68,11 @@ describe("CookieService", () => {
         httpOnly: true,
         path: "/passbolt/",
         sameSite: "strict",
-        expirationDate: 0
+        expirationDate: 0,
       });
     });
 
-    it("should call for chrome.cookies.set for each cookie found", async() => {
+    it("should call for chrome.cookies.set for each cookie found", async () => {
       expect.assertions(3);
 
       jest.spyOn(chrome.cookies, "set").mockImplementation(() => {});
@@ -97,7 +92,7 @@ describe("CookieService", () => {
         httpOnly: true,
         path: "/passbolt/",
         sameSite: "strict",
-        expirationDate: 0
+        expirationDate: 0,
       });
 
       expect(chrome.cookies.set).toHaveBeenCalledWith({
@@ -109,7 +104,7 @@ describe("CookieService", () => {
       });
     });
 
-    it("should assert its parameter", async() => {
+    it("should assert its parameter", async () => {
       expect.assertions(1);
       const service = new CookiesService("https://www.passbolt.com");
       await expect(() => service.updateCookiesWithSetCookieHeader(42)).rejects.toThrowError();
@@ -117,10 +112,10 @@ describe("CookieService", () => {
   });
 
   describe("::getCsrfToken", () => {
-    it("should return the csrf token value if any", async() => {
+    it("should return the csrf token value if any", async () => {
       expect.assertions(3);
 
-      jest.spyOn(chrome.cookies, "get").mockImplementation(() => ({value: "123456"}));
+      jest.spyOn(chrome.cookies, "get").mockImplementation(() => ({ value: "123456" }));
 
       const service = new CookiesService("https://www.passbolt.com");
 
@@ -130,11 +125,11 @@ describe("CookieService", () => {
       expect(chrome.cookies.get).toHaveBeenCalledWith({
         domain: "www.passbolt.com",
         url: "https://www.passbolt.com/",
-        name: "csrfToken"
+        name: "csrfToken",
       });
     });
 
-    it("should return null if there is no csrf token set", async() => {
+    it("should return null if there is no csrf token set", async () => {
       expect.assertions(3);
 
       jest.spyOn(chrome.cookies, "get").mockImplementation(() => null);
@@ -147,7 +142,7 @@ describe("CookieService", () => {
       expect(chrome.cookies.get).toHaveBeenCalledWith({
         domain: "www.passbolt.com",
         url: "https://www.passbolt.com/",
-        name: "csrfToken"
+        name: "csrfToken",
       });
     });
   });
@@ -165,7 +160,7 @@ describe("CookieService", () => {
         domain: "www.passbolt.com",
         name: "theme",
         value: "dark",
-        sameSite: "strict"
+        sameSite: "strict",
       });
     });
 
@@ -185,7 +180,7 @@ describe("CookieService", () => {
         path: "/passbolt/",
         secure: true,
         httpOnly: true,
-        expirationDate: 0
+        expirationDate: 0,
       });
     });
 
@@ -205,7 +200,7 @@ describe("CookieService", () => {
         path: "/passbolt/",
         secure: true,
         httpOnly: true,
-        expirationDate: 0
+        expirationDate: 0,
       });
       expect(cookieList[1]).toStrictEqual({
         url: "https://www.passbolt.com/",
@@ -216,7 +211,7 @@ describe("CookieService", () => {
         path: "/passbolt/",
         secure: true,
         httpOnly: true,
-        expirationDate: 0
+        expirationDate: 0,
       });
     });
 
@@ -241,7 +236,7 @@ describe("CookieService", () => {
     it("should not split the string if there is only one cookie with some attributes", () => {
       expect.assertions(2);
       const service = new CookiesService("https://www.passbolt.com");
-      const cookieString = simpleThemeCookie({withSecure: true, withHttpOnly: true});
+      const cookieString = simpleThemeCookie({ withSecure: true, withHttpOnly: true });
 
       const cookieList = service.splitMultiCookieString(cookieString);
       expect(cookieList).toHaveLength(1);
@@ -274,8 +269,8 @@ describe("CookieService", () => {
     it("should split the string if there are more than cookie with some attributes", () => {
       expect.assertions(3);
       const service = new CookiesService("https://www.passbolt.com");
-      const cookie1 = simpleThemeCookie({withSecure: true, withHttpOnly: true});
-      const cookie2 = simpleSessionCookie({withPath: true, withSameSaite: true});
+      const cookie1 = simpleThemeCookie({ withSecure: true, withHttpOnly: true });
+      const cookie2 = simpleSessionCookie({ withPath: true, withSameSaite: true });
       const cookieString = `${cookie1}, ${cookie2}`;
 
       const cookieList = service.splitMultiCookieString(cookieString);
@@ -303,8 +298,8 @@ describe("CookieService", () => {
       const cookies = [
         simpleThemeCookie(),
         simpleSessionCookie(),
-        simpleThemeCookie({withSecure: true, withHttpOnly: true}),
-        simpleSessionCookie({withPath: true, withSameSaite: true}),
+        simpleThemeCookie({ withSecure: true, withHttpOnly: true }),
+        simpleSessionCookie({ withPath: true, withSameSaite: true }),
         fullThemeCookie(),
         fullSessionCookie(),
       ];
@@ -320,7 +315,8 @@ describe("CookieService", () => {
     it("should handle cookies with Expires containing commas in dates", () => {
       expect.assertions(4);
       const service = new CookiesService("https://www.passbolt.com");
-      const cookieString = "session=abc; Expires=Thu, 19 Nov 2026 08:52:00 GMT; Path=/; Secure, csrfToken=xyz123; Expires=Fri, 20 Nov 2026 08:52:00 GMT; Path=/";
+      const cookieString =
+        "session=abc; Expires=Thu, 19 Nov 2026 08:52:00 GMT; Path=/; Secure, csrfToken=xyz123; Expires=Fri, 20 Nov 2026 08:52:00 GMT; Path=/";
 
       const cookieList = service.splitMultiCookieString(cookieString);
       expect(cookieList).toHaveLength(2);
@@ -332,12 +328,13 @@ describe("CookieService", () => {
     it("should not create cookies where Expires becomes the cookie name", () => {
       expect.assertions(4);
       const service = new CookiesService("https://www.passbolt.com");
-      const cookieString = "PHPSESSID=abc; path=/; Expires=Thu, 19 Nov 1981 08:52:00 GMT; HttpOnly, csrfToken=xyz; path=/; secure";
+      const cookieString =
+        "PHPSESSID=abc; path=/; Expires=Thu, 19 Nov 1981 08:52:00 GMT; HttpOnly, csrfToken=xyz; path=/; secure";
 
       const cookieList = service.deserialisedCookie(cookieString);
 
       expect(cookieList).toHaveLength(2);
-      expect(cookieList.every(c => c.name !== "Expires")).toBe(true);
+      expect(cookieList.every((c) => c.name !== "Expires")).toBe(true);
       expect(cookieList[0].name).toBe("PHPSESSID");
       expect(cookieList[1].name).toBe("csrfToken");
     });

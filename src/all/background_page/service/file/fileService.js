@@ -35,7 +35,7 @@ export default class FileService {
     content = new Blob([content], { type: mimeType });
     const dataUrl = await this.blobToDataURL(content);
 
-    if (typeof(customFileService) !== "undefined") {
+    if (typeof customFileService !== "undefined") {
       // eslint-disable-next-line no-undef
       return customFileService.saveFile(filename, content, mimeType);
     } else if (chrome.downloads) {

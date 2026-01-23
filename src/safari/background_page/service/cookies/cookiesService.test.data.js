@@ -28,7 +28,7 @@ export const defaultCookieString = (name, value, options = {}) => {
   const cookieParts = [`${name}=${value}`];
 
   if (options.withPath) {
-    const attribute = typeof(options.withPath) === "string" ? options.withPath : "/passbolt/";
+    const attribute = typeof options.withPath === "string" ? options.withPath : "/passbolt/";
     cookieParts.push(`Path=${attribute}`);
   }
 
@@ -41,17 +41,17 @@ export const defaultCookieString = (name, value, options = {}) => {
   }
 
   if (options.withExpires) {
-    const attribute = typeof(options.withExpires) === "string" ? options.withExpires : "Thu, 01 Jan 1970 00:00:00 GMT";
+    const attribute = typeof options.withExpires === "string" ? options.withExpires : "Thu, 01 Jan 1970 00:00:00 GMT";
     cookieParts.push(`Expires=${attribute}`);
   }
 
   if (options.withSameSite) {
-    const attribute = typeof(options.withSameSite) === "string" ? options.withSameSite : "strict";
+    const attribute = typeof options.withSameSite === "string" ? options.withSameSite : "strict";
     cookieParts.push(`SameSite=${attribute}`);
   }
 
   if (options.withMaxAge) {
-    const attribute = typeof(options.withMaxAge) === "string" ? options.withMaxAge : "0";
+    const attribute = typeof options.withMaxAge === "string" ? options.withMaxAge : "0";
     cookieParts.push(`Max-Age=${attribute}`);
   }
 
@@ -60,5 +60,23 @@ export const defaultCookieString = (name, value, options = {}) => {
 
 export const simpleThemeCookie = (options = {}) => defaultCookieString("theme", "dark", options);
 export const simpleSessionCookie = (options = {}) => defaultCookieString("session", "test-session", options);
-export const fullThemeCookie = (options = {}) => defaultCookieString("theme", "dark", {withPath: true, withExpires: true, withHttpOnly: true, withMaxAge: true, withSameSite: true, withSecure: true, ...options});
-export const fullSessionCookie = (options = {}) => defaultCookieString("session", "test-session", {withPath: true, withExpires: true, withHttpOnly: true, withMaxAge: true, withSameSite: true, withSecure: true, ...options});
+export const fullThemeCookie = (options = {}) =>
+  defaultCookieString("theme", "dark", {
+    withPath: true,
+    withExpires: true,
+    withHttpOnly: true,
+    withMaxAge: true,
+    withSameSite: true,
+    withSecure: true,
+    ...options,
+  });
+export const fullSessionCookie = (options = {}) =>
+  defaultCookieString("session", "test-session", {
+    withPath: true,
+    withExpires: true,
+    withHttpOnly: true,
+    withMaxAge: true,
+    withSameSite: true,
+    withSecure: true,
+    ...options,
+  });

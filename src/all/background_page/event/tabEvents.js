@@ -33,7 +33,7 @@ const listen = function (worker) {
    * @param {string} requestId
    * @listens passbolt.active-tab.close
    */
-  worker.port.on('passbolt.active-tab.close', async requestId => {
+  worker.port.on("passbolt.active-tab.close", async (requestId) => {
     const controller = new CloseActiveTabController(worker, requestId);
     await controller._exec();
   });
@@ -43,7 +43,7 @@ const listen = function (worker) {
    * @param {string} requestId
    * @listens passbolt.tabs.open
    */
-  worker.port.on('passbolt.tabs.open', async(requestId, url) => {
+  worker.port.on("passbolt.tabs.open", async (requestId, url) => {
     const controller = new OpenTabController(worker, requestId);
     await controller._exec(url);
   });

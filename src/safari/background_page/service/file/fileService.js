@@ -12,7 +12,7 @@
  * @since         5.6.0
  */
 
-import {SendNativeMessageService} from "../nativeMessage/sendNativeMessageService";
+import { SendNativeMessageService } from "../nativeMessage/sendNativeMessageService";
 
 /**
  * File service
@@ -31,10 +31,10 @@ export default class FileService {
       mimeType = "text/plain";
     }
 
-    content = new Blob([content], {type: mimeType});
+    content = new Blob([content], { type: mimeType });
     const base64Data = await this.blobToDataURL(content);
 
-    return await SendNativeMessageService.sendNativeMessage("save-file", {filename, mimeType, base64Data});
+    return await SendNativeMessageService.sendNativeMessage("save-file", { filename, mimeType, base64Data });
   }
 
   /**
@@ -44,9 +44,9 @@ export default class FileService {
    * @private
    */
   static blobToDataURL(blob) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const a = new FileReader();
-      a.onload = function(e) {
+      a.onload = function (e) {
         const data = e.target.result;
         const base64Data = data.substring(data.indexOf("base64,") + 7);
         resolve(base64Data);

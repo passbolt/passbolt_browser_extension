@@ -99,6 +99,31 @@ class TagsCollection extends EntityV2Collection {
   }
 
   /**
+   * Push or replace multiple items to the list.
+   * @param {Array<TagEntity>} data The items to add or replace to the collection.
+   * @param {object} [entityOptions] Options for constructing the entity, identical to those accepted by the Entity
+   *   constructor that will be utilized for its creation. Note, this entity options will be passed to the associated
+   *   collections and entities.
+   * @param {object} [options] Options.
+   * @param {object} [options.validateBuildRules] Options to pass to validate build rules function @see EntityV2Collection::validateBuildRules
+   * @param {function} [options.onItemPushed] Callback to execute after the item has been pushed to the collection.
+   * @throws {CollectionValidationError} If one item doesn't validate.
+   */
+  pushOrReplaceMany(data, entityOptions = {}, options = {}) {
+    if (!Array.isArray(data)) {
+      throw new TypeError(`${this.constructor.name} pushOrReplaceMany expects "data" to be an array`);
+    }
+
+    for (let index = 0; index < data.length; index++) {
+      try {
+        this.pushOrReplace(data[index], entityOptions, options);
+      } catch (error) {
+        this.handlePushItemError(index, error, entityOptions);
+      }
+    }
+  }
+
+  /**
    * Remove by Id
    * @param {string} tagId uuid
    * @returns {boolean} true if tag was found and removed from the collection

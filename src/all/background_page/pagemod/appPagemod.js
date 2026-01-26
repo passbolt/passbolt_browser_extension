@@ -27,7 +27,6 @@ import { ShareEvents } from "../event/shareEvents";
 import { UserEvents } from "../event/userEvents";
 import { GroupEvents } from "../event/groupEvents";
 import { CommentEvents } from "../event/commentEvents";
-import { TagEvents } from "../event/tagEvents";
 import { ImportResourcesEvents } from "../event/importResourcesEvents";
 import { ExportResourcesEvents } from "../event/exportResourcesEvents";
 import { ActionLogEvents } from "../event/actionLogEvents";
@@ -72,7 +71,6 @@ class App extends Pagemod {
       UserEvents,
       GroupEvents,
       CommentEvents,
-      TagEvents,
       ImportResourcesEvents,
       ExportResourcesEvents,
       ActionLogEvents,

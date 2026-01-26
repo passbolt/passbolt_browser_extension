@@ -27,7 +27,6 @@ import { SecretEvents } from "../event/secretEvents";
 import { ShareEvents } from "../event/shareEvents";
 import { GroupEvents } from "../event/groupEvents";
 import { CommentEvents } from "../event/commentEvents";
-import { TagEvents } from "../event/tagEvents";
 import { ImportResourcesEvents } from "../event/importResourcesEvents";
 import { ExportResourcesEvents } from "../event/exportResourcesEvents";
 import { ActionLogEvents } from "../event/actionLogEvents";
@@ -60,7 +59,6 @@ jest.spyOn(ShareEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(GroupEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(CommentEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(TagEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ImportResourcesEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ExportResourcesEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ActionLogEvents, "listen").mockImplementation(jest.fn());
@@ -83,7 +81,7 @@ describe("App", () => {
 
   describe("App::attachEvents", () => {
     it("Should attach events", async () => {
-      expect.assertions(31);
+      expect.assertions(30);
       // data mocked
       const port = {
         _port: {
@@ -121,7 +119,6 @@ describe("App", () => {
       expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(GroupEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(CommentEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(TagEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ImportResourcesEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ExportResourcesEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ActionLogEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
@@ -153,7 +150,6 @@ describe("App", () => {
         UserEvents,
         GroupEvents,
         CommentEvents,
-        TagEvents,
         ImportResourcesEvents,
         ExportResourcesEvents,
         ActionLogEvents,

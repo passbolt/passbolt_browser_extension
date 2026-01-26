@@ -74,6 +74,11 @@ import DeleteSecretRevisionsSettingsController from "../controller/secretRevisio
 import SaveSecretRevisionsSettingsController from "../controller/secretRevision/saveSecretRevisionsSettingsController";
 import FindSubscriptionKeyController from "../controller/subscription/findSubscriptionKeyController";
 import UpdateSubscriptionKeyController from "../controller/subscription/updateSubscriptionKeyController";
+import FindTagsController from "../controller/tag/findTagsController";
+import UpdateTagController from "../controller/tag/updateTagController";
+import DeleteTagController from "../controller/tag/deleteTagController";
+import UpdateResourceTagsController from "../controller/tag/updateResourceTagsController";
+import AddTagsToResourcesController from "../controller/tag/addTagsToResourcesController";
 
 const listen = function (worker, apiClientOptions, account) {
   /*
@@ -742,7 +747,68 @@ const listen = function (worker, apiClientOptions, account) {
    */
   worker.port.on("passbolt.subscription.update", async (requestId, subscriptionKeyDto) => {
     const subscriptionController = new UpdateSubscriptionKeyController(worker, requestId, apiClientOptions);
-    return await subscriptionController._exec(subscriptionKeyDto);
+    await subscriptionController._exec(subscriptionKeyDto);
+  });
+
+  /**
+   * Find all the tags
+   *
+   * @listens passbolt.tags.find-all
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on("passbolt.tags.find-all", async (requestId) => {
+    const findTagsController = new FindTagsController(worker, requestId, apiClientOptions);
+    await findTagsController._exec();
+  });
+
+  /**
+   * Update a tag
+   *
+   * @listens passbolt.tags.update
+   * @param requestId {uuid} The request identifier
+   * @param tagDto {object} The tag object
+   */
+  worker.port.on("passbolt.tags.update", async (requestId, tagDto) => {
+    const updateTagController = new UpdateTagController(worker, requestId, apiClientOptions);
+    await updateTagController._exec(tagDto);
+  });
+
+  /**
+   * Delete a tag
+   *
+   * @listens passbolt.tags.delete
+   * @param requestId {uuid} The request identifier
+   * @param tagId {uuid} The tag identifier
+   */
+  worker.port.on("passbolt.tags.delete", async (requestId, tagId) => {
+    const deleteTagController = new DeleteTagController(worker, requestId, apiClientOptions);
+    await deleteTagController._exec(tagId);
+  });
+
+  /**
+   * Update resource tags
+   *
+   * @listens passbolt.tags.update-resource-tags
+   * @param requestId {uuid} The request identifier
+   * @param resourceId {uuid} The resource identifier
+   * @param tagsDto {Object} tags dto
+   */
+  worker.port.on("passbolt.tags.update-resource-tags", async (requestId, resourceId, tagsDto) => {
+    const updateResourceTagsController = new UpdateResourceTagsController(worker, requestId, apiClientOptions);
+    await updateResourceTagsController._exec(resourceId, tagsDto);
+  });
+
+  /**
+   * Add resources tag
+   *
+   * @listens passbolt.tags.add-resource-tags
+   * @param requestId {uuid} The request identifier
+   * @param {object} resourcesTagDto {resources: array of uuids, tag: {object}} the tag to add for the resources
+   */
+  worker.port.on("passbolt.tags.add-resources-tag", async (requestId, resourcesTagDto) => {
+    const addTagsToResourcesController = new AddTagsToResourcesController(worker, requestId, apiClientOptions);
+    await addTagsToResourcesController._exec(resourcesTagDto.resources, [resourcesTagDto.tag]);
   });
 };
+
 export const AppEvents = { listen };

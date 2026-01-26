@@ -17,7 +17,6 @@ import { ConfigEvents } from "../event/configEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { QuickAccessEvents } from "../event/quickAccessEvents";
 import { GroupEvents } from "../event/groupEvents";
-import { TagEvents } from "../event/tagEvents";
 import { ResourceEvents } from "../event/resourceEvents";
 import { SecretEvents } from "../event/secretEvents";
 import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
@@ -49,7 +48,6 @@ class QuickAccess extends Pagemod {
       KeyringEvents,
       QuickAccessEvents,
       GroupEvents,
-      TagEvents,
       ResourceEvents,
       SecretEvents,
       OrganizationSettingsEvents,

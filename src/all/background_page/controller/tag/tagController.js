@@ -10,27 +10,27 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import ResourceModel from "../../model/resource/resourceModel";
-import TagModel from "../../model/tag/tagModel";
-import TagsCollection from "../../model/entity/tag/tagsCollection";
 import i18n from "../../sdk/i18n";
+import ResourceModel from "../../model/resource/resourceModel";
+import TagsCollection from "../../model/entity/tag/tagsCollection";
 import ProgressService from "../../service/progress/progressService";
+import UpdateResourceTagsService from "../../service/tag/updateResourceTagsService";
 
 class TagController {
   /**
    * TagController constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions
    * @param {AccountEntity} account the user account
    */
-  constructor(worker, clientOptions, account) {
+  constructor(worker, apiClientOptions, account) {
     this.worker = worker;
 
     // Models
-    this.resourceModel = new ResourceModel(clientOptions, account);
-    this.tagModel = new TagModel(clientOptions, account);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
 
     // Progress
+    this.updateResourceTagsService = new UpdateResourceTagsService(apiClientOptions);
     this.progressService = new ProgressService(this.worker, i18n.t("Adding tag..."));
   }
 
@@ -85,12 +85,10 @@ class TagController {
     // Bulk tag the resources.
     const resourceNumber = resourceIds.length;
     let taggedCount = 0;
-    const successCallback = () => this._handleTagResourceSuccess(resourceNumber, ++taggedCount);
-    const errorCallback = () => this._handleTagResourceError(resourceNumber, ++taggedCount);
 
-    await this.tagModel.bulkTagResources(resourceIds, tagsCollection, {
-      successCallback: successCallback,
-      errorCallback: errorCallback,
+    await this.updateResourceTagsService.addTagsToResources(resourceIds, tagsCollection, {
+      successCallback: () => this._handleTagResourceSuccess(resourceNumber, ++taggedCount),
+      errorCallback: () => this._handleTagResourceError(resourceNumber, ++taggedCount),
     });
   }
 

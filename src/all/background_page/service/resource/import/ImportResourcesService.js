@@ -23,7 +23,6 @@ import ResourcesImportParser from "../../../model/import/resourcesImportParser";
 import Keyring from "../../../model/keyring";
 import ResourceModel from "../../../model/resource/resourceModel";
 import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
-import TagModel from "../../../model/tag/tagModel";
 import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import ResourceService from "../../api/resource/resourceService";
 import EncryptMessageService from "../../crypto/encryptMessageService";
@@ -38,6 +37,7 @@ import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import PasswordExpirySettingsGetOrFindService from "../../passwordExpirySettings/passwordExpirySettingsGetOrFindService";
 import OrganizationSettingsModel from "../../../model/organizationSettings/organizationSettingsModel";
+import UpdateResourceTagsService from "../../tag/updateResourceTagsService";
 
 /**
  * The service aim to import the resources from a file and save it to the API / localstorage.
@@ -54,12 +54,12 @@ class ImportResourcesService {
     //Models
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.folderModel = new FolderModel(apiClientOptions, account);
-    this.tagModel = new TagModel(apiClientOptions, account);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     //Services
     this.resourceService = new ResourceService(apiClientOptions);
     this.executeConcurrentlyService = new ExecuteConcurrentlyService();
     this.progressService = progressService;
+    this.updateResourceTagsService = new UpdateResourceTagsService(apiClientOptions);
     this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
     this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
@@ -296,20 +296,19 @@ class ImportResourcesService {
      * unexpected behavior.
      * @todo investigate the API resource tag entry point and remove this hack.
      */
-    await this.tagModel.updateResourceTags(resourcesIds[0], tagsCollection);
+    await this.updateResourceTagsService.updateResourceTags(resourcesIds[0], tagsCollection);
     resourcesIds.splice(0, 1);
 
     // If there was only one resource, exit.
     if (!resourcesIds.length) {
       return;
     }
+
     // Bulk tag the resources.
     let taggedCount = 0;
-    const successCallback = () => this.handleTagResourceSuccess(importResourcesFile, ++taggedCount);
-    const errorCallback = () => this.handleTagResourceError(importResourcesFile, ++taggedCount);
-    await this.tagModel.bulkTagResources(resourcesIds, tagsCollection, {
-      successCallback: successCallback,
-      errorCallback: errorCallback,
+    await this.updateResourceTagsService.addTagsToResources(resourcesIds, tagsCollection, {
+      successCallback: () => this.handleTagResourceSuccess(importResourcesFile, ++taggedCount),
+      errorCallback: () => this.handleTagResourceError(importResourcesFile, ++taggedCount),
     });
   }
 

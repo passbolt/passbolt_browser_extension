@@ -9,12 +9,15 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         6.0.0
  */
+import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import AbstractService from "../abstract/abstractService";
+import { assertArray } from "../../../utils/assertions";
 
-const FOLDER_SERVICE_RESOURCE_NAME = "tags";
+export const TAG_API_SERVICE_RESOURCE_NAME = "tags";
 
-class TagService extends AbstractService {
+class TagApiService extends AbstractService {
   /**
    * Constructor
    *
@@ -22,7 +25,7 @@ class TagService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, TagService.RESOURCE_NAME);
+    super(apiClientOptions, TagApiService.RESOURCE_NAME);
   }
 
   /**
@@ -32,14 +35,13 @@ class TagService extends AbstractService {
    * @public
    */
   static get RESOURCE_NAME() {
-    return FOLDER_SERVICE_RESOURCE_NAME;
+    return TAG_API_SERVICE_RESOURCE_NAME;
   }
 
   /**
    * Find all tags
    *
-   * @returns {Promise<*>} response body
-   * @throws {TypeError} if urlOptions key or values are not a string
+   * @returns {Promise<PassboltResponseEntity>} Response
    * @throws {PassboltServiceUnavailableError} if service is not reachable
    * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
    * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
@@ -47,29 +49,33 @@ class TagService extends AbstractService {
    */
   async findAll() {
     const response = await this.apiClient.findAll();
-    if (!response.body || !response.body.length) {
-      return [];
-    }
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 
   /**
-   * Add a tag to a resource using Passbolt API
+   * Update the resource's tag collection using Passbolt API
    *
    * @param {string} resourceId uuid
-   * @param {Object} tagsDto tag dto
-   * @returns {Promise<*>} Response body
+   * @param {Array<Object>} tagsDto tag dto
+   * @returns {Promise<PassboltResponseEntity>} Response
+   * @throws {TypeError} if resourceId is not an uuid or if tagsDto is not an array
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
    * @public
    */
   async updateResourceTags(resourceId, tagsDto) {
     this.assertValidId(resourceId);
+    assertArray(tagsDto);
+
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${resourceId}`);
     const data = {
-      Tags: tagsDto.map((tag) => tag.slug), // @deprecated since v3 should be 'tags'
+      tags: tagsDto.map((tag) => tag.slug),
     };
     const bodyString = this.apiClient.buildBody(data);
+
     const response = await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 
   /**
@@ -77,29 +83,37 @@ class TagService extends AbstractService {
    *
    * @param {String} tagId uuid
    * @param {Object} tagData
-   * @returns {Promise<*>} Response body
-   * @throw {TypeError} if tagId is not a valid uuid
+   * @returns {Promise<PassboltResponseEntity>} Response
+   * @throws {TypeError} if tagId is not a valid uuid
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
    * @public
    */
   async update(tagId, tagData) {
     this.assertValidId(tagId);
+
     const response = await this.apiClient.update(tagId, tagData);
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 
   /**
    * Delete a tag using Passbolt API
    *
    * @param {string} tagId uuid
-   * @returns {Promise<*>} Response body
-   * @throw {TypeError} if tagId is not a valid uuid
+   * @returns {Promise<PassboltResponseEntity>} Response
+   * @throws {TypeError} if tagId is not a valid uuid
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
    * @public
    */
   async delete(tagId) {
     this.assertValidId(tagId);
+
     const response = await this.apiClient.delete(tagId);
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 }
 
-export default TagService;
+export default TagApiService;

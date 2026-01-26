@@ -13,12 +13,18 @@
  */
 import { v4 as uuid } from "uuid";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import { defaultTagDto, minimalTagDto } from "./tagEntity.test.data";
+import { FAIL_ARRAY_SCENARIOS } from "passbolt-styleguide/test/assert/assertEntityProperty";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
+
+import { defaultTagDto } from "./tagEntity.test.data";
 import TagsCollection from "./tagsCollection";
 import TagEntity from "./tagEntity";
-import { defaultTagsDtos } from "./tagCollection.test.data";
+import { defaultTagsCollectionDto, defaultTagsDtos, minimalTagsCollectionDto } from "./tagsCollection.test.data";
 
 describe("TagsCollection", () => {
+  const minimalCollectionDto = minimalTagsCollectionDto(),
+    defaultCollectionDto = defaultTagsCollectionDto();
+
   describe("TagsCollection::constructor", () => {
     it("schema must validate", () => {
       EntitySchema.validateSchema(TagsCollection.ENTITY_NAME, TagsCollection.getSchema());
@@ -26,48 +32,45 @@ describe("TagsCollection", () => {
 
     it("works if valid minimal DTOs are provided", () => {
       expect.assertions(9);
-      const dto1 = minimalTagDto({ slug: "tag1" });
-      const dto2 = minimalTagDto({ slug: "tag2" });
-      const dto3 = minimalTagDto({ slug: "tag3" });
-      const dtos = [dto1, dto2, dto3];
-      const collection = new TagsCollection(dtos);
-      const expectToDtos = dtos.map((dto) => ({ ...dto, is_shared: false })); // Is shared is marshalled.
-      expect(collection.items).toHaveLength(3);
-      expect(collection.toDto()).toEqual(expectToDtos);
-      expect(JSON.stringify(collection)).toEqual(JSON.stringify(expectToDtos));
-      expect(collection.items[0]).toBeInstanceOf(TagEntity);
-      expect(collection.items[0].slug).toEqual("tag1");
-      expect(collection.items[1]).toBeInstanceOf(TagEntity);
-      expect(collection.items[1].slug).toEqual("tag2");
-      expect(collection.items[2]).toBeInstanceOf(TagEntity);
-      expect(collection.items[2].slug).toEqual("tag3");
+
+      const minimalCollection = new TagsCollection(minimalCollectionDto);
+
+      const expectToDtos = minimalCollectionDto.map((dto) => ({ ...dto, is_shared: false })); // Is shared is marshalled.
+      expect(minimalCollection.items).toHaveLength(minimalCollectionDto.length);
+      expect(minimalCollection.toDto()).toEqual(expectToDtos);
+      expect(JSON.stringify(minimalCollection)).toEqual(JSON.stringify(expectToDtos));
+      expect(minimalCollection.items[0]).toBeInstanceOf(TagEntity);
+      expect(minimalCollection.items[0].slug).toEqual("tag1");
+      expect(minimalCollection.items[1]).toBeInstanceOf(TagEntity);
+      expect(minimalCollection.items[1].slug).toEqual("tag2");
+      expect(minimalCollection.items[2]).toBeInstanceOf(TagEntity);
+      expect(minimalCollection.items[2].slug).toEqual("tag3");
     });
 
     it("works if valid complete DTOs are provided", () => {
       expect.assertions(9);
-      const dto1 = defaultTagDto({ slug: "tag1" });
-      const dto2 = defaultTagDto({ slug: "tag2" });
-      const dto3 = defaultTagDto({ slug: "tag" });
-      const dtos = [dto1, dto2, dto3];
-      const collection = new TagsCollection(dtos);
-      expect(collection.items).toHaveLength(3);
-      expect(collection.toDto()).toEqual(dtos);
-      expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
-      expect(collection.items[0]).toBeInstanceOf(TagEntity);
-      expect(collection.items[0].id).toEqual(dto1.id);
-      expect(collection.items[1]).toBeInstanceOf(TagEntity);
-      expect(collection.items[1].id).toEqual(dto2.id);
-      expect(collection.items[2]).toBeInstanceOf(TagEntity);
-      expect(collection.items[2].id).toEqual(dto3.id);
+
+      const defaultCollection = new TagsCollection(defaultCollectionDto);
+
+      expect(defaultCollection.items).toHaveLength(defaultCollectionDto.length);
+      expect(defaultCollection.toDto()).toEqual(defaultCollectionDto);
+      expect(JSON.stringify(defaultCollection)).toEqual(JSON.stringify(defaultCollectionDto));
+      expect(defaultCollection.items[0]).toBeInstanceOf(TagEntity);
+      expect(defaultCollection.items[0].id).toEqual(defaultCollectionDto[0].id);
+      expect(defaultCollection.items[1]).toBeInstanceOf(TagEntity);
+      expect(defaultCollection.items[1].id).toEqual(defaultCollectionDto[1].id);
+      expect(defaultCollection.items[2]).toBeInstanceOf(TagEntity);
+      expect(defaultCollection.items[2].id).toEqual(defaultCollectionDto[2].id);
     });
 
     it("works if valid entities are provided", () => {
       expect.assertions(7);
+
       const entity1 = new TagEntity(defaultTagDto({ slug: "tag1" }));
       const entity2 = new TagEntity(defaultTagDto({ slug: "tag2" }));
       const entity3 = new TagEntity(defaultTagDto({ slug: "tag" }));
-      const entities = [entity1, entity2, entity3];
-      const collection = new TagsCollection(entities);
+      const collection = new TagsCollection([entity1, entity2, entity3]);
+
       expect(collection.items).toHaveLength(3);
       expect(collection.items[0]).toBeInstanceOf(TagEntity);
       expect(collection.items[0].id).toEqual(entity1.id);
@@ -135,37 +138,86 @@ describe("TagsCollection", () => {
     });
   });
 
+  describe("TagsCollection:pushOrReplaceMany", () => {
+    it("should add new tags to the collection", () => {
+      const collection = new TagsCollection();
+
+      collection.pushOrReplaceMany(defaultCollectionDto);
+
+      expect(collection).toEqual(new TagsCollection(defaultCollectionDto));
+    });
+
+    it("should replace tags in the collection", () => {
+      const collection = new TagsCollection(defaultCollectionDto);
+
+      const updatedCollectionDto = [...defaultCollectionDto];
+      updatedCollectionDto[0] = {
+        ...defaultCollectionDto[0],
+        slug: "updated",
+      };
+
+      collection.pushOrReplaceMany(updatedCollectionDto);
+
+      expect(collection).toEqual(new TagsCollection(updatedCollectionDto));
+    });
+
+    it("should add and replace tags in the collection", () => {
+      const collection = new TagsCollection(defaultCollectionDto);
+
+      collection.pushOrReplaceMany(minimalCollectionDto);
+
+      expect(collection).toEqual(new TagsCollection([...defaultCollectionDto, ...minimalCollectionDto]));
+    });
+
+    it("should not throw an EntityValidatorError if an item is malformed when ignoreInvalidEntity is true", () => {
+      const collection = new TagsCollection(defaultCollectionDto);
+
+      expect(() => collection.pushOrReplaceMany([{ id: null }], { ignoreInvalidEntity: true })).not.toThrow();
+
+      expect(collection).toEqual(new TagsCollection(defaultCollectionDto));
+    });
+
+    it("should throw a TypeError if data is not an array", () => {
+      FAIL_ARRAY_SCENARIOS.forEach((scenario) => {
+        expect(() => new TagsCollection().pushOrReplaceMany(scenario)).toThrow(TypeError);
+      });
+    });
+
+    it("should throw a CollectionValidationError if data is contains invalid TagEntity", () => {
+      expect(() => new TagsCollection().pushOrReplaceMany([{}])).toThrow(CollectionValidationError);
+    });
+  });
+
   describe("TagsCollection:removeById", () => {
     it("remove by id works", () => {
-      const tag1 = defaultTagDto();
-      const tag2 = defaultTagDto();
-      const tag3 = defaultTagDto();
-      const dto = [tag1, tag2, tag3];
-      const collection = new TagsCollection(dto);
+      const collection = new TagsCollection(defaultCollectionDto);
+
       expect(collection.length).toBe(3);
       expect(collection.removeById(uuid())).toBe(false);
       expect(collection.length).toBe(3);
-      expect(collection.removeById(tag2.id)).toBe(true);
+
+      expect(collection.removeById(defaultCollectionDto[2].id)).toBe(true);
       expect(collection.length).toBe(2);
-      expect(collection.removeById(tag2.id)).toBe(false);
+      expect(collection.removeById(defaultCollectionDto[2].id)).toBe(false);
       expect(collection.length).toBe(2);
-      expect(collection.removeById(tag1.id)).toBe(true);
+
+      expect(collection.removeById(defaultCollectionDto[1].id)).toBe(true);
       expect(collection.length).toBe(1);
-      expect(collection.removeById(tag1.id)).toBe(false);
+      expect(collection.removeById(defaultCollectionDto[1].id)).toBe(false);
       expect(collection.length).toBe(1);
-      expect(collection.removeById(tag3.id)).toBe(true);
+
+      expect(collection.removeById(defaultCollectionDto[0].id)).toBe(true);
       expect(collection.length).toBe(0);
-      expect(collection.removeById(tag3.id)).toBe(false);
+      expect(collection.removeById(defaultCollectionDto[0].id)).toBe(false);
       expect(collection.length).toBe(0);
     });
   });
 
   describe("TagsCollection:update", () => {
     it("update works", () => {
-      const tag1 = defaultTagDto();
-      const tag2 = defaultTagDto({ slug: "personal-tag-2" });
-      const dto = [tag1, tag2];
-      const collection = new TagsCollection(dto);
+      const collection = new TagsCollection(defaultCollectionDto);
+      const [tag1, tag2] = defaultCollectionDto;
+
       expect(
         collection.replaceTag(
           tag1.id,
@@ -175,9 +227,11 @@ describe("TagsCollection", () => {
           }),
         ),
       ).toBe(true);
+
       expect(collection.items[0].slug).toBe("updated");
-      expect(collection.items[1].slug).toBe("personal-tag-2");
-      expect(collection.length).toBe(2);
+      expect(collection.items[1].slug).toBe(defaultCollectionDto[1].slug);
+      expect(collection.length).toBe(defaultCollectionDto.length);
+
       expect(
         collection.replaceTag(
           "45ce85c9-e301-4de2-8b41-298507002860",
@@ -187,7 +241,7 @@ describe("TagsCollection", () => {
           }),
         ),
       ).toBe(false);
-      expect(collection.length).toBe(2);
+      expect(collection.length).toBe(defaultCollectionDto.length);
     });
   });
 });

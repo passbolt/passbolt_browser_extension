@@ -1,18 +1,19 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2026 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2026 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         5.9.0
  */
 
 /**
- * Test scenarios for parse() function
+ * Test scenarios for parseGpgUserId() function
  * Format: [description, input, expectedName, expectedEmail]
  * @see https://datatracker.ietf.org/doc/html/rfc2822#section-3.4
  * @see https://datatracker.ietf.org/doc/html/rfc4880#section-5.11
@@ -266,31 +267,78 @@ export const parseScenarios = [
   ["angle bracket at end of string", "John Doe<", "John Doe<", ""],
   ["parenthesis at end of string", "John Doe(", "John Doe(", ""],
   ["consecutive openers", '"(<[test', '"(<[test', ""],
+
+  // Escaped quotes outside quoted strings (unquoted context)
+  ["escaped quote in unquoted name", 'a\\"test <john@example.com>', 'a"test', "john@example.com"],
+  ["escaped quote at start of name", '\\"test <john@example.com>', '"test', "john@example.com"],
+  ["escaped quote before @ no brackets", 'a\\"@test.com', "", 'a\\"@test.com'],
+  ["escaped quote at start before @ no brackets", '\\"@test.com', "", '\\"@test.com'],
+
+  // Mixed escaped and unescaped quotes (complex scenarios)
+  ["escaped then unescaped quote with brackets", '\\"asdf" <john@example.com>', '"asdf"', "john@example.com"],
+  ["unescaped quote then escaped quote no brackets", 'a"test\\"@test.com', "", 'a"test\\"@test.com'],
 ];
 
 /**
- * Test scenarios for getToken_() function
- * Format: [description, input, position, expectedToken]
+ * Test scenarios for extractParts() function
+ * Format: [description, input, expectedName, expectedEmail]
  */
-export const getTokenScenarios = [
-  ["single char for non-openers", "abc", 0, "a"],
-  ["quoted strings", '"Hello World" <test@test.com>', 0, '"Hello World"'],
-  ["angle-bracketed content", "Name <test@test.com>", 5, "<test@test.com>"],
-  ["escaped quotes inside strings", '"Hello \\"World\\"" <test@test.com>', 0, '"Hello \\"World\\""'],
-  ["parenthetical content", "Name (comment) <test@test.com>", 5, "(comment)"],
-  ["square-bracketed content", "Name [note] <test@test.com>", 5, "[note]"],
-  // Tests for escaped quote as opener (isEscapedDlQuote_ branch at line 130)
-  ["escaped quote at position returns single char", 'test\\"more', 5, '"'],
-  ["triple backslash escaped quote returns single char", 'a\\\\\\"b', 4, '"'],
+export const extractPartsScenarios = [
+  ["name and email with angle brackets", "John <john@example.com>", "John ", "john@example.com"],
+  ["email only when no brackets but @ present", "john@example.com", "", "john@example.com"],
+  ["name only when no brackets and no @", "John Doe", "John Doe", ""],
+  [
+    "uses last angle bracket pair for email",
+    "John <first@example.com> <second@example.com>",
+    "John ",
+    "second@example.com",
+  ],
+  ["empty string", "", "", ""],
 ];
 
 /**
- * Test scenarios for isEscapedDlQuote_() function
- * Format: [description, input, position, expectedResult]
+ * Test scenarios for findAngleBracketPairs() function
+ * Format: [description, input, expectedPairs]
  */
-export const isEscapedDlQuoteScenarios = [
-  ["unescaped quote", '"test"', 0, false],
-  ["escaped quote with single backslash", 'test\\"more', 5, true],
-  ["quote preceded by double backslash", 'test\\\\"more', 6, false],
-  ["quote preceded by triple backslash", 'test\\\\\\"more', 7, true],
+export const findAngleBracketPairsScenarios = [
+  ["single angle bracket pair", "Name <email>", [{ start: 5, end: 11 }]],
+  [
+    "multiple angle bracket pairs",
+    "<a> <b>",
+    [
+      { start: 0, end: 2 },
+      { start: 4, end: 6 },
+    ],
+  ],
+  ["skips angle brackets inside quotes", '"<skip>" <use>', [{ start: 9, end: 13 }]],
+  ["skips escaped quotes", '\\"test <email>', [{ start: 7, end: 13 }]],
+  ["empty array when no pairs", "no brackets", []],
+  ["unclosed angle bracket", "Name <email", []],
+];
+
+/**
+ * Test scenarios for findClosingQuote() function
+ * Format: [description, input, openingPosition, expectedPosition]
+ */
+export const findClosingQuoteScenarios = [
+  ["finds closing quote", '"test"', 0, 5],
+  ["skips escaped quotes", '"test\\"more"', 0, 11],
+  ["returns -1 when no closing quote", '"unclosed', 0, -1],
+  ["handles escaped backslash before quote", '"test\\\\"', 0, 7],
+  ["finds quote from middle position", 'skip "test"', 5, 10],
+];
+
+/**
+ * Test scenarios for cleanName() function
+ * Format: [description, input, expected]
+ */
+export const cleanNameScenarios = [
+  ["collapses whitespace", "John   Doe", "John Doe"],
+  ["strips outer double quotes", '"John Doe"', "John Doe"],
+  ["strips outer single quotes", "'John Doe'", "John Doe"],
+  ["unescapes quotes", 'John\\"Doe', 'John"Doe'],
+  ["unescapes backslashes", "John\\\\Doe", "John\\Doe"],
+  ["trims whitespace", "  John Doe  ", "John Doe"],
+  ["handles non-breaking spaces", "John\xa0Doe", "John Doe"],
+  ["empty string", "", ""],
 ];

@@ -1,18 +1,19 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2026 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2026 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         5.9.0
  */
 
 /**
- * Test scenarios for parse() function
+ * Test scenarios for parseGpgUserId() function
  * Format: [description, input, expectedName, expectedEmail]
  * @see https://datatracker.ietf.org/doc/html/rfc2822#section-3.4
  * @see https://datatracker.ietf.org/doc/html/rfc4880#section-5.11
@@ -266,31 +267,4 @@ export const parseScenarios = [
   ["angle bracket at end of string", "John Doe<", "John Doe<", ""],
   ["parenthesis at end of string", "John Doe(", "John Doe(", ""],
   ["consecutive openers", '"(<[test', '"(<[test', ""],
-];
-
-/**
- * Test scenarios for getToken_() function
- * Format: [description, input, position, expectedToken]
- */
-export const getTokenScenarios = [
-  ["single char for non-openers", "abc", 0, "a"],
-  ["quoted strings", '"Hello World" <test@test.com>', 0, '"Hello World"'],
-  ["angle-bracketed content", "Name <test@test.com>", 5, "<test@test.com>"],
-  ["escaped quotes inside strings", '"Hello \\"World\\"" <test@test.com>', 0, '"Hello \\"World\\""'],
-  ["parenthetical content", "Name (comment) <test@test.com>", 5, "(comment)"],
-  ["square-bracketed content", "Name [note] <test@test.com>", 5, "[note]"],
-  // Tests for escaped quote as opener (isEscapedDlQuote_ branch at line 130)
-  ["escaped quote at position returns single char", 'test\\"more', 5, '"'],
-  ["triple backslash escaped quote returns single char", 'a\\\\\\"b', 4, '"'],
-];
-
-/**
- * Test scenarios for isEscapedDlQuote_() function
- * Format: [description, input, position, expectedResult]
- */
-export const isEscapedDlQuoteScenarios = [
-  ["unescaped quote", '"test"', 0, false],
-  ["escaped quote with single backslash", 'test\\"more', 5, true],
-  ["quote preceded by double backslash", 'test\\\\"more', 6, false],
-  ["quote preceded by triple backslash", 'test\\\\\\"more', 7, true],
 ];

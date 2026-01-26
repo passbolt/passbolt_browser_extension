@@ -12,8 +12,14 @@
  * @since         5.9.0
  */
 
-import { parseGpgUserId } from "./gpgUserIdParser";
-import { parseScenarios } from "./gpgUserIdParser.test.data";
+import { parseGpgUserId, extractParts, findAngleBracketPairs, findClosingQuote, cleanName } from "./gpgUserIdParser";
+import {
+  parseScenarios,
+  extractPartsScenarios,
+  findAngleBracketPairsScenarios,
+  findClosingQuoteScenarios,
+  cleanNameScenarios,
+} from "./gpgUserIdParser.test.data";
 
 /**
  * Unit tests for the GPG User ID parser.
@@ -27,5 +33,33 @@ describe("parseGpgUserId", () => {
     const result = parseGpgUserId(input);
     expect(result.name).toStrictEqual(expectedName);
     expect(result.email).toStrictEqual(expectedEmail);
+  });
+});
+
+describe("extractParts", () => {
+  it.each(extractPartsScenarios)("should handle %s", (_description, input, expectedName, expectedEmail) => {
+    expect.assertions(1);
+    expect(extractParts(input)).toStrictEqual({ name: expectedName, email: expectedEmail });
+  });
+});
+
+describe("findAngleBracketPairs", () => {
+  it.each(findAngleBracketPairsScenarios)("should handle %s", (_description, input, expectedPairs) => {
+    expect.assertions(1);
+    expect(findAngleBracketPairs(input)).toStrictEqual(expectedPairs);
+  });
+});
+
+describe("findClosingQuote", () => {
+  it.each(findClosingQuoteScenarios)("should handle %s", (_description, input, openingPosition, expectedPosition) => {
+    expect.assertions(1);
+    expect(findClosingQuote(input, openingPosition)).toBe(expectedPosition);
+  });
+});
+
+describe("cleanName", () => {
+  it.each(cleanNameScenarios)("should handle %s", (_description, input, expected) => {
+    expect.assertions(1);
+    expect(cleanName(input)).toBe(expected);
   });
 });

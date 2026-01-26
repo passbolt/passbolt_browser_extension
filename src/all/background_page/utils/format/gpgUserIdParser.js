@@ -35,7 +35,7 @@ export function parseGpgUserId(addr) {
  * @param {string} addr
  * @returns {{name: string, email: string}}
  */
-function extractParts(addr) {
+export function extractParts(addr) {
   // First, find all <...> pairs (ignoring those inside quotes)
   const anglePairs = findAngleBracketPairs(addr);
 
@@ -60,20 +60,21 @@ function extractParts(addr) {
  * @param {string} input
  * @returns {Array<{start: number, end: number}>}
  */
-function findAngleBracketPairs(input) {
+export function findAngleBracketPairs(input) {
   const pairs = [];
-  let skipUntilIndex = -1;
 
   for (let position = 0; position < input.length; position++) {
-    // Skip characters inside quoted strings
-    if (position <= skipUntilIndex) {
+    const character = input[position];
+
+    // Skip escaped characters (handles \", \\, etc. outside quoted strings)
+    if (character === "\\") {
+      position++;
       continue;
     }
 
-    const character = input[position];
-
     if (character === '"') {
-      skipUntilIndex = findClosingQuote(input, position);
+      const closingQuote = findClosingQuote(input, position);
+      position = closingQuote > -1 ? closingQuote : position;
       continue;
     }
 
@@ -95,7 +96,7 @@ function findAngleBracketPairs(input) {
  * @param {number} openingQuotePosition
  * @returns {number} Position of closing quote, or -1 if not found
  */
-function findClosingQuote(input, openingQuotePosition) {
+export function findClosingQuote(input, openingQuotePosition) {
   for (let position = openingQuotePosition + 1; position < input.length; position++) {
     const character = input[position];
 
@@ -116,7 +117,7 @@ function findClosingQuote(input, openingQuotePosition) {
  * @param {string} name
  * @returns {string}
  */
-function cleanName(name) {
+export function cleanName(name) {
   name = name.replace(/[\s\xa0]+/g, " ").trim();
 
   // Strip matching outer quotes

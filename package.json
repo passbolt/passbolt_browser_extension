@@ -88,7 +88,8 @@
     "brace-expansion": "^1.1.12",
     "browserslist": "4.26.2",
     "undici": "7.18.2",
-    "lodash": ">=4.17.23"
+    "lodash": ">=4.17.23",
+    "lodash-es": ">=4.17.23"
   },
   "scripts": {
     "build": "npx grunt build",

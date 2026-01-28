@@ -44,6 +44,13 @@ export const parseScenarios = [
   // Unicode (RFC 4880)
   ["unicode characters in name", "日本語名前 <user@example.jp>", "日本語名前", "user@example.jp"],
   ["unicode with accents", "José García <jose@example.com>", "José García", "jose@example.com"],
+  ["unicode domain", "John <john@例え.テスト>", "John", "john@例え.テスト"],
+  [
+    "encoded display name",
+    "=?UTF-8?Q?Jos=C3=A9_Garc=C3=ADa?= <john@example.com>",
+    "=?UTF-8?Q?Jos=C3=A9_Garc=C3=ADa?=",
+    "john@example.com",
+  ],
 
   // Edge cases
   ["empty string", "", "", ""],
@@ -105,6 +112,7 @@ export const parseScenarios = [
   // RFC 2822 - Comments (in parentheses, typically stripped or treated as part of display name)
   ["comment after name", "John Doe (Marketing) <john@example.com>", "John Doe (Marketing)", "john@example.com"],
   ["comment with nested parens", "John (CEO (Acting)) <john@example.com>", "John (CEO (Acting))", "john@example.com"],
+  ["comment after email is ignored", "John <john@example.com> (Comment)", "John", "john@example.com"],
 
   // RFC 2822 - Folding white space (multiple spaces should collapse)
   ["folding whitespace in display name", "John    Doe <john@example.com>", "John Doe", "john@example.com"],
@@ -162,6 +170,34 @@ export const parseScenarios = [
     '"Doe, John" <john@example.com>, jane@example.com',
     "Doe, John",
     "john@example.com",
+  ],
+  [
+    "coma inside comment",
+    "John (Sales, EMEA) <john@example.com>, jane@example.com",
+    "John (Sales, EMEA)",
+    "john@example.com",
+  ],
+  ["coma inside square bracket", "[weird,token], <john@example.com>", "[weird,token],", "john@example.com"],
+  ["semicolon inside quote", '"Doe; John" <john@example.com>; jane@example.com', "Doe; John", "john@example.com"],
+  ["whitespace separated emails 1/4", "john@example.com\r\njane@example.com", "", "john@example.com jane@example.com"], // Output is unexpected
+  ["whitespace separated emails 2/4", "john@example.com\rjane@example.com", "", "john@example.com jane@example.com"],
+  ["whitespace separated emails 3/4", "john@example.com\njane@example.com", "", "john@example.com jane@example.com"],
+  ["whitespace separated emails 4/4", "john@example.com\n\rjane@example.com", "", "john@example.com jane@example.com"],
+  ["only separators", ",,", ",,", ""],
+  ["leading separators", ", <john@example.com> , <jane@example.com>", ",", "jane@example.com"],
+  ["trailing separators", "<john@example.com> , <jane@example.com> ,", "", "jane@example.com"],
+  ["multiple separators", "<john@example.com> ,,,, <jane@example.com> ,", "", "jane@example.com"],
+  [
+    "mixed leading/trailing/multiple separators",
+    ", <john@example.com> ,,,, <jane@example.com> ,",
+    ",",
+    "jane@example.com",
+  ],
+  [
+    "RFC 5322 group syntax not detected",
+    "Friends: Alice <john@example.com>, <jane@example.com>;",
+    "Friends: Alice",
+    "jane@example.com",
   ],
 
   // Display name edge cases
@@ -277,6 +313,7 @@ export const parseScenarios = [
   // Mixed escaped and unescaped quotes (complex scenarios)
   ["escaped then unescaped quote with brackets", '\\"asdf" <john@example.com>', '"asdf"', "john@example.com"],
   ["unescaped quote then escaped quote no brackets", 'a"test\\"@test.com', "", 'a"test\\"@test.com'],
+  ["odd trailing escape", '"endswithslash\\"@example.com', "", '"endswithslash\\"@example.com'],
 ];
 
 /**

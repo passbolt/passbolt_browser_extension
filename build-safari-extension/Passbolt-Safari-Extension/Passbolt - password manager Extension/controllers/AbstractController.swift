@@ -32,13 +32,13 @@ protocol AbstractController {
 extension AbstractController {
     // Respond to the extension with a success message
     // This should be used after finishing treating the request from the extension
-    func respondAsSuccess(_ context: NSExtensionContext, _ responseBody: [String: Any] = [:]) {
+    func respondAsSuccess(_ context: NSExtensionContext, _ responseBody: [String: Any]?) {
         var body: [String: Any] = [
-            "success": true
+            "success": true,
         ]
 
-        for (k, v) in responseBody {
-            body[k] = v
+        if (responseBody != nil) {
+            body["returnedValue"] = responseBody
         }
 
         self.respond(context, body)

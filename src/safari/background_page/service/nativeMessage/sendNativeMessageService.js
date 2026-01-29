@@ -50,6 +50,6 @@ export class SendNativeMessageService {
       throw new Error(resp.error || "Safari native application execution failed");
     }
 
-    return resp;
+    return resp?.returnedValue;
   }
 }

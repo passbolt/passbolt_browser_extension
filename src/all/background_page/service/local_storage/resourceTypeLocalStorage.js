@@ -13,9 +13,9 @@
  */
 import Log from "../../model/log";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {assertType} from "../../utils/assertions";
+import { assertType } from "../../utils/assertions";
 
-const RESOURCE_TYPES_LOCAL_STORAGE_KEY = 'resourceTypes';
+const RESOURCE_TYPES_LOCAL_STORAGE_KEY = "resourceTypes";
 
 class ResourceTypeLocalStorage {
   /**
@@ -33,7 +33,7 @@ class ResourceTypeLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
-    Log.write({level: 'debug', message: 'ResourceTypeLocalStorage flushed'});
+    Log.write({ level: "debug", message: "ResourceTypeLocalStorage flushed" });
     return await browser.storage.local.remove(this.storageKey);
   }
 
@@ -45,7 +45,7 @@ class ResourceTypeLocalStorage {
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    const {resourceTypes} = await browser.storage.local.get([this.storageKey]);
+    const { resourceTypes } = await browser.storage.local.get([this.storageKey]);
     return resourceTypes;
   }
 
@@ -56,9 +56,13 @@ class ResourceTypeLocalStorage {
    * @throws {TypeError} if the given argument is not a ResourceTypesCollection
    */
   static async set(resourceTypesCollection) {
-    assertType(resourceTypesCollection, ResourceTypesCollection, 'ResourceTypeLocalStorage::set expects a ResourceTypesCollection');
-    await navigator.locks.request(this.storageKey, async() => {
-      await browser.storage.local.set({[this.storageKey]: resourceTypesCollection.toDto()});
+    assertType(
+      resourceTypesCollection,
+      ResourceTypesCollection,
+      "ResourceTypeLocalStorage::set expects a ResourceTypesCollection",
+    );
+    await navigator.locks.request(this.storageKey, async () => {
+      await browser.storage.local.set({ [this.storageKey]: resourceTypesCollection.toDto() });
     });
   }
 }

@@ -15,15 +15,15 @@
  * @since         4.10.1
  */
 
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {resourceTypePasswordAndDescriptionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {v4 as uuidv4} from "uuid";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { resourceTypePasswordAndDescriptionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import { v4 as uuidv4 } from "uuid";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import PlaintextEntity from "../../../model/entity/plaintext/plaintextEntity";
-import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 
-export const resourceCollectionV4ToExport = async(data = {}, options = {}) => {
+export const resourceCollectionV4ToExport = async (data = {}, options = {}) => {
   const collection = await resourceCollectionV5ToExport(data, options);
 
   delete collection[0].metadata;
@@ -31,25 +31,25 @@ export const resourceCollectionV4ToExport = async(data = {}, options = {}) => {
   return collection;
 };
 
-export const resourceCollectionV5ToExport = async(data = {}, options = {}) => {
+export const resourceCollectionV5ToExport = async (data = {}, options = {}) => {
   const plaintextDto = {
     password: data.password || "Password 1",
     description: data.description || "Description 1",
-    totp: data.totp
+    totp: data.totp,
   };
   const id = uuidv4();
   const resourceType = data.resourceType || resourceTypePasswordAndDescriptionDto();
 
-  const plaintextEntity = new PlaintextEntity(plaintextDto, {schema: resourceType.definition.secret});
+  const plaintextEntity = new PlaintextEntity(plaintextDto, { schema: resourceType.definition.secret });
   const serializedPlaintextDto = JSON.stringify(plaintextEntity);
-  const userPublicKey = data.userPublicKey || await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
-  const privateKey = data.privateKey || await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+  const userPublicKey = data.userPublicKey || (await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public));
+  const privateKey = data.privateKey || (await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
 
   const encryptedSecret = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, [privateKey]);
   const secret = {
     id: id,
     resource_id: id,
-    data: encryptedSecret
+    data: encryptedSecret,
   };
   const metadata = {
     name: "Password 1",
@@ -58,17 +58,20 @@ export const resourceCollectionV5ToExport = async(data = {}, options = {}) => {
     resource_type_id: resourceType.id,
     object_type: "PASSBOLT_RESOURCE_METADATA",
   };
-  const dto = defaultResourceDto({
-    id: id,
-    name: "Password 1",
-    username: "Username 1",
-    uri: "https://url1.com",
-    secrets: [secret],
-    resource_type_id: resourceType.id,
-    folder_parent_id: data.folder_parent_id,
-    metadata: metadata,
-    ...data
-  }, options);
+  const dto = defaultResourceDto(
+    {
+      id: id,
+      name: "Password 1",
+      username: "Username 1",
+      uri: "https://url1.com",
+      secrets: [secret],
+      resource_type_id: resourceType.id,
+      folder_parent_id: data.folder_parent_id,
+      metadata: metadata,
+      ...data,
+    },
+    options,
+  );
 
   return [dto];
 };

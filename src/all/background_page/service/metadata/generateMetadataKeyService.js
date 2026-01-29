@@ -13,10 +13,10 @@
  */
 import ExternalGpgKeyPairEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 import * as openpgp from "openpgp";
-import {assertString} from "../../utils/assertions";
+import { assertString } from "../../utils/assertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import SignGpgKeyService from "../crypto/signGpgKeyService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class GenerateMetadataKeyService {
   /**
@@ -33,12 +33,15 @@ class GenerateMetadataKeyService {
    */
   async generateKey(passphrase) {
     assertString(passphrase);
-    const userPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
+    const userPrivateKey = await DecryptPrivateKeyService.decryptArmoredKey(
+      this.account.userPrivateArmoredKey,
+      passphrase,
+    );
     const email = `no-reply+${crypto.randomUUID()}@passbolt.com`;
     const keyOptions = {
       type: "ecc",
       curve: "ed25519",
-      userIDs: [{name: "Passbolt Metadata Key", email: email}],
+      userIDs: [{ name: "Passbolt Metadata Key", email: email }],
       format: "armored",
     };
 
@@ -47,8 +50,8 @@ class GenerateMetadataKeyService {
     const signedPublicKey = await SignGpgKeyService.sign(publicKey, [userPrivateKey]);
 
     return new ExternalGpgKeyPairEntity({
-      public_key: {armored_key: signedPublicKey.armor()},
-      private_key: {armored_key: key.privateKey},
+      public_key: { armored_key: signedPublicKey.armor() },
+      private_key: { armored_key: key.privateKey },
     });
   }
 }

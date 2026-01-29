@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import GetGpgKeyCreationDateService from "../../service/crypto/getGpgKeyCreationDateService";
 import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
 import GenerateGpgKeyPairService from "../../service/crypto/generateGpgKeyPairService";
@@ -42,10 +42,10 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
   async _exec(generateGpgKeyPairDto) {
     try {
       await this.exec(generateGpgKeyPairDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -57,7 +57,7 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
   async exec(generateGpgKeyPairDto) {
     const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
     const dto = {
-      name: 'Account recovery request key',
+      name: "Account recovery request key",
       email: temporaryAccount.account?.username,
       passphrase: generateGpgKeyPairDto?.passphrase,
       keySize: ACCOUNT_RECOVERY_REQUEST_KEY_SIZE,

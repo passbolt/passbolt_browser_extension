@@ -13,7 +13,7 @@
  */
 
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
-import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import { QuickAccessService } from "../../service/ui/quickAccess.service";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 
 /**
@@ -33,8 +33,8 @@ class WebIntegrationController {
    */
   async autosave(resourceToSave) {
     const queryParameters = [
-      {name: "uiMode", value: "detached"},
-      {name: "feature", value: "autosave-credentials"}
+      { name: "uiMode", value: "detached" },
+      { name: "feature", value: "autosave-credentials" },
     ];
     // Request username and password
     const url = new URL(resourceToSave.url);
@@ -42,13 +42,12 @@ class WebIntegrationController {
       name: resourceToSave.name,
       uris: [`${url.protocol}//${url.host}${url.pathname}`],
       username: resourceToSave.username,
-      secret_clear: resourceToSave.password
+      secret_clear: resourceToSave.password,
     };
     const resource = new ExternalResourceEntity(resourceDto);
     await ResourceInProgressCacheService.set(resource);
     QuickAccessService.openInDetachedMode(queryParameters);
   }
 }
-
 
 export default WebIntegrationController;

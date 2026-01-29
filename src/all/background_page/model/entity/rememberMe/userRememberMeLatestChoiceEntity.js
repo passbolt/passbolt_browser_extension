@@ -14,18 +14,21 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'UserRememberMeLatestChoice';
+const ENTITY_NAME = "UserRememberMeLatestChoice";
 
 class UserRememberMeLatestChoiceEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(userRememberMeLatestChoice, options = {}) {
-    super(EntitySchema.validate(
-      UserRememberMeLatestChoiceEntity.ENTITY_NAME,
-      userRememberMeLatestChoice,
-      UserRememberMeLatestChoiceEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        UserRememberMeLatestChoiceEntity.ENTITY_NAME,
+        userRememberMeLatestChoice,
+        UserRememberMeLatestChoiceEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -34,16 +37,14 @@ class UserRememberMeLatestChoiceEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "duration",
-      ],
-      "properties": {
-        "duration": {
-          "type": "integer",
-          "minimum": -1
-        }
-      }
+      type: "object",
+      required: ["duration"],
+      properties: {
+        duration: {
+          type: "integer",
+          minimum: -1,
+        },
+      },
     };
   }
 

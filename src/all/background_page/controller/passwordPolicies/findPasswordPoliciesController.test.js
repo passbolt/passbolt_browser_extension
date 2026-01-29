@@ -12,32 +12,32 @@
  * @since         4.3.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import PasswordPoliciesEntity from "../../model/entity/passwordPolicies/passwordPoliciesEntity";
 import FindPasswordPoliciesController from "./findPasswordPoliciesController";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultPasswordPolicies} from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultPasswordPolicies } from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 
 describe("FindPasswordPoliciesController::exec", () => {
   let account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
 
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  it("Should return the registered password policies", async() => {
+  it("Should return the registered password policies", async () => {
     expect.assertions(4);
 
     const expectedPasswordPolicies = defaultPasswordPolicies({
-      default_generator: "passphrase"
+      default_generator: "passphrase",
     });
 
     fetch.doMockOnceIf(/password-policies\/settings\.json/, () => mockApiResponse(expectedPasswordPolicies));
@@ -56,10 +56,12 @@ describe("FindPasswordPoliciesController::exec", () => {
     expect(spyOnGetOrFind).not.toHaveBeenCalled();
   });
 
-  it("Should return the default password policies if something wrong happens ont the API", async() => {
+  it("Should return the default password policies if something wrong happens ont the API", async () => {
     expect.assertions(2);
 
-    const throwErrorCallback = () => { throw new Error("Something went wrong!"); };
+    const throwErrorCallback = () => {
+      throw new Error("Something went wrong!");
+    };
     fetch.doMockOnceIf(/password-policies\/settings\.json/, throwErrorCallback);
     fetch.doMockOnceIf(/password-generator\/settings\.json/, throwErrorCallback);
 
@@ -73,11 +75,13 @@ describe("FindPasswordPoliciesController::exec", () => {
     expect(dto).toStrictEqual(defaultDto);
   });
 
-  it("Should return the default password policies if something wrong happens ont the model", async() => {
+  it("Should return the default password policies if something wrong happens ont the model", async () => {
     expect.assertions(2);
 
     const controller = new FindPasswordPoliciesController(null, null, account, apiClientOptions);
-    jest.spyOn(controller.passwordPoliciesModel, "find").mockImplementation(() => { throw new Error("Something went wrong!"); });
+    jest.spyOn(controller.passwordPoliciesModel, "find").mockImplementation(() => {
+      throw new Error("Something went wrong!");
+    });
 
     const resultingPasswordPolicies = await controller.exec();
 

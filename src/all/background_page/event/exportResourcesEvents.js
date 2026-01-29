@@ -12,7 +12,7 @@ import ExportResourcesFileController from "../controller/export/exportResourcesF
  * @param {ApiClientOptions} apiClientOptions The api client options
  * @param {AccountEntity} account The account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Export resources to file
    *
@@ -21,10 +21,10 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param exportResourcesFileDto {object} The export resources file DTO
    */
-  worker.port.on('passbolt.export-resources.export-to-file', async(requestId, exportResourcesFileDto) => {
+  worker.port.on("passbolt.export-resources.export-to-file", async (requestId, exportResourcesFileDto) => {
     const controller = new ExportResourcesFileController(worker, requestId, apiClientOptions, account);
     await controller._exec(exportResourcesFileDto);
   });
 };
 
-export const ExportResourcesEvents = {listen};
+export const ExportResourcesEvents = { listen };

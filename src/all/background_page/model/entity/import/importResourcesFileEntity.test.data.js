@@ -21,7 +21,6 @@ export const defaultCsvData = [
   "Password 2,Username 2,https://url1.com,Password 2,Description 2,Folder",
 ].join("\n");
 
-
 export const defaultKDBXCSVData = (lineCount = 1) => {
   const header = "Title,Username,URL,Password,Notes,Group,TOTP";
 
@@ -44,7 +43,7 @@ export const defaultImportResourceFileCSVDto = (data = {}) => ({
 
 export const importResourceFileWithAllOptionsDto = (data = {}) => {
   const options = defaultImportResourceFileOptionsDto(data.options);
-  delete(data?.options);
+  delete data?.options;
   return defaultImportResourceFileCSVDto({
     options,
     ...data,
@@ -53,13 +52,13 @@ export const importResourceFileWithAllOptionsDto = (data = {}) => {
 
 export const defaultImportResourceFileKDBXDto = (data = {}) => {
   const defaultPath = "./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx";
-  const file = fs.readFileSync(data.path || defaultPath, {encoding: 'base64'});
+  const file = fs.readFileSync(data.path || defaultPath, { encoding: "base64" });
 
   return {
     ref: "import-ref",
     file_type: "kdbx",
     file: file,
-    ...data
+    ...data,
   };
 };
 
@@ -70,7 +69,7 @@ export const defaultImportResourceFileOptionsDto = (data = {}) => ({
     password: "",
     keyfile: "",
   },
-  ...data
+  ...data,
 });
 
 /**
@@ -130,10 +129,10 @@ export const logMeOnceCsvFile = [
 
 export const KdbxCsvFile = [
   '"Title","Username","URL","Password","Notes","Group","TOTP"',
-  '"Password 1","Username 1","https://url1.com","Password 1","Description 1","Folder 1","otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"'
+  '"Password 1","Username 1","https://url1.com","Password 1","Description 1","Folder 1","otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"',
 ].join("\r\n");
 
 export const KdbxCsvFileTotpData = [
   "Title,Username,URL,Password,Notes,Group,TOTP",
-  "Password 1,Username 1,https://url1.com,,,,otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"
+  "Password 1,Username 1,https://url1.com,,,,otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30",
 ].join("\r\n");

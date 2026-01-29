@@ -13,7 +13,7 @@
  */
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import ProgressService from "../../service/progress/progressService";
-import {assertArray, assertArrayUUID, assertNonEmptyArray} from "../../utils/assertions";
+import { assertArray, assertArrayUUID, assertNonEmptyArray } from "../../utils/assertions";
 import ShareResourceService from "../../service/share/shareResourceService";
 import i18n from "../../sdk/i18n";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
@@ -45,10 +45,10 @@ class ShareResourcesController {
   async _exec(resources, changes) {
     try {
       await this.exec(resources, changes);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -82,12 +82,12 @@ class ShareResourcesController {
      * - Updating resources local storage
      */
     const goals = 8;
-    this.progressService.title = i18n.t("Share {{count}} resource", {count: resourcesIds.length});
-    this.progressService.start(goals, i18n.t('Initialize'));
+    this.progressService.title = i18n.t("Share {{count}} resource", { count: resourcesIds.length });
+    this.progressService.start(goals, i18n.t("Initialize"));
 
     try {
       await this.shareResourceService.shareAll(resourcesIds, permissionChanges, passphrase);
-      this.progressService.finishStep(i18n.t('Done!'), true);
+      this.progressService.finishStep(i18n.t("Done!"), true);
     } finally {
       this.progressService.close();
     }

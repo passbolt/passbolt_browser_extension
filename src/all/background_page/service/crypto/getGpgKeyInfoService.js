@@ -15,7 +15,7 @@
 import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import goog from "../../utils/format/emailaddress";
 import GpgKeyError from "../../error/GpgKeyError";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class GetGpgKeyInfoService {
   /**
@@ -31,7 +31,7 @@ class GetGpgKeyInfoService {
     const userIds = key.getUserIDs();
     const userIdsSplited = [];
     if (userIds.length === 0) {
-      throw new GpgKeyError('No key user ID found');
+      throw new GpgKeyError("No key user ID found");
     }
 
     for (const i in userIds) {
@@ -39,7 +39,7 @@ class GetGpgKeyInfoService {
         const result = goog.format.EmailAddress.parse(userIds[i]);
         userIdsSplited.push({
           name: result.name_,
-          email: result.address_
+          email: result.address_,
         });
       }
     }
@@ -57,7 +57,8 @@ class GetGpgKeyInfoService {
       expirationTime = opengpgExpirationTime.toISOString();
     } else if (opengpgExpirationTime === Infinity) {
       expirationTime = opengpgExpirationTime.toString();
-    } else { // opengpgExpirationTime === null
+    } else {
+      // opengpgExpirationTime === null
       expirationTime = null;
     }
 
@@ -73,7 +74,7 @@ class GetGpgKeyInfoService {
       length: this.getKeyLength(algorithmInfo),
       curve: this.getCurveName(algorithmInfo.curve),
       private: key.isPrivate(),
-      revoked: await key.isRevoked()
+      revoked: await key.isRevoked(),
     };
     return new ExternalGpgKeyEntity(externalGpgKeyDto);
   }
@@ -117,7 +118,7 @@ class GetGpgKeyInfoService {
    */
   static getKeyLength(algorithmInfo) {
     //algorithm are DSA or RSA
-    if (typeof(algorithmInfo.bits) !== "undefined") {
+    if (typeof algorithmInfo.bits !== "undefined") {
       return algorithmInfo.bits;
     }
 

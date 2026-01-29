@@ -13,11 +13,10 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import GenerateMetadataPrivateKeyController from "./generateMetadataPrivateKeyController";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import ExternalGpgKeyPairEntity
-  from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import ExternalGpgKeyPairEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -26,13 +25,13 @@ beforeEach(() => {
 describe("GenerateMetadataPrivateKeyController", () => {
   let controller, account;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     controller = new GenerateMetadataPrivateKeyController(null, null, account);
   });
 
   describe("::exec", () => {
-    it("generates a metadata key", async() => {
+    it("generates a metadata key", async () => {
       expect.assertions(3);
 
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockResolvedValue(pgpKeys.ada.passphrase);
@@ -45,7 +44,7 @@ describe("GenerateMetadataPrivateKeyController", () => {
       expect(controller.generateMetadataKeyService.generateKey).toHaveBeenCalledWith(pgpKeys.ada.passphrase);
     });
 
-    it("throws if the passphrase is invalid", async() => {
+    it("throws if the passphrase is invalid", async () => {
       expect.assertions(1);
 
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockResolvedValue(pgpKeys.betty.passphrase);

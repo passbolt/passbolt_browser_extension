@@ -19,10 +19,10 @@ import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
 import each from "jest-each";
 import Pagemod from "./pagemod";
-import {ConfigEvents} from "../event/configEvents";
-import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
-import {WebIntegrationEvents} from "../event/webIntegrationEvents";
-import {PortEvents} from "../event/portEvents";
+import { ConfigEvents } from "../event/configEvents";
+import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { WebIntegrationEvents } from "../event/webIntegrationEvents";
+import { PortEvents } from "../event/portEvents";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -34,13 +34,13 @@ jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("WebIntegration", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
   describe("WebIntegration::injectFile", () => {
-    it("Should inject file", async() => {
+    it("Should inject file", async () => {
       expect.assertions(10);
       // process
       await WebIntegration.injectFiles(1, 0);
@@ -51,50 +51,58 @@ describe("WebIntegration", () => {
       expect(ScriptExecution.prototype.injectCss).toHaveBeenCalledWith(WebIntegration.contentStyleFiles);
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(WebIntegration.contentScriptFiles);
       expect(WebIntegration.contentStyleFiles).toStrictEqual([]);
-      expect(WebIntegration.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/browser-integration/vendors.js', 'contentScripts/js/dist/browser-integration/browser-integration.js']);
-      expect(WebIntegration.events).toStrictEqual([ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents, PortEvents]);
+      expect(WebIntegration.contentScriptFiles).toStrictEqual([
+        "contentScripts/js/dist/browser-integration/vendors.js",
+        "contentScripts/js/dist/browser-integration/browser-integration.js",
+      ]);
+      expect(WebIntegration.events).toStrictEqual([
+        ConfigEvents,
+        WebIntegrationEvents,
+        OrganizationSettingsEvents,
+        PortEvents,
+      ]);
       expect(WebIntegration.mustReloadOnExtensionUpdate).toBeFalsy();
-      expect(WebIntegration.appName).toBe('WebIntegration');
+      expect(WebIntegration.appName).toBe("WebIntegration");
     });
   });
 
   describe("WebIntegration::canBeAttachedTo", () => {
-    it("Should be able to attach web integration pagemod to browser frame", async() => {
+    it("Should be able to attach web integration pagemod to browser frame", async () => {
       expect.assertions(1);
       // mock functions
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
-      const result = await WebIntegration.canBeAttachedTo({frameId: 1, url: "https://test.dev/auth/login"});
+      const result = await WebIntegration.canBeAttachedTo({ frameId: 1, url: "https://test.dev/auth/login" });
       expect(result).toBeFalsy();
     });
 
     each([
-      {scenario: "Passbolt domain", url: "https://passbolt.dev/auth/login", frameId: Pagemod.TOP_FRAME_ID},
-      {scenario: "No domain", url: "about:blank", frameId: 1},
-    ]).describe("Should not be able to attach a pagemod to browser frame", _props => {
-      it(`Should not be able to attach a pagemod to browser frame: ${_props.scenario}`, async() => {
+      { scenario: "Passbolt domain", url: "https://passbolt.dev/auth/login", frameId: Pagemod.TOP_FRAME_ID },
+      { scenario: "No domain", url: "about:blank", frameId: 1 },
+    ]).describe("Should not be able to attach a pagemod to browser frame", (_props) => {
+      it(`Should not be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         // mock functions
         jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
         jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
-        const result = await WebIntegration.canBeAttachedTo({frameId: _props.frameId, url: _props.url});
+        const result = await WebIntegration.canBeAttachedTo({ frameId: _props.frameId, url: _props.url });
         expect(result).toBeFalsy();
       });
     });
 
-    it("Should have the constraint not valid if the user is not valid", async() => {
+    it("Should have the constraint not valid if the user is not valid", async () => {
       expect.assertions(1);
       // mock functions
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => false);
       // process
-      const result = await WebIntegration.canBeAttachedTo({frameId: 0});
+      const result = await WebIntegration.canBeAttachedTo({ frameId: 0 });
       // expectations
       expect(result).toBeFalsy();
     });
   });
 
   describe("WebIntegration::attachEvents", () => {
-    it("Should attach events", async() => {
+    it("Should attach events", async () => {
       expect.assertions(4);
       // data mocked
       const port = {
@@ -102,18 +110,34 @@ describe("WebIntegration", () => {
         _port: {
           sender: {
             tab: {
-              url: "https://localhost"
-            }
-          }
-        }
+              url: "https://localhost",
+            },
+          },
+        },
       };
       // process
       await WebIntegration.attachEvents(port);
       // expectations
-      expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.appName});
-      expect(WebIntegrationEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.appName});
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.appName});
-      expect(PortEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.appName});
+      expect(ConfigEvents.listen).toHaveBeenCalledWith({
+        port: port,
+        tab: port._port.sender.tab,
+        name: WebIntegration.appName,
+      });
+      expect(WebIntegrationEvents.listen).toHaveBeenCalledWith({
+        port: port,
+        tab: port._port.sender.tab,
+        name: WebIntegration.appName,
+      });
+      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({
+        port: port,
+        tab: port._port.sender.tab,
+        name: WebIntegration.appName,
+      });
+      expect(PortEvents.listen).toHaveBeenCalledWith({
+        port: port,
+        tab: port._port.sender.tab,
+        name: WebIntegration.appName,
+      });
     });
   });
 });

@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from "uuid";
 
 export function withAzureSsoSettings(data = {}) {
   const defaultData = {
@@ -31,6 +31,6 @@ export function withAzureSsoSettings(data = {}) {
 
   return {
     ...defaultData,
-    ...data
+    ...data,
   };
 }

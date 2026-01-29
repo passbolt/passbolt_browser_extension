@@ -29,23 +29,32 @@ class AccountRecoveryRequestEntity extends Entity {
    * @inheritDoc
    */
   constructor(accountRecoveryRequestDto = {}, options = {}) {
-    super(EntitySchema.validate(
-      AccountRecoveryRequestEntity.ENTITY_NAME,
-      accountRecoveryRequestDto,
-      AccountRecoveryRequestEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        AccountRecoveryRequestEntity.ENTITY_NAME,
+        accountRecoveryRequestDto,
+        AccountRecoveryRequestEntity.getSchema(),
+      ),
+      options,
+    );
 
     // Associations
     if (this._props.account_recovery_private_key) {
-      this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key, {clone: false});
+      this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(
+        this._props.account_recovery_private_key,
+        { clone: false },
+      );
       delete this._props.account_recovery_private_key;
     }
     if (this._props.account_recovery_responses) {
-      this._account_recovery_responses = new AccountRecoveryResponsesCollection(this._props.account_recovery_responses, {clone: false});
+      this._account_recovery_responses = new AccountRecoveryResponsesCollection(
+        this._props.account_recovery_responses,
+        { clone: false },
+      );
       delete this._props.account_recovery_responses;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator, {clone: false});
+      this._creator = new UserEntity(this._props.creator, { clone: false });
       delete this._props.creator;
     }
   }
@@ -55,53 +64,50 @@ class AccountRecoveryRequestEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "id",
-        "status"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["id", "status"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
+        user_id: {
+          type: "string",
+          format: "uuid",
         },
-        "armored_key": {
-          "type": "string",
+        armored_key: {
+          type: "string",
         },
-        "fingerprint": {
-          "type": "string",
-          "length": FINGERPRINT_LENGTH,
-          "nullable": true,
+        fingerprint: {
+          type: "string",
+          length: FINGERPRINT_LENGTH,
+          nullable: true,
         },
-        "status": {
-          "type": "string",
-          "enum": [STATUS_PENDING, STATUS_REJECTED, STATUS_APPROVED, STATUS_COMPLETED]
+        status: {
+          type: "string",
+          enum: [STATUS_PENDING, STATUS_REJECTED, STATUS_APPROVED, STATUS_COMPLETED],
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
         // Associated models
-        "account_recovery_private_key": AccountRecoveryPrivateKeyEntity.getSchema(),
-        "creator": UserEntity.getSchema(),
-        "account_recovery_responses": AccountRecoveryResponsesCollection.getSchema(),
-      }
+        account_recovery_private_key: AccountRecoveryPrivateKeyEntity.getSchema(),
+        creator: UserEntity.getSchema(),
+        account_recovery_responses: AccountRecoveryResponsesCollection.getSchema(),
+      },
     };
   }
 
@@ -121,7 +127,9 @@ class AccountRecoveryRequestEntity extends Entity {
       return result;
     }
     if (this.accountRecoveryPrivateKey && contain.account_recovery_private_key) {
-      result.account_recovery_private_key = this.accountRecoveryPrivateKey.toDto(AccountRecoveryPrivateKeyEntity.ALL_CONTAIN_OPTIONS);
+      result.account_recovery_private_key = this.accountRecoveryPrivateKey.toDto(
+        AccountRecoveryPrivateKeyEntity.ALL_CONTAIN_OPTIONS,
+      );
     }
     if (this.creator && contain.creator) {
       result.creator = this.creator.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
@@ -179,7 +187,7 @@ class AccountRecoveryRequestEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {account_recovery_private_key: true, creator: true};
+    return { account_recovery_private_key: true, creator: true };
   }
 
   /*

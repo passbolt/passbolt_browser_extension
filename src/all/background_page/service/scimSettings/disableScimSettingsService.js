@@ -13,7 +13,7 @@
  */
 
 import ScimSettingsApiService from "../api/scimSettings/scimSettingsApiService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 class DisableScimSettingsService {
   /**
@@ -36,4 +36,3 @@ class DisableScimSettingsService {
 }
 
 export default DisableScimSettingsService;
-

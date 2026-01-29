@@ -16,7 +16,7 @@ import GetExtensionVersionController from "./getExtensionVersionController";
 
 describe("GetExtensionVersionController", () => {
   describe("GetExtensionVersionController::exec", () => {
-    it("Should retrieve the extension version.", async() => {
+    it("Should retrieve the extension version.", async () => {
       // extension version is mocked in .jest.setup.js
       const controller = new GetExtensionVersionController();
       const version = await controller.exec();

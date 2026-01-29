@@ -12,17 +12,17 @@
  */
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import CsvLastPassRowComposer from "./csvLastPassRowComposer";
-import {defaultTotpDto} from "../../../entity/totp/totpDto.test.data";
+import { defaultTotpDto } from "../../../entity/totp/totpDto.test.data";
 
 describe("CsvLastPassRowComposer", () => {
   it("can compose lastpass csv row", () => {
     const dto = {
-      "name": "Password 1",
-      "username": "Username 1",
-      "uris": ["https://url1.com"],
-      "secret_clear": "Secret 1",
-      "description": "Description 1",
-      "folder_parent_path": "Folder 1"
+      name: "Password 1",
+      username: "Username 1",
+      uris: ["https://url1.com"],
+      secret_clear: "Secret 1",
+      description: "Description 1",
+      folder_parent_path: "Folder 1",
     };
     const externalResourceEntity = new ExternalResourceEntity(dto);
     const csvRow = CsvLastPassRowComposer.compose(externalResourceEntity);
@@ -37,13 +37,13 @@ describe("CsvLastPassRowComposer", () => {
 
   it("can compose lastpass csv row with totp", () => {
     const dto = {
-      "name": "Password 1",
-      "username": "Username 1",
-      "uris": ["https://url1.com"],
-      "secret_clear": "Secret 1",
-      "description": "Description 1",
-      "folder_parent_path": "Folder 1",
-      "totp": defaultTotpDto()
+      name: "Password 1",
+      username: "Username 1",
+      uris: ["https://url1.com"],
+      secret_clear: "Secret 1",
+      description: "Description 1",
+      folder_parent_path: "Folder 1",
+      totp: defaultTotpDto(),
     };
     const externalResourceEntity = new ExternalResourceEntity(dto);
     const csvRow = CsvLastPassRowComposer.compose(externalResourceEntity);

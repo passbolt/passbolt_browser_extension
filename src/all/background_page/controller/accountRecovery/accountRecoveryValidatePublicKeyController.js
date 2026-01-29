@@ -35,7 +35,7 @@ class AccountRecoveryValidatePublicKeyController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -47,7 +47,10 @@ class AccountRecoveryValidatePublicKeyController {
    */
   async exec(publicKeyToValidate) {
     const organizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();
-    await this.validateOrganizationPublicKeyService.validatePublicKey(publicKeyToValidate, organizationPolicy.armoredKey);
+    await this.validateOrganizationPublicKeyService.validatePublicKey(
+      publicKeyToValidate,
+      organizationPolicy.armoredKey,
+    );
   }
 }
 

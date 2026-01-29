@@ -39,7 +39,7 @@ class GetAndInitializeAccountLocaleController {
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -56,9 +56,7 @@ class GetAndInitializeAccountLocaleController {
       accountLocale = await this.localeModel.getSupportedLocale(this.account.locale);
     }
 
-    const locale = accountLocale
-      || await this.localeModel.getOrganizationLocale()
-      || LocaleModel.DEFAULT_LOCALE;
+    const locale = accountLocale || (await this.localeModel.getOrganizationLocale()) || LocaleModel.DEFAULT_LOCALE;
 
     // @todo It is not the best place to initialize the background page i18next library.
     this.localeModel.initializeI18next(locale);

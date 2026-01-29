@@ -12,8 +12,8 @@
  * @since         4.3.0
  */
 
-import {defaultPassphraseGeneratorSettings} from "./passphraseGeneratorSettingsEntity.test.data";
-import {defaultPasswordGeneratorSettings} from "./passwordGeneratorSettingsEntity.test.data";
+import { defaultPassphraseGeneratorSettings } from "./passphraseGeneratorSettingsEntity.test.data";
+import { defaultPasswordGeneratorSettings } from "./passwordGeneratorSettingsEntity.test.data";
 
 export const defaultPasswordPolicies = (data = {}) => {
   const defaultData = {

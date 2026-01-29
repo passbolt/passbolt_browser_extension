@@ -15,19 +15,14 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
-const ENTITY_NAME = 'Mfa-Policy';
+const ENTITY_NAME = "Mfa-Policy";
 
 class MfaPolicyEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(mfaPolicyDto, options = {}) {
-    super(EntitySchema.validate(
-      MfaPolicyEntity.ENTITY_NAME,
-      mfaPolicyDto,
-      MfaPolicyEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(MfaPolicyEntity.ENTITY_NAME, mfaPolicyDto, MfaPolicyEntity.getSchema()), options);
   }
 
   /**
@@ -36,20 +31,17 @@ class MfaPolicyEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "policy",
-        "remember_me_for_a_month"
-      ],
-      "properties": {
-        "policy": {
-          "type": "string",
-          enum: MfaPolicyEntity.SUPPORTED_POLICY_TYPE
+      type: "object",
+      required: ["policy", "remember_me_for_a_month"],
+      properties: {
+        policy: {
+          type: "string",
+          enum: MfaPolicyEntity.SUPPORTED_POLICY_TYPE,
         },
-        "remember_me_for_a_month": {
-          "type": "boolean",
-        }
-      }
+        remember_me_for_a_month: {
+          type: "boolean",
+        },
+      },
     };
   }
 
@@ -93,12 +85,8 @@ class MfaPolicyEntity extends Entity {
    * @returns {array<string>}
    */
   static get SUPPORTED_POLICY_TYPE() {
-    return [
-      MfaPolicyEntity.OPTIN,
-      MfaPolicyEntity.MANDATORY
-    ];
+    return [MfaPolicyEntity.OPTIN, MfaPolicyEntity.MANDATORY];
   }
-
 
   /**
    * MfaPolicyEntity.OptIn

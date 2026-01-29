@@ -13,11 +13,11 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import MoveFolderController from "./moveFolderController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { v4 as uuidv4 } from "uuid";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 
 describe("MoveFolderController", () => {
@@ -25,12 +25,12 @@ describe("MoveFolderController", () => {
     let worker, account, controller;
 
     beforeEach(() => {
-      worker = {port: new MockPort()};
+      worker = { port: new MockPort() };
       account = new AccountEntity(defaultAccountDto());
       controller = new MoveFolderController(worker, null, defaultApiClientOptions(), account);
     });
 
-    it("Should move a folder", async() => {
+    it("Should move a folder", async () => {
       expect.assertions(2);
       const expectedFolderId = uuidv4();
       const expectedDestinationFolderId = uuidv4();
@@ -45,20 +45,22 @@ describe("MoveFolderController", () => {
         expectedFolderId,
         expectedDestinationFolderId,
         controller.confirmMoveStrategyService,
-        pgpKeys.ada.passphrase
+        pgpKeys.ada.passphrase,
       );
     });
 
-    it("throws if the parameters are invalid", async() => {
+    it("throws if the parameters are invalid", async () => {
       expect.assertions(7);
 
       jest.spyOn(controller.getPassphraseService, "getPassphrase");
       jest.spyOn(controller.moveOneFolderService, "moveOne");
 
-      await expect(() => controller.exec()).rejects.toThrow("The parameter \"folderId\" should be a UUID");
-      await expect(() => controller.exec(null)).rejects.toThrow("The parameter \"folderId\" should be a UUID");
-      await expect(() => controller.exec(42)).rejects.toThrow("The parameter \"folderId\" should be a UUID");
-      await expect(() => controller.exec(uuidv4(), 42)).rejects.toThrow("The parameter \"destinationFolderId\" should be a UUID");
+      await expect(() => controller.exec()).rejects.toThrow('The parameter "folderId" should be a UUID');
+      await expect(() => controller.exec(null)).rejects.toThrow('The parameter "folderId" should be a UUID');
+      await expect(() => controller.exec(42)).rejects.toThrow('The parameter "folderId" should be a UUID');
+      await expect(() => controller.exec(uuidv4(), 42)).rejects.toThrow(
+        'The parameter "destinationFolderId" should be a UUID',
+      );
       const sameId = uuidv4();
       await expect(() => controller.exec(sameId, sameId)).rejects.toThrow("The folder cannot be moved inside itself.");
 

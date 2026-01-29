@@ -12,14 +12,14 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import AccountRecoveryValidateOrganizationPrivateKeyController from "./accountRecoveryValidateOrganizationPrivateKeyController";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { enabledAccountRecoveryOrganizationPolicyDto } from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import WrongOrganizationRecoveryKeyError from "../../error/wrongOrganizationRecoveryKeyError";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import each from "jest-each";
 
 // Reset the modules before each test.
@@ -29,8 +29,12 @@ beforeEach(() => {
 
 describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
   describe("AccountRecoveryValidateOrganizationPrivateKeyController::exec", () => {
-    it("Should assert the provided private key dto is valid.", async() => {
-      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
+    it("Should assert the provided private key dto is valid.", async () => {
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(
+        null,
+        null,
+        defaultApiClientOptions(),
+      );
 
       const accountRecoveryPrivateKeyDto = {};
       const resultPromise = controller.exec(accountRecoveryPrivateKeyDto);
@@ -39,15 +43,19 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
       await expect(resultPromise).rejects.toThrowError(EntityValidationError);
     });
 
-    it("Should throw an error if no account recovery organization policy is found.", async() => {
-      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
+    it("Should throw an error if no account recovery organization policy is found.", async () => {
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(
+        null,
+        null,
+        defaultApiClientOptions(),
+      );
 
       // Mock API get account recovery organization policy.
       fetch.doMockOnce(() => mockApiResponse(null));
 
       const privateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private,
-        passphrase: pgpKeys.account_recovery_organization.passphrase
+        passphrase: pgpKeys.account_recovery_organization.passphrase,
       };
       const result = controller.exec(privateKeyDto);
 
@@ -55,16 +63,19 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
       await expect(result).rejects.toThrowError("Account recovery organization policy not found.");
     });
 
-
-    it("Should throw an error if the key doesn't validate.", async() => {
-      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
+    it("Should throw an error if the key doesn't validate.", async () => {
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(
+        null,
+        null,
+        defaultApiClientOptions(),
+      );
 
       // Mock API get account recovery organization policy.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
 
       const privateKeyDto = {
         armored_key: pgpKeys.ada.private,
-        passphrase: pgpKeys.ada.passphrase
+        passphrase: pgpKeys.ada.passphrase,
       };
       const result = controller.exec(privateKeyDto);
 
@@ -73,18 +84,30 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
     });
 
     each([
-      {scenario: "private key decrypted", accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private_decrypted, accountRecoveryOrganizationPrivateKeyPassphrase: ""},
-      {scenario: "private key encrypted", accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private, accountRecoveryOrganizationPrivateKeyPassphrase: pgpKeys.account_recovery_organization.passphrase},
-    ]).describe("Should disable an account recovery organization policy previously enabled.",  test => {
-      it(`Should validate a valid account organization private key: ${test.scenario}.`, async() => {
-        const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
+      {
+        scenario: "private key decrypted",
+        accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private_decrypted,
+        accountRecoveryOrganizationPrivateKeyPassphrase: "",
+      },
+      {
+        scenario: "private key encrypted",
+        accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private,
+        accountRecoveryOrganizationPrivateKeyPassphrase: pgpKeys.account_recovery_organization.passphrase,
+      },
+    ]).describe("Should disable an account recovery organization policy previously enabled.", (test) => {
+      it(`Should validate a valid account organization private key: ${test.scenario}.`, async () => {
+        const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(
+          null,
+          null,
+          defaultApiClientOptions(),
+        );
 
         // Mock API get account recovery organization policy.
         fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
 
         const privateKeyDto = {
           armored_key: test.accountRecoveryOrganizationPrivateKey,
-          passphrase: test.accountRecoveryOrganizationPrivateKeyPassphrase
+          passphrase: test.accountRecoveryOrganizationPrivateKeyPassphrase,
         };
         const result = controller.exec(privateKeyDto);
 
@@ -93,16 +116,19 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
       });
     });
 
-
-    it("Should validate a valid account organization decrypted private key with an empty passphrase.", async() => {
-      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
+    it("Should validate a valid account organization decrypted private key with an empty passphrase.", async () => {
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(
+        null,
+        null,
+        defaultApiClientOptions(),
+      );
 
       // Mock API get account recovery organization policy.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
 
       const privateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private_decrypted,
-        passphrase: ""
+        passphrase: "",
       };
       const result = controller.exec(privateKeyDto);
 

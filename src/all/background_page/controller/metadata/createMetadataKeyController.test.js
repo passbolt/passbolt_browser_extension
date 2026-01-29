@@ -14,38 +14,37 @@
 
 import expect from "expect";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import CreateMetadataKeyController from "./createMetadataKeyController";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
-import {defaultMetadataKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
-import ExternalGpgKeyPairEntity
-  from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
+import { defaultMetadataKeyDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
+import ExternalGpgKeyPairEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 
 describe("CreateMetadataKeyController", () => {
   describe("::exec", () => {
     let controller, account, apiClientOptions;
 
-    beforeEach(async() => {
+    beforeEach(async () => {
       account = new AccountEntity(defaultAccountDto());
       apiClientOptions = defaultApiClientOptions();
       controller = new CreateMetadataKeyController(null, null, account, apiClientOptions);
       await controller.createMetadataKeyService.getOrFindMetadataSettings.metadataKeysSettingsLocalStorage.flush();
     });
 
-    it("Create the metadata key.", async() => {
+    it("Create the metadata key.", async () => {
       expect.assertions(3);
 
       const metadataKeyPairDto = {
-        private_key: {armored_key: pgpKeys.eddsa_ed25519.private},
-        public_key: {armored_key: pgpKeys.eddsa_ed25519.public},
+        private_key: { armored_key: pgpKeys.eddsa_ed25519.private },
+        public_key: { armored_key: pgpKeys.eddsa_ed25519.public },
       };
 
-      jest.spyOn(controller.createMetadataKeyService, "create")
+      jest
+        .spyOn(controller.createMetadataKeyService, "create")
         .mockReturnValue(new MetadataKeyEntity(defaultMetadataKeyDto()));
-      jest.spyOn(controller.getPassphraseService, "getPassphrase")
-        .mockResolvedValue(pgpKeys.ada.passphrase);
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockResolvedValue(pgpKeys.ada.passphrase);
 
       const savedMetadataKey = await controller.exec(metadataKeyPairDto);
 
@@ -57,10 +56,9 @@ describe("CreateMetadataKeyController", () => {
       expect(savedMetadataKey).toBeInstanceOf(MetadataKeyEntity);
     });
 
-    it("throws if the parameters are not valid.", async() => {
+    it("throws if the parameters are not valid.", async () => {
       expect.assertions(1);
-      await expect(() => controller.exec({}))
-        .toThrowEntityValidationError("private_key", "required");
+      await expect(() => controller.exec({})).toThrowEntityValidationError("private_key", "required");
     });
   });
 });

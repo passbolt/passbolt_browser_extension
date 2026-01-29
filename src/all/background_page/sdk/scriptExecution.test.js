@@ -15,7 +15,7 @@ import ScriptExecution from "./scriptExecution";
 
 describe("ScriptExecution", () => {
   describe("ScriptExecution::injectPortname", () => {
-    it("Should insert JS func", async() => {
+    it("Should insert JS func", async () => {
       expect.assertions(1);
       const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
       const scriptExecution = new ScriptExecution(1);
@@ -26,9 +26,9 @@ describe("ScriptExecution", () => {
         args: [portname],
         target: {
           tabId: 1,
-          frameIds: [0]
+          frameIds: [0],
         },
-        world: "ISOLATED"
+        world: "ISOLATED",
       };
 
       scriptExecution.injectPortname(portname);
@@ -38,7 +38,7 @@ describe("ScriptExecution", () => {
   });
 
   describe("ScriptExecution::injectJs", () => {
-    it("Should insert JS files", async() => {
+    it("Should insert JS files", async () => {
       expect.assertions(1);
       const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
       const scriptExecution = new ScriptExecution(2);
@@ -48,9 +48,9 @@ describe("ScriptExecution", () => {
         files: files,
         target: {
           tabId: 2,
-          frameIds: [0]
+          frameIds: [0],
         },
-        world: "ISOLATED"
+        world: "ISOLATED",
       };
 
       scriptExecution.injectJs(files);
@@ -60,7 +60,7 @@ describe("ScriptExecution", () => {
   });
 
   describe("ScriptExecution::injectCSS", () => {
-    it("Should insert CSS file", async() => {
+    it("Should insert CSS file", async () => {
       expect.assertions(1);
       const mockedScriptingCSS = jest.spyOn(browser.scripting, "insertCSS");
       const scriptExecution = new ScriptExecution(3);
@@ -70,8 +70,8 @@ describe("ScriptExecution", () => {
         files: files,
         target: {
           tabId: 3,
-          frameIds: [0]
-        }
+          frameIds: [0],
+        },
       };
 
       scriptExecution.injectCss(files);
@@ -81,7 +81,7 @@ describe("ScriptExecution", () => {
   });
 
   describe("ScriptExecution::injectBase64UrlToCreateObjectURL", () => {
-    it("Should insert JS func", async() => {
+    it("Should insert JS func", async () => {
       expect.assertions(2);
       const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
       // data mocked
@@ -92,15 +92,15 @@ describe("ScriptExecution", () => {
         args: [dataUrl],
         target: {
           tabId: 1,
-          frameIds: [0]
+          frameIds: [0],
         },
-        world: "ISOLATED"
+        world: "ISOLATED",
       };
       const resultUrl = "blob:https://passbolt.dev/8a3e66b9-4646-4077-815a-5978936aa6d6";
       // mock function
-      mockedScriptingJS.mockImplementationOnce(script => {
+      mockedScriptingJS.mockImplementationOnce((script) => {
         const url = script.func.apply(null, script.args);
-        return [{result: url}];
+        return [{ result: url }];
       });
       jest.spyOn(self.URL, "createObjectURL").mockImplementationOnce(() => resultUrl);
       // process
@@ -113,7 +113,7 @@ describe("ScriptExecution", () => {
   });
 
   describe("ScriptExecution::injectURLToRevoke", () => {
-    it("Should insert JS func", async() => {
+    it("Should insert JS func", async () => {
       expect.assertions(2);
       const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
       // data mocked
@@ -124,12 +124,12 @@ describe("ScriptExecution", () => {
         args: [url],
         target: {
           tabId: 1,
-          frameIds: [0]
+          frameIds: [0],
         },
-        world: "ISOLATED"
+        world: "ISOLATED",
       };
       // mock function
-      mockedScriptingJS.mockImplementationOnce(async script => {
+      mockedScriptingJS.mockImplementationOnce(async (script) => {
         script.func.apply(null, script.args);
       });
       // process

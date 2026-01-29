@@ -15,7 +15,7 @@ import WorkersSessionStorage from "../../service/sessionStorage/workersSessionSt
 import PortManager from "../../sdk/port/portManager";
 
 const APPLICATION_ALLOWED = {
-  "WebIntegration": ["InFormCallToAction", "InFormMenu"],
+  WebIntegration: ["InFormCallToAction", "InFormMenu"],
 };
 
 class RemovePortController {
@@ -61,12 +61,12 @@ class RemovePortController {
     if (workers.length === 1) {
       const workerId = workers[0].id;
       // Remove the port
-      PortManager.removePort(workerId, {reason: "disconnected"});
+      PortManager.removePort(workerId, { reason: "disconnected" });
       // Remove the reference in the session storage
       await WorkersSessionStorage.deleteById(workerId);
     } else if (workers.length > 1) {
       // Check which port is already disconnected to remove it
-      await Promise.all(workers.map(worker => this.removePortReference(worker.id)));
+      await Promise.all(workers.map((worker) => this.removePortReference(worker.id)));
     }
   }
 
@@ -90,11 +90,11 @@ class RemovePortController {
       const port = PortManager.getPortById(portId);
       try {
         // If the port is still connected do nothing
-        port.emit('passbolt.port.check');
+        port.emit("passbolt.port.check");
       } catch (error) {
         console.error(error);
-        console.debug('The port is not connected, remove references');
-        PortManager.removePort(portId, {reason: "disconnected"});
+        console.debug("The port is not connected, remove references");
+        PortManager.removePort(portId, { reason: "disconnected" });
         await WorkersSessionStorage.deleteById(portId);
       }
     } else {

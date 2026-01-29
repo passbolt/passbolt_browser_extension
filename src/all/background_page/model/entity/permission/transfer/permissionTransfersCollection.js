@@ -29,9 +29,9 @@ class PermissionTransfersCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": PermissionTransferEntity.getSchema(),
-      "minItems": 1
+      type: "array",
+      items: PermissionTransferEntity.getSchema(),
+      minItems: 1,
     };
   }
 }

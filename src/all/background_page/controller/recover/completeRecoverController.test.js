@@ -12,14 +12,14 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import CompleteRecoverController from "./completeRecoverController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { withSecurityTokenAccountRecoverDto } from "../../model/entity/account/accountRecoverEntity.test.data";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import User from "../../model/user";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
@@ -30,10 +30,14 @@ beforeEach(() => {
 
 describe("CompleteRecoverController", () => {
   describe("CompleteRecoverController::exec", () => {
-    it("Should complete the recover.", async() => {
+    it("Should complete the recover.", async () => {
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new CompleteRecoverController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new CompleteRecoverController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
@@ -62,10 +66,14 @@ describe("CompleteRecoverController", () => {
       expect(keyringPublicFingerprint).toStrictEqual(keyringPrivateFingerprint);
     });
 
-    it("Should not add the account to the local storage if the complete API request fails.", async() => {
+    it("Should not add the account to the local storage if the complete API request fails.", async () => {
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new CompleteRecoverController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new CompleteRecoverController(
+        { port: { _port: { name: "test" } } },
+        null,
+        defaultApiClientOptions(),
+      );
 
       // Mock API complete request.
       fetch.doMockOnce(() => Promise.reject());

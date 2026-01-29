@@ -12,10 +12,9 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
-
 
 class GetDecryptedUserPrivateKeyService {
   /**

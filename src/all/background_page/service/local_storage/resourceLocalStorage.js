@@ -15,12 +15,12 @@ import Log from "../../model/log";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import Lock from "../../utils/lock";
-import {assertArrayUUID, assertType, assertUuid} from "../../utils/assertions";
+import { assertArrayUUID, assertType, assertUuid } from "../../utils/assertions";
 import PasswordExpiryResourceEntity from "../../model/entity/passwordExpiry/passwordExpiryResourceEntity";
 
 const lock = new Lock();
 
-export const RESOURCES_LOCAL_STORAGE_KEY = 'resources';
+export const RESOURCES_LOCAL_STORAGE_KEY = "resources";
 
 class ResourceLocalStorage {
   /**
@@ -45,7 +45,7 @@ class ResourceLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
-    Log.write({level: 'debug', message: 'ResourceLocalStorage flushed'});
+    Log.write({ level: "debug", message: "ResourceLocalStorage flushed" });
     await browser.storage.local.remove(RESOURCES_LOCAL_STORAGE_KEY);
     ResourceLocalStorage._cachedData = null;
   }
@@ -62,7 +62,7 @@ class ResourceLocalStorage {
    */
   static async get() {
     if (!ResourceLocalStorage._cachedData) {
-      const {resources} = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
+      const { resources } = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
       ResourceLocalStorage._cachedData = resources;
     }
 
@@ -80,14 +80,14 @@ class ResourceLocalStorage {
       const resources = [];
       if (resourcesCollection) {
         if (!(resourcesCollection instanceof ResourcesCollection)) {
-          throw new TypeError('ResourceLocalStorage::set expects a ResourcesCollection');
+          throw new TypeError("ResourceLocalStorage::set expects a ResourcesCollection");
         }
         for (const resourceEntity of resourcesCollection) {
           ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
           resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
         }
       }
-      await browser.storage.local.set({resources: resources});
+      await browser.storage.local.set({ resources: resources });
       ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
@@ -102,7 +102,7 @@ class ResourceLocalStorage {
    */
   static async getResourceById(id) {
     const resources = await ResourceLocalStorage.get();
-    return resources?.find(item => item.id === id);
+    return resources?.find((item) => item.id === id);
   }
 
   /**
@@ -113,9 +113,8 @@ class ResourceLocalStorage {
    */
   static async getResourcesByIds(ids) {
     const resources = await ResourceLocalStorage.get();
-    return resources?.filter(item => ids.includes(item.id));
+    return resources?.filter((item) => ids.includes(item.id));
   }
-
 
   /**
    * Add a resource in the local storage
@@ -125,9 +124,9 @@ class ResourceLocalStorage {
     await lock.acquire();
     try {
       ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
-      const resources = await ResourceLocalStorage.get() || [];
+      const resources = (await ResourceLocalStorage.get()) || [];
       resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({resources: resources});
+      await browser.storage.local.set({ resources: resources });
       ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
@@ -142,12 +141,12 @@ class ResourceLocalStorage {
     assertType(resources, ResourcesCollection, "The `resources` parameter should be of type ResourcesCollection");
     await lock.acquire();
     try {
-      const storedResources = await ResourceLocalStorage.get() || [];
-      resources.items.forEach(resourceEntity => {
+      const storedResources = (await ResourceLocalStorage.get()) || [];
+      resources.items.forEach((resourceEntity) => {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
         storedResources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       });
-      await browser.storage.local.set({resources: storedResources});
+      await browser.storage.local.set({ resources: storedResources });
       ResourceLocalStorage._cachedData = storedResources;
     } finally {
       lock.release();
@@ -163,13 +162,13 @@ class ResourceLocalStorage {
     await lock.acquire();
     try {
       ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
-      const resources = await ResourceLocalStorage.get() || [];
-      const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
+      const resources = (await ResourceLocalStorage.get()) || [];
+      const resourceIndex = resources.findIndex((item) => item.id === resourceEntity.id);
       if (resourceIndex === -1) {
-        throw new Error('The resource could not be found in the local storage');
+        throw new Error("The resource could not be found in the local storage");
       }
       resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
-      await browser.storage.local.set({resources: resources});
+      await browser.storage.local.set({ resources: resources });
       ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
@@ -182,19 +181,23 @@ class ResourceLocalStorage {
    * @throws {Error} if the resource does not exist in the local storage
    */
   static async updateResourcesCollection(resourcesCollection) {
-    assertType(resourcesCollection, ResourcesCollection, 'The parameter resourcesEntities should be of ResourcesCollection type.');
+    assertType(
+      resourcesCollection,
+      ResourcesCollection,
+      "The parameter resourcesEntities should be of ResourcesCollection type.",
+    );
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get() || [];
+      const resources = (await ResourceLocalStorage.get()) || [];
       for (const resourceEntity of resourcesCollection) {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
-        const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
+        const resourceIndex = resources.findIndex((item) => item.id === resourceEntity.id);
         if (resourceIndex === -1) {
-          throw new Error('The resource could not be found in the local storage');
+          throw new Error("The resource could not be found in the local storage");
         }
         resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       }
-      await browser.storage.local.set({resources: resources});
+      await browser.storage.local.set({ resources: resources });
       ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
@@ -207,20 +210,24 @@ class ResourceLocalStorage {
    * @throws {Error} if parameter resourcesCollection is not of ResourcesCollection type
    */
   static async addOrReplaceResourcesCollection(resourcesCollection) {
-    assertType(resourcesCollection, ResourcesCollection, 'The parameter resourcesEntities should be of ResourcesCollection type.');
+    assertType(
+      resourcesCollection,
+      ResourcesCollection,
+      "The parameter resourcesEntities should be of ResourcesCollection type.",
+    );
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get() || [];
+      const resources = (await ResourceLocalStorage.get()) || [];
       for (const resourceEntity of resourcesCollection) {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
-        const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
+        const resourceIndex = resources.findIndex((item) => item.id === resourceEntity.id);
         if (resourceIndex === -1) {
           resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
         } else {
           resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
         }
       }
-      await browser.storage.local.set({resources: resources});
+      await browser.storage.local.set({ resources: resources });
       ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
@@ -235,16 +242,20 @@ class ResourceLocalStorage {
   static async updateResourcesExpiryDate(passwordExpiryResourcesCollection) {
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get() || [];
+      const resources = (await ResourceLocalStorage.get()) || [];
       for (const passwordExpiryResourceEntity of passwordExpiryResourcesCollection) {
-        assertType(passwordExpiryResourceEntity, PasswordExpiryResourceEntity, 'The given entity is not a PasswordExpiryResourceEntity');
-        const resourceIndex = resources.findIndex(item => item.id === passwordExpiryResourceEntity.id);
+        assertType(
+          passwordExpiryResourceEntity,
+          PasswordExpiryResourceEntity,
+          "The given entity is not a PasswordExpiryResourceEntity",
+        );
+        const resourceIndex = resources.findIndex((item) => item.id === passwordExpiryResourceEntity.id);
         if (resourceIndex === -1) {
-          throw new Error('The resource could not be found in the local storage');
+          throw new Error("The resource could not be found in the local storage");
         }
         resources[resourceIndex].expired = passwordExpiryResourceEntity.expired;
       }
-      await browser.storage.local.set({resources: resources});
+      await browser.storage.local.set({ resources: resources });
       ResourceLocalStorage._cachedData = resources;
     } finally {
       lock.release();
@@ -259,13 +270,13 @@ class ResourceLocalStorage {
     assertUuid(resourceId, "The parameter resourceId should be a UUID.");
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get() || [];
+      const resources = (await ResourceLocalStorage.get()) || [];
       if (resources.length > 0) {
-        const resourceIndex = resources.findIndex(item => item.id === resourceId);
+        const resourceIndex = resources.findIndex((item) => item.id === resourceId);
         if (resourceIndex !== -1) {
           resources.splice(resourceIndex, 1);
         }
-        await browser.storage.local.set({resources: resources});
+        await browser.storage.local.set({ resources: resources });
         ResourceLocalStorage._cachedData = resources;
       }
     } finally {
@@ -281,21 +292,20 @@ class ResourceLocalStorage {
     assertArrayUUID(resourceIds);
     await lock.acquire();
     try {
-      const resources = await ResourceLocalStorage.get() || [];
+      const resources = (await ResourceLocalStorage.get()) || [];
 
       if (resources.length > 0 && resourceIds.length > 0) {
         const setOfResourceIds = new Set(resourceIds);
 
-        const filteredResources = resources.filter(resource => !setOfResourceIds.has(resource.id));
+        const filteredResources = resources.filter((resource) => !setOfResourceIds.has(resource.id));
 
-        await browser.storage.local.set({resources: filteredResources});
+        await browser.storage.local.set({ resources: filteredResources });
         ResourceLocalStorage._cachedData = filteredResources;
       }
     } finally {
       lock.release();
     }
   }
-
 
   /*
    * =================================================
@@ -310,7 +320,7 @@ class ResourceLocalStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {permission: true, favorite: true, tag: true};
+    return { permission: true, favorite: true, tag: true };
   }
 
   /**
@@ -322,19 +332,19 @@ class ResourceLocalStorage {
    */
   static assertEntityBeforeSave(resourceEntity) {
     if (!resourceEntity) {
-      throw new TypeError('ResourceLocalStorage expects a ResourceEntity to be set');
+      throw new TypeError("ResourceLocalStorage expects a ResourceEntity to be set");
     }
     if (!(resourceEntity instanceof ResourceEntity)) {
-      throw new TypeError('ResourceLocalStorage expects an object of type ResourceEntity');
+      throw new TypeError("ResourceLocalStorage expects an object of type ResourceEntity");
     }
     if (!resourceEntity.id) {
-      throw new TypeError('ResourceLocalStorage expects ResourceEntity id to be set');
+      throw new TypeError("ResourceLocalStorage expects ResourceEntity id to be set");
     }
     if (!resourceEntity.permission) {
-      throw new TypeError('ResourceLocalStorage::set expects ResourceEntity permission to be set');
+      throw new TypeError("ResourceLocalStorage::set expects ResourceEntity permission to be set");
     }
     if (!resourceEntity.isMetadataDecrypted()) {
-      throw new TypeError('ResourceLocalStorage::set expects ResourceEntity metadata to be decrypted');
+      throw new TypeError("ResourceLocalStorage::set expects ResourceEntity metadata to be decrypted");
     }
   }
 }

@@ -12,11 +12,11 @@
  * @since         5.7.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import FavoriteResourceService from "../../service/favorite/favoriteResourceService";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import UnfavoriteResourceController from "./unfavoriteResourceController";
 
 describe("FavoriteResourceController", () => {
@@ -28,7 +28,7 @@ describe("FavoriteResourceController", () => {
     controller = new UnfavoriteResourceController(null, null, apiClientOptions, account);
   });
   describe("UnfavoriteResourceController::exec", () => {
-    it("Should call the removeResourceFromFavorite and emit a success message", async() => {
+    it("Should call the removeResourceFromFavorite and emit a success message", async () => {
       expect.assertions(1);
       const resourceDto = defaultResourceDto();
       jest.spyOn(FavoriteResourceService.prototype, "removeResourceFromFavorite").mockImplementationOnce(() => {});

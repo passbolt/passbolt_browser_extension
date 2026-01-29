@@ -44,10 +44,10 @@ class RequestAccountRecoveryController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -66,7 +66,10 @@ class RequestAccountRecoveryController {
     const accountAccountRecovery = new AccountAccountRecoveryEntity(accountAccountRecoveryDto);
 
     // Delete any existing account recovery request temporary accounts, as the API will anyway cancel other on going requests.
-    await AccountLocalStorage.deleteByUserIdAndType(accountAccountRecovery.userId, AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY);
+    await AccountLocalStorage.deleteByUserIdAndType(
+      accountAccountRecovery.userId,
+      AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY,
+    );
     await AccountLocalStorage.add(accountAccountRecovery);
     await AccountTemporarySessionStorageService.remove();
   }

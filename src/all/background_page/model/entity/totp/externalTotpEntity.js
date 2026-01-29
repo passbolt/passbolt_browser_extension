@@ -85,10 +85,10 @@ class ExternalTotpEntity extends TotpEntity {
    */
   static createTotpFromUrl(url) {
     const totp = {
-      secret_key: url.searchParams.get('secret'),
-      algorithm: url.searchParams.get('algorithm') || DEFAULT_ALGORITHM,
-      digits: parseInt(url.searchParams.get('digits'), 10) || 6,
-      period: parseInt(url.searchParams.get('period'), 10) || 30,
+      secret_key: url.searchParams.get("secret"),
+      algorithm: url.searchParams.get("algorithm") || DEFAULT_ALGORITHM,
+      digits: parseInt(url.searchParams.get("digits"), 10) || 6,
+      period: parseInt(url.searchParams.get("period"), 10) || 30,
     };
     return new ExternalTotpEntity(totp);
   }
@@ -100,10 +100,10 @@ class ExternalTotpEntity extends TotpEntity {
    */
   static createTotpFromKdbxWindows(fields) {
     const totp = {
-      secret_key: fields.get('TimeOtp-Secret-Base32').getText(),
-      algorithm: fields.get('TimeOtp-Algorithm')?.slice(5).replace('-', '') || DEFAULT_ALGORITHM,
-      digits:  parseInt(fields.get('TimeOtp-Length'), 10) || 6,
-      period: parseInt(fields.get('TimeOtp-Period'), 10) || 30
+      secret_key: fields.get("TimeOtp-Secret-Base32").getText(),
+      algorithm: fields.get("TimeOtp-Algorithm")?.slice(5).replace("-", "") || DEFAULT_ALGORITHM,
+      digits: parseInt(fields.get("TimeOtp-Length"), 10) || 6,
+      period: parseInt(fields.get("TimeOtp-Period"), 10) || 30,
     };
     return new ExternalTotpEntity(totp);
   }
@@ -120,7 +120,7 @@ class ExternalTotpEntity extends TotpEntity {
       secret_key: secretKey,
       algorithm: DEFAULT_ALGORITHM, // Default algorithm
       digits: 6, // Default digits
-      period: 30 // Default period
+      period: 30, // Default period
     };
     return new ExternalTotpEntity(dto);
   }

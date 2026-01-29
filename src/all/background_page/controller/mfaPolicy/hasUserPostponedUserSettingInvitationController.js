@@ -12,7 +12,7 @@
  * @since         3.10.0
  */
 
-import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
+import PostponeUserSettingInvitationService from "../../service/invitation/postponeUserSettingInvitationService";
 
 class HasUserPostponedUserSettingInvitationMFAPolicyController {
   /**
@@ -35,7 +35,7 @@ class HasUserPostponedUserSettingInvitationMFAPolicyController {
       this.worker.port.emit(this.requestId, "SUCCESS", hasPostponedInvitation);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

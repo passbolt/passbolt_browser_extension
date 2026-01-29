@@ -13,9 +13,12 @@
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import AppEmailValidatorService from "../../../../service/validator/appEmailValidatorService";
-import {GPG_KEY_CURVE_25519, GPG_KEY_TYPE_CURVE} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
+import {
+  GPG_KEY_CURVE_25519,
+  GPG_KEY_TYPE_CURVE,
+} from "passbolt-styleguide/src/shared/models/entity/gpgkey/gpgkeyEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {assertType} from "../../../../utils/assertions";
+import { assertType } from "../../../../utils/assertions";
 import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
 
 const ENTITY_NAME = "GenerateGpgKeyPairOptionsEntity";
@@ -33,15 +36,18 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
    * @inheritdoc
    */
   marshall() {
-    if (typeof(this._props.type) === "undefined") {
+    if (typeof this._props.type === "undefined") {
       this._props.type = GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_TYPE;
     }
 
-    if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA && typeof(this._props.keySize) === "undefined") {
+    if (
+      this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA &&
+      typeof this._props.keySize === "undefined"
+    ) {
       this._props.keySize = GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE;
     }
 
-    if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC && typeof(this._props.curve) === "undefined") {
+    if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC && typeof this._props.curve === "undefined") {
       this._props.curve = GenerateGpgKeyPairOptionsEntity.DEFAULT_ECC_KEY_CURVE;
     }
     super.marshall();
@@ -53,13 +59,21 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
   validateBuildRules() {
     if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA && Boolean(this._props.curve)) {
       const error = new EntityValidationError();
-      error.addError("curve", "unwanted_curve", `The curve should not be set when the type is set to '${GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA}'`);
+      error.addError(
+        "curve",
+        "unwanted_curve",
+        `The curve should not be set when the type is set to '${GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA}'`,
+      );
       throw error;
     }
 
     if (this._props.type === GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC && Boolean(this._props.keySize)) {
       const error = new EntityValidationError();
-      error.addError("keySize", "unwanted_keySize", `The keySize should not be set when the type is set to '${GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC}'`);
+      error.addError(
+        "keySize",
+        "unwanted_keySize",
+        `The keySize should not be set when the type is set to '${GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC}'`,
+      );
       throw error;
     }
   }
@@ -70,44 +84,39 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "name",
-        "email",
-        "passphrase",
-        "type",
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1
+      type: "object",
+      required: ["name", "email", "passphrase", "type"],
+      properties: {
+        name: {
+          type: "string",
+          minLength: 1,
         },
-        "email": {
-          "type": "string",
-          "custom": AppEmailValidatorService.validate
+        email: {
+          type: "string",
+          custom: AppEmailValidatorService.validate,
         },
-        "passphrase": {
-          "type": "string",
-          "minLength": 8,
+        passphrase: {
+          type: "string",
+          minLength: 8,
         },
-        "type": {
-          "type": "string",
-          "enum": [GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA, GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC],
+        type: {
+          type: "string",
+          enum: [GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA, GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC],
         },
-        "keySize": {
-          "type": "integer",
-          "minLength": GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE,
-          "nullable": true,
+        keySize: {
+          type: "integer",
+          minLength: GenerateGpgKeyPairOptionsEntity.DEFAULT_RSA_KEY_SIZE,
+          nullable: true,
         },
-        "curve": {
-          "type": "string",
-          "minLength": [GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519],
-          "nullable": true,
+        curve: {
+          type: "string",
+          minLength: [GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519],
+          nullable: true,
         },
-        "date": {
-          "type": "integer"
-        }
-      }
+        date: {
+          type: "integer",
+        },
+      },
     };
   }
 
@@ -120,15 +129,21 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
    * @throws {TypeError} if the `userKeyPolicy` is not a UserKeyPoliciesSettingsEntity
    */
   static createForUserKeyGeneration(userKeyPolicy, generateGpgKeyPairDto) {
-    assertType(userKeyPolicy, UserKeyPoliciesSettingsEntity, "The userKeyPolicy should be a valid 'UserKeyPoliciesSettingsEntity'");
+    assertType(
+      userKeyPolicy,
+      UserKeyPoliciesSettingsEntity,
+      "The userKeyPolicy should be a valid 'UserKeyPoliciesSettingsEntity'",
+    );
 
-    const type = userKeyPolicy.preferredKeyType === GPG_KEY_TYPE_CURVE
-      ? GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC
-      : GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA;
+    const type =
+      userKeyPolicy.preferredKeyType === GPG_KEY_TYPE_CURVE
+        ? GenerateGpgKeyPairOptionsEntity.KEY_TYPE_ECC
+        : GenerateGpgKeyPairOptionsEntity.KEY_TYPE_RSA;
 
-    const curve = userKeyPolicy.preferredKeyCurve === GPG_KEY_CURVE_25519
-      ? GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519
-      : null;
+    const curve =
+      userKeyPolicy.preferredKeyCurve === GPG_KEY_CURVE_25519
+        ? GenerateGpgKeyPairOptionsEntity.KEY_CURVE_ED25519
+        : null;
 
     const keySize = userKeyPolicy.preferredKeySize;
 
@@ -193,7 +208,7 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
    * @returns {string} ie. Ada Lovelace <ada@passbolt.com>
    */
   get userId() {
-    return {name: this.name, email: this.email};
+    return { name: this.name, email: this.email };
   }
 
   /**
@@ -249,9 +264,7 @@ export default class GenerateGpgKeyPairOptionsEntity extends EntityV2 {
    * @returns {Date}
    */
   get date() {
-    return this._props.date !== undefined ?
-      new Date(this._props.date) :
-      new Date();
+    return this._props.date !== undefined ? new Date(this._props.date) : new Date();
   }
 
   /*

@@ -12,12 +12,12 @@
  * @since         3.9.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {v4 as uuid} from "uuid";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { v4 as uuid } from "uuid";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import ActivateSsoSettingsController from "./activateSsoSettingsController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultSsoSettingsWithAzure} from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultSsoSettingsWithAzure } from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -25,16 +25,16 @@ beforeEach(() => {
 
 describe("ActivateSsoSettingsController", () => {
   describe("AccountRecoveryGetRequestController::exec", () => {
-    it("Should activate the given SSO settings.", async() => {
+    it("Should activate the given SSO settings.", async () => {
       expect.assertions(1);
       const ssoDraftSettingsId = uuid();
       const ssoToken = uuid();
 
-      fetch.doMockOnceIf(new RegExp(`/sso/settings/${ssoDraftSettingsId}.json`), async req => {
+      fetch.doMockOnceIf(new RegExp(`/sso/settings/${ssoDraftSettingsId}.json`), async (req) => {
         const request = JSON.parse(await req.text());
         expect(request).toStrictEqual({
           status: "active",
-          token: ssoToken
+          token: ssoToken,
         });
         return mockApiResponse(defaultSsoSettingsWithAzure());
       });
@@ -43,7 +43,7 @@ describe("ActivateSsoSettingsController", () => {
       await controller.exec(ssoDraftSettingsId, ssoToken);
     });
 
-    it("Should throw an error if the SSO settings id is not a valid uuid.", async() => {
+    it("Should throw an error if the SSO settings id is not a valid uuid.", async () => {
       expect.assertions(1);
       const ssoDraftSettingsId = "not a uuid";
       const ssoToken = uuid();
@@ -52,11 +52,11 @@ describe("ActivateSsoSettingsController", () => {
       try {
         await controller.exec(ssoDraftSettingsId, ssoToken);
       } catch (e) {
-        expect(e).toStrictEqual(new Error('The SSO settings id should be a valid uuid.'));
+        expect(e).toStrictEqual(new Error("The SSO settings id should be a valid uuid."));
       }
     });
 
-    it("Should throw an error if the SSO activation token is not a valid uuid.", async() => {
+    it("Should throw an error if the SSO activation token is not a valid uuid.", async () => {
       expect.assertions(1);
       const ssoDraftSettingsId = uuid();
       const ssoToken = "not a uuid";
@@ -65,7 +65,7 @@ describe("ActivateSsoSettingsController", () => {
       try {
         await controller.exec(ssoDraftSettingsId, ssoToken);
       } catch (e) {
-        expect(e).toStrictEqual(new Error('The SSO activation token should be a valid uuid.'));
+        expect(e).toStrictEqual(new Error("The SSO activation token should be a valid uuid."));
       }
     });
   });

@@ -28,8 +28,8 @@ class NeededSecretsCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": NeededSecretEntity.getSchema()
+      type: "array",
+      items: NeededSecretEntity.getSchema(),
     };
   }
 }

@@ -41,10 +41,10 @@ class DeleteUserController {
   async _exec(userId, transferDto) {
     try {
       await this.exec(userId, transferDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -63,7 +63,7 @@ class DeleteUserController {
     } catch (error) {
       if (error instanceof DeleteDryRunError) {
         const resourcesCollection = error.errors.resources?.sole_owner;
-        if (resourcesCollection?.items.some(resourceEntity => !resourceEntity.isMetadataDecrypted())) {
+        if (resourcesCollection?.items.some((resourceEntity) => !resourceEntity.isMetadataDecrypted())) {
           const passphrase = this.getPassphraseService.getPassphrase(this.worker);
           await this.decryptMetadataService.decryptAllFromForeignModels(error.errors.resources.sole_owner, passphrase);
         }

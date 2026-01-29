@@ -16,26 +16,29 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import LoggedUserEntity from "../../user/actionLog/loggedUserEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'UpdatedPermission';
+const ENTITY_NAME = "UpdatedPermission";
 
 class UpdatedPermissionEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(updatedPermission, options = {}) {
-    super(EntitySchema.validate(
-      UpdatedPermissionEntity.ENTITY_NAME,
-      updatedPermission,
-      UpdatedPermissionEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        UpdatedPermissionEntity.ENTITY_NAME,
+        updatedPermission,
+        UpdatedPermissionEntity.getSchema(),
+      ),
+      options,
+    );
 
     // Associations
     if (this._props.user) {
-      this._user = new LoggedUserEntity(this._props.user, {clone: false});
+      this._user = new LoggedUserEntity(this._props.user, { clone: false });
       delete this._props.user;
     }
     if (this._props.group) {
-      this._group = new GroupEntity(this._props.group, {clone: false});
+      this._group = new GroupEntity(this._props.group, { clone: false });
       delete this._props.group;
     }
   }
@@ -46,28 +49,25 @@ class UpdatedPermissionEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "id",
-        "type"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["id", "type"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "type": {
-          "type": "integer",
-          "enum": [
+        type: {
+          type: "integer",
+          enum: [
             PermissionEntity.PERMISSION_READ,
             PermissionEntity.PERMISSION_UPDATE,
-            PermissionEntity.PERMISSION_OWNER
-          ]
+            PermissionEntity.PERMISSION_OWNER,
+          ],
         },
         // Associated models
-        "user": LoggedUserEntity.getSchema(),
-        "group": GroupEntity.getSchema()
-      }
+        user: LoggedUserEntity.getSchema(),
+        group: GroupEntity.getSchema(),
+      },
     };
   }
 

@@ -12,7 +12,7 @@
  * @since         4.12.0
  */
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {assertType, assertUuid} from "../../utils/assertions";
+import { assertType, assertUuid } from "../../utils/assertions";
 import ResourceTypeService from "../api/resourceType/resourceTypeService";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 
@@ -46,7 +46,11 @@ export default class UpdateResourceTypesService {
    * @returns {Promise<void>}
    */
   async undeleteAll(resourceTypesCollection) {
-    assertType(resourceTypesCollection, ResourceTypesCollection, "The resourceTypesCollection parameter should be a valid ResourceTypesCollection");
+    assertType(
+      resourceTypesCollection,
+      ResourceTypesCollection,
+      "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
+    );
     for (let i = 0; i < resourceTypesCollection.items.length; i++) {
       const resourceType = resourceTypesCollection.items[i];
       await this.undelete(resourceType.id);
@@ -69,7 +73,11 @@ export default class UpdateResourceTypesService {
    * @returns {Promise<void>}
    */
   async deleteAll(resourceTypesCollection) {
-    assertType(resourceTypesCollection, ResourceTypesCollection, "The resourceTypesCollection parameter should be a valid ResourceTypesCollection");
+    assertType(
+      resourceTypesCollection,
+      ResourceTypesCollection,
+      "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
+    );
     for (let i = 0; i < resourceTypesCollection.items.length; i++) {
       const resourceType = resourceTypesCollection.items[i];
       await this.delete(resourceType.id);
@@ -84,12 +92,16 @@ export default class UpdateResourceTypesService {
    * @returns {Promise<void>}
    */
   async updateAllDeletedStatus(resourceTypesCollection) {
-    assertType(resourceTypesCollection, ResourceTypesCollection, "The resourceTypesCollection parameter should be a valid ResourceTypesCollection");
-    const resourceTypesToDelete = resourceTypesCollection.items.filter(rt => rt.isDeleted());
-    const resourceTypesToUndelete = resourceTypesCollection.items.filter(rt => !rt.isDeleted());
+    assertType(
+      resourceTypesCollection,
+      ResourceTypesCollection,
+      "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
+    );
+    const resourceTypesToDelete = resourceTypesCollection.items.filter((rt) => rt.isDeleted());
+    const resourceTypesToUndelete = resourceTypesCollection.items.filter((rt) => !rt.isDeleted());
 
-    await this.deleteAll(new ResourceTypesCollection(resourceTypesToDelete, {validate: false}));
-    await this.undeleteAll(new ResourceTypesCollection(resourceTypesToUndelete, {validate: false}));
+    await this.deleteAll(new ResourceTypesCollection(resourceTypesToDelete, { validate: false }));
+    await this.undeleteAll(new ResourceTypesCollection(resourceTypesToUndelete, { validate: false }));
 
     await this.resourceTypeModel.updateLocalStorage();
   }

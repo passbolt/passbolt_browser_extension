@@ -13,11 +13,11 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindAndUpdateGroupsLocalStorageService from "./findAndUpdateGroupsLocalStorageService";
 import GroupsCollection from "../../model/entity/group/groupsCollection";
-import {defaultGroupsDtos} from "../../model/entity/group/groupsCollection.test.data";
+import { defaultGroupsDtos } from "../../model/entity/group/groupsCollection.test.data";
 import FindGroupsService from "./findGroupsService";
 
 beforeEach(() => {
@@ -27,7 +27,7 @@ beforeEach(() => {
 describe("FindAndUpdateGroupsLocalStorageService", () => {
   let findAndUpdateGroupsLocalStorageService, account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
     findAndUpdateGroupsLocalStorageService = new FindAndUpdateGroupsLocalStorageService(account, apiClientOptions);
@@ -36,11 +36,13 @@ describe("FindAndUpdateGroupsLocalStorageService", () => {
   });
 
   describe("::findAndUpdateAll", () => {
-    it("retrieves the groups from the API and store them into the local storage.", async() => {
+    it("retrieves the groups from the API and store them into the local storage.", async () => {
       expect.assertions(2);
       const groupsDtos = defaultGroupsDtos();
       const collection = new GroupsCollection(groupsDtos);
-      jest.spyOn(findAndUpdateGroupsLocalStorageService.findGroupsService, "findAllForLocalStorage").mockImplementation(() => collection);
+      jest
+        .spyOn(findAndUpdateGroupsLocalStorageService.findGroupsService, "findAllForLocalStorage")
+        .mockImplementation(() => collection);
 
       const entity = await findAndUpdateGroupsLocalStorageService.findAndUpdateAll();
 
@@ -49,13 +51,13 @@ describe("FindAndUpdateGroupsLocalStorageService", () => {
       expect(storageValue).toEqual(groupsDtos);
     });
 
-    it("overrides local storage with an update call.", async() => {
+    it("overrides local storage with an update call.", async () => {
       expect.assertions(6);
       const cachedGroupsDtos = defaultGroupsDtos();
       const groupsDtos = JSON.parse(JSON.stringify(cachedGroupsDtos));
 
       // Modify the copied object to make it different
-      groupsDtos.forEach(group => {
+      groupsDtos.forEach((group) => {
         group.name = `${group.name} (modified)`;
       });
 
@@ -71,7 +73,8 @@ describe("FindAndUpdateGroupsLocalStorageService", () => {
       expect(storageValue).not.toEqual(groupsDtos);
 
       // Mock the service call
-      jest.spyOn(findAndUpdateGroupsLocalStorageService.findGroupsService, "findAllForLocalStorage")
+      jest
+        .spyOn(findAndUpdateGroupsLocalStorageService.findGroupsService, "findAllForLocalStorage")
         .mockImplementation(() => collection);
 
       // Perform the update
@@ -89,13 +92,13 @@ describe("FindAndUpdateGroupsLocalStorageService", () => {
       expect(storageValue === groupsDtos).toBe(false);
     });
 
-    it("should return cached data if lock is not granted initially", async() => {
+    it("should return cached data if lock is not granted initially", async () => {
       expect.assertions(3);
 
       const groupsDto = defaultGroupsDtos();
       const groupsCollection = new GroupsCollection(groupsDto);
       let resolve;
-      const promise = new Promise(_resolve => resolve = _resolve);
+      const promise = new Promise((_resolve) => (resolve = _resolve));
       jest.spyOn(FindGroupsService.prototype, "findAllForLocalStorage").mockImplementation(() => promise);
 
       findAndUpdateGroupsLocalStorageService.findAndUpdateAll();

@@ -24,7 +24,7 @@ import Keyring from "../../../model/keyring";
 import ResourceModel from "../../../model/resource/resourceModel";
 import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import TagModel from "../../../model/tag/tagModel";
-import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import ResourceService from "../../api/resource/resourceService";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import ExecuteConcurrentlyService from "../../execute/executeConcurrentlyService";
@@ -79,15 +79,17 @@ class ImportResourcesService {
     const organizationSettings = await this.organisationSettingsModel.getOrFind();
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     await this.encryptSecrets(importResourcesFile, userId, privateKey);
-    importResourcesFile.mustImportFolders && await this.bulkImportFolders(importResourcesFile);
+    importResourcesFile.mustImportFolders && (await this.bulkImportFolders(importResourcesFile));
     const resourceToImportDto = importResourcesFile.importResources.toResourceCollectionImportDto();
     const resourcesCollection = new ResourcesCollection(resourceToImportDto);
-    const passwordExpirySettings = organizationSettings.isPluginEnabled("passwordExpiry") ? await this.passwordExpirySettingsGetOrFindService.exec() : null;
+    const passwordExpirySettings = organizationSettings.isPluginEnabled("passwordExpiry")
+      ? await this.passwordExpirySettingsGetOrFindService.exec()
+      : null;
     await this.applyDefaultExpiryDate(importResourcesFile, resourcesCollection, passwordExpirySettings);
     const clearTextMetadataResourcesCollection = new ResourcesCollection(resourceToImportDto);
     await this.encryptMetadata(resourcesCollection, passphrase);
     await this.bulkImportResources(importResourcesFile, resourcesCollection, clearTextMetadataResourcesCollection);
-    importResourcesFile.mustTag && await this.bulkTagResources(importResourcesFile);
+    importResourcesFile.mustTag && (await this.bulkTagResources(importResourcesFile));
     await this.progressService.finishStep(null, true);
     return importResourcesFile;
   }
@@ -104,11 +106,12 @@ class ImportResourcesService {
     await importParser.parseImport(importResourcesFile, resourceTypesCollection, metadataTypesSettings);
 
     // Now that we know about the content of the import, update the progress bar goals.
-    const progressGoal = 1 // Initialization
-      + (importResourcesFile.mustImportFolders ? importResourcesFile.importFolders.items.length : 0) // #folders create API calls
-      + importResourcesFile.importResources.items.length * 2 // #resource to encrypt + #resource create API calls
-      + 1 // #resource metadata encryption
-      + (importResourcesFile.mustTag ? importResourcesFile.importResources.items.length : 0); // #resources tag API calls
+    const progressGoal =
+      1 + // Initialization
+      (importResourcesFile.mustImportFolders ? importResourcesFile.importFolders.items.length : 0) + // #folders create API calls
+      importResourcesFile.importResources.items.length * 2 + // #resource to encrypt + #resource create API calls
+      1 + // #resource metadata encryption
+      (importResourcesFile.mustTag ? importResourcesFile.importResources.items.length : 0); // #resources tag API calls
     this.progressService.updateGoals(progressGoal);
   }
 
@@ -123,7 +126,7 @@ class ImportResourcesService {
    */
   async applyDefaultExpiryDate(importResourcesFile, resourcesCollection, passwordExpirySettings) {
     // For KDBX imports, null expiry dates are intentional (expires flag was false in KeePass)
-    if (importResourcesFile.fileType === 'kdbx') {
+    if (importResourcesFile.fileType === "kdbx") {
       return;
     }
 
@@ -144,7 +147,9 @@ class ImportResourcesService {
    * @returns {Promise<void>} A promise that resolves when the encryption process is complete.
    */
   async encryptMetadata(resourcesCollection, passphrase) {
-    await this.progressService.finishStep(i18n.t('Encrypting {{total}} metadata', {total: resourcesCollection.items.length}));
+    await this.progressService.finishStep(
+      i18n.t("Encrypting {{total}} metadata", { total: resourcesCollection.items.length }),
+    );
     await this.encryptMetadataService.encryptAllFromForeignModels(resourcesCollection, passphrase);
   }
 
@@ -163,13 +168,23 @@ class ImportResourcesService {
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     for (const importResourceEntity of importResourcesFile.importResources) {
       i++;
-      await this.progressService.finishStep(i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importResourcesFile.importResources.items.length}));
-      const resourceType = importResourceEntity.resourceTypeId ? resourceTypes.getFirstById(importResourceEntity.resourceTypeId) : null;
+      await this.progressService.finishStep(
+        i18n.t("Encrypting {{counter}}/{{total}}", {
+          counter: i,
+          total: importResourcesFile.importResources.items.length,
+        }),
+      );
+      const resourceType = importResourceEntity.resourceTypeId
+        ? resourceTypes.getFirstById(importResourceEntity.resourceTypeId)
+        : null;
       const secretDto = importResourceEntity.toSecretDto(resourceType);
       importResourceEntity.resetSecretProps(resourceType); //
-      const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
+      const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(
+        importResourceEntity.resourceTypeId,
+        secretDto,
+      );
       const data = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, [privateKey]);
-      const secret = new SecretEntity({data: data});
+      const secret = new SecretEntity({ data: data });
       importResourceEntity.secrets = new ResourceSecretsCollection([secret]);
     }
   }
@@ -190,9 +205,24 @@ class ImportResourcesService {
         break;
       }
       const foldersCollection = ExternalFoldersCollection.toFoldersCollection(externalFolderChunk);
-      const successCallback = (folderEntity, index) => this.handleImportFolderSuccess.bind(this)(importResourcesFile, ++importedCount, folderEntity, externalFolderChunk[index]);
-      const errorCallback = (error, index) => this.handleImportFolderError.bind(this)(importResourcesFile, ++importedCount, error, externalFolderChunk[index]);
-      await this.folderModel.bulkCreate(foldersCollection, {successCallback: successCallback, errorCallback: errorCallback});
+      const successCallback = (folderEntity, index) =>
+        this.handleImportFolderSuccess.bind(this)(
+          importResourcesFile,
+          ++importedCount,
+          folderEntity,
+          externalFolderChunk[index],
+        );
+      const errorCallback = (error, index) =>
+        this.handleImportFolderError.bind(this)(
+          importResourcesFile,
+          ++importedCount,
+          error,
+          externalFolderChunk[index],
+        );
+      await this.folderModel.bulkCreate(foldersCollection, {
+        successCallback: successCallback,
+        errorCallback: errorCallback,
+      });
     } while (++depth);
 
     // Set import folder reference
@@ -215,7 +245,12 @@ class ImportResourcesService {
     externalFolderEntity.id = folderEntity.id;
     importResourcesFile.importFolders.setFolderParentIdsByPath(externalFolderEntity.path, externalFolderEntity.id);
     importResourcesFile.importResources.setFolderParentIdsByPath(externalFolderEntity.path, externalFolderEntity.id);
-    await this.progressService.finishStep(i18n.t('Importing folders {{importedCount}}/{{total}}', {importedCount: importedCount, total: importResourcesFile.importFolders.items.length}));
+    await this.progressService.finishStep(
+      i18n.t("Importing folders {{importedCount}}/{{total}}", {
+        importedCount: importedCount,
+        total: importResourcesFile.importFolders.items.length,
+      }),
+    );
   }
 
   /**
@@ -227,7 +262,12 @@ class ImportResourcesService {
    * @private
    */
   async handleImportFolderError(importResourcesFile, importedCount, error, externalFolderEntity) {
-    await this.progressService.finishStep(i18n.t('Importing folders {{importedCount}}/{{total}}', {importedCount: importedCount, total: importResourcesFile.importFolders.items.length}));
+    await this.progressService.finishStep(
+      i18n.t("Importing folders {{importedCount}}/{{total}}", {
+        importedCount: importedCount,
+        total: importResourcesFile.importFolders.items.length,
+      }),
+    );
     importResourcesFile.importFoldersErrors.push(new ImportError("Cannot import folder", externalFolderEntity, error));
     importResourcesFile.importFolders.removeByPath(externalFolderEntity.path);
     importResourcesFile.importResources.removeByPath(externalFolderEntity.path);
@@ -240,10 +280,11 @@ class ImportResourcesService {
    * @private
    */
   async bulkTagResources(importResourcesFile) {
-    const tagsCollection = new TagsCollection([{slug: importResourcesFile.ref}]);
-    const resourcesIds = importResourcesFile.importResources.items.filter(importResourceEntity => importResourceEntity.id)
+    const tagsCollection = new TagsCollection([{ slug: importResourcesFile.ref }]);
+    const resourcesIds = importResourcesFile.importResources.items
+      .filter((importResourceEntity) => importResourceEntity.id)
       // Do not tag resource which failed.
-      .map(importResourceEntity => importResourceEntity.id);
+      .map((importResourceEntity) => importResourceEntity.id);
 
     if (!resourcesIds.length) {
       return;
@@ -266,7 +307,10 @@ class ImportResourcesService {
     let taggedCount = 0;
     const successCallback = () => this.handleTagResourceSuccess(importResourcesFile, ++taggedCount);
     const errorCallback = () => this.handleTagResourceError(importResourcesFile, ++taggedCount);
-    await this.tagModel.bulkTagResources(resourcesIds, tagsCollection, {successCallback: successCallback, errorCallback: errorCallback});
+    await this.tagModel.bulkTagResources(resourcesIds, tagsCollection, {
+      successCallback: successCallback,
+      errorCallback: errorCallback,
+    });
   }
 
   /**
@@ -276,7 +320,12 @@ class ImportResourcesService {
    * @private
    */
   async handleTagResourceSuccess(importResourcesFile, taggedCount) {
-    await this.progressService.finishStep(i18n.t('Tagging passwords {{taggedCount}}/{{total}}', {taggedCount: taggedCount, total: importResourcesFile.importResources.items.length}));
+    await this.progressService.finishStep(
+      i18n.t("Tagging passwords {{taggedCount}}/{{total}}", {
+        taggedCount: taggedCount,
+        total: importResourcesFile.importResources.items.length,
+      }),
+    );
   }
 
   /**
@@ -286,7 +335,12 @@ class ImportResourcesService {
    * @private
    */
   async handleTagResourceError(importResourcesFile, taggedCount) {
-    await this.progressService.finishStep(i18n.t('Tagging passwords {{taggedCount}}/{{total}}', {taggedCount: taggedCount, total: importResourcesFile.importResources.items.length}));
+    await this.progressService.finishStep(
+      i18n.t("Tagging passwords {{taggedCount}}/{{total}}", {
+        taggedCount: taggedCount,
+        total: importResourcesFile.importResources.items.length,
+      }),
+    );
   }
 
   /**
@@ -302,27 +356,38 @@ class ImportResourcesService {
     let importedCount = 0;
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
 
-    const callbacks = resourcesCollection.items.map((resourceEntity, index) => async() => {
+    const callbacks = resourcesCollection.items.map((resourceEntity, index) => async () => {
       try {
         let data;
         const resourceType = resourceTypesCollection.getFirstById(resourceEntity.resourceTypeId);
 
         if (resourceType.isV4()) {
-          data = resourceEntity.toV4Dto({secrets: true});
+          data = resourceEntity.toV4Dto({ secrets: true });
         } else {
-          data = resourceEntity.toDto({secrets: true});
+          data = resourceEntity.toDto({ secrets: true });
         }
 
-        const contain = {permission: true, favorite: true, tags: true, folder: true};
+        const contain = { permission: true, favorite: true, tags: true, folder: true };
         const createdResourceDto = await this.resourceService.create(data, contain);
         // Reuse the original non decrypted resource metadata.
-        createdResourceDto.metadata = clearTextMetadataResourcesCollection.items[index].metadata.toDto(ResourceMetadataEntity.DEFAULT_CONTAIN);
-        this.handleImportResourceSuccess(importResourcesFile, ++importedCount, createdResourceDto, importResourcesFile.importResources.items[index]);
+        createdResourceDto.metadata = clearTextMetadataResourcesCollection.items[index].metadata.toDto(
+          ResourceMetadataEntity.DEFAULT_CONTAIN,
+        );
+        this.handleImportResourceSuccess(
+          importResourcesFile,
+          ++importedCount,
+          createdResourceDto,
+          importResourcesFile.importResources.items[index],
+        );
 
         return createdResourceDto;
       } catch (error) {
         console.error(error);
-        this.handleImportResourceError(importResourcesFile, ++importedCount, error, importResourcesFile.importResources.items[index]
+        this.handleImportResourceError(
+          importResourcesFile,
+          ++importedCount,
+          error,
+          importResourcesFile.importResources.items[index],
         );
       }
     });
@@ -344,7 +409,12 @@ class ImportResourcesService {
    */
   async handleImportResourceSuccess(importResourcesFile, importedCount, createdResourceDto, externalResourceEntity) {
     externalResourceEntity.id = createdResourceDto.id;
-    await this.progressService.finishStep(i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount: importedCount, total: importResourcesFile.importResources.items.length}));
+    await this.progressService.finishStep(
+      i18n.t("Importing passwords {{importedCount}}/{{total}}", {
+        importedCount: importedCount,
+        total: importResourcesFile.importResources.items.length,
+      }),
+    );
   }
 
   /**
@@ -356,8 +426,15 @@ class ImportResourcesService {
    * @private
    */
   async handleImportResourceError(importResourcesFile, importedCount, error, externalResourceEntity) {
-    await this.progressService.finishStep(i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount: importedCount, total: importResourcesFile.importResources.items.length}));
-    importResourcesFile.importResourcesErrors.push(new ImportError("Cannot import resource", externalResourceEntity, error));
+    await this.progressService.finishStep(
+      i18n.t("Importing passwords {{importedCount}}/{{total}}", {
+        importedCount: importedCount,
+        total: importResourcesFile.importResources.items.length,
+      }),
+    );
+    importResourcesFile.importResourcesErrors.push(
+      new ImportError("Cannot import resource", externalResourceEntity, error),
+    );
   }
 }
 

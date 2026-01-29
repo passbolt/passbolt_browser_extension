@@ -13,16 +13,16 @@
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
-import {withAzureSsoSettings} from "../../controller/sso/getCurrentSsoSettingsController.test.data";
+import { withAzureSsoSettings } from "../../controller/sso/getCurrentSsoSettingsController.test.data";
 import GenerateSsoKitService from "./generateSsoKitService";
-import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
 import SsoKitTemporaryStorageService from "../session_storage/ssoKitTemporaryStorageService";
 import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntity";
 
-beforeEach(async() => {
+beforeEach(async () => {
   enableFetchMocks();
   jest.clearAllMocks();
 });
@@ -32,16 +32,18 @@ describe("GenerateSsoKitService", () => {
     const mockOrganisationSettings = (withSsoEnabled = true) => {
       const organizationSettings = anonymousOrganizationSettings();
       organizationSettings.passbolt.plugins.sso = {
-        enabled: withSsoEnabled
+        enabled: withSsoEnabled,
       };
-      fetch.doMockOnceIf(new RegExp('/settings.json'), () => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
+      fetch.doMockOnceIf(new RegExp("/settings.json"), () =>
+        mockApiResponse(organizationSettings, { servertime: Date.now() / 1000 }),
+      );
     };
 
-    const mockOrganisationSettingsSsoSettings = ssoSettings => {
-      fetch.doMockOnceIf(new RegExp('/sso/settings/current.json'), () => mockApiResponse(ssoSettings));
+    const mockOrganisationSettingsSsoSettings = (ssoSettings) => {
+      fetch.doMockOnceIf(new RegExp("/sso/settings/current.json"), () => mockApiResponse(ssoSettings));
     };
 
-    it("Should generate an SSO kit.", async() => {
+    it("Should generate an SSO kit.", async () => {
       expect.assertions(2);
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(withAzureSsoSettings());
@@ -53,13 +55,15 @@ describe("GenerateSsoKitService", () => {
       expect(SsoKitTemporaryStorageService.set).toHaveBeenCalledWith(expect.any(SsoKitServerPartEntity));
     });
 
-    it("Should flush local data when an exception is thrown.", async() => {
+    it("Should flush local data when an exception is thrown.", async () => {
       expect.assertions(3);
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(withAzureSsoSettings());
 
       const exepctedError = new Error("something went wrong");
-      SsoDataStorage.save.mockImplementation(() => { throw exepctedError; });
+      SsoDataStorage.save.mockImplementation(() => {
+        throw exepctedError;
+      });
       jest.spyOn(SsoKitTemporaryStorageService, "flush");
 
       await expect(GenerateSsoKitService.generate("test", "azure")).rejects.toThrow(exepctedError);

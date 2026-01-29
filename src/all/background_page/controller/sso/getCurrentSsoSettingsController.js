@@ -1,4 +1,3 @@
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -48,7 +47,7 @@ class GetCurrentSsoSettingsController {
    * @return {Promise<SsoSettingsEntity>}
    */
   async exec() {
-    const contains = {data: true};
+    const contains = { data: true };
     return this.ssoSettingsModel.getCurrent(contains);
   }
 }

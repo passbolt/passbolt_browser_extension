@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.1.0
  */
-import MetadataTrustedKeyEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity";
+import MetadataTrustedKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 
 export const TRUSTED_METADATA_KEY_LOCAL_STORAGE_KEY = "trusted_metadata_key";
@@ -83,9 +82,9 @@ class TrustedMetadataKeyLocalStorage {
     if (!metadataTrustedKey || !(metadataTrustedKey instanceof MetadataTrustedKeyEntity)) {
       throw new TypeError("Parameter `settings` should be of type MetadataTypesSettingsEntity");
     }
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       const metadataTrustedKeyDto = metadataTrustedKey.toDto();
-      await this._setBrowserStorage({[this.storageKey]: metadataTrustedKeyDto});
+      await this._setBrowserStorage({ [this.storageKey]: metadataTrustedKeyDto });
       TrustedMetadataKeyLocalStorage._runtimeCachedData[this.account.id] = metadataTrustedKeyDto;
     });
   }

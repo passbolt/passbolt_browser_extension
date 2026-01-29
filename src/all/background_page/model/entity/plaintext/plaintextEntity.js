@@ -12,8 +12,7 @@
  * @since         3.0.0
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
-import {RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
-
+import { RESOURCE_TYPE_PASSWORD_STRING_LEGACY_DEFINITION_SCHEMA } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 
 /**
  * This is a schema specificaly made up for 'password-string' resource type plaintext secret data validation.
@@ -38,8 +37,8 @@ class PlaintextEntity extends EntityV2 {
    * @returns {PlaintextEntity}
    */
   static createFromLegacyPlaintextSecret(password) {
-    const plaintextSecretDto = {password};
-    return new PlaintextEntity(plaintextSecretDto, {schema: PLAINTEXT_SECRET_SCHEMA_PASSWORD_STRING});
+    const plaintextSecretDto = { password };
+    return new PlaintextEntity(plaintextSecretDto, { schema: PLAINTEXT_SECRET_SCHEMA_PASSWORD_STRING });
   }
 
   /**
@@ -47,7 +46,7 @@ class PlaintextEntity extends EntityV2 {
    * @throws TypeError unsupported
    */
   static getSchema() {
-    throw new TypeError('Plaintext only support dynamic schemas, defined from resource type.');
+    throw new TypeError("Plaintext only support dynamic schemas, defined from resource type.");
   }
 
   /**

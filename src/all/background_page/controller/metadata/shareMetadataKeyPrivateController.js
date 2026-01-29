@@ -15,7 +15,7 @@
 import ShareMetadataKeyPrivateService from "../../service/metadata/shareMetadataKeyPrivateService";
 import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 class ShareMetadataKeyPrivateController {
   /**
@@ -40,10 +40,10 @@ class ShareMetadataKeyPrivateController {
   async _exec() {
     try {
       const result = await this.exec.apply(this, arguments);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

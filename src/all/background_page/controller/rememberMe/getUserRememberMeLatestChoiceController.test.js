@@ -12,9 +12,9 @@
  * @since         4.2.0
  */
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
-import {defaultRememberMeLatestChoiceDto} from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity.test.data";
+import { defaultRememberMeLatestChoiceDto } from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity.test.data";
 import UserRememberMeLatestChoiceLocalStorage from "../../service/local_storage/userRememberMeLatestChoiceLocalStorage";
 import GetUserRememberMeLatestChoiceController from "./getUserRememberMeLatestChoiceController";
 
@@ -23,7 +23,7 @@ describe("GetUserRememberMeLatestChoiceController", () => {
   const storage = new UserRememberMeLatestChoiceLocalStorage(account);
   const controller = new GetUserRememberMeLatestChoiceController(null, null, account);
 
-  it("Should return false if the local storage is not set", async() => {
+  it("Should return false if the local storage is not set", async () => {
     expect.assertions(1);
     storage.flush();
 
@@ -31,7 +31,7 @@ describe("GetUserRememberMeLatestChoiceController", () => {
     expect(result).toStrictEqual(false);
   });
 
-  it("Should return the value stored in local storage", async() => {
+  it("Should return the value stored in local storage", async () => {
     expect.assertions(2);
     storage.flush();
 
@@ -40,9 +40,11 @@ describe("GetUserRememberMeLatestChoiceController", () => {
     let result = await controller.exec();
     expect(result).toStrictEqual(false);
 
-    const entity2 = new UserRememberMeLatestChoiceEntity(defaultRememberMeLatestChoiceDto({
-      duration: -1
-    }));
+    const entity2 = new UserRememberMeLatestChoiceEntity(
+      defaultRememberMeLatestChoiceDto({
+        duration: -1,
+      }),
+    );
     storage.set(entity2);
     result = await controller.exec();
     expect(result).toStrictEqual(true);

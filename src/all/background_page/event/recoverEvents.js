@@ -33,99 +33,98 @@ import GetUserPassphrasePoliciesController from "../controller/setup/getUserPass
 import ReloadTabController from "../controller/tab/reloadTabController";
 import RedirectPostLoginController from "../controller/auth/redirectPostLoginController";
 
-
 const listen = (worker, apiClientOptions, account) => {
-  worker.port.on('passbolt.recover.first-install', async requestId => {
+  worker.port.on("passbolt.recover.first-install", async (requestId) => {
     const controller = new IsExtensionFirstInstallController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.recover.lost-passphrase-case', async requestId => {
+  worker.port.on("passbolt.recover.lost-passphrase-case", async (requestId) => {
     const controller = new IsLostPassphraseCaseController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.organization-settings.get', async requestId => {
+  worker.port.on("passbolt.organization-settings.get", async (requestId) => {
     const controller = new GetOrganizationSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.recover.start', async requestId => {
+  worker.port.on("passbolt.recover.start", async (requestId) => {
     const controller = new StartRecoverController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.locale.get', async requestId => {
+  worker.port.on("passbolt.locale.get", async (requestId) => {
     const controller = new GetAndInitializeAccountLocaleController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.locale.update-user-locale', async(requestId, localeDto) => {
+  worker.port.on("passbolt.locale.update-user-locale", async (requestId, localeDto) => {
     const controller = new SetSetupLocaleController(worker, requestId, apiClientOptions, account);
     await controller._exec(localeDto);
   });
 
-  worker.port.on('passbolt.recover.has-user-enabled-account-recovery', async requestId => {
+  worker.port.on("passbolt.recover.has-user-enabled-account-recovery", async (requestId) => {
     const controller = new HasRecoverUserEnabledAccountRecoveryController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.recover.import-key', async(requestId, armoredKey) => {
+  worker.port.on("passbolt.recover.import-key", async (requestId, armoredKey) => {
     const controller = new ImportRecoverPrivateKeyController(worker, requestId, apiClientOptions);
     await controller._exec(armoredKey);
   });
 
-  worker.port.on('passbolt.recover.verify-passphrase', async(requestId, passphrase) => {
+  worker.port.on("passbolt.recover.verify-passphrase", async (requestId, passphrase) => {
     const controller = new VerifyImportedKeyPassphraseController(worker, requestId);
     await controller._exec(passphrase);
   });
 
-  worker.port.on('passbolt.recover.set-security-token', async(requestId, securityTokenDto) => {
+  worker.port.on("passbolt.recover.set-security-token", async (requestId, securityTokenDto) => {
     const controller = new SetSetupSecurityTokenController(worker, requestId);
     await controller._exec(securityTokenDto);
   });
 
-  worker.port.on('passbolt.recover.complete', async requestId => {
+  worker.port.on("passbolt.recover.complete", async (requestId) => {
     const controller = new CompleteRecoverController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.recover.sign-in', async(requestId, rememberMe) => {
+  worker.port.on("passbolt.recover.sign-in", async (requestId, rememberMe) => {
     const controller = new SignInSetupController(worker, requestId, apiClientOptions);
     await controller._exec(rememberMe);
   });
 
-  worker.port.on('passbolt.recover.generate-account-recovery-request-key', async(requestId, generateGpgKeyPairDto) => {
+  worker.port.on("passbolt.recover.generate-account-recovery-request-key", async (requestId, generateGpgKeyPairDto) => {
     const controller = new GenerateRecoverAccountRecoveryRequestKeyController(worker, requestId, apiClientOptions);
     await controller._exec(generateGpgKeyPairDto);
   });
 
-  worker.port.on('passbolt.recover.initiate-account-recovery-request', async requestId => {
+  worker.port.on("passbolt.recover.initiate-account-recovery-request", async (requestId) => {
     const controller = new RequestAccountRecoveryController(worker, apiClientOptions, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.keyring.get-key-info', async(requestId, armoredKey) => {
+  worker.port.on("passbolt.keyring.get-key-info", async (requestId, armoredKey) => {
     const controller = new GetKeyInfoController(worker, requestId);
     await controller._exec(armoredKey);
   });
 
-  worker.port.on('passbolt.recover.validate-private-key', async(requestId, key) => {
+  worker.port.on("passbolt.recover.validate-private-key", async (requestId, key) => {
     const controller = new ValidatePrivateGpgKeyRecoverController(worker, requestId);
     await controller._exec(key);
   });
 
-  worker.port.on('passbolt.recover.request-help-credentials-lost', async requestId => {
+  worker.port.on("passbolt.recover.request-help-credentials-lost", async (requestId) => {
     const controller = new AbortAndRequestHelp(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.recover.get-user-passphrase-policies', async requestId => {
+  worker.port.on("passbolt.recover.get-user-passphrase-policies", async (requestId) => {
     const controller = new GetUserPassphrasePoliciesController(worker, requestId);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.tab.reload', async requestId => {
+  worker.port.on("passbolt.tab.reload", async (requestId) => {
     const controller = new ReloadTabController(worker, requestId);
     await controller._exec();
   });
@@ -136,9 +135,9 @@ const listen = (worker, apiClientOptions, account) => {
    * @listens passbolt.auth.post-login-redirect
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.post-login-redirect', async requestId => {
+  worker.port.on("passbolt.auth.post-login-redirect", async (requestId) => {
     const controller = new RedirectPostLoginController(worker, requestId, account);
     await controller._exec();
   });
 };
-export const RecoverEvents = {listen};
+export const RecoverEvents = { listen };

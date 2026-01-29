@@ -15,7 +15,7 @@ import Port from "./port";
 
 describe("Port", () => {
   describe("Port::constructor", () => {
-    it("Should create new port, emit and respond to messages", async() => {
+    it("Should create new port, emit and respond to messages", async () => {
       expect.assertions(5);
       // data mocked
       const port = {
@@ -23,10 +23,10 @@ describe("Port", () => {
           addListener: jest.fn(),
         },
         onDisconnect: {
-          addListener: () => jest.fn()
+          addListener: () => jest.fn(),
         },
         postMessage: jest.fn(),
-        disconnect: jest.fn()
+        disconnect: jest.fn(),
       };
       const portServiceWorker = new Port(port);
       const callback = jest.fn();
@@ -37,13 +37,13 @@ describe("Port", () => {
       portServiceWorker.disconnect();
       // expectations
       expect(port.onMessage.addListener).toHaveBeenCalled();
-      expect(portServiceWorker._listeners["test"]).toStrictEqual([{callback: callback, name: "test", once: false}]);
+      expect(portServiceWorker._listeners["test"]).toStrictEqual([{ callback: callback, name: "test", once: false }]);
       expect(Object.keys(portServiceWorker._listeners).length).toBe(1);
       expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify(["hello"]));
       expect(port.disconnect).toHaveBeenCalled();
     });
 
-    it("Should raise an error if port is null or undefined", async() => {
+    it("Should raise an error if port is null or undefined", async () => {
       expect.assertions(2);
 
       try {
@@ -61,7 +61,7 @@ describe("Port", () => {
   });
 
   describe("Port::request", () => {
-    it("Should post a message and wait a success result", async() => {
+    it("Should post a message and wait a success result", async () => {
       expect.assertions(7);
       // data mocked
       const port = {
@@ -69,29 +69,31 @@ describe("Port", () => {
           addListener: jest.fn(),
         },
         onDisconnect: {
-          addListener: () => jest.fn()
+          addListener: () => jest.fn(),
         },
-        postMessage: jest.fn()
+        postMessage: jest.fn(),
       };
       const portServiceWorker = new Port(port);
       const message = "request_message";
       jest.spyOn(portServiceWorker, "emit");
       // process
-      const promise = portServiceWorker.request(message, {data: "data"});
+      const promise = portServiceWorker.request(message, { data: "data" });
       const requestId = Object.keys(portServiceWorker._listeners)[0];
       // expectations
-      expect(portServiceWorker.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
-      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
-      expect(portServiceWorker._listeners[requestId]).toStrictEqual([{callback: expect.anything(), name: requestId, once: true}]);
+      expect(portServiceWorker.emit).toHaveBeenCalledWith(message, requestId, { data: "data" });
+      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, { data: "data" }]));
+      expect(portServiceWorker._listeners[requestId]).toStrictEqual([
+        { callback: expect.anything(), name: requestId, once: true },
+      ]);
       expect(Object.keys(portServiceWorker._disconnectListeners).length).toBe(1);
-      const dataReceived = {data: "dataReceived"};
+      const dataReceived = { data: "dataReceived" };
       portServiceWorker._onMessage(JSON.stringify([requestId, "SUCCESS", dataReceived]));
       expect(Object.keys(portServiceWorker._listeners).length).toBe(0);
       expect(Object.keys(portServiceWorker._disconnectListeners).length).toBe(0);
       expect(await promise).toStrictEqual(dataReceived);
     });
 
-    it("Should post a message and wait an error result", async() => {
+    it("Should post a message and wait an error result", async () => {
       expect.assertions(6);
       // data mocked
       const port = {
@@ -99,21 +101,23 @@ describe("Port", () => {
           addListener: jest.fn(),
         },
         onDisconnect: {
-          addListener: () => jest.fn()
+          addListener: () => jest.fn(),
         },
-        postMessage: jest.fn()
+        postMessage: jest.fn(),
       };
       const portServiceWorker = new Port(port);
       const message = "request_message";
       jest.spyOn(portServiceWorker, "emit");
       // process
-      const promise = portServiceWorker.request(message, {data: "data"});
+      const promise = portServiceWorker.request(message, { data: "data" });
       const requestId = Object.keys(portServiceWorker._listeners)[0];
       // expectations
-      expect(portServiceWorker.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
-      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
-      expect(portServiceWorker._listeners[requestId]).toStrictEqual([{callback: expect.anything(), name: requestId, once: true}]);
-      const dataReceived = {data: "dataReceived"};
+      expect(portServiceWorker.emit).toHaveBeenCalledWith(message, requestId, { data: "data" });
+      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, { data: "data" }]));
+      expect(portServiceWorker._listeners[requestId]).toStrictEqual([
+        { callback: expect.anything(), name: requestId, once: true },
+      ]);
+      const dataReceived = { data: "dataReceived" };
       portServiceWorker._onMessage(JSON.stringify([requestId, "ERROR", dataReceived]));
       expect(Object.keys(portServiceWorker._listeners).length).toBe(0);
       expect(Object.keys(portServiceWorker._disconnectListeners).length).toBe(0);
@@ -124,7 +128,7 @@ describe("Port", () => {
       }
     });
 
-    it("Should post a message and wait an error result when the port is disconnected", async() => {
+    it("Should post a message and wait an error result when the port is disconnected", async () => {
       expect.assertions(5);
       // data mocked
       const port = {
@@ -132,20 +136,22 @@ describe("Port", () => {
           addListener: jest.fn(),
         },
         onDisconnect: {
-          addListener: () => jest.fn()
+          addListener: () => jest.fn(),
         },
-        postMessage: jest.fn()
+        postMessage: jest.fn(),
       };
       const portServiceWorker = new Port(port);
       const message = "request_message";
       jest.spyOn(portServiceWorker, "emit");
       // process
-      const promise = portServiceWorker.request(message, {data: "data"});
+      const promise = portServiceWorker.request(message, { data: "data" });
       const requestId = Object.keys(portServiceWorker._listeners)[0];
       // expectations
-      expect(portServiceWorker.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
-      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
-      expect(portServiceWorker._listeners[requestId]).toStrictEqual([{callback: expect.anything(), name: requestId, once: true}]);
+      expect(portServiceWorker.emit).toHaveBeenCalledWith(message, requestId, { data: "data" });
+      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, { data: "data" }]));
+      expect(portServiceWorker._listeners[requestId]).toStrictEqual([
+        { callback: expect.anything(), name: requestId, once: true },
+      ]);
       expect(portServiceWorker._disconnectListeners[requestId]).toStrictEqual(expect.anything());
       portServiceWorker._onDisconnect();
       try {

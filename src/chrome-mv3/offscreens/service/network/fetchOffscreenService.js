@@ -45,14 +45,17 @@ export default class FetchOffscreenService {
    * @param {{resource: string, options: object}} data the fetch parameters
    * @returns {Promise<object>}
    */
-  static async handleFetchRequest({resource, options}) {
+  static async handleFetchRequest({ resource, options }) {
     const validationErrors = FetchOffscreenService.validateMessageData(resource, options);
     if (validationErrors) {
       return validationErrors;
     }
 
     // Update the body to fit the data type to send (JSON or FORM DATA)
-    options.body = options.body?.dataType === FETCH_OFFSCREEN_DATA_TYPE_JSON ? options.body.data : FormDataUtils.arrayToFormData(options.body.data);
+    options.body =
+      options.body?.dataType === FETCH_OFFSCREEN_DATA_TYPE_JSON
+        ? options.body.data
+        : FormDataUtils.arrayToFormData(options.body.data);
     await FetchOffscreenService.increaseAwaitingRequests();
     try {
       const response = await fetch(resource, options);
@@ -111,7 +114,7 @@ export default class FetchOffscreenService {
     return {
       data: {
         name: error?.name,
-        message: error?.message || "FetchOffscreenService: an unexpected error occurred"
+        message: error?.message || "FetchOffscreenService: an unexpected error occurred",
       },
       type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR,
       target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER,
@@ -132,7 +135,7 @@ export default class FetchOffscreenService {
       redirected: response.redirected,
       url: response.url,
       ok: response.ok,
-      text: await response.text()
+      text: await response.text(),
     };
   }
 

@@ -12,7 +12,7 @@
  * @since         4.8.0
  */
 
-import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
+import { defaultGroupDto } from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 
 /**
  * Build groups dtos.
@@ -27,9 +27,8 @@ import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/grou
 export const defaultGroupsDtos = (groupsCount = 10, options = {}) => {
   const dtos = [];
   for (let i = 0; i < groupsCount; i++) {
-    const groupDto = defaultGroupDto({name: `Group ${i}`}, options);
+    const groupDto = defaultGroupDto({ name: `Group ${i}` }, options);
     dtos.push(groupDto);
   }
   return dtos;
 };
-

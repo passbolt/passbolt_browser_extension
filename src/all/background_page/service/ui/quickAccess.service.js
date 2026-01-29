@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.4
  */
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 
@@ -31,19 +31,19 @@ async function openInDetachedMode(queryParameters = []) {
   const workerId = uuidv4();
 
   const url = await buildDetachedQuickacessUrl(queryParameters, workerId);
-  const {top, left} = await buildDetachedQuickaccessPosition();
+  const { top, left } = await buildDetachedQuickaccessPosition();
 
   const type = "popup";
   const width = QUICKACCESS_WINDOW_WIDTH;
   const height = QUICKACCESS_WINDOW_HEIGHT;
-  const windowCreateData = {url: url, type: type, left: left, top: top, width: width, height: height};
+  const windowCreateData = { url: url, type: type, left: left, top: top, width: width, height: height };
   const quickAccessWindow = await browser.windows.create(windowCreateData);
 
   // Register the worker in the session storage
   await addWorkerQuickAccess(workerId, quickAccessWindow.tabs[0].id);
 
   // On firefox 90, with dual screen, the window is not positioned properly and it requires to be moved manually.
-  browser.windows.update(quickAccessWindow.id, {left: left, top: top});
+  browser.windows.update(quickAccessWindow.id, { left: left, top: top });
   return quickAccessWindow;
 }
 
@@ -59,7 +59,7 @@ async function addWorkerQuickAccess(workerId, tabId) {
     name: "QuickAccess",
     tabId: tabId,
     frameId: 0,
-    status: WorkerEntity.STATUS_WAITING_CONNECTION
+    status: WorkerEntity.STATUS_WAITING_CONNECTION,
   };
   await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
 }
@@ -74,7 +74,9 @@ async function buildDetachedQuickacessUrl(queryParameters, workerId) {
   const browserExtensionUrl = await browser.action.getPopup({});
   const quickaccessUrl = new URL(browserExtensionUrl);
   quickaccessUrl.searchParams.set("passbolt", workerId);
-  queryParameters.forEach(queryParameter => quickaccessUrl.searchParams.append(queryParameter.name, queryParameter.value));
+  queryParameters.forEach((queryParameter) =>
+    quickaccessUrl.searchParams.append(queryParameter.name, queryParameter.value),
+  );
   return quickaccessUrl.href;
 }
 
@@ -86,7 +88,7 @@ async function buildDetachedQuickaccessPosition() {
   const currentWindow = await browser.windows.getCurrent();
   const left = currentWindow.left + currentWindow.width - QUICKACCESS_WINDOW_WIDTH;
   const top = currentWindow.top;
-  return {top: top, left: left};
+  return { top: top, left: left };
 }
 
 export const QuickAccessService = {

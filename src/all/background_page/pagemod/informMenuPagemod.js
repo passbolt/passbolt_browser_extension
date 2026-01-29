@@ -12,10 +12,10 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {InformMenuEvents} from "../event/informMenuEvents";
+import { InformMenuEvents } from "../event/informMenuEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
-import {AccountEvents} from "../event/accountEvents";
+import { AccountEvents } from "../event/accountEvents";
 
 class InFormMenu extends Pagemod {
   /**
@@ -43,7 +43,7 @@ class InFormMenu extends Pagemod {
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const name = this.appName;
       for (const event of this.events) {
-        event.listen({port, tab, name}, apiClientOptions, account);
+        event.listen({ port, tab, name }, apiClientOptions, account);
       }
     } catch (error) {
       /*
@@ -51,7 +51,7 @@ class InFormMenu extends Pagemod {
        * The following controllers won't work as expected:
        * - RequestHelpCredentialsLostController
        */
-      console.error('InFormMenu::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error("InFormMenu::attach legacy account cannot be retrieved, please contact your administrator.");
       console.error(error);
     }
   }

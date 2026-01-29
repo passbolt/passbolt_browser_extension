@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 class ActivateSsoSettingsController {
   /**

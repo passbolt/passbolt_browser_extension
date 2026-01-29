@@ -19,9 +19,9 @@ beforeEach(() => {
 
 describe("ReloadTabController", () => {
   describe("ReloadTabController::exec", () => {
-    it("Should reload the tab.", async() => {
-      const tab = {id: 1};
-      const controller = new ReloadTabController({tab: tab}, null);
+    it("Should reload the tab.", async () => {
+      const tab = { id: 1 };
+      const controller = new ReloadTabController({ tab: tab }, null);
       jest.spyOn(browser.tabs, "reload");
 
       expect.assertions(1);
@@ -29,7 +29,7 @@ describe("ReloadTabController", () => {
       expect(browser.tabs.reload).toHaveBeenCalledWith(tab.id);
     });
 
-    it("Should not add the account to the local storage if the complete API request fails.", async() => {
+    it("Should not add the account to the local storage if the complete API request fails.", async () => {
       const controller = new ReloadTabController(null, null);
       const promise = controller.exec();
 

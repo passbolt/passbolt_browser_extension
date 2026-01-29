@@ -13,18 +13,17 @@
  */
 
 export class ControllerMessageEventHandlerMock {
-  exec() {
-  }
+  exec() {}
 }
 
 export class ControllerWithResponseMessageEventHandlerMock {
   exec() {
-    return 'controller-exec-output';
+    return "controller-exec-output";
   }
 }
 
 export class ControllerMessageEventHandlerErrorExecMock {
   exec() {
-    throw new Error('Execution error');
+    throw new Error("Execution error");
   }
 }

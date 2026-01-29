@@ -1,0 +1,115 @@
+# Dependencies
+node_modules/
+vendor/
+bower_components/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+*.min.js
+*.min.css
+
+# Coverage and test
+coverage/
+.nyc_output/
+
+# IDE and system
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Package files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+npm-shrinkwrap.json
+
+# Environment
+.env
+.env.*
+
+# Documentation
+*.md
+docs/
+README.md
+CHANGELOG.md
+LICENSE
+
+# Data files
+*.json
+*.yaml
+*.yml
+*.xml
+*.csv
+*.tsv
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Images and media
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.ico
+*.webp
+*.mp4
+*.webm
+
+# Fonts
+*.woff
+*.woff2
+*.ttf
+*.eot
+
+# Generated files
+*.generated.*
+*-generated.*
+*.auto.*
+*-auto.*
+
+# Passbolt specific
+src/data/legacy/**
+src/migrations/**
+public/lib/**
+src/vendor/**
+webextension/vendor/**
+styleguide/vendor/**
+
+# OpenPGP files
+*.asc
+*.gpg
+*.pgp
+*.key
+
+# Test fixtures with specific formatting
+test/fixtures/**
+__fixtures__/**
+test/mocks/**
+__mocks__/**
+
+# Config files that might have specific formatting
+.eslintrc*
+.babelrc*
+.stylelintrc*
+tsconfig.json
+jsconfig.json
+
+# Keep original formatting for these
+CHANGELOG.md
+AUTHORS
+CONTRIBUTORS

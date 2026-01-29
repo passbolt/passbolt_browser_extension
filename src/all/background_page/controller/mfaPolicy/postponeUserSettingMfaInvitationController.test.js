@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
-import PostponeUserSettingMfaInvitationController from './postponeUserSettingMfaInvitationController';
+import PostponeUserSettingInvitationService from "../../service/invitation/postponeUserSettingInvitationService";
+import PostponeUserSettingMfaInvitationController from "./postponeUserSettingMfaInvitationController";
 
 describe("PostponeUserSettingMFAInvitationController", () => {
   it("can set the MFA Policy enrollment invitation as postponed", () => {

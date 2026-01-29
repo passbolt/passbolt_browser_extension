@@ -32,11 +32,10 @@ class SsoKitClientPartEntity extends Entity {
     //Because of the type of the data in the dto, we cannot use JSON serialization to make a copy of the object, however we can use `structuredClone` to proceed
     const clonedDto = structuredClone(ssoUserClientDataDto);
 
-    super(EntitySchema.validate(
-      SsoKitClientPartEntity.ENTITY_NAME,
-      clonedDto,
-      SsoKitClientPartEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(SsoKitClientPartEntity.ENTITY_NAME, clonedDto, SsoKitClientPartEntity.getSchema()),
+      options,
+    );
 
     SsoKitClientPartEntity.validateNek(clonedDto.nek);
     SsoKitClientPartEntity.validateIv(clonedDto.iv1);
@@ -59,7 +58,11 @@ class SsoKitClientPartEntity extends Entity {
   static validateNek(nek) {
     const entityValidationError = new EntityValidationError();
     if (!(nek instanceof CryptoKey)) {
-      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to be an instance of CryptoKey.");
+      entityValidationError.addError(
+        "nek",
+        "type",
+        "SsoKitClientPartEntity expects an nek to be an instance of CryptoKey.",
+      );
     }
 
     if (nek.extractable) {
@@ -67,7 +70,11 @@ class SsoKitClientPartEntity extends Entity {
     }
 
     if (nek?.algorithm?.name !== "AES-GCM") {
-      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to use the algorithm 'AES-GSM'.");
+      entityValidationError.addError(
+        "nek",
+        "type",
+        "SsoKitClientPartEntity expects an nek to use the algorithm 'AES-GSM'.",
+      );
     }
 
     if (nek?.algorithm?.length !== 256) {
@@ -75,15 +82,27 @@ class SsoKitClientPartEntity extends Entity {
     }
 
     if (!nek?.usages?.includes("encrypt")) {
-      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to have the capability to encrypt.");
+      entityValidationError.addError(
+        "nek",
+        "type",
+        "SsoKitClientPartEntity expects an nek to have the capability to encrypt.",
+      );
     }
 
     if (!nek?.usages?.includes("decrypt")) {
-      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to have the capability to decrypt.");
+      entityValidationError.addError(
+        "nek",
+        "type",
+        "SsoKitClientPartEntity expects an nek to have the capability to decrypt.",
+      );
     }
 
     if (nek?.usages?.length !== 2) {
-      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to only have the following capabilities: encrypt and decrypt.");
+      entityValidationError.addError(
+        "nek",
+        "type",
+        "SsoKitClientPartEntity expects an nek to only have the following capabilities: encrypt and decrypt.",
+      );
     }
 
     if (entityValidationError.hasErrors()) {
@@ -99,7 +118,11 @@ class SsoKitClientPartEntity extends Entity {
   static validateIv(iv) {
     const entityValidationError = new EntityValidationError();
     if (!(iv instanceof Uint8Array)) {
-      entityValidationError.addError("iv", "type", "SsoKitClientPartEntity expects IVs to be an instance of Uint8Array.");
+      entityValidationError.addError(
+        "iv",
+        "type",
+        "SsoKitClientPartEntity expects IVs to be an instance of Uint8Array.",
+      );
     }
 
     if (iv.length !== 12) {
@@ -138,46 +161,46 @@ class SsoKitClientPartEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": ["nek", "iv1", "iv2", "secret"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["nek", "iv1", "iv2", "secret"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "provider": {
-          "type": "string",
-          "enum": SsoSettingsEntity.AVAILABLE_PROVIDERS,
+        provider: {
+          type: "string",
+          enum: SsoSettingsEntity.AVAILABLE_PROVIDERS,
         },
-        "nek": {
-          "type": "object",
+        nek: {
+          type: "object",
         },
-        "iv1": {
-          "type": "object",
+        iv1: {
+          type: "object",
         },
-        "iv2": {
-          "type": "object",
+        iv2: {
+          type: "object",
         },
-        "secret": {
-          "type": "string"
+        secret: {
+          type: "string",
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
-      }
+      },
     };
   }
 

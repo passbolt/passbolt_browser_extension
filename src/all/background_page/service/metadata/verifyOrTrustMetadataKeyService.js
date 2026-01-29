@@ -13,7 +13,7 @@
  */
 
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
-import {assertString} from "../../utils/assertions";
+import { assertString } from "../../utils/assertions";
 import GetMetadataTrustedKeyService from "./getMetadataTrustedKeyService";
 import ConfirmMetadataKeyContentCodeService from "./ConfirmMetadataKeyContentCodeService";
 import TrustMetadataKeyService from "./trustMetadataKeyService";
@@ -76,7 +76,10 @@ class VerifyOrTrustMetadataKeyService {
     }
 
     // Request the user to trust the key
-    const userConfirmation = await this.confirmMetadataKeyContentCodeService.requestConfirm(metadataTrustedKey, activeMetadataKey);
+    const userConfirmation = await this.confirmMetadataKeyContentCodeService.requestConfirm(
+      metadataTrustedKey,
+      activeMetadataKey,
+    );
     if (userConfirmation) {
       await this.trustMetadataKeyService.trust(activeMetadataPrivateKey, passphrase);
     } else {

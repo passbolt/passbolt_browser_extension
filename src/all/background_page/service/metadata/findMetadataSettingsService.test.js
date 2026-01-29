@@ -13,17 +13,15 @@
  */
 
 import FindMetadataSettingsService from "./findMetadataSettingsService";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MetadataTypesSettingsApiService from "../api/metadata/metadataTypesSettingsApiService";
 import {
   defaultMetadataTypesSettingsV4Dto,
-  defaultMetadataTypesSettingsV50FreshDto
+  defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import {defaultMetadataKeysSettingsDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
-import MetadataTypesSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
+import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 import MetadataKeysSettingsApiService from "../api/metadata/metadataKeysSettingsApiService";
 
 beforeEach(() => {
@@ -33,16 +31,18 @@ beforeEach(() => {
 describe("FindMetadataSettingsService", () => {
   let findMetadataTypesSettingsService, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     apiClientOptions = defaultApiClientOptions();
     findMetadataTypesSettingsService = new FindMetadataSettingsService(apiClientOptions);
   });
 
   describe("::findTypesSettings", () => {
-    it("retrieve the metadata types settings.", async() => {
+    it("retrieve the metadata types settings.", async () => {
       expect.assertions(2);
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
-      jest.spyOn(MetadataTypesSettingsApiService.prototype, "findSettings").mockImplementation(() => metadataTypesSettingsDto);
+      jest
+        .spyOn(MetadataTypesSettingsApiService.prototype, "findSettings")
+        .mockImplementation(() => metadataTypesSettingsDto);
 
       const entity = await findMetadataTypesSettingsService.findTypesSettings();
 
@@ -50,7 +50,7 @@ describe("FindMetadataSettingsService", () => {
       expect(entity.toDto()).toEqual(metadataTypesSettingsDto);
     });
 
-    it("marshall the API data with local default", async() => {
+    it("marshall the API data with local default", async () => {
       expect.assertions(2);
       jest.spyOn(MetadataTypesSettingsApiService.prototype, "findSettings").mockImplementation(() => {});
 
@@ -63,10 +63,12 @@ describe("FindMetadataSettingsService", () => {
   });
 
   describe("::findKeysSettings", () => {
-    it("retrieve the metadata keys settings.", async() => {
+    it("retrieve the metadata keys settings.", async () => {
       expect.assertions(2);
       const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
-      jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => metadataKeysSettingsDto);
+      jest
+        .spyOn(MetadataKeysSettingsApiService.prototype, "findSettings")
+        .mockImplementation(() => metadataKeysSettingsDto);
 
       const entity = await findMetadataTypesSettingsService.findKeysSettings();
 
@@ -74,7 +76,7 @@ describe("FindMetadataSettingsService", () => {
       expect(entity.toDto()).toEqual(metadataKeysSettingsDto);
     });
 
-    it("marshall the API data with local default", async() => {
+    it("marshall the API data with local default", async () => {
       expect.assertions(2);
       jest.spyOn(MetadataKeysSettingsApiService.prototype, "findSettings").mockImplementation(() => {});
 

@@ -13,64 +13,64 @@
  */
 
 import PownedPasswordService from "./pownedService";
-import ExternalServiceUnavailableError from '../../error/externalServiceUnavailableError';
-import ExternalServiceError from '../../error/externalServiceError';
+import ExternalServiceUnavailableError from "../../error/externalServiceUnavailableError";
+import ExternalServiceError from "../../error/externalServiceError";
 
-describe('PownedPasswordService', () => {
-  describe('checkIfPasswordIsPowned', () => {
-    it('should return a rejected promise if the input password is not a string', async() => {
+describe("PownedPasswordService", () => {
+  describe("checkIfPasswordIsPowned", () => {
+    it("should return a rejected promise if the input password is not a string", async () => {
       expect.assertions(1);
       try {
         await PownedPasswordService.checkIfPasswordIsPowned(123);
       } catch (error) {
-        expect(error.message).toEqual('Input password must be a string.');
+        expect(error.message).toEqual("Input password must be a string.");
       }
     });
 
-    it('should return a rejected promise if the pwnedpasswords API is unavailable', async() => {
+    it("should return a rejected promise if the pwnedpasswords API is unavailable", async () => {
       expect.assertions(1);
       try {
         // Mock the fetch function to throw an error
-        jest.spyOn(global, 'fetch').mockImplementation(() => {
+        jest.spyOn(global, "fetch").mockImplementation(() => {
           throw new Error();
         });
-        await PownedPasswordService.checkIfPasswordIsPowned('password');
+        await PownedPasswordService.checkIfPasswordIsPowned("password");
       } catch (error) {
         expect(error).toBeInstanceOf(ExternalServiceUnavailableError);
       }
     });
 
-    it('should return a rejected promise if the pwnedpasswords API returns a non-200 status code', async() => {
+    it("should return a rejected promise if the pwnedpasswords API returns a non-200 status code", async () => {
       expect.assertions(1);
       // Mock the fetch function to return a response with a non-200 status code
-      jest.spyOn(global, 'fetch').mockImplementation(() => ({
+      jest.spyOn(global, "fetch").mockImplementation(() => ({
         status: 500,
-        text: () => Promise.resolve('')
+        text: () => Promise.resolve(""),
       }));
       try {
-        await PownedPasswordService.checkIfPasswordIsPowned('password');
+        await PownedPasswordService.checkIfPasswordIsPowned("password");
       } catch (error) {
         expect(error).toBeInstanceOf(ExternalServiceError);
       }
     });
 
-    it('should return the number of times the password has been pwned if it is present in the pwnedpasswords API', async() => {
+    it("should return the number of times the password has been pwned if it is present in the pwnedpasswords API", async () => {
       // Mock the fetch function to return a response with a 200 status code and a pwned password
-      jest.spyOn(global, 'fetch').mockImplementation(() => ({
+      jest.spyOn(global, "fetch").mockImplementation(() => ({
         status: 200,
-        text: () => Promise.resolve('suffix:count')
+        text: () => Promise.resolve("suffix:count"),
       }));
-      const count = await PownedPasswordService.checkIfPasswordIsPowned('password');
+      const count = await PownedPasswordService.checkIfPasswordIsPowned("password");
       expect(count).toEqual(count);
     });
 
-    it('should return 0 if the password is not present in the pwnedpasswords API', async() => {
+    it("should return 0 if the password is not present in the pwnedpasswords API", async () => {
       // Mock the fetch function to return a response with a 200 status code and no pwned password
-      jest.spyOn(global, 'fetch').mockImplementation(() => ({
+      jest.spyOn(global, "fetch").mockImplementation(() => ({
         status: 200,
-        text: () => Promise.resolve('')
+        text: () => Promise.resolve(""),
       }));
-      const count = await PownedPasswordService.checkIfPasswordIsPowned('password');
+      const count = await PownedPasswordService.checkIfPasswordIsPowned("password");
       expect(count).toEqual(0);
     });
   });

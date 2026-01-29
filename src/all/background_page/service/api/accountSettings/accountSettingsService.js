@@ -12,7 +12,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const RESOURCE_SERVICE_RESOURCE_NAME = 'account/settings';
+const RESOURCE_SERVICE_RESOURCE_NAME = "account/settings";
 
 class AccountSettingsService extends AbstractService {
   /**
@@ -44,7 +44,7 @@ class AccountSettingsService extends AbstractService {
    */
   async findAllThemes() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/themes`);
-    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const response = await this.apiClient.fetchAndHandleResponse("GET", url);
     return response.body;
   }
 
@@ -57,10 +57,10 @@ class AccountSettingsService extends AbstractService {
    * @public
    */
   async updateTheme(name) {
-    const data = {value: name};
+    const data = { value: name };
     const bodyString = this.apiClient.buildBody(data);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/themes`);
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
     return response.body;
   }
 
@@ -73,10 +73,10 @@ class AccountSettingsService extends AbstractService {
    * @public
    */
   async updateLocale(locale) {
-    const data = {value: locale};
+    const data = { value: locale };
     const bodyString = this.apiClient.buildBody(data);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/locales`);
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
     return response.body;
   }
 }

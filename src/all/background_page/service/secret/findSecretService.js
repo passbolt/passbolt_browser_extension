@@ -11,10 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import SecretService from "../api/secret/secretService";
 import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
-
 
 class FindSecretService {
   /**

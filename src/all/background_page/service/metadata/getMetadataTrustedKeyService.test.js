@@ -13,10 +13,8 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {
-  defaultMetadataTrustedKeyDto
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultMetadataTrustedKeyDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity.test.data";
 import GetMetadataTrustedKeyService from "./getMetadataTrustedKeyService";
 import TrustedMetadataKeyLocalStorage from "../local_storage/trustedMetadataKeyLocalStorage";
 import MetadataTrustedKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTrustedKeyEntity";
@@ -36,16 +34,16 @@ describe("GetMetadataTrustedKeyService", () => {
   });
 
   describe("::get", () => {
-    it("returns null if nothing is stored in the local storage.", async() => {
+    it("returns null if nothing is stored in the local storage.", async () => {
       expect.assertions(1);
       const result = await service.get();
       expect(result).toBeNull();
     });
 
-    it("returns content stored in the local storage.", async() => {
+    it("returns content stored in the local storage.", async () => {
       const settingsDto = defaultMetadataTrustedKeyDto();
       expect.assertions(1);
-      browser.storage.local.set({[storage.storageKey]: settingsDto});
+      browser.storage.local.set({ [storage.storageKey]: settingsDto });
       const result = await service.get();
       expect(result).toEqual(new MetadataTrustedKeyEntity(settingsDto));
     });

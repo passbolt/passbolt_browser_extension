@@ -19,11 +19,11 @@ import GetAccountController from "../controller/account/getAccountController";
  * @param {ApiClientOptions} apiClientOptions The api client options
  * @param {AccountEntity} account The account completing the account recovery
  */
-const listen = function(worker, apiClientOptions, account) {
-  worker.port.on('passbolt.account.get', async requestId => {
+const listen = function (worker, apiClientOptions, account) {
+  worker.port.on("passbolt.account.get", async (requestId) => {
     const controller = new GetAccountController(worker, requestId, account);
     await controller._exec();
   });
 };
 
-export const AccountEvents = {listen};
+export const AccountEvents = { listen };

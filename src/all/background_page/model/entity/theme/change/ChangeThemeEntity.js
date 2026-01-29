@@ -15,18 +15,14 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import ThemeEntity from "../themeEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'ChangeTheme';
+const ENTITY_NAME = "ChangeTheme";
 
 class ChangeThemeEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(changeThemeDto, options = {}) {
-    super(EntitySchema.validate(
-      ChangeThemeEntity.ENTITY_NAME,
-      changeThemeDto,
-      ChangeThemeEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(ChangeThemeEntity.ENTITY_NAME, changeThemeDto, ChangeThemeEntity.getSchema()), options);
   }
 
   /**
@@ -36,13 +32,11 @@ class ChangeThemeEntity extends Entity {
   static getSchema() {
     const themeEntitySchema = ThemeEntity.getSchema();
     return {
-      "type": "object",
-      "required": [
-        "name",
-      ],
-      "properties": {
-        "name": themeEntitySchema.properties.name
-      }
+      type: "object",
+      required: ["name"],
+      properties: {
+        name: themeEntitySchema.properties.name,
+      },
     };
   }
 
@@ -59,7 +53,6 @@ class ChangeThemeEntity extends Entity {
   get name() {
     return this._props.name;
   }
-
 
   /*
    * ==================================================

@@ -14,7 +14,7 @@
 
 import AbstractService from "../abstract/abstractService";
 
-const USER_PASSPRHASE_POLICIES_RESOURCE_NAME = 'user-passphrase-policies/settings';
+const USER_PASSPRHASE_POLICIES_RESOURCE_NAME = "user-passphrase-policies/settings";
 
 class UserPassphrasePoliciesService extends AbstractService {
   /**

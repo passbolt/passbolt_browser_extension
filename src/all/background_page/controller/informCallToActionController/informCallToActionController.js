@@ -13,7 +13,7 @@
  */
 import User from "../../model/user";
 import ResourceModel from "../../model/resource/resourceModel";
-import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import { QuickAccessService } from "../../service/ui/quickAccess.service";
 import WorkerService from "../../service/worker/workerService";
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
@@ -45,10 +45,9 @@ class InformCallToActionController {
       this.worker.port.emit(requestId, "SUCCESS", suggestedResourcesCount.length);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(requestId, 'ERROR', error);
+      this.worker.port.emit(requestId, "ERROR", error);
     }
   }
-
 
   /**
    * Whenever the user executes the inform call-to-action
@@ -59,24 +58,23 @@ class InformCallToActionController {
       const status = await this.checkAuthStatusService.checkAuthStatus(false);
       if (!status.isAuthenticated) {
         const queryParameters = [
-          {name: "uiMode", value: "detached"},
-          {name: "feature", value: "login"}
+          { name: "uiMode", value: "detached" },
+          { name: "feature", value: "login" },
         ];
         await QuickAccessService.openInDetachedMode(queryParameters);
         this.worker.port.emit(requestId, "SUCCESS");
       } else if (status.isMfaRequired) {
-        browser.tabs.create({url: User.getInstance().settings.getDomain(), active: true});
+        browser.tabs.create({ url: User.getInstance().settings.getDomain(), active: true });
         this.worker.port.emit(requestId, "SUCCESS");
       } else {
-        const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
-        webIntegrationWorker.port.emit('passbolt.in-form-menu.open');
+        const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
+        webIntegrationWorker.port.emit("passbolt.in-form-menu.open");
       }
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(requestId, 'ERROR', error);
+      this.worker.port.emit(requestId, "ERROR", error);
     }
   }
 }
-
 
 export default InformCallToActionController;

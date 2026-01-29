@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import {BrowserExtensionIconService} from "../ui/browserExtensionIcon.service";
+import { BrowserExtensionIconService } from "../ui/browserExtensionIcon.service";
 import Toolbar from "../../model/toolbar";
-import {TabController as tabsController} from "../../controller/tabsController";
+import { TabController as tabsController } from "../../controller/tabsController";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import CheckAuthStatusService from "../auth/checkAuthStatusService";
@@ -123,7 +123,7 @@ class ToolbarService {
   async resetSuggestedResourcesBadge() {
     this.tabUrl = null;
     // Should do nothing if the user is not authenticated
-    if (!await this.isUserAuthenticated()) {
+    if (!(await this.isUserAuthenticated())) {
       return;
     }
     BrowserExtensionIconService.setSuggestedResourcesCount(0);
@@ -138,13 +138,13 @@ class ToolbarService {
       const account = await GetActiveAccountService.get();
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       // Should do nothing if the user is not authenticated
-      if (!await this.isUserAuthenticated()) {
+      if (!(await this.isUserAuthenticated())) {
         return;
       }
 
       this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
 
-      const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
+      const tabs = await browser.tabs.query({ active: true, lastFocusedWindow: true });
       const currentTab = tabs?.[0];
 
       const tabUrl = currentTab?.url;
@@ -181,7 +181,10 @@ class ToolbarService {
     } catch (error) {
       console.error(error);
       // Service is unavailable, do nothing...
-      Log.write({level: 'debug', message: 'Could not check if the user is authenticated, the service is unavailable.'});
+      Log.write({
+        level: "debug",
+        message: "Could not check if the user is authenticated, the service is unavailable.",
+      });
       // The user is not authenticated
       return false;
     }

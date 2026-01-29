@@ -38,10 +38,10 @@ class ResourceDeleteController {
   async _exec(resourceIds) {
     try {
       await this.exec(resourceIds);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -52,12 +52,12 @@ class ResourceDeleteController {
    */
   async exec(resourceIds) {
     const steps = 2;
-    this.progressService.title = i18n.t("Delete {{count}} resource(s)", {count: resourceIds.length});
-    this.progressService.start(steps, i18n.t('Deleting Resource(s)'));
+    this.progressService.title = i18n.t("Delete {{count}} resource(s)", { count: resourceIds.length });
+    this.progressService.start(steps, i18n.t("Deleting Resource(s)"));
 
     try {
       await this.resourceDeleteService.deleteResources(resourceIds);
-      this.progressService.finishStep(i18n.t('Done!'), true);
+      this.progressService.finishStep(i18n.t("Done!"), true);
     } finally {
       this.progressService.close();
     }

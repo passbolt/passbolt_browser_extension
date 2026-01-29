@@ -11,29 +11,35 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
+import { ApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import AbstractService from "./abstractService";
 
 describe("Abstract service", () => {
   it("constructor works", () => {
-    const options = new ApiClientOptions().setBaseUrl('https://test.passbolt.test/');
-    const service = new AbstractService(options, 'test');
+    const options = new ApiClientOptions().setBaseUrl("https://test.passbolt.test/");
+    const service = new AbstractService(options, "test");
 
     // Basics
-    let t = () => { service.assertValidId('test'); };
+    let t = () => {
+      service.assertValidId("test");
+    };
     expect(t).toThrow(TypeError);
-    t = () => { service.assertNonEmptyData(null); };
+    t = () => {
+      service.assertNonEmptyData(null);
+    };
     expect(t).toThrow(TypeError);
   });
 
   it("constructor works", () => {
-    const options = new ApiClientOptions().setBaseUrl('https://test.passbolt.test/');
-    const service = new AbstractService(options, 'test');
+    const options = new ApiClientOptions().setBaseUrl("https://test.passbolt.test/");
+    const service = new AbstractService(options, "test");
 
-    const formated = service.formatContainOptions(
-      {"user": true, "user.profile": false},
-      ['user', 'user.profile', 'user.profile.avatar', 'gpgkey'],
-    );
-    expect(formated).toEqual({"contain[user]": "1", "contain[user.profile]": "0"});
+    const formated = service.formatContainOptions({ user: true, "user.profile": false }, [
+      "user",
+      "user.profile",
+      "user.profile.avatar",
+      "gpgkey",
+    ]);
+    expect(formated).toEqual({ "contain[user]": "1", "contain[user.profile]": "0" });
   });
 });

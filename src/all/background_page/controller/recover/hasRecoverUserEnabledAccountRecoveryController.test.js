@@ -14,7 +14,7 @@
 
 import {
   startAccountRecoverDto,
-  startWithApprovedAccountRecoveryAccountRecoverDto
+  startWithApprovedAccountRecoveryAccountRecoverDto,
 } from "../../model/entity/account/accountRecoverEntity.test.data";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import HasRecoverUserEnabledAccountRecoveryController from "./hasRecoverUserEnabledAccountRecoveryController";
@@ -22,29 +22,39 @@ import AccountTemporarySessionStorageService from "../../service/sessionStorage/
 
 describe("HasRecoverUserEnabledAccountRecoveryController", () => {
   describe("HasRecoverUserEnabledAccountRecoveryController::exec", () => {
-    it("Should return true if the user has approved the program", async() => {
+    it("Should return true if the user has approved the program", async () => {
       const account = new AccountRecoverEntity(startWithApprovedAccountRecoveryAccountRecoverDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new HasRecoverUserEnabledAccountRecoveryController({port: {_port: {name: "test"}}}, null);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new HasRecoverUserEnabledAccountRecoveryController(
+        { port: { _port: { name: "test" } } },
+        null,
+      );
 
       expect.assertions(1);
       const hasApproved = await controller.exec();
       expect(hasApproved).toStrictEqual(true);
     });
 
-    it("Should return false if the user didn't subscribe to the program yet", async() => {
+    it("Should return false if the user didn't subscribe to the program yet", async () => {
       const account = new AccountRecoverEntity(startAccountRecoverDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new HasRecoverUserEnabledAccountRecoveryController({port: {_port: {name: "test"}}}, null);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new HasRecoverUserEnabledAccountRecoveryController(
+        { port: { _port: { name: "test" } } },
+        null,
+      );
 
       expect.assertions(1);
       const hasApproved = await controller.exec();
       expect(hasApproved).toStrictEqual(false);
     });
 
-    it("Should raise an error if no account has been found.", async() => {
+    it("Should raise an error if no account has been found.", async () => {
       const account = new AccountRecoverEntity(startAccountRecoverDto());
-      const controller = new HasRecoverUserEnabledAccountRecoveryController({port: {_port: {name: "test"}}}, null, account);
+      const controller = new HasRecoverUserEnabledAccountRecoveryController(
+        { port: { _port: { name: "test" } } },
+        null,
+        account,
+      );
       expect.assertions(1);
       try {
         await controller.exec();

@@ -12,11 +12,9 @@
  * @since         4.9.4
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {
-  resourceTypesCollectionDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import GetResourceTypesController from "./getResourceTypesController";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 
@@ -28,12 +26,14 @@ jest.mock("../../service/passphrase/getPassphraseService");
 
 describe("GetResourceTypesController", () => {
   describe("GetResourceTypesController::exec", () => {
-    it("Get or find resource types.", async() => {
+    it("Get or find resource types.", async () => {
       expect.assertions(2);
 
       const resourceTypesDto = resourceTypesCollectionDto();
       const controller = new GetResourceTypesController(null, null, defaultApiClientOptions());
-      jest.spyOn(controller.resourceTypeModel, "getOrFindAll").mockImplementationOnce(() => new ResourceTypesCollection(resourceTypesDto));
+      jest
+        .spyOn(controller.resourceTypeModel, "getOrFindAll")
+        .mockImplementationOnce(() => new ResourceTypesCollection(resourceTypesDto));
 
       const resourceTypesCollection = await controller.exec();
       expect(resourceTypesCollection).toBeInstanceOf(ResourceTypesCollection);

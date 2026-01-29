@@ -23,10 +23,10 @@ export default class CreateOffscreenDocumentService {
    */
   static async createIfNotExistOffscreenDocument() {
     // Create offscreen document if it does not already exist.
-    await navigator.locks.request(LOCK_CREATE_OFFSCREEN_DOCUMENT, async() => {
+    await navigator.locks.request(LOCK_CREATE_OFFSCREEN_DOCUMENT, async () => {
       const existingContexts = await chrome.runtime.getContexts({
         contextTypes: ["OFFSCREEN_DOCUMENT"],
-        documentUrls: [chrome.runtime.getURL(OFFSCREEN_URL)]
+        documentUrls: [chrome.runtime.getURL(OFFSCREEN_URL)],
       });
 
       if (existingContexts.length > 0) {
@@ -36,7 +36,8 @@ export default class CreateOffscreenDocumentService {
       await chrome.offscreen.createDocument({
         url: OFFSCREEN_URL,
         reasons: [FETCH_OFFSCREEN_DOCUMENT_REASON, CLIPBOARD_OFFSCREEN_DOCUMENT_REASON],
-        justification: "1. Read/write clipboard as clipboard API is unavailable in MV3 service workers 2. Perform requests to self hosted Passbolt API serving invalid certificate.",
+        justification:
+          "1. Read/write clipboard as clipboard API is unavailable in MV3 service workers 2. Perform requests to self hosted Passbolt API serving invalid certificate.",
       });
     });
   }

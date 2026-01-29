@@ -8,9 +8,9 @@ import i18n from "../sdk/i18n";
 
 class ExternalServiceError extends Error {
   constructor(message) {
-    message = message || i18n.t('The external service raised an error');
+    message = message || i18n.t("The external service raised an error");
     super(message);
-    this.name = 'ExternalServiceError';
+    this.name = "ExternalServiceError";
   }
 }
 

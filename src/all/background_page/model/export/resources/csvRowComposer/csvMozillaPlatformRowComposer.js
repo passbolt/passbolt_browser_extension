@@ -30,15 +30,15 @@ class CsvMozillaPlatformRowComposer extends AbstractRowComposer {
    */
   static get mapping() {
     return {
-      "uris": "url",
-      "username": "username",
-      "secret_clear": "password",
-      "httpRealm": "httpRealm",
-      "formActionOrigin": "formActionOrigin",
-      "guid": "guid",
-      "timeCreated": "timeCreated",
-      "timeLastUsed": "timeLastUsed",
-      "timePasswordChanged": "timePasswordChanged"
+      uris: "url",
+      username: "username",
+      secret_clear: "password",
+      httpRealm: "httpRealm",
+      formActionOrigin: "formActionOrigin",
+      guid: "guid",
+      timeCreated: "timeCreated",
+      timeLastUsed: "timeLastUsed",
+      timePasswordChanged: "timePasswordChanged",
     };
   }
 

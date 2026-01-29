@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.3.0
  */
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import FindAndUpdateResourcesLocalStorage from "../../service/resource/findAndUpdateResourcesLocalStorageService";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
@@ -39,10 +39,10 @@ class UpdateResourceLocalStorageByFolderParentIdController {
   async _exec(parentFolderId) {
     try {
       await this.exec(parentFolderId);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

@@ -15,12 +15,12 @@
 import FindResourceDetailsController from "./findResourceDetailsController";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -29,7 +29,7 @@ beforeEach(() => {
 
 describe("FindResourceDetailsController", () => {
   describe("FindResourceDetailsController::exec", () => {
-    it("Should return the resoruce matching the given id with all the necessary contains", async() => {
+    it("Should return the resoruce matching the given id with all the necessary contains", async () => {
       expect.assertions(5);
 
       const expectedUser = defaultUserDto();
@@ -38,7 +38,7 @@ describe("FindResourceDetailsController", () => {
         modifier: expectedUser,
       });
 
-      fetch.doMockOnceIf(new RegExp(`resources/${resource.id}.json`), async request => {
+      fetch.doMockOnceIf(new RegExp(`resources/${resource.id}.json`), async (request) => {
         const url = new URL(request.url);
         const containCreator = url.searchParams.get("contain[creator]");
         const containModifier = url.searchParams.get("contain[modifier]");
@@ -47,7 +47,6 @@ describe("FindResourceDetailsController", () => {
         expect(containModifier).toStrictEqual("1");
         return await mockApiResponse(resource);
       });
-
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
@@ -60,7 +59,7 @@ describe("FindResourceDetailsController", () => {
       expect(dto.modifier).toStrictEqual(expectedUser);
     });
 
-    it("Should throw an error if the resource ID is not a valid UUID", async() => {
+    it("Should throw an error if the resource ID is not a valid UUID", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());

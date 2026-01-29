@@ -1,4 +1,3 @@
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -13,11 +12,11 @@
  * @since         4.12.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindMetadataMigrateResourcesService from "./findMetadataMigrateResourcesService";
 import PassboltResponsePaginationHeaderEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponsePaginationHeaderEntity";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
-import {defaultPassboltResponseDto} from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity.test.data";
+import { defaultPassboltResponseDto } from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -25,7 +24,7 @@ beforeEach(() => {
 
 describe("FindMetadataMigrateResourcesService", () => {
   describe("::findMigrateDetails", () => {
-    it("should return the count details of the resources to migrate", async() => {
+    it("should return the count details of the resources to migrate", async () => {
       expect.assertions(4);
 
       const service = new FindMetadataMigrateResourcesService(defaultApiClientOptions());
@@ -40,12 +39,14 @@ describe("FindMetadataMigrateResourcesService", () => {
       expect(result._props.page).toStrictEqual(pagination._props.page);
     });
 
-    it("should not catch error and let throw the error from the API if any", async() => {
+    it("should not catch error and let throw the error from the API if any", async () => {
       expect.assertions(1);
 
       const service = new FindMetadataMigrateResourcesService(defaultApiClientOptions());
       const error = new Error("Something went wrong");
-      jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockImplementation(() => { throw error; });
+      jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockImplementation(() => {
+        throw error;
+      });
 
       expect(() => service.findMigrateDetails()).rejects.toStrictEqual(error);
     });

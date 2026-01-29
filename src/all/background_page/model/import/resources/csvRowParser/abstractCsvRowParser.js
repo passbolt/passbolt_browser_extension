@@ -40,7 +40,7 @@ class AbstractCsvRowParser {
   static canParse(csvFields) {
     const score = 0;
     const requiredFields = ["name", "secret_clear"];
-    const csvHasField = fieldName => csvFields.some(csvFieldName => this.mapping[fieldName] === csvFieldName);
+    const csvHasField = (fieldName) => csvFields.some((csvFieldName) => this.mapping[fieldName] === csvFieldName);
 
     // Check that the row parser match the required properties
     const hasRequiredFieldsReducer = (contain, fieldName) => contain && csvHasField(fieldName);

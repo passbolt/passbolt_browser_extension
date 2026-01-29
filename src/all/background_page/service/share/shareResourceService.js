@@ -14,7 +14,7 @@
 
 import i18n from "../../sdk/i18n";
 import Keyring from "../../model/keyring";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import ShareService from "../api/share/shareService";
@@ -25,7 +25,7 @@ import {
   assertNonEmptyArray,
   assertNonEmptyString,
   assertString,
-  assertType
+  assertType,
 } from "../../utils/assertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
@@ -35,9 +35,7 @@ import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import EncryptMetadataService from "../metadata/encryptMetadataService";
 import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
 import FindResourcesService from "../resource/findResourcesService";
-import {
-  RESOURCE_TYPE_VERSION_5
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import { RESOURCE_TYPE_VERSION_5 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import NeededSecretsCollection from "../../model/entity/secret/needed/neededSecretsCollection";
 import SecretsCollection from "passbolt-styleguide/src/shared/models/entity/secret/secretsCollection";
@@ -76,7 +74,11 @@ class ShareResourceService {
     assertArray(resourcesIds, 'The parameter "resourcesIds" should be an array');
     assertNonEmptyArray(resourcesIds, 'The parameter "resourcesIds" should be a non empty array');
     assertArrayUUID(resourcesIds, 'The parameter "resourcesIds" should contain only uuid');
-    assertType(permissionChanges, PermissionChangesCollection, 'The parameter "permissionChanges" should be of type PermissionChangesCollection');
+    assertType(
+      permissionChanges,
+      PermissionChangesCollection,
+      'The parameter "permissionChanges" should be of type PermissionChangesCollection',
+    );
     assertString(passphrase, 'The parameter "passphrase" should be a string');
     assertNonEmptyString(passphrase, 'The parameter "passphrase" should not be empty');
 
@@ -106,8 +108,9 @@ class ShareResourceService {
     this.progressService.finishStep(i18n.t("Updating resources metadata"), true);
     const resourcesToUpdate = await this.getOrFindResourcesService.getOrFindByIds(resourcesIds);
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
-    const resourceIdMetadataToShare = permissionChanges.items.filter(permissionChange => !permissionChange.isDeleted)
-      .map(permissionChange => permissionChange.acoForeignKey);
+    const resourceIdMetadataToShare = permissionChanges.items
+      .filter((permissionChange) => !permissionChange.isDeleted)
+      .map((permissionChange) => permissionChange.acoForeignKey);
 
     resourceTypes.filterByResourceTypeVersion(RESOURCE_TYPE_VERSION_5);
     resourcesToUpdate.filterByResourceTypes(resourceTypes); // v4 resources have their metadata decrypted.
@@ -127,11 +130,20 @@ class ShareResourceService {
     // Update the resources.
     const concurrentlyExecutionService = new ExecuteConcurrentlyService();
     let updatingCounter = 0;
-    const updateCallbacks = resourceToUpdate => {
-      this.progressService.updateStepMessage(i18n.t("Updating resources metadata {{counter}}/{{total}}", {counter: ++updatingCounter, total: resourcesToUpdate.length}));
-      return this.resourceService.update(resourceToUpdate.id, resourceToUpdate.toDto(), ResourceLocalStorage.DEFAULT_CONTAIN);
+    const updateCallbacks = (resourceToUpdate) => {
+      this.progressService.updateStepMessage(
+        i18n.t("Updating resources metadata {{counter}}/{{total}}", {
+          counter: ++updatingCounter,
+          total: resourcesToUpdate.length,
+        }),
+      );
+      return this.resourceService.update(
+        resourceToUpdate.id,
+        resourceToUpdate.toDto(),
+        ResourceLocalStorage.DEFAULT_CONTAIN,
+      );
     };
-    const callbacks = resourcesToUpdate.items.map(resourceToUpdate => () => updateCallbacks(resourceToUpdate));
+    const callbacks = resourcesToUpdate.items.map((resourceToUpdate) => () => updateCallbacks(resourceToUpdate));
     await concurrentlyExecutionService.execute(callbacks, 5);
   }
 
@@ -145,17 +157,25 @@ class ShareResourceService {
     this.progressService.finishStep(i18n.t("Calculating secrets"), true);
     const concurrentlyExecutionService = new ExecuteConcurrentlyService();
     const neededSecretsDto = [];
-    const resourceIds = [...new Set(permissionChanges.extract('aco_foreign_key'))];
+    const resourceIds = [...new Set(permissionChanges.extract("aco_foreign_key"))];
     let simulatingCounter = 0;
 
-
-    const shareCallbacks = async resourceId => {
-      this.progressService.updateStepMessage(i18n.t("Calculating secrets {{counter}}/{{total}}", {counter: ++simulatingCounter, total: resourceIds.length}));
-      const resourcePermissionChanges = permissionChanges.items.filter(permissionChange => permissionChange.acoForeignKey === resourceId);
+    const shareCallbacks = async (resourceId) => {
+      this.progressService.updateStepMessage(
+        i18n.t("Calculating secrets {{counter}}/{{total}}", {
+          counter: ++simulatingCounter,
+          total: resourceIds.length,
+        }),
+      );
+      const resourcePermissionChanges = permissionChanges.items.filter(
+        (permissionChange) => permissionChange.acoForeignKey === resourceId,
+      );
       const simulateResult = await this.shareService.simulateShareResource(resourceId, resourcePermissionChanges);
-      simulateResult.changes.added?.forEach(user => neededSecretsDto.push({resource_id: resourceId, user_id: user.User.id}));
+      simulateResult.changes.added?.forEach((user) =>
+        neededSecretsDto.push({ resource_id: resourceId, user_id: user.User.id }),
+      );
     };
-    const callbacks = resourceIds.map(resourceId => () => shareCallbacks(resourceId));
+    const callbacks = resourceIds.map((resourceId) => () => shareCallbacks(resourceId));
     await concurrentlyExecutionService.execute(callbacks, 5);
 
     return new NeededSecretsCollection(neededSecretsDto);
@@ -184,11 +204,11 @@ class ShareResourceService {
       const secretData = await EncryptMessageService.encrypt(
         secretsSerialized[neededSecret.resourceId],
         userPublicKeys[neededSecret.userId],
-        [userPrivateKey]
+        [userPrivateKey],
       );
       secretsDto.push({
         ...neededSecret.toDto(),
-        data: secretData
+        data: secretData,
       });
     }
 
@@ -212,7 +232,9 @@ class ShareResourceService {
     this.progressService.finishStep(i18n.t("Decrypting secrets"), true);
     let decryptingCounter = 0;
     for (const resource of resources) {
-      this.progressService.updateStepMessage(i18n.t("Decrypting secrets {{counter}}/{{total}}", {counter: ++decryptingCounter, total: resources.length}));
+      this.progressService.updateStepMessage(
+        i18n.t("Decrypting secrets {{counter}}/{{total}}", { counter: ++decryptingCounter, total: resources.length }),
+      );
       const secretDataMessage = await OpenpgpAssertion.readMessageOrFail(resource.secrets.items[0].data);
       secretsSerialized[resource.id] = await DecryptMessageService.decrypt(secretDataMessage, userPrivateKey);
     }
@@ -232,7 +254,7 @@ class ShareResourceService {
     const userIds = [...new Set(neededSecrets.extract("user_id"))];
     const keyring = new Keyring();
 
-    this.progressService.finishStep(i18n.t('Synchronizing keyring'), true);
+    this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
     await keyring.sync();
 
     for (const userId of userIds) {
@@ -253,16 +275,23 @@ class ShareResourceService {
   async saveChanges(permissionChanges, secrets) {
     this.progressService.finishStep(i18n.t("Sharing resources"), true);
     const concurrentlyExecutionService = new ExecuteConcurrentlyService();
-    const resourcesIds = [...new Set(permissionChanges.extract('aco_foreign_key'))];
+    const resourcesIds = [...new Set(permissionChanges.extract("aco_foreign_key"))];
     let sharingCounter = 0;
 
-    const shareCallbacks = resourceId => {
-      this.progressService.updateStepMessage(i18n.t("Sharing resources {{counter}}/{{total}}", {counter: ++sharingCounter, total: resourcesIds.length}));
-      const resourcePermissionChanges = permissionChanges.items.filter(permissionChange => permissionChange.acoForeignKey === resourceId);
-      const resourceSecrets = secrets.items.filter(secret => secret.resourceId === resourceId);
-      return this.shareService.shareResource(resourceId, {permissions: resourcePermissionChanges, secrets: resourceSecrets});
+    const shareCallbacks = (resourceId) => {
+      this.progressService.updateStepMessage(
+        i18n.t("Sharing resources {{counter}}/{{total}}", { counter: ++sharingCounter, total: resourcesIds.length }),
+      );
+      const resourcePermissionChanges = permissionChanges.items.filter(
+        (permissionChange) => permissionChange.acoForeignKey === resourceId,
+      );
+      const resourceSecrets = secrets.items.filter((secret) => secret.resourceId === resourceId);
+      return this.shareService.shareResource(resourceId, {
+        permissions: resourcePermissionChanges,
+        secrets: resourceSecrets,
+      });
     };
-    const callbacks = resourcesIds.map(resourceId => () => shareCallbacks(resourceId));
+    const callbacks = resourcesIds.map((resourceId) => () => shareCallbacks(resourceId));
     await concurrentlyExecutionService.execute(callbacks, 5);
   }
 }

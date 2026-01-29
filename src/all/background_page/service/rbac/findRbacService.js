@@ -31,7 +31,7 @@ export default class FindRbacService {
    * @returns {Promise<RbacsCollection>}
    */
   async findMe() {
-    const response = await this.rbacApiService.findMe({ui_action: true, action: true});
-    return new RbacsCollection(response.body, {clone: false});
+    const response = await this.rbacApiService.findMe({ ui_action: true, action: true });
+    return new RbacsCollection(response.body, { clone: false });
   }
 }

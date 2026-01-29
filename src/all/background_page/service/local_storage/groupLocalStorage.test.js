@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.7.0
  */
-import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
+import { defaultGroupDto } from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import GroupsCollection from "../../model/entity/group/groupsCollection";
-import {defaultGroupsDtos} from "../../model/entity/group/groupsCollection.test.data";
+import { defaultGroupsDtos } from "../../model/entity/group/groupsCollection.test.data";
 import GroupLocalStorage from "./groupLocalStorage";
 import GroupEntity from "../../model/entity/group/groupEntity";
 
@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe("GroupLocalStorage", () => {
   let account, storage;
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     storage = new GroupLocalStorage(account);
     // flush account related storage before each.
@@ -63,7 +63,7 @@ describe("GroupLocalStorage", () => {
     it("should return false if the cached data for the account is empty", () => {
       const accountId = "some-account-id";
       GroupLocalStorage._runtimeCachedData = {
-        [accountId]: {}
+        [accountId]: {},
       };
       const result = GroupLocalStorage.hasCachedData(accountId);
       expect(result).toBe(false);
@@ -73,8 +73,8 @@ describe("GroupLocalStorage", () => {
       const accountId = "some-account-id";
       GroupLocalStorage._runtimeCachedData = {
         [accountId]: {
-          "some-key": "some-value"
-        }
+          "some-key": "some-value",
+        },
       };
       const result = GroupLocalStorage.hasCachedData(accountId);
       expect(result).toBe(true);
@@ -82,7 +82,7 @@ describe("GroupLocalStorage", () => {
   });
 
   describe("::flush", () => {
-    it("flushes works with not initialized local storage.", async() => {
+    it("flushes works with not initialized local storage.", async () => {
       expect.assertions(2);
       await storage.flush();
       // Expect the local storage (mocked here) to not be set.
@@ -91,7 +91,7 @@ describe("GroupLocalStorage", () => {
       expect(GroupLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("flushes local storage's content.", async() => {
+    it("flushes local storage's content.", async () => {
       expect.assertions(2);
       const dtos = defaultGroupsDtos();
       const collection = new GroupsCollection(dtos);
@@ -105,21 +105,21 @@ describe("GroupLocalStorage", () => {
   });
 
   describe("::get", () => {
-    it("returns undefined if nothing is stored in the local storage.", async() => {
+    it("returns undefined if nothing is stored in the local storage.", async () => {
       expect.assertions(1);
       const result = await storage.get();
       expect(result).toBeUndefined();
     });
 
-    it("returns content stored in the local storage.", async() => {
+    it("returns content stored in the local storage.", async () => {
       expect.assertions(1);
       const collectionDto = defaultGroupsDtos();
-      browser.storage.local.set({[storage.storageKey]: collectionDto});
+      browser.storage.local.set({ [storage.storageKey]: collectionDto });
       const result = await storage.get();
       expect(result).toEqual(collectionDto);
     });
 
-    it("returns content stored in the runtime cache.", async() => {
+    it("returns content stored in the runtime cache.", async () => {
       const collectionDto = defaultGroupsDtos();
       expect.assertions(2);
       // Force the runtime cache, to ensure it is hit even if the local storage is empty.
@@ -132,7 +132,7 @@ describe("GroupLocalStorage", () => {
   });
 
   describe("::set", () => {
-    it("stores content in the local storage.", async() => {
+    it("stores content in the local storage.", async () => {
       expect.assertions(3);
       const dtos = defaultGroupsDtos();
       const collection = new GroupsCollection(dtos);
@@ -146,7 +146,7 @@ describe("GroupLocalStorage", () => {
       expect(resultGet).toEqual(dtos);
     });
 
-    it("throws error if no data is given to store.", async() => {
+    it("throws error if no data is given to store.", async () => {
       expect.assertions(3);
       await expect(() => storage.set()).rejects.toThrow(TypeError);
       // Expect the local storage (mocked here) to not be set.
@@ -155,7 +155,7 @@ describe("GroupLocalStorage", () => {
       expect(GroupLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("throws error if invalid data is given to store.", async() => {
+    it("throws error if invalid data is given to store.", async () => {
       expect.assertions(3);
       await expect(() => storage.set({})).rejects.toThrow(TypeError);
       // Expect the local storage (mocked here) to not be set.
@@ -164,13 +164,13 @@ describe("GroupLocalStorage", () => {
       expect(GroupLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("waits any on-going call to set to perform another set.", async() => {
+    it("waits any on-going call to set to perform another set.", async () => {
       expect.assertions(3);
       const promisesResolvers = [];
 
       jest.spyOn(storage, "_setBrowserStorage").mockImplementation(() => {
         let resolve;
-        const promise = new Promise(_resolve => resolve = _resolve);
+        const promise = new Promise((_resolve) => (resolve = _resolve));
         promisesResolvers.push(resolve);
         return promise;
       });
@@ -179,33 +179,33 @@ describe("GroupLocalStorage", () => {
       const collectionDto2 = defaultGroupsDtos();
       const resultPromise1 = storage.set(new GroupsCollection(collectionDto1));
       const resultPromise2 = storage.set(new GroupsCollection(collectionDto2));
-      expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: collectionDto1});
-      expect(storage._setBrowserStorage).not.toHaveBeenCalledWith({[storage.storageKey]: collectionDto2});
+      expect(storage._setBrowserStorage).toHaveBeenCalledWith({ [storage.storageKey]: collectionDto1 });
+      expect(storage._setBrowserStorage).not.toHaveBeenCalledWith({ [storage.storageKey]: collectionDto2 });
       promisesResolvers[0]();
       await resultPromise1;
-      expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: collectionDto2});
+      expect(storage._setBrowserStorage).toHaveBeenCalledWith({ [storage.storageKey]: collectionDto2 });
       promisesResolvers[1]();
       await resultPromise2;
     });
   });
 
   describe("::getGroupById", () => {
-    it("returns a group by its id.", async() => {
+    it("returns a group by its id.", async () => {
       expect.assertions(1);
       const collectionDto = defaultGroupsDtos();
       const firstGroupDto = collectionDto[0];
       expect.assertions(1);
-      browser.storage.local.set({[storage.storageKey]: collectionDto});
+      browser.storage.local.set({ [storage.storageKey]: collectionDto });
       const result = await storage.getGroupById(firstGroupDto.id);
       expect(result).toEqual(firstGroupDto);
     });
   });
 
   describe("::addGroup", () => {
-    it("adds a group to local storage.", async() => {
+    it("adds a group to local storage.", async () => {
       expect.assertions(2);
       const collectionDto = defaultGroupsDtos();
-      browser.storage.local.set({[storage.storageKey]: collectionDto});
+      browser.storage.local.set({ [storage.storageKey]: collectionDto });
 
       const newGroupDto = defaultGroupDto();
       const newGroupEntiy = new GroupEntity(newGroupDto);
@@ -215,29 +215,29 @@ describe("GroupLocalStorage", () => {
       expect(collectionDto.length).toEqual(11);
     });
 
-    it("throws error when parameter is not a GroupEntity.", async() => {
+    it("throws error when parameter is not a GroupEntity.", async () => {
       expect.assertions(2);
       const collectionDto = defaultGroupsDtos();
-      browser.storage.local.set({[storage.storageKey]: collectionDto});
+      browser.storage.local.set({ [storage.storageKey]: collectionDto });
 
       await expect(storage.addGroup()).rejects.toThrow(
-        TypeError('The parameter `groupEntity` should be of type GroupEntity.')
+        TypeError("The parameter `groupEntity` should be of type GroupEntity."),
       );
       await expect(storage.addGroup({})).rejects.toThrow(
-        TypeError('The parameter `groupEntity` should be of type GroupEntity.')
+        TypeError("The parameter `groupEntity` should be of type GroupEntity."),
       );
     });
   });
 
   describe("::updateGroup", () => {
-    it("updates a group in local storage.", async() => {
+    it("updates a group in local storage.", async () => {
       expect.assertions(3);
       const collectionDto = defaultGroupsDtos();
       const firstGroupDto = collectionDto[0];
       const secondGroupDto = collectionDto[2];
 
       // Insert groups in local storage
-      browser.storage.local.set({[storage.storageKey]: collectionDto});
+      browser.storage.local.set({ [storage.storageKey]: collectionDto });
       let result = await storage.getGroupById(firstGroupDto.id);
       // Verify that the first group is present
       expect(result).toEqual(firstGroupDto);
@@ -253,43 +253,43 @@ describe("GroupLocalStorage", () => {
       expect(result).toEqual(secondGroupDto);
     });
 
-    it("throws error when updating a group not in local storage.", async() => {
+    it("throws error when updating a group not in local storage.", async () => {
       const collectionDto = defaultGroupsDtos();
       const unknownGroupDto = defaultGroupDto();
       expect.assertions(1);
 
       // Insert groups in local storage
-      browser.storage.local.set({[storage.storageKey]: collectionDto});
+      browser.storage.local.set({ [storage.storageKey]: collectionDto });
       const groupEntity = new GroupEntity(unknownGroupDto);
       await expect(storage.updateGroup(groupEntity)).rejects.toThrow(
-        TypeError('The group could not be found in the local storage')
+        TypeError("The group could not be found in the local storage"),
       );
     });
 
-    it("throws error when the groupEntity parameter not defined or not a GroupEntity.", async() => {
+    it("throws error when the groupEntity parameter not defined or not a GroupEntity.", async () => {
       expect.assertions(2);
 
       const collectionDto = defaultGroupsDtos();
       // Insert groups in local storage
-      browser.storage.local.set({[storage.storageKey]: collectionDto});
+      browser.storage.local.set({ [storage.storageKey]: collectionDto });
       await expect(storage.updateGroup()).rejects.toThrow(
-        TypeError('The parameter `groupEntity` should be of type GroupEntity.')
+        TypeError("The parameter `groupEntity` should be of type GroupEntity."),
       );
       await expect(storage.updateGroup({})).rejects.toThrow(
-        TypeError('The parameter `groupEntity` should be of type GroupEntity.')
+        TypeError("The parameter `groupEntity` should be of type GroupEntity."),
       );
     });
   });
 
   describe("::delete", () => {
-    it("deletes a group from local storage.", async() => {
+    it("deletes a group from local storage.", async () => {
       const collectionDto = defaultGroupsDtos();
       const firstGroupDto = collectionDto[0];
       const secondGroupDto = collectionDto[2];
       expect.assertions(5);
 
       // Insert groups in local storage
-      browser.storage.local.set({[storage.storageKey]: collectionDto});
+      browser.storage.local.set({ [storage.storageKey]: collectionDto });
       let result = await storage.getGroupById(firstGroupDto.id);
       // Verify that the first group is present
       expect(result).toEqual(firstGroupDto);
@@ -308,7 +308,7 @@ describe("GroupLocalStorage", () => {
   });
 
   describe("::assertEntityBeforeSave", () => {
-    it("doesn't throw an error if the entity is a GroupEntity.", async() => {
+    it("doesn't throw an error if the entity is a GroupEntity.", async () => {
       expect.assertions(1);
       const groupDto = defaultGroupDto();
       const groupEntity = new GroupEntity(groupDto);
@@ -316,24 +316,32 @@ describe("GroupLocalStorage", () => {
       expect(() => GroupLocalStorage.assertEntityBeforeSave(groupEntity)).not.toThrow(Error);
     });
 
-    it("throws an error if the entity is not set.", async() => {
+    it("throws an error if the entity is not set.", async () => {
       expect.assertions(1);
-      expect(() => GroupLocalStorage.assertEntityBeforeSave()).toThrow(TypeError('GroupLocalStorage expects a GroupEntity to be set'));
+      expect(() => GroupLocalStorage.assertEntityBeforeSave()).toThrow(
+        TypeError("GroupLocalStorage expects a GroupEntity to be set"),
+      );
     });
 
-    it("throws an error if the entity is not a GroupEntity.", async() => {
+    it("throws an error if the entity is not a GroupEntity.", async () => {
       expect.assertions(1);
-      expect(() => GroupLocalStorage.assertEntityBeforeSave({})).toThrow(TypeError('GroupLocalStorage expects an object of type GroupEntity'));
+      expect(() => GroupLocalStorage.assertEntityBeforeSave({})).toThrow(
+        TypeError("GroupLocalStorage expects an object of type GroupEntity"),
+      );
     });
 
-    it("throws an error if the entity id is not set.", async() => {
+    it("throws an error if the entity id is not set.", async () => {
       expect.assertions(2);
       const groupDto = defaultGroupDto();
       const groupEntity = new GroupEntity(groupDto);
       groupEntity._props.id = "";
-      expect(() => GroupLocalStorage.assertEntityBeforeSave(groupEntity)).toThrow(TypeError('GroupLocalStorage expects GroupEntity id to be set'));
+      expect(() => GroupLocalStorage.assertEntityBeforeSave(groupEntity)).toThrow(
+        TypeError("GroupLocalStorage expects GroupEntity id to be set"),
+      );
       groupEntity._props.id = null;
-      expect(() => GroupLocalStorage.assertEntityBeforeSave(groupEntity)).toThrow(TypeError('GroupLocalStorage expects GroupEntity id to be set'));
+      expect(() => GroupLocalStorage.assertEntityBeforeSave(groupEntity)).toThrow(
+        TypeError("GroupLocalStorage expects GroupEntity id to be set"),
+      );
     });
   });
 });

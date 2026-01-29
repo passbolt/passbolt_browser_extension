@@ -48,10 +48,10 @@ class ResourceUpdateController {
   async _exec(resourceDto, plaintextDto) {
     try {
       const resource = await this.exec(resourceDto, plaintextDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS', resource);
+      this.worker.port.emit(this.requestId, "SUCCESS", resource);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -65,11 +65,11 @@ class ResourceUpdateController {
   async exec(resourceDto, plaintextDto) {
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
-    this.progressService.start(1, i18n.t('Updating resource'));
+    this.progressService.start(1, i18n.t("Updating resource"));
 
     try {
-      const resourceUpdated =  await this.resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
-      await this.progressService.finishStep(i18n.t('Done!'), true);
+      const resourceUpdated = await this.resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
+      await this.progressService.finishStep(i18n.t("Done!"), true);
       return resourceUpdated;
     } finally {
       await this.progressService.close();

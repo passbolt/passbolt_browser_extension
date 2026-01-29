@@ -19,9 +19,7 @@ const FOREIGN_MODEL_RESOURCE = "Resource";
 /**
  * List of allowed foreign models on which Comments can be plugged.
  */
-const ALLOWED_FOREIGN_MODELS = [
-  FOREIGN_MODEL_RESOURCE,
-];
+const ALLOWED_FOREIGN_MODELS = [FOREIGN_MODEL_RESOURCE];
 
 class CommentEntity extends EntityV2 {
   /**
@@ -32,11 +30,11 @@ class CommentEntity extends EntityV2 {
 
     // Associations
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator, {clone: false});
+      this._creator = new UserEntity(this._props.creator, { clone: false });
       delete this._props.creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier, {clone: false});
+      this._modifier = new UserEntity(this._props.modifier, { clone: false });
       delete this._props.modifier;
     }
   }
@@ -47,60 +45,55 @@ class CommentEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "user_id",
-        "foreign_key",
-        "foreign_model",
-        "content"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["user_id", "foreign_key", "foreign_model", "content"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
+        user_id: {
+          type: "string",
+          format: "uuid",
         },
-        "foreign_key": {
-          "type": "string",
-          "format": "uuid"
+        foreign_key: {
+          type: "string",
+          format: "uuid",
         },
-        "foreign_model": {
-          "type": "string",
-          "enum": CommentEntity.ALLOWED_FOREIGN_MODELS
+        foreign_model: {
+          type: "string",
+          enum: CommentEntity.ALLOWED_FOREIGN_MODELS,
         },
-        "parent_id": {
-          "type": "string",
-          "format": "uuid",
-          "nullable": true,
+        parent_id: {
+          type: "string",
+          format: "uuid",
+          nullable: true,
         },
-        "content": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": CommentEntity.COMMENT_CONTENT_MAX_LENGTH
+        content: {
+          type: "string",
+          minLength: 1,
+          maxLength: CommentEntity.COMMENT_CONTENT_MAX_LENGTH,
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
         // Associations
-        "creator": UserEntity.getSchema(),
-        "modifier": UserEntity.getSchema(),
-      }
+        creator: UserEntity.getSchema(),
+        modifier: UserEntity.getSchema(),
+      },
     };
   }
 

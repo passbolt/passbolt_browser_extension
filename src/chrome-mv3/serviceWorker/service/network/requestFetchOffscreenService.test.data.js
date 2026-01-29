@@ -13,7 +13,7 @@
  */
 
 export const fetchOptionsHeaders = () => ({
-  "X-CSRF-Token": crypto.randomUUID()
+  "X-CSRF-Token": crypto.randomUUID(),
 });
 
 export const fetchOptionWithBodyData = () => ({
@@ -21,18 +21,18 @@ export const fetchOptionWithBodyData = () => ({
   headers: fetchOptionsHeaders(),
   body: {
     prop1: "value 1",
-    prop2: "value 2"
-  }
+    prop2: "value 2",
+  },
 });
 
 export const fetchOptionsWithBodyFormData = () => {
-  const formDataBody = (new FormData());
+  const formDataBody = new FormData();
   formDataBody.append("prop1", "value 1");
   formDataBody.append("prop1", "value 2");
   return {
     method: "POST",
     credentials: "include",
     headers: fetchOptionsHeaders(),
-    body: formDataBody
+    body: formDataBody,
   };
 };

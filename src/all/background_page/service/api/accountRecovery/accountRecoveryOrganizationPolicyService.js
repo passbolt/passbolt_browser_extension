@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const ACCOUNT_RECOVERY_ORGANIZATION_POLICY_SERVICE_RESOURCE_NAME = '/account-recovery/organization-policies';
+const ACCOUNT_RECOVERY_ORGANIZATION_POLICY_SERVICE_RESOURCE_NAME = "/account-recovery/organization-policies";
 
 class AccountRecoveryOrganizationPolicyService extends AbstractService {
   /**
@@ -42,10 +42,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return [
-      "creator",
-      "creator.gpgkey",
-    ];
+    return ["creator", "creator.gpgkey"];
   }
 
   /**
@@ -56,7 +53,9 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    * @public
    */
   async find(contains) {
-    const options = contains ? this.formatContainOptions(contains, AccountRecoveryOrganizationPolicyService.getSupportedContainOptions()) : null;
+    const options = contains
+      ? this.formatContainOptions(contains, AccountRecoveryOrganizationPolicyService.getSupportedContainOptions())
+      : null;
     const response = await this.apiClient.findAll(options);
     return response.body;
   }

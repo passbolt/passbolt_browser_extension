@@ -17,16 +17,16 @@ module.exports = function (grunt) {
     build: 'build/all/',
     build_web_accessible_resources: 'build/all/webAccessibleResources/',
 
-    dist_chrome: 'dist/chrome/',
-    dist_chrome_mv3: 'dist/chrome-mv3/',
+    dist_chromium_mv2: 'dist/chromium-mv2/',
+    dist_chromium_mv3: 'dist/chromium-mv3/',
     dist_safari: 'dist/safari/',
     dist_firefox: 'dist/firefox/',
 
     src: 'src/all/',
     test: 'test/',
     src_background_page: 'src/all/background_page/',
-    src_chrome: 'src/chrome/',
-    src_chrome_mv3: 'src/chrome-mv3/',
+    src_chromium_mv2: 'src/chrome/',
+    src_chromium_mv3: 'src/chrome-mv3/',
     src_safari: 'src/safari/',
     src_firefox: 'src/firefox/',
     src_content_scripts: 'src/all/contentScripts/',
@@ -51,25 +51,25 @@ module.exports = function (grunt) {
   grunt.registerTask('pre-dist', ['copy:styleguide']);
 
   grunt.registerTask('bundle', ['externalize-locale-strings', 'copy:background_page', 'copy:web_accessible_resources', 'copy:locales']);
-  grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle']);
-  grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle']);
   grunt.registerTask('bundle-mv3', ['externalize-locale-strings', 'copy:service_worker', 'copy:web_accessible_resources', 'copy:locales']);
-  grunt.registerTask('bundle-chrome-mv3', ['copy:manifest_chrome_mv3', 'bundle-mv3']);
+  grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle']);
+  grunt.registerTask('bundle-chromium-mv2', ['copy:manifest_chromium_mv2', 'bundle']);
+  grunt.registerTask('bundle-chromium-mv3', ['copy:manifest_chromium_mv3', 'bundle-mv3']);
   grunt.registerTask('bundle-safari', ['copy:manifest_safari', 'bundle-mv3']);
 
-  grunt.registerTask('build', ['build-firefox-prod', 'build-chrome-prod']);
+  grunt.registerTask('build', ['build-firefox-prod', 'build-chromium-mv2-prod', 'build-chromium-mv3-prod']);
 
   grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
   grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_background_page_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug', 'shell:build_firefox_debug']);
   grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'shell:build_background_page_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_firefox_prod']);
 
-  grunt.registerTask('build-chrome', ['build-chrome-debug', 'build-chrome-prod']);
-  grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'shell:build_background_page_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'shell:build_background_page_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chromium-mv2', ['build-chromium-mv2-debug', 'build-chromium-mv2-prod']);
+  grunt.registerTask('build-chromium-mv2-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chromium-mv2', 'shell:build_background_page_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug', 'shell:build_chromium_mv2_debug']);
+  grunt.registerTask('build-chromium-mv2-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chromium-mv2', 'shell:build_background_page_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_chromium_mv2_prod']);
 
-  grunt.registerTask('build-chrome-mv3', ['build-chrome-mv3-debug', 'build-chrome-mv3-prod']);
-  grunt.registerTask('build-chrome-mv3-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome-mv3', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug', 'shell:build_chrome_mv3_debug']);
-  grunt.registerTask('build-chrome-mv3-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome-mv3', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_chrome_mv3_prod']);
+  grunt.registerTask('build-chromium-mv3', ['build-chromium-mv3-debug', 'build-chromium-mv3-prod']);
+  grunt.registerTask('build-chromium-mv3-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chromium-mv3', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug', 'shell:build_chromium_mv3_debug']);
+  grunt.registerTask('build-chromium-mv3-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chromium-mv3', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_chromium_mv3_prod']);
 
   grunt.registerTask('build-safari', ['build-safari-debug', 'build-safari-prod']);
   grunt.registerTask('build-safari-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-safari', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug']);
@@ -118,8 +118,8 @@ module.exports = function (grunt) {
       },
       service_worker: {
         files: [
-          { expand: true, cwd: path.src_chrome_mv3, src: 'serviceWorker.js', dest: path.build + 'serviceWorker' },
-          { expand: true, cwd: `${path.src_chrome_mv3}/offscreens`, src: 'offscreen.html', dest: `${path.build}/offscreens` },
+          { expand: true, cwd: path.src_chromium_mv3, src: 'serviceWorker.js', dest: path.build + 'serviceWorker' },
+          { expand: true, cwd: `${path.src_chromium_mv3}/offscreens`, src: 'offscreen.html', dest: `${path.build}/offscreens` },
         ]
       },
       web_accessible_resources: {
@@ -139,14 +139,14 @@ module.exports = function (grunt) {
           expand: true, cwd: path.src_firefox, src: 'manifest.json', dest: path.build
         }]
       },
-      manifest_chrome: {
+      manifest_chromium_mv2: {
         files: [{
-          expand: true, cwd: path.src_chrome, src: 'manifest.json', dest: path.build
+          expand: true, cwd: path.src_chromium_mv2, src: 'manifest.json', dest: path.build
         }]
       },
-      manifest_chrome_mv3: {
+      manifest_chromium_mv3: {
         files: [{
-          expand: true, cwd: path.src_chrome_mv3, src: 'manifest.json', dest: path.build
+          expand: true, cwd: path.src_chromium_mv3, src: 'manifest.json', dest: path.build
         }]
       },
       manifest_safari: {
@@ -386,6 +386,7 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          'mkdir -p ' + path.dist_firefox,
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
           'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + manifestVersion + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
           'rm -f ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
@@ -398,6 +399,7 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          'mkdir -p ' + path.dist_firefox,
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
           'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + manifestVersion + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + ".zip'"
@@ -407,47 +409,51 @@ module.exports = function (grunt) {
       /**
        * Chrome
        */
-      build_chrome_debug: {
+      build_chromium_mv2_debug: {
         options: {
           stderr: false
         },
         command: [
-          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome + 'passbolt-' + pkg.version + '-debug.crx',
-          'rm -f ' + path.dist_chrome + 'passbolt-latest@passbolt.com.crx',
-          'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.dist_chrome + 'passbolt-latest@passbolt.com.crx'
+          'mkdir -p ' + path.dist_chromium_mv2,
+          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv2 + 'passbolt-' + pkg.version + '-debug.crx',
+          'rm -f ' + path.dist_chromium_mv2 + 'passbolt-latest@passbolt.com.crx',
+          'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.dist_chromium_mv2 + 'passbolt-latest@passbolt.com.crx'
         ].join(' && ')
       },
-      build_chrome_prod: {
+      build_chromium_mv2_prod: {
         options: {
           stderr: false
         },
         command: [
-          'zip -q -1 -r ' + path.dist_chrome + 'passbolt-' + pkg.version + '.zip ' + path.build,
-          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome + 'passbolt-' + pkg.version + '.crx ',
-          "echo '\nZip and Crx files generated in " + path.dist_chrome + "'"
+          'mkdir -p ' + path.dist_chromium_mv2,
+          'zip -q -1 -r ' + path.dist_chromium_mv2 + 'passbolt-' + pkg.version + '.zip ' + path.build,
+          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv2 + 'passbolt-' + pkg.version + '.crx ',
+          "echo '\nZip and Crx files generated in " + path.dist_chromium_mv2 + "'"
         ].join(' && ')
       },
       /**
        * Chrome MV3
        */
-      build_chrome_mv3_debug: {
+      build_chromium_mv3_debug: {
         options: {
           stderr: false
         },
         command: [
-          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome_mv3 + 'passbolt-' + pkg.version + '-debug.crx',
-          'rm -f ' + path.dist_chrome_mv3 + 'passbolt-latest@passbolt.com.crx',
-          'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.dist_chrome_mv3 + 'passbolt-latest@passbolt.com.crx'
+          'mkdir -p ' + path.dist_chromium_mv3,
+          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv3 + 'passbolt-' + pkg.version + '-debug.crx',
+          'rm -f ' + path.dist_chromium_mv3 + 'passbolt-latest@passbolt.com.crx',
+          'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.dist_chromium_mv3 + 'passbolt-latest@passbolt.com.crx'
         ].join(' && ')
       },
-      build_chrome_mv3_prod: {
+      build_chromium_mv3_prod: {
         options: {
           stderr: false
         },
         command: [
-          'zip -q -1 -r ' + path.dist_chrome_mv3 + 'passbolt-' + pkg.version + '.zip ' + path.build,
-          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome_mv3 + 'passbolt-' + pkg.version + '.crx ',
-          "echo '\nZip and Crx files generated in " + path.dist_chrome_mv3 + "'"
+          'mkdir -p ' + path.dist_chromium_mv3,
+          'zip -q -1 -r ' + path.dist_chromium_mv3 + 'passbolt-' + pkg.version + '.zip ' + path.build,
+          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv3 + 'passbolt-' + pkg.version + '.crx ',
+          "echo '\nZip and Crx files generated in " + path.dist_chromium_mv3 + "'"
         ].join(' && ')
       }
     }

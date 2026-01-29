@@ -13,8 +13,11 @@
  */
 
 import {
-  defaultResourceDto, resourceLegacyDto, resourceStandaloneTotpDto, resourceUnknownResourceTypeDto,
-  resourceWithTotpDto
+  defaultResourceDto,
+  resourceLegacyDto,
+  resourceStandaloneTotpDto,
+  resourceUnknownResourceTypeDto,
+  resourceWithTotpDto,
 } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 
 /**
@@ -22,10 +25,10 @@ import {
  * @returns {array}
  */
 export const multipleResourceDtos = () => [
-  resourceLegacyDto({}, {withTags: true}),
-  defaultResourceDto({}, {withTags: true}),
-  resourceWithTotpDto({}, {withTags: true}),
-  resourceStandaloneTotpDto({}, {withTags: true}),
+  resourceLegacyDto({}, { withTags: true }),
+  defaultResourceDto({}, { withTags: true }),
+  resourceWithTotpDto({}, { withTags: true }),
+  resourceStandaloneTotpDto({}, { withTags: true }),
 ];
 
 /**
@@ -34,10 +37,10 @@ export const multipleResourceDtos = () => [
  * @returns {array}
  */
 export const multipleResourceIncludingUnsupportedResourceTypesDtos = () => [
-  resourceLegacyDto({}, {withTags: true}),
-  defaultResourceDto({}, {withTags: true}),
-  resourceUnknownResourceTypeDto({}, {withTags: true}),
-  resourceWithTotpDto({}, {withTags: true}),
-  resourceStandaloneTotpDto({}, {withTags: true}),
-  resourceUnknownResourceTypeDto({}, {withTags: true}),
+  resourceLegacyDto({}, { withTags: true }),
+  defaultResourceDto({}, { withTags: true }),
+  resourceUnknownResourceTypeDto({}, { withTags: true }),
+  resourceWithTotpDto({}, { withTags: true }),
+  resourceStandaloneTotpDto({}, { withTags: true }),
+  resourceUnknownResourceTypeDto({}, { withTags: true }),
 ];

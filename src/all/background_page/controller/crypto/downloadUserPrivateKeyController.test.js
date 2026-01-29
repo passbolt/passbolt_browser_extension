@@ -16,8 +16,8 @@ import DownloadUserPrivateKeyController from "./downloadUserPrivateKeyController
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import GpgKeyError from "../../error/GpgKeyError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import FileService from "../../service/file/fileService";
 
 const mockedSaveFile = jest.spyOn(FileService, "saveFile");
@@ -25,21 +25,21 @@ const mockedSaveFile = jest.spyOn(FileService, "saveFile");
 jest.mock("../../service/passphrase/getPassphraseService");
 
 const expectedTabId = "tabIdentifier";
-const mockedWorker = {tab: {id: expectedTabId}};
+const mockedWorker = { tab: { id: expectedTabId } };
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 describe("DownloadUserPrivateKeyController", () => {
-  it(`Should trigegr a file download with the private key`, async() => {
+  it(`Should trigegr a file download with the private key`, async () => {
     expect.assertions(8);
     await MockExtension.withConfiguredAccount();
     const controller = new DownloadUserPrivateKeyController(mockedWorker, null);
     controller.getPassphraseService.requestPassphrase.mockResolvedValue("");
     const privateKey = pgpKeys.ada;
 
-    mockedSaveFile.mockImplementation(async(fileName, fileContent, fileContentType, workerTabId) => {
+    mockedSaveFile.mockImplementation(async (fileName, fileContent, fileContentType, workerTabId) => {
       expect(fileName).toBe("passbolt_private.asc");
       expect(fileContentType).toBe("text/plain");
       expect(workerTabId).toBe(expectedTabId);
@@ -57,7 +57,7 @@ describe("DownloadUserPrivateKeyController", () => {
     expect(controller.getPassphraseService.requestPassphrase).toHaveBeenCalledTimes(1);
   });
 
-  it(`Should throw an exception if the user's private key can't be find`, async() => {
+  it(`Should throw an exception if the user's private key can't be find`, async () => {
     expect.assertions(3);
     MockExtension.withMissingPrivateKeyAccount();
     const controller = new DownloadUserPrivateKeyController(mockedWorker, null);

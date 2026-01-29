@@ -14,7 +14,7 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'AccountRecoveryOrganizationPublicKey';
+const ENTITY_NAME = "AccountRecoveryOrganizationPublicKey";
 const FINGERPRINT_LENGTH = 40;
 
 class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
@@ -23,13 +23,18 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
    * Note: Sanitize the DTO fingerprint by converting it to uppercase.
    */
   constructor(accountRecoveryOrganizationPublicKeyDto, options = {}) {
-    accountRecoveryOrganizationPublicKeyDto = AccountRecoveryOrganizationPublicKeyEntity.sanitizeDto(accountRecoveryOrganizationPublicKeyDto);
-
-    super(EntitySchema.validate(
-      AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME,
+    accountRecoveryOrganizationPublicKeyDto = AccountRecoveryOrganizationPublicKeyEntity.sanitizeDto(
       accountRecoveryOrganizationPublicKeyDto,
-      AccountRecoveryOrganizationPublicKeyEntity.getSchema()
-    ), options);
+    );
+
+    super(
+      EntitySchema.validate(
+        AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME,
+        accountRecoveryOrganizationPublicKeyDto,
+        AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -38,44 +43,42 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "armored_key"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      type: "object",
+      required: ["armored_key"],
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "armored_key": {
-          "type": "string",
+        armored_key: {
+          type: "string",
         },
-        "fingerprint": {
-          "type": "string",
-          "length": FINGERPRINT_LENGTH,
-          "nullable": true,
+        fingerprint: {
+          type: "string",
+          length: FINGERPRINT_LENGTH,
+          nullable: true,
         },
-        "created": {
-          "type": "string",
-          "format": "date-time"
+        created: {
+          type: "string",
+          format: "date-time",
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
+        modified: {
+          type: "string",
+          format: "date-time",
         },
-        "created_by": {
-          "type": "string",
-          "format": "uuid"
+        created_by: {
+          type: "string",
+          format: "uuid",
         },
-        "modified_by": {
-          "type": "string",
-          "format": "uuid"
+        modified_by: {
+          type: "string",
+          format: "uuid",
         },
-        "deleted": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
+        deleted: {
+          type: "string",
+          format: "date-time",
+        },
+      },
     };
   }
 
@@ -151,7 +154,11 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
    * @param {string} fingerprint The fingerprint to set.
    */
   set fingerprint(fingerprint) {
-    EntitySchema.validateProp("fingerprint", fingerprint, AccountRecoveryOrganizationPublicKeyEntity.getSchema().properties.fingerprint);
+    EntitySchema.validateProp(
+      "fingerprint",
+      fingerprint,
+      AccountRecoveryOrganizationPublicKeyEntity.getSchema().properties.fingerprint,
+    );
     this._props.fingerprint = AccountRecoveryOrganizationPublicKeyEntity.sanitizeFingerPrint(fingerprint);
   }
 

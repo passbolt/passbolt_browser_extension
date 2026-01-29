@@ -15,10 +15,9 @@
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import ProgressService from "../../service/progress/progressService";
 import i18n from "../../sdk/i18n";
-import ExternalGpgKeyPairEntity
-  from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
+import ExternalGpgKeyPairEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/external/externalGpgKeyPairEntity";
 import RotateMetadataKeyService from "../../service/metadata/rotateMetadata/rotateMetadataKeyService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 export default class RotateMetadataKeyController {
   /**
@@ -43,10 +42,10 @@ export default class RotateMetadataKeyController {
   async _exec() {
     try {
       const result = await this.exec.apply(this, arguments);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

@@ -12,21 +12,21 @@
  * @since         4.0.0
  */
 import BrowserTabService from "./browserTab.service";
-import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
+import { readWorker } from "../../model/entity/worker/workerEntity.test.data";
 
 describe("BrowserTabService", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
   describe("BrowserTabService::getCurrent", () => {
-    it("Should get current tab", async() => {
+    it("Should get current tab", async () => {
       expect.assertions(1);
       // mock data
-      const tab = {url: "https://localhost"};
+      const tab = { url: "https://localhost" };
       // mock functions
-      jest.spyOn(browser.tabs, 'query').mockImplementationOnce(() => [tab]);
+      jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [tab]);
       // process
       const cuurentTab = await BrowserTabService.getCurrent();
       // expectations
@@ -35,13 +35,13 @@ describe("BrowserTabService", () => {
   });
 
   describe("BrowserTabService::getById", () => {
-    it("Should get tab by id", async() => {
+    it("Should get tab by id", async () => {
       expect.assertions(1);
       // mock data
-      const tab1 = {id: 1};
-      const tab2 = {id: 2};
+      const tab1 = { id: 1 };
+      const tab2 = { id: 2 };
       // mock functions
-      jest.spyOn(browser.tabs, 'query').mockImplementationOnce(() => [tab1, tab2]);
+      jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [tab1, tab2]);
       // process
       const tab = await BrowserTabService.getById(1);
       // expectations
@@ -50,42 +50,46 @@ describe("BrowserTabService", () => {
   });
 
   describe("BrowserTabService::sendMessage", () => {
-    it("Should send message to a specific tab and frame and get a success response", async() => {
+    it("Should send message to a specific tab and frame and get a success response", async () => {
       expect.assertions(1);
       // data mocked
       const worker = readWorker();
       // mock functions
-      jest.spyOn(browser.tabs, 'sendMessage').mockImplementationOnce(() => ({status: "SUCCESS", response: "DONE"}));
+      jest.spyOn(browser.tabs, "sendMessage").mockImplementationOnce(() => ({ status: "SUCCESS", response: "DONE" }));
       // process
       await BrowserTabService.sendMessage(worker, "message", "arguments1", "arguments2");
       // expectations
-      expect(browser.tabs.sendMessage).toHaveBeenCalledWith(worker.tabId, ["message", "arguments1", "arguments2"], {frameId: worker.frameId});
+      expect(browser.tabs.sendMessage).toHaveBeenCalledWith(worker.tabId, ["message", "arguments1", "arguments2"], {
+        frameId: worker.frameId,
+      });
     });
 
-    it("Should send message to a specific tab and frame and get an error response", async() => {
+    it("Should send message to a specific tab and frame and get an error response", async () => {
       expect.assertions(2);
       // data mocked
       const worker = readWorker();
       // mock functions
-      jest.spyOn(browser.tabs, 'sendMessage').mockImplementationOnce(() => Promise.reject("Error"));
+      jest.spyOn(browser.tabs, "sendMessage").mockImplementationOnce(() => Promise.reject("Error"));
       // process
       try {
         await BrowserTabService.sendMessage(worker, "message", "arguments1", "arguments2");
       } catch (error) {
         // expectations
-        expect(browser.tabs.sendMessage).toHaveBeenCalledWith(worker.tabId, ["message", "arguments1", "arguments2"], {frameId: worker.frameId});
+        expect(browser.tabs.sendMessage).toHaveBeenCalledWith(worker.tabId, ["message", "arguments1", "arguments2"], {
+          frameId: worker.frameId,
+        });
         expect(error).toStrictEqual("Error");
       }
     });
   });
 
   describe("BrowserTabService::reloadTab", () => {
-    it("Should reload the tab by id", async() => {
+    it("Should reload the tab by id", async () => {
       expect.assertions(1);
       // mock data
-      const tab = {id: 1};
+      const tab = { id: 1 };
       // mock functions
-      jest.spyOn(browser.tabs, 'reload');
+      jest.spyOn(browser.tabs, "reload");
       // process
       await BrowserTabService.reloadTab(tab.id);
       // expectations

@@ -14,7 +14,7 @@
 
 import AbstractService from "../abstract/abstractService";
 
-const USER_SERVICE_RESOURCE_NAME = 'mfa-policies';
+const USER_SERVICE_RESOURCE_NAME = "mfa-policies";
 
 class MultiFactorAuthenticationPolicyService extends AbstractService {
   /**
@@ -45,7 +45,7 @@ class MultiFactorAuthenticationPolicyService extends AbstractService {
    */
   async find() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/settings`);
-    const setting = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const setting = await this.apiClient.fetchAndHandleResponse("GET", url);
     return setting.body;
   }
 }

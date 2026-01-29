@@ -14,17 +14,17 @@
 import VerifyImportedKeyPassphraseController from "./verifyImportedKeyPassphraseController";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 describe("VerifyImportedKeyPassphraseController", () => {
   describe("VerifyImportedKeyPassphraseController::exec", () => {
-    it("Should pass if the passphrase is correct.", async() => {
+    it("Should pass if the passphrase is correct.", async () => {
       const account = new AccountEntity(defaultAccountDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
       jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
-      const controller = new VerifyImportedKeyPassphraseController({port: {_port: {name: "test"}}}, null);
+      const controller = new VerifyImportedKeyPassphraseController({ port: { _port: { name: "test" } } }, null);
 
       expect.assertions(1);
       const promise = controller.exec(pgpKeys.ada.passphrase);
@@ -33,8 +33,8 @@ describe("VerifyImportedKeyPassphraseController", () => {
 
     it("Should throw an exception if no passphrase provided.", () => {
       const account = new AccountEntity(defaultAccountDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new VerifyImportedKeyPassphraseController({port: {_port: {name: "test"}}}, null);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new VerifyImportedKeyPassphraseController({ port: { _port: { name: "test" } } }, null);
 
       expect.assertions(1);
       const promise = controller.exec();
@@ -43,8 +43,8 @@ describe("VerifyImportedKeyPassphraseController", () => {
 
     it("Should throw an exception if the passphrase is incorrect.", () => {
       const account = new AccountEntity(defaultAccountDto());
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new VerifyImportedKeyPassphraseController({port: {_port: {name: "test"}}}, null);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new VerifyImportedKeyPassphraseController({ port: { _port: { name: "test" } } }, null);
 
       expect.assertions(1);
       const promise = controller.exec("wrong passphrase");
@@ -54,16 +54,16 @@ describe("VerifyImportedKeyPassphraseController", () => {
     it("Should throw an exception if the setupEntity doesn't have a private key set.", () => {
       const account = new AccountEntity(defaultAccountDto());
       delete account._props.user_private_armored_key;
-      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
-      const controller = new VerifyImportedKeyPassphraseController({port: {_port: {name: "test"}}}, null);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
+      const controller = new VerifyImportedKeyPassphraseController({ port: { _port: { name: "test" } } }, null);
 
       expect.assertions(1);
       const promise = controller.exec("whatever passphrase");
       return expect(promise).rejects.toThrowError(new Error("An account user private key is required."));
     });
 
-    it("Should raise an error if no account has been found.", async() => {
-      const controller = new VerifyImportedKeyPassphraseController({port: {_port: {name: "test"}}}, null);
+    it("Should raise an error if no account has been found.", async () => {
+      const controller = new VerifyImportedKeyPassphraseController({ port: { _port: { name: "test" } } }, null);
       expect.assertions(1);
       try {
         await controller.exec("test");

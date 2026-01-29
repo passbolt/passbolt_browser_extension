@@ -17,14 +17,14 @@ import UserService from "../api/user/userService";
 import KeepSessionAliveService from "./keepSessionAliveService";
 import PassphraseStorageService from "./passphraseStorageService";
 
-beforeEach(async() => {
+beforeEach(async () => {
   await browser.alarms.clearAll();
   jest.resetAllMocks();
 });
 
 describe("KeepSessionAliveService", () => {
   describe("KeepSessionAliveService::set", () => {
-    it("should start the alarm if none has been set already", async() => {
+    it("should start the alarm if none has been set already", async () => {
       expect.assertions(3);
       const spyOnAlarmGet = jest.spyOn(browser.alarms, "get").mockImplementation(() => {});
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create").mockImplementation(() => {});
@@ -35,11 +35,11 @@ describe("KeepSessionAliveService", () => {
       expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
       expect(spyOnAlarmCreate).toHaveBeenCalledWith("SessionKeepAlive", {
         delayInMinutes: 15,
-        periodInMinutes: 15
+        periodInMinutes: 15,
       });
     });
 
-    it("should not start the alarm if one already exist", async() => {
+    it("should not start the alarm if one already exist", async () => {
       expect.assertions(1);
       jest.spyOn(browser.alarms, "get").mockImplementation(() => ({}));
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create").mockImplementation(() => {});
@@ -51,14 +51,14 @@ describe("KeepSessionAliveService", () => {
   });
 
   describe("KeepSessionAliveService::isStarted", () => {
-    it("should return true if the alarm is started", async() => {
+    it("should return true if the alarm is started", async () => {
       expect.assertions(1);
       jest.spyOn(browser.alarms, "get").mockImplementation(() => ({}));
       const isSessionKept = await KeepSessionAliveService.isStarted();
       expect(isSessionKept).toStrictEqual(true);
     });
 
-    it("should return false if the alarm has been cleared out", async() => {
+    it("should return false if the alarm has been cleared out", async () => {
       expect.assertions(1);
       await KeepSessionAliveService.start();
       await browser.alarms.clearAll();
@@ -66,7 +66,7 @@ describe("KeepSessionAliveService", () => {
       expect(isSessionKept).toStrictEqual(false);
     });
 
-    it("should return false if the alarm has never been set", async() => {
+    it("should return false if the alarm has never been set", async () => {
       expect.assertions(1);
       const isSessionKept = await KeepSessionAliveService.isStarted();
       expect(isSessionKept).toStrictEqual(false);
@@ -74,7 +74,7 @@ describe("KeepSessionAliveService", () => {
   });
 
   describe("KeepSessionAliveService::stop", () => {
-    it("should clear the alarms and remove listeners if any", async() => {
+    it("should clear the alarms and remove listeners if any", async () => {
       expect.assertions(2);
 
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
@@ -85,7 +85,7 @@ describe("KeepSessionAliveService", () => {
       expect(spyOnAlarmClear).toHaveBeenCalledWith("SessionKeepAlive");
     });
 
-    it("should clear the alarms and not remove the listeners if there is none", async() => {
+    it("should clear the alarms and not remove the listeners if there is none", async () => {
       expect.assertions(2);
 
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
@@ -98,7 +98,7 @@ describe("KeepSessionAliveService", () => {
   });
 
   describe("KeepSessionAliveService::handleKeepSessionAlive", () => {
-    it("should not handle alarms that is not SessionKeepAlive", async() => {
+    it("should not handle alarms that is not SessionKeepAlive", async () => {
       expect.assertions(1);
       const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
 
@@ -109,10 +109,10 @@ describe("KeepSessionAliveService", () => {
       expect(spyOnPassphraseStorage).not.toHaveBeenCalled();
     });
 
-    it("should not try to keep session alive if no passphrase is found in memory", async() => {
+    it("should not try to keep session alive if no passphrase is found in memory", async () => {
       expect.assertions(1);
       const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
-      spyOnPassphraseStorage.mockImplementation(async() => null);
+      spyOnPassphraseStorage.mockImplementation(async () => null);
 
       await KeepSessionAliveService.handleKeepSessionAlive({
         name: "SessionKeepAlive",
@@ -121,10 +121,12 @@ describe("KeepSessionAliveService", () => {
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
 
-    it("should keep the session alive if a passphrase is found in memory", async() => {
+    it("should keep the session alive if a passphrase is found in memory", async () => {
       expect.assertions(2);
       await MockExtension.withConfiguredAccount();
-      const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get").mockImplementation(async() => "what a passphrase!");
+      const spyOnPassphraseStorage = jest
+        .spyOn(PassphraseStorageService, "get")
+        .mockImplementation(async () => "what a passphrase!");
       const spyOnUserService = jest.spyOn(UserService.prototype, "keepSessionAlive").mockImplementation(() => true);
 
       await KeepSessionAliveService.handleKeepSessionAlive({

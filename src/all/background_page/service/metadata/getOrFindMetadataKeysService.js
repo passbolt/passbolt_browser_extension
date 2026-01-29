@@ -26,7 +26,10 @@ export default class GetOrFindMetadataKeysService {
    * @param {ApiClientOptions} apiClientOptions The api client options
    */
   constructor(account, apiClientOptions) {
-    this.findAndUpdateMetadataKeysService = new FindAndUpdateMetadataKeysSessionStorageService(account, apiClientOptions);
+    this.findAndUpdateMetadataKeysService = new FindAndUpdateMetadataKeysSessionStorageService(
+      account,
+      apiClientOptions,
+    );
     this.metadataKeysSessionStorage = new MetadataKeysSessionStorage(account);
   }
 

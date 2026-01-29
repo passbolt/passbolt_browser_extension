@@ -14,9 +14,9 @@
 
 export const createMfaOrganizationSettings = (data = {}) => {
   const defaultData = {
-    "totp": false,
-    "duo": false,
-    "yubikey": false
+    totp: false,
+    duo: false,
+    yubikey: false,
   };
 
   return Object.assign(defaultData, data);
@@ -24,19 +24,18 @@ export const createMfaOrganizationSettings = (data = {}) => {
 
 export const createMfaCombinedEnabledProviders = (data = {}) => {
   const defaultData = {
-    "totp": false,
-    "duo": false,
-    "yubikey": false
+    totp: false,
+    duo: false,
+    yubikey: false,
   };
 
   return Object.assign(defaultData, data);
 };
 
-
 export const defaultMfaSettings = (data = {}) => {
   const defaultData = {
-    "MfaOrganizationSettings": createMfaOrganizationSettings(data.MfaOrganizationSettings),
-    "MfaAccountSettings": createMfaCombinedEnabledProviders(data.MfaAccountSettings)
+    MfaOrganizationSettings: createMfaOrganizationSettings(data.MfaOrganizationSettings),
+    MfaAccountSettings: createMfaCombinedEnabledProviders(data.MfaAccountSettings),
   };
   return Object.assign(defaultData, data);
 };

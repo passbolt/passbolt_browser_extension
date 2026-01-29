@@ -12,7 +12,7 @@
  * @since         5.1.1
  */
 
-import {assertUuid} from "../../../utils/assertions";
+import { assertUuid } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
 const USER_KEY_POLICIES_SETTINGS_API_SERVICE_RESOURCE_NAME = "setup/user-key-policies/settings";
@@ -41,7 +41,7 @@ class UserKeyPoliciesSettingsApiService extends AbstractService {
 
     const urlOptions = {
       user_id: userId,
-      token: authenticationToken
+      token: authenticationToken,
     };
 
     const apiResult = await this.apiClient.findAll(urlOptions);

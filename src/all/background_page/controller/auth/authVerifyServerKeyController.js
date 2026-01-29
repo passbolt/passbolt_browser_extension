@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import i18n from "../../sdk/i18n";
 import KeyIsExpiredError from "../../error/keyIsExpiredError";
 import ServerKeyChangedError from "../../error/serverKeyChangedError";
@@ -45,10 +45,10 @@ class AuthVerifyServerKeyController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -59,7 +59,10 @@ class AuthVerifyServerKeyController {
    */
   async exec() {
     try {
-      await this.authVerifyServerChallengeService.verifyAndValidateServerChallenge(this.account.userKeyFingerprint, this.account.serverPublicArmoredKey);
+      await this.authVerifyServerChallengeService.verifyAndValidateServerChallenge(
+        this.account.userKeyFingerprint,
+        this.account.serverPublicArmoredKey,
+      );
     } catch (error) {
       await this.onVerifyError(error);
     }
@@ -83,30 +86,30 @@ class AuthVerifyServerKeyController {
       throw error;
     }
 
-    if (error.message && error.message.indexOf('no user associated') !== -1) {
+    if (error.message && error.message.indexOf("no user associated") !== -1) {
       /*
        * If the user has been deleted from the API, remove the authentication iframe served by the
        * browser extension, and let the user continue its journey through the triage app served by the API.
        */
-      (await WorkerService.get('AuthBootstrap', this.worker.tab.id)).port.emit('passbolt.auth-bootstrap.remove-iframe');
+      (await WorkerService.get("AuthBootstrap", this.worker.tab.id)).port.emit("passbolt.auth-bootstrap.remove-iframe");
     } else {
       try {
-        if (!await this.canParseServerKey()) {
+        if (!(await this.canParseServerKey())) {
           // @deprecated with v3.6.0. Fix an issue users encounter while using an armored server key with multiple keys https://github.com/passbolt/passbolt_browser_extension/issues/150
-          error = new ServerKeyChangedError(i18n.t('The server key cannot be parsed.'));
+          error = new ServerKeyChangedError(i18n.t("The server key cannot be parsed."));
         } else if (await this.serverKeyChanged()) {
-          error = new ServerKeyChangedError(i18n.t('The server key has changed.'));
+          error = new ServerKeyChangedError(i18n.t("The server key has changed."));
         } else if (await this.serverKeyIsExpired()) {
-          error = new KeyIsExpiredError(i18n.t('The server key is expired.'));
+          error = new KeyIsExpiredError(i18n.t("The server key is expired."));
         }
       } catch (e) {
         console.error(e);
         // Cannot ask for old server key, maybe server is misconfigured
-        error = new Error(i18n.t('Server internal error. Check with your administrator.'));
+        error = new Error(i18n.t("Server internal error. Check with your administrator."));
       }
     }
 
-    error.message = `${i18n.t('Could not verify the server key.')} ${error.message}`;
+    error.message = `${i18n.t("Could not verify the server key.")} ${error.message}`;
     throw error;
   }
 
@@ -132,7 +135,7 @@ class AuthVerifyServerKeyController {
     const remoteServerArmoredKey = (await this.authVerifyServerKeyService.getServerKey()).armored_key;
     const remoteServerKey = await OpenpgpAssertion.readKeyOrFail(remoteServerArmoredKey);
     const serverLocalKey = await OpenpgpAssertion.readKeyOrFail(this.account.serverPublicArmoredKey);
-    return !await CompareGpgKeyService.areKeysTheSame(remoteServerKey, serverLocalKey);
+    return !(await CompareGpgKeyService.areKeysTheSame(remoteServerKey, serverLocalKey));
   }
 
   /**

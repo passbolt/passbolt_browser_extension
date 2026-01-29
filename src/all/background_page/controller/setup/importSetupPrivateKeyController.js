@@ -13,7 +13,7 @@
  */
 
 import i18n from "../../sdk/i18n";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import GpgKeyError from "../../error/GpgKeyError";
 import AuthVerifyServerChallengeService from "../../service/auth/authVerifyServerChallengeService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
@@ -40,10 +40,10 @@ class ImportSetupPrivateKeyController {
   async _exec(armoredKey) {
     try {
       await this.exec(armoredKey);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -76,7 +76,7 @@ class ImportSetupPrivateKeyController {
    */
   async _assertImportKeyNotUsed(fingerprint, serverPublicArmoredKey) {
     if (!serverPublicArmoredKey) {
-      throw new Error('The server public key should have been provided before importing a private key');
+      throw new Error("The server public key should have been provided before importing a private key");
     }
     let keyAlreadyUsed = false;
 
@@ -89,7 +89,7 @@ class ImportSetupPrivateKeyController {
     }
 
     if (keyAlreadyUsed) {
-      throw new GpgKeyError(i18n.t('This key is already used by another user.'));
+      throw new GpgKeyError(i18n.t("This key is already used by another user."));
     }
   }
 }

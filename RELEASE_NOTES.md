@@ -1,102 +1,76 @@
-Release song: https://www.youtube.com/watch?v=F5uXomY94w8
+Release song: https://www.youtube.com/watch?v=QNa5o85Q-FE
 
-Passbolt 5.8.0 introduces dynamic role management, allowing organizations to define additional roles that better align with internal policies, compliance requirements, and operational needs. This release also adds drag & drop user assignment to groups, simplifying day-to-day user and group management.
+Passbolt 5.9 is designed to keep upgrades predictable and everyday use reliable. It expands runtime compatibility with PHP 8.5, makes environment risks easier to spot earlier through health checks, and closes a couple of security gaps that could otherwise be used to probe accounts or mislead users during navigation.
 
-**Warning**: Ensure that all users have updated their browser extension to at least version 5.8 before assigning new roles. Otherwise, they will not be able to connect to Passbolt.
+**Warning**: If you run MariaDB 10.3 or 10.5, or MySQL 5, pay particular attention to the environment section below. Support for these versions is planned to stop in January 2027, and this release starts flagging them proactively so you can schedule upgrades before they become urgent.
 
-## Dynamic role management
+### Environment support and deprecation signals you can act on early
 
-As was already the case with the default User role, Passbolt allows administrators to restrict what users can do by limiting access to specific capabilities. With version 5.8, this model is extended beyond the default Admin and User roles, making it possible to create additional roles and assign them to users for more granular control.Default roles cannot be modified or deleted, while newly created roles (up to two per instance)  can copy permissions from existing roles and can be renamed or deleted.
+Passbolt 5.9 adds PHP 8.5 support, helping administrators and platform teams validate upcoming runtime upgrades in advance. Moreover, while PHP 8.2 is still supported until 2027, it has entered security maintenance, and administrators should plan its upgrade this year.
 
-Dynamic roles also enable the delegation of administrative responsibilities. Rather than granting full administrative access, administrators can now assign selected capabilities to custom roles and distribute operational tasks across multiple users. Initial support covers group creation, as well as handling account recovery requests in Passbolt Pro.
+At the same time, this release improves environment health checks to surface database versions that have reached end of life. MariaDB 10.3 and 10.5, and MySQL 5, are now flagged as deprecated allowing administrators to identify risky deployments during routine maintenance rather than responding under time pressure. These notices are explicitly tied to a planned end of support in January 2027, giving teams  a clear runway to align database upgrades with regular change windows and internal upgrade policies.
 
-At this stage, dynamic role management comes with a defined scope and set of constraints.
+### Safer account recovery responses to reduce email enumeration risk
 
-- The default Admin and User roles keep fixed names and cannot be renamed or deleted.
-- As before, the User role can be restricted, but it cannot be assigned delegated administrative responsibilities.
-- The Admin role, by contrast, always retains access to all capabilities and cannot be restricted.
-- Custom roles are currently limited to two per instance and support a first set of administrative capabilities.
+Account recovery endpoints can unintentionally reveal whether a user exists, which makes targeted attacks easier. In Passbolt 5.9, the recover endpoint no longer leaks information when a user does not exist in the database, reducing the signal attackers rely on for email or username enumeration.
 
-This scope will be expanded progressively as additional needs and use cases are identified by the community.
+### Stronger protection against clickjacking and deceptive overlays
 
-## Drag & drop users to groups
+Clickjacking and overlay techniques aim to trick users into clicking something different from what they believe they are interacting with. Passbolt 5.9 reinforces defenses against these UI-level attacks in edge-case conditions, including scenarios where a compromised website tries to influence user interactions when a password could be suggested.
 
-Managing group membership often requires repetitive actions when working with large teams or frequently changing group structures. With Passbolt 5.8, administrators can now add users to a group by dragging them directly onto it from the Users & Groups workspace. This removes the need to open and edit each group individually and makes day-to-day group management faster and more fluid.
+In practice, this extra hardening helps ensure users cannot be guided into interacting with sensitive Passbolt components when those components are not fully visible and clearly presented to them.
 
-## Miscellaneous improvements
+### Better visibility and efficiency around email digest operations
 
-As usual, this release includes fixes and smaller improvements intended to improve the overall experience. For the full list of changes, please refer to the changelog.
+Large folder operations can generate a lot of email activity and can be difficult  to reason about as  queues grow. Passbolt 5.9 improves digest handling related to folder operations, helping reduce unnecessary mail churn in workspaces where folder structure and permissions evolve frequently.
 
-Many thanks to everyone who provided feedback and helped refine these features.
+In addition, the passbolt *email_digest* command now reports how many emails were sent and how many remain in the queue. This makes it easier for administrators to confirm progress, anticipate bursts, and troubleshoot queue behavior using logs.
 
-### Added
-- PB-46646 Reduce accidental destructive actions by moving Delete user and Disable MFA into a More menu in Users and groups
-- PB-28298 Add users to groups by dragging and dropping
-- PB-47198 Add exception to allow users to autofill workbench.cisecurity.org
-- PB-46997 DR - WP1.1 Update RbacsCollection to EntityV2Collection and add new methods
-- PB-46999 DR - WP1.2 Update RoleEntity schema and add new methods
-- PB-47000 DR - WP1.3 Update RolesCollection to EntityV2Collection and add new methods
-- PB-47002 DR - WP2.1 Update of RoleService to a RoleApiService
-- PB-47003 DR - WP2.2 Update of RoleModel to a RoleService
-- PB-47003 DR - WP2.3 Update of RbacService to a RbacApiService
-- PB-47014 DR - WP2.4 Update of RbacModel to a RbacService
-- PB-47015 DR - WP3.1 Create the FindAllRolesController and update the event
-- PB-47015 DR - WP3.1 Create the FindAllRolesController and update the event
-- PB-47017 DR - WP3.2 Update the FindMeController into a FindMeRbacController
-- PB-47088 DR - WP3.3 Create the FindAndUpdateRolesLocalStorageController
-- PB-47018 DR - WP4.1 Create RoleServiceWorkerService to get the roles
-- PB-47019 DR - WP4.2 Create RbacServiceWorkerService to get the RBAC permissions of a signed-in user
-- PB-47021 DR - WP4.3 Add the method canRoleUseAction in CanUseService
-- PB-47089 DR - WP4.4 Add a method to find and update roles in local storage
-- PB-47022 DR - WP5.1 Add the method canIUseAction in RbacContext
-- PB-47023 DR - WP5.2 Verify the signed-in user's RBAC privileges before allowing access to the FilterUsersByGroup functionality
-- PB-47024 DR - WP5.3 Verify the signed-in user's RBAC privileges before allowing access to the DisplayUserWorkspaceMainActions functionality
+### Maintenance work that improves stability over time
 
-- PB-47023 DR - WP5.4 Verify the signed-in user's RBAC privileges before allowing access to the DisplayUserWorkspaceActions functionality
-- PB-47036 DR - WP5.5 Verify the signed-in user's RBAC privileges before allowing access to the DisplayUsersWorkspaceFilterBar functionality
-- PB-47037 DR - WP5.6 Verify the signed-in user's RBAC privileges before allowing access to the DisplayUsers functionality
-- PB-47039 DR - WP5.7 Update CreateUser to select role in a dropdown component
-- PB-47042 DR - WP5.8 Update EditUser to select role in a dropdown component
-- PB-47027 DR - WP5.9 Create the component CreateRoleDialog
-- PB-47028 DR - WP5.10 Create the component EditRoleDialog
-- PB-47029 DR - WP5.11 Create the component DeleteRoleDialog
-- PB-47030 DR - WP5.12 Update the style of DisplayRbacAdministration to match current design
-- PB-47031 DR - WP5.13 Add create role in DisplayRbacAdministration
-- PB-47032 DR - WP5.14 Display all roles in DisplayRbacAdministration
-- PB-47033 DR - WP5.15 Add menu item to update the name of new role
-- PB-47016 DR - WP5.16 Add menu item to delete new role
-- PB-47090 DR - WP5.17 Update ManageAccountRecoveryUserSettings to use roles from context
-- PB-47091 DR - WP5.18 Update ReviewAccountRecoveryRequest to use roles from context
-- PB-47092 DR - WP5.19 Update DisplayScimSettingsAdministration to use roles from context
-- PB-47093 DR - WP5.20 Update DisplayUserDetailsInformation to use roles from context
-- PB-47094 DR - WP5.21 Update DisplayAccountRecoveryUserSettings to use roles from context
-- PB-47095 DR - WP5.22 Update UserWorkspaceContext to use roles from context
-- PB-47096 DR - WP5.23 Create the RoleContextProvider and add it on ExtAppContext
-- PB-47214 DR - WP5.24 Update the RoleEntity to avoid name bypass
-- PB-47215 DR - WP5.25 Update RolesCollection to filter out Guest role
-- PB-47216 DR - WP5.26 Update FindRolesService to filter out guest role
-- PB-47231 DR - WP5.27 Create component DeleteRoleNotAllowed
+Passbolt 5.9 continues the migration work of its UI framework for authentication-related applications. The first applications have been migrated as  part of a larger foundation effort aimed at improving stability and long-term performance as more areas move to the new framework.
+
+### Conclusion
+This release also includes additional fixes and improvements beyond the highlights above. Check out the changelogs to learn more. Thanks to the community members and teams who reported issues and helped validate fixes.
+
 
 ### Fixed
-- PB-46180 Incorrect folder name encoding in sharing progress dialog
-- PB-46612 Add missing border radius to secret history selected revision
-- PB-45978 Resize bar continues dragging after mouse release
-- PB-46905 Display the "Remove from group" action button to group managers
-- PB-46627 Fix missing space in the “Advanced settings” of the password generator tabs between the last component and the CTA
-- PB-46930 Secret history review should display an unknown user when creator does not exists
-- PB-47298 KDBX not set expiry if never is set
+- PB-43511 Display the "Migrate metadata" admin home page card icon with a 2px stroke width
 
 ### Maintenance
-- PB-46636 Remove eslint v8 compatibility
-- PB-46890 Small upgrade for js-yaml (Medium)
-- PB-46831 Increase coverage of passbolt-styleguide DisplayUserTheme to 100%, and verify no change occurs when the user selects the already-selected theme
-- PB-29338 React 18: upgrade changes with Legacy DOM renderer
-- PB-47057 React 18: Remove unused dev dependency jest-dom
-- PB-47069 DisplayResourceDetailsInformation Test Cases for Expired Passwords
-- PB-46831 Increase coverage of passbolt-styleguide DisplayUserTheme to 100%
-- PB-47069 DisplayResourceDetailsInformation Test Cases for Expired Passwords
-- PB-47311 Major upgrade for serialize-javascript (Medium)
-- PB-46832 Increase coverage of ThemeEntity
-- PB-46833 Increase coverage of AccountSettingsService
-- PB-46834 Increase coverage of ThemeModel
-- PB-47011 ESLINT - WP1.1 Install phantom dependencies
+- PB-6069 Moving folders should not send unnecessary data to the API
+- PB-44598 Replaced links from old help site with new docs links
+- PB-46314 REACT18 Implement migration for Login Content Script
+- PB-46361 REACT18 Implement migration for Login WAR file
+- PB-46364 REACT18 Implement migration for Account Recovery
+- PB-46664 First browser extension build has missing dist folder for browsers that cause issue
+- PB-46665 Browser extension build should add chrome-mv3 in the global build command
+- PB-47012 Add prettier to replace ESLINT styling rules
+- PB-47073 Add SubscriptionKeyServiceWorkerService
+- PB-47074 Rename subscriptionService to subscriptionApiService
+- PB-47075 Migrate subscription key finder business logic
+- PB-47100 Move find controller logic from SubscriptionController
+- PB-47101 Migrate subscription logic from SubscriptionController to UpdateSubscriptionKeyController
+- PB-47103 Remove grunt-contrib-clean dependency
+- PB-47351 Chrome Bext is killed and not restarted on upgrade
+- PB-47606 Add eslint-plugin-security
+- PB-47607 Add eslint-plugin-n
+- PB-47608 Add eslint-plugin-regexp
+- PB-47609 Add eslint-plugin-promise
+- PB-47621 Move SubscriptionEntity from browser extension to styleguide
+- PB-47692 Fix prettier warning
+- PB-47707 REACT18 Implement migration for Recover
+- PB-47711 REACT18 Implement migration for Setup
+- PB-47719 REACT18 Implement migration for Inform Menu
+- PB-47783 REACT18 Implement migration for API Triage Feedback
+- PB-47785 REACT18 Implement migration for Setup/Recover Account recovery
+- PB-47867 Align dynamic roles to work with the windows application
+- PB-47902 Add a ResponseEntity factory for the unit tests
+- PB-47905 Refactor test mock for subscription refactoring
+- PB-47931 Cleanup ResourceModel
+- PB-47955 Update overlay calculation detection on inform
+- PB-48014 Remove dead code from Google Closure library
+- PB-48038 Small upgrade for validator
+
+### Security
+- PB-46637 Prevent in-form menu to be displayed when overlaid by other components

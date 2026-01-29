@@ -14,8 +14,7 @@
 
 export const defaultVerifyProviderData = (props = {}) => {
   const data = {
-    verified: "2023-09-27T13:03:23+00:00"
+    verified: "2023-09-27T13:03:23+00:00",
   };
   return Object.assign(data, props);
 };
-

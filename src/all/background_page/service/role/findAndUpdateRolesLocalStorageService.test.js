@@ -14,14 +14,14 @@
 import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";
 import RolesLocalStorage from "../local_storage/rolesLocalStorage";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {rolesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { rolesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection.test.data";
 import FindAndUpdateRolesLocalStorageService from "./findAndUpdateRolesLocalStorageService";
 
 describe("FindAndUpdateRolesLocalStorageService", () => {
   describe("::findAndUpdateAll", () => {
-    it("should call the API to retrieve the data and set the local storage", async() => {
+    it("should call the API to retrieve the data and set the local storage", async () => {
       expect.assertions(5);
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
@@ -35,18 +35,18 @@ describe("FindAndUpdateRolesLocalStorageService", () => {
 
       const resultCollection = await service.findAndUpdateAll();
       expect(service.findRolesService.findAll).toHaveBeenCalledTimes(1);
-      expect(service.findRolesService.findAll).toHaveBeenCalledWith({ignoreInvalidEntity: true});
+      expect(service.findRolesService.findAll).toHaveBeenCalledWith({ ignoreInvalidEntity: true });
       expect(resultCollection).toStrictEqual(rolesCollection);
 
       const localStorageStateAfter = await RolesLocalStorage.get();
       expect(localStorageStateAfter).toStrictEqual(rolesCollection.toDto());
     });
 
-    it("should call the API only once if the API did not responded yet", async() => {
+    it("should call the API only once if the API did not responded yet", async () => {
       expect.assertions(3);
 
       let resolve;
-      const promise = new Promise(_resolve => resolve = _resolve);
+      const promise = new Promise((_resolve) => (resolve = _resolve));
 
       const account = new AccountEntity(defaultAccountDto());
       const apiClientOptions = defaultApiClientOptions();
@@ -63,7 +63,7 @@ describe("FindAndUpdateRolesLocalStorageService", () => {
       const rolesCollectionLocalStorage = await RolesLocalStorage.get();
 
       expect(service.findRolesService.findAll).toHaveBeenCalledTimes(1);
-      expect(service.findRolesService.findAll).toHaveBeenCalledWith({ignoreInvalidEntity: true});
+      expect(service.findRolesService.findAll).toHaveBeenCalledWith({ ignoreInvalidEntity: true });
       expect(rolesCollectionLocalStorage).toEqual(rolesCollection.toDto());
     });
   });

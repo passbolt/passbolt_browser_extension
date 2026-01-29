@@ -32,10 +32,10 @@ export default class RedirectPostLoginController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -48,10 +48,8 @@ export default class RedirectPostLoginController {
     const workerUrl = new URL(this.worker.tab.url);
     const redirectTo = workerUrl.searchParams.get("redirect");
 
-    const url = /^\/[A-Za-z0-9\-\/]*$/.test(redirectTo)
-      ? `${this.account.domain}${redirectTo}`
-      : this.account.domain;
+    const url = /^\/[A-Za-z0-9\-\/]*$/.test(redirectTo) ? `${this.account.domain}${redirectTo}` : this.account.domain;
 
-    chrome.tabs.update(this.worker.tab.id, {url});
+    chrome.tabs.update(this.worker.tab.id, { url });
   }
 }

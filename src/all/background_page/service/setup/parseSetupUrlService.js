@@ -25,7 +25,7 @@ class ParseSetupUrlService {
     const regex = new RegExp(`(.*)\/setup\/(install|start)\/(${uuidRegex})\/(${uuidRegex})`);
 
     if (!regex.test(url)) {
-      throw new Error('Cannot parse setup url. The url does not match the pattern.');
+      throw new Error("Cannot parse setup url. The url does not match the pattern.");
     }
 
     const parsedUrl = url.match(regex);
@@ -33,16 +33,16 @@ class ParseSetupUrlService {
     const [, , , user_id, authentication_token_token] = parsedUrl;
 
     // Sanitize domains, removed trailing "/" in order to avoid domains such as https://passbolt.dev//
-    domain = domain.replace(/\/*$/g, '');
+    domain = domain.replace(/\/*$/g, "");
 
     try {
       new URL(domain);
     } catch (error) {
       console.error(error);
-      throw new Error('Cannot parse setup url. The domain is not valid.');
+      throw new Error("Cannot parse setup url. The domain is not valid.");
     }
 
-    return {domain, user_id, authentication_token_token};
+    return { domain, user_id, authentication_token_token };
   }
 
   /**

@@ -33,7 +33,9 @@ class SsoSettingsModel {
    * @returns {Promise<SsoSettingsEntity>} the saved entity
    */
   async saveDraft(ssoSettingsEntity) {
-    const savedDraft = await this.ssoSettingsService.saveDraft(ssoSettingsEntity.toDto(SsoSettingsEntity.DEFAULT_CONTAIN));
+    const savedDraft = await this.ssoSettingsService.saveDraft(
+      ssoSettingsEntity.toDto(SsoSettingsEntity.DEFAULT_CONTAIN),
+    );
     return new SsoSettingsEntity(savedDraft);
   }
 
@@ -68,7 +70,7 @@ class SsoSettingsModel {
   async activate(ssoSettingsId, ssoToken) {
     const activationDto = {
       token: ssoToken,
-      status: "active"
+      status: "active",
     };
     const savedDraft = await this.ssoSettingsService.activateSettings(ssoSettingsId, activationDto);
     return new SsoSettingsEntity(savedDraft);

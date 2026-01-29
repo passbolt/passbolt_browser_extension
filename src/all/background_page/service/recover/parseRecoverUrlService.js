@@ -24,23 +24,23 @@ class ParseRecoverUrlService {
     const parsedUrl = url.match(this.getRegex());
 
     if (!parsedUrl) {
-      throw new Error('The url does not match the pattern.');
+      throw new Error("The url does not match the pattern.");
     }
 
     let [, domain] = parsedUrl;
     const [, , , user_id, authentication_token_token] = parsedUrl;
 
     // Sanitize domains, removed trailing "/" in order to avoid domains such as https://passbolt.dev//
-    domain = domain.replace(/\/*$/g, '');
+    domain = domain.replace(/\/*$/g, "");
 
     try {
       new URL(domain);
     } catch (error) {
       console.error(error);
-      throw new Error('The domain is not valid.');
+      throw new Error("The domain is not valid.");
     }
 
-    return {domain, user_id, authentication_token_token};
+    return { domain, user_id, authentication_token_token };
   }
 
   /**

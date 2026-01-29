@@ -15,21 +15,20 @@ import TagController from "../controller/tag/tagController";
 import TagEntity from "../model/entity/tag/tagEntity";
 import TagsCollection from "../model/entity/tag/tagsCollection";
 
-
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Find all the tags
    *
    * @listens passbolt.tags.find-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.tags.find-all', async requestId => {
+  worker.port.on("passbolt.tags.find-all", async (requestId) => {
     try {
       const tagModel = new TagModel(apiClientOptions, account);
       const tagsCollection = await tagModel.findAll();
-      worker.port.emit(requestId, 'SUCCESS', tagsCollection);
+      worker.port.emit(requestId, "SUCCESS", tagsCollection);
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 
@@ -41,14 +40,14 @@ const listen = function(worker, apiClientOptions, account) {
    * @param resourceId {uuid} The resource identifier
    * @param tagsDto {Object} tags dto
    */
-  worker.port.on('passbolt.tags.update-resource-tags', async(requestId, resourceId, tagsDto) => {
+  worker.port.on("passbolt.tags.update-resource-tags", async (requestId, resourceId, tagsDto) => {
     try {
       const tagModel = new TagModel(apiClientOptions, account);
       const tagsCollection = new TagsCollection(tagsDto);
       const tags = await tagModel.updateResourceTags(resourceId, tagsCollection);
-      worker.port.emit(requestId, 'SUCCESS', tags);
+      worker.port.emit(requestId, "SUCCESS", tags);
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 
@@ -59,13 +58,13 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param {object} resourcesTagDto {resources: array of uuids, tag: {object}} the tag to add for the resources
    */
-  worker.port.on('passbolt.tags.add-resources-tag', async(requestId, resourcesTagDto) => {
+  worker.port.on("passbolt.tags.add-resources-tag", async (requestId, resourcesTagDto) => {
     try {
       const tagController = new TagController(worker, apiClientOptions, account);
       await tagController.addTagResources(resourcesTagDto.resources, resourcesTagDto.tag);
-      worker.port.emit(requestId, 'SUCCESS');
+      worker.port.emit(requestId, "SUCCESS");
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 
@@ -76,14 +75,14 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param tagDto {object} The tag object
    */
-  worker.port.on('passbolt.tags.update', async(requestId, tagDto) => {
+  worker.port.on("passbolt.tags.update", async (requestId, tagDto) => {
     try {
       const tagModel = new TagModel(apiClientOptions, account);
       const tagEntity = new TagEntity(tagDto);
       const updatedTag = await tagModel.update(tagEntity);
-      worker.port.emit(requestId, 'SUCCESS', updatedTag);
+      worker.port.emit(requestId, "SUCCESS", updatedTag);
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 
@@ -94,14 +93,14 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param tagId {uuid} The tag identifier
    */
-  worker.port.on('passbolt.tags.delete', async(requestId, tagId) => {
+  worker.port.on("passbolt.tags.delete", async (requestId, tagId) => {
     try {
       const tagModel = new TagModel(apiClientOptions, account);
       await tagModel.delete(tagId);
-      worker.port.emit(requestId, 'SUCCESS');
+      worker.port.emit(requestId, "SUCCESS");
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, "ERROR", error);
     }
   });
 };
-export const TagEvents = {listen};
+export const TagEvents = { listen };

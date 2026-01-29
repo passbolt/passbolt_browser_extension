@@ -1,4 +1,3 @@
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -20,11 +19,11 @@ import PublicWebsiteSignInController from "../controller/publicWebsiteSignIn/pub
  * @param {ApiClientOptions} _
  * @param {AccountEntity} account The account completing the account recovery
  */
-const listen = function(worker, _, account) {
-  worker.port.on('passbolt.extension.sign-in-url', async requestId => {
+const listen = function (worker, _, account) {
+  worker.port.on("passbolt.extension.sign-in-url", async (requestId) => {
     const controller = new PublicWebsiteSignInController(worker, requestId, account);
     await controller._exec();
   });
 };
 
-export const PublicWebsiteSignInEvents = {listen};
+export const PublicWebsiteSignInEvents = { listen };

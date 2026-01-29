@@ -14,10 +14,10 @@
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
-import MoveOneFolderService, {PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE} from "../../service/move/moveOneFolderService";
+import MoveOneFolderService, { PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE } from "../../service/move/moveOneFolderService";
 import ConfirmMoveStrategyService from "../../service/move/confirmMoveStrategyService";
 import FolderModel from "../../model/folder/folderModel";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
 class MoveFolderController {
@@ -48,10 +48,10 @@ class MoveFolderController {
   async _exec(folderId, destinationFolderId) {
     try {
       await this.exec(folderId, destinationFolderId);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -66,9 +66,9 @@ class MoveFolderController {
    * @throws {Error} If the folderId is equal to destinationFolderId
    */
   async exec(folderId, destinationFolderId = null) {
-    assertUuid(folderId, "The parameter \"folderId\" should be a UUID");
+    assertUuid(folderId, 'The parameter "folderId" should be a UUID');
     if (destinationFolderId !== null) {
-      assertUuid(destinationFolderId, "The parameter \"destinationFolderId\" should be a UUID");
+      assertUuid(destinationFolderId, 'The parameter "destinationFolderId" should be a UUID');
     }
     if (folderId === destinationFolderId) {
       throw new Error(i18n.t("The folder cannot be moved inside itself."));
@@ -77,11 +77,16 @@ class MoveFolderController {
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
-    this.progressService.start(PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE, i18n.t('Initialize'));
+    this.progressService.start(PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE, i18n.t("Initialize"));
 
     try {
-      await this.moveOneFolderService.moveOne(folderId, destinationFolderId, this.confirmMoveStrategyService, passphrase);
-      this.progressService.finishStep(i18n.t('Done!'), true);
+      await this.moveOneFolderService.moveOne(
+        folderId,
+        destinationFolderId,
+        this.confirmMoveStrategyService,
+        passphrase,
+      );
+      this.progressService.finishStep(i18n.t("Done!"), true);
     } finally {
       this.progressService.close();
     }

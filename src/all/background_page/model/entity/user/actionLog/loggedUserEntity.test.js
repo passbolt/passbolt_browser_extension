@@ -21,36 +21,48 @@ describe("Logged user entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "id": "f848277c-5398-58f8-a82a-72397af2d450",
-      "username": "ada@passbolt.com",
-      "profile": {
-        "first_name": "Ada",
-        "last_name": "Lovelace",
-        "avatar": {
-          "url": {
-            "medium": "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.a99472d5.png",
-            "small": "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.65a0ba70.png"
-          }
-        }
+      id: "f848277c-5398-58f8-a82a-72397af2d450",
+      username: "ada@passbolt.com",
+      profile: {
+        first_name: "Ada",
+        last_name: "Lovelace",
+        avatar: {
+          url: {
+            medium:
+              "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.a99472d5.png",
+            small:
+              "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.65a0ba70.png",
+          },
+        },
       },
     };
     const entity = new LoggedUserEntity(dto);
     expect(entity.toDto(LoggedUserEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
-    expect(entity.id).toEqual('f848277c-5398-58f8-a82a-72397af2d450');
-    expect(entity.username).toEqual('ada@passbolt.com');
-    expect(entity.profile.firstName).toBe('Ada');
-    expect(entity.profile.lastName).toBe('Lovelace');
-    expect(entity.profile.avatar.urlMedium).toBe("img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.a99472d5.png");
-    expect(entity.profile.avatar.urlSmall).toBe("img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.65a0ba70.png");
+    expect(entity.id).toEqual("f848277c-5398-58f8-a82a-72397af2d450");
+    expect(entity.username).toEqual("ada@passbolt.com");
+    expect(entity.profile.firstName).toBe("Ada");
+    expect(entity.profile.lastName).toBe("Lovelace");
+    expect(entity.profile.avatar.urlMedium).toBe(
+      "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.a99472d5.png",
+    );
+    expect(entity.profile.avatar.urlSmall).toBe(
+      "img\/public\/Avatar\/22\/47\/85\/50adf80e3534413abdd8e34c9be6d1b6\/50adf80e3534413abdd8e34c9be6d1b6.65a0ba70.png",
+    );
   });
 
   it("constructor works fails if not enough data is provided", () => {
     let t;
-    t = () => { new LoggedUserEntity({}); };
+    t = () => {
+      new LoggedUserEntity({});
+    };
     expect(t).toThrow(EntityValidationError);
-    t = () => { new LoggedUserEntity({id: "f848277c-5398-58f8-a82a-72397af2d450"}); };
+    t = () => {
+      new LoggedUserEntity({ id: "f848277c-5398-58f8-a82a-72397af2d450" });
+    };
     expect(t).toThrow(EntityValidationError);
-    t = () => { new LoggedUserEntity({id: "f848277c-5398-58f8-a82a-72397af2d450", "username": "ada@passbolt.com"}); };
+    t = () => {
+      new LoggedUserEntity({ id: "f848277c-5398-58f8-a82a-72397af2d450", username: "ada@passbolt.com" });
+    };
     expect(t).toThrow(EntityValidationError);
   });
 });

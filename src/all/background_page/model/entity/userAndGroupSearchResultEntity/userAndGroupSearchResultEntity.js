@@ -15,7 +15,7 @@ import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/enti
 import GroupEntity from "../group/groupEntity";
 import UserEntity from "../user/userEntity";
 
-const ENTITY_NAME = 'UserAndGroupSearchResult';
+const ENTITY_NAME = "UserAndGroupSearchResult";
 
 /**
  * User and group search result entity
@@ -25,7 +25,7 @@ class UserAndGroupSearchResultEntity extends EntityV2 {
    * @inheritDoc
    */
   marshall() {
-    if (Object.prototype.hasOwnProperty.call(this._props, 'user_count') && typeof(this._props.user_count) === 'string') {
+    if (Object.prototype.hasOwnProperty.call(this._props, "user_count") && typeof this._props.user_count === "string") {
       // the API might respond with a string for the user_count
       this._props.user_count = parseInt(this._props.user_count, 10);
     }
@@ -41,27 +41,25 @@ class UserAndGroupSearchResultEntity extends EntityV2 {
     const groupSchema = GroupEntity.getSchema();
 
     return {
-      "type": "object",
-      "required": [
-        "id",
-      ],
-      "properties": {
+      type: "object",
+      required: ["id"],
+      properties: {
         //common
-        "id": {
-          "type": "string",
-          "format": "uuid",
+        id: {
+          type: "string",
+          format: "uuid",
         },
 
         //user
-        "username": userSchema.properties.username,
-        "profile": userSchema.properties.profile,
+        username: userSchema.properties.username,
+        profile: userSchema.properties.profile,
 
         //group
-        "name": groupSchema.properties.name,
-        "user_count": {
-          "type": "integer",
+        name: groupSchema.properties.name,
+        user_count: {
+          type: "integer",
         },
-      }
+      },
     };
   }
 

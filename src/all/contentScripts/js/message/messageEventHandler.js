@@ -23,7 +23,7 @@ class MessageEventHandler {
    */
   constructor(messageService) {
     if (!(messageService instanceof MessageService)) {
-      throw new Error('The messageService should be a valid MessageService instance.');
+      throw new Error("The messageService should be a valid MessageService instance.");
     }
     this.messageService = messageService;
   }
@@ -35,17 +35,17 @@ class MessageEventHandler {
    * @param {any} controllerArgs The controller additional parameters.
    */
   listen(message, ControllerClass, ...controllerArgs) {
-    if (typeof message !== 'string') {
-      throw new Error('The message should be a valid string.');
+    if (typeof message !== "string") {
+      throw new Error("The message should be a valid string.");
     }
     if (!message.length) {
-      throw new Error('The message should not be empty.');
+      throw new Error("The message should not be empty.");
     }
-    if (typeof ControllerClass !== 'function') {
-      throw new Error('The ControllerClass should be a valid class.');
+    if (typeof ControllerClass !== "function") {
+      throw new Error("The ControllerClass should be a valid class.");
     }
 
-    const callback = async(...callbackArgs) => {
+    const callback = async (...callbackArgs) => {
       callbackArgs = callbackArgs || {};
       try {
         const controllersArgs = controllerArgs || {};

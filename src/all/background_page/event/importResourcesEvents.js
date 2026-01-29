@@ -6,14 +6,13 @@
  */
 import ImportResourcesFileController from "../controller/import/importResourcesFileController";
 
-
 /**
  * Listens to the import resources events
  * @param {Worker} worker The worker
  * @param {ApiClientOptions} apiClientOptions The api client options
  * @param {AccountEntity} account The account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Import resources file
    *
@@ -23,10 +22,10 @@ const listen = function(worker, apiClientOptions, account) {
    * @param file {string} The file in base64
    * @returns {{references: {folder: (object|null), tag: (object|null)}, created: {resourcesCount: int, foldersCount: int}, options: {folders: boolean, tags: boolean}, errors: {folders: array, resources: array}}}
    */
-  worker.port.on('passbolt.import-resources.import-file', async(requestId, fileType, file, options) => {
+  worker.port.on("passbolt.import-resources.import-file", async (requestId, fileType, file, options) => {
     const importController = new ImportResourcesFileController(worker, requestId, apiClientOptions, account);
     await importController._exec(fileType, file, options);
   });
 };
 
-export const ImportResourcesEvents = {listen};
+export const ImportResourcesEvents = { listen };

@@ -14,7 +14,7 @@
 import fs from "fs";
 
 describe("Locales", () => {
-  it("Extension name and description have the right size.", async() => {
+  it("Extension name and description have the right size.", async () => {
     const localesPath = "./src/all/_locales";
     const dir = await fs.promises.opendir(localesPath);
     const extensionNameLength = 45;
@@ -30,14 +30,18 @@ describe("Locales", () => {
           expect(localeContent.appName.message.length).toBeLessThanOrEqual(extensionNameLength);
         } catch (error) {
           console.error(error);
-          throw new Error(`Extension name for locale "${locale}" should not be greater than ${extensionNameLength} characters`);
+          throw new Error(
+            `Extension name for locale "${locale}" should not be greater than ${extensionNameLength} characters`,
+          );
         }
 
         try {
           expect(localeContent.appDescription.message.length).toBeLessThanOrEqual(extensionDescriptionLength);
         } catch (error) {
           console.error(error);
-          throw new Error(`Extension description for locale "${locale}" should not be greater than ${extensionDescriptionLength} characters`);
+          throw new Error(
+            `Extension description for locale "${locale}" should not be greater than ${extensionDescriptionLength} characters`,
+          );
         }
       }
     }

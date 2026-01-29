@@ -11,16 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {buildMockedCryptoKey} from "../../utils/assertions.test.data";
+import { buildMockedCryptoKey } from "../../utils/assertions.test.data";
 import DecryptSsoPassphraseService from "./decryptSsoPassphraseService";
 import EncryptSsoPassphraseService from "./encryptSsoPassphraseService";
 import GenerateSsoIvService from "./generateSsoIvService";
 
 describe("EncryptSsoPassphrase service", () => {
-  it('should encrypt the passphrase', async() => {
+  it("should encrypt the passphrase", async () => {
     expect.assertions(2);
-    const key1 = await buildMockedCryptoKey({algoName: "AES-GCM", extractable: false});
-    const key2 = await buildMockedCryptoKey({algoName: "AES-GCM"});
+    const key1 = await buildMockedCryptoKey({ algoName: "AES-GCM", extractable: false });
+    const key2 = await buildMockedCryptoKey({ algoName: "AES-GCM" });
     const iv1 = GenerateSsoIvService.generateIv();
     const iv2 = GenerateSsoIvService.generateIv();
     const passphraseToEncrypt = "passphrase";

@@ -13,7 +13,7 @@
  */
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 const POPUP_WINDOW_HEIGHT = 600;
 const POPUP_WINDOW_WIDTH = 380;
@@ -69,7 +69,9 @@ class PopupHandlerService {
    */
   async verifyCodeInTab(tabId, changeInfo, tab) {
     if (tabId === this.originTabIdCall) {
-      this.rejectPromise(new UserAbortsOperationError("The user navigated away from the tab where the SSO sign-in initiated"));
+      this.rejectPromise(
+        new UserAbortsOperationError("The user navigated away from the tab where the SSO sign-in initiated"),
+      );
       await this.closeHandler();
       return;
     }
@@ -137,7 +139,7 @@ class PopupHandlerService {
     const width = POPUP_WINDOW_WIDTH;
     const height = POPUP_WINDOW_HEIGHT;
 
-    const windowCreateData = {url, type, width, height};
+    const windowCreateData = { url, type, width, height };
     return await browser.windows.create(windowCreateData);
   }
 
@@ -152,7 +154,7 @@ class PopupHandlerService {
       return null;
     }
     const parsedUrl = new URL(url);
-    const ssoToken = parsedUrl.searchParams.get('token') || null;
+    const ssoToken = parsedUrl.searchParams.get("token") || null;
 
     if (ssoToken) {
       assertUuid(ssoToken, "The SSO token should be a valid uuid.");

@@ -12,11 +12,14 @@
  * @since         4.9.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../../test/mocks/mockApiResponse";
-import {defaultGroupSearchResultDto, defaultUserSearchResultDto} from "../../../model/entity/userAndGroupSearchResultEntity/userAndGroupSearchResultEntity.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
+import {
+  defaultGroupSearchResultDto,
+  defaultUserSearchResultDto,
+} from "../../../model/entity/userAndGroupSearchResultEntity/userAndGroupSearchResultEntity.test.data";
 import ShareService from "./shareService";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -25,12 +28,9 @@ beforeEach(() => {
 
 describe("ShareService", () => {
   describe("::searchUsersAndGroups", () => {
-    it("should return a collection dto from the API", async() => {
+    it("should return a collection dto from the API", async () => {
       expect.assertions(1);
-      const expectedDto = [
-        defaultUserSearchResultDto(),
-        defaultGroupSearchResultDto(),
-      ];
+      const expectedDto = [defaultUserSearchResultDto(), defaultGroupSearchResultDto()];
       const contains = {
         profile: true,
         user_count: true,
@@ -44,22 +44,19 @@ describe("ShareService", () => {
       expect(resultDto).toStrictEqual(expectedDto);
     });
 
-    it("should set only the right filters and contains", async() => {
+    it("should set only the right filters and contains", async () => {
       expect.assertions(4);
-      const expectedDto = [
-        defaultUserSearchResultDto(),
-        defaultGroupSearchResultDto(),
-      ];
+      const expectedDto = [defaultUserSearchResultDto(), defaultGroupSearchResultDto()];
       const contains = {
         profile: true,
         user_count: true,
         unsupported_contain: true,
       };
-      fetch.doMockOnceIf(/share\/search-aros\.json/, async request => {
+      fetch.doMockOnceIf(/share\/search-aros\.json/, async (request) => {
         const url = new URL(request.url);
-        expect(url.searchParams.get('contain[profile]')).toStrictEqual('1');
-        expect(url.searchParams.get('contain[user_count]')).toStrictEqual('1');
-        expect(url.searchParams.has('contain[unsupported_contain]')).toStrictEqual(false);
+        expect(url.searchParams.get("contain[profile]")).toStrictEqual("1");
+        expect(url.searchParams.get("contain[user_count]")).toStrictEqual("1");
+        expect(url.searchParams.has("contain[unsupported_contain]")).toStrictEqual(false);
         return await mockApiResponse(expectedDto);
       });
 
@@ -70,7 +67,7 @@ describe("ShareService", () => {
       expect(resultDto).toStrictEqual(expectedDto);
     });
 
-    it("should throw an excpetion if the search keyword is empty", async() => {
+    it("should throw an excpetion if the search keyword is empty", async () => {
       expect.assertions(1);
 
       const service = new ShareService(defaultApiClientOptions());

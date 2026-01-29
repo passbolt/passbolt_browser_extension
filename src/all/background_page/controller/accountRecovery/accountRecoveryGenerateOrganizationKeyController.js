@@ -42,7 +42,7 @@ class AccountRecoveryGenerateOrganizationKeyController {
       this.worker.port.emit(this.requestId, "SUCCESS", keyPairEntity);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -56,7 +56,8 @@ class AccountRecoveryGenerateOrganizationKeyController {
       ...generateGpgKeyPairOptionsDto,
       date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
     };
-    const generateKeyPairOptions = GenerateGpgKeyPairOptionsEntity.createForOrkKeyGeneration(generateGpgKeyPairOptionsDto);
+    const generateKeyPairOptions =
+      GenerateGpgKeyPairOptionsEntity.createForOrkKeyGeneration(generateGpgKeyPairOptionsDto);
     return GenerateGpgKeyPairService.generateKeyPair(generateKeyPairOptions);
   }
 }

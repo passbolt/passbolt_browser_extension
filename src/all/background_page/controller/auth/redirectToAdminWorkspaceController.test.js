@@ -13,7 +13,7 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import RedirectToAdminWorkspaceController from "./redirectToAdminWorkspaceController";
 
 beforeEach(() => {
@@ -22,7 +22,7 @@ beforeEach(() => {
 
 describe("RedirectToAdminWorkspaceController", () => {
   describe("::exec", () => {
-    it("should redirect to the administration workspace", async() => {
+    it("should redirect to the administration workspace", async () => {
       expect.assertions(2);
 
       const worker = {
@@ -38,7 +38,7 @@ describe("RedirectToAdminWorkspaceController", () => {
       await controller.exec();
 
       expect(chrome.tabs.update).toHaveBeenCalledTimes(1);
-      expect(chrome.tabs.update).toHaveBeenCalledWith(worker.tab.id, {url: expectedUrl});
+      expect(chrome.tabs.update).toHaveBeenCalledWith(worker.tab.id, { url: expectedUrl });
     });
   });
 });

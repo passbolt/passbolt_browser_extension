@@ -30,14 +30,14 @@ import RedirectPostLoginController from "../controller/auth/redirectPostLoginCon
  * @param {ApiClientOptions} apiClientOptions The api client options
  * @param {AccountEntity} account The account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Check if the user requires to complete the mfa.
    *
    * @listens passbolt.auth.is-mfa-required
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.is-mfa-required', async requestId => {
+  worker.port.on("passbolt.auth.is-mfa-required", async (requestId) => {
     const controller = new AuthIsMfaRequiredController(worker, requestId);
     controller._exec();
   });
@@ -48,7 +48,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.check-status
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.check-status', async requestId => {
+  worker.port.on("passbolt.auth.check-status", async (requestId) => {
     const controller = new AuthCheckStatusController(worker, requestId);
     controller._exec();
   });
@@ -59,7 +59,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.logout
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.logout', async(requestId, withRedirection) => {
+  worker.port.on("passbolt.auth.logout", async (requestId, withRedirection) => {
     const controller = new AuthLogoutController(worker, requestId, apiClientOptions);
     await controller._exec(withRedirection);
   });
@@ -70,7 +70,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.verify
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.verify-server-key', async requestId => {
+  worker.port.on("passbolt.auth.verify-server-key", async (requestId) => {
     const auth = new AuthVerifyServerKeyController(worker, requestId, apiClientOptions, account);
     await auth._exec();
   });
@@ -82,7 +82,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param domain {string} The server's domain
    */
-  worker.port.on('passbolt.auth.get-server-key', async requestId => {
+  worker.port.on("passbolt.auth.get-server-key", async (requestId) => {
     const getServerKeyController = new GetServerKeyController(worker, requestId, apiClientOptions);
     await getServerKeyController._exec();
   });
@@ -93,7 +93,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.replace-server-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.replace-server-key', async requestId => {
+  worker.port.on("passbolt.auth.replace-server-key", async (requestId) => {
     const replaceServerKeyController = new ReplaceServerKeyController(worker, requestId, apiClientOptions, account);
     await replaceServerKeyController._exec();
   });
@@ -105,7 +105,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase to verify
    */
-  worker.port.on('passbolt.auth.verify-passphrase', async(requestId, passphrase) => {
+  worker.port.on("passbolt.auth.verify-passphrase", async (requestId, passphrase) => {
     const controller = new CheckPassphraseController(worker, requestId);
     await controller._exec(passphrase);
   });
@@ -119,7 +119,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param remember {string} whether to remember the passphrase
    *   (bool) false|undefined if should not remember
    */
-  worker.port.on('passbolt.auth.login', async(requestId, passphrase, remember) => {
+  worker.port.on("passbolt.auth.login", async (requestId, passphrase, remember) => {
     const controller = new AuthLoginController(worker, requestId, apiClientOptions, account);
     await controller._exec(passphrase, remember);
   });
@@ -130,7 +130,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.post-login-redirect
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.post-login-redirect', async requestId => {
+  worker.port.on("passbolt.auth.post-login-redirect", async (requestId) => {
     const controller = new RedirectPostLoginController(worker, requestId, account);
     await controller._exec();
   });
@@ -141,7 +141,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.request-help-credentials-lost
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.request-help-credentials-lost', async requestId => {
+  worker.port.on("passbolt.auth.request-help-credentials-lost", async (requestId) => {
     const controller = new RequestHelpCredentialsLostController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
@@ -153,7 +153,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param {uuid} providerId the SSO provider identifier
    * @param {boolean} isInQuickaccessMode is the current call made from the quickaccess
    */
-  worker.port.on('passbolt.sso.sign-in', async(requestId, providerId, isInQuickaccessMode) => {
+  worker.port.on("passbolt.sso.sign-in", async (requestId, providerId, isInQuickaccessMode) => {
     const controller = new SsoAuthenticationController(worker, requestId, apiClientOptions, account);
     await controller._exec(providerId, isInQuickaccessMode);
   });
@@ -163,7 +163,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.sso.get-local-configured-provider
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.sso.get-local-configured-provider', async requestId => {
+  worker.port.on("passbolt.sso.get-local-configured-provider", async (requestId) => {
     const controller = new GetLocalSsoProviderConfiguredController(worker, requestId);
     await controller._exec();
   });
@@ -173,7 +173,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.sso.delete-local-kit
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.sso.delete-local-kit', async requestId => {
+  worker.port.on("passbolt.sso.delete-local-kit", async (requestId) => {
     const controller = new DeleteLocalSsoKitController(worker, requestId);
     await controller._exec();
   });
@@ -184,7 +184,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param {uuid} requestId The request identifier
    * @param {string} ssoProviderId The new provider to set
    */
-  worker.port.on('passbolt.sso.update-provider-local-kit', async(requestId, ssoProviderId) => {
+  worker.port.on("passbolt.sso.update-provider-local-kit", async (requestId, ssoProviderId) => {
     const controller = new UpdateLocalSsoProviderController(worker, requestId);
     await controller._exec(ssoProviderId);
   });
@@ -194,7 +194,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.sso.has-sso-login-error
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.sso.has-sso-login-error', async requestId => {
+  worker.port.on("passbolt.sso.has-sso-login-error", async (requestId) => {
     const controller = new HasSsoLoginErrorController(worker, requestId);
     await controller._exec();
   });
@@ -204,15 +204,15 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.sso.get-qualified-sso-login-error
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.sso.get-qualified-sso-login-error', async requestId => {
+  worker.port.on("passbolt.sso.get-qualified-sso-login-error", async (requestId) => {
     const controller = new GetQualifiedSsoLoginErrorController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.tab.reload', async requestId => {
+  worker.port.on("passbolt.tab.reload", async (requestId) => {
     const controller = new ReloadTabController(worker, requestId);
     await controller._exec();
   });
 };
 
-export const AuthEvents = {listen};
+export const AuthEvents = { listen };

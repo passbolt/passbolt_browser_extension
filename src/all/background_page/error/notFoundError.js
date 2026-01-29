@@ -13,9 +13,9 @@
  */
 class NotFoundError extends Error {
   constructor(message) {
-    message = message || 'NotFoundError';
+    message = message || "NotFoundError";
     super(message);
-    this.name = 'NotFoundError';
+    this.name = "NotFoundError";
   }
 }
 

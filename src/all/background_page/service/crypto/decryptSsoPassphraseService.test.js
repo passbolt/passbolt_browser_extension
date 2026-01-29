@@ -13,18 +13,18 @@
  */
 import DecryptSsoPassphraseService from "./decryptSsoPassphraseService";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
-import {buildMockedCryptoKey} from "../../utils/assertions.test.data";
+import { buildMockedCryptoKey } from "../../utils/assertions.test.data";
 import GenerateSsoIvService from "./generateSsoIvService";
 import EncryptSsoPassphraseService from "./encryptSsoPassphraseService";
 
 describe("DecryptSsoPassphrase service", () => {
-  const key1Promise = buildMockedCryptoKey({algoName: "AES-GCM", extractable: false});
-  const key2Promise = buildMockedCryptoKey({algoName: "AES-GCM"});
+  const key1Promise = buildMockedCryptoKey({ algoName: "AES-GCM", extractable: false });
+  const key2Promise = buildMockedCryptoKey({ algoName: "AES-GCM" });
   const iv1 = GenerateSsoIvService.generateIv();
   const iv2 = GenerateSsoIvService.generateIv();
-  const buffer1 = Buffer.from("This is a buffer").toString('base64');
+  const buffer1 = Buffer.from("This is a buffer").toString("base64");
 
-  it('should decrypt the passphrase if all data are correct', async() => {
+  it("should decrypt the passphrase if all data are correct", async () => {
     expect.assertions(1);
     const key1 = await key1Promise;
     const key2 = await key2Promise;
@@ -36,7 +36,7 @@ describe("DecryptSsoPassphrase service", () => {
     expect(decrypted).toStrictEqual(expectedDecryptedPassphrase);
   });
 
-  it("should throw an OutdatedSsoKitError if the server SSO kit doesn't match the local SSO kit", async() => {
+  it("should throw an OutdatedSsoKitError if the server SSO kit doesn't match the local SSO kit", async () => {
     expect.assertions(1);
     const key1 = await key1Promise;
     const key2 = await key2Promise;
@@ -48,7 +48,7 @@ describe("DecryptSsoPassphrase service", () => {
     }
   });
 
-  it("should throw an Error if the local SSO kit has been modified somehow", async() => {
+  it("should throw an Error if the local SSO kit has been modified somehow", async () => {
     expect.assertions(1);
     const key1 = await key1Promise;
     const key2 = await key2Promise;

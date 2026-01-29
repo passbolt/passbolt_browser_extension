@@ -14,8 +14,8 @@
 
 import AbstractService from "../abstract/abstractService";
 
-const PASSWORD_GENERATOR_RESOURCE_NAME = 'password-generator/settings';
-const PASSWORD_POLICIES_RESOURCE_NAME = 'password-policies/settings';
+const PASSWORD_GENERATOR_RESOURCE_NAME = "password-generator/settings";
+const PASSWORD_POLICIES_RESOURCE_NAME = "password-policies/settings";
 
 class PasswordPoliciesService extends AbstractService {
   /**
@@ -39,7 +39,10 @@ class PasswordPoliciesService extends AbstractService {
       return setting.body;
     } catch (error) {
       if (error?.data?.code === 404) {
-        console.error("The endpoint `password-policies` cannot be find; Falling back to the deprecated endpoint.", error);
+        console.error(
+          "The endpoint `password-policies` cannot be find; Falling back to the deprecated endpoint.",
+          error,
+        );
         return this.findLegacy();
       }
       throw error;
@@ -55,11 +58,11 @@ class PasswordPoliciesService extends AbstractService {
    */
   async findLegacy() {
     let baseUrl = this.apiClient.options.getBaseUrl().toString();
-    if (!baseUrl.endsWith('/')) {
-      baseUrl += '/';
+    if (!baseUrl.endsWith("/")) {
+      baseUrl += "/";
     }
     const url = this.apiClient.buildUrl(`${baseUrl}${PASSWORD_GENERATOR_RESOURCE_NAME}`);
-    const setting = await this.apiClient.fetchAndHandleResponse('GET', url);
+    const setting = await this.apiClient.fetchAndHandleResponse("GET", url);
     return setting.body;
   }
 

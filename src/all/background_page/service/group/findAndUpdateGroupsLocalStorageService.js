@@ -15,7 +15,7 @@ import GroupLocalStorage from "../local_storage/groupLocalStorage";
 import FindGroupsService from "./findGroupsService";
 import GroupsCollection from "../../model/entity/group/groupsCollection";
 
-const GROUPS_UPDATE_ALL_LS_LOCK_PREFIX = 'GROUPS_UPDATE_LS_LOCK_';
+const GROUPS_UPDATE_ALL_LS_LOCK_PREFIX = "GROUPS_UPDATE_LS_LOCK_";
 
 /**
  * The service aim to find and update the resources local storage service.
@@ -40,15 +40,15 @@ class FindAndUpdateGroupsLocalStorageService {
    * @public
    */
   async findAndUpdateAll() {
-    return await navigator.locks.request(this.lockKey, {ifAvailable: true}, async lock => {
+    return await navigator.locks.request(this.lockKey, { ifAvailable: true }, async (lock) => {
       // Lock not granted, an update is already in progress. Wait for its completion to notify the function consumer.
       if (!lock) {
-        return await navigator.locks.request(this.lockKey, {mode: "shared"}, async() => {
+        return await navigator.locks.request(this.lockKey, { mode: "shared" }, async () => {
           /*
            * Return the data from local storage while waiting for the update in progress.
            */
           const groupsDtos = await this.groupLocalStorage.get();
-          return new GroupsCollection(groupsDtos, {validate: !GroupLocalStorage.hasCachedData(this.account.id)});
+          return new GroupsCollection(groupsDtos, { validate: !GroupLocalStorage.hasCachedData(this.account.id) });
         });
       }
 

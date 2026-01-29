@@ -16,7 +16,6 @@ import TagsCollection from "../../model/entity/tag/tagsCollection";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 
-
 class TagController {
   /**
    * TagController constructor
@@ -32,7 +31,7 @@ class TagController {
     this.tagModel = new TagModel(clientOptions, account);
 
     // Progress
-    this.progressService = new ProgressService(this.worker, i18n.t('Adding tag...'));
+    this.progressService = new ProgressService(this.worker, i18n.t("Adding tag..."));
   }
 
   /**
@@ -41,15 +40,16 @@ class TagController {
    * @param {Object} tag The tag to add
    */
   async addTagResources(resourceIds, tag) {
-    const progressGoal = 2 // Initialization + resource to filter
-      + resourceIds.length; // #resource add tag
-    this.progressService.start(progressGoal, i18n.t('Initialize'));
+    const progressGoal =
+      2 + // Initialization + resource to filter
+      resourceIds.length; // #resource add tag
+    this.progressService.start(progressGoal, i18n.t("Initialize"));
     try {
       const resourceIdsToKeep = await this._keepResourcesTagNotPresent(resourceIds, tag.id);
       if (resourceIdsToKeep.length > 0) {
         await this._taggingResources(resourceIdsToKeep, tag);
       }
-      await this.progressService.finishStep(i18n.t('Done!'), true);
+      await this.progressService.finishStep(i18n.t("Done!"), true);
       await this.progressService.close();
     } catch (error) {
       await this.progressService.close();
@@ -65,10 +65,10 @@ class TagController {
    * @private
    */
   async _keepResourcesTagNotPresent(resourceIds, tagId) {
-    await this.progressService.finishStep(i18n.t('Preparing...'), true);
+    await this.progressService.finishStep(i18n.t("Preparing..."), true);
     const resourceCollections = await this.resourceModel.getAllByIds(resourceIds);
     const resourceCollectionsToKeep = resourceCollections.filterByTagNotPresent(tagId);
-    const resourceIdsToKeep = resourceCollectionsToKeep.map(resource => resource.id);
+    const resourceIdsToKeep = resourceCollectionsToKeep.map((resource) => resource.id);
     return resourceIdsToKeep;
   }
 
@@ -79,7 +79,7 @@ class TagController {
    * @private
    */
   async _taggingResources(resourceIds, tag) {
-    await this.progressService.finishStep(i18n.t('Updating resource'), true);
+    await this.progressService.finishStep(i18n.t("Updating resource"), true);
     const tagsCollection = new TagsCollection([tag]);
 
     // Bulk tag the resources.
@@ -88,7 +88,10 @@ class TagController {
     const successCallback = () => this._handleTagResourceSuccess(resourceNumber, ++taggedCount);
     const errorCallback = () => this._handleTagResourceError(resourceNumber, ++taggedCount);
 
-    await this.tagModel.bulkTagResources(resourceIds, tagsCollection, {successCallback: successCallback, errorCallback: errorCallback});
+    await this.tagModel.bulkTagResources(resourceIds, tagsCollection, {
+      successCallback: successCallback,
+      errorCallback: errorCallback,
+    });
   }
 
   /**

@@ -15,23 +15,21 @@ import LocaleEntity from "./localeEntity";
 import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
-const ENTITY_NAME = 'Locales';
+const ENTITY_NAME = "Locales";
 
 class LocalesCollection extends EntityCollection {
   /**
    * @inheritDoc
    */
   constructor(localesCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      LocalesCollection.ENTITY_NAME,
-      localesCollectionDto,
-      LocalesCollection.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(LocalesCollection.ENTITY_NAME, localesCollectionDto, LocalesCollection.getSchema()),
+      options,
+    );
 
     // Directly push into the private property _items[]
-    this._props.forEach(locale => {
-      this._items.push(new LocaleEntity(locale, {clone: false}));
+    this._props.forEach((locale) => {
+      this._items.push(new LocaleEntity(locale, { clone: false }));
     });
 
     // We do not keep original props
@@ -45,8 +43,8 @@ class LocalesCollection extends EntityCollection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": LocaleEntity.getSchema(),
+      type: "array",
+      items: LocaleEntity.getSchema(),
     };
   }
 
@@ -68,7 +66,7 @@ class LocalesCollection extends EntityCollection {
    * @param {object} locale DTO or LocaleEntity
    */
   push(locale) {
-    if (!locale || typeof locale !== 'object') {
+    if (!locale || typeof locale !== "object") {
       throw new TypeError(`LocalesCollection push parameter should be an object.`);
     }
     if (locale instanceof LocaleEntity) {

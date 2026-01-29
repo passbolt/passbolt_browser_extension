@@ -15,19 +15,17 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
-const ENTITY_NAME = 'MfaSetupYubikeyEntity';
+const ENTITY_NAME = "MfaSetupYubikeyEntity";
 
 class MfaSetupYubikeyEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(setupDto, options = {}) {
-    super(EntitySchema.validate(
-      MfaSetupYubikeyEntity.ENTITY_NAME,
-      setupDto,
-      MfaSetupYubikeyEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(MfaSetupYubikeyEntity.ENTITY_NAME, setupDto, MfaSetupYubikeyEntity.getSchema()),
+      options,
+    );
   }
 
   /**
@@ -36,16 +34,14 @@ class MfaSetupYubikeyEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "hotp",
-      ],
-      "properties": {
-        "hotp": {
-          "type": "string",
-          "pattern": /^[cbdefghijklnrtuv]{44}$/
+      type: "object",
+      required: ["hotp"],
+      properties: {
+        hotp: {
+          type: "string",
+          pattern: /^[cbdefghijklnrtuv]{44}$/,
         },
-      }
+      },
     };
   }
 

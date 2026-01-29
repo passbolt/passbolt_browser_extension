@@ -13,37 +13,36 @@
  */
 import Pagemod from "./pagemod";
 import AppInitController from "../controller/app/appInitController";
-import {AppEvents} from "../event/appEvents";
-import {ConfigEvents} from "../event/configEvents";
-import {AuthEvents} from "../event/authEvents";
-import {FolderEvents} from "../event/folderEvents";
-import {ResourceEvents} from "../event/resourceEvents";
-import {ResourceTypeEvents} from "../event/resourceTypeEvents";
-import {RoleEvents} from "../event/roleEvents";
-import {KeyringEvents} from "../event/keyringEvents";
-import {SecretEvents} from "../event/secretEvents";
-import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
-import {ShareEvents} from "../event/shareEvents";
-import {SubscriptionEvents} from "../event/subscriptionEvents";
-import {UserEvents} from "../event/userEvents";
-import {GroupEvents} from "../event/groupEvents";
-import {CommentEvents} from "../event/commentEvents";
-import {TagEvents} from "../event/tagEvents";
-import {ImportResourcesEvents} from "../event/importResourcesEvents";
-import {ExportResourcesEvents} from "../event/exportResourcesEvents";
-import {ActionLogEvents} from "../event/actionLogEvents";
-import {MultiFactorAuthenticationEvents} from "../event/multiFactorAuthenticationEvents";
-import {ThemeEvents} from "../event/themeEvents";
-import {LocaleEvents} from "../event/localeEvents";
-import {MobileEvents} from "../event/mobileEvents";
-import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
-import {MfaEvents} from "../event/mfaEvents";
+import { AppEvents } from "../event/appEvents";
+import { ConfigEvents } from "../event/configEvents";
+import { AuthEvents } from "../event/authEvents";
+import { FolderEvents } from "../event/folderEvents";
+import { ResourceEvents } from "../event/resourceEvents";
+import { ResourceTypeEvents } from "../event/resourceTypeEvents";
+import { RoleEvents } from "../event/roleEvents";
+import { KeyringEvents } from "../event/keyringEvents";
+import { SecretEvents } from "../event/secretEvents";
+import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { ShareEvents } from "../event/shareEvents";
+import { UserEvents } from "../event/userEvents";
+import { GroupEvents } from "../event/groupEvents";
+import { CommentEvents } from "../event/commentEvents";
+import { TagEvents } from "../event/tagEvents";
+import { ImportResourcesEvents } from "../event/importResourcesEvents";
+import { ExportResourcesEvents } from "../event/exportResourcesEvents";
+import { ActionLogEvents } from "../event/actionLogEvents";
+import { MultiFactorAuthenticationEvents } from "../event/multiFactorAuthenticationEvents";
+import { ThemeEvents } from "../event/themeEvents";
+import { LocaleEvents } from "../event/localeEvents";
+import { MobileEvents } from "../event/mobileEvents";
+import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
+import { MfaEvents } from "../event/mfaEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import {RememberMeEvents} from "../event/rememberMeEvents";
+import { RememberMeEvents } from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
-import {PermissionEvents} from "../event/permissionEvents";
-import {AccountEvents} from "../event/accountEvents";
+import { PermissionEvents } from "../event/permissionEvents";
+import { AccountEvents } from "../event/accountEvents";
 
 class App extends Pagemod {
   /**
@@ -70,7 +69,6 @@ class App extends Pagemod {
       SecretEvents,
       OrganizationSettingsEvents,
       ShareEvents,
-      SubscriptionEvents,
       UserEvents,
       GroupEvents,
       CommentEvents,
@@ -86,7 +84,7 @@ class App extends Pagemod {
       MfaEvents,
       RememberMeEvents,
       PermissionEvents,
-      AccountEvents
+      AccountEvents,
     ];
   }
 
@@ -99,7 +97,7 @@ class App extends Pagemod {
       const checkAuthStatusService = new CheckAuthStatusService();
       const authStatus = await checkAuthStatusService.checkAuthStatus(true);
       if (!authStatus.isAuthenticated || authStatus.isMfaRequired) {
-        console.error('Can not attach application if user is not logged in.');
+        console.error("Can not attach application if user is not logged in.");
         return;
       }
 
@@ -107,10 +105,10 @@ class App extends Pagemod {
       const appInitController = new AppInitController();
       await appInitController.main();
 
-      const account = await GetActiveAccountService.get({role: true});
+      const account = await GetActiveAccountService.get({ role: true });
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
-        event.listen({port, tab}, apiClientOptions, account);
+        event.listen({ port, tab }, apiClientOptions, account);
       }
     } catch (error) {
       /*
@@ -119,7 +117,7 @@ class App extends Pagemod {
        * - AccountRecoverySaveUserSettingsController
        * - ReviewRequestController
        */
-      console.error('appPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error("appPagemod::attach legacy account cannot be retrieved, please contact your administrator.");
       console.error(error);
     }
   }

@@ -12,11 +12,11 @@
  * @since         4.12.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import UpdateResourceTypesService from "./updateResourceTypesService";
-import {v4 as uuidV4} from "uuid";
+import { v4 as uuidV4 } from "uuid";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -25,19 +25,19 @@ beforeEach(() => {
 describe("UpdateResourceTypesService", () => {
   let apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     apiClientOptions = defaultApiClientOptions();
   });
 
   describe("::delete", () => {
-    it("should assert its parameters", async() => {
+    it("should assert its parameters", async () => {
       expect.assertions(1);
 
       const service = new UpdateResourceTypesService(apiClientOptions);
       expect(() => service.delete("test")).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
-    it("should call for the right service with the right arguments.", async() => {
+    it("should call for the right service with the right arguments.", async () => {
       expect.assertions(2);
 
       const expectedId = uuidV4();
@@ -52,14 +52,14 @@ describe("UpdateResourceTypesService", () => {
   });
 
   describe("::undelete", () => {
-    it("should assert its parameters", async() => {
+    it("should assert its parameters", async () => {
       expect.assertions(1);
 
       const service = new UpdateResourceTypesService(apiClientOptions);
       expect(() => service.undelete("test")).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
-    it("should call for the right service with the right arguments.", async() => {
+    it("should call for the right service with the right arguments.", async () => {
       expect.assertions(2);
 
       const expectedId = uuidV4();
@@ -73,16 +73,17 @@ describe("UpdateResourceTypesService", () => {
     });
   });
 
-
   describe("::deleteAll", () => {
-    it("should assert its parameters", async() => {
+    it("should assert its parameters", async () => {
       expect.assertions(1);
 
       const service = new UpdateResourceTypesService(apiClientOptions);
-      expect(() => service.deleteAll("test")).rejects.toThrow("The resourceTypesCollection parameter should be a valid ResourceTypesCollection");
+      expect(() => service.deleteAll("test")).rejects.toThrow(
+        "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
+      );
     });
 
-    it("should call for the right service with the right arguments.", async() => {
+    it("should call for the right service with the right arguments.", async () => {
       const resourceTypesDto = resourceTypesCollectionDto();
 
       expect.assertions(1 + resourceTypesDto.length);
@@ -102,14 +103,16 @@ describe("UpdateResourceTypesService", () => {
   });
 
   describe("::undeleteAll", () => {
-    it("should assert its parameters", async() => {
+    it("should assert its parameters", async () => {
       expect.assertions(1);
 
       const service = new UpdateResourceTypesService(apiClientOptions);
-      expect(() => service.undeleteAll("test")).rejects.toThrow("The resourceTypesCollection parameter should be a valid ResourceTypesCollection");
+      expect(() => service.undeleteAll("test")).rejects.toThrow(
+        "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
+      );
     });
 
-    it("should call for the right service with the right arguments.", async() => {
+    it("should call for the right service with the right arguments.", async () => {
       const resourceTypesDto = resourceTypesCollectionDto();
 
       expect.assertions(1 + resourceTypesDto.length);
@@ -129,14 +132,16 @@ describe("UpdateResourceTypesService", () => {
   });
 
   describe("::updateAllDeletedStatus", () => {
-    it("should assert its parameters", async() => {
+    it("should assert its parameters", async () => {
       expect.assertions(1);
 
       const service = new UpdateResourceTypesService(apiClientOptions);
-      expect(() => service.updateAllDeletedStatus("test")).rejects.toThrow("The resourceTypesCollection parameter should be a valid ResourceTypesCollection");
+      expect(() => service.updateAllDeletedStatus("test")).rejects.toThrow(
+        "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
+      );
     });
 
-    it("should call for the right service with the right arguments.", async() => {
+    it("should call for the right service with the right arguments.", async () => {
       expect.assertions(13);
       const resourceTypesDto = resourceTypesCollectionDto();
       for (let i = 0; i < resourceTypesDto.length; i += 2) {

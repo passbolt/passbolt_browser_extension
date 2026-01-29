@@ -13,17 +13,17 @@ import FindSecretByResourceIdController from "../controller/secret/findSecretByR
  * @param {ApiClientOptions} apiClientOptions the api client options
  * @param {AccountEntity} account the user account
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Decrypt a given armored string.
    *
    * @listens passbolt.secret.find-by-resource-id
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.secret.find-by-resource-id', async(requestId, resourceId) => {
+  worker.port.on("passbolt.secret.find-by-resource-id", async (requestId, resourceId) => {
     const controller = new FindSecretByResourceIdController(worker, requestId, apiClientOptions, account);
     await controller._exec(resourceId);
   });
 };
 
-export const SecretEvents = {listen};
+export const SecretEvents = { listen };

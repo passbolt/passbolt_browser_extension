@@ -11,18 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
 
 export function defaultEmptySettings(data = {}) {
   const defaultData = {
     provider: null,
     data: null,
-    providers: ["azure"]
+    providers: ["azure"],
   };
 
   return {
     ...defaultData,
-    ...data
+    ...data,
   };
 }
 
@@ -46,6 +46,6 @@ export function withAzureSsoSettings(data = {}) {
 
   return {
     ...defaultData,
-    ...data
+    ...data,
   };
 }

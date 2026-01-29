@@ -22,13 +22,13 @@ jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn())
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
 
 describe("Pagemod", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
   describe("Pagemod default behavior", () => {
-    it("Should create a page mod and inject file with events", async() => {
+    it("Should create a page mod and inject file with events", async () => {
       expect.assertions(11);
       // process
       const pagemod = new Pagemod();
@@ -36,9 +36,9 @@ describe("Pagemod", () => {
       const port = {
         _port: {
           sender: {
-            tab: 1
-          }
-        }
+            tab: 1,
+          },
+        },
       };
       await pagemod.attachEvents(port);
       // expectations

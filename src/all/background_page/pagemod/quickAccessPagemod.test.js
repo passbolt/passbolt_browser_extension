@@ -12,25 +12,25 @@
  * @since         4.0.0
  */
 import QuickAccess from "./quickAccessPagemod";
-import {ConfigEvents} from "../event/configEvents";
-import {AuthEvents} from "../event/authEvents";
-import {KeyringEvents} from "../event/keyringEvents";
-import {QuickAccessEvents} from "../event/quickAccessEvents";
-import {GroupEvents} from "../event/groupEvents";
-import {TagEvents} from "../event/tagEvents";
-import {ResourceEvents} from "../event/resourceEvents";
-import {SecretEvents} from "../event/secretEvents";
-import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
-import {TabEvents} from "../event/tabEvents";
-import {LocaleEvents} from "../event/localeEvents";
-import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
-import {v4 as uuid} from 'uuid';
-import {enableFetchMocks} from "jest-fetch-mock";
-import {RememberMeEvents} from "../event/rememberMeEvents";
-import {ResourceTypeEvents} from "../event/resourceTypeEvents";
+import { ConfigEvents } from "../event/configEvents";
+import { AuthEvents } from "../event/authEvents";
+import { KeyringEvents } from "../event/keyringEvents";
+import { QuickAccessEvents } from "../event/quickAccessEvents";
+import { GroupEvents } from "../event/groupEvents";
+import { TagEvents } from "../event/tagEvents";
+import { ResourceEvents } from "../event/resourceEvents";
+import { SecretEvents } from "../event/secretEvents";
+import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { TabEvents } from "../event/tabEvents";
+import { LocaleEvents } from "../event/localeEvents";
+import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
+import { v4 as uuid } from "uuid";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { RememberMeEvents } from "../event/rememberMeEvents";
+import { ResourceTypeEvents } from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
-import {AccountEvents} from "../event/accountEvents";
+import { AccountEvents } from "../event/accountEvents";
 
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
@@ -49,30 +49,30 @@ jest.spyOn(ResourceTypeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
 
 describe("QuickAccess", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
   });
 
   describe("QuickAccess::attachEvents", () => {
-    it("Should attach events", async() => {
+    it("Should attach events", async () => {
       expect.assertions(18);
       // data mocked
       const port = {
         _port: {
-          sender: {}
-        }
+          sender: {},
+        },
       };
       // mock functions
-      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
-      const mockedAccount = {user_id: uuid(), domain: "https://test.passbolt.local"};
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
+      const mockedAccount = { user_id: uuid(), domain: "https://test.passbolt.local" };
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
-      jest.spyOn(GetActiveAccountService, 'get').mockImplementation(() => mockedAccount);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
       // process
       await QuickAccess.attachEvents(port);
       // expectations
-      const expectedArgument = {port: port, tab: port._port.sender.tab, name: QuickAccess.appName};
+      const expectedArgument = { port: port, tab: port._port.sender.tab, name: QuickAccess.appName };
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
@@ -88,14 +88,30 @@ describe("QuickAccess", () => {
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ResourceTypeEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(AccountEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
-      expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PownedPasswordEvents, RememberMeEvents, ResourceTypeEvents, AccountEvents]);
+      expect(QuickAccess.events).toStrictEqual([
+        AuthEvents,
+        ConfigEvents,
+        KeyringEvents,
+        QuickAccessEvents,
+        GroupEvents,
+        TagEvents,
+        ResourceEvents,
+        SecretEvents,
+        OrganizationSettingsEvents,
+        TabEvents,
+        LocaleEvents,
+        PownedPasswordEvents,
+        RememberMeEvents,
+        ResourceTypeEvents,
+        AccountEvents,
+      ]);
       expect(QuickAccess.mustReloadOnExtensionUpdate).toBeFalsy();
-      expect(QuickAccess.appName).toBe('QuickAccess');
+      expect(QuickAccess.appName).toBe("QuickAccess");
     });
   });
 
   describe("QuickAccess::canBeAttachedTo", () => {
-    it("Should have the canBeAttachedTo not valid", async() => {
+    it("Should have the canBeAttachedTo not valid", async () => {
       expect.assertions(1);
       // process
       const canBeAttachedTo = await QuickAccess.canBeAttachedTo({});

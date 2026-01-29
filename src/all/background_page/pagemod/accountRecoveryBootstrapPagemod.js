@@ -12,9 +12,8 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {PortEvents} from "../event/portEvents";
-import ParseAccountRecoveryUrlService
-  from "../service/accountRecovery/parseAccountRecoveryUrlService";
+import { PortEvents } from "../event/portEvents";
+import ParseAccountRecoveryUrlService from "../service/accountRecovery/parseAccountRecoveryUrlService";
 import GetRequestLocalAccountService from "../service/accountRecovery/getRequestLocalAccountService";
 
 class AccountRecoveryBootstrap extends Pagemod {
@@ -30,10 +29,7 @@ class AccountRecoveryBootstrap extends Pagemod {
    * @inheritDoc
    */
   get contentScriptFiles() {
-    return [
-      'contentScripts/js/dist/vendors.js',
-      'contentScripts/js/dist/account-recovery.js',
-    ];
+    return ["contentScripts/js/dist/vendors.js", "contentScripts/js/dist/account-recovery.js"];
   }
 
   /**
@@ -54,9 +50,11 @@ class AccountRecoveryBootstrap extends Pagemod {
    * @inheritDoc
    */
   async canBeAttachedTo(frameDetails) {
-    return this.assertTopFrameAttachConstraint(frameDetails)
-      && this.assertUrlAttachConstraint(frameDetails)
-      && this.assertAccountInLocalStorage(frameDetails);
+    return (
+      this.assertTopFrameAttachConstraint(frameDetails) &&
+      this.assertUrlAttachConstraint(frameDetails) &&
+      this.assertAccountInLocalStorage(frameDetails)
+    );
   }
 
   /**

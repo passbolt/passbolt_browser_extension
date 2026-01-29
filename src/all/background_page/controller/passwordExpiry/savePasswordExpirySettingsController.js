@@ -42,7 +42,7 @@ class SavePasswordExpirySettingsController {
       this.worker.port.emit(this.requestId, "SUCCESS", settings);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -54,7 +54,9 @@ class SavePasswordExpirySettingsController {
   async exec(passwordExpirySettingsDto) {
     const organizationSettings = await this.organisationSettingsModel.getOrFind();
     const isAdvancedSettingsEnabled = organizationSettings.isPluginEnabled("passwordExpiryPolicies");
-    const entity = isAdvancedSettingsEnabled ? new PasswordExpiryProSettingsEntity(passwordExpirySettingsDto) : new PasswordExpirySettingsEntity(passwordExpirySettingsDto);
+    const entity = isAdvancedSettingsEnabled
+      ? new PasswordExpiryProSettingsEntity(passwordExpirySettingsDto)
+      : new PasswordExpirySettingsEntity(passwordExpirySettingsDto);
     return await this.passwordExpirySettingsModel.save(entity);
   }
 }

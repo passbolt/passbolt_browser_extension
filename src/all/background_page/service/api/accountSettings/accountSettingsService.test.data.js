@@ -12,24 +12,24 @@
  * @since         5.8.0
  */
 
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 export const accountSettingsService_midgarThemeDto = (data = {}) => ({
-  "id": uuidv4(),
-  "value": "midgar",
-  "property": "theme",
+  id: uuidv4(),
+  value: "midgar",
+  property: "theme",
   ...data,
 });
 
-export const accountSettingsService_themesDto = () => ([
-  accountSettingsService_midgarThemeDto({value: "default"}),
-  accountSettingsService_midgarThemeDto({value: "midgar"}),
-  accountSettingsService_midgarThemeDto({value: "solarized_light"}),
-]);
+export const accountSettingsService_themesDto = () => [
+  accountSettingsService_midgarThemeDto({ value: "default" }),
+  accountSettingsService_midgarThemeDto({ value: "midgar" }),
+  accountSettingsService_midgarThemeDto({ value: "solarized_light" }),
+];
 
 export const accountSettingsService_localeDto = (data = {}) => ({
-  "id": uuidv4(),
-  "value": "en-UK",
-  "property": "locale",
+  id: uuidv4(),
+  value: "en-UK",
+  property: "locale",
   ...data,
 });

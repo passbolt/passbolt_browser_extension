@@ -68,7 +68,7 @@ class ProgressService {
     this._progress = 0;
     this._goals = goals;
     this.isClose = false;
-    this.worker.port.emit('passbolt.progress.open-progress-dialog', this._title, goals, message);
+    this.worker.port.emit("passbolt.progress.open-progress-dialog", this._title, goals, message);
     this.lastTimeCall = new Date().getTime();
   }
 
@@ -78,7 +78,7 @@ class ProgressService {
    */
   updateGoals(goals) {
     this._goals = goals;
-    this.worker.port.emit('passbolt.progress.update-goals', goals);
+    this.worker.port.emit("passbolt.progress.update-goals", goals);
   }
 
   /**
@@ -118,7 +118,7 @@ class ProgressService {
    */
   close() {
     this.isClose = true;
-    this.worker.port.emit('passbolt.progress.close-progress-dialog');
+    this.worker.port.emit("passbolt.progress.close-progress-dialog");
   }
 
   /**
@@ -126,7 +126,7 @@ class ProgressService {
    * @private
    */
   _updateProgressBar() {
-    this.worker.port.emit('passbolt.progress.update', this.message, this._progress);
+    this.worker.port.emit("passbolt.progress.update", this.message, this._progress);
   }
 
   /**

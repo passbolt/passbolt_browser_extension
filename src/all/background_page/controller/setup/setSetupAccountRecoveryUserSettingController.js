@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import BuildApprovedAccountRecoveryUserSettingEntityService from "../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService";
@@ -42,7 +42,7 @@ class SetSetupAccountRecoveryUserSettingController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -75,14 +75,21 @@ class SetSetupAccountRecoveryUserSettingController {
    */
   async buildApprovedUserSetting() {
     if (!this.temporaryAccount?.passphrase) {
-      throw new Error('A passphrase is required.');
+      throw new Error("A passphrase is required.");
     }
 
     const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(this.temporaryAccount.account.userPrivateArmoredKey);
-    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, this.temporaryAccount.passphrase);
+    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(
+      userPrivateKey,
+      this.temporaryAccount.passphrase,
+    );
     const organizationPolicy = this.temporaryAccount.accountRecoveryOrganizationPolicy;
 
-    return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.temporaryAccount.account, userDecryptedPrivateKey, organizationPolicy);
+    return BuildApprovedAccountRecoveryUserSettingEntityService.build(
+      this.temporaryAccount.account,
+      userDecryptedPrivateKey,
+      organizationPolicy,
+    );
   }
 
   /**
@@ -91,7 +98,7 @@ class SetSetupAccountRecoveryUserSettingController {
    */
   async buildRejectedUserSetting() {
     const userId = this.temporaryAccount.account.userId;
-    const userSettingDto = {user_id: userId, status: AccountRecoveryUserSettingEntity.STATUS_REJECTED};
+    const userSettingDto = { user_id: userId, status: AccountRecoveryUserSettingEntity.STATUS_REJECTED };
 
     return new AccountRecoveryUserSettingEntity(userSettingDto);
   }

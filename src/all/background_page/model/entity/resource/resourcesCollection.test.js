@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import ResourcesCollection from "./resourcesCollection";
 import TagEntity from "../tag/tagEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
@@ -22,28 +22,29 @@ import {
   TEST_RESOURCE_TYPE_PASSWORD_STRING,
   TEST_RESOURCE_TYPE_TOTP,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import {defaultResourceDtosCollection, defaultResourcesDtos, resourceAllTypesDtosCollection} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
-import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
-  resourceTypesCollectionDto,
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+  defaultResourceDtosCollection,
+  defaultResourcesDtos,
+  resourceAllTypesDtosCollection,
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
   defaultResourceDto,
   defaultResourceV4Dto,
   resourceStandaloneTotpDto,
-  resourceWithTotpDto
+  resourceWithTotpDto,
 } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import ResourceEntity, {METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY} from "./resourceEntity";
-import {defaultTagDto} from "../tag/tagEntity.test.data";
+import ResourceEntity, { METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY } from "./resourceEntity";
+import { defaultTagDto } from "../tag/tagEntity.test.data";
 import expect from "expect";
 import {
-  ownerPermissionDto, readPermissionDto,
-  updatePermissionDto
+  ownerPermissionDto,
+  readPermissionDto,
+  updatePermissionDto,
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
-import {
-  defaultResourceMetadataDto
-} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
-import {metadata} from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
+import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
 
 describe("ResourcesCollection", () => {
   it("schema must validate", () => {
@@ -59,20 +60,30 @@ describe("ResourcesCollection", () => {
 
     it("works if valid minimal DTO is provided", () => {
       expect.assertions(4);
-      const dto1 = {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, metadata: {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, "name": "resource1"}};
-      const dto2 = {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, metadata: {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, "name": "resource2"}};
+      const dto1 = {
+        resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
+        metadata: { resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, name: "resource1" },
+      };
+      const dto2 = {
+        resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
+        metadata: { resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, name: "resource2" },
+      };
       const dtos = [dto1, dto2];
       const collection = new ResourcesCollection(dtos);
       expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
       expect(collection).toHaveLength(2);
-      expect(collection.items[0].metadata.name).toEqual('resource1');
-      expect(collection.items[1].metadata.name).toEqual('resource2');
+      expect(collection.items[0].metadata.name).toEqual("resource1");
+      expect(collection.items[1].metadata.name).toEqual("resource2");
     });
 
     it("works if valid complete DTOs are provided", () => {
       expect.assertions(3);
-      const dto1 = defaultResourceDto({metadata: {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, name: "resource1"}});
-      const dto2 = defaultResourceDto({metadata: {resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, name: "resource2"}});
+      const dto1 = defaultResourceDto({
+        metadata: { resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, name: "resource1" },
+      });
+      const dto2 = defaultResourceDto({
+        metadata: { resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, name: "resource2" },
+      });
       const dtos = [dto1, dto2];
       const collection = new ResourcesCollection(dtos);
       expect(collection).toHaveLength(2);
@@ -93,74 +104,72 @@ describe("ResourcesCollection", () => {
 
     it("should throw if the collection schema does not validate", () => {
       expect.assertions(1);
-      expect(() => new ResourcesCollection({}))
-        .toThrowEntityValidationError("items");
+      expect(() => new ResourcesCollection({})).toThrowEntityValidationError("items");
     });
 
     it("should throw if one of data item does not validate the collection entity schema", () => {
       const dto1 = defaultResourceDto();
-      const dto2 = defaultResourceDto({id: 42});
+      const dto2 = defaultResourceDto({ id: 42 });
 
       expect.assertions(1);
-      expect(() => new ResourcesCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("1.id.type");
+      expect(() => new ResourcesCollection([dto1, dto2])).toThrowCollectionValidationError("1.id.type");
     });
 
     it("should throw if one of data item does not validate the unique id build rule", () => {
       const dto1 = defaultResourceDto();
-      const dto2 = defaultResourceDto({id: dto1.id});
+      const dto2 = defaultResourceDto({ id: dto1.id });
 
       expect.assertions(1);
-      expect(() => new ResourcesCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("1.id.unique");
+      expect(() => new ResourcesCollection([dto1, dto2])).toThrowCollectionValidationError("1.id.unique");
     });
 
     it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
       const dto1 = defaultResourceDto();
-      const dto2 = defaultResourceDto({metadata: defaultResourceMetadataDto({username: 42})});
+      const dto2 = defaultResourceDto({ metadata: defaultResourceMetadataDto({ username: 42 }) });
 
       expect.assertions(2);
-      const collection = new ResourcesCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      const collection = new ResourcesCollection([dto1, dto2], { ignoreInvalidEntity: true });
       expect(collection.items).toHaveLength(1);
       expect(collection.items[0].id).toEqual(dto1.id);
     });
 
     it("should, with enabling the ignore invalid option, ignore items which do not validate the unique id build rule", () => {
-      const dto1 = defaultResourceDto({username: "user1@passbolt.com"});
-      const dto2 = defaultResourceDto({id: dto1.id, username: "user2@passbolt.com"});
+      const dto1 = defaultResourceDto({ username: "user1@passbolt.com" });
+      const dto2 = defaultResourceDto({ id: dto1.id, username: "user2@passbolt.com" });
 
       expect.assertions(2);
-      const collection = new ResourcesCollection([dto1, dto2], {ignoreInvalidEntity: true});
+      const collection = new ResourcesCollection([dto1, dto2], { ignoreInvalidEntity: true });
       expect(collection.items).toHaveLength(1);
       expect(collection.items[0].id).toEqual(dto1.id);
     });
 
     // @todo ignoreInvalidEntity option is not yet passed to associated entities and collections, therefore the parent entity is ignored.
-    it.failing("should, with enabling the ignore invalid option, ignore items associated permissions entities which do not validate their entity schema validation", () => {
-      const dto1 = defaultResourceDto({}, {withPermissions: true});
-      const dto2 = defaultResourceDto({
-        permissions: [
-          ownerPermissionDto({aco_foreign_key: 42})
-        ]
-      });
-      const dto3 = defaultResourceDto({}, {withPermissions: true});
+    it.failing(
+      "should, with enabling the ignore invalid option, ignore items associated permissions entities which do not validate their entity schema validation",
+      () => {
+        const dto1 = defaultResourceDto({}, { withPermissions: true });
+        const dto2 = defaultResourceDto({
+          permissions: [ownerPermissionDto({ aco_foreign_key: 42 })],
+        });
+        const dto3 = defaultResourceDto({}, { withPermissions: true });
 
-      expect.assertions(1);
-      const collection = new ResourcesCollection([dto1, dto2, dto3], {ignoreInvalidEntity: true});
-      expect(collection.items).toHaveLength(3);
-      expect(collection.items[0].id).toEqual(dto1.id);
-      expect(collection.items[0]._permissions).toHaveLength(1);
-      expect(collection.items[1].id).toEqual(dto2.id);
-      expect(collection.items[1]._permissions).toHaveLength(0);
-      expect(collection.items[2].id).toEqual(dto3.id);
-      expect(collection.items[2]._permissions).toHaveLength(1);
-    });
+        expect.assertions(1);
+        const collection = new ResourcesCollection([dto1, dto2, dto3], { ignoreInvalidEntity: true });
+        expect(collection.items).toHaveLength(3);
+        expect(collection.items[0].id).toEqual(dto1.id);
+        expect(collection.items[0]._permissions).toHaveLength(1);
+        expect(collection.items[1].id).toEqual(dto2.id);
+        expect(collection.items[1]._permissions).toHaveLength(0);
+        expect(collection.items[2].id).toEqual(dto3.id);
+        expect(collection.items[2]._permissions).toHaveLength(1);
+      },
+    );
   });
 
   describe(":pushMany", () => {
-    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async () => {
       const count = 10_000;
-      const options = {withCreator: true, withModifier: true, withPermissions: {count: 10}, withFavorite: true};
+      const options = { withCreator: true, withModifier: true, withPermissions: { count: 10 }, withFavorite: true };
       const dtos = defaultResourcesDtos(count, {}, options);
 
       const start = performance.now();
@@ -173,11 +182,11 @@ describe("ResourcesCollection", () => {
 
   describe("::removeTagById", () => {
     it("removeTagById works", () => {
-      const tagDto1 = defaultTagDto({slug: "tag 1"});
-      const tagDto2 = defaultTagDto({slug: "tag 2"});
-      const resourceDto1 = defaultResourceDto({tags: [tagDto1, tagDto2]});
-      const resourceDto2 = defaultResourceDto({tags: [tagDto1]});
-      const resourceDto3 = defaultResourceDto({tags: [tagDto2]});
+      const tagDto1 = defaultTagDto({ slug: "tag 1" });
+      const tagDto2 = defaultTagDto({ slug: "tag 2" });
+      const resourceDto1 = defaultResourceDto({ tags: [tagDto1, tagDto2] });
+      const resourceDto2 = defaultResourceDto({ tags: [tagDto1] });
+      const resourceDto3 = defaultResourceDto({ tags: [tagDto2] });
       const resourceDto4 = defaultResourceDto();
       const dtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
       const resourcesCollection = new ResourcesCollection(dtos);
@@ -200,13 +209,13 @@ describe("ResourcesCollection", () => {
 
   describe("::replaceTag", () => {
     it("update tag works", () => {
-      const tagDto1 = defaultTagDto({slug: "tag 1"});
-      const updatedTagDto1 = defaultTagDto({id: tagDto1.id, slug: "updated tag 1"});
-      const tagDto2 = defaultTagDto({slug: "tag 2"});
-      const tagDto3 = defaultTagDto({slug: "tag 3"});
-      const resourceDto1 = defaultResourceDto({tags: [tagDto1, tagDto2]});
-      const resourceDto2 = defaultResourceDto({tags: [tagDto1]});
-      const resourceDto3 = defaultResourceDto({tags: [tagDto2]});
+      const tagDto1 = defaultTagDto({ slug: "tag 1" });
+      const updatedTagDto1 = defaultTagDto({ id: tagDto1.id, slug: "updated tag 1" });
+      const tagDto2 = defaultTagDto({ slug: "tag 2" });
+      const tagDto3 = defaultTagDto({ slug: "tag 3" });
+      const resourceDto1 = defaultResourceDto({ tags: [tagDto1, tagDto2] });
+      const resourceDto2 = defaultResourceDto({ tags: [tagDto1] });
+      const resourceDto3 = defaultResourceDto({ tags: [tagDto2] });
       const resourceDto4 = defaultResourceDto();
       const dtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
       const resourcesCollection = new ResourcesCollection(dtos);
@@ -229,12 +238,12 @@ describe("ResourcesCollection", () => {
 
   describe("::bulkReplaceTagsCollection", () => {
     it("bulk replace tag works", () => {
-      const tagDto1 = defaultTagDto({slug: "tag 1"});
-      const tagDto2 = defaultTagDto({slug: "tag 2"});
-      const tagDto3 = defaultTagDto({slug: "tag 3"});
-      const resourceDto1 = defaultResourceDto({tags: [tagDto1, tagDto2]});
-      const resourceDto2 = defaultResourceDto({tags: [tagDto1]});
-      const resourceDto3 = defaultResourceDto({tags: [tagDto2]});
+      const tagDto1 = defaultTagDto({ slug: "tag 1" });
+      const tagDto2 = defaultTagDto({ slug: "tag 2" });
+      const tagDto3 = defaultTagDto({ slug: "tag 3" });
+      const resourceDto1 = defaultResourceDto({ tags: [tagDto1, tagDto2] });
+      const resourceDto2 = defaultResourceDto({ tags: [tagDto1] });
+      const resourceDto3 = defaultResourceDto({ tags: [tagDto2] });
       const resourceDto4 = defaultResourceDto();
       const dtos = [resourceDto1, resourceDto2, resourceDto3, resourceDto4];
       const resourcesCollection = new ResourcesCollection(dtos);
@@ -307,15 +316,21 @@ describe("ResourcesCollection", () => {
 
   describe("::filterBySuggestedResources", () => {
     it("should filter the collection by resources that could be suggested for a given url.", () => {
-      const suggestedResource1 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["https://passbolt.com"]})});
-      const suggestedResource2 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["passbolt.com"]})});
-      const notSuggestedResource1 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: ["nost-passbolt.com"]})});
-      const notSuggestedResource2 = defaultResourceDto({metadata: defaultResourceMetadataDto({uris: [""]})});
+      const suggestedResource1 = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+      });
+      const suggestedResource2 = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["passbolt.com"] }),
+      });
+      const notSuggestedResource1 = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["nost-passbolt.com"] }),
+      });
+      const notSuggestedResource2 = defaultResourceDto({ metadata: defaultResourceMetadataDto({ uris: [""] }) });
       const resources = new ResourcesCollection([
         suggestedResource1,
         suggestedResource2,
         notSuggestedResource1,
-        notSuggestedResource2
+        notSuggestedResource2,
       ]);
       resources.filterBySuggestResources("https://www.passbolt.com");
       expect.assertions(3);
@@ -325,12 +340,9 @@ describe("ResourcesCollection", () => {
     });
 
     it("should filter all resources out if no resources could be suggested.", () => {
-      const suggestedResource1 = defaultResourceDto({uri: "https://passbolt.com"});
-      const suggestedResource2 = defaultResourceDto({uri: "passbolt.com"});
-      const resources = new ResourcesCollection([
-        suggestedResource1,
-        suggestedResource2,
-      ]);
+      const suggestedResource1 = defaultResourceDto({ uri: "https://passbolt.com" });
+      const suggestedResource2 = defaultResourceDto({ uri: "passbolt.com" });
+      const resources = new ResourcesCollection([suggestedResource1, suggestedResource2]);
       resources.filterBySuggestResources("https://www.not-passbolt.com");
       expect.assertions(1);
       expect(resources).toHaveLength(0);
@@ -349,8 +361,8 @@ describe("ResourcesCollection", () => {
 
       const resourceDecrypted1 = defaultResourceDto();
       const resourceDecrypted2 = defaultResourceDto();
-      const resourceEncrypted1 = defaultResourceDto({metadata: metadata.withAdaKey.encryptedMetadata[0]});
-      const resourceEncrypted2 = defaultResourceDto({metadata: metadata.withSharedKey.encryptedMetadata[1]});
+      const resourceEncrypted1 = defaultResourceDto({ metadata: metadata.withAdaKey.encryptedMetadata[0] });
+      const resourceEncrypted2 = defaultResourceDto({ metadata: metadata.withSharedKey.encryptedMetadata[1] });
 
       delete resourceDecrypted1.permission;
       delete resourceDecrypted2.permission;
@@ -359,7 +371,7 @@ describe("ResourcesCollection", () => {
         resourceDecrypted1,
         resourceEncrypted1,
         resourceDecrypted2,
-        resourceEncrypted2
+        resourceEncrypted2,
       ]);
 
       resources.filterOutMetadataEncrypted();
@@ -374,9 +386,11 @@ describe("ResourcesCollection", () => {
     it("should filter out the resource which have metadata key type different than user_key.", () => {
       expect.assertions(2);
 
-      const resourceMetaKeyTypeUserKeyDto = defaultResourceDto({metadata_key_type: METADATA_KEY_TYPE_USER_KEY});
+      const resourceMetaKeyTypeUserKeyDto = defaultResourceDto({ metadata_key_type: METADATA_KEY_TYPE_USER_KEY });
       const resourceV4Dto = defaultResourceV4Dto();
-      const resourceMetaKeyTypeMetadataKeyDto = defaultResourceDto({metadata_key_type: METADATA_KEY_TYPE_METADATA_KEY});
+      const resourceMetaKeyTypeMetadataKeyDto = defaultResourceDto({
+        metadata_key_type: METADATA_KEY_TYPE_METADATA_KEY,
+      });
       const resources = new ResourcesCollection([
         resourceMetaKeyTypeUserKeyDto,
         resourceMetaKeyTypeMetadataKeyDto,
@@ -395,19 +409,26 @@ describe("ResourcesCollection", () => {
       expect.assertions(2);
 
       const resource1Id = uuidv4();
-      const resource1Dto = defaultResourceDto({id: resource1Id, permission: ownerPermissionDto({aco_foreign_key: resource1Id})});
+      const resource1Dto = defaultResourceDto({
+        id: resource1Id,
+        permission: ownerPermissionDto({ aco_foreign_key: resource1Id }),
+      });
       const resource2Id = uuidv4();
-      const resource2Dto = defaultResourceDto({id: resource2Id, permission: updatePermissionDto({aco_foreign_key: resource2Id})});
+      const resource2Dto = defaultResourceDto({
+        id: resource2Id,
+        permission: updatePermissionDto({ aco_foreign_key: resource2Id }),
+      });
       const resource3Id = uuidv4();
-      const resource3Dto = defaultResourceDto({id: resource3Id, permission: readPermissionDto({aco_foreign_key: resource3Id})});
+      const resource3Dto = defaultResourceDto({
+        id: resource3Id,
+        permission: readPermissionDto({ aco_foreign_key: resource3Id }),
+      });
       const resource4Id = uuidv4();
-      const resource4Dto = defaultResourceDto({id: resource4Id, permission: ownerPermissionDto({aco_foreign_key: resource4Id})});
-      const resources = new ResourcesCollection([
-        resource1Dto,
-        resource2Dto,
-        resource3Dto,
-        resource4Dto,
-      ]);
+      const resource4Dto = defaultResourceDto({
+        id: resource4Id,
+        permission: ownerPermissionDto({ aco_foreign_key: resource4Id }),
+      });
+      const resources = new ResourcesCollection([resource1Dto, resource2Dto, resource3Dto, resource4Dto]);
 
       const filteredResources = resources.filterByIsOwner();
 
@@ -428,8 +449,8 @@ describe("ResourcesCollection", () => {
       encryptedCollectionDto[2].metadata = metadata.withSharedKey.encryptedMetadata[2];
       encryptedCollectionDto[3].metadata = metadata.withSharedKey.encryptedMetadata[3];
 
-      encryptedCollectionDto[0].modified = (new Date()).toISOString();
-      encryptedCollectionDto[2].modified = (new Date()).toISOString();
+      encryptedCollectionDto[0].modified = new Date().toISOString();
+      encryptedCollectionDto[2].modified = new Date().toISOString();
 
       const decryptedCollection = new ResourcesCollection(decryptedCollectionDto);
       const collection = new ResourcesCollection(encryptedCollectionDto);
@@ -445,7 +466,9 @@ describe("ResourcesCollection", () => {
       expect.assertions(1);
 
       const collection = new ResourcesCollection([]);
-      expect(() => collection.setDecryptedMetadataFromCollection("test")).toThrow('The `resourcesCollection` parameter should be a ResourcesCollection.');
+      expect(() => collection.setDecryptedMetadataFromCollection("test")).toThrow(
+        "The `resourcesCollection` parameter should be a ResourcesCollection.",
+      );
     });
   });
 
@@ -504,9 +527,9 @@ describe("ResourcesCollection", () => {
       expect.assertions(3);
 
       const existingExpiryDate = "2025-06-30T23:59:59Z";
-      const resource1 = defaultResourceDto({expired: existingExpiryDate});
+      const resource1 = defaultResourceDto({ expired: existingExpiryDate });
       const resource2 = defaultResourceDto();
-      const resource3 = defaultResourceDto({expired: existingExpiryDate});
+      const resource3 = defaultResourceDto({ expired: existingExpiryDate });
       const collection = new ResourcesCollection([resource1, resource2, resource3]);
       const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 

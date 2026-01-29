@@ -34,7 +34,7 @@ class IsExtensionFirstInstallController {
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -44,7 +44,7 @@ class IsExtensionFirstInstallController {
    * @return {Promise<boolean>}
    */
   async exec() {
-    return this.worker.tab.url.indexOf('first-install') !== -1;
+    return this.worker.tab.url.indexOf("first-install") !== -1;
   }
 }
 

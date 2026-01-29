@@ -12,16 +12,15 @@
  * @since         4.5.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MfaSetupGetTotpCodeController from "./MfaSetupGetTotpCodeController";
-import {defaultTotpQrCodeData} from "../../model/entity/mfa/mfaTotpSetupInfoEntity.test.data";
+import { defaultTotpQrCodeData } from "../../model/entity/mfa/mfaTotpSetupInfoEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
 });
-
 
 describe("MfaSetupGetTotpCodeController", () => {
   let controller;
@@ -30,7 +29,7 @@ describe("MfaSetupGetTotpCodeController", () => {
     controller = new MfaSetupGetTotpCodeController(null, null, defaultApiClientOptions());
   });
 
-  it("Should retrieve the totp uri", async() => {
+  it("Should retrieve the totp uri", async () => {
     expect.assertions(2);
     jest.spyOn(controller.multiFactorAuthenticationModel, "getMfaToTpSetupInfo");
 

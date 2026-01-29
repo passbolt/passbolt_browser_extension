@@ -53,9 +53,7 @@ class GetLocalSsoProviderConfiguredController {
       return null;
     }
 
-    return data?.isRegistered()
-      ? data.provider
-      : null;
+    return data?.isRegistered() ? data.provider : null;
   }
 }
 

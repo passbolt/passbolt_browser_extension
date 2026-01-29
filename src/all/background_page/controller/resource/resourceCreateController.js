@@ -30,7 +30,7 @@ class ResourceCreateController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.progressService = new ProgressService(this.worker, i18n.t('Creating password'));
+    this.progressService = new ProgressService(this.worker, i18n.t("Creating password"));
     this.resourceCreateService = new ResourceCreateService(account, apiClientOptions, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
     this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
@@ -45,10 +45,10 @@ class ResourceCreateController {
   async _exec(resourceDto, plaintextDto) {
     try {
       const resource = await this.exec(resourceDto, plaintextDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS', resource);
+      this.worker.port.emit(this.requestId, "SUCCESS", resource);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -61,11 +61,11 @@ class ResourceCreateController {
     const goals = resourceDto.folder_parent_id ? 10 : 3;
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
-    this.progressService.start(goals, i18n.t('Initializing'));
+    this.progressService.start(goals, i18n.t("Initializing"));
 
     try {
-      const resourceCreated =  await this.resourceCreateService.create(resourceDto, plaintextDto, passphrase);
-      await this.progressService.finishStep(i18n.t('Done!'), true);
+      const resourceCreated = await this.resourceCreateService.create(resourceDto, plaintextDto, passphrase);
+      await this.progressService.finishStep(i18n.t("Done!"), true);
       return resourceCreated;
     } finally {
       await this.progressService.close();

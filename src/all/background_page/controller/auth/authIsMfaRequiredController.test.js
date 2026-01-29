@@ -12,7 +12,7 @@
  * @since         4.7.0
  */
 
-import {userLoggedInAuthStatus, userLoggedOutAuthStatus, userRequireMfaAuthStatus} from "./authCheckStatus.test.data";
+import { userLoggedInAuthStatus, userLoggedOutAuthStatus, userRequireMfaAuthStatus } from "./authCheckStatus.test.data";
 import AuthIsMfaRequiredController from "./authIsMfaRequiredController";
 
 beforeEach(() => {
@@ -20,33 +20,37 @@ beforeEach(() => {
 });
 
 describe("AuthIsMfaRequiredController", () => {
-  it("should return true if the user needs to authenticate with MFA", async() => {
+  it("should return true if the user needs to authenticate with MFA", async () => {
     expect.assertions(1);
 
     const controller = new AuthIsMfaRequiredController();
-    jest.spyOn(controller.checkAuthStatusService, "checkAuthStatus").mockImplementation(async() => userRequireMfaAuthStatus());
+    jest
+      .spyOn(controller.checkAuthStatusService, "checkAuthStatus")
+      .mockImplementation(async () => userRequireMfaAuthStatus());
 
     const isMfaRequired = await controller.exec();
     expect(isMfaRequired).toStrictEqual(true);
   });
 
-  it("should return false if the user does not need to authenticate with MFA", async() => {
+  it("should return false if the user does not need to authenticate with MFA", async () => {
     expect.assertions(1);
 
     const controller = new AuthIsMfaRequiredController();
-    jest.spyOn(controller.checkAuthStatusService, "checkAuthStatus").mockImplementation(async() => userLoggedInAuthStatus());
+    jest
+      .spyOn(controller.checkAuthStatusService, "checkAuthStatus")
+      .mockImplementation(async () => userLoggedInAuthStatus());
 
     const isMfaRequired = await controller.exec();
     expect(isMfaRequired).toStrictEqual(false);
   });
 
-  it("should return the MFA status part of the authentication status", async() => {
+  it("should return the MFA status part of the authentication status", async () => {
     expect.assertions(1);
 
     const controller = new AuthIsMfaRequiredController();
 
     const authStatus = userLoggedOutAuthStatus();
-    jest.spyOn(controller.checkAuthStatusService, "checkAuthStatus").mockImplementation(async() => authStatus);
+    jest.spyOn(controller.checkAuthStatusService, "checkAuthStatus").mockImplementation(async () => authStatus);
 
     const isMfaRequired = await controller.exec();
     expect(isMfaRequired).toStrictEqual(authStatus.isMfaRequired);

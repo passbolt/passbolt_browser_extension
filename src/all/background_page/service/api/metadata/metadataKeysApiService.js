@@ -12,7 +12,7 @@
  * @since         v4.10.0
  */
 
-import {assertType, assertUuid} from "../../../utils/assertions";
+import { assertType, assertUuid } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 import MetadataKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity";
 
@@ -35,11 +35,7 @@ class MetadataKeysApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return [
-      'metadata_private_keys',
-      'creator',
-      'creator.profile',
-    ];
+    return ["metadata_private_keys", "creator", "creator.profile"];
   }
 
   /**
@@ -48,9 +44,7 @@ class MetadataKeysApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedFiltersOptions() {
-    return [
-      'deleted',
-    ];
+    return ["deleted"];
   }
 
   /**
@@ -63,7 +57,7 @@ class MetadataKeysApiService extends AbstractService {
    */
   async create(metadataKey) {
     assertType(metadataKey, MetadataKeyEntity);
-    const data = metadataKey.toDto({metadata_private_keys: true});
+    const data = metadataKey.toDto({ metadata_private_keys: true });
     const response = await this.apiClient.create(data);
     return response.body;
   }
@@ -76,11 +70,13 @@ class MetadataKeysApiService extends AbstractService {
    * @public
    */
   async findAll(contains = {}, filters = {}) {
-    assertType(contains, Object, 'The given contains is not an Object');
-    contains = contains ? this.formatContainOptions(contains, MetadataKeysApiService.getSupportedContainOptions()) : null;
+    assertType(contains, Object, "The given contains is not an Object");
+    contains = contains
+      ? this.formatContainOptions(contains, MetadataKeysApiService.getSupportedContainOptions())
+      : null;
     filters = filters ? this.formatFilterOptions(filters, MetadataKeysApiService.getSupportedFiltersOptions()) : null;
 
-    const options = {...contains, ...filters};
+    const options = { ...contains, ...filters };
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];

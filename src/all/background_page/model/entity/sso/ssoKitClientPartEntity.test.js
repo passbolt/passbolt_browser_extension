@@ -14,8 +14,8 @@
 import SsoKitClientPartEntity from "./ssoKitClientPartEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {v4 as uuid} from "uuid";
-import {clientSsoKit} from "./ssoKitClientPart.test.data";
+import { v4 as uuid } from "uuid";
+import { clientSsoKit } from "./ssoKitClientPart.test.data";
 import GenerateSsoIvService from "../../../service/crypto/generateSsoIvService";
 
 describe("Sso Kit Client Part Entity", () => {
@@ -23,7 +23,7 @@ describe("Sso Kit Client Part Entity", () => {
     EntitySchema.validateSchema(SsoKitClientPartEntity.ENTITY_NAME, SsoKitClientPartEntity.getSchema());
   });
 
-  it("constructor works if valid minimal DTO is provided", async() => {
+  it("constructor works if valid minimal DTO is provided", async () => {
     expect.assertions(1);
     const dto = await clientSsoKit();
 
@@ -31,7 +31,7 @@ describe("Sso Kit Client Part Entity", () => {
     expect(entity.toDbSerializableObject()).toEqual(dto);
   });
 
-  it("constructor works if full valid DTO is provided", async() => {
+  it("constructor works if full valid DTO is provided", async () => {
     expect.assertions(1);
     const dto = await clientSsoKit({
       created: "2020-05-04T20:31:45+00:00",
@@ -44,36 +44,40 @@ describe("Sso Kit Client Part Entity", () => {
     expect(entity.toDbSerializableObject()).toEqual(dto);
   });
 
-  it("constructor returns validation error if dto required fields are invalid", async() => {
+  it("constructor returns validation error if dto required fields are invalid", async () => {
     const ssoKit = await clientSsoKit();
-    const invalidNeks = [
-      "nek",
-      {},
+    const invalidNeks = ["nek", {}];
+    const invalidIvs = [
+      {
+        iv1: [1, 2, 3],
+        iv2: GenerateSsoIvService.generateIv(),
+      },
+      {
+        iv1: GenerateSsoIvService.generateIv(),
+        iv2: [1, 2, 3],
+      },
+      {
+        iv1: GenerateSsoIvService.generateIv(),
+        iv2: GenerateSsoIvService.generateIv(1),
+      },
+      {
+        iv1: GenerateSsoIvService.generateIv(1),
+        iv2: GenerateSsoIvService.generateIv(),
+      },
+      {
+        iv1: GenerateSsoIvService.generateIv(16),
+        iv2: GenerateSsoIvService.generateIv(),
+      },
+      {
+        iv1: GenerateSsoIvService.generateIv(),
+        iv2: GenerateSsoIvService.generateIv(16),
+      },
     ];
-    const invalidIvs = [{
-      iv1: [1, 2, 3],
-      iv2: GenerateSsoIvService.generateIv()
-    }, {
-      iv1: GenerateSsoIvService.generateIv(),
-      iv2: [1, 2, 3]
-    }, {
-      iv1: GenerateSsoIvService.generateIv(),
-      iv2: GenerateSsoIvService.generateIv(1)
-    }, {
-      iv1: GenerateSsoIvService.generateIv(1),
-      iv2: GenerateSsoIvService.generateIv()
-    }, {
-      iv1: GenerateSsoIvService.generateIv(16),
-      iv2: GenerateSsoIvService.generateIv()
-    }, {
-      iv1: GenerateSsoIvService.generateIv(),
-      iv2: GenerateSsoIvService.generateIv(16)
-    }];
 
     expect.assertions(invalidNeks.length + invalidIvs.length);
 
     for (let i = 0; i < invalidNeks.length; i++) {
-      const dto = Object.assign({}, ssoKit, {nek: invalidNeks[i]});
+      const dto = Object.assign({}, ssoKit, { nek: invalidNeks[i] });
       try {
         new SsoKitClientPartEntity(dto);
       } catch (e) {
@@ -91,7 +95,7 @@ describe("Sso Kit Client Part Entity", () => {
     }
   });
 
-  it("isRegistered returns true only if the data is complete", async() => {
+  it("isRegistered returns true only if the data is complete", async () => {
     const ssoKit = await clientSsoKit();
     const ssoKitIdLess = await clientSsoKit();
     const ssoKitProviderLess = await clientSsoKit();
@@ -100,9 +104,9 @@ describe("Sso Kit Client Part Entity", () => {
     delete ssoKitProviderLess.provider;
 
     const scenarios = [
-      {data: ssoKit, isRegistered: true},
-      {data: ssoKitIdLess, isRegistered: false},
-      {data: ssoKitProviderLess, isRegistered: false},
+      { data: ssoKit, isRegistered: true },
+      { data: ssoKitIdLess, isRegistered: false },
+      { data: ssoKitProviderLess, isRegistered: false },
     ];
 
     expect.assertions(scenarios.length);

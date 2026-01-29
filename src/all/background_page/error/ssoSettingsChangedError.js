@@ -14,7 +14,7 @@
 class SsoSettingsChangedError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'SsoSettingsChangedError';
+    this.name = "SsoSettingsChangedError";
   }
 }
 

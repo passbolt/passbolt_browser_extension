@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import {defaultExternalFolderDto} from "./externalFolderEntity.test.data";
+import { defaultExternalFolderDto } from "./externalFolderEntity.test.data";
 
 export const defaultExternalFoldersCollectionDto = (foldersCount = 4, data) => {
   const dtos = [];
   for (let i = 0; i < foldersCount; i++) {
-    const dto = defaultExternalFolderDto({name: `folder ${i}`, ...data});
+    const dto = defaultExternalFolderDto({ name: `folder ${i}`, ...data });
     dtos.push(dto);
   }
   return dtos;

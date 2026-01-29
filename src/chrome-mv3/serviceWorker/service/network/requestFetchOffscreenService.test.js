@@ -14,18 +14,16 @@
 
 import each from "jest-each";
 import Validator from "validator";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY, RequestFetchOffscreenService } from "./requestFetchOffscreenService";
 import {
-  IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY,
-  RequestFetchOffscreenService
-} from "./requestFetchOffscreenService";
-import {
-  FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA, FETCH_OFFSCREEN_DATA_TYPE_JSON,
-  SEND_MESSAGE_TARGET_FETCH_OFFSCREEN
+  FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA,
+  FETCH_OFFSCREEN_DATA_TYPE_JSON,
+  SEND_MESSAGE_TARGET_FETCH_OFFSCREEN,
 } from "../../../offscreens/service/network/fetchOffscreenService";
-import {fetchOptionsWithBodyFormData, fetchOptionWithBodyData} from "./requestFetchOffscreenService.test.data";
+import { fetchOptionsWithBodyFormData, fetchOptionWithBodyData } from "./requestFetchOffscreenService.test.data";
 import FormDataUtils from "../../../../all/background_page/utils/format/formDataUtils";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import HandleOffscreenResponseService from "../offscreen/handleOffscreenResponseService";
 
 beforeEach(() => {
@@ -38,16 +36,16 @@ beforeEach(() => {
 
 describe("RequestFetchOffscreenService", () => {
   describe("::isFetchOffscreenPreferred", () => {
-    it("should return false if no value found in runtime or session storage caches", async() => {
+    it("should return false if no value found in runtime or session storage caches", async () => {
       expect.assertions(1);
       expect(await RequestFetchOffscreenService.isFetchOffscreenPreferred()).toBeFalsy();
     });
 
     each([
-      {label: "true", value: true},
-      {label: "false", value: false},
-    ]).describe("should return the runtime cached value", scenario => {
-      it(`should return the runtime cached value for scenario: ${scenario.label}`, async() => {
+      { label: "true", value: true },
+      { label: "false", value: false },
+    ]).describe("should return the runtime cached value", (scenario) => {
+      it(`should return the runtime cached value for scenario: ${scenario.label}`, async () => {
         expect.assertions(1);
         // Mock runtime cached value.
         RequestFetchOffscreenService.isFetchOffscreenPreferredCache = scenario.value;
@@ -56,46 +54,49 @@ describe("RequestFetchOffscreenService", () => {
     });
 
     each([
-      {label: "true", value: true},
-      {label: "false", value: false},
-    ]).describe("should return the session storage value if no runtime value is present", scenario => {
-      it(`should return the runtime cached value for scenario: ${scenario.label}`, async() => {
+      { label: "true", value: true },
+      { label: "false", value: false },
+    ]).describe("should return the session storage value if no runtime value is present", (scenario) => {
+      it(`should return the runtime cached value for scenario: ${scenario.label}`, async () => {
         expect.assertions(1);
         // Mock session storage cached value.
-        browser.storage.session.set({[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: scenario.value});
+        browser.storage.session.set({ [IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: scenario.value });
         expect(await RequestFetchOffscreenService.isFetchOffscreenPreferred()).toEqual(scenario.value);
       });
     });
 
     each([
-      {label: "true", value: true},
-      {label: "false", value: false},
-    ]).describe("should return the runtime cached value if set and if the session storage value is also set", scenario => {
-      it(`should return the runtime cached value for scenario: ${scenario.label}`, async() => {
-        expect.assertions(1);
-        // Mock runtime cached value.
-        RequestFetchOffscreenService.isFetchOffscreenPreferredCache = scenario.value;
-        browser.storage.session.set({[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: !scenario.value});
-        expect(await RequestFetchOffscreenService.isFetchOffscreenPreferred()).toEqual(scenario.value);
-      });
-    });
+      { label: "true", value: true },
+      { label: "false", value: false },
+    ]).describe(
+      "should return the runtime cached value if set and if the session storage value is also set",
+      (scenario) => {
+        it(`should return the runtime cached value for scenario: ${scenario.label}`, async () => {
+          expect.assertions(1);
+          // Mock runtime cached value.
+          RequestFetchOffscreenService.isFetchOffscreenPreferredCache = scenario.value;
+          browser.storage.session.set({ [IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: !scenario.value });
+          expect(await RequestFetchOffscreenService.isFetchOffscreenPreferred()).toEqual(scenario.value);
+        });
+      },
+    );
   });
 
   describe("::buildOffscreenData", () => {
-    it("should build data to send to the offscreen document", async() => {
+    it("should build data to send to the offscreen document", async () => {
       expect.assertions(1);
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionWithBodyData();
       const offscreenData = await RequestFetchOffscreenService.buildOffscreenData(resource, options);
       options.body = {
         data: options.body,
-        dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON
+        dataType: FETCH_OFFSCREEN_DATA_TYPE_JSON,
       };
       // Ensure body remains a form data after serialization.
-      expect(offscreenData).toEqual({resource, options});
+      expect(offscreenData).toEqual({ resource, options });
     });
 
-    it("should ensure given fetch options body will not be altered", async() => {
+    it("should ensure given fetch options body will not be altered", async () => {
       expect.assertions(2);
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const fetchOptions = fetchOptionsWithBodyFormData();
@@ -105,7 +106,7 @@ describe("RequestFetchOffscreenService", () => {
       expect(offscreenData.options.body.dataType).toStrictEqual(FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA);
     });
 
-    it("should transform FormData body into serialized encoded url parameters", async() => {
+    it("should transform FormData body into serialized encoded url parameters", async () => {
       expect.assertions(1);
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
@@ -119,36 +120,39 @@ describe("RequestFetchOffscreenService", () => {
             ...options.headers,
           },
           body: {
-            data: [{key: "prop1", value: "value 1", type: FormDataUtils.TYPE_SCALAR}, {key: "prop1", value: "value 2", type: FormDataUtils.TYPE_SCALAR}],
-            dataType: FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA
-          } // ensure the body is serialized as url encoded parameter
-        }
+            data: [
+              { key: "prop1", value: "value 1", type: FormDataUtils.TYPE_SCALAR },
+              { key: "prop1", value: "value 2", type: FormDataUtils.TYPE_SCALAR },
+            ],
+            dataType: FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA,
+          }, // ensure the body is serialized as url encoded parameter
+        },
       };
       expect(offscreenData).toEqual(expectedOffscreenMessageData);
     });
   });
 
   describe("::sendOffscreenMessage", () => {
-    it("should send a message to the offscreen document", async() => {
+    it("should send a message to the offscreen document", async () => {
       expect.assertions(1);
       const id = uuidv4();
-      const data = {prop1: "value1"};
+      const data = { prop1: "value1" };
       const target = SEND_MESSAGE_TARGET_FETCH_OFFSCREEN;
 
       await RequestFetchOffscreenService.sendOffscreenMessage(id, data);
 
-      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({id, target, data});
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ id, target, data });
     });
   });
 
   describe("::fetchOffscreen", () => {
-    it("should send a message to the offscreen document and stack the response callback handlers", async() => {
+    it("should send a message to the offscreen document and stack the response callback handlers", async () => {
       expect.assertions(4);
 
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
 
-      jest.spyOn(chrome.runtime, "sendMessage").mockImplementationOnce(message => {
+      jest.spyOn(chrome.runtime, "sendMessage").mockImplementationOnce((message) => {
         expect(Validator.isUUID(message.id)).toBe(true);
         const expectedMessageData = {
           id: message.id,
@@ -162,12 +166,12 @@ describe("RequestFetchOffscreenService", () => {
               },
               body: {
                 data: [
-                  {key: "prop1", value: "value 1", type: FormDataUtils.TYPE_SCALAR},
-                  {key: "prop1", value: "value 2", type: FormDataUtils.TYPE_SCALAR}
+                  { key: "prop1", value: "value 1", type: FormDataUtils.TYPE_SCALAR },
+                  { key: "prop1", value: "value 2", type: FormDataUtils.TYPE_SCALAR },
                 ],
-                dataType: FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA
+                dataType: FETCH_OFFSCREEN_DATA_TYPE_FORM_DATA,
               }, // ensure the body is serialized as url encoded parameter
-            }
+            },
           },
         };
         expect(message).toEqual(expectedMessageData);
@@ -178,7 +182,7 @@ describe("RequestFetchOffscreenService", () => {
       await expect(requestPromise).resolves.not.toThrow();
     });
 
-    it("should throw if the message cannot be sent to the offscreen document for unexpected reason", async() => {
+    it("should throw if the message cannot be sent to the offscreen document for unexpected reason", async () => {
       expect.assertions(2);
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
@@ -192,7 +196,7 @@ describe("RequestFetchOffscreenService", () => {
   });
 
   describe("::fetchNative", () => {
-    it("should call the native fetch API", async() => {
+    it("should call the native fetch API", async () => {
       expect.assertions(2);
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
@@ -202,7 +206,7 @@ describe("RequestFetchOffscreenService", () => {
       expect(fetch).toHaveBeenCalledWith(resource, options);
     });
 
-    it("should fallback on fetchOffscreen if an unexpected error occurred", async() => {
+    it("should fallback on fetchOffscreen if an unexpected error occurred", async () => {
       expect.assertions(3);
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
@@ -214,7 +218,7 @@ describe("RequestFetchOffscreenService", () => {
       expect(RequestFetchOffscreenService.fetchOffscreen).toHaveBeenCalledWith(resource, options);
     });
 
-    it("should throw and not fallback on fetchOffscreen if the navigator is not online", async() => {
+    it("should throw and not fallback on fetchOffscreen if the navigator is not online", async () => {
       expect.assertions(1);
 
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
@@ -229,7 +233,7 @@ describe("RequestFetchOffscreenService", () => {
   });
 
   describe("::fetch", () => {
-    it("should call the native fetch API if offscreen strategy has not been marked as preferred", async() => {
+    it("should call the native fetch API if offscreen strategy has not been marked as preferred", async () => {
       expect.assertions(1);
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();
@@ -238,7 +242,7 @@ describe("RequestFetchOffscreenService", () => {
       expect(RequestFetchOffscreenService.fetchNative).toHaveBeenCalledWith(resource, options);
     });
 
-    it("should call the native fetch offscreen if this strategy has been marked as preferred", async() => {
+    it("should call the native fetch offscreen if this strategy has been marked as preferred", async () => {
       expect.assertions(1);
       const resource = "https://test.passbolt.com/passbolt-unit-test/test.json";
       const options = fetchOptionsWithBodyFormData();

@@ -12,11 +12,11 @@
  * @since         5.7.0
  */
 
-import {assertType, assertUuid} from "../../../utils/assertions";
+import { assertType, assertUuid } from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
-const RESOURCE_SECRET_REVISION_RESOURCE_NAME = 'secret-revisions/resource';
+const RESOURCE_SECRET_REVISION_RESOURCE_NAME = "secret-revisions/resource";
 
 export default class ResourceSecretRevisionApiService extends AbstractService {
   /**
@@ -41,13 +41,7 @@ export default class ResourceSecretRevisionApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return [
-      "creator",
-      "creator.profile",
-      "owner_accessors",
-      "owner_accessors.profile",
-      "secret",
-    ];
+    return ["creator", "creator.profile", "owner_accessors", "owner_accessors.profile", "secret"];
   }
 
   /**
@@ -75,7 +69,7 @@ export default class ResourceSecretRevisionApiService extends AbstractService {
    */
   assertContains(contains) {
     const supportedOptions = ResourceSecretRevisionApiService.getSupportedContainOptions();
-    if (contains && !Object.keys(contains).every(option => supportedOptions.includes(option))) {
+    if (contains && !Object.keys(contains).every((option) => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
     }
   }

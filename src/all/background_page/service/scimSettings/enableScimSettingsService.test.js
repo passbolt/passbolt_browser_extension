@@ -12,10 +12,10 @@
  * @since         5.5.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse, mockApiResponseError} from "passbolt-styleguide/test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse, mockApiResponseError } from "passbolt-styleguide/test/mocks/mockApiResponse";
 import EnableScimSettingsService from "./enableScimSettingsService";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {
   defaultScimSettingsDto,
   scimSettingsWithoutSecretTokenDto,
@@ -27,21 +27,21 @@ import ScimSettingsEntity from "passbolt-styleguide/src/shared/models/entity/sci
 describe("EnableScimSettingsService", () => {
   let apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
     apiClientOptions = defaultApiClientOptions();
   });
 
-  describe('::enable', () => {
-    it("successfully creates SCIM settings", async() => {
+  describe("::enable", () => {
+    it("successfully creates SCIM settings", async () => {
       expect.assertions(2);
 
       const apiResponse = scimSettingsWithoutSecretTokenDto();
       fetch.doMockOnceIf(/scim\/settings\.json/, () => mockApiResponse(apiResponse));
       const expected = {
         ...apiResponse,
-        secret_token: ScimSettingsEntity.EMPTY_SECRET_VALUE
+        secret_token: ScimSettingsEntity.EMPTY_SECRET_VALUE,
       };
 
       const service = new EnableScimSettingsService(apiClientOptions);
@@ -53,16 +53,18 @@ describe("EnableScimSettingsService", () => {
       expect(result).toEqual(new ScimSettingsEntity(expected));
     });
 
-    it("throws an error for invalid input type", async() => {
+    it("throws an error for invalid input type", async () => {
       expect.assertions(1);
       const service = new EnableScimSettingsService(apiClientOptions);
 
       await expect(() => service.enable({})).rejects.toThrow(TypeError);
     });
 
-    it("throws service unavailable error if an error occurred but not from the API", async() => {
+    it("throws service unavailable error if an error occurred but not from the API", async () => {
       expect.assertions(1);
-      fetch.doMockOnceIf(/scim\/settings\.json/, () => { throw new Error("Service unavailable"); });
+      fetch.doMockOnceIf(/scim\/settings\.json/, () => {
+        throw new Error("Service unavailable");
+      });
 
       const service = new EnableScimSettingsService(apiClientOptions);
       const scimSetting = new ScimSettingsEntity(defaultScimSettingsDto());
@@ -70,7 +72,7 @@ describe("EnableScimSettingsService", () => {
       await expect(() => service.enable(scimSetting)).rejects.toThrow(PassboltServiceUnavailableError);
     });
 
-    it("throws API error if the API encountered an issue", async() => {
+    it("throws API error if the API encountered an issue", async () => {
       expect.assertions(1);
       fetch.doMockOnceIf(/scim\/settings\.json/, () => mockApiResponseError(500, "Something wrong happened!"));
 

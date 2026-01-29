@@ -15,29 +15,28 @@
 import ResourceService from "../api/resource/resourceService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import FindResourcesService from "./findResourcesService";
 import ResourceTypeService from "../api/resourceType/resourceTypeService";
-import {
-  resourceTypesCollectionDto
-} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import {
   multipleResourceDtos,
   multipleResourceIncludingUnsupportedResourceTypesDtos,
-  multipleResourceWithMetadataEncrypted} from "./findResourcesService.test.data";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+  multipleResourceWithMetadataEncrypted,
+} from "./findResourcesService.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
-import {defaultDecryptedSharedMetadataKeysDtos} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
+import { defaultDecryptedSharedMetadataKeysDtos } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -47,13 +46,13 @@ describe("FindResourcesService", () => {
   let findResourcesService, apiClientOptions;
   const account = new AccountEntity(defaultAccountDto());
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     apiClientOptions = defaultApiClientOptions();
     findResourcesService = new FindResourcesService(account, apiClientOptions);
   });
 
   describe("::findAll", () => {
-    it("should return all items with any params.", async() => {
+    it("should return all items with any params.", async () => {
       expect.assertions(2);
 
       const collection = multipleResourceDtos();
@@ -65,7 +64,7 @@ describe("FindResourcesService", () => {
       expect(resources.toDto()).toEqual(collection);
     });
 
-    it("should filter collection when param is defined.", async() => {
+    it("should filter collection when param is defined.", async () => {
       expect.assertions(3);
 
       const collection = multipleResourceDtos();
@@ -73,37 +72,42 @@ describe("FindResourcesService", () => {
 
       const resources = await findResourcesService.findAll(null, {
         "has-tag": false,
-        "is-favorite": true
+        "is-favorite": true,
       });
 
       expect(resources).toBeInstanceOf(ResourcesCollection);
       expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith(null, {
         "has-tag": false,
-        "is-favorite": true
+        "is-favorite": true,
       });
       expect(resources.toDto()).toEqual(collection);
     });
 
-    it("should add field to collection when contains param is defined.", async() => {
+    it("should add field to collection when contains param is defined.", async () => {
       expect.assertions(3);
 
       const collection = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
 
-      const resources = await findResourcesService.findAll({favorite: true, permission: true, tag: true}, null);
+      const resources = await findResourcesService.findAll({ favorite: true, permission: true, tag: true }, null);
 
       expect(resources).toBeInstanceOf(ResourcesCollection);
-      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith({favorite: true, permission: true, tag: true}, null);
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith(
+        { favorite: true, permission: true, tag: true },
+        null,
+      );
       expect(resources.toDto()).toEqual(collection);
     });
 
-    it("should skip invalid entity with ignore strategy.", async() => {
+    it("should skip invalid entity with ignore strategy.", async () => {
       expect.assertions(2);
 
       const multipleResources = multipleResourceIncludingUnsupportedResourceTypesDtos();
-      const resourcesCollectionDto = multipleResources.concat([defaultResourceDto({
-        resource_type_id: null
-      })]);
+      const resourcesCollectionDto = multipleResources.concat([
+        defaultResourceDto({
+          resource_type_id: null,
+        }),
+      ]);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
       const resources = await findResourcesService.findAll(null, null, true);
@@ -112,13 +116,15 @@ describe("FindResourcesService", () => {
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(multipleResources);
     });
 
-    it("should not skip invalid entity without ignore strategy.", async() => {
+    it("should not skip invalid entity without ignore strategy.", async () => {
       expect.assertions(1);
 
       const multipleResources = multipleResourceIncludingUnsupportedResourceTypesDtos();
-      const resourcesCollectionDto = multipleResources.concat([defaultResourceDto({
-        resource_type_id: null
-      })]);
+      const resourcesCollectionDto = multipleResources.concat([
+        defaultResourceDto({
+          resource_type_id: null,
+        }),
+      ]);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
       const promise = findResourcesService.findAll(null, null, false);
@@ -126,27 +132,27 @@ describe("FindResourcesService", () => {
       await expect(promise).rejects.toThrow(CollectionValidationError);
     });
 
-    it("should not allow invalid contains params.", async() => {
+    it("should not allow invalid contains params.", async () => {
       expect.assertions(1);
 
       const collection = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
 
       const promise = findResourcesService.findAll({
-        invalid: true
+        invalid: true,
       });
 
       expect(promise).rejects.toThrow(Error("Unsupported contains parameter used, please check supported contains"));
     });
 
-    it("should not allow invalid filters params.", async() => {
+    it("should not allow invalid filters params.", async () => {
       expect.assertions(1);
 
       const collection = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
 
       const promise = findResourcesService.findAll(null, {
-        "is-not-supported": true
+        "is-not-supported": true,
       });
 
       expect(promise).rejects.toThrow(Error("Unsupported filter parameter used, please check supported filters"));
@@ -154,7 +160,7 @@ describe("FindResourcesService", () => {
   });
 
   describe("::findAllForLocalStorage", () => {
-    it("uses the contains required by the local storage.", async() => {
+    it("uses the contains required by the local storage.", async () => {
       expect.assertions(2);
       jest.spyOn(findResourcesService, "findAll");
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
@@ -162,11 +168,14 @@ describe("FindResourcesService", () => {
 
       const resources = await findResourcesService.findAllForLocalStorage();
 
-      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith({favorite: true, permission: true, tag: true}, null);
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith(
+        { favorite: true, permission: true, tag: true },
+        null,
+      );
       expect(resources).toBeInstanceOf(ResourcesCollection);
     });
 
-    it("retrieves resources of all types.", async() => {
+    it("retrieves resources of all types.", async () => {
       expect.assertions(1);
       const resourcesDto = multipleResourceDtos();
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
@@ -177,27 +186,35 @@ describe("FindResourcesService", () => {
       expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(resourcesDto);
     });
 
-    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
-      expect.assertions(2);
-      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
-      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+    it(
+      "does not retrieve the passphrase from the session storage if passed as parameter",
+      async () => {
+        expect.assertions(2);
+        const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+        const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
 
-      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
-      const resourceTypesDto = resourceTypesCollectionDto();
+        const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+        const resourceTypesDto = resourceTypesCollectionDto();
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
-      jest.spyOn(PassphraseStorageService, "get");
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+        jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+        jest.spyOn(PassphraseStorageService, "get");
+        jest
+          .spyOn(GetDecryptedUserPrivateKeyService, "getKey")
+          .mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+        jest
+          .spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll")
+          .mockImplementation(() => metadataKeys);
 
-      const resources = await findResourcesService.findAllForLocalStorage(pgpKeys.ada.passphrase);
+        const resources = await findResourcesService.findAllForLocalStorage(pgpKeys.ada.passphrase);
 
-      expect(resources).toHaveLength(resourcesDto.length);
-      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
-    }, 10 * 1000);
+        expect(resources).toHaveLength(resourcesDto.length);
+        expect(PassphraseStorageService.get).not.toHaveBeenCalled();
+      },
+      10 * 1000,
+    );
 
-    it("should return a collection with resources metadata decrypted from a mixed source of information (alread decrypted metadata and encrypted metadata)", async() => {
+    it("should return a collection with resources metadata decrypted from a mixed source of information (alread decrypted metadata and encrypted metadata)", async () => {
       expect.assertions(1);
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
@@ -206,11 +223,17 @@ describe("FindResourcesService", () => {
       const decryptedMetadataResourcesDto = multipleResourceDtos();
       const resourceTypesDto = resourceTypesCollectionDto();
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [...resourcesDto, ...decryptedMetadataResourcesDto]);
+      jest
+        .spyOn(ResourceService.prototype, "findAll")
+        .mockImplementation(() => [...resourcesDto, ...decryptedMetadataResourcesDto]);
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+      jest
+        .spyOn(GetDecryptedUserPrivateKeyService, "getKey")
+        .mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+      jest
+        .spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll")
+        .mockImplementation(() => metadataKeys);
 
       const resources = await findResourcesService.findAllForLocalStorage();
 
@@ -227,7 +250,7 @@ describe("FindResourcesService", () => {
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
     });
 
-    it("should return resources shared with group id", async() => {
+    it("should return resources shared with group id", async () => {
       expect.assertions(1);
 
       const collection = multipleResourceDtos();
@@ -238,7 +261,7 @@ describe("FindResourcesService", () => {
       expect(resourcesCollection).toEqual(new ResourcesCollection(collection));
     });
 
-    it("should call the api with is-shared-with-group and the groupId associated", async() => {
+    it("should call the api with is-shared-with-group and the groupId associated", async () => {
       expect.assertions(2);
 
       const collection = multipleResourceDtos();
@@ -248,11 +271,17 @@ describe("FindResourcesService", () => {
 
       await service.findAllByIsSharedWithGroupForLocalStorage(groupId);
 
-      expect(service.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
-      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId});
+      expect(service.findAll).toHaveBeenCalledWith(
+        ResourceLocalStorage.DEFAULT_CONTAIN,
+        { "is-shared-with-group": groupId },
+        true,
+      );
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {
+        "is-shared-with-group": groupId,
+      });
     });
 
-    it("should call the api with is-shared-with-group and the groupId associated", async() => {
+    it("should call the api with is-shared-with-group and the groupId associated", async () => {
       expect.assertions(2);
 
       const collection = multipleResourceDtos();
@@ -262,49 +291,74 @@ describe("FindResourcesService", () => {
 
       await service.findAllByIsSharedWithGroupForLocalStorage(groupId);
 
-      expect(service.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId}, true);
-      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {"is-shared-with-group": groupId});
+      expect(service.findAll).toHaveBeenCalledWith(
+        ResourceLocalStorage.DEFAULT_CONTAIN,
+        { "is-shared-with-group": groupId },
+        true,
+      );
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {
+        "is-shared-with-group": groupId,
+      });
     });
 
-    it("should return a collection with resources metadata decrypted", async() => {
-      expect.assertions(2);
-      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
-      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+    it(
+      "should return a collection with resources metadata decrypted",
+      async () => {
+        expect.assertions(2);
+        const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+        const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
 
-      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
-      const resourceTypesDto = resourceTypesCollectionDto();
+        const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+        const resourceTypesDto = resourceTypesCollectionDto();
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
-      jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+        jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+        jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
+        jest
+          .spyOn(GetDecryptedUserPrivateKeyService, "getKey")
+          .mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+        jest
+          .spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll")
+          .mockImplementation(() => metadataKeys);
 
-      const resources = await findResourcesService.findAllByIsSharedWithGroupForLocalStorage(groupId);
+        const resources = await findResourcesService.findAllByIsSharedWithGroupForLocalStorage(groupId);
 
-      expect(resources).toHaveLength(resourcesDto.length);
-      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
-    }, 10 * 1000);
+        expect(resources).toHaveLength(resourcesDto.length);
+        expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
+      },
+      10 * 1000,
+    );
 
-    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
-      expect.assertions(2);
-      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
-      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+    it(
+      "does not retrieve the passphrase from the session storage if passed as parameter",
+      async () => {
+        expect.assertions(2);
+        const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos();
+        const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
 
-      const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
-      const resourceTypesDto = resourceTypesCollectionDto();
+        const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
+        const resourceTypesDto = resourceTypesCollectionDto();
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
-      jest.spyOn(PassphraseStorageService, "get");
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
-      jest.spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+        jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
+        jest.spyOn(PassphraseStorageService, "get");
+        jest
+          .spyOn(GetDecryptedUserPrivateKeyService, "getKey")
+          .mockImplementation(() => OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted));
+        jest
+          .spyOn(findResourcesService.decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll")
+          .mockImplementation(() => metadataKeys);
 
-      const resources = await findResourcesService.findAllByIsSharedWithGroupForLocalStorage(groupId, pgpKeys.ada.passphrase);
+        const resources = await findResourcesService.findAllByIsSharedWithGroupForLocalStorage(
+          groupId,
+          pgpKeys.ada.passphrase,
+        );
 
-      expect(resources).toHaveLength(resourcesDto.length);
-      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
-    }, 10 * 1000);
+        expect(resources).toHaveLength(resourcesDto.length);
+        expect(PassphraseStorageService.get).not.toHaveBeenCalled();
+      },
+      10 * 1000,
+    );
   });
 
   describe("::findAllByIds", () => {
@@ -314,11 +368,11 @@ describe("FindResourcesService", () => {
       service = new FindResourcesService(account, apiClientOptions);
     });
 
-    it("should call the api only 1 times when the array of ids length is less than the limit of 80", async() => {
+    it("should call the api only 1 times when the array of ids length is less than the limit of 80", async () => {
       expect.assertions(4);
 
-      const dtos = Array.from({length: 79}, () => defaultResourceDto());
-      const ids = dtos.map(dto => dto.id);
+      const dtos = Array.from({ length: 79 }, () => defaultResourceDto());
+      const ids = dtos.map((dto) => dto.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => dtos);
       jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
@@ -328,7 +382,7 @@ describe("FindResourcesService", () => {
       expect(result).toEqual(new ResourcesCollection(dtos));
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(ResourceLocalStorage.DEFAULT_CONTAIN, {
-        "has-id": ids
+        "has-id": ids,
       });
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
     });
@@ -340,15 +394,15 @@ describe("FindResourcesService", () => {
     beforeEach(() => {
       service = new FindResourcesService(account, apiClientOptions);
       expectedContains = {
-        "secret": true
+        secret: true,
       };
     });
 
-    it("should call the api only 1 times when the resource is less than 80", async() => {
+    it("should call the api only 1 times when the resource is less than 80", async () => {
       expect.assertions(3);
 
-      const dtos = Array.from({length: 80}, () => defaultResourceDto());
-      const ids = dtos.map(dto => dto.id);
+      const dtos = Array.from({ length: 80 }, () => defaultResourceDto());
+      const ids = dtos.map((dto) => dto.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => dtos);
       jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
@@ -358,17 +412,17 @@ describe("FindResourcesService", () => {
       expect(result).toEqual(new ResourcesCollection(dtos));
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, {
-        "has-id": ids
+        "has-id": ids,
       });
     });
 
-    it("should call the api only 2 times when the resource is more than 80", async() => {
+    it("should call the api only 2 times when the resource is more than 80", async () => {
       expect.assertions(4);
 
-      const dtos = Array.from({length: 82}, () => defaultResourceDto());
+      const dtos = Array.from({ length: 82 }, () => defaultResourceDto());
       // @todo to review, it seems wrong
       const resultCollectionDto = [...dtos];
-      const ids = dtos.map(collection => collection.id);
+      const ids = dtos.map((collection) => collection.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
         expect(contains).toEqual(expectedContains);
@@ -388,17 +442,17 @@ describe("FindResourcesService", () => {
     beforeEach(() => {
       service = new FindResourcesService(account, apiClientOptions);
       expectedContains = {
-        "permission": true,
+        permission: true,
         "permissions.user.profile": true,
         "permissions.group": true,
       };
     });
 
-    it("should call the api only 1 times when the resource is less than 80", async() => {
+    it("should call the api only 1 times when the resource is less than 80", async () => {
       expect.assertions(3);
 
-      const collectionDto = Array.from({length: 80}, () => defaultResourceDto());
-      const collectionIds = collectionDto.map(collection => collection.id);
+      const collectionDto = Array.from({ length: 80 }, () => defaultResourceDto());
+      const collectionIds = collectionDto.map((collection) => collection.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
 
@@ -407,16 +461,16 @@ describe("FindResourcesService", () => {
       expect(result).toEqual(new ResourcesCollection(collectionDto));
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, {
-        "has-id": collectionIds
+        "has-id": collectionIds,
       });
     });
 
-    it("should call the api only 2 times when the resource is more than 80", async() => {
+    it("should call the api only 2 times when the resource is more than 80", async () => {
       expect.assertions(4);
 
-      const collectionDto = Array.from({length: 82}, () => defaultResourceDto());
+      const collectionDto = Array.from({ length: 82 }, () => defaultResourceDto());
       const resultCollectionDto = [...collectionDto];
-      const collectionIds = collectionDto.map(collection => collection.id);
+      const collectionIds = collectionDto.map((collection) => collection.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
         expect(contains).toEqual(expectedContains);
@@ -436,15 +490,15 @@ describe("FindResourcesService", () => {
     beforeEach(() => {
       service = new FindResourcesService(account, apiClientOptions);
       expectedContains = {
-        "secret": true
+        secret: true,
       };
     });
 
-    it("should call the api only 1 times when the resource is less than 80", async() => {
+    it("should call the api only 1 times when the resource is less than 80", async () => {
       expect.assertions(3);
 
-      const collectionDto = Array.from({length: 80}, () => defaultResourceDto());
-      const resourcesIds = collectionDto.map(resource => resource.id);
+      const collectionDto = Array.from({ length: 80 }, () => defaultResourceDto());
+      const resourcesIds = collectionDto.map((resource) => resource.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
 
@@ -453,16 +507,16 @@ describe("FindResourcesService", () => {
       expect(result).toEqual(new ResourcesCollection(collectionDto));
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, {
-        "has-id": resourcesIds
+        "has-id": resourcesIds,
       });
     });
 
-    it("should call the api only 2 times when the resource is more than 80", async() => {
+    it("should call the api only 2 times when the resource is more than 80", async () => {
       expect.assertions(4);
 
-      const collectionDto = Array.from({length: 82}, () => defaultResourceDto());
+      const collectionDto = Array.from({ length: 82 }, () => defaultResourceDto());
       const resultCollectionDto = [...collectionDto];
-      const resourcesIds = collectionDto.map(collection => collection.id);
+      const resourcesIds = collectionDto.map((collection) => collection.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
         expect(contains).toEqual(expectedContains);
@@ -483,7 +537,7 @@ describe("FindResourcesService", () => {
       service = new FindResourcesService(account, apiClientOptions);
     });
 
-    it("should retrieve the resource by an id with optional contain parameter", async() => {
+    it("should retrieve the resource by an id with optional contain parameter", async () => {
       expect.assertions(3);
 
       const ressource = defaultResourceDto();
@@ -497,7 +551,7 @@ describe("FindResourcesService", () => {
       expect(ResourceService.prototype.get).toHaveBeenCalledWith(ressource.id, {});
     });
 
-    it("should retrieve the resource by an id with contain parameter", async() => {
+    it("should retrieve the resource by an id with contain parameter", async () => {
       expect.assertions(3);
 
       const ressource = defaultResourceDto();
@@ -515,7 +569,7 @@ describe("FindResourcesService", () => {
       expect(ResourceService.prototype.get).toHaveBeenCalledWith(ressource.id, contain);
     });
 
-    it("should validate the resource id to be an uuid", async() => {
+    it("should validate the resource id to be an uuid", async () => {
       expect.assertions(1);
 
       const promise = service.findOneById("Not an uuid");
@@ -523,21 +577,25 @@ describe("FindResourcesService", () => {
       await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
     });
 
-    it("should validate the contains parameter", async() => {
+    it("should validate the contains parameter", async () => {
       expect.assertions(1);
       const ressource = defaultResourceDto();
 
-      const promise = service.findOneById(ressource.id, {"not-valid": true});
+      const promise = service.findOneById(ressource.id, { "not-valid": true });
 
-      await expect(promise).rejects.toThrowError("Unsupported contains parameter used, please check supported contains");
+      await expect(promise).rejects.toThrowError(
+        "Unsupported contains parameter used, please check supported contains",
+      );
     });
 
-    it("should throw an error in case of api error", async() => {
+    it("should throw an error in case of api error", async () => {
       expect.assertions(1);
 
       const ressource = defaultResourceDto();
 
-      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => { throw new Error("API error"); });
+      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => {
+        throw new Error("API error");
+      });
 
       const promise = service.findOneById(ressource.id);
 
@@ -551,12 +609,12 @@ describe("FindResourcesService", () => {
     beforeEach(() => {
       service = new FindResourcesService(account, apiClientOptions);
       expectedContains = {
-        "creator": true,
-        "modifier": true
+        creator: true,
+        modifier: true,
       };
     });
 
-    it("should retrieve the resource by id for detail", async() => {
+    it("should retrieve the resource by id for detail", async () => {
       expect.assertions(3);
 
       const ressource = defaultResourceDto();
@@ -570,7 +628,7 @@ describe("FindResourcesService", () => {
       expect(ResourceService.prototype.get).toHaveBeenCalledWith(ressource.id, expectedContains);
     });
 
-    it("should validate the resource id to be an uuid", async() => {
+    it("should validate the resource id to be an uuid", async () => {
       expect.assertions(1);
 
       const promise = service.findOneByIdForDetails("Not an uuid");
@@ -578,12 +636,14 @@ describe("FindResourcesService", () => {
       await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
     });
 
-    it("should throw an error in case of api error", async() => {
+    it("should throw an error in case of api error", async () => {
       expect.assertions(1);
 
       const ressource = defaultResourceDto();
 
-      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => { throw new Error("API error"); });
+      jest.spyOn(ResourceService.prototype, "get").mockImplementation(() => {
+        throw new Error("API error");
+      });
 
       const promise = service.findOneByIdForDetails(ressource.id);
 
@@ -599,28 +659,28 @@ describe("FindResourcesService", () => {
       expectedContains = {
         permission: true,
         favorite: true,
-        tag: true
+        tag: true,
       };
     });
 
-    it("should retrieve all resources by their ids", async() => {
+    it("should retrieve all resources by their ids", async () => {
       expect.assertions(3);
 
       const ressourcesDto = multipleResourceDtos();
-      const resourcesIds = ressourcesDto.map(r => r.id);
+      const resourcesIds = ressourcesDto.map((r) => r.id);
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => ressourcesDto);
 
       const result = await service.findAllByIdsForLocalStorage(resourcesIds);
 
-      const resourcesIdsFilter = {"has-id": resourcesIds};
+      const resourcesIdsFilter = { "has-id": resourcesIds };
 
       expect(result).toEqual(new ResourcesCollection(ressourcesDto));
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, resourcesIdsFilter);
     });
 
-    it("should assert the given ids", async() => {
+    it("should assert the given ids", async () => {
       expect.assertions(1);
 
       const resourcesIds = [uuidv4(), "test"];
@@ -637,15 +697,15 @@ describe("FindResourcesService", () => {
       expectedContains = {
         permission: true,
         favorite: true,
-        tag: true
+        tag: true,
       };
 
       expectedFilters = {
-        'has-parent': parentFolderId
+        "has-parent": parentFolderId,
       };
     });
 
-    it("should retrieve all resources by parent folder id", async() => {
+    it("should retrieve all resources by parent folder id", async () => {
       expect.assertions(3);
 
       const ressourcesDto = multipleResourceDtos();
@@ -659,7 +719,7 @@ describe("FindResourcesService", () => {
       expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, expectedFilters);
     });
 
-    it("should assert the given id", async() => {
+    it("should assert the given id", async () => {
       expect.assertions(1);
       await expect(() => service.findAllByParentFolderIdForLocalStorage("test")).rejects.toThrowError();
     });
@@ -671,16 +731,16 @@ describe("FindResourcesService", () => {
 
       const service = new FindResourcesService(account, apiClientOptions);
       const allContains = {
-        'creator': true,
-        'favorite': true,
-        'modifier': true,
-        'secret': true,
-        'permission': true,
-        'permissions': true,
-        'permissions.user.profile': true,
-        'permissions.group': true,
-        'tag': true,
-        'resource-type': true,
+        creator: true,
+        favorite: true,
+        modifier: true,
+        secret: true,
+        permission: true,
+        permissions: true,
+        "permissions.user.profile": true,
+        "permissions.group": true,
+        tag: true,
+        "resource-type": true,
       };
 
       expect(() => service.assertContains(allContains)).not.toThrow();
@@ -690,7 +750,7 @@ describe("FindResourcesService", () => {
       expect.assertions(1);
 
       const service = new FindResourcesService(account, apiClientOptions);
-      const contains = {'permissions.user.profile': true};
+      const contains = { "permissions.user.profile": true };
 
       expect(() => service.assertContains(contains)).not.toThrow();
     });
@@ -709,23 +769,22 @@ describe("FindResourcesService", () => {
 
       const service = new FindResourcesService(account, apiClientOptions);
       const allContains = {
-        'creator': true,
-        'favorite': true,
-        'modifier': true,
-        'secret': true,
-        'permission': true,
-        'permissions': true,
-        'permissions.user.profile': true,
-        'permissions.group': true,
-        'tag': true,
-        'resource-type': true,
-        'resource-type-wrong': true,
+        creator: true,
+        favorite: true,
+        modifier: true,
+        secret: true,
+        permission: true,
+        permissions: true,
+        "permissions.user.profile": true,
+        "permissions.group": true,
+        tag: true,
+        "resource-type": true,
+        "resource-type-wrong": true,
       };
 
       expect(() => service.assertContains(allContains)).toThrow();
     });
   });
-
 
   describe("::assertFilters", () => {
     it("should not throw errors if all given filters are fine", () => {
@@ -733,12 +792,12 @@ describe("FindResourcesService", () => {
 
       const service = new FindResourcesService(account, apiClientOptions);
       const allFilters = {
-        'is-favorite': true,
-        'is-shared-with-group': uuidv4(),
-        'is-owned-by-me': true,
-        'is-shared-with-me': true,
-        'has-id': uuidv4(),
-        'has-tag': uuidv4(),
+        "is-favorite": true,
+        "is-shared-with-group": uuidv4(),
+        "is-owned-by-me": true,
+        "is-shared-with-me": true,
+        "has-id": uuidv4(),
+        "has-tag": uuidv4(),
         "has-parent": uuidv4(),
       };
 
@@ -749,7 +808,7 @@ describe("FindResourcesService", () => {
       expect.assertions(1);
 
       const service = new FindResourcesService(account, apiClientOptions);
-      const contains = {'is-shared-with-me': true};
+      const contains = { "is-shared-with-me": true };
 
       expect(() => service.assertFilters(contains)).not.toThrow();
     });
@@ -768,12 +827,12 @@ describe("FindResourcesService", () => {
 
       const service = new FindResourcesService(account, apiClientOptions);
       const allContains = {
-        'is-favorite': true,
-        'is-shared-with-group': uuidv4(),
-        'is-owned-by-me': true,
-        'is-shared-with-me': true,
-        'has-id': uuidv4(),
-        'has-tag': uuidv4(),
+        "is-favorite": true,
+        "is-shared-with-group": uuidv4(),
+        "is-owned-by-me": true,
+        "is-shared-with-me": true,
+        "has-id": uuidv4(),
+        "has-tag": uuidv4(),
         "has-parent": uuidv4(),
         "has-parent-wrong": uuidv4(),
       };

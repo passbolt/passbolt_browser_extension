@@ -14,8 +14,7 @@
 
 export const defaultMfaProviderData = (props = {}) => {
   const data = {
-    provider: "totp"
+    provider: "totp",
   };
   return Object.assign(data, props);
 };
-

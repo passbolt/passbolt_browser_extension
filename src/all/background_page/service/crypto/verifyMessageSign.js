@@ -12,9 +12,9 @@
  * @since         4.3.0
  */
 
-import * as openpgp from 'openpgp';
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import DecryptMessageService from './decryptMessageService';
+import * as openpgp from "openpgp";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import DecryptMessageService from "./decryptMessageService";
 
 class VerifyMessageService {
   /**
@@ -31,7 +31,7 @@ class VerifyMessageService {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertKeys(verificationKeys);
 
-    const verificationResult = await openpgp.verify({message, verificationKeys});
+    const verificationResult = await openpgp.verify({ message, verificationKeys });
     await DecryptMessageService.doSignatureVerification(verificationResult.signatures);
   }
 
@@ -48,7 +48,7 @@ class VerifyMessageService {
   static async verifyClearMessage(message, verificationKeys) {
     OpenpgpAssertion.assertClearMessage(message);
     OpenpgpAssertion.assertKeys(verificationKeys);
-    const verificationResult = await openpgp.verify({message, verificationKeys});
+    const verificationResult = await openpgp.verify({ message, verificationKeys });
     await DecryptMessageService.doSignatureVerification(verificationResult.signatures);
   }
 }

@@ -24,7 +24,7 @@ class Lock {
    */
   acquire() {
     if (this._locked) {
-      return new Promise(resolve => this._queue.push(resolve));
+      return new Promise((resolve) => this._queue.push(resolve));
     } else {
       this._locked = true;
       return Promise.resolve();

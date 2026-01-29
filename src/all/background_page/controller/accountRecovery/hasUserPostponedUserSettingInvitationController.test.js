@@ -13,7 +13,7 @@
  */
 
 import HasUserPostponedUserSettingInvitationController from "./hasUserPostponedUserSettingInvitationController";
-import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
+import PostponeUserSettingInvitationService from "../../service/invitation/postponeUserSettingInvitationService";
 
 describe("HasUserPostponedUserSettingInvitationController", () => {
   it("can get the account recovery enrollment invitation status", () => {
@@ -29,4 +29,3 @@ describe("HasUserPostponedUserSettingInvitationController", () => {
     expect(setValue).toBe(true);
   });
 });
-

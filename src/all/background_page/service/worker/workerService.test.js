@@ -15,10 +15,10 @@ import PortManager from "../../sdk/port/portManager";
 import WorkerService from "./workerService";
 import BrowserTabService from "../ui/browserTab.service";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
-import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
+import { readWorker } from "../../model/entity/worker/workerEntity.test.data";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import WebNavigationService from "../webNavigation/webNavigationService";
-import {mockPort} from "../../sdk/port/portManager.test.data";
+import { mockPort } from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
 
 describe("WorkerService", () => {
@@ -30,14 +30,14 @@ describe("WorkerService", () => {
   });
 
   describe("WorkerService::get", () => {
-    it("Should get worker", async() => {
+    it("Should get worker", async () => {
       expect.assertions(3);
       // data mocked
       const worker = readWorker();
-      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId });
       const portWrapper = new Port(port);
       // mock functions
-      jest.spyOn(WorkersSessionStorage, 'getWorkersByNameAndTabId').mockImplementationOnce(() => [worker]);
+      jest.spyOn(WorkersSessionStorage, "getWorkersByNameAndTabId").mockImplementationOnce(() => [worker]);
       jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => PortManager.registerPort(portWrapper));
       jest.spyOn(PortManager, "getPortById");
       // process
@@ -45,13 +45,13 @@ describe("WorkerService", () => {
       // expectations
       expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker, "passbolt.port.connect", worker.id);
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
-      expect(workerResult).toStrictEqual({port: portWrapper, tab: portWrapper._port.sender.tab});
+      expect(workerResult).toStrictEqual({ port: portWrapper, tab: portWrapper._port.sender.tab });
     });
 
-    it("Should get no worker", async() => {
+    it("Should get no worker", async () => {
       expect.assertions(3);
       // mock functions
-      jest.spyOn(WorkersSessionStorage, 'getWorkersByNameAndTabId').mockImplementationOnce(() => []);
+      jest.spyOn(WorkersSessionStorage, "getWorkersByNameAndTabId").mockImplementationOnce(() => []);
       jest.spyOn(BrowserTabService, "sendMessage");
       jest.spyOn(PortManager, "getPortById");
       // process
@@ -67,11 +67,11 @@ describe("WorkerService", () => {
   });
 
   describe("WorkerService::waitExists", () => {
-    it("should wait for the worker exists", async() => {
+    it("should wait for the worker exists", async () => {
       expect.assertions(5);
       // data mocked
-      const worker = readWorker({name: "QuickAccess"});
-      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const worker = readWorker({ name: "QuickAccess" });
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId });
       const portWrapper = new Port(port);
       PortManager.registerPort(portWrapper);
       // mock functions
@@ -96,12 +96,14 @@ describe("WorkerService", () => {
     it("should raise an error if the worker not exists until timeout", () => {
       expect.assertions(4);
       const spy = jest.spyOn(WorkerService, "waitExists");
-      jest.spyOn(WorkerService, "get").mockImplementation(() => { throw new Error("Could not find worker ID QuickAccess for tab 1."); });
+      jest.spyOn(WorkerService, "get").mockImplementation(() => {
+        throw new Error("Could not find worker ID QuickAccess for tab 1.");
+      });
       jest.spyOn(global, "setTimeout");
 
       expect(spy).not.toHaveBeenCalled();
 
-      WorkerService.waitExists("QuickAccess", 1).catch(error => {
+      WorkerService.waitExists("QuickAccess", 1).catch((error) => {
         expect(error.message).toBe("Could not find worker ID QuickAccess for tab 1.");
       });
 
@@ -113,19 +115,19 @@ describe("WorkerService", () => {
   });
 
   describe("WorkerService::checkAndExecNavigationForWorkerWaitingConnection", () => {
-    it("Exec a navigation", async() => {
+    it("Exec a navigation", async () => {
       expect.assertions(3);
 
-      const dto = readWorker({status: WorkerEntity.STATUS_WAITING_CONNECTION});
+      const dto = readWorker({ status: WorkerEntity.STATUS_WAITING_CONNECTION });
 
       jest.spyOn(WorkersSessionStorage, "getWorkerById").mockImplementationOnce(() => dto);
-      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({url: "https://url.com"}));
+      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({ url: "https://url.com" }));
       jest.spyOn(WebNavigationService, "exec");
 
       const frameDetails = {
         url: "https://url.com",
         tabId: dto.tabId,
-        frameId: 0
+        frameId: 0,
       };
       const entity = new WorkerEntity(dto);
       await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
@@ -138,19 +140,19 @@ describe("WorkerService", () => {
       expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
     });
 
-    it("Exec a navigation", async() => {
+    it("Exec a navigation", async () => {
       expect.assertions(3);
 
-      const dto = readWorker({status: WorkerEntity.STATUS_RECONNECTING});
+      const dto = readWorker({ status: WorkerEntity.STATUS_RECONNECTING });
 
       jest.spyOn(WorkersSessionStorage, "getWorkerById").mockImplementationOnce(() => dto);
-      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({url: "https://url.com"}));
+      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({ url: "https://url.com" }));
       jest.spyOn(WebNavigationService, "exec");
 
       const frameDetails = {
         url: "https://url.com",
         tabId: dto.tabId,
-        frameId: 0
+        frameId: 0,
       };
       const entity = new WorkerEntity(dto);
       await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
@@ -163,7 +165,7 @@ describe("WorkerService", () => {
       expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
     });
 
-    it("Should not exec a navigation if the worker is connected", async() => {
+    it("Should not exec a navigation if the worker is connected", async () => {
       expect.assertions(2);
       const dto = readWorker();
 
@@ -178,7 +180,7 @@ describe("WorkerService", () => {
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
     });
 
-    it("Should not exec a navigation if the worker is not found", async() => {
+    it("Should not exec a navigation if the worker is not found", async () => {
       expect.assertions(2);
       const dto = readWorker();
 
@@ -195,14 +197,14 @@ describe("WorkerService", () => {
   });
 
   describe("WorkerService::destroyWorkersByName", () => {
-    it("Destroy workers", async() => {
+    it("Destroy workers", async () => {
       expect.assertions(6);
 
       const worker = readWorker();
       const worker2 = readWorker();
-      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId });
       const portWrapper = new Port(port);
-      const port2 = mockPort({name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId});
+      const port2 = mockPort({ name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId });
       const portWrapper2 = new Port(port2);
       PortManager.registerPort(portWrapper);
 
@@ -223,18 +225,20 @@ describe("WorkerService", () => {
       expect(BrowserTabService.sendMessage).toHaveBeenCalledTimes(1);
     });
 
-    it("Should continue process if worker cannot reconnect port", async() => {
+    it("Should continue process if worker cannot reconnect port", async () => {
       expect.assertions(5);
       const worker = readWorker();
       const worker2 = readWorker();
-      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId });
       const portWrapper = new Port(port);
-      const port2 = mockPort({name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId});
+      const port2 = mockPort({ name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId });
       const portWrapper2 = new Port(port2);
       PortManager.registerPort(portWrapper2);
 
       jest.spyOn(WorkersSessionStorage, "getWorkersByNames").mockImplementationOnce(() => [worker, worker2]);
-      jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => { throw new Error("error"); });
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => {
+        throw new Error("error");
+      });
       jest.spyOn(portWrapper, "emit");
       jest.spyOn(portWrapper2, "emit");
 

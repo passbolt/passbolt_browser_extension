@@ -14,18 +14,18 @@
 import ConnectPortController from "./connectPortController";
 
 describe("ConnectPortController", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
   describe("ConnectPortController::exec", () => {
-    it("Should connect port", async() => {
+    it("Should connect port", async () => {
       expect.assertions(1);
       // data mocked
       const port = {
         _name: "name",
-        connectIfDisconnected: jest.fn()
+        connectIfDisconnected: jest.fn(),
       };
       // process
       const connectPortController = new ConnectPortController(port);
@@ -34,12 +34,12 @@ describe("ConnectPortController", () => {
       expect(port.connectIfDisconnected).toHaveBeenCalled();
     });
 
-    it("Should not connect port if port name is unknown", async() => {
+    it("Should not connect port if port name is unknown", async () => {
       expect.assertions(1);
       // data mocked
       const port = {
         _name: "unknown",
-        connectIfDisconnected: jest.fn()
+        connectIfDisconnected: jest.fn(),
       };
       // process
       const connectPortController = new ConnectPortController(port);

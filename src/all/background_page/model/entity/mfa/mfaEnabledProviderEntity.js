@@ -15,18 +15,17 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'MfaEnabledProvider';
+const ENTITY_NAME = "MfaEnabledProvider";
 
 class MfaEnabledProviderEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(MfaDto, options = {}) {
-    super(EntitySchema.validate(
-      MfaEnabledProviderEntity.ENTITY_NAME,
-      MfaDto,
-      MfaEnabledProviderEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(MfaEnabledProviderEntity.ENTITY_NAME, MfaDto, MfaEnabledProviderEntity.getSchema()),
+      options,
+    );
   }
 
   /**
@@ -35,23 +34,19 @@ class MfaEnabledProviderEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "totp",
-        "duo",
-        "yubikey"
-      ],
-      "properties": {
-        "yubikey": {
-          "type": "boolean",
+      type: "object",
+      required: ["totp", "duo", "yubikey"],
+      properties: {
+        yubikey: {
+          type: "boolean",
         },
-        "totp": {
-          "type": "boolean",
+        totp: {
+          type: "boolean",
         },
-        "duo": {
-          "type": "boolean",
-        }
-      }
+        duo: {
+          type: "boolean",
+        },
+      },
     };
   }
 
@@ -69,7 +64,6 @@ class MfaEnabledProviderEntity extends Entity {
     return this._props.yubikey;
   }
 
-
   /**
    * get the totp prop
    * @returns {boolean}
@@ -77,7 +71,6 @@ class MfaEnabledProviderEntity extends Entity {
   get totp() {
     return this._props.totp;
   }
-
 
   /**
    * get the duo prop

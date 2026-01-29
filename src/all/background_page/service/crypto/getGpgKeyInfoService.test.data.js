@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
+const { pgpKeys } = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 
-const getKeyDto = key => ({
+const getKeyDto = (key) => ({
   armored_key: key.public,
   key_id: key.key_id,
   user_ids: key.user_ids,
@@ -24,7 +24,7 @@ const getKeyDto = key => ({
   length: key.length,
   curve: key.curve,
   private: false,
-  revoked: key.revoked
+  revoked: key.revoked,
 });
 
 export const validKeyDto = (data = {}) => {

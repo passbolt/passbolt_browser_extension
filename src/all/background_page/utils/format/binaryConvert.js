@@ -27,7 +27,7 @@ class BinaryConvert {
       bytes[i] = binary.charCodeAt(i);
     }
     const concatenateStringFromByte = (data, byte) => data + String.fromCharCode(byte);
-    return new Uint16Array(bytes.buffer).reduce(concatenateStringFromByte, '');
+    return new Uint16Array(bytes.buffer).reduce(concatenateStringFromByte, "");
   }
 
   /**
@@ -40,7 +40,7 @@ class BinaryConvert {
       codeUnits[i] = string.charCodeAt(i);
     }
     const concatenateStringFromByte = (data, byte) => data + String.fromCharCode(byte);
-    return new Uint8Array(codeUnits.buffer).reduce(concatenateStringFromByte, '');
+    return new Uint8Array(codeUnits.buffer).reduce(concatenateStringFromByte, "");
   }
 }
 

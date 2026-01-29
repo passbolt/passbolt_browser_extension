@@ -11,15 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.5.0
  */
-import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
+import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import PasswordExpiryResourcesCollection from "../../model/entity/passwordExpiry/passwordExpiryResourcesCollection";
-import {defaultPasswordExpiryCollectionDto} from "../../model/entity/passwordExpiry/passwordExpiryResourceCollection.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultPasswordExpiryCollectionDto } from "../../model/entity/passwordExpiry/passwordExpiryResourceCollection.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 import SetResourcesExpiryDateController from "./setResourcesExpiryDateController";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 
 jest.mock("../../service/progress/progressService");
@@ -30,21 +30,21 @@ beforeAll(() => {
 });
 
 describe("SetResourcesExpiryDateController", () => {
-  it("Should call the API to update the expiration date of the given resources", async() => {
+  it("Should call the API to update the expiration date of the given resources", async () => {
     expect.assertions(6);
 
     const date = new Date();
-    const passwordExpiryCollectionDto = defaultPasswordExpiryCollectionDto({expired: date.toISOString()});
+    const passwordExpiryCollectionDto = defaultPasswordExpiryCollectionDto({ expired: date.toISOString() });
 
     //Mock the API call and check if the call is the one expected
-    fetch.doMockOnceIf(/password-expiry\/resources\.json/, async request => {
+    fetch.doMockOnceIf(/password-expiry\/resources\.json/, async (request) => {
       const body = JSON.parse(await request.text());
       expect(body).toStrictEqual(passwordExpiryCollectionDto);
       return mockApiResponse(body);
     });
 
     //Mock the local storage call and check if the given parameters are ok
-    ResourceLocalStorage.updateResourcesExpiryDate.mockImplementation(passwordExpiryCollection => {
+    ResourceLocalStorage.updateResourcesExpiryDate.mockImplementation((passwordExpiryCollection) => {
       const collection = new PasswordExpiryResourcesCollection(passwordExpiryCollectionDto);
       expect(passwordExpiryCollection).toStrictEqual(collection.passwordExpiryResources);
     });
@@ -62,7 +62,7 @@ describe("SetResourcesExpiryDateController", () => {
     expect(controller.progressService.finishStep).toHaveBeenCalledTimes(2);
   });
 
-  it("Should throw an exception if the API sends an error during the process", async() => {
+  it("Should throw an exception if the API sends an error during the process", async () => {
     const passwordExpiryCollectionDto = defaultPasswordExpiryCollectionDto();
 
     const controller = new SetResourcesExpiryDateController(null, null, defaultApiClientOptions());
@@ -77,13 +77,15 @@ describe("SetResourcesExpiryDateController", () => {
     }
   });
 
-  it("Should throw an exception if an error happened during the process", async() => {
+  it("Should throw an exception if an error happened during the process", async () => {
     const passwordExpiryCollectionDto = defaultPasswordExpiryCollectionDto();
 
     const controller = new SetResourcesExpiryDateController(null, null, defaultApiClientOptions());
 
     //Mock the API call and check if the call is the one expected
-    fetch.doMockOnceIf(/password-expiry\/resources\.json/, () => { throw new Error("Something went wrong!"); });
+    fetch.doMockOnceIf(/password-expiry\/resources\.json/, () => {
+      throw new Error("Something went wrong!");
+    });
 
     try {
       await controller.exec(passwordExpiryCollectionDto);

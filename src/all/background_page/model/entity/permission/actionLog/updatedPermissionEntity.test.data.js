@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.4.0
  */
-import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import PermissionEntity from "../permissionEntity";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
-export const defaultUpdatePermissionDto = data => ({
+export const defaultUpdatePermissionDto = (data) => ({
   id: uuidv4(),
   type: PermissionEntity.PERMISSION_OWNER,
   user: defaultUserDto(),
-  ...data
+  ...data,
 });

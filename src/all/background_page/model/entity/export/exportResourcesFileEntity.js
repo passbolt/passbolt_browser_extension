@@ -13,7 +13,7 @@
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import ExternalFoldersCollection from "../folder/external/externalFoldersCollection";
 import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
-import {assertType} from "../../../utils/assertions";
+import { assertType } from "../../../utils/assertions";
 
 export const FORMAT_KDBX = "kdbx";
 export const FORMAT_KDBX_OTHERS = "kdbx-others";
@@ -40,7 +40,7 @@ const SUPPORTED_FORMAT = [
   FORMAT_CSV_SAFARI,
   FORMAT_CSV_DASHLANE,
   FORMAT_CSV_NORDPASS,
-  FORMAT_CSV_LOGMEONCE
+  FORMAT_CSV_LOGMEONCE,
 ];
 
 class ExportResourcesFileEntity extends EntityV2 {
@@ -69,11 +69,11 @@ class ExportResourcesFileEntity extends EntityV2 {
 
     // Associations
     if (this._props.export_resources) {
-      this._export_resources = new ExternalResourcesCollection(this._props.export_resources, {clone: false});
+      this._export_resources = new ExternalResourcesCollection(this._props.export_resources, { clone: false });
       delete this._props.export_resources;
     }
     if (this._props.export_folders) {
-      this._export_folders = new ExternalFoldersCollection(this._props.export_folders, {clone: false});
+      this._export_folders = new ExternalFoldersCollection(this._props.export_folders, { clone: false });
       delete this._props.export_folders;
     }
   }
@@ -84,55 +84,53 @@ class ExportResourcesFileEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "format"
-      ],
-      "properties": {
-        "format": {
-          "type": "string",
-          "enum": SUPPORTED_FORMAT
+      type: "object",
+      required: ["format"],
+      properties: {
+        format: {
+          type: "string",
+          enum: SUPPORTED_FORMAT,
         },
-        "resources_ids": {
-          "type": "array",
-          "nullable": true,
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
+        resources_ids: {
+          type: "array",
+          nullable: true,
+          items: {
+            type: "string",
+            format: "uuid",
+          },
         },
-        "folders_ids": {
-          "type": "array",
-          "nullable": true,
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
+        folders_ids: {
+          type: "array",
+          nullable: true,
+          items: {
+            type: "string",
+            format: "uuid",
+          },
         },
-        "export_resources": ExternalResourcesCollection.getSchema(),
-        "export_folders": ExternalFoldersCollection.getSchema(),
-        "options": {
-          "type": "object",
-          "required": [],
-          "properties": {
-            "credentials": {
-              "type": "object",
-              "required": [],
-              "properties": {
-                "password": {
-                  "type": "string",
-                  "nullable": true,
+        export_resources: ExternalResourcesCollection.getSchema(),
+        export_folders: ExternalFoldersCollection.getSchema(),
+        options: {
+          type: "object",
+          required: [],
+          properties: {
+            credentials: {
+              type: "object",
+              required: [],
+              properties: {
+                password: {
+                  type: "string",
+                  nullable: true,
                 },
-                "keyfile": {
-                  "type": "string",
-                  "format": "x-base64",
-                  "nullable": true,
-                }
-              }
-            }
-          }
-        }
-      }
+                keyfile: {
+                  type: "string",
+                  format: "x-base64",
+                  nullable: true,
+                },
+              },
+            },
+          },
+        },
+      },
     };
   }
 
@@ -193,7 +191,7 @@ class ExportResourcesFileEntity extends EntityV2 {
    * @returns {string}
    */
   get fileType() {
-    return this.format.split('-')[0];
+    return this.format.split("-")[0];
   }
 
   /*
@@ -264,7 +262,7 @@ class ExportResourcesFileEntity extends EntityV2 {
    * @returns {Blob} blob file to export
    */
   toBlob(mimeType) {
-    return new Blob([this.file], {type: mimeType});
+    return new Blob([this.file], { type: mimeType });
   }
 }
 

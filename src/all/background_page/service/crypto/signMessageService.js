@@ -12,8 +12,8 @@
  * @since         4.3.0
  */
 
-import * as openpgp from 'openpgp';
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import * as openpgp from "openpgp";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class SignMessageService {
   /**
@@ -29,7 +29,7 @@ class SignMessageService {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
 
-    const signedMesage = await openpgp.sign({message: message, signingKeys: signingKeys});
+    const signedMesage = await openpgp.sign({ message: message, signingKeys: signingKeys });
     return signedMesage;
   }
 
@@ -46,10 +46,9 @@ class SignMessageService {
     OpenpgpAssertion.assertClearMessage(message);
     OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
 
-    const signedMesage = await openpgp.sign({message: message, signingKeys: signingKeys});
+    const signedMesage = await openpgp.sign({ message: message, signingKeys: signingKeys });
     return signedMesage;
   }
 }
-
 
 export default SignMessageService;

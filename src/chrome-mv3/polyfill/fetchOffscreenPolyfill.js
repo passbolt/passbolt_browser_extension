@@ -12,6 +12,6 @@
  * @since         4.7.0
  */
 
-const {RequestFetchOffscreenService} = require("../serviceWorker/service/network/requestFetchOffscreenService");
+const { RequestFetchOffscreenService } = require("../serviceWorker/service/network/requestFetchOffscreenService");
 
-module.exports = async(resource, options) => RequestFetchOffscreenService.fetch(resource, options);
+module.exports = async (resource, options) => RequestFetchOffscreenService.fetch(resource, options);

@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const PASSWORD_EXPIRY_SETTINGS_RESOURCE_NAME = 'password-expiry/settings';
+const PASSWORD_EXPIRY_SETTINGS_RESOURCE_NAME = "password-expiry/settings";
 
 class PasswordExpirySettingsService extends AbstractService {
   /**

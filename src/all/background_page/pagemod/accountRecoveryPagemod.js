@@ -12,11 +12,9 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import BuildApiClientOptionsService
-  from "../service/account/buildApiClientOptionsService";
-import {AccountRecoveryEvents} from "../event/accountRecoveryEvents";
-import GetRequestLocalAccountService
-  from "../service/accountRecovery/getRequestLocalAccountService";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import { AccountRecoveryEvents } from "../event/accountRecoveryEvents";
+import GetRequestLocalAccountService from "../service/accountRecovery/getRequestLocalAccountService";
 
 class AccountRecovery extends Pagemod {
   /**
@@ -45,7 +43,7 @@ class AccountRecovery extends Pagemod {
       const account = await GetRequestLocalAccountService.getAccountMatchingContinueUrl(tab.url);
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
-        event.listen({port, tab}, apiClientOptions, account);
+        event.listen({ port, tab }, apiClientOptions, account);
       }
     } catch (error) {
       /*

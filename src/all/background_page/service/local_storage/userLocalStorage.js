@@ -17,7 +17,7 @@ import UsersCollection from "../../model/entity/user/usersCollection";
 import Lock from "../../utils/lock";
 const lock = new Lock();
 
-const USER_LOCAL_STORAGE_KEY = 'users';
+const USER_LOCAL_STORAGE_KEY = "users";
 
 class UserLocalStorage {
   /**
@@ -27,7 +27,7 @@ class UserLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
-    Log.write({level: 'debug', message: 'UserLocalStorage flushed'});
+    Log.write({ level: "debug", message: "UserLocalStorage flushed" });
     return await browser.storage.local.remove(UserLocalStorage.USER_LOCAL_STORAGE_KEY);
   }
 
@@ -39,7 +39,7 @@ class UserLocalStorage {
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    const {users} = await browser.storage.local.get([UserLocalStorage.USER_LOCAL_STORAGE_KEY]);
+    const { users } = await browser.storage.local.get([UserLocalStorage.USER_LOCAL_STORAGE_KEY]);
     return users;
   }
 
@@ -53,13 +53,13 @@ class UserLocalStorage {
     await lock.acquire();
     const users = [];
     if (!(usersCollection instanceof UsersCollection)) {
-      throw new TypeError('UserLocalStorage::set expects a UsersCollection');
+      throw new TypeError("UserLocalStorage::set expects a UsersCollection");
     }
     for (const userEntity of usersCollection) {
       UserLocalStorage.assertEntityBeforeSave(userEntity);
       users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
     }
-    await browser.storage.local.set({users: users});
+    await browser.storage.local.set({ users: users });
     lock.release();
   }
 
@@ -71,7 +71,7 @@ class UserLocalStorage {
    */
   static async getUserById(id) {
     const users = await UserLocalStorage.get();
-    return users.find(item => item.id === id);
+    return users.find((item) => item.id === id);
   }
 
   /**
@@ -84,7 +84,7 @@ class UserLocalStorage {
       UserLocalStorage.assertEntityBeforeSave(userEntity);
       const users = await UserLocalStorage.get();
       users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({users: users});
+      await browser.storage.local.set({ users: users });
       lock.release();
     } catch (error) {
       lock.release();
@@ -105,12 +105,12 @@ class UserLocalStorage {
       const users = await UserLocalStorage.get();
       // If the local storage has been already initialized.
       if (users) {
-        const userIndex = users.findIndex(item => item.id === userEntity.id);
+        const userIndex = users.findIndex((item) => item.id === userEntity.id);
         if (userIndex === -1) {
-          throw new Error('The user could not be found in the local storage');
+          throw new Error("The user could not be found in the local storage");
         }
         users[userIndex] = Object.assign(users[userIndex], userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
-        await browser.storage.local.set({users: users});
+        await browser.storage.local.set({ users: users });
       }
       lock.release();
     } catch (error) {
@@ -128,11 +128,11 @@ class UserLocalStorage {
     try {
       const users = await UserLocalStorage.get();
       if (users) {
-        const userIndex = users.findIndex(item => item.id === userId);
+        const userIndex = users.findIndex((item) => item.id === userId);
         if (userIndex !== -1) {
           users.splice(userIndex, 1);
         }
-        await browser.storage.local.set({users: users});
+        await browser.storage.local.set({ users: users });
         lock.release();
       }
     } catch (error) {
@@ -149,7 +149,7 @@ class UserLocalStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {profile: {avatar: true}, pending_account_recovery_request: true, account_recovery_user_setting: true};
+    return { profile: { avatar: true }, pending_account_recovery_request: true, account_recovery_user_setting: true };
   }
 
   /**
@@ -170,19 +170,19 @@ class UserLocalStorage {
    */
   static assertEntityBeforeSave(userEntity) {
     if (!userEntity) {
-      throw new TypeError('UserLocalStorage expects a UserEntity to be set');
+      throw new TypeError("UserLocalStorage expects a UserEntity to be set");
     }
     if (!(userEntity instanceof UserEntity)) {
-      throw new TypeError('UserLocalStorage expects an object of type UserEntity');
+      throw new TypeError("UserLocalStorage expects an object of type UserEntity");
     }
     if (!userEntity.id) {
-      throw new TypeError('UserLocalStorage expects UserEntity id to be set');
+      throw new TypeError("UserLocalStorage expects UserEntity id to be set");
     }
     if (!userEntity.profile) {
-      throw new TypeError('UserLocalStorage::set expects UserEntity profile to be set');
+      throw new TypeError("UserLocalStorage::set expects UserEntity profile to be set");
     }
     if (!userEntity.profile.avatar) {
-      throw new TypeError('UserLocalStorage::set expects UserEntity avatar to be set');
+      throw new TypeError("UserLocalStorage::set expects UserEntity avatar to be set");
     }
   }
 }

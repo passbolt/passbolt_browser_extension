@@ -12,37 +12,37 @@
  * @since         4.3.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import PasswordPoliciesEntity from "../../model/entity/passwordPolicies/passwordPoliciesEntity";
 import SavePasswordPoliciesController from "./savePasswordPoliciesController";
-import {defaultPasswordPolicies} from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { defaultPasswordPolicies } from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 
 describe("SavePasswordPoliciesController::exec", () => {
   let account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
-    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
 
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  it("Should save the given data", async() => {
+  it("Should save the given data", async () => {
     expect.assertions(3);
 
     const expectedPasswordPolicies = defaultPasswordPolicies({
-      default_generator: "passphrase"
+      default_generator: "passphrase",
     });
 
-    fetch.doMockOnceIf(/password-policies\/settings\.json/, async request => {
+    fetch.doMockOnceIf(/password-policies\/settings\.json/, async (request) => {
       const requestBody = JSON.parse(await request.text());
       expect(requestBody).toStrictEqual(expectedPasswordPolicies);
       return mockApiResponse(expectedPasswordPolicies);
@@ -57,11 +57,11 @@ describe("SavePasswordPoliciesController::exec", () => {
     expect(dto).toStrictEqual(expectedPasswordPolicies);
   });
 
-  it("Should throw an exception if the given data is not a valid password policies entity", async() => {
+  it("Should throw an exception if the given data is not a valid password policies entity", async () => {
     expect.assertions(1);
 
     const wrongPasswordPolicies = defaultPasswordPolicies({
-      default_generator: "wrong-data"
+      default_generator: "wrong-data",
     });
 
     const controller = new SavePasswordPoliciesController(null, null, account, apiClientOptions);
@@ -72,10 +72,12 @@ describe("SavePasswordPoliciesController::exec", () => {
     }
   });
 
-  it("Should throw an exception if something went wrong on the API", async() => {
+  it("Should throw an exception if something went wrong on the API", async () => {
     expect.assertions(1);
 
-    fetch.doMockOnceIf(/password-policies\/settings\.json/, () => { throw new Error("something went wrong"); });
+    fetch.doMockOnceIf(/password-policies\/settings\.json/, () => {
+      throw new Error("something went wrong");
+    });
 
     const controller = new SavePasswordPoliciesController(null, null, account, apiClientOptions);
     try {

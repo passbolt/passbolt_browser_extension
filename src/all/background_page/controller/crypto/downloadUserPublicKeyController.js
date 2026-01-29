@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import i18n from "../../sdk/i18n";
 import GpgKeyError from "../../error/GpgKeyError";
@@ -44,7 +44,7 @@ class DownloadUserPublicKeyController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
   /**

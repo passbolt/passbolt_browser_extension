@@ -34,10 +34,10 @@ class GetServerKeyController {
   async _exec() {
     try {
       const serverKey = await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS', serverKey);
+      this.worker.port.emit(this.requestId, "SUCCESS", serverKey);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

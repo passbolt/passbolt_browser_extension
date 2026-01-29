@@ -35,10 +35,10 @@ class DownloadRecoveryKitController {
   async _exec() {
     try {
       await this.exec();
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -49,7 +49,7 @@ class DownloadRecoveryKitController {
   async exec() {
     const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
     if (!temporaryAccount.account?.userPrivateArmoredKey) {
-      throw new Error('An account user private armored key is required.');
+      throw new Error("An account user private armored key is required.");
     }
     const userPrivateArmoredKey = temporaryAccount.account.userPrivateArmoredKey;
     await FileService.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);

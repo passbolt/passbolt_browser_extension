@@ -15,7 +15,7 @@ import CollectionValidationError from "passbolt-styleguide/src/shared/models/ent
 import CommentEntity from "./commentEntity";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 
-const RULE_SAME_FOREIGN_MODEL = 'same_foreign_model';
+const RULE_SAME_FOREIGN_MODEL = "same_foreign_model";
 
 class CommentsCollection extends EntityV2Collection {
   /**
@@ -32,8 +32,8 @@ class CommentsCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": CommentEntity.getSchema(),
+      type: "array",
+      items: CommentEntity.getSchema(),
     };
   }
 
@@ -62,7 +62,7 @@ class CommentsCollection extends EntityV2Collection {
    * @returns {Array<CommentEntity>}
    */
   get ids() {
-    return this._items.map(r => r.id);
+    return this._items.map((r) => r.id);
   }
 
   /**
@@ -71,7 +71,7 @@ class CommentsCollection extends EntityV2Collection {
    * @returns {Array<CommentEntity>}
    */
   get userIds() {
-    return this._items.map(r => r.userId);
+    return this._items.map((r) => r.userId);
   }
 
   /**
@@ -80,7 +80,7 @@ class CommentsCollection extends EntityV2Collection {
    * @returns {Array<CommentEntity>}
    */
   get foreignKey() {
-    return this._items.map(r => r.foreignKey);
+    return this._items.map((r) => r.foreignKey);
   }
 
   /*
@@ -98,8 +98,9 @@ class CommentsCollection extends EntityV2Collection {
     if (!this.comments.length) {
       return;
     }
-    const matches = (commentEntity.foreignKey === this.comments[0].foreignKey) &&
-      (commentEntity.foreignModel === this.comments[0].foreignModel);
+    const matches =
+      commentEntity.foreignKey === this.comments[0].foreignKey &&
+      commentEntity.foreignModel === this.comments[0].foreignModel;
     if (!matches) {
       const collectionValidationError = new CollectionValidationError();
       const message = `The collection is already used for another model with id ${this.comments[0].resourceId} (${this.comments[0].foreignKey}).`;

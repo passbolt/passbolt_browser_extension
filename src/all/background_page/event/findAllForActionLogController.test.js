@@ -12,30 +12,32 @@
  * @since         5.4.0
  */
 import AccountEntity from "../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultAccountDto } from "../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindAllForActionLogController from "./findAllForActionLogController";
-import {defaultActionLogsCollection} from "../model/entity/actionLog/actionLogsCollection.test.data";
+import { defaultActionLogsCollection } from "../model/entity/actionLog/actionLogsCollection.test.data";
 import ActionLogsCollection from "../model/entity/actionLog/actionLogsCollection";
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
 
 describe("FindAllForActionLogController", () => {
   let controller, account, apiClientOptions;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
     controller = new FindAllForActionLogController(null, null, apiClientOptions, account);
   });
 
   describe("FindAllForActionLogController::exec", () => {
-    it("Find all action logs for the resource", async() => {
+    it("Find all action logs for the resource", async () => {
       expect.assertions(2);
 
       const actionLogsDto = defaultActionLogsCollection;
-      jest.spyOn(controller.findAllForActionLogService, "findAllFor").mockImplementationOnce(() => new ActionLogsCollection(actionLogsDto));
+      jest
+        .spyOn(controller.findAllForActionLogService, "findAllFor")
+        .mockImplementationOnce(() => new ActionLogsCollection(actionLogsDto));
 
-      const actionLogsCollection = await controller.exec("Resource", uuid(), {page: 1, limit: 5});
+      const actionLogsCollection = await controller.exec("Resource", uuid(), { page: 1, limit: 5 });
       expect(actionLogsCollection).toBeInstanceOf(ActionLogsCollection);
       expect(actionLogsCollection.toDto()).toEqual(actionLogsDto);
     });

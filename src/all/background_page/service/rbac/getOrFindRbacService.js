@@ -36,7 +36,7 @@ export default class GetOrFindRbacService {
    */
   async getOrFindMe() {
     const collectionDto = await this.rbacsLocalStorage.get();
-    if (typeof collectionDto !== 'undefined') {
+    if (typeof collectionDto !== "undefined") {
       return new RbacsCollection(collectionDto, true);
     }
     return this.findAndUpdateRbacLocalStorageService.findAndUpdateAll();

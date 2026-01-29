@@ -12,11 +12,10 @@
  * @since         3.6.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import i18n from "../../sdk/i18n";
-
 
 class GetUserKeyInfoController {
   /**
@@ -41,7 +40,7 @@ class GetUserKeyInfoController {
       this.worker.port.emit(this.requestId, "SUCCESS", keyInfo);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -61,7 +60,7 @@ class GetUserKeyInfoController {
 
       if (!keyInfo) {
         //@todo maybe send a KeyringError instead
-        throw new Error(i18n.t('User key not found'));
+        throw new Error(i18n.t("User key not found"));
       }
     }
     const key = await OpenpgpAssertion.readKeyOrFail(keyInfo.armoredKey);

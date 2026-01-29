@@ -22,7 +22,7 @@ describe("AuthenticationToken entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      'token': '7f077753-0835-4054-92ee-556660ea04f4'
+      token: "7f077753-0835-4054-92ee-556660ea04f4",
     };
     const entity = new AuthenticationTokenEntity(dto);
     expect(entity.toDto()).toEqual(dto);
@@ -30,68 +30,68 @@ describe("AuthenticationToken entity", () => {
 
   it("constructor works if valid DTO is provided with optional and non supported fields", () => {
     const dto = {
-      'id': '7f077753-0835-4054-92ee-556660ea04f3',
-      'token': '7f077753-0835-4054-92ee-556660ea04f4',
-      'active': true,
-      'type': 'mobile_transfer',
-      'created': '2020-04-25 12:52:00',
-      'modified': '2020-04-25 12:52:01',
-      '_type': 'none'
+      id: "7f077753-0835-4054-92ee-556660ea04f3",
+      token: "7f077753-0835-4054-92ee-556660ea04f4",
+      active: true,
+      type: "mobile_transfer",
+      created: "2020-04-25 12:52:00",
+      modified: "2020-04-25 12:52:01",
+      _type: "none",
     };
     const filtered = {
-      'id': '7f077753-0835-4054-92ee-556660ea04f3',
-      'token': '7f077753-0835-4054-92ee-556660ea04f4',
-      'active': true,
-      'type': 'mobile_transfer',
-      'created': '2020-04-25 12:52:00',
-      'modified': '2020-04-25 12:52:01',
+      id: "7f077753-0835-4054-92ee-556660ea04f3",
+      token: "7f077753-0835-4054-92ee-556660ea04f4",
+      active: true,
+      type: "mobile_transfer",
+      created: "2020-04-25 12:52:00",
+      modified: "2020-04-25 12:52:01",
     };
 
     const authenticationTokenEntity = new AuthenticationTokenEntity(dto);
     expect(authenticationTokenEntity.toDto()).toEqual(filtered);
 
     // test getters
-    expect(authenticationTokenEntity.token).toEqual('7f077753-0835-4054-92ee-556660ea04f4');
+    expect(authenticationTokenEntity.token).toEqual("7f077753-0835-4054-92ee-556660ea04f4");
   });
 
   it("constructor returns validation error if dto fields are invalid", () => {
     let t;
     t = () => {
       new AuthenticationTokenEntity({
-        'id': 'nope',
-        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+        id: "nope",
+        token: "7f077753-0835-4054-92ee-556660ea04f4",
       });
     };
     expect(t).toThrow(EntityValidationError);
 
     t = () => {
       new AuthenticationTokenEntity({
-        'active': 'nope',
-        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+        active: "nope",
+        token: "7f077753-0835-4054-92ee-556660ea04f4",
       });
     };
     expect(t).toThrow(EntityValidationError);
 
     t = () => {
       new AuthenticationTokenEntity({
-        'type': 'nope',
-        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+        type: "nope",
+        token: "7f077753-0835-4054-92ee-556660ea04f4",
       });
     };
     expect(t).toThrow(EntityValidationError);
 
     t = () => {
       new AuthenticationTokenEntity({
-        'created': 'nope',
-        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+        created: "nope",
+        token: "7f077753-0835-4054-92ee-556660ea04f4",
       });
     };
     expect(t).toThrow(EntityValidationError);
 
     t = () => {
       new AuthenticationTokenEntity({
-        'created': 'modified',
-        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+        created: "modified",
+        token: "7f077753-0835-4054-92ee-556660ea04f4",
       });
     };
     expect(t).toThrow(EntityValidationError);

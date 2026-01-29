@@ -19,19 +19,19 @@ jest.spyOn(PortManager, "onTabRemoved");
 jest.spyOn(PagemodManager, "exec");
 
 describe("NavigationService", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
   describe("NavigationService::exec", () => {
-    it("Should remove port and exec pagemod manager", async() => {
+    it("Should remove port and exec pagemod manager", async () => {
       expect.assertions(2);
       // data mocked
       const frameDetails = {
         url: "https://localhost",
         tabId: 1234,
-        frameId: 0
+        frameId: 0,
       };
       // process
       await WebNavigationService.exec(frameDetails);
@@ -40,13 +40,13 @@ describe("NavigationService", () => {
       expect(PagemodManager.exec).toHaveBeenCalledWith(frameDetails);
     });
 
-    it("Should only exec pagemod manager", async() => {
+    it("Should only exec pagemod manager", async () => {
       expect.assertions(2);
       // data mocked
       const frameDetails = {
         url: "https://localhost",
         tabId: 1234,
-        frameId: 1234
+        frameId: 1234,
       };
       // process
       await WebNavigationService.exec(frameDetails);

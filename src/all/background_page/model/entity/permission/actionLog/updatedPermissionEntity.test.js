@@ -13,7 +13,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import UpdatedPermissionEntity from "./updatedPermissionEntity";
-import {defaultUpdatePermissionDto} from "./updatedPermissionEntity.test.data";
+import { defaultUpdatePermissionDto } from "./updatedPermissionEntity.test.data";
 
 describe("Updated permission entity", () => {
   it("schema must validate", () => {
@@ -41,7 +41,9 @@ describe("Updated permission entity", () => {
     expect.assertions(3);
 
     expect(() => new UpdatedPermissionEntity({})).toThrow(EntityValidationError);
-    expect(() => new UpdatedPermissionEntity({id: "fa5f5d7a-32cc-4c5b-9478-f58584ca4222"})).toThrow(EntityValidationError);
-    expect(() => new UpdatedPermissionEntity({"type": 15})).toThrow(EntityValidationError);
+    expect(() => new UpdatedPermissionEntity({ id: "fa5f5d7a-32cc-4c5b-9478-f58584ca4222" })).toThrow(
+      EntityValidationError,
+    );
+    expect(() => new UpdatedPermissionEntity({ type: 15 })).toThrow(EntityValidationError);
   });
 });

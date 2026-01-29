@@ -12,10 +12,10 @@
  * @since         5.4.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultAccountDto } from "../../../model/entity/account/accountEntity.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import DeleteResourceService from "./deleteResourceService";
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import ProgressService from "../../progress/progressService";
@@ -31,18 +31,18 @@ describe("DeleteResourceService", () => {
   const account = new AccountEntity(defaultAccountDto());
   const apiClientOptions = defaultApiClientOptions();
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     worker = {
       port: {
-        emit: jest.fn()
-      }
+        emit: jest.fn(),
+      },
     };
     deleteResourceService = new DeleteResourceService(account, apiClientOptions, new ProgressService(worker, ""));
     jest.spyOn(ResourceLocalStorage, "deleteResources");
   });
 
   describe("DeleteResourceService::deleteResources", () => {
-    it("Should delete the resources and call local storage update", async() => {
+    it("Should delete the resources and call local storage update", async () => {
       expect.assertions(5);
 
       const resourceDto1 = defaultResourceDto();
@@ -55,10 +55,14 @@ describe("DeleteResourceService", () => {
       expect(deleteResourceService.resourceService.delete).toHaveBeenCalledWith(resourceDto1.id);
       expect(deleteResourceService.resourceService.delete).toHaveBeenCalledWith(resourceDto2.id);
       expect(deleteResourceService.resourceService.delete).toHaveBeenCalledWith(resourceDto3.id);
-      expect(ResourceLocalStorage.deleteResources).toHaveBeenCalledWith([resourceDto1.id, resourceDto2.id, resourceDto3.id]);
+      expect(ResourceLocalStorage.deleteResources).toHaveBeenCalledWith([
+        resourceDto1.id,
+        resourceDto2.id,
+        resourceDto3.id,
+      ]);
     });
 
-    it("Should call progress service during the different steps of deletion", async() => {
+    it("Should call progress service during the different steps of deletion", async () => {
       expect.assertions(3);
 
       const resourceDto1 = defaultResourceDto();
@@ -68,8 +72,11 @@ describe("DeleteResourceService", () => {
       await deleteResourceService.deleteResources([resourceDto1.id, resourceDto2.id, resourceDto3.id]);
 
       expect(deleteResourceService.progressService.finishStep).toHaveBeenCalledTimes(2);
-      expect(deleteResourceService.progressService.finishStep).toHaveBeenCalledWith('Deleting Resource(s)', true);
-      expect(deleteResourceService.progressService.finishStep).toHaveBeenCalledWith("Updating resources local storage", true);
+      expect(deleteResourceService.progressService.finishStep).toHaveBeenCalledWith("Deleting Resource(s)", true);
+      expect(deleteResourceService.progressService.finishStep).toHaveBeenCalledWith(
+        "Updating resources local storage",
+        true,
+      );
     });
   });
 });

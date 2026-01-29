@@ -39,8 +39,8 @@ class GroupUpdateSecretsCollection extends EntityV2Collection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": SecretEntity.getSchema(),
+      type: "array",
+      items: SecretEntity.getSchema(),
     };
   }
 
@@ -50,8 +50,8 @@ class GroupUpdateSecretsCollection extends EntityV2Collection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same resource and user.
    */
   validateBuildRules(item, options = {}) {
-    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
-    this.assertUniqueResourceIdUserId(item, {haystackSet: options?.uniqueResourceIdsUserIdsOrNullSetCache});
+    this.assertNotExist("id", item._props.id, { haystackSet: options?.uniqueIdsSetCache });
+    this.assertUniqueResourceIdUserId(item, { haystackSet: options?.uniqueResourceIdsUserIdsOrNullSetCache });
   }
 
   /*
@@ -82,9 +82,10 @@ class GroupUpdateSecretsCollection extends EntityV2Collection {
 
     if (haystackSet.has(resourceIdUserIdKey)) {
       const error = new EntityValidationError();
-      const message = options?.message
-        || `The collection already includes an element that has a couple resource_id:user_id (${resourceIdUserIdKey}) with an identical value.`;
-      error.addError("resource_id:user_id", 'unique', message);
+      const message =
+        options?.message ||
+        `The collection already includes an element that has a couple resource_id:user_id (${resourceIdUserIdKey}) with an identical value.`;
+      error.addError("resource_id:user_id", "unique", message);
       throw error;
     }
   }
@@ -113,15 +114,15 @@ class GroupUpdateSecretsCollection extends EntityV2Collection {
     const uniqueResourceIdsUserIdsOrNullSetCache = new Set(this.extractUserIdResourceId());
 
     // Build rules
-    const onItemPushed = item => {
+    const onItemPushed = (item) => {
       uniqueIdsSetCache.add(item.id);
       uniqueResourceIdsUserIdsOrNullSetCache.add(GroupUpdateSecretsCollection.getResourceIdUserIdKey(item));
     };
 
     options = {
       onItemPushed: onItemPushed,
-      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueResourceIdsUserIdsOrNullSetCache},
-      ...options
+      validateBuildRules: { ...options?.validateBuildRules, uniqueIdsSetCache, uniqueResourceIdsUserIdsOrNullSetCache },
+      ...options,
     };
     super.pushMany(data, entityOptions, options);
   }

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since        3.4.0
  */
-import {BrowserIntegrationBootstrap} from "passbolt-styleguide/src/react-web-integration/BrowserIntegrationBootstrap.js";
+import { BrowserIntegrationBootstrap } from "passbolt-styleguide/src/react-web-integration/BrowserIntegrationBootstrap.js";
 import Port from "../../../webAccessibleResources/js/lib/port";
 import MessageService from "../service/messageService";
 import ConnectPortController from "../controller/connectPortController";
@@ -21,7 +21,7 @@ async function main() {
   // Make the port object as a global variable to use it directly (TODO the port could be use in props)
   self.port = new Port(self.portname);
   // Emit a success if the port is still connected
-  port.on("passbolt.port.check", requestId => self.port.emit(requestId, "SUCCESS"));
+  port.on("passbolt.port.check", (requestId) => self.port.emit(requestId, "SUCCESS"));
   await self.port.connect();
   // Message listener
   const messageService = new MessageService();

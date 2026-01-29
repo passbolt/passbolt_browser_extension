@@ -12,18 +12,18 @@
  * @since         3.8.0
  */
 
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import DeleteCommentController from "./deleteCommentController";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {enableFetchMocks} from "jest-fetch-mock";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
 import CommentService from "../../model/comment/commentService";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
 const mockedWorker = {
   port: {
-    emit: jest.fn()
-  }
+    emit: jest.fn(),
+  },
 };
 
 const fetchCommentsMock = () => {
@@ -31,7 +31,7 @@ const fetchCommentsMock = () => {
 };
 const requestId = uuidv4();
 const id = uuidv4();
-beforeEach(async() =>  {
+beforeEach(async () => {
   enableFetchMocks();
   fetch.resetMocks();
   await MockExtension.withConfiguredAccount();
@@ -39,7 +39,7 @@ beforeEach(async() =>  {
 
 describe("DeleteCommentController", () => {
   describe("DeleteCommentController::constructor", () => {
-    it("Should init all properties.", async() => {
+    it("Should init all properties.", async () => {
       const controller = new DeleteCommentController(mockedWorker, requestId, defaultApiClientOptions());
       const apiClientOption = defaultApiClientOptions();
 
@@ -51,7 +51,7 @@ describe("DeleteCommentController", () => {
     });
   });
   describe("DeleteCommentController::exec", () => {
-    it("Should delete comment by using the service", async() => {
+    it("Should delete comment by using the service", async () => {
       fetchCommentsMock();
 
       const controller = new DeleteCommentController(mockedWorker, null, defaultApiClientOptions());
@@ -64,7 +64,7 @@ describe("DeleteCommentController", () => {
       expect(spy).toHaveBeenCalled();
       expect(spy).toHaveBeenCalledWith(id);
     });
-    it("Should raise an error when id not a valid uuid", async() => {
+    it("Should raise an error when id not a valid uuid", async () => {
       fetchCommentsMock();
       const uuid = "1223-1225";
       const controller = new DeleteCommentController(mockedWorker, null, defaultApiClientOptions());
@@ -77,7 +77,7 @@ describe("DeleteCommentController", () => {
       expect(spy).toHaveBeenCalled();
       expect(spy).toHaveBeenCalledTimes(1);
     });
-    it("Should raise an error when id is missing", async() => {
+    it("Should raise an error when id is missing", async () => {
       fetchCommentsMock();
       const controller = new DeleteCommentController(mockedWorker, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller, "exec");
@@ -89,9 +89,11 @@ describe("DeleteCommentController", () => {
       expect(spy).toHaveBeenCalled();
       expect(spy).toHaveBeenCalledTimes(1);
     });
-    it("Should call exec method and send ERROR to worker when fetch is failing", async() => {
+    it("Should call exec method and send ERROR to worker when fetch is failing", async () => {
       const mockedError = new TypeError("Unable to reach the server, an unexpected error occurred");
-      fetch.doMock(() => { throw mockedError; });
+      fetch.doMock(() => {
+        throw mockedError;
+      });
       const controller = new DeleteCommentController(mockedWorker, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller, "exec");
 

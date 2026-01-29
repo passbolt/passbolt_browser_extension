@@ -38,10 +38,10 @@ class SetSetupLocaleController {
   async _exec(localeDto) {
     try {
       const result = await this.exec(localeDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -54,7 +54,7 @@ class SetSetupLocaleController {
   async exec(localeDto) {
     const locale = await this.localeModel.getSupportedLocale(localeDto.locale);
     if (!locale) {
-      throw new Error('Unsupported locale.');
+      throw new Error("Unsupported locale.");
     }
     // Update the temporary account locale, don't need to check the worker.
     const temporaryAccount = await AccountTemporarySessionStorageService.get(this.worker.port._port.name);

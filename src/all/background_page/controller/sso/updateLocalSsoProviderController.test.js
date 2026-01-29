@@ -12,7 +12,7 @@
  * @since         4.0.0
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
-import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
+import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
@@ -21,11 +21,11 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 
 describe("UpdateLocalSsoProviderController", () => {
   describe("UpdateLocalSsoProviderController::exec", () => {
-    it("Should update the SSO provider stored locally", async() => {
+    it("Should update the SSO provider stored locally", async () => {
       expect.assertions(1);
       const expectedProvider = GoogleSsoSettingsEntity.PROVIDER_ID;
 
-      const ssoKit = await clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
+      const ssoKit = await clientSsoKit({ provider: AzureSsoSettingsEntity.PROVIDER_ID });
       SsoDataStorage.setMockedData(ssoKit);
 
       const controller = new UpdateLocalSsoProviderController();
@@ -35,7 +35,7 @@ describe("UpdateLocalSsoProviderController", () => {
       expect(localKit.provider).toStrictEqual(expectedProvider);
     });
 
-    it("Should throw and exception if the new SSO provider is not valid", async() => {
+    it("Should throw and exception if the new SSO provider is not valid", async () => {
       expect.assertions(1);
       const expectedProvider = "invalid-provider";
 

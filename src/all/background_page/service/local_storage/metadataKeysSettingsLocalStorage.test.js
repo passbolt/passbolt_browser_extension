@@ -13,13 +13,10 @@
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {
-  defaultMetadataKeysSettingsDto
-} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataKeysSettingsLocalStorage from "./metadataKeysSettingsLocalStorage";
-import MetadataKeysSettingsEntity
-  from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -47,21 +44,21 @@ describe("MetadataKeysSettingsLocalStorage", () => {
   });
 
   describe("::get", () => {
-    it("returns undefined if nothing is stored in the local storage.", async() => {
+    it("returns undefined if nothing is stored in the local storage.", async () => {
       expect.assertions(1);
       const result = await storage.get();
       expect(result).toBeUndefined();
     });
 
-    it("returns content stored in the local storage.", async() => {
+    it("returns content stored in the local storage.", async () => {
       const settingsDto = defaultMetadataKeysSettingsDto();
       expect.assertions(1);
-      browser.storage.local.set({[storage.storageKey]: settingsDto});
+      browser.storage.local.set({ [storage.storageKey]: settingsDto });
       const result = await storage.get();
       expect(result).toEqual(settingsDto);
     });
 
-    it("returns content stored in the runtime cache.", async() => {
+    it("returns content stored in the runtime cache.", async () => {
       const settingsDto = defaultMetadataKeysSettingsDto();
       expect.assertions(2);
       // Force the runtime cache, to ensure it is hit even if the local storage is empty.
@@ -74,7 +71,7 @@ describe("MetadataKeysSettingsLocalStorage", () => {
   });
 
   describe("::set", () => {
-    it("stores content in the local storage.", async() => {
+    it("stores content in the local storage.", async () => {
       expect.assertions(3);
       const settings = new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto());
       await storage.set(settings);
@@ -87,7 +84,7 @@ describe("MetadataKeysSettingsLocalStorage", () => {
       expect(resultGet).toEqual(settings.toDto());
     });
 
-    it("throws if no data is given to store.", async() => {
+    it("throws if no data is given to store.", async () => {
       expect.assertions(3);
       await expect(() => storage.set()).rejects.toThrow(TypeError);
       // Expect the local storage (mocked here) to not be set.
@@ -96,7 +93,7 @@ describe("MetadataKeysSettingsLocalStorage", () => {
       expect(MetadataKeysSettingsLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("throws if invalid data is given to store.", async() => {
+    it("throws if invalid data is given to store.", async () => {
       expect.assertions(3);
       await expect(() => storage.set({})).rejects.toThrow(TypeError);
       // Expect the local storage (mocked here) to not be set.
@@ -105,31 +102,44 @@ describe("MetadataKeysSettingsLocalStorage", () => {
       expect(MetadataKeysSettingsLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("waits any on-going call to set to perform another set.", async() => {
+    it("waits any on-going call to set to perform another set.", async () => {
       expect.assertions(3);
       const promisesResolvers = [];
 
       jest.spyOn(storage, "_setBrowserStorage").mockImplementation(() => {
         let resolve;
-        const promise = new Promise(_resolve => resolve = _resolve);
+        const promise = new Promise((_resolve) => (resolve = _resolve));
         promisesResolvers.push(resolve);
         return promise;
       });
 
       const resultPromise1 = storage.set(new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto()));
-      const resultPromise2 = storage.set(new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto({allow_usage_of_personal_keys: false, zero_knowledge_key_share: true})));
-      expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: defaultMetadataKeysSettingsDto()});
-      expect(storage._setBrowserStorage).not.toHaveBeenCalledWith({[storage.storageKey]: defaultMetadataKeysSettingsDto({allow_usage_of_personal_keys: false, zero_knowledge_key_share: true})});
+      const resultPromise2 = storage.set(
+        new MetadataKeysSettingsEntity(
+          defaultMetadataKeysSettingsDto({ allow_usage_of_personal_keys: false, zero_knowledge_key_share: true }),
+        ),
+      );
+      expect(storage._setBrowserStorage).toHaveBeenCalledWith({
+        [storage.storageKey]: defaultMetadataKeysSettingsDto(),
+      });
+      expect(storage._setBrowserStorage).not.toHaveBeenCalledWith({
+        [storage.storageKey]: defaultMetadataKeysSettingsDto({
+          allow_usage_of_personal_keys: false,
+          zero_knowledge_key_share: true,
+        }),
+      });
       promisesResolvers[0]();
       await resultPromise1;
-      expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: defaultMetadataKeysSettingsDto()});
+      expect(storage._setBrowserStorage).toHaveBeenCalledWith({
+        [storage.storageKey]: defaultMetadataKeysSettingsDto(),
+      });
       promisesResolvers[1]();
       await resultPromise2;
     });
   });
 
   describe("::flush", () => {
-    it("flushes works with not initialized local storage.", async() => {
+    it("flushes works with not initialized local storage.", async () => {
       expect.assertions(2);
       await storage.flush();
       // Expect the local storage (mocked here) to not be set.
@@ -138,7 +148,7 @@ describe("MetadataKeysSettingsLocalStorage", () => {
       expect(MetadataKeysSettingsLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("flushes content of the local storage.", async() => {
+    it("flushes content of the local storage.", async () => {
       expect.assertions(2);
       const settings = new MetadataKeysSettingsEntity(defaultMetadataKeysSettingsDto());
       await storage.set(settings);

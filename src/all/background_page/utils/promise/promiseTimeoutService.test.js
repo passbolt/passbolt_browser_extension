@@ -20,10 +20,10 @@ describe("PromiseTimeoutService", () => {
   });
 
   describe("PromiseTimeoutService::exec", () => {
-    it("Should exec PromiseTimeout with a promise resolved before timeout", async() => {
+    it("Should exec PromiseTimeout with a promise resolved before timeout", async () => {
       expect.assertions(3);
       // data mocked
-      const promise = new Promise(resolve => resolve("DONE"));
+      const promise = new Promise((resolve) => resolve("DONE"));
       // mock functions
       jest.spyOn(global, "setTimeout");
       jest.spyOn(global, "clearTimeout");
@@ -38,7 +38,7 @@ describe("PromiseTimeoutService", () => {
       expect(global.clearTimeout).toHaveBeenCalledTimes(1);
     });
 
-    it("Should exec PromiseTimeout with a promise rejected before timeout", async() => {
+    it("Should exec PromiseTimeout with a promise rejected before timeout", async () => {
       expect.assertions(3);
       // data mocked
       const promise = new Promise((resolve, reject) => reject("REJECT"));
@@ -58,10 +58,12 @@ describe("PromiseTimeoutService", () => {
       }
     });
 
-    it("Should exec PromiseTimeout with a promise throwing error before timeout", async() => {
+    it("Should exec PromiseTimeout with a promise throwing error before timeout", async () => {
       expect.assertions(3);
       // data mocked
-      const promise = new Promise(() => { throw new Error("REJECT"); });
+      const promise = new Promise(() => {
+        throw new Error("REJECT");
+      });
       // mock functions
       jest.spyOn(global, "setTimeout");
       jest.spyOn(global, "clearTimeout");
@@ -78,7 +80,7 @@ describe("PromiseTimeoutService", () => {
       }
     });
 
-    it("Should exec PromiseTimeout with a promise not resolved before timeout", async() => {
+    it("Should exec PromiseTimeout with a promise not resolved before timeout", async () => {
       expect.assertions(1);
       // data mocked
       const promise = new Promise(() => null);

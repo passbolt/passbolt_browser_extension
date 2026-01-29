@@ -14,7 +14,7 @@
 
 import ScimSettingsEntity from "passbolt-styleguide/src/shared/models/entity/scimSettings/scimSettingsEntity";
 import UpdateScimSettingsService from "../../service/scimSettings/updateScimSettingsService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 class UpdateScimSettingsController {
   /**
@@ -36,10 +36,10 @@ class UpdateScimSettingsController {
   async _exec(id, data) {
     try {
       const result = await this.exec(id, data);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

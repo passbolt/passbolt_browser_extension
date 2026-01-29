@@ -14,7 +14,7 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = 'Locale';
+const ENTITY_NAME = "Locale";
 
 /**
  * Local entity for the user language
@@ -24,11 +24,7 @@ class LocaleEntity extends Entity {
    * @inheritDoc
    */
   constructor(localeDto, options = {}) {
-    super(EntitySchema.validate(
-      LocaleEntity.ENTITY_NAME,
-      localeDto,
-      LocaleEntity.getSchema()
-    ), options);
+    super(EntitySchema.validate(LocaleEntity.ENTITY_NAME, localeDto, LocaleEntity.getSchema()), options);
   }
 
   /**
@@ -37,19 +33,17 @@ class LocaleEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "locale",
-      ],
-      "properties": {
-        "locale": {
-          "type": "string",
-          "pattern": /^[a-z]{2}-[A-Z]{2}$/,
+      type: "object",
+      required: ["locale"],
+      properties: {
+        locale: {
+          type: "string",
+          pattern: /^[a-z]{2}-[A-Z]{2}$/,
         },
-        "label": {
-          "type": "string"
-        }
-      }
+        label: {
+          type: "string",
+        },
+      },
     };
   }
 

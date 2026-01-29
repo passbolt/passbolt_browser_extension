@@ -19,7 +19,7 @@ import {
   groupMemberRemovalOperationDto,
   groupMemberRoleUpdateOperationDto,
   groupNameUpdateOperationDto,
-  defaultGroupUpdateDto
+  defaultGroupUpdateDto,
 } from "./groupUpdatesCollection.test.data";
 import GroupUpdateEntity from "./groupUpdateEntity";
 
@@ -137,7 +137,7 @@ describe("GroupUpdatesCollections", () => {
       return "user-update";
     }
 
-    it("should build a collection with all kind of items and put them in the right order", async() => {
+    it("should build a collection with all kind of items and put them in the right order", async () => {
       expect.assertions(19);
 
       //1 delete operation, 2 add operations, 2 update operations
@@ -182,9 +182,11 @@ describe("GroupUpdatesCollections", () => {
 
       const groupUpdateDto = new GroupUpdateEntity(defaultGroupUpdateDto());
 
-      jest.spyOn(groupUpdateDto.groupsUsers.items[0], "scenario", 'get').mockImplementation(() => "unknown");
+      jest.spyOn(groupUpdateDto.groupsUsers.items[0], "scenario", "get").mockImplementation(() => "unknown");
 
-      expect(() => GroupUpdatesCollection.createFromGroupUpdateEntity(groupUpdateDto)).toThrowError("Unsupported Group user membership update operation type.");
+      expect(() => GroupUpdatesCollection.createFromGroupUpdateEntity(groupUpdateDto)).toThrowError(
+        "Unsupported Group user membership update operation type.",
+      );
     });
   });
 });

@@ -12,7 +12,7 @@
  * @since         3.10.0
  */
 
-import MultiFactorAuthenticationModel from '../../model/multiFactorAuthentication/multiFactorAuthenticationModel';
+import MultiFactorAuthenticationModel from "../../model/multiFactorAuthentication/multiFactorAuthenticationModel";
 
 class MfaGetPolicyController {
   /**
@@ -36,7 +36,7 @@ class MfaGetPolicyController {
       this.worker.port.emit(this.requestId, "SUCCESS", policy);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

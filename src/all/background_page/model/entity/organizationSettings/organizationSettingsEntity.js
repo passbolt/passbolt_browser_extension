@@ -17,9 +17,9 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 const ENTITY_NAME = "OrganizationSettings";
 
 // Organization status
-const ORGANIZATION_ENABLED = 'enabled';
-const ORGANIZATION_DISABLED = 'disabled';
-const ORGANIZATION_NOT_FOUND = 'not found';
+const ORGANIZATION_ENABLED = "enabled";
+const ORGANIZATION_DISABLED = "disabled";
+const ORGANIZATION_NOT_FOUND = "not found";
 
 class OrganizationSettingsEntity extends Entity {
   /**
@@ -30,11 +30,14 @@ class OrganizationSettingsEntity extends Entity {
     // Default properties values
     const props = Object.assign(OrganizationSettingsEntity.getDefault(), organizationSettingsDto);
     const sanitizedDto = OrganizationSettingsEntity.sanitizeDto(props);
-    super(EntitySchema.validate(
-      OrganizationSettingsEntity.ENTITY_NAME,
-      sanitizedDto,
-      OrganizationSettingsEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        OrganizationSettingsEntity.ENTITY_NAME,
+        sanitizedDto,
+        OrganizationSettingsEntity.getSchema(),
+      ),
+      options,
+    );
   }
 
   /**
@@ -43,7 +46,7 @@ class OrganizationSettingsEntity extends Entity {
    */
   static getDefault() {
     return {
-      "status": OrganizationSettingsEntity.ORGANIZATION_ENABLED
+      status: OrganizationSettingsEntity.ORGANIZATION_ENABLED,
     };
   }
 
@@ -53,30 +56,28 @@ class OrganizationSettingsEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-
-      ],
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": [
+      type: "object",
+      required: [],
+      properties: {
+        status: {
+          type: "string",
+          enum: [
             OrganizationSettingsEntity.ORGANIZATION_ENABLED,
             OrganizationSettingsEntity.ORGANIZATION_DISABLED,
-            OrganizationSettingsEntity.ORGANIZATION_NOT_FOUND
-          ]
+            OrganizationSettingsEntity.ORGANIZATION_NOT_FOUND,
+          ],
         },
-        "app": {
-          "type": "object"
+        app: {
+          type: "object",
         },
-        "passbolt": {
-          "type": "object"
+        passbolt: {
+          type: "object",
         },
-        "serverTimeDiff": {
-          "type": "integer",
-          "nullable": true,
+        serverTimeDiff: {
+          type: "integer",
+          nullable: true,
         },
-      }
+      },
     };
   }
 
@@ -85,7 +86,7 @@ class OrganizationSettingsEntity extends Entity {
    */
   static get disabledOrganizationSettings() {
     return {
-      status: this.ORGANIZATION_DISABLED
+      status: this.ORGANIZATION_DISABLED,
     };
   }
 
@@ -112,18 +113,14 @@ class OrganizationSettingsEntity extends Entity {
   static sanitizeEmailValidateRegex(dto) {
     const emailValidateRegex = dto?.passbolt?.email?.validate?.regex;
 
-    if (
-      !emailValidateRegex
-        || typeof emailValidateRegex !== 'string'
-        || !emailValidateRegex.trim().length
-    ) {
+    if (!emailValidateRegex || typeof emailValidateRegex !== "string" || !emailValidateRegex.trim().length) {
       return;
     }
 
     dto.passbolt.email.validate.regex = emailValidateRegex
       .trim()
-      .replace(/^\/+/, '') // Trim starting slash
-      .replace(/\/+$/, '');   // Trim trailing slash
+      .replace(/^\/+/, "") // Trim starting slash
+      .replace(/\/+$/, ""); // Trim trailing slash
   }
 
   /*

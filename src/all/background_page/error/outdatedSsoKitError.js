@@ -15,7 +15,7 @@
 class OutdatedSsoKitError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'OutdatedSsoKitError';
+    this.name = "OutdatedSsoKitError";
   }
 }
 

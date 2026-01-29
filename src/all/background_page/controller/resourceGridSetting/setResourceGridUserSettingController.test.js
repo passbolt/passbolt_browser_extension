@@ -13,9 +13,9 @@
  */
 
 import SetResourceGridUserSettingController from "./setResourceGridUserSettingController";
-import {RESOURCE_GRID_USER_SETTING_STORAGE_KEY} from "../../service/local_storage/ressourceGridSettingLocalStorage";
+import { RESOURCE_GRID_USER_SETTING_STORAGE_KEY } from "../../service/local_storage/ressourceGridSettingLocalStorage";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 beforeEach(() => {
   jest.resetModules();
@@ -24,20 +24,22 @@ beforeEach(() => {
 
 describe("SetResourceColumnsSettingController", () => {
   describe("SetResourceColumnsSettingController::exec", () => {
-    it("Should update the resource columns settings in the local storage.", async() => {
+    it("Should update the resource columns settings in the local storage.", async () => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
-      const columnsSetting = [{id: "name", label: "name"}];
-      const sorter = {propertyName: "name", asc: true};
-      const gridUserSetting = {columns_setting: columnsSetting, sorter: sorter};
+      const columnsSetting = [{ id: "name", label: "name" }];
+      const sorter = { propertyName: "name", asc: true };
+      const gridUserSetting = { columns_setting: columnsSetting, sorter: sorter };
       jest.spyOn(browser.storage.local, "set");
       const controller = new SetResourceGridUserSettingController(null, null, account);
       await controller.exec(gridUserSetting);
 
-      expect(browser.storage.local.set).toHaveBeenCalledWith({[`${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${account.id}`]: gridUserSetting});
+      expect(browser.storage.local.set).toHaveBeenCalledWith({
+        [`${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${account.id}`]: gridUserSetting,
+      });
     });
 
-    it("Should not update the resource columns settings if an error occurred.", async() => {
+    it("Should not update the resource columns settings if an error occurred.", async () => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
       const columnsSetting = {};

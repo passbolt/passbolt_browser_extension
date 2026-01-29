@@ -36,9 +36,7 @@ class SessionStorage {
       return this._storedData;
     }
 
-    const result = this._storedData[key]
-      ? {[key]: this._storedData[key]}
-      : {};
+    const result = this._storedData[key] ? { [key]: this._storedData[key] } : {};
 
     return result;
   }

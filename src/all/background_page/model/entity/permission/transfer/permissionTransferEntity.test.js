@@ -14,7 +14,7 @@
 import PermissionTransferEntity from "./permissionTransferEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultPermissionTransferDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransferEntity.test.data";
+import { defaultPermissionTransferDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionTransferEntity.test.data";
 
 describe("Permission transfer entity", () => {
   describe("::getSchema", () => {

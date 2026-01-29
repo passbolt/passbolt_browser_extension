@@ -13,15 +13,18 @@
  */
 import UserAndGroupSearchResultEntity from "./userAndGroupSearchResultEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import {defaultProfileDto} from "passbolt-styleguide/src/shared/models/entity/profile/ProfileEntity.test.data";
-import {defaultGroupSearchResultDto, defaultUserSearchResultDto} from "./userAndGroupSearchResultEntity.test.data";
+import { defaultProfileDto } from "passbolt-styleguide/src/shared/models/entity/profile/ProfileEntity.test.data";
+import { defaultGroupSearchResultDto, defaultUserSearchResultDto } from "./userAndGroupSearchResultEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from "uuid";
 
 describe("UserAndGroupSearchResultEntity", () => {
   describe("UserAndGroupSearchResultEntity::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(UserAndGroupSearchResultEntity.ENTITY_NAME, UserAndGroupSearchResultEntity.getSchema());
+      EntitySchema.validateSchema(
+        UserAndGroupSearchResultEntity.ENTITY_NAME,
+        UserAndGroupSearchResultEntity.getSchema(),
+      );
     });
 
     it("validates id property", () => {
@@ -38,15 +41,19 @@ describe("UserAndGroupSearchResultEntity", () => {
 
     it("validates profile property", () => {
       const failProfileScenario = [
-        {scenario: "not a profile", value: "not-a-profile"},
-        {scenario: "year, month, day, time and zulu", value: "2018-10-18T08:04:30+00:00Z"},
+        { scenario: "not a profile", value: "not-a-profile" },
+        { scenario: "year, month, day, time and zulu", value: "2018-10-18T08:04:30+00:00Z" },
       ];
 
-      const successProfileScenario = [
-        {scenario: "a correct profile", value: defaultProfileDto()},
-      ];
+      const successProfileScenario = [{ scenario: "a correct profile", value: defaultProfileDto() }];
 
-      assertEntityProperty.assert(UserAndGroupSearchResultEntity, "profile", successProfileScenario, failProfileScenario, "type");
+      assertEntityProperty.assert(
+        UserAndGroupSearchResultEntity,
+        "profile",
+        successProfileScenario,
+        failProfileScenario,
+        "type",
+      );
       assertEntityProperty.notRequired(UserAndGroupSearchResultEntity, "profile");
     });
 
@@ -65,7 +72,7 @@ describe("UserAndGroupSearchResultEntity", () => {
     it("works if valid minimal DTO is provided", () => {
       expect.assertions(1);
       const dto = {
-        "id": uuid(),
+        id: uuid(),
       };
       const entity = new UserAndGroupSearchResultEntity(dto);
       expect(entity.toDto()).toEqual(dto);

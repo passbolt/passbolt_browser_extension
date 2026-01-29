@@ -7,20 +7,20 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-import {Config} from "./config";
+import { Config } from "./config";
 
-const logSettings = Config.read('log');
+const logSettings = Config.read("log");
 
 // Logs type.
-const ERROR = 'error';
-const WARNING = 'warning';
+const ERROR = "error";
+const WARNING = "warning";
 
 // Logs level mapping.
 const logLevelMapping = {
   error: 1,
   warning: 2,
   info: 3,
-  debug: 4
+  debug: 4,
 };
 
 // The stored logs.
@@ -30,13 +30,13 @@ let _logs = [];
  * The Logger constructor.
  * @constructor
  */
-const Log = function() {};
+const Log = function () {};
 
 /**
  * Write a log.
  * @param log {object} The log to write.
  */
-Log.write = function(log) {
+Log.write = function (log) {
   // If no logging is required, or the log level is lower than the log level message, leave.
   if (logSettings.level == 0 || logSettings.level < logLevelMapping[log.level]) {
     return;
@@ -44,7 +44,7 @@ Log.write = function(log) {
 
   // add a timestamp
   function formatTime(i) {
-    return (i < 10) ? `0${i}` : i;
+    return i < 10 ? `0${i}` : i;
   }
 
   if (!log.date) {
@@ -54,7 +54,7 @@ Log.write = function(log) {
   const m = formatTime(log.date.getMinutes());
   const s = formatTime(log.date.getSeconds());
   const ms = formatTime(log.date.getMilliseconds());
-  log.created =  `${h}:${m}:${s}:${ms}`;
+  log.created = `${h}:${m}:${s}:${ms}`;
 
   // Register the log.
   _logs.push(log);
@@ -75,7 +75,7 @@ Log.write = function(log) {
 /**
  * Flush a log.
  */
-Log.init = function() {
+Log.init = function () {
   _logs = [];
 };
 

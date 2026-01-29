@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import ActionLogsCollection from "../entity/actionLog/actionLogsCollection";
-import {assertUuid, assertNonEmptyString, assertNumber} from "../../utils/assertions";
+import { assertUuid, assertNonEmptyString, assertNumber } from "../../utils/assertions";
 import AbstractActionLogEntity from "../entity/actionLog/abstractActionLogEntity";
 import ActionLogApiService from "../../service/api/actionLog/actionLogApiService";
 
@@ -60,7 +60,7 @@ class FindActionLogService {
    * @public
    */
   assertValidForeignModel(foreignModel) {
-    assertNonEmptyString(foreignModel, 'ActionLog foreign model should be a valid string.');
+    assertNonEmptyString(foreignModel, "ActionLog foreign model should be a valid string.");
     if (!AbstractActionLogEntity.ALLOWED_FOREIGN_MODELS.includes(foreignModel)) {
       throw new TypeError(`ActionLog foreign model ${foreignModel} is not in the list of supported models.`);
     }

@@ -16,7 +16,7 @@ import GroupsCollection from "../../model/entity/group/groupsCollection";
 import GroupEntity from "../../model/entity/group/groupEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 
-export const GROUP_LOCAL_STORAGE_KEY = 'groups';
+export const GROUP_LOCAL_STORAGE_KEY = "groups";
 
 class GroupLocalStorage {
   /**
@@ -55,9 +55,11 @@ class GroupLocalStorage {
    * @returns {boolean}
    */
   static hasCachedData(accountId) {
-    return accountId in GroupLocalStorage._runtimeCachedData &&
+    return (
+      accountId in GroupLocalStorage._runtimeCachedData &&
       GroupLocalStorage._runtimeCachedData[accountId] &&
-      Object.keys(GroupLocalStorage._runtimeCachedData[accountId]).length > 0;
+      Object.keys(GroupLocalStorage._runtimeCachedData[accountId]).length > 0
+    );
   }
 
   /**
@@ -71,7 +73,7 @@ class GroupLocalStorage {
     await browser.storage.local.remove(GROUP_LOCAL_STORAGE_KEY);
     await browser.storage.local.remove(this.storageKey);
     delete GroupLocalStorage._runtimeCachedData[this.account.id];
-    Log.write({level: 'debug', message: `GroupLocalStorage flushed for (${this.account.id})`});
+    Log.write({ level: "debug", message: `GroupLocalStorage flushed for (${this.account.id})` });
   }
 
   /**
@@ -111,17 +113,14 @@ class GroupLocalStorage {
       throw new TypeError("The parameter `groupsCollection` should be of type GroupsCollection.");
     }
 
-    await navigator.locks.request(
-      this.storageKey,
-      async() => {
-        for (const group of groupsCollection) {
-          GroupLocalStorage.assertEntityBeforeSave(group);
-        }
-        const dtos = groupsCollection.toDto(GroupLocalStorage.DEFAULT_CONTAIN);
-        await this._setBrowserStorage({[this.storageKey]: dtos});
-        GroupLocalStorage._runtimeCachedData[this.account.id] = dtos;
+    await navigator.locks.request(this.storageKey, async () => {
+      for (const group of groupsCollection) {
+        GroupLocalStorage.assertEntityBeforeSave(group);
       }
-    );
+      const dtos = groupsCollection.toDto(GroupLocalStorage.DEFAULT_CONTAIN);
+      await this._setBrowserStorage({ [this.storageKey]: dtos });
+      GroupLocalStorage._runtimeCachedData[this.account.id] = dtos;
+    });
   }
 
   /**
@@ -132,7 +131,7 @@ class GroupLocalStorage {
    */
   async getGroupById(id) {
     const groups = await this.get();
-    const groupInCache = groups.find(item => item.id === id);
+    const groupInCache = groups.find((item) => item.id === id);
     return groupInCache;
   }
 
@@ -146,12 +145,12 @@ class GroupLocalStorage {
       throw new TypeError("The parameter `groupEntity` should be of type GroupEntity.");
     }
 
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       GroupLocalStorage.assertEntityBeforeSave(groupEntity);
       const groups = await this.get();
       const dtos = groupEntity.toDto(GroupLocalStorage.DEFAULT_CONTAIN);
       groups.push(dtos);
-      await this._setBrowserStorage({[this.storageKey]: groups});
+      await this._setBrowserStorage({ [this.storageKey]: groups });
       GroupLocalStorage._runtimeCachedData[this.account.id] = groups;
     });
   }
@@ -168,15 +167,15 @@ class GroupLocalStorage {
       throw new TypeError("The parameter `groupEntity` should be of type GroupEntity.");
     }
 
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       GroupLocalStorage.assertEntityBeforeSave(groupEntity);
       const groups = await this.get();
-      const groupIndex = groups.findIndex(item => item.id === groupEntity.id);
+      const groupIndex = groups.findIndex((item) => item.id === groupEntity.id);
       if (groupIndex === -1) {
-        throw new TypeError('The group could not be found in the local storage');
+        throw new TypeError("The group could not be found in the local storage");
       }
       groups[groupIndex] = Object.assign(groups[groupIndex], groupEntity.toDto(GroupLocalStorage.DEFAULT_CONTAIN));
-      await this._setBrowserStorage({[this.storageKey]: groups});
+      await this._setBrowserStorage({ [this.storageKey]: groups });
       GroupLocalStorage._runtimeCachedData[this.account.id] = groups;
     });
   }
@@ -186,14 +185,14 @@ class GroupLocalStorage {
    * @param {string} groupId group uuid
    */
   async delete(groupId) {
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       const groups = await this.get();
       if (groups) {
-        const groupIndex = groups.findIndex(item => item.id === groupId);
+        const groupIndex = groups.findIndex((item) => item.id === groupId);
         if (groupIndex !== -1) {
           groups.splice(groupIndex, 1);
         }
-        await this._setBrowserStorage({[this.storageKey]: groups});
+        await this._setBrowserStorage({ [this.storageKey]: groups });
         GroupLocalStorage._runtimeCachedData[this.account.id] = groups;
       }
     });
@@ -208,13 +207,13 @@ class GroupLocalStorage {
    */
   static assertEntityBeforeSave(groupEntity) {
     if (!groupEntity) {
-      throw new TypeError('GroupLocalStorage expects a GroupEntity to be set');
+      throw new TypeError("GroupLocalStorage expects a GroupEntity to be set");
     }
     if (!(groupEntity instanceof GroupEntity)) {
-      throw new TypeError('GroupLocalStorage expects an object of type GroupEntity');
+      throw new TypeError("GroupLocalStorage expects an object of type GroupEntity");
     }
     if (!groupEntity.id) {
-      throw new TypeError('GroupLocalStorage expects GroupEntity id to be set');
+      throw new TypeError("GroupLocalStorage expects GroupEntity id to be set");
     }
   }
 
@@ -238,7 +237,7 @@ class GroupLocalStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {my_group_user: true, groups_users: true};
+    return { my_group_user: true, groups_users: true };
   }
 }
 

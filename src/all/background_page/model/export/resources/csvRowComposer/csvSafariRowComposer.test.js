@@ -16,12 +16,12 @@ import CsvSafariRowComposer from "./csvSafariRowComposer";
 describe("CsvSafariRowComposer", () => {
   it("can compose safari csv row", () => {
     const dto = {
-      "name": "Password 1",
-      "username": "Username 1",
-      "uris": ["https://url1.com"],
-      "secret_clear": "Secret 1",
-      "description": "Description 1",
-      "folder_parent_path": "Folder 1"
+      name: "Password 1",
+      username: "Username 1",
+      uris: ["https://url1.com"],
+      secret_clear: "Secret 1",
+      description: "Description 1",
+      folder_parent_path: "Folder 1",
     };
     const externalResourceEntity = new ExternalResourceEntity(dto);
     const csvRow = CsvSafariRowComposer.compose(externalResourceEntity);

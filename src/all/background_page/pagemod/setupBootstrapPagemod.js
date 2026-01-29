@@ -13,7 +13,7 @@
  */
 import Pagemod from "./pagemod";
 import ParseSetupUrlService from "../service/setup/parseSetupUrlService";
-import {PortEvents} from "../event/portEvents";
+import { PortEvents } from "../event/portEvents";
 
 class SetupBootstrap extends Pagemod {
   /**
@@ -28,17 +28,14 @@ class SetupBootstrap extends Pagemod {
    * @inheritDoc
    */
   get contentStyleFiles() {
-    return ['webAccessibleResources/css/themes/default/ext_external.min.css'];
+    return ["webAccessibleResources/css/themes/default/ext_external.min.css"];
   }
 
   /**
    * @inheritDoc
    */
   get contentScriptFiles() {
-    return [
-      'contentScripts/js/dist/vendors.js',
-      'contentScripts/js/dist/setup.js',
-    ];
+    return ["contentScripts/js/dist/vendors.js", "contentScripts/js/dist/setup.js"];
   }
 
   /**
@@ -59,8 +56,7 @@ class SetupBootstrap extends Pagemod {
    * @inheritDoc
    */
   async canBeAttachedTo(frameDetails) {
-    return this.assertTopFrameAttachConstraint(frameDetails)
-      && this.assertUrlAttachConstraint(frameDetails);
+    return this.assertTopFrameAttachConstraint(frameDetails) && this.assertUrlAttachConstraint(frameDetails);
   }
 
   /**

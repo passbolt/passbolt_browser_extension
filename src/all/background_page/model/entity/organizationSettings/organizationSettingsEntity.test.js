@@ -16,7 +16,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import OrganizationSettingsEntity from "./organizationSettingsEntity";
 import {
   customEmailValidationProOrganizationSettings,
-  defaultProOrganizationSettings
+  defaultProOrganizationSettings,
 } from "./organizationSettingsEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
@@ -27,7 +27,7 @@ describe("OrganizationSettingsEntity entity", () => {
     });
 
     it("validates status property", () => {
-      const successValues = ['enabled', 'disabled', 'not found'];
+      const successValues = ["enabled", "disabled", "not found"];
       const failValues = ["string"];
 
       assertEntityProperty.enumeration(OrganizationSettingsEntity, "status", successValues, failValues);
@@ -59,17 +59,20 @@ describe("OrganizationSettingsEntity entity", () => {
     });
 
     it("validates serverTimeDiff property", () => {
-      const successScenarios = [
-        assertEntityProperty.SCENARIO_INTEGER,
-        assertEntityProperty.SCENARIO_NULL,
-      ];
+      const successScenarios = [assertEntityProperty.SCENARIO_INTEGER, assertEntityProperty.SCENARIO_NULL];
       const failingScenarios = [
         assertEntityProperty.SCENARIO_STRING,
         assertEntityProperty.SCENARIO_FLOAT,
         assertEntityProperty.SCENARIO_OBJECT,
       ];
 
-      assertEntityProperty.assert(OrganizationSettingsEntity, "serverTimeDiff", successScenarios, failingScenarios, "type");
+      assertEntityProperty.assert(
+        OrganizationSettingsEntity,
+        "serverTimeDiff",
+        successScenarios,
+        failingScenarios,
+        "type",
+      );
       assertEntityProperty.notRequired(OrganizationSettingsEntity, "serverTimeDiff");
     });
   });
@@ -80,7 +83,7 @@ describe("OrganizationSettingsEntity entity", () => {
       const dto = {};
       expect(() => new OrganizationSettingsEntity(dto)).not.toThrow();
       expect(new OrganizationSettingsEntity(dto).toDto()).toStrictEqual({
-        status: 'enabled',
+        status: "enabled",
       });
     });
 

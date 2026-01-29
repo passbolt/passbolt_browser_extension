@@ -12,29 +12,29 @@
  * @since         4.5.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 import PasswordExpiryResourcesCollection from "../entity/passwordExpiry/passwordExpiryResourcesCollection";
-import {defaultPasswordExpiryCollectionDto} from "../entity/passwordExpiry/passwordExpiryResourceCollection.test.data";
+import { defaultPasswordExpiryCollectionDto } from "../entity/passwordExpiry/passwordExpiryResourceCollection.test.data";
 import PasswordExpiryResourceModel from "./passwordExpiryResourceModel";
 
 jest.mock("../../service/local_storage/resourceLocalStorage");
 
 describe("PasswordExpiryResourceModel", () => {
-  describe('::update', () => {
-    it("Should call for the service to update the date on the API and run callbacks during the process", async() => {
+  describe("::update", () => {
+    it("Should call for the service to update the date on the API and run callbacks during the process", async () => {
       expect.assertions(2);
 
       const collectionDto = defaultPasswordExpiryCollectionDto();
       const collection = new PasswordExpiryResourcesCollection(collectionDto);
 
       const model = new PasswordExpiryResourceModel(defaultApiClientOptions());
-      jest.spyOn(model.passwordExpiryResourceService, "update").mockImplementation(collectionDto => {
+      jest.spyOn(model.passwordExpiryResourceService, "update").mockImplementation((collectionDto) => {
         expect(collectionDto).toStrictEqual(collection.toDto());
       });
 
       //Mock the local storage call and check if the given parameters are ok
-      ResourceLocalStorage.updateResourcesExpiryDate.mockImplementation(passwordExpiryCollection => {
+      ResourceLocalStorage.updateResourcesExpiryDate.mockImplementation((passwordExpiryCollection) => {
         const collection = new PasswordExpiryResourcesCollection(collectionDto);
         expect(passwordExpiryCollection).toStrictEqual(collection.passwordExpiryResources);
       });
@@ -42,7 +42,7 @@ describe("PasswordExpiryResourceModel", () => {
       await model.update(collection);
     });
 
-    it("Should throw an Error if the something goes wrong during the process", async() => {
+    it("Should throw an Error if the something goes wrong during the process", async () => {
       expect.assertions(1);
 
       const collectionDto = defaultPasswordExpiryCollectionDto();
@@ -50,7 +50,9 @@ describe("PasswordExpiryResourceModel", () => {
 
       const model = new PasswordExpiryResourceModel(defaultApiClientOptions());
       const expectedError = new Error("Something went wrong!");
-      jest.spyOn(model.passwordExpiryResourceService, "update").mockImplementation(() => { throw expectedError; });
+      jest.spyOn(model.passwordExpiryResourceService, "update").mockImplementation(() => {
+        throw expectedError;
+      });
 
       try {
         await model.update(collection);

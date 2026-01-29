@@ -15,7 +15,7 @@
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import CheckPassphraseController from "./checkPassphraseController";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import Keyring from "../../model/keyring";
 
 const mockFindPrivate = jest.spyOn(Keyring.prototype, "findPrivate");
@@ -23,21 +23,21 @@ const mockFindPrivate = jest.spyOn(Keyring.prototype, "findPrivate");
 describe("CheckPassphraseController", () => {
   it(`Should decrypt current user's key with the right passphrase`, () => {
     expect.assertions(1);
-    mockFindPrivate.mockImplementation(() => new ExternalGpgKeyEntity({armored_key: pgpKeys.ada.private}));
+    mockFindPrivate.mockImplementation(() => new ExternalGpgKeyEntity({ armored_key: pgpKeys.ada.private }));
     const controller = new CheckPassphraseController();
     const promise = controller.exec(pgpKeys.ada.passphrase);
     return expect(promise).resolves.not.toThrow();
   });
 
-  it(`Should throw an exception if the given passphrase doesn't match the key`, async() => {
+  it(`Should throw an exception if the given passphrase doesn't match the key`, async () => {
     expect.assertions(1);
-    mockFindPrivate.mockImplementation(() => new ExternalGpgKeyEntity({armored_key: pgpKeys.ada.private}));
+    mockFindPrivate.mockImplementation(() => new ExternalGpgKeyEntity({ armored_key: pgpKeys.ada.private }));
     const controller = new CheckPassphraseController();
     const promise = controller.exec("wrong passphrase");
     return expect(promise).rejects.toThrowError(new InvalidMasterPasswordError());
   });
 
-  it(`Should throw an exception if no private key is found`, async() => {
+  it(`Should throw an exception if no private key is found`, async () => {
     expect.assertions(1);
     mockFindPrivate.mockImplementation(() => null);
     const controller = new CheckPassphraseController();

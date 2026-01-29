@@ -14,14 +14,17 @@
 
 import AccountEntity from "../../model/entity/account/accountEntity";
 import MetadataKeysSessionStorage from "./metadataKeysSessionStorage";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import {
   defaultDecryptedSharedMetadataKeysDtos,
-  defaultMetadataKeysDtos
+  defaultMetadataKeysDtos,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import MetadataPrivateKeyEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity";
-import {defaultMetadataPrivateKeyDto, decryptedMetadataPrivateKeyDto} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
+import {
+  defaultMetadataPrivateKeyDto,
+  decryptedMetadataPrivateKeyDto,
+} from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -49,21 +52,21 @@ describe("MetadataKeysSessionStorage", () => {
   });
 
   describe("::get", () => {
-    it("returns undefined if nothing is stored in the session storage.", async() => {
+    it("returns undefined if nothing is stored in the session storage.", async () => {
       expect.assertions(1);
       const result = await storage.get();
       expect(result).toBeUndefined();
     });
 
-    it("returns content stored in the session storage.", async() => {
+    it("returns content stored in the session storage.", async () => {
       const collectionDto = defaultMetadataKeysDtos();
       expect.assertions(1);
-      browser.storage.session.set({[storage.storageKey]: collectionDto});
+      browser.storage.session.set({ [storage.storageKey]: collectionDto });
       const result = await storage.get();
       expect(result).toEqual(collectionDto);
     });
 
-    it("returns content stored in the runtime cache.", async() => {
+    it("returns content stored in the runtime cache.", async () => {
       const collectionDto = defaultDecryptedSharedMetadataKeysDtos();
       expect.assertions(2);
       // Force the runtime cache, to ensure it is hit even if the session storage is empty.
@@ -76,7 +79,7 @@ describe("MetadataKeysSessionStorage", () => {
   });
 
   describe("::set", () => {
-    it("stores content in the session storage.", async() => {
+    it("stores content in the session storage.", async () => {
       expect.assertions(3);
       const dtos = defaultDecryptedSharedMetadataKeysDtos();
       const collection = new MetadataKeysCollection(dtos);
@@ -90,7 +93,7 @@ describe("MetadataKeysSessionStorage", () => {
       expect(resultGet).toEqual(dtos);
     });
 
-    it("throws if no data is given to store.", async() => {
+    it("throws if no data is given to store.", async () => {
       expect.assertions(3);
       await expect(() => storage.set()).rejects.toThrow(TypeError);
       // Expect the session storage (mocked here) to not be set.
@@ -99,7 +102,7 @@ describe("MetadataKeysSessionStorage", () => {
       expect(MetadataKeysSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("throws if invalid data is given to store.", async() => {
+    it("throws if invalid data is given to store.", async () => {
       expect.assertions(3);
       await expect(() => storage.set({})).rejects.toThrow(TypeError);
       // Expect the session storage (mocked here) to not be set.
@@ -108,27 +111,31 @@ describe("MetadataKeysSessionStorage", () => {
       expect(MetadataKeysSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("throws if invalid incomplete data given to store.", async() => {
+    it("throws if invalid incomplete data given to store.", async () => {
       expect.assertions(1);
       // missing metadata private keys association
       const collection = new MetadataKeysCollection(defaultMetadataKeysDtos());
-      await expect(() => storage.set(collection)).rejects.toThrow(new TypeError("The parameter 'metadataKey' should have the association '_metadata_private_keys' set."));
+      await expect(() => storage.set(collection)).rejects.toThrow(
+        new TypeError("The parameter 'metadataKey' should have the association '_metadata_private_keys' set."),
+      );
     });
 
-    it("throws if the collection contains encrypted private keys.", async() => {
+    it("throws if the collection contains encrypted private keys.", async () => {
       expect.assertions(1);
       // missing metadata private keys association
-      const collection = new MetadataKeysCollection(defaultMetadataKeysDtos(2, {}, {withMetadataPrivateKeys: true}));
-      await expect(() => storage.set(collection)).rejects.toThrow(new TypeError("The parameter `collection` should contain only decrypted keys."));
+      const collection = new MetadataKeysCollection(defaultMetadataKeysDtos(2, {}, { withMetadataPrivateKeys: true }));
+      await expect(() => storage.set(collection)).rejects.toThrow(
+        new TypeError("The parameter `collection` should contain only decrypted keys."),
+      );
     });
 
-    it("waits any on-going call to set to perform another set.", async() => {
+    it("waits any on-going call to set to perform another set.", async () => {
       expect.assertions(3);
       const promisesResolvers = [];
 
       jest.spyOn(storage, "_setBrowserStorage").mockImplementation(() => {
         let resolve;
-        const promise = new Promise(_resolve => resolve = _resolve);
+        const promise = new Promise((_resolve) => (resolve = _resolve));
         promisesResolvers.push(resolve);
         return promise;
       });
@@ -137,28 +144,28 @@ describe("MetadataKeysSessionStorage", () => {
       const collectionDto2 = defaultDecryptedSharedMetadataKeysDtos();
       const resultPromise1 = storage.set(new MetadataKeysCollection(collectionDto1));
       const resultPromise2 = storage.set(new MetadataKeysCollection(collectionDto2));
-      expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: collectionDto1});
-      expect(storage._setBrowserStorage).not.toHaveBeenCalledWith({[storage.storageKey]: collectionDto2});
+      expect(storage._setBrowserStorage).toHaveBeenCalledWith({ [storage.storageKey]: collectionDto1 });
+      expect(storage._setBrowserStorage).not.toHaveBeenCalledWith({ [storage.storageKey]: collectionDto2 });
       promisesResolvers[0]();
       await resultPromise1;
-      expect(storage._setBrowserStorage).toHaveBeenCalledWith({[storage.storageKey]: collectionDto2});
+      expect(storage._setBrowserStorage).toHaveBeenCalledWith({ [storage.storageKey]: collectionDto2 });
       promisesResolvers[1]();
       await resultPromise2;
     });
   });
 
   describe("::updatePrivateKey", () => {
-    it("stores content in the session storage.", async() => {
+    it("stores content in the session storage.", async () => {
       expect.assertions(3);
       const dtos = defaultDecryptedSharedMetadataKeysDtos();
       const collection = new MetadataKeysCollection(dtos);
       await storage.set(collection);
-      const date = (new Date()).toISOString();
+      const date = new Date().toISOString();
       const metadataPrivateKeyDto = decryptedMetadataPrivateKeyDto({
         id: dtos[0].metadata_private_keys[0].id,
         metadata_key_id: dtos[0].id,
         user_id: dtos[0].metadata_private_keys[0].user_id,
-        data_signed_by_current_user: date
+        data_signed_by_current_user: date,
       });
       const metadataPrivateKey = new MetadataPrivateKeyEntity(metadataPrivateKeyDto);
       const updatedDtos = JSON.parse(JSON.stringify(dtos));
@@ -176,7 +183,7 @@ describe("MetadataKeysSessionStorage", () => {
       expect(resultGet).toEqual(updatedDtos);
     });
 
-    it("throws if no data is given to update.", async() => {
+    it("throws if no data is given to update.", async () => {
       expect.assertions(3);
       await expect(() => storage.updatePrivateKey()).rejects.toThrow(TypeError);
       // Expect the session storage (mocked here) to not be set.
@@ -185,7 +192,7 @@ describe("MetadataKeysSessionStorage", () => {
       expect(MetadataKeysSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("throws if invalid data is given to update.", async() => {
+    it("throws if invalid data is given to update.", async () => {
       expect.assertions(3);
       await expect(() => storage.updatePrivateKey({})).rejects.toThrow(TypeError);
       // Expect the session storage (mocked here) to not be set.
@@ -194,21 +201,25 @@ describe("MetadataKeysSessionStorage", () => {
       expect(MetadataKeysSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("throws if encrypted data given to update.", async() => {
+    it("throws if encrypted data given to update.", async () => {
       expect.assertions(1);
       const metadataPrivateKey = new MetadataPrivateKeyEntity(defaultMetadataPrivateKeyDto());
-      await expect(() => storage.updatePrivateKey(metadataPrivateKey)).rejects.toThrow(new TypeError("The metadata private key should be decrypted."));
+      await expect(() => storage.updatePrivateKey(metadataPrivateKey)).rejects.toThrow(
+        new TypeError("The metadata private key should be decrypted."),
+      );
     });
 
-    it("throws if the associated metadata key cannot be found.", async() => {
+    it("throws if the associated metadata key cannot be found.", async () => {
       expect.assertions(1);
       const metadataPrivateKey = new MetadataPrivateKeyEntity(decryptedMetadataPrivateKeyDto());
-      await expect(() => storage.updatePrivateKey(metadataPrivateKey)).rejects.toThrow(new TypeError("The metadata key could not be found in the session storage"));
+      await expect(() => storage.updatePrivateKey(metadataPrivateKey)).rejects.toThrow(
+        new TypeError("The metadata key could not be found in the session storage"),
+      );
     });
   });
 
   describe("::flush", () => {
-    it("flushes works with not initialized session storage.", async() => {
+    it("flushes works with not initialized session storage.", async () => {
       expect.assertions(2);
       await storage.flush();
       // Expect the session storage (mocked here) to not be set.
@@ -217,7 +228,7 @@ describe("MetadataKeysSessionStorage", () => {
       expect(MetadataKeysSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
-    it("flushes content of the session storage.", async() => {
+    it("flushes content of the session storage.", async () => {
       expect.assertions(2);
       const dtos = defaultDecryptedSharedMetadataKeysDtos();
       const collection = new MetadataKeysCollection(dtos);

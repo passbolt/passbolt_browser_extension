@@ -13,21 +13,25 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ExternalResourceEntity from "./externalResourceEntity";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
-import {defaultTotpDto} from "../../totp/totpDto.test.data";
+import { defaultTotpDto } from "../../totp/totpDto.test.data";
 import ResourceEntity from "../resourceEntity";
-import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
-import {defaultResourcesSecretsDtos} from "../../secret/resource/resourceSecretsCollection.test.data";
-import {defaultExternalResourceDto, defaultExternalResourceImportDto, minimalExternalResourceDto} from "./externalResourceEntity.test.data";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourcesSecretsDtos } from "../../secret/resource/resourceSecretsCollection.test.data";
+import {
+  defaultExternalResourceDto,
+  defaultExternalResourceImportDto,
+  minimalExternalResourceDto,
+} from "./externalResourceEntity.test.data";
 import ExternalTotpEntity from "../../totp/externalTotpEntity";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
 import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
-import {defaultCustomFieldsCollection} from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
-import {defaultResourceMetadataDto} from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
+import { defaultCustomFieldsCollection } from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
+import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
   RESOURCE_TYPE_PASSWORD_STRING_SLUG,
   RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
@@ -38,9 +42,9 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
   RESOURCE_TYPE_V5_TOTP_SLUG,
   RESOURCE_TYPE_V5_CUSTOM_FIELDS_SLUG,
-  RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG
+  RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition.js";
-import {SECRET_DATA_OBJECT_TYPE} from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
+import { SECRET_DATA_OBJECT_TYPE } from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
 describe("ExternalResourceEntity", () => {
   describe("::getSchema", () => {
@@ -84,13 +88,9 @@ describe("ExternalResourceEntity", () => {
       const dto = defaultExternalResourceDto();
       const invalidSecret = defaultResourcesSecretsDtos();
 
-      const successScenario = [
-        {scenario: "valid secrets collection", value: dto.secrets},
-      ];
+      const successScenario = [{ scenario: "valid secrets collection", value: dto.secrets }];
 
-      const failingScenario = [
-        {scenario: "invalid secrets: different resource_id", value: invalidSecret},
-      ];
+      const failingScenario = [{ scenario: "invalid secrets: different resource_id", value: invalidSecret }];
       assertEntityProperty.assertAssociation(ExternalResourceEntity, "secrets", dto, successScenario, failingScenario);
       assertEntityProperty.notRequired(ExternalResourceEntity, "secrets");
     });
@@ -113,15 +113,13 @@ describe("ExternalResourceEntity", () => {
 
     it("validates totp property", () => {
       const dto = defaultExternalResourceDto();
-      const invalidTotp = Object.assign({}, dto.totp, {algorithm: "CHAT-1"});
+      const invalidTotp = Object.assign({}, dto.totp, { algorithm: "CHAT-1" });
 
-      const successScenario = [
-        {scenario: "valid totp", value: dto.totp},
-      ];
+      const successScenario = [{ scenario: "valid totp", value: dto.totp }];
 
       const failingScenario = [
-        {scenario: "invalid totp: string", value: "abcd"},
-        {scenario: "invalid totp: wrong fields", value: invalidTotp},
+        { scenario: "invalid totp: string", value: "abcd" },
+        { scenario: "invalid totp: wrong fields", value: invalidTotp },
       ];
 
       assertEntityProperty.assertAssociation(ExternalResourceEntity, "totp", dto, successScenario, failingScenario);
@@ -141,19 +139,23 @@ describe("ExternalResourceEntity", () => {
 
     it("validates customFields property", () => {
       const dto = defaultExternalResourceDto();
-      const invalidCustomFields = [{
-        metadata_key: "key-0",
-        secret_value: "secret-0",
-      }];
-
-      const successScenario = [
-        {scenario: "valid customFields collection", value: dto.custom_fields},
+      const invalidCustomFields = [
+        {
+          metadata_key: "key-0",
+          secret_value: "secret-0",
+        },
       ];
 
-      const failingScenario = [
-        {scenario: "invalid id: string", value: invalidCustomFields},
-      ];
-      assertEntityProperty.assertAssociation(ExternalResourceEntity, "custom_fields", dto, successScenario, failingScenario);
+      const successScenario = [{ scenario: "valid customFields collection", value: dto.custom_fields }];
+
+      const failingScenario = [{ scenario: "invalid id: string", value: invalidCustomFields }];
+      assertEntityProperty.assertAssociation(
+        ExternalResourceEntity,
+        "custom_fields",
+        dto,
+        successScenario,
+        failingScenario,
+      );
       assertEntityProperty.notRequired(ExternalResourceEntity, "custom_fields");
       assertEntityProperty.nullable(ExternalResourceEntity, "custom_fields");
     });
@@ -203,7 +205,9 @@ describe("ExternalResourceEntity", () => {
       expect(entity.totp.toDto()).toStrictEqual(dto.totp);
       expect(entity.secrets.toDto()).toStrictEqual(dto.secrets);
       expect(entity.customFields.toDto()).toStrictEqual(dto.custom_fields);
-      entity.totp = new ExternalTotpEntity(defaultTotpDto({secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"}));
+      entity.totp = new ExternalTotpEntity(
+        defaultTotpDto({ secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA" }),
+      );
       expect(entity.totp.secret_key !== dto.totp.secret_key).toBeTruthy();
     });
 
@@ -213,7 +217,7 @@ describe("ExternalResourceEntity", () => {
       const dto = defaultExternalResourceDto({
         icon: {
           type: "wrong",
-        }
+        },
       });
 
       expect(() => new ExternalResourceEntity(dto)).not.toThrow();
@@ -232,7 +236,7 @@ describe("ExternalResourceEntity", () => {
       expect.assertions(1);
 
       const dto = minimalExternalResourceDto({
-        "folder_parent_path": "// at/ the///root /"
+        folder_parent_path: "// at/ the///root /",
       });
       const entity = new ExternalResourceEntity(dto);
       expect(entity.folderParentPath).toEqual("/ at/ the/root /");
@@ -243,8 +247,8 @@ describe("ExternalResourceEntity", () => {
     it("changeRootPath change the resource root path", () => {
       expect.assertions(2);
 
-      const rootFolder = new ExternalFolderEntity({"name": "root"});
-      const resource = new ExternalResourceEntity({"name": "Resource 1", "secret_clear": ""});
+      const rootFolder = new ExternalFolderEntity({ name: "root" });
+      const resource = new ExternalResourceEntity({ name: "Resource 1", secret_clear: "" });
       resource.changeRootPath(rootFolder);
       expect(resource.folderParentPath).toEqual("root");
       resource.changeRootPath(rootFolder);
@@ -263,7 +267,9 @@ describe("ExternalResourceEntity", () => {
       });
       const entity = new ResourceEntity(resourceDto);
 
-      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(entity.toDto({secrets: true, metadata: true}));
+      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(
+        entity.toDto({ secrets: true, metadata: true }),
+      );
       expect(resultDto).toStrictEqual({
         id: entity.id,
         name: entity.metadata.name,
@@ -289,7 +295,9 @@ describe("ExternalResourceEntity", () => {
       });
       const entity = new ResourceEntity(resourceDto);
 
-      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(entity.toDto({secrets: true, metadata: true}));
+      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(
+        entity.toDto({ secrets: true, metadata: true }),
+      );
       expect(() => new ExternalResourceEntity(resultDto)).not.toThrow();
     });
 
@@ -301,12 +309,14 @@ describe("ExternalResourceEntity", () => {
         id: secrets[0].resource_id,
         secrets: secrets,
         metadata: defaultResourceMetadataDto({
-          custom_fields: customFields
+          custom_fields: customFields,
         }),
       });
       const entity = new ResourceEntity(resourceDto);
 
-      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(entity.toDto({secrets: true, metadata: true}));
+      const resultDto = ExternalResourceEntity.buildDtoFromResourceEntityDto(
+        entity.toDto({ secrets: true, metadata: true }),
+      );
       expect(resultDto.custom_fields).toStrictEqual(customFields);
     });
   });
@@ -628,7 +638,7 @@ describe("ExternalResourceEntity", () => {
         secret_clear: "this is a secret",
         secrets: new ResourceSecretsCollection(defaultResourcesSecretsDtos()),
         totp: new ExternalTotpEntity(defaultTotpDto()),
-        customFields: new CustomFieldsCollection(defaultCustomFieldsCollection())
+        customFields: new CustomFieldsCollection(defaultCustomFieldsCollection()),
       };
 
       entity.id = expectedData.id;
@@ -655,56 +665,72 @@ describe("ExternalResourceEntity", () => {
       expect.assertions(1);
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
-      expect(() => { entity.id = 42; }).toThrow(EntityValidationError);
+      expect(() => {
+        entity.id = 42;
+      }).toThrow(EntityValidationError);
     });
 
     it("should validate folderParentId when using the setter", () => {
       expect.assertions(1);
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
-      expect(() => { entity.folderParentId = 42; }).toThrow(EntityValidationError);
+      expect(() => {
+        entity.folderParentId = 42;
+      }).toThrow(EntityValidationError);
     });
 
     it("should validate description when using the setter", () => {
       expect.assertions(1);
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
-      expect(() => { entity.description = 42; }).toThrow(EntityValidationError);
+      expect(() => {
+        entity.description = 42;
+      }).toThrow(EntityValidationError);
     });
 
     it("should validate secretClear when using the setter", () => {
       expect.assertions(1);
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
-      expect(() => { entity.secretClear = 42; }).toThrow(EntityValidationError);
+      expect(() => {
+        entity.secretClear = 42;
+      }).toThrow(EntityValidationError);
     });
 
     it("should validate folderParentPath when using the setter", () => {
       expect.assertions(1);
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
-      expect(() => { entity.folderParentPath = 42; }).toThrow(EntityValidationError);
+      expect(() => {
+        entity.folderParentPath = 42;
+      }).toThrow(EntityValidationError);
     });
 
     it("should validate totp when using the setter", () => {
       expect.assertions(1);
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
-      expect(() => { entity.totp = defaultTotpDto(); }).toThrow(TypeError);
+      expect(() => {
+        entity.totp = defaultTotpDto();
+      }).toThrow(TypeError);
     });
 
     it("should validate secrets when using the setter", () => {
       expect.assertions(1);
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
-      expect(() => { entity.secrets = defaultResourcesSecretsDtos(); }).toThrow(TypeError);
+      expect(() => {
+        entity.secrets = defaultResourcesSecretsDtos();
+      }).toThrow(TypeError);
     });
 
     it("should validate customFields when using the setter", () => {
       expect.assertions(1);
 
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
-      expect(() => { entity.customFields = defaultCustomFieldsCollection(); }).toThrow(TypeError);
+      expect(() => {
+        entity.customFields = defaultCustomFieldsCollection();
+      }).toThrow(TypeError);
     });
   });
 

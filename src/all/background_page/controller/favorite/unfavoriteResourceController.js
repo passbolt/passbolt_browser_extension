@@ -13,7 +13,7 @@
  */
 
 import FavoriteResourceService from "../../service/favorite/favoriteResourceService";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 
 class UnfavoriteResourceController {
   /**
@@ -26,7 +26,7 @@ class UnfavoriteResourceController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.favoriteResourceService =  new FavoriteResourceService(apiClientOptions, account);
+    this.favoriteResourceService = new FavoriteResourceService(apiClientOptions, account);
   }
 
   /**
@@ -36,10 +36,10 @@ class UnfavoriteResourceController {
   async _exec() {
     try {
       const result = await this.exec.apply(this, arguments);
-      this.worker.port.emit(this.requestId, 'SUCCESS', result);
+      this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

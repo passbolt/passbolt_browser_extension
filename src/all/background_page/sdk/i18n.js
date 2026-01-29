@@ -27,21 +27,20 @@ class I18n {
    */
   static init(locale, locales) {
     _i18next = i18next.createInstance();
-    _i18next.use(HttpApi)
-      .init({
-        lng: locale,
-        load: 'currentOnly',
-        backend: {
-          loadPath: (lngs, namespaces) => I18n.getTranslationPath(lngs, namespaces)
-        },
-        supportedLngs: I18n.supportedLocales(locales),
-        fallbackLng: false,
-        ns: ['common'],
-        defaultNS: 'common',
-        keySeparator: false, // don't use the dot for separator of nested json object
-        nsSeparator: false, // allowed ':' in key to avoid namespace separator
-        debug: false,
-      });
+    _i18next.use(HttpApi).init({
+      lng: locale,
+      load: "currentOnly",
+      backend: {
+        loadPath: (lngs, namespaces) => I18n.getTranslationPath(lngs, namespaces),
+      },
+      supportedLngs: I18n.supportedLocales(locales),
+      fallbackLng: false,
+      ns: ["common"],
+      defaultNS: "common",
+      keySeparator: false, // don't use the dot for separator of nested json object
+      nsSeparator: false, // allowed ':' in key to avoid namespace separator
+      debug: false,
+    });
   }
 
   /**
@@ -61,11 +60,9 @@ class I18n {
     const lng = lngs[0];
     const ns = namespaces[0];
     //i18next is doing a fallback on en-GB we are redirecting to our en-UK folder
-    const actualLng = lng === 'en-GB' ? 'en-UK' : lng;
-    const basePath = '/locales/{{lng}}/{{ns}}.json';
-    return basePath
-      .replace('{{lng}}', actualLng)
-      .replace('{{ns}}', ns);
+    const actualLng = lng === "en-GB" ? "en-UK" : lng;
+    const basePath = "/locales/{{lng}}/{{ns}}.json";
+    return basePath.replace("{{lng}}", actualLng).replace("{{ns}}", ns);
   }
 
   /**
@@ -81,12 +78,11 @@ class I18n {
    * @returns {array<string>} The locales with fallback locales added
    */
   static supportedLocales(locales) {
-    if (locales.includes('en-UK')) {
-      locales.push('en-GB'); //Need to add the locale to support i18next fallback as en-UK is not supported
+    if (locales.includes("en-UK")) {
+      locales.push("en-GB"); //Need to add the locale to support i18next fallback as en-UK is not supported
     }
     return locales;
   }
-
 
   /**
    * Initialize the library with the default locale.

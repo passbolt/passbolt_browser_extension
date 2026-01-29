@@ -12,17 +12,17 @@
  * @since         4.0.0
  */
 
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 
 const APPLICATION_ALLOWED = {
-  "RecoverBootstrap": ["Recover"],
-  "SetupBootstrap": ["Setup", "FileIframe"],
-  "AuthBootstrap": ["Auth"],
-  "AppBootstrap": ["App", "FileIframe"],
-  "AccountRecoveryBootstrap": ["AccountRecovery", "FileIframe"],
-  "WebIntegration": ["InFormCallToAction", "InFormMenu"],
+  RecoverBootstrap: ["Recover"],
+  SetupBootstrap: ["Setup", "FileIframe"],
+  AuthBootstrap: ["Auth"],
+  AppBootstrap: ["App", "FileIframe"],
+  AccountRecoveryBootstrap: ["AccountRecovery", "FileIframe"],
+  WebIntegration: ["InFormCallToAction", "InFormMenu"],
 };
 
 class GeneratePortIdController {
@@ -47,7 +47,7 @@ class GeneratePortIdController {
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -71,7 +71,7 @@ class GeneratePortIdController {
       name: applicationName,
       tabId: tab.id,
       frameId: null,
-      status: WorkerEntity.STATUS_WAITING_CONNECTION
+      status: WorkerEntity.STATUS_WAITING_CONNECTION,
     };
     await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
     return worker.id;

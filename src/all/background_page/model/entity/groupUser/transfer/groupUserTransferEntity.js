@@ -22,21 +22,21 @@ class GroupUserTransferEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
+      type: "object",
+      required: [
         "id", // Group user id
         "group_id", // Group ID
       ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
+      properties: {
+        id: {
+          type: "string",
+          format: "uuid",
         },
-        "group_id": {
-          "type": "string",
-          "format": "uuid"
+        group_id: {
+          type: "string",
+          format: "uuid",
         },
-      }
+      },
     };
   }
 }

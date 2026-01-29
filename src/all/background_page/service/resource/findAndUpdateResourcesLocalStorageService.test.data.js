@@ -14,24 +14,24 @@
 
 import {
   defaultResourceDto,
-  resourceLegacyDto, resourceStandaloneTotpDto, resourceWithTotpDto
+  resourceLegacyDto,
+  resourceStandaloneTotpDto,
+  resourceWithTotpDto,
 } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 
 /**
  * Build an array of resources containing only a single resource.
  * @returns {array}
  */
-export const singleResourceDtos = () => [
-  defaultResourceDto({name: "Resource1"}, {withTags: true}),
-];
+export const singleResourceDtos = () => [defaultResourceDto({ name: "Resource1" }, { withTags: true })];
 
 /**
  * Build an array of resources containing multiple resources.
  * @returns {array}
  */
 export const multipleResourceDtos = () => [
-  resourceLegacyDto({name: "Resource0"}, {withTags: true}),
-  defaultResourceDto({name: "Resource1"}, {withTags: true}),
-  resourceWithTotpDto({name: "Resource2"}, {withTags: true}),
-  resourceStandaloneTotpDto({name: "Resource3"}, {withTags: true}),
+  resourceLegacyDto({ name: "Resource0" }, { withTags: true }),
+  defaultResourceDto({ name: "Resource1" }, { withTags: true }),
+  resourceWithTotpDto({ name: "Resource2" }, { withTags: true }),
+  resourceStandaloneTotpDto({ name: "Resource3" }, { withTags: true }),
 ];

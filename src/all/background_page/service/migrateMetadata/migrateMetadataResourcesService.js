@@ -15,7 +15,7 @@ import ResourcesCollection from "../../model/entity/resource/resourcesCollection
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import MigrateMetadataResourcesApiService from "../api/migrateMetadata/migrateMetadataResourcesApiService";
 import EncryptMetadataService from "../metadata/encryptMetadataService";
-import {V4_TO_V5_RESOURCE_TYPE_MAPPING} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
+import { V4_TO_V5_RESOURCE_TYPE_MAPPING } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import i18n from "../../sdk/i18n";
 import PermissionEntity from "../../model/entity/permission/permissionEntity";
@@ -71,7 +71,7 @@ export default class MigrateMetadataResourcesService {
    * @returns {Promise<void>}
    * @public
    */
-  async migrate(migrateMetadataEntity, passphrase, replayOptions = {count: 0}) {
+  async migrate(migrateMetadataEntity, passphrase, replayOptions = { count: 0 }) {
     await this._runReplayableProcess(() => this._migrateResources(migrateMetadataEntity, passphrase), replayOptions);
   }
 
@@ -96,7 +96,7 @@ export default class MigrateMetadataResourcesService {
       contains["permissions"] = true;
     }
 
-    this.progressService.finishStep(i18n.t('Retrieving resource types'));
+    this.progressService.finishStep(i18n.t("Retrieving resource types"));
     const resourceTypes = await this.resourceTypeModel.getOrFindAll();
     const resourceTypesMapping = this._computeResourceTypesMapping(resourceTypes);
 
@@ -105,15 +105,27 @@ export default class MigrateMetadataResourcesService {
     let v4ResourcesCollection = new ResourcesCollection(migrationDetailsPage.body);
 
     while (v4ResourcesCollection.length > 0) {
-      this.progressService.finishStep(i18n.t('Migrating resources metadata page {{number}}/{{totalPagesCount}}', {number: ++resourcePage, totalPagesCount: totalPagesCount}));
-      const v5ResourcesCollection = this._prepareResourcesCollectionForMetadataEncryption(v4ResourcesCollection, resourceTypesMapping);
+      this.progressService.finishStep(
+        i18n.t("Migrating resources metadata page {{number}}/{{totalPagesCount}}", {
+          number: ++resourcePage,
+          totalPagesCount: totalPagesCount,
+        }),
+      );
+      const v5ResourcesCollection = this._prepareResourcesCollectionForMetadataEncryption(
+        v4ResourcesCollection,
+        resourceTypesMapping,
+      );
       if (v5ResourcesCollection.length === 0) {
         // if we reach such a state, we might get stuck in an infinite loop as the API will serve again and again the same batch of resources that can't be migrated for some reasons.
         throw new Error("Unexpected empty resources collection to migrate");
       }
 
       await this.encryptMetadataService.encryptAllFromForeignModels(v5ResourcesCollection, passphrase);
-      migrationDetailsPage = await this.migrateMetadataResourcesApiService.migrate(v5ResourcesCollection, contains, filters);
+      migrationDetailsPage = await this.migrateMetadataResourcesApiService.migrate(
+        v5ResourcesCollection,
+        contains,
+        filters,
+      );
       v4ResourcesCollection = new ResourcesCollection(migrationDetailsPage.body);
     }
   }
@@ -126,7 +138,7 @@ export default class MigrateMetadataResourcesService {
    */
   _computeResourceTypesMapping(resourceTypes) {
     const map = {};
-    const v4ResourceTypes = resourceTypes.items.filter(rt => rt.isV4());
+    const v4ResourceTypes = resourceTypes.items.filter((rt) => rt.isV4());
     for (let i = 0; i < v4ResourceTypes.length; i++) {
       const v4ResourceType = v4ResourceTypes[i];
 

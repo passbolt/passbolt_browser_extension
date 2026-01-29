@@ -103,13 +103,13 @@ class TagModel {
     const chunks = splitBySize(resourcesIds, BULK_OPERATION_SIZE);
     for (const chunkIndex in chunks) {
       const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async(resourceId, mapIndex) => {
-        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
+      const promises = chunk.map(async (resourceId, mapIndex) => {
+        const collectionIndex = chunkIndex * BULK_OPERATION_SIZE + mapIndex;
         return this._bulkTagResources_tagResource(resourceId, tagsCollection, collectionIndex, callbacks);
       });
 
       const bulkPromises = await Promise.allSettled(promises);
-      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
+      const intermediateResult = bulkPromises.map((promiseResult) => promiseResult.value);
       tagCollections = [...tagCollections, ...intermediateResult];
     }
 
@@ -132,7 +132,7 @@ class TagModel {
 
     try {
       const resourceEntity = await this.resourceModel.getById(resourceId);
-      const updatedTagCollection = new TagsCollection([...tagsCollection.tags, ...resourceEntity.tags || []]);
+      const updatedTagCollection = new TagsCollection([...tagsCollection.tags, ...(resourceEntity.tags || [])]);
       const tagsDto = await this.tagService.updateResourceTags(resourceId, updatedTagCollection.toDto());
       const updatedTagsCollection = new TagsCollection(tagsDto);
       successCallback(updatedTagsCollection, collectionIndex);

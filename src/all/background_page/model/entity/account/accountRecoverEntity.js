@@ -17,7 +17,6 @@ import AuthenticationTokenEntity from "../authenticationToken/authenticationToke
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 
-
 const ENTITY_NAME = "AccountRecover";
 const TYPE_ACCOUNT_RECOVER = "account-recover";
 
@@ -28,19 +27,21 @@ class AccountRecoverEntity extends AbstractAccountEntity {
   constructor(accountRecoverDto, options = {}) {
     AccountRecoverEntity.marshal(accountRecoverDto);
 
-    super(EntitySchema.validate(
-      AccountRecoverEntity.ENTITY_NAME,
-      accountRecoverDto,
-      AccountRecoverEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(AccountRecoverEntity.ENTITY_NAME, accountRecoverDto, AccountRecoverEntity.getSchema()),
+      options,
+    );
 
     // Recover account associations.
     if (this._props.account_recovery_user_setting) {
-      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {clone: false});
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(
+        this._props.account_recovery_user_setting,
+        { clone: false },
+      );
       delete this._props.account_recovery_user_setting;
     }
     if (this._props.user) {
-      this._user = new UserEntity(this._props.user, {clone: false});
+      this._user = new UserEntity(this._props.user, { clone: false });
       delete this._props.user;
     }
   }
@@ -51,12 +52,9 @@ class AccountRecoverEntity extends AbstractAccountEntity {
    * @return {Object}
    */
   static marshal(accountRecoverDto) {
-    Object.assign(
-      accountRecoverDto,
-      {
-        type: AccountRecoverEntity.TYPE_ACCOUNT_RECOVER
-      }
-    );
+    Object.assign(accountRecoverDto, {
+      type: AccountRecoverEntity.TYPE_ACCOUNT_RECOVER,
+    });
   }
 
   /**
@@ -67,23 +65,18 @@ class AccountRecoverEntity extends AbstractAccountEntity {
     const abstractAccountEntitySchema = AbstractAccountEntity.getSchema();
     const authenticationTokenSchema = AuthenticationTokenEntity.getSchema();
     return {
-      "type": "object",
-      "required": [
-        "type",
-        "domain",
-        "user_id",
-        "authentication_token_token"
-      ],
-      "properties": {
-        ... abstractAccountEntitySchema.properties,
-        "type": {
-          "type": "string",
-          "pattern": `^${AccountRecoverEntity.TYPE_ACCOUNT_RECOVER}$`,
+      type: "object",
+      required: ["type", "domain", "user_id", "authentication_token_token"],
+      properties: {
+        ...abstractAccountEntitySchema.properties,
+        type: {
+          type: "string",
+          pattern: `^${AccountRecoverEntity.TYPE_ACCOUNT_RECOVER}$`,
         },
-        "authentication_token_token": authenticationTokenSchema.properties.token,
+        authentication_token_token: authenticationTokenSchema.properties.token,
         // @todo refactoring-account-recovery check if it's necessary on the react and in the bp
-        "user": UserEntity.getSchema(),
-      }
+        user: UserEntity.getSchema(),
+      },
     };
   }
 
@@ -119,7 +112,9 @@ class AccountRecoverEntity extends AbstractAccountEntity {
       result.security_token = this.securityToken.toDto();
     }
     if (contains.account_recovery_user_setting && this.accountRecoveryUserSetting) {
-      result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS);
+      result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto(
+        AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS,
+      );
     }
     if (contains.user && this._user) {
       result.user = this._user.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
@@ -136,17 +131,17 @@ class AccountRecoverEntity extends AbstractAccountEntity {
     return {
       //@deprecated since v3.6.0: the expected format is authentication_token.
       authenticationtoken: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
       authentication_token: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
       gpgkey: {
-        armored_key: this.userPublicArmoredKey
+        armored_key: this.userPublicArmoredKey,
       },
       //@deprecated since v3.6.0: the `locale` field is now on the root object.
       user: {
-        locale: this.locale
+        locale: this.locale,
       },
       locale: this.locale,
     };
@@ -159,7 +154,7 @@ class AccountRecoverEntity extends AbstractAccountEntity {
   toAbortRecoverDto() {
     return {
       authentication_token: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
     };
   }
@@ -171,11 +166,11 @@ class AccountRecoverEntity extends AbstractAccountEntity {
   toAccountRecoveryRequestDto() {
     return {
       authentication_token: {
-        token: this.authenticationTokenToken
+        token: this.authenticationTokenToken,
       },
       fingerprint: this.userKeyFingerprint,
       user_id: this.userId,
-      armored_key: this.userPublicArmoredKey
+      armored_key: this.userPublicArmoredKey,
     };
   }
 
@@ -220,7 +215,7 @@ class AccountRecoverEntity extends AbstractAccountEntity {
    */
   set user(user) {
     if (!user || !(user instanceof UserEntity)) {
-      throw new TypeError('Failed to assert the parameter is a valid UserEntity');
+      throw new TypeError("Failed to assert the parameter is a valid UserEntity");
     }
     this._user = user;
   }
@@ -248,7 +243,7 @@ class AccountRecoverEntity extends AbstractAccountEntity {
       security_token: true,
       authentication_token_token: true,
       account_recovery_user_setting: true,
-      user: true
+      user: true,
     };
   }
 

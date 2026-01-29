@@ -16,9 +16,9 @@ import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstr
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
-const ENTITY_NAME = 'PasswordExpiryResources';
+const ENTITY_NAME = "PasswordExpiryResources";
 
-const RULE_UNIQUE_ID = 'unique_id';
+const RULE_UNIQUE_ID = "unique_id";
 
 class PasswordExpiryResourcesCollection extends EntityCollection {
   /**
@@ -26,18 +26,21 @@ class PasswordExpiryResourcesCollection extends EntityCollection {
    * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
   constructor(passwordExpiryResourcesCollectionDto, options = {}) {
-    super(EntitySchema.validate(
-      PasswordExpiryResourcesCollection.ENTITY_NAME,
-      passwordExpiryResourcesCollectionDto,
-      PasswordExpiryResourcesCollection.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(
+        PasswordExpiryResourcesCollection.ENTITY_NAME,
+        passwordExpiryResourcesCollectionDto,
+        PasswordExpiryResourcesCollection.getSchema(),
+      ),
+      options,
+    );
 
     /*
      * Note: there is no "multi-item" validation
      * Collection validation will fail at the first item that doesn't validate
      */
-    this._props.forEach(passwordExpiryResources => {
-      this.push(new PasswordExpiryResourceEntity(passwordExpiryResources, {clone: false}));
+    this._props.forEach((passwordExpiryResources) => {
+      this.push(new PasswordExpiryResourceEntity(passwordExpiryResources, { clone: false }));
     });
 
     // We do not keep original props
@@ -51,8 +54,8 @@ class PasswordExpiryResourcesCollection extends EntityCollection {
    */
   static getSchema() {
     return {
-      "type": "array",
-      "items": PasswordExpiryResourceEntity.getSchema(),
+      type: "array",
+      items: PasswordExpiryResourceEntity.getSchema(),
     };
   }
 
@@ -84,7 +87,11 @@ class PasswordExpiryResourcesCollection extends EntityCollection {
     for (; i < length; i++) {
       const existingPasswordExpiryResource = this.passwordExpiryResources[i];
       if (existingPasswordExpiryResource.id && existingPasswordExpiryResource.id === passwordExpiryResourcesEntity.id) {
-        throw new EntityCollectionError(i, PasswordExpiryResourcesCollection.RULE_UNIQUE_ID, `PasswordExpiryResource id ${passwordExpiryResourcesEntity.id} already exists.`);
+        throw new EntityCollectionError(
+          i,
+          PasswordExpiryResourcesCollection.RULE_UNIQUE_ID,
+          `PasswordExpiryResource id ${passwordExpiryResourcesEntity.id} already exists.`,
+        );
       }
     }
   }
@@ -99,8 +106,8 @@ class PasswordExpiryResourcesCollection extends EntityCollection {
    * @param {object} passwordExpiryResource DTO or PasswordExpiryResourceEntity
    */
   push(passwordExpiryResource) {
-    if (!passwordExpiryResource || typeof passwordExpiryResource !== 'object') {
-      throw new TypeError('PasswordExpiryResourcesCollection push parameter should be an object.');
+    if (!passwordExpiryResource || typeof passwordExpiryResource !== "object") {
+      throw new TypeError("PasswordExpiryResourcesCollection push parameter should be an object.");
     }
     if (passwordExpiryResource instanceof PasswordExpiryResourceEntity) {
       passwordExpiryResource = passwordExpiryResource.toDto(); // deep clone
@@ -118,7 +125,7 @@ class PasswordExpiryResourcesCollection extends EntityCollection {
    * @param passwordExpiryResourcesId
    */
   remove(passwordExpiryResourcesId) {
-    const i = this.items.findIndex(item => item.id === passwordExpiryResourcesId);
+    const i = this.items.findIndex((item) => item.id === passwordExpiryResourcesId);
     this.items.splice(i, 1);
   }
 

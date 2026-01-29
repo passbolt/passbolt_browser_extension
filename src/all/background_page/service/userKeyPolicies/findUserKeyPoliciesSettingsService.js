@@ -12,7 +12,7 @@
  * @since         5.1.1
  */
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
-import {assertUuid} from "../../utils/assertions";
+import { assertUuid } from "../../utils/assertions";
 import UserKeyPoliciesSettingsApiService from "../api/userKeyPolicies/userKeyPoliciesSettingsApiService";
 import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
 

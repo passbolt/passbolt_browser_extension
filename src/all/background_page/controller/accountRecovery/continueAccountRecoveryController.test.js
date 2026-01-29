@@ -12,14 +12,14 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import ContinueAccountRecoveryController from "./continueAccountRecoveryController";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
-import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
+import { defaultAccountAccountRecoveryDto } from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
 import WorkerService from "../../service/worker/workerService";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
@@ -28,17 +28,24 @@ beforeEach(() => {
 
 describe("ContinueAccountRecoveryController", () => {
   describe("ContinueAccountRecoveryController::exec", () => {
-    it("Should continue the account recovery if the user can continue.", async() => {
+    it("Should continue the account recovery if the user can continue.", async () => {
       const workerId = uuidv4();
-      const mockedWorker = {tab: {id: "tabID"}, port: {_port: {name: workerId}}};
+      const mockedWorker = { tab: { id: "tabID" }, port: { _port: { name: workerId } } };
       const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
 
       // Mock API fetch account recovery requests response.
-      const url = new RegExp(`/account-recovery/continue/${accountRecovery.userId}/${accountRecovery.authenticationTokenToken}.json`);
+      const url = new RegExp(
+        `/account-recovery/continue/${accountRecovery.userId}/${accountRecovery.authenticationTokenToken}.json`,
+      );
       fetch.doMockIf(url, () => mockApiResponse());
       jest.spyOn(AccountTemporarySessionStorageService, "set");
 
-      const controller = new ContinueAccountRecoveryController(mockedWorker, null, defaultApiClientOptions(), accountRecovery);
+      const controller = new ContinueAccountRecoveryController(
+        mockedWorker,
+        null,
+        defaultApiClientOptions(),
+        accountRecovery,
+      );
       const promise = controller.exec();
 
       expect.assertions(2);
@@ -46,28 +53,37 @@ describe("ContinueAccountRecoveryController", () => {
       await expect(AccountTemporarySessionStorageService.set).toHaveBeenCalledTimes(1);
     });
 
-    it("Should not continue the account recovery if the API return an error.", async() => {
+    it("Should not continue the account recovery if the API return an error.", async () => {
       const workerId = uuidv4();
-      const mockedWorker = {tab: {id: "tabID"}, port: {_port: {name: workerId}}};
+      const mockedWorker = { tab: { id: "tabID" }, port: { _port: { name: workerId } } };
       const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
 
       // Mock API fetch account recovery requests response.
-      const url = new RegExp(`/account-recovery/continue/${accountRecovery.userId}/${accountRecovery.authenticationTokenToken}.json`);
+      const url = new RegExp(
+        `/account-recovery/continue/${accountRecovery.userId}/${accountRecovery.authenticationTokenToken}.json`,
+      );
       fetch.doMockIf(url, () => Promise.reject(new Error("Unable to reach the server, an unexpected error occurred")));
       // Mock Worker to assert error handler.
       const mockedBootstrapAccountRecoveryWorkerPortEmit = jest.fn();
       WorkerService.get = jest.fn(() => ({
         port: {
-          emit: mockedBootstrapAccountRecoveryWorkerPortEmit
-        }
+          emit: mockedBootstrapAccountRecoveryWorkerPortEmit,
+        },
       }));
 
-      const controller = new ContinueAccountRecoveryController(mockedWorker, null, defaultApiClientOptions(), accountRecovery);
+      const controller = new ContinueAccountRecoveryController(
+        mockedWorker,
+        null,
+        defaultApiClientOptions(),
+        accountRecovery,
+      );
       const promise = controller.exec();
 
       expect.assertions(2);
       await expect(promise).rejects.toThrowError("Unable to reach the server, an unexpected error occurred");
-      expect(mockedBootstrapAccountRecoveryWorkerPortEmit).toHaveBeenCalledWith("passbolt.account-recovery-bootstrap.remove-iframe");
+      expect(mockedBootstrapAccountRecoveryWorkerPortEmit).toHaveBeenCalledWith(
+        "passbolt.account-recovery-bootstrap.remove-iframe",
+      );
     });
   });
 });

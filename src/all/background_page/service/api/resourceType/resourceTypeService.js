@@ -13,9 +13,9 @@
 import AbstractService from "../abstract/abstractService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import {assertUuid} from "../../../utils/assertions";
+import { assertUuid } from "../../../utils/assertions";
 
-const RESOURCE_TYPES_SERVICE_RESOURCE_NAME = 'resource-types';
+const RESOURCE_TYPES_SERVICE_RESOURCE_NAME = "resource-types";
 
 class ResourceTypeService extends AbstractService {
   /**
@@ -44,9 +44,7 @@ class ResourceTypeService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedContainOptions() {
-    return [
-      'resources_count',
-    ];
+    return ["resources_count"];
   }
 
   /**
@@ -55,9 +53,7 @@ class ResourceTypeService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedFiltersOptions() {
-    return [
-      'is-deleted',
-    ];
+    return ["is-deleted"];
   }
 
   /**
@@ -70,7 +66,7 @@ class ResourceTypeService extends AbstractService {
   async findAll(contain = {}, filters = {}) {
     contain = filters ? this.formatContainOptions(contain, ResourceTypeService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(filters, ResourceTypeService.getSupportedFiltersOptions()) : null;
-    const options = {...contain, ...filters};
+    const options = { ...contain, ...filters };
 
     const response = new PassboltResponseEntity(await this.apiClient.findAll(options));
     return response.body;
@@ -83,8 +79,8 @@ class ResourceTypeService extends AbstractService {
    * @public
    */
   async findAllByDeletedAndNonDeleted() {
-    const contain = {resources_count: true};
-    const deletedResourcesType = await this.findAll(contain, {['is-deleted']: true});
+    const contain = { resources_count: true };
+    const deletedResourcesType = await this.findAll(contain, { ["is-deleted"]: true });
     const activeResourcesType = await this.findAll(contain);
 
     return new ResourceTypesCollection([...activeResourcesType, ...deletedResourcesType]);
@@ -98,7 +94,7 @@ class ResourceTypeService extends AbstractService {
    */
   async undelete(id) {
     assertUuid(id, "The id of the resource type to activate should be a valid uuid.");
-    const body = {deleted: null};
+    const body = { deleted: null };
     const response = await this.apiClient.update(id, body);
     return new PassboltResponseEntity(response);
   }

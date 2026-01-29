@@ -12,12 +12,12 @@
  * @since         4.7.0
  */
 import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
-import {temporarySetupAccountDto} from "../../model/entity/account/accountTemporaryEntity.test.data";
+import { temporarySetupAccountDto } from "../../model/entity/account/accountTemporaryEntity.test.data";
 import AccountTemporarySessionStorageService from "../sessionStorage/accountTemporarySessionStorageService";
 import FindAccountTemporaryService from "./findAccountTemporaryService";
 
 describe("FindAccountTemporaryService", () => {
-  it("FindAccountTemporaryService:exec", async() => {
+  it("FindAccountTemporaryService:exec", async () => {
     expect.assertions(1);
     // data
     const accountTemporaryEntity = new AccountTemporaryEntity(temporarySetupAccountDto());
@@ -28,7 +28,7 @@ describe("FindAccountTemporaryService", () => {
     expect(temporaryAccount).not.toBeNull();
   });
 
-  it("FindAccountTemporaryService:exec with workerId unknown", async() => {
+  it("FindAccountTemporaryService:exec with workerId unknown", async () => {
     expect.assertions(1);
     // execution
     try {

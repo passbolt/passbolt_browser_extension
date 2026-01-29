@@ -16,7 +16,6 @@ import PermissionTransfersCollection from "../../permission/transfer/permissionT
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
-
 class UserDeleteTransferEntity extends EntityV2 {
   /**
    * @inheritDoc
@@ -26,11 +25,11 @@ class UserDeleteTransferEntity extends EntityV2 {
 
     // Association
     if (this._props.owners) {
-      this._owners = new PermissionTransfersCollection(this._props.owners, {clone: false});
+      this._owners = new PermissionTransfersCollection(this._props.owners, { clone: false });
       delete this._props.owners;
     }
     if (this._props.managers) {
-      this._managers = new GroupUserTransfersCollection(this._props.managers, {clone: false});
+      this._managers = new GroupUserTransfersCollection(this._props.managers, { clone: false });
       delete this._props.managers;
     }
   }
@@ -51,12 +50,12 @@ class UserDeleteTransferEntity extends EntityV2 {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "owners": PermissionTransfersCollection.getSchema(),
-        "managers": GroupUserTransfersCollection.getSchema()
-      }
+      type: "object",
+      required: [],
+      properties: {
+        owners: PermissionTransfersCollection.getSchema(),
+        managers: GroupUserTransfersCollection.getSchema(),
+      },
     };
   }
 

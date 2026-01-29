@@ -18,7 +18,7 @@ import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService
 jest.useFakeTimers();
 
 // Reset the modules before each test.
-beforeEach(async() => {
+beforeEach(async () => {
   jest.resetModules();
   jest.clearAllMocks();
   jest.clearAllTimers();
@@ -26,15 +26,19 @@ beforeEach(async() => {
 });
 
 describe("StartLoopAuthSessionCheckService", () => {
-  it("should trigger a check authentication and clear alarm on logout", async() => {
+  it("should trigger a check authentication and clear alarm on logout", async () => {
     expect.assertions(7);
     // Function mocked
     const spyClearAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
-    const authStatus = {isAuthenticated: true, isMfaRequired: false};
-    const spyIsAuthenticated = jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
+    const authStatus = { isAuthenticated: true, isMfaRequired: false };
+    const spyIsAuthenticated = jest
+      .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
+      .mockImplementation(() => Promise.resolve(authStatus));
 
     //mocking top-level alarm handler
-    browser.alarms.onAlarm.addListener(async alarm => await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm(alarm));
+    browser.alarms.onAlarm.addListener(
+      async (alarm) => await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm(alarm),
+    );
 
     // Process
     await StartLoopAuthSessionCheckService.exec();
@@ -54,16 +58,20 @@ describe("StartLoopAuthSessionCheckService", () => {
     expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(1);
   });
 
-  it("should send logout event if not authenticated anymore", async() => {
+  it("should send logout event if not authenticated anymore", async () => {
     expect.assertions(4);
     // Function mocked
     const spyClearAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
-    const authStatus = {isAuthenticated: false, isMfaRequired: false};
-    const spyIsAuthenticated = jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
-    const spyOnPostLogout = jest.spyOn(PostLogoutService, "exec").mockImplementation(async() => {});
+    const authStatus = { isAuthenticated: false, isMfaRequired: false };
+    const spyIsAuthenticated = jest
+      .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
+      .mockImplementation(() => Promise.resolve(authStatus));
+    const spyOnPostLogout = jest.spyOn(PostLogoutService, "exec").mockImplementation(async () => {});
 
     //mocking top-level alarm handler
-    browser.alarms.onAlarm.addListener(async alarm => await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm(alarm));
+    browser.alarms.onAlarm.addListener(
+      async (alarm) => await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm(alarm),
+    );
 
     // Process
     await StartLoopAuthSessionCheckService.exec();

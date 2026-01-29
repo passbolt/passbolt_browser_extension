@@ -12,25 +12,22 @@
  * @since         4.10.1
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import FindSessionKeysService from "./findSessionKeysService";
-import {mockApiResponseError} from "passbolt-styleguide/test/mocks/mockApiResponse";
+import { mockApiResponseError } from "passbolt-styleguide/test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import {
-  defaultSessionKeysBundlesDtos
-} from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection.test.data";
-import SessionKeysBundlesCollection
-  from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { defaultSessionKeysBundlesDtos } from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection.test.data";
+import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
 
 describe("FindSessionKeysService", () => {
   let apiClientOptions, account;
-  beforeEach(async() => {
+  beforeEach(async () => {
     enableFetchMocks();
     fetch.resetMocks();
     jest.clearAllMocks();
@@ -38,8 +35,8 @@ describe("FindSessionKeysService", () => {
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
   });
 
-  describe('::findAllBundles', () => {
-    it("retrieves the session keys bundles from API", async() => {
+  describe("::findAllBundles", () => {
+    it("retrieves the session keys bundles from API", async () => {
       expect.assertions(5);
 
       const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
@@ -59,25 +56,30 @@ describe("FindSessionKeysService", () => {
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
 
-    it("does not retrieve the passphrase from the session storage if passed as parameter", async() => {
+    it("does not retrieve the passphrase from the session storage if passed as parameter", async () => {
       expect.assertions(1);
       const apiSessionKeysBundlesCollection = defaultSessionKeysBundlesDtos();
 
       const service = new FindSessionKeysService(apiClientOptions, account);
       jest.spyOn(PassphraseStorageService, "get");
-      jest.spyOn(service.sesionKeysBundlesApiService, "findAll").mockImplementation(() => apiSessionKeysBundlesCollection);
+      jest
+        .spyOn(service.sesionKeysBundlesApiService, "findAll")
+        .mockImplementation(() => apiSessionKeysBundlesCollection);
       await service.findAllBundles(pgpKeys.ada.passphrase);
 
       expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
-    it("throws an error if the keys from the API is already decrypted", async() => {
+    it("throws an error if the keys from the API is already decrypted", async () => {
       expect.assertions(1);
 
       const spyOnPassphraseStorage = jest.spyOn(PassphraseStorageService, "get");
       spyOnPassphraseStorage.mockImplementation(() => pgpKeys.ada.passphrase);
 
-      const apiSessionKeysBundlesCollection = defaultSessionKeysBundlesDtos({}, {withDecryptedSessionKeysBundle: true});
+      const apiSessionKeysBundlesCollection = defaultSessionKeysBundlesDtos(
+        {},
+        { withDecryptedSessionKeysBundle: true },
+      );
 
       const service = new FindSessionKeysService(apiClientOptions, account);
       const spyOnFindService = jest.spyOn(service.sesionKeysBundlesApiService, "findAll");
@@ -87,7 +89,7 @@ describe("FindSessionKeysService", () => {
       await expect(() => service.findAllBundles()).rejects.toThrow(expectedError);
     });
 
-    it("throws API error if the API encountered an issue", async() => {
+    it("throws API error if the API encountered an issue", async () => {
       expect.assertions(1);
       fetch.doMockOnceIf(/metadata\/session-keys/, () => mockApiResponseError(500, "Something wrong happened!"));
 
@@ -96,9 +98,11 @@ describe("FindSessionKeysService", () => {
       await expect(() => service.findAllBundles()).rejects.toThrow(PassboltApiFetchError);
     });
 
-    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async() => {
+    it("throws service unavailable error if an error occurred but not from the API (by instance cloudflare)", async () => {
       expect.assertions(1);
-      fetch.doMockOnceIf(/metadata\/session-keys/, () => { throw new Error("Service unavailable"); });
+      fetch.doMockOnceIf(/metadata\/session-keys/, () => {
+        throw new Error("Service unavailable");
+      });
 
       const service = new FindSessionKeysService(apiClientOptions, account);
 

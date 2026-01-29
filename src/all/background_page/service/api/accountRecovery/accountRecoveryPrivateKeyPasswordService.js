@@ -13,7 +13,7 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const ACCOUNT_RECOVERY_PRIVATE_KEY_PASSWORD_RESOURCE_NAME = '/account-recovery/private-key-passwords';
+const ACCOUNT_RECOVERY_PRIVATE_KEY_PASSWORD_RESOURCE_NAME = "/account-recovery/private-key-passwords";
 
 class AccountRecoveryPrivateKeyPasswordService extends AbstractService {
   /**
@@ -49,4 +49,4 @@ class AccountRecoveryPrivateKeyPasswordService extends AbstractService {
   }
 }
 
-export default  AccountRecoveryPrivateKeyPasswordService;
+export default AccountRecoveryPrivateKeyPasswordService;

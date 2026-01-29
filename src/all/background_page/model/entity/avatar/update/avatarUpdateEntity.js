@@ -15,8 +15,7 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import Base64Utils from "../../../../utils/format/base64";
 
-
-const ENTITY_NAME = 'AvatarUpdate';
+const ENTITY_NAME = "AvatarUpdate";
 
 class AvatarUpdateEntity extends Entity {
   /**
@@ -25,11 +24,10 @@ class AvatarUpdateEntity extends Entity {
    * cloning process. Doesn't embed this entity into another one for this reason.
    */
   constructor(avatarUpdateDto, options = {}) {
-    super(EntitySchema.validate(
-      AvatarUpdateEntity.ENTITY_NAME,
-      avatarUpdateDto,
-      AvatarUpdateEntity.getSchema()
-    ), options);
+    super(
+      EntitySchema.validate(AvatarUpdateEntity.ENTITY_NAME, avatarUpdateDto, AvatarUpdateEntity.getSchema()),
+      options,
+    );
     // The default behavior of the constructor is to serialize/unserialize the props to ensure a deep copy, it doesn't work with Blob.
     this.file = avatarUpdateDto.file;
   }
@@ -41,14 +39,14 @@ class AvatarUpdateEntity extends Entity {
    * @return {AvatarUpdateEntity}
    */
   static createFromFileBase64(avatarBase64UpdateDto) {
-    if (!avatarBase64UpdateDto || typeof avatarBase64UpdateDto !== 'object') {
+    if (!avatarBase64UpdateDto || typeof avatarBase64UpdateDto !== "object") {
       throw new TypeError(`AvatarUpdateEntity createFromFileBase64 parameter should be an object.`);
     }
     const filename = avatarBase64UpdateDto.filename;
     const fileBase64 = avatarBase64UpdateDto.fileBase64;
     const mimeType = avatarBase64UpdateDto.mimeType;
     const file = Base64Utils.base64ToBlob(fileBase64, mimeType);
-    const avatarUpdateDto = {file: file, filename: filename, mimeType: mimeType};
+    const avatarUpdateDto = { file: file, filename: filename, mimeType: mimeType };
     return new AvatarUpdateEntity(avatarUpdateDto);
   }
 
@@ -58,23 +56,19 @@ class AvatarUpdateEntity extends Entity {
    */
   static getSchema() {
     return {
-      "type": "object",
-      "required": [
-        "file",
-        "filename",
-        "mime"
-      ],
-      "properties": {
-        "file": {
-          "type": "blob"
+      type: "object",
+      required: ["file", "filename", "mime"],
+      properties: {
+        file: {
+          type: "blob",
         },
-        "filename": {
-          "type": "string"
+        filename: {
+          type: "string",
         },
-        "mimeType": {
-          "type": "string"
-        }
-      }
+        mimeType: {
+          type: "string",
+        },
+      },
     };
   }
 

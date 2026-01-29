@@ -12,12 +12,12 @@
  * @since         3.6.0
  */
 
-import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import GetOrganizationPolicyController from "./getOrganizationPolicyController";
-import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
+import { enabledAccountRecoveryOrganizationPolicyDto } from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe("GetOrganizationPolicyController", () => {
   describe("GetOrganizationPolicyController::exec", () => {
-    it("Should retrieve the account recovery organization policy.", async() => {
+    it("Should retrieve the account recovery organization policy.", async () => {
       // Mock API fetch account recovery organization policy response.
       const mockApiResult = enabledAccountRecoveryOrganizationPolicyDto();
       fetch.doMock(() => mockApiResponse(mockApiResult));
@@ -34,7 +34,9 @@ describe("GetOrganizationPolicyController", () => {
       const accountRecoveryOrganizationPolicy = await controller.exec();
 
       expect.assertions(1);
-      const accountRecoveryOrganizationPolicyDto = accountRecoveryOrganizationPolicy.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
+      const accountRecoveryOrganizationPolicyDto = accountRecoveryOrganizationPolicy.toDto(
+        AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS,
+      );
       await expect(accountRecoveryOrganizationPolicyDto).toEqual(mockApiResult);
     });
   });

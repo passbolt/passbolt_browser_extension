@@ -13,7 +13,7 @@
  */
 
 import FileService from "../../service/file/fileService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 class DownloadOrganizationGeneratedKey {
   /**
@@ -51,7 +51,12 @@ class DownloadOrganizationGeneratedKey {
     const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredPrivateKey);
     const keyId = privateKey.getKeyID().toHex().slice(8, 16);
     const date = new Date().toISOString().slice(0, 10);
-    await FileService.saveFile(`organization-recovery-private-key_${date}_${keyId}.asc`, armoredPrivateKey, "text/plain", this.worker.tab.id);
+    await FileService.saveFile(
+      `organization-recovery-private-key_${date}_${keyId}.asc`,
+      armoredPrivateKey,
+      "text/plain",
+      this.worker.tab.id,
+    );
   }
 }
 

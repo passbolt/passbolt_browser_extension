@@ -11,17 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.3.0
  */
-import {enableFetchMocks} from "jest-fetch-mock";
-import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
+import { enableFetchMocks } from "jest-fetch-mock";
+import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import Keyring from '../../model/keyring';
+import Keyring from "../../model/keyring";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
-import {v4 as uuidv4} from "uuid";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { v4 as uuidv4 } from "uuid";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import GetUserPrivateKeyController from "./getUserPrivateKeyController";
 import GpgKeyError from "../../error/GpgKeyError";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import { adminAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 const keyring = new Keyring();
 jest.mock("../../service/passphrase/getPassphraseService");
@@ -32,7 +32,7 @@ beforeAll(() => {
 
 describe("GetUserPrivateKeyController", () => {
   const account = new AccountEntity(adminAccountDto());
-  it(`Should return the user's armored encrypted private key`, async() => {
+  it(`Should return the user's armored encrypted private key`, async () => {
     expect.assertions(1);
     const userId = uuidv4();
     await MockExtension.withConfiguredAccount();
@@ -51,14 +51,14 @@ describe("GetUserPrivateKeyController", () => {
     expect(returnedKeyInfo.toDto()).toStrictEqual(adaKeyInfo.toDto());
   });
 
-  it(`Should throw an exception if the private key does not exist`, async() => {
+  it(`Should throw an exception if the private key does not exist`, async () => {
     expect.assertions(1);
     const controller = new GetUserPrivateKeyController(null, null, account);
 
     try {
       await controller.exec();
     } catch (error) {
-      expect(error).toStrictEqual(new GpgKeyError('Private key not found.'));
+      expect(error).toStrictEqual(new GpgKeyError("Private key not found."));
     }
   });
 });

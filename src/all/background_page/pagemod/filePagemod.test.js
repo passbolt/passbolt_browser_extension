@@ -14,35 +14,35 @@
 import FilePagemod from "./filePagemod";
 
 describe("FilePagemod", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
   describe("FilePagemod::attachEvents", () => {
-    it("Should attach events", async() => {
+    it("Should attach events", async () => {
       expect.assertions(3);
       // data mocked
       const port = {
         _port: {
           sender: {
             tab: {
-              url: "https://localhost"
-            }
-          }
-        }
+              url: "https://localhost",
+            },
+          },
+        },
       };
       // process
       await FilePagemod.attachEvents(port);
       // expectations
       expect(FilePagemod.events).toStrictEqual([]);
       expect(FilePagemod.mustReloadOnExtensionUpdate).toBeFalsy();
-      expect(FilePagemod.appName).toBe('FileIframe');
+      expect(FilePagemod.appName).toBe("FileIframe");
     });
   });
 
   describe("FilePagemod::canBeAttachedTo", () => {
-    it("Should have the canBeAttachedTo not valid", async() => {
+    it("Should have the canBeAttachedTo not valid", async () => {
       expect.assertions(1);
       // process
       const canBeAttachedTo = await FilePagemod.canBeAttachedTo({});

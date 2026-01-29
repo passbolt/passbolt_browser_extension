@@ -12,19 +12,20 @@
  * @since         4.12.0
  */
 
-import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import FindMetadataMigrateResourcesController from "./findMetadataMigrateResourcesController";
 import PassboltResponsePaginationHeaderEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponsePaginationHeaderEntity";
-import {defaultPassboltResponsePaginationHeaderDto} from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponsePaginationHeaderEntity.test.data";
+import { defaultPassboltResponsePaginationHeaderDto } from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponsePaginationHeaderEntity.test.data";
 
 describe("FindMetadataMigrateResourcesController", () => {
   describe("::exec", () => {
-    it("Find the resource migration details.", async() => {
+    it("Find the resource migration details.", async () => {
       expect.assertions(2);
 
       const controller = new FindMetadataMigrateResourcesController(null, null, defaultApiClientOptions());
 
-      jest.spyOn(controller.findMetadataMigrateResourcesService, "findMigrateDetails")
+      jest
+        .spyOn(controller.findMetadataMigrateResourcesService, "findMigrateDetails")
         .mockReturnValue(new PassboltResponsePaginationHeaderEntity(defaultPassboltResponsePaginationHeaderDto()));
 
       const result = await controller.exec();
@@ -33,14 +34,15 @@ describe("FindMetadataMigrateResourcesController", () => {
       expect(result).toBeInstanceOf(PassboltResponsePaginationHeaderEntity);
     });
 
-    it("should not catch the error and let it be thrown if any.", async() => {
+    it("should not catch the error and let it be thrown if any.", async () => {
       expect.assertions(1);
 
       const controller = new FindMetadataMigrateResourcesController(null, null, defaultApiClientOptions());
 
       const error = new Error("Something went wrong!");
-      jest.spyOn(controller.findMetadataMigrateResourcesService, "findMigrateDetails")
-        .mockImplementation(() => { throw error; });
+      jest.spyOn(controller.findMetadataMigrateResourcesService, "findMigrateDetails").mockImplementation(() => {
+        throw error;
+      });
 
       expect(() => controller.exec()).rejects.toStrictEqual(error);
     });

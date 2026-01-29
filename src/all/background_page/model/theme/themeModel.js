@@ -11,9 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import AccountSettingsService from "../../service/api/accountSettings/accountSettingsService";
-import {Config} from "../config";
+import { Config } from "../config";
 import ThemesCollection from "../entity/theme/themesCollection";
-
 
 class ThemeModel {
   /**
@@ -60,7 +59,7 @@ class ThemeModel {
    */
   async change(changeThemeEntity) {
     await this.accountSettingsService.updateTheme(changeThemeEntity.name);
-    Config.write('user.settings.theme', changeThemeEntity.name);
+    Config.write("user.settings.theme", changeThemeEntity.name);
   }
 }
 

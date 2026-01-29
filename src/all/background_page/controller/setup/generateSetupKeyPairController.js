@@ -14,11 +14,10 @@
 import GetGpgKeyCreationDateService from "../../service/crypto/getGpgKeyCreationDateService";
 import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
 import GenerateGpgKeyPairService from "../../service/crypto/generateGpgKeyPairService";
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
-import FindUserKeyPoliciesSettingsService
-  from "../../service/userKeyPolicies/findUserKeyPoliciesSettingsService";
+import FindUserKeyPoliciesSettingsService from "../../service/userKeyPolicies/findUserKeyPoliciesSettingsService";
 
 /**
  * @typedef {({passphrase: string})} GenerateKeyPairPassphraseDto
@@ -48,10 +47,10 @@ class GenerateSetupKeyPairController {
   async _exec(generateGpgKeyDto) {
     try {
       await this.exec(generateGpgKeyDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS');
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
@@ -87,7 +86,10 @@ class GenerateSetupKeyPairController {
   async _buildGenerateKeyPairOptionsEntity(passphrase) {
     const userId = this.temporaryAccount.account.userId;
     const authenticationToken = this.temporaryAccount.account.authenticationTokenToken;
-    const userKeyPoliciesSettings = await this.findUserKeyPoliciesSettingsService.findSettingsAsGuest(userId, authenticationToken);
+    const userKeyPoliciesSettings = await this.findUserKeyPoliciesSettingsService.findSettingsAsGuest(
+      userId,
+      authenticationToken,
+    );
 
     const generateKeyPairOptionsDto = {
       name: `${this.temporaryAccount.account.firstName} ${this.temporaryAccount.account.lastName}`,
@@ -96,7 +98,10 @@ class GenerateSetupKeyPairController {
       date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
     };
 
-    return GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(userKeyPoliciesSettings, generateKeyPairOptionsDto);
+    return GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(
+      userKeyPoliciesSettings,
+      generateKeyPairOptionsDto,
+    );
   }
 }
 

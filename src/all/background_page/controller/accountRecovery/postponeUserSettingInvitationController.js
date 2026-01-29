@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
+import PostponeUserSettingInvitationService from "../../service/invitation/postponeUserSettingInvitationService";
 
 class PostponeUserSettingInvitationController {
   /**
@@ -35,7 +35,7 @@ class PostponeUserSettingInvitationController {
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 

@@ -93,9 +93,9 @@ class SessionKeysBundlesSessionStorageService {
     if (collection.length > 0 && collection.hasSomeEncryptedSessionKeysBundles()) {
       throw new TypeError("The parameter `collection` should contain only decrypted keys.");
     }
-    await navigator.locks.request(this.storageKey, async() => {
+    await navigator.locks.request(this.storageKey, async () => {
       const sessionKeysBundlesDto = collection.toDto();
-      await this._setBrowserStorage({[this.storageKey]: sessionKeysBundlesDto});
+      await this._setBrowserStorage({ [this.storageKey]: sessionKeysBundlesDto });
       SessionKeysBundlesSessionStorageService._runtimeCachedData[this.account.id] = sessionKeysBundlesDto;
     });
   }

@@ -12,10 +12,10 @@
  * @since         5.3.2
  */
 
-import {SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER} from "../../../offscreens/service/clipboard/writeClipobardOffscreenService";
+import { SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER } from "../../../offscreens/service/clipboard/writeClipobardOffscreenService";
 
 export const defaultClipboardWriteResponseMessage = (message = {}) => ({
   id: crypto.randomUUID(),
   target: SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER,
-  ...message
+  ...message,
 });

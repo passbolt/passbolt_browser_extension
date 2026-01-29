@@ -14,8 +14,8 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ThemeEntity from "./themeEntity";
 import ThemesCollection from "./themesCollection";
-import {defaultThemeDto, midgarThemeDto} from "./themeEntity.test.data";
-import {defaultThemeCollectionDtos} from "./themesCollection.test.data";
+import { defaultThemeDto, midgarThemeDto } from "./themeEntity.test.data";
+import { defaultThemeCollectionDtos } from "./themesCollection.test.data";
 
 describe("ThemesCollection", () => {
   describe("::getSchema", () => {
@@ -66,8 +66,7 @@ describe("ThemesCollection", () => {
     it("should throw if the collection schema does not validate", () => {
       expect.assertions(1);
 
-      expect(() => new ThemesCollection({}))
-        .toThrowEntityValidationError("items");
+      expect(() => new ThemesCollection({})).toThrowEntityValidationError("items");
     });
 
     it("should, with enabling the ignore invalid option, ignore items which do not validate their schema", () => {
@@ -76,7 +75,7 @@ describe("ThemesCollection", () => {
       const dtos = [defaultThemeDto(), defaultThemeDto()];
       delete dtos[0].id;
 
-      const collection = new ThemesCollection(dtos, {ignoreInvalidEntity: true});
+      const collection = new ThemesCollection(dtos, { ignoreInvalidEntity: true });
       expect(collection.items).toHaveLength(1);
     });
 
@@ -84,10 +83,9 @@ describe("ThemesCollection", () => {
       expect.assertions(1);
 
       const dto1 = defaultThemeDto();
-      const dto2 = midgarThemeDto({id: dto1.id});
+      const dto2 = midgarThemeDto({ id: dto1.id });
 
-      expect(() => new ThemesCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("1.id.unique");
+      expect(() => new ThemesCollection([dto1, dto2])).toThrowCollectionValidationError("1.id.unique");
     });
 
     it("should throw if one of data item does not validate the unique id build rule", () => {
@@ -96,8 +94,7 @@ describe("ThemesCollection", () => {
       const dto1 = defaultThemeDto();
       const dto2 = defaultThemeDto();
 
-      expect(() => new ThemesCollection([dto1, dto2]))
-        .toThrowCollectionValidationError("1.name.unique");
+      expect(() => new ThemesCollection([dto1, dto2])).toThrowCollectionValidationError("1.name.unique");
     });
   });
 });

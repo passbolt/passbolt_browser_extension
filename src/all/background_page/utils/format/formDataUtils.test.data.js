@@ -44,3 +44,10 @@ export const formDataMixed = () => {
   formDataBody.append("blob", blob, "blob 1");
   return formDataBody;
 };
+
+export const formDataWithSpecialChars = () => {
+  const formData = new FormData();
+  formData.append("search query", "hello world");
+  formData.append("symbols", "a=1&b=2");
+  return formData;
+};

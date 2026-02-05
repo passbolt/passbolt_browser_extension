@@ -22,8 +22,8 @@ import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypeLocalStorage from "../local_storage/resourceTypeLocalStorage";
 import CheckAuthStatusService from "../auth/checkAuthStatusService";
-import { TabController as tabsController } from "../../controller/tabsController";
 import User from "../../../../all/background_page/model/user";
+import OpenWebsiteGettingStartedPageService from "../ui/openWebsiteGettingStartedPageService";
 
 jest.useFakeTimers();
 
@@ -221,15 +221,14 @@ describe("ToolbarService", () => {
 
   describe("handleIconToolbarClicked", () => {
     it("Given that no account is set on the local storage, a tab should be opened on the passbolt start URL.", async () => {
-      expect.assertions(2);
+      expect.assertions(1);
 
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => {});
-      jest.spyOn(tabsController, "open").mockImplementation(() => {});
+      jest.spyOn(OpenWebsiteGettingStartedPageService.prototype, "openTab").mockImplementation(() => {});
 
       toolbarService.handleIconToolbarClicked();
 
-      expect(tabsController.open).toHaveBeenCalledTimes(1);
-      expect(tabsController.open).toHaveBeenCalledWith("https://www.passbolt.com/start");
+      expect(OpenWebsiteGettingStartedPageService.prototype.openTab).toHaveBeenCalledTimes(1);
     });
 
     it("Given that an account is set on the local storage, the popup should be set with the right URL and the popup should be opened", async () => {

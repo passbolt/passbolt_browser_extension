@@ -25,14 +25,14 @@ describe("OpenTabController", () => {
 
       expect.assertions(1);
       await controller.exec("https://example.com");
-      expect(browser.tabs.create).toHaveBeenCalledWith({ url: "https://example.com" });
+      expect(browser.tabs.create).toHaveBeenCalledWith({ url: "https://example.com/" });
     });
 
     it("Should throw if the URL is not a valid URL format", async () => {
       const controller = new OpenTabController(null, null);
 
       expect.assertions(1);
-      await expect(controller.exec("not-a-valid-url")).rejects.toThrow("Cannot open tab due to an invalid URL");
+      await expect(controller.exec("not-a-valid-url")).rejects.toThrow("Cannot open an new tab due to an invalid URL");
     });
 
     it("Should throw if no URL is provided", async () => {

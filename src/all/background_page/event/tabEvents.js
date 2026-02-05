@@ -7,7 +7,8 @@
 import i18n from "../sdk/i18n";
 import CloseActiveTabController from "../controller/tab/closeActiveTabController";
 import BrowserTabService from "../service/ui/browserTab.service";
-import OpenTabController from "../controller/tab/openTabController";
+import OpenTrustedDomainTabController from "../controller/tab/openTrustedDomainTabController";
+import OpenWebsiteGettingStartedPageController from "../controller/tab/openWebsiteGettingStartedPageController";
 
 const listen = function (worker) {
   /*
@@ -39,13 +40,23 @@ const listen = function (worker) {
   });
 
   /**
-   * Opens a new tab given a URL.
+   * Opens the trusted domain in a new tab.
    * @param {string} requestId
-   * @listens passbolt.tabs.open
+   * @listens passbolt.tabs.open-trusted-domain
    */
-  worker.port.on("passbolt.tabs.open", async (requestId, url) => {
-    const controller = new OpenTabController(worker, requestId);
-    await controller._exec(url);
+  worker.port.on("passbolt.tabs.open-trusted-domain", async (requestId) => {
+    const controller = new OpenTrustedDomainTabController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Opens the Passbolt getting started page in a new tab.
+   * @param {string} requestId
+   * @listens passbolt.tabs.open-website-getting-started-page
+   */
+  worker.port.on("passbolt.tabs.open-website-getting-started-page", async (requestId) => {
+    const controller = new OpenWebsiteGettingStartedPageController(worker, requestId);
+    await controller._exec();
   });
 };
 

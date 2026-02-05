@@ -12,7 +12,7 @@
  * @since         3.4.0
  */
 
-import { assertNumber } from "../../utils/assertions";
+import { assertNumber, assertString } from "../../utils/assertions";
 import Validator from "validator";
 
 class BrowserTabService {
@@ -67,10 +67,38 @@ class BrowserTabService {
 
   /**
    * Opens a new tab on the given URL
-   * @param {string} url
+   * @param {string} urlString
    * @return {Promise<void>}
    */
-  static async openTab(url) {
+  static async openTab(urlString) {
+    this.assertUrl(urlString, "Cannot open an new tab due to an invalid URL");
+    const url = new URL(urlString); //ensures urlString can be parsed
+
+    await browser.tabs.create({ url: url.toString() });
+  }
+
+  /**
+   * Updates the current active tab with a new URL
+   * @param {string} urlString
+   * @return {Promise<void>}
+   */
+  static async updateCurrentTabUrl(urlString) {
+    this.assertUrl(urlString, "Cannot update the current tab due to an invalid URL");
+    const url = new URL(urlString); //ensures urlString can be parsed
+
+    const currentTab = await BrowserTabService.getCurrent();
+    await browser.tabs.update(currentTab.id, { url: url.toString() });
+  }
+
+  /**
+   * Asserts that the URL is valid to be proceed by this service.
+   * @param {string} urlString
+   * @throws {Error} if the string is not a valid URL that can be processed by this service.
+   * @private
+   */
+  static assertUrl(urlString, message) {
+    assertString(urlString, message);
+
     const validationOption = {
       require_tld: false,
       require_host: true,
@@ -79,11 +107,9 @@ class BrowserTabService {
       protocols: ["https", "http"],
     };
 
-    if (!Validator.isURL(url, validationOption)) {
-      throw new Error("Cannot open tab due to an invalid URL");
+    if (!Validator.isURL(urlString, validationOption)) {
+      throw new Error(message);
     }
-
-    await browser.tabs.create({ url });
   }
 }
 

@@ -24,10 +24,43 @@
 import Foundation
 import AppKit
 
-enum SaveFileServiceError: Error {
+enum SaveFileServiceError: LocalizedError {
     case noBase64DataProvided
     case invalidBase64Data
     case destinationFolderIsNotAvailable
+
+    var errorDescription: String? {
+        switch self {
+        case .noBase64DataProvided:
+            return "No base64 data was provided"
+        case .invalidBase64Data:
+            return "The provided base64 data is invalid or corrupted"
+        case .destinationFolderIsNotAvailable:
+            return "The destination folder is not available or inaccessible"
+        }
+    }
+
+    var failureReason: String? {
+        switch self {
+        case .noBase64DataProvided:
+            return "The payload did not contain the required 'base64Data' field"
+        case .invalidBase64Data:
+            return "Base64 decoding failed"
+        case .destinationFolderIsNotAvailable:
+            return "Unable to access the Downloads directory"
+        }
+    }
+
+    var recoverySuggestion: String? {
+        switch self {
+        case .noBase64DataProvided:
+            return "Ensure the payload includes a 'base64Data' field"
+        case .invalidBase64Data:
+            return "Verify the base64 encoding is correct"
+        case .destinationFolderIsNotAvailable:
+            return "Check file system permissions and disk space"
+        }
+    }
 }
 
 final class SaveFileService {
@@ -36,15 +69,15 @@ final class SaveFileService {
         let filename = (payload["filename"] as? String) ?? "export.txt"
 
         guard let base64Data = payload["base64Data"] as? String else {
-            throw SaveFileServiceError.noBase64DataProvided
+            throw locatedError(SaveFileServiceError.noBase64DataProvided)
         }
 
         guard let fileData = Data(base64Encoded: base64Data) else {
-            throw SaveFileServiceError.invalidBase64Data
+            throw locatedError(SaveFileServiceError.invalidBase64Data)
         }
 
         guard let root = destinationRootURL() else {
-            throw SaveFileServiceError.destinationFolderIsNotAvailable
+            throw locatedError(SaveFileServiceError.destinationFolderIsNotAvailable)
         }
 
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)

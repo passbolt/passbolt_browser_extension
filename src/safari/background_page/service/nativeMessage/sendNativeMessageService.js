@@ -15,6 +15,26 @@
 const SAFARI_APP_ID = "com.passbolt.safari";
 
 /**
+ * Custom error class for Safari native messaging errors.
+ * Formats all error details in the message for better debugging visibility.
+ */
+class SafariNativeError extends Error {
+  constructor(errorData) {
+    // Compact message: [Domain:Code] Message @ File:Line
+    const compactMessage = [
+      `[${errorData.domain}:${errorData.code}]`,
+      errorData.message,
+      errorData.file ? `@ ${errorData.file}:${errorData.line}` : null,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    super(compactMessage);
+    this.name = "SafariNativeError";
+  }
+}
+
+/**
  * Send Native Message service for Safari
  */
 export class SendNativeMessageService {
@@ -47,7 +67,15 @@ export class SendNativeMessageService {
     const resp = await chrome.runtime.sendNativeMessage(SAFARI_APP_ID, message);
 
     if (!resp.success) {
-      throw new Error(resp.error || "Safari native application execution failed");
+      const errorData = resp.error;
+
+      // Handle structured error objects from the native application
+      if (typeof errorData === "object" && errorData.message) {
+        throw new SafariNativeError(errorData);
+      }
+
+      // Fallback for unexpected format (string or other types)
+      throw new Error(errorData ? String(errorData) : "Safari native application execution failed");
     }
 
     return resp?.returnedValue;

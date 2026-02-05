@@ -27,6 +27,21 @@ class ErrorController: AbstractController {
     required init() {}
 
     func run(_ context: NSExtensionContext, _ payload: [String: Any]) -> Void {
-        self.respondAsError(context, payload["error"] as! String)
+        guard let errorDict = payload["error"] as? [String: Any] else {
+            let fallbackError = NSError(
+                domain: "SafariExtension",
+                code: SafariExtensionError.unknownError.rawValue,
+                userInfo: [NSLocalizedDescriptionKey: "Unknown error occurred"]
+            )
+            self.respondAsError(context, fallbackError)
+            return
+        }
+
+        let body: [String: Any] = [
+            "success": false,
+            "error": errorDict
+        ]
+        self.respond(context, body)
     }
 }
+

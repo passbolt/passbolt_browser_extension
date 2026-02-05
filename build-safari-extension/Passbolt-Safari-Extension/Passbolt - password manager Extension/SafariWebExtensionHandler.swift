@@ -22,6 +22,14 @@
 //
 import SafariServices
 
+enum SafariExtensionError: Int {
+    case missingMessage = 1
+    case missingAction = 2
+    case unsupportedAction = 3
+    case controllerExecutionFailed = 4
+    case unknownError = 999
+}
+
 @available(macOSApplicationExtension 12.0, *)
 let routes: [String: AbstractController.Type] = [
     "save-file": SaveFileController.self,
@@ -40,12 +48,22 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             let item = context.inputItems.first as? NSExtensionItem,
             let payload = item.userInfo?[SFExtensionMessageKey] as? [String: Any]
         else {
-            errorController.run(context, ["error": "Bad or missing message"]);
+            let error = locatedNSError(
+                domain: "SafariExtension",
+                code: SafariExtensionError.missingMessage.rawValue,
+                description: "Bad or missing message"
+            )
+            errorController.run(context, ["error": ErrorSerializer.serialize(error)]);
             return;
         }
 
         guard let action = payload["action"] as? String else {
-            errorController.run(context, ["error": "No action is provided, cannot excute request"]);
+            let error = locatedNSError(
+                domain: "SafariExtension",
+                code: SafariExtensionError.missingAction.rawValue,
+                description: "No action is provided, cannot execute request"
+            )
+            errorController.run(context, ["error": ErrorSerializer.serialize(error)]);
             return;
         }
 
@@ -54,12 +72,17 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 let controller = controllerType.init()
                 try controller.run(context, payload)
             } catch {
-                errorController.run(context, ["error": error.localizedDescription]);
+                errorController.run(context, ["error": ErrorSerializer.serialize(error)]);
             }
             return
         }
 
-        errorController.run(context, ["error": "Unsupported action: \(action)"]);
+        let error = locatedNSError(
+            domain: "SafariExtension",
+            code: SafariExtensionError.unsupportedAction.rawValue,
+            description: "Unsupported action: \(action)"
+        )
+        errorController.run(context, ["error": ErrorSerializer.serialize(error)]);
         return;
     }
 }

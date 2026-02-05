@@ -65,12 +65,11 @@ class FetchSafariPolyfill {
    * @private
    */
   static async getProcessedAppResponse(appResponse, cookieService) {
-    const { headers, body } = appResponse.httpResponse;
+    const { headers, body, status } = appResponse.httpResponse;
     const httpHeaders = { ...headers };
 
     httpHeaders.statusText = httpHeaders.status;
-    httpHeaders.status = httpHeaders.code || body.header.code;
-    delete httpHeaders.code;
+    httpHeaders.status = status;
 
     if (httpHeaders["Set-Cookie"]) {
       await cookieService.updateCookiesWithSetCookieHeader(httpHeaders["Set-Cookie"]);

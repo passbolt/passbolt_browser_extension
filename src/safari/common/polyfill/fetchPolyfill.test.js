@@ -165,20 +165,5 @@ describe("FetchSafariPolyfill", () => {
 
       expect(CookiesService.prototype.updateCookiesWithSetCookieHeader).not.toHaveBeenCalled();
     });
-
-    it("should use body header code when code is not in headers", async () => {
-      expect.assertions(1);
-      jest.spyOn(SendNativeMessageService, "sendNativeMessage").mockResolvedValue({
-        success: true,
-        httpResponse: {
-          headers: { status: "Accepted" },
-          body: { header: { code: 202 } },
-        },
-      });
-
-      const response = await FetchSafariPolyfill(TEST_URL, defaultFetchOptions());
-
-      expect(response.status).toBe(202);
-    });
   });
 });

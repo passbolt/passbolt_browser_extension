@@ -29,7 +29,11 @@ class FetchController: AbstractController {
 
     func run(_ context: NSExtensionContext, _ payload: [String: Any]) throws -> Void {
         guard let urlString = payload["resource"] as? String else {
-            return self.respondAsError(context, "Missing required 'resource' parameter")
+            return self.respondAsError(context, locatedNSError(
+                domain: "FetchController",
+                code: 400,
+                description: "Missing required 'resource' parameter"
+            ))
         }
 
         let url = URL(string: urlString)!

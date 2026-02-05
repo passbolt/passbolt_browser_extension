@@ -57,13 +57,16 @@ final class FetchService {
     // The actual fetch sent to the API
     private static func doFetch(request: URLRequest) async throws -> [String: Any] {
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         let responseJSON = try! JSONSerialization.jsonObject(with: data, options: [])
-        let headers = (response as! HTTPURLResponse).allHeaderFields
-        
+        let httpResponse = response as! HTTPURLResponse
+        let headers = httpResponse.allHeaderFields
+        let statusCode = httpResponse.statusCode
+
         return [
             "headers": headers,
-            "body": responseJSON
+            "body": responseJSON,
+            "status": statusCode
         ]
     }
 }

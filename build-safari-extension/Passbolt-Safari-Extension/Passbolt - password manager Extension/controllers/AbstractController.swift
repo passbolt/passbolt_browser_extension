@@ -44,19 +44,19 @@ extension AbstractController {
         self.respond(context, body)
     }
 
-    // Respond to the extension with an error message
+    // Respond to the extension with an error
     // This should be used after aborting the request from the extension
-    func respondAsError(_ context: NSExtensionContext, _ errorMessage: String) {
+    func respondAsError(_ context: NSExtensionContext, _ error: Error) {
         let body: [String: Any] = [
             "success": false,
-            "error": errorMessage
+            "error": ErrorSerializer.serialize(error)
         ]
 
         self.respond(context, body)
     }
 
     // Sends the response to the extension
-    private func respond(_ context: NSExtensionContext, _ responseBody: [String: Any] = [:]) {
+    internal func respond(_ context: NSExtensionContext, _ responseBody: [String: Any] = [:]) {
         let reply = NSExtensionItem()
         reply.userInfo = [ SFExtensionMessageKey: responseBody ]
         context.completeRequest(returningItems: [reply], completionHandler: nil)

@@ -78,6 +78,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		8260C00A2F2A652400C30185 /* utils */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = utils;
+			sourceTree = "<group>";
+		};
 		979642262EC5D7850002E98F /* services */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = services;
@@ -154,6 +159,7 @@
 		978962722E27D39300F48BDD /* Passbolt - password manager Extension */ = {
 			isa = PBXGroup;
 			children = (
+				8260C00A2F2A652400C30185 /* utils */,
 				978962862E27D39300F48BDD /* Resources */,
 				978962732E27D39300F48BDD /* SafariWebExtensionHandler.swift */,
 				978962752E27D39300F48BDD /* Info.plist */,
@@ -217,6 +223,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				8260C00A2F2A652400C30185 /* utils */,
 				979642262EC5D7850002E98F /* services */,
 				9796422B2EC5D7890002E98F /* controllers */,
 			);

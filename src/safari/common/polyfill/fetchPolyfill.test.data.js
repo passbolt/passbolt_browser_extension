@@ -20,6 +20,7 @@
 export const defaultAppResponse = (data = {}) => ({
   success: true,
   httpResponse: {
+    status: data?.status ?? 200,
     headers: {
       status: "OK",
       code: 200,
@@ -42,6 +43,7 @@ export const defaultAppResponse = (data = {}) => ({
  */
 export const appResponseWithStatus = (code, status) =>
   defaultAppResponse({
+    status: code,
     headers: { code, status },
     body: { header: { code } },
   });

@@ -35,8 +35,7 @@ class ParseWebIntegrationUrlService {
       // Check if the url is valid
       new URL(url);
       return this.regex.test(url);
-    } catch (error) {
-      console.error(error);
+    } catch {
       return false;
     }
   }

@@ -37,7 +37,7 @@ final class FetchService {
         let method = options["method"] as? String ?? "GET"
         let body = options["body"] as? String ?? ""
         let headers = options["headers"] as? [String: String] ?? [:]
-        let cookies = options["cookies"] as? String ?? nil
+        let cookies = options["cookies"] as? String
 
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = method
@@ -67,8 +67,11 @@ final class FetchService {
 
         let (data, response) = try await session.data(for: request)
 
-        let responseJSON = try! JSONSerialization.jsonObject(with: data, options: [])
-        let httpResponse = response as! HTTPURLResponse
+        let responseJSON = try JSONSerialization.jsonObject(with: data, options: [])
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "FetchService", code: 500,
+                          userInfo: [NSLocalizedDescriptionKey: "Response is not HTTP"])
+        }
         let headers = httpResponse.allHeaderFields
         let statusCode = httpResponse.statusCode
 

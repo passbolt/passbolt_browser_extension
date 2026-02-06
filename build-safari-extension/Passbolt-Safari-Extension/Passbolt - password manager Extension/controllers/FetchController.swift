@@ -36,12 +36,22 @@ class FetchController: AbstractController {
             ))
         }
 
-        let url = URL(string: urlString)!
+        guard let url = URL(string: urlString) else {
+            return self.respondAsError(context, locatedNSError(
+                domain: "FetchController",
+                code: 400,
+                description: "Invalid URL: \(urlString)"
+            ))
+        }
         let options = payload["options"] as? [String: Any] ?? [:]
 
         Task {
             let httpResponse = try await FetchService.fetch(url: url, options: options, profileUUID: profileUUID)
-            self.respondAsSuccess(context, ["httpResponse": httpResponse])
+            do {
+                self.respondAsSuccess(context, ["httpResponse": httpResponse])
+            } catch {
+                self.respondAsError(context, error)
+            }
         }
     }
 }

@@ -56,11 +56,13 @@ export class CookiesService {
    */
   async updateCookiesWithSetCookieHeader(setCookieHeaderValue) {
     assertString(setCookieHeaderValue);
-    const cookies = this.deserialisedCookie(setCookieHeaderValue);
-    for (const cookie of cookies) {
-      cookie.storeId = this.storeId;
-      await chrome.cookies.set(cookie);
-    }
+
+    await Promise.all(
+      this.deserialisedCookie(setCookieHeaderValue).map((cookie) => {
+        cookie.storeId = this.storeId;
+        return chrome.cookies.set(cookie);
+      }),
+    );
   }
 
   /**
@@ -129,11 +131,12 @@ export class CookiesService {
             break;
           }
           case "samesite": {
-            cookie.sameSite = cookie.sameSite ?? value;
+            const normalised = value?.toLowerCase() === "none" ? "no_restriction" : value?.toLowerCase();
+            cookie.sameSite = cookie.sameSite ?? normalised;
             break;
           }
           case "max-age": {
-            cookie.expirationDate = cookie.expirationDate ?? Date.now() + parseInt(value, 10) * 1000;
+            cookie.expirationDate = cookie.expirationDate ?? Math.floor(Date.now() / 1000) + parseInt(value, 10);
             break;
           }
           case "expires": {
@@ -143,7 +146,7 @@ export class CookiesService {
         }
       }
       // the cookie API requires some defaults value for sameSite.
-      cookies.push(Object.assign(cookie, DEFAULT_COOKIE_VALUES));
+      cookies.push({ ...DEFAULT_COOKIE_VALUES, ...cookie });
     }
     return cookies;
   }

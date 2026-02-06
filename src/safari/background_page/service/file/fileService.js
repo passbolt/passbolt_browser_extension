@@ -44,14 +44,20 @@ export default class FileService {
    * @private
    */
   static blobToDataURL(blob) {
-    return new Promise((resolve) => {
-      const a = new FileReader();
-      a.onload = function (e) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
         const data = e.target.result;
         const base64Data = data.substring(data.indexOf("base64,") + 7);
         resolve(base64Data);
       };
-      a.readAsDataURL(blob);
+      reader.onerror = function () {
+        reject(reader.error);
+      };
+      reader.onabort = function () {
+        reject(new Error("FileReader aborted"));
+      };
+      reader.readAsDataURL(blob);
     });
   }
 }

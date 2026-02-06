@@ -225,6 +225,18 @@ describe("CookieService", () => {
       });
     });
 
+    it("should compute expirationDate in seconds for max-age only cookies", () => {
+      expect.assertions(2);
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      const service = new CookiesService("https://www.passbolt.com", TEST_STORE_ID);
+      const cookieString = "session=abc; Max-Age=3600";
+
+      const cookieList = service.deserialisedCookie(cookieString);
+      expect(cookieList).toHaveLength(1);
+      // expirationDate should be within a reasonable range of now + 3600 seconds
+      expect(cookieList[0].expirationDate).toBeGreaterThanOrEqual(nowInSeconds + 3600);
+    });
+
     it("should assert its parameter", () => {
       expect.assertions(1);
       const service = new CookiesService("https://www.passbolt.com", TEST_STORE_ID);

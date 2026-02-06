@@ -23,40 +23,49 @@
 
 import Foundation
 
-@available(macOSApplicationExtension 12.0, *)
 final class FetchService {
-    
-    // Runs a fetch on the API.
+
+    // Runs a fetch on the API with profile isolation.
     // It expects a payload set from the extention with the possible property
     //   url: The URL to send to request to
     //   options["method"]: the HTTP method to use
     //   options["body"]: the HTTP body of the request
     //   options["headers"]: the HTTP headers to send along with the request
     //   options["cookies"]: the specific Cookies (HTTP serialized) to set on the request
-    static func fetch(url: URL, options: [String: Any]) async throws -> [String: Any] {
+    //   profileUUID: The Safari profile UUID for session isolation
+    static func fetch(url: URL, options: [String: Any], profileUUID: String) async throws -> [String: Any] {
         let method = options["method"] as? String ?? "GET"
         let body = options["body"] as? String ?? ""
         let headers = options["headers"] as? [String: String] ?? [:]
         let cookies = options["cookies"] as? String ?? nil
-        
+
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = method
         httpRequest.httpBody = body.data(using: .utf8)
-        
+
+        // SECURITY: Add cache-control headers to prevent response caching
+        httpRequest.setValue("no-cache, no-store, must-revalidate", forHTTPHeaderField: "Cache-Control")
+        httpRequest.setValue("no-cache", forHTTPHeaderField: "Pragma")
+
         for header in headers {
             httpRequest.setValue(String(describing: header.value), forHTTPHeaderField: String(describing: header.key))
         }
-        
+
+        // Cookies from extension (already profile-isolated via browser.cookies)
         if (cookies != nil) {
             httpRequest.setValue(cookies, forHTTPHeaderField: "Cookie")
         }
 
-        return try await doFetch(request: httpRequest)
+        return try await doFetch(request: httpRequest, profileUUID: profileUUID)
     }
-    
-    // The actual fetch sent to the API
-    private static func doFetch(request: URLRequest) async throws -> [String: Any] {
-        let (data, response) = try await URLSession.shared.data(for: request)
+
+    // The actual fetch sent to the API using a profile-isolated session
+    private static func doFetch(request: URLRequest, profileUUID: String) async throws -> [String: Any] {
+        // SECURITY: Use profile-specific session, NEVER URLSession.shared
+        // This ensures cookies from one profile cannot leak to another
+        let session = SecureProfileSessionManager.session(forProfile: profileUUID)
+
+        let (data, response) = try await session.data(for: request)
 
         let responseJSON = try! JSONSerialization.jsonObject(with: data, options: [])
         let httpResponse = response as! HTTPURLResponse

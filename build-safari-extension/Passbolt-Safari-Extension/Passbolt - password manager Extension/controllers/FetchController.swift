@@ -27,7 +27,7 @@ import Foundation
 class FetchController: AbstractController {
     required init() {}
 
-    func run(_ context: NSExtensionContext, _ payload: [String: Any]) throws -> Void {
+    func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) throws -> Void {
         guard let urlString = payload["resource"] as? String else {
             return self.respondAsError(context, locatedNSError(
                 domain: "FetchController",
@@ -40,7 +40,7 @@ class FetchController: AbstractController {
         let options = payload["options"] as? [String: Any] ?? [:]
 
         Task {
-            let httpResponse = try await FetchService.fetch(url: url, options: options)
+            let httpResponse = try await FetchService.fetch(url: url, options: options, profileUUID: profileUUID)
             self.respondAsSuccess(context, ["httpResponse": httpResponse])
         }
     }

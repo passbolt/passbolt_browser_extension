@@ -30,7 +30,6 @@ enum SafariExtensionError: Int {
     case unknownError = 999
 }
 
-@available(macOSApplicationExtension 12.0, *)
 let routes: [String: AbstractController.Type] = [
     "save-file": SaveFileController.self,
     "fetch": FetchController.self,
@@ -38,7 +37,6 @@ let routes: [String: AbstractController.Type] = [
 
 // Entry point of the Application part of the Safari extension.
 // It is mainly used to handle request from the extension
-@available(macOSApplicationExtension 12.0, *)
 final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
     private let errorController = ErrorController()
 
@@ -53,9 +51,13 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 code: SafariExtensionError.missingMessage.rawValue,
                 description: "Bad or missing message"
             )
-            errorController.run(context, ["error": ErrorSerializer.serialize(error)]);
-            return;
+            errorController.run(context, ["error": ErrorSerializer.serialize(error)], profileUUID: "unknown")
+            return
         }
+
+        // SECURITY: Extract profile UUID for session isolation
+        // SFExtensionProfileKey provides the Safari profile identifier (macOS 14+)
+        let profileUUID = item.userInfo?[SFExtensionProfileKey] as? String ?? "default"
 
         guard let action = payload["action"] as? String else {
             let error = locatedNSError(
@@ -63,16 +65,16 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 code: SafariExtensionError.missingAction.rawValue,
                 description: "No action is provided, cannot execute request"
             )
-            errorController.run(context, ["error": ErrorSerializer.serialize(error)]);
-            return;
+            errorController.run(context, ["error": ErrorSerializer.serialize(error)], profileUUID: profileUUID)
+            return
         }
 
         if let controllerType = routes[action] {
             do {
                 let controller = controllerType.init()
-                try controller.run(context, payload)
+                try controller.run(context, payload, profileUUID: profileUUID)
             } catch {
-                errorController.run(context, ["error": ErrorSerializer.serialize(error)]);
+                errorController.run(context, ["error": ErrorSerializer.serialize(error)], profileUUID: profileUUID)
             }
             return
         }
@@ -82,7 +84,6 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             code: SafariExtensionError.unsupportedAction.rawValue,
             description: "Unsupported action: \(action)"
         )
-        errorController.run(context, ["error": ErrorSerializer.serialize(error)]);
-        return;
+        errorController.run(context, ["error": ErrorSerializer.serialize(error)], profileUUID: profileUUID)
     }
 }

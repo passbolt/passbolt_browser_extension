@@ -26,7 +26,12 @@ import SafariServices
 
 protocol AbstractController {
     init()
-    func run(_ context: NSExtensionContext, _ payload: [String: Any]) throws -> Void
+    /// Runs the controller with the given context, payload, and profile UUID.
+    /// - Parameters:
+    ///   - context: The extension context for responding to the request
+    ///   - payload: The message payload from the extension
+    ///   - profileUUID: The Safari profile UUID for session isolation (macOS 14+/iOS 17+)
+    func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) throws -> Void
 }
 
 extension AbstractController {

@@ -24,7 +24,9 @@ class FetchSafariPolyfill {
    * @returns {Promise<Response>}
    */
   static async fetch(resource, options) {
-    const cookieService = new CookiesService(resource);
+    // Get the current profile's cookie store ID for proper Safari profile isolation
+    const storeId = await FetchSafariPolyfill.getCurrentCookieStoreId();
+    const cookieService = new CookiesService(resource, storeId);
     const requestOptions = await FetchSafariPolyfill.prepareOptions(options, cookieService);
 
     const appResponse = await SendNativeMessageService.sendNativeMessage("fetch", {
@@ -34,6 +36,34 @@ class FetchSafariPolyfill {
     const fetchResponse = await FetchSafariPolyfill.getProcessedAppResponse(appResponse, cookieService);
 
     return fetchResponse;
+  }
+
+  /**
+   * Get the cookie store ID for the current Safari profile.
+   * Safari 17+ uses separate cookie stores for each profile.
+   * @returns {Promise<string>} The cookie store ID
+   * @throws {Error} If no valid cookie store can be determined
+   * @private
+   */
+  static async getCurrentCookieStoreId() {
+    const stores = await chrome.cookies.getAllCookieStores();
+
+    if (!stores || stores.length === 0) {
+      throw new Error("No cookie stores available for Safari profile isolation");
+    }
+
+    // Find the store associated with the current tab
+    const currentTabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (currentTabs?.length > 0) {
+      const currentTabId = currentTabs[0].id;
+      const matchingStore = stores.find((store) => store.tabIds?.includes(currentTabId));
+      if (matchingStore) {
+        return matchingStore.id;
+      }
+    }
+
+    // SECURITY: Don't guess - fail if we can't determine the correct store
+    throw new Error("Could not determine correct cookie store for current Safari profile");
   }
 
   /**

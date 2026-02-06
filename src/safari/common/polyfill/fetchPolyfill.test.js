@@ -32,6 +32,9 @@ const TEST_URL = "https://www.passbolt.com/api/resources.json";
 
 beforeEach(() => {
   jest.resetAllMocks();
+  // Mock cookie store API for Safari profile isolation
+  jest.spyOn(chrome.cookies, "getAllCookieStores").mockResolvedValue([{ id: "test-store-id", tabIds: [1] }]);
+  jest.spyOn(chrome.tabs, "query").mockResolvedValue([{ id: 1, active: true }]);
 });
 
 describe("FetchSafariPolyfill", () => {

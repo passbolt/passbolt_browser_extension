@@ -26,7 +26,7 @@ import Foundation
 class ErrorController: AbstractController {
     required init() {}
 
-    func run(_ context: NSExtensionContext, _ payload: [String: Any]) -> Void {
+    func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) -> Void {
         guard let errorDict = payload["error"] as? [String: Any] else {
             let fallbackError = NSError(
                 domain: "SafariExtension",

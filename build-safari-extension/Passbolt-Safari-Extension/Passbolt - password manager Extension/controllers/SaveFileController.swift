@@ -26,7 +26,7 @@ import Foundation
 class SaveFileController: AbstractController {
     required init() {}
 
-    func run(_ context: NSExtensionContext, _ payload: [String: Any]) throws -> Void {
+    func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) throws -> Void {
         let destinationPath = try SaveFileService.saveFile(payload)
         self.respondAsSuccess(context, ["path": destinationPath])
     }

@@ -12,7 +12,7 @@
  * @since         5.7.0
  */
 
-import { assertString } from "../../../../all/background_page/utils/assertions";
+import { assertNonEmptyString, assertString } from "../../../../all/background_page/utils/assertions";
 
 const CSRF_TOKEN_COOKIE_NAME = "csrfToken";
 const DEFAULT_COOKIE_VALUES = {
@@ -26,19 +26,27 @@ export class CookiesService {
   /**
    * @constructor
    * @param {string} urlString the url string to derive the domain from.
+   * @param {string} storeId Cookie store ID for profile isolation (Safari 17+)
    */
-  constructor(urlString) {
+  constructor(urlString, storeId) {
+    assertNonEmptyString(storeId, "The storeId is required for Safari profile isolation");
     const url = new URL(urlString);
     this.domain = url.host;
     this.url = `${url.protocol}//${url.host}${url.pathname}`;
+    this.storeId = storeId;
   }
 
   /**
-   * Get all the cookies available for the current domain in a HTTP header compatible format
+   * Get all the cookies available for the current domain in a HTTP header compatible format.
+   * Uses storeId for proper Safari profile isolation.
    * @returns {Promise<string>}
    */
   async getSerialisedCookies() {
-    const cookies = await chrome.cookies.getAll({ domain: this.domain });
+    const query = {
+      domain: this.domain,
+      storeId: this.storeId,
+    };
+    const cookies = await chrome.cookies.getAll(query);
     return this.serializeCookies(cookies);
   }
 
@@ -48,19 +56,25 @@ export class CookiesService {
    */
   async updateCookiesWithSetCookieHeader(setCookieHeaderValue) {
     assertString(setCookieHeaderValue);
-    this.deserialisedCookie(setCookieHeaderValue).forEach((cookie) => chrome.cookies.set(cookie));
+    const cookies = this.deserialisedCookie(setCookieHeaderValue);
+    for (const cookie of cookies) {
+      cookie.storeId = this.storeId;
+      await chrome.cookies.set(cookie);
+    }
   }
 
   /**
    * Returns the value of the CSRF token cookie.
+   * Uses storeId for proper Safari profile isolation.
    * @returns {Promise<string|null>}
    */
   async getCsrfToken() {
-    const cookie = await chrome.cookies.get({
-      domain: this.domain,
+    const query = {
       url: this.url,
       name: CSRF_TOKEN_COOKIE_NAME,
-    });
+      storeId: this.storeId,
+    };
+    const cookie = await chrome.cookies.get(query);
 
     return cookie?.value || null;
   }

@@ -9,25 +9,16 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         5.3.2
+ * @since         5.10.0
  */
 
-/**
- * The service aims to help get browser information.
- */
-export default class BrowserService {
+export default class ExtensionPermissionsService {
   /**
-   * Returns true if the current browser is firefox.
-   * @returns {boolean}
+   * Checks if the extension is allowed to run on every website.
+   * @returns {Promise<boolean>} true if the extension has permissions for all origins
    */
-  static isFirefox() {
-    return browser.runtime.getURL("/").startsWith("moz-extension://");
-  }
-  /**
-   * Returns true if the current browser is Safari.
-   * @returns {boolean}
-   */
-  static isSafari() {
-    return browser.runtime.getURL("/").startsWith("safari-web-extension://");
+  static async isAllowedOnEveryWebsite() {
+    const permissions = await browser.permissions.getAll();
+    return permissions.origins.some((origin) => origin === "*://*/*" || origin === "<all_urls>");
   }
 }

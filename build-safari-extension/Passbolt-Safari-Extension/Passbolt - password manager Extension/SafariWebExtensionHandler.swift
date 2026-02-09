@@ -33,6 +33,7 @@ enum SafariExtensionError: Int {
 let routes: [String: AbstractController.Type] = [
     "save-file": SaveFileController.self,
     "fetch": FetchController.self,
+    "open-safari-settings": OpenSafariSettingsController.self,
 ]
 
 // Entry point of the Application part of the Safari extension.

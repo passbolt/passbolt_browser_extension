@@ -9,25 +9,20 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         5.3.2
+ * @since         5.10.0
  */
 
-/**
- * The service aims to help get browser information.
- */
-export default class BrowserService {
+import { SendNativeMessageService } from "../../../../safari/background_page/service/nativeMessage/sendNativeMessageService";
+import BrowserService from "../browser/browserService";
+
+export default class OpenSafariExtensionSettingsService {
   /**
-   * Returns true if the current browser is firefox.
-   * @returns {boolean}
+   * Opens the Safari extension settings page via native messaging.
+   * @returns {Promise<void>}
    */
-  static isFirefox() {
-    return browser.runtime.getURL("/").startsWith("moz-extension://");
-  }
-  /**
-   * Returns true if the current browser is Safari.
-   * @returns {boolean}
-   */
-  static isSafari() {
-    return browser.runtime.getURL("/").startsWith("safari-web-extension://");
+  static async openSettings() {
+    if (BrowserService.isSafari()) {
+      await SendNativeMessageService.sendNativeMessage("open-safari-settings");
+    }
   }
 }

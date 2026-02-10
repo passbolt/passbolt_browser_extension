@@ -16,7 +16,7 @@ import { assertNonEmptyString, assertString } from "../../../../all/background_p
 
 const CSRF_TOKEN_COOKIE_NAME = "csrfToken";
 const DEFAULT_COOKIE_VALUES = {
-  sameSite: "strict",
+  sameSite: "no_restriction",
 };
 
 /**

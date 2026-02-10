@@ -109,7 +109,7 @@ describe("CookieService", () => {
         value: "dark",
         url: "https://www.passbolt.com/",
         domain: "www.passbolt.com",
-        sameSite: "strict",
+        sameSite: "no_restriction",
         storeId: TEST_STORE_ID,
       });
     });
@@ -170,7 +170,7 @@ describe("CookieService", () => {
         domain: "www.passbolt.com",
         name: "theme",
         value: "dark",
-        sameSite: "strict",
+        sameSite: "no_restriction",
       });
     });
 

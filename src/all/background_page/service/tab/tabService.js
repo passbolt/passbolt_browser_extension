@@ -23,6 +23,7 @@ import BrowserTabService from "../ui/browserTab.service";
 class TabService {
   /**
    * Handle tabs onUpdated events.
+   * Used by Chrome and Firefox entry points.
    * @see /doc/worker-port-lifecycle.md to know more about worker and content script applications port lifecycle.
    *
    * @param {number} tabId The tab id
@@ -48,7 +49,40 @@ class TabService {
       return;
     }
 
-    console.debug(`TabService::exec(id: ${tabId}, url: ${tab.url}): Navigation detected.`);
+    await TabService.handleNavigation(tabId, tab.url);
+  }
+
+  /**
+   * Handle webNavigation.onCompleted events.
+   * Used by Safari entry point. The browser-level URL filter ensures only http/https URLs reach this handler.
+   * @param {object} details The webNavigation event details
+   * @param {number} details.tabId The tab id
+   * @param {number} details.frameId The frame id (0 for top frame)
+   * @param {string} details.url The URL of the navigation
+   * @returns {Promise<void>}
+   */
+  static async execNavigationCompletion(details) {
+    /*
+     * SECURITY: Only process top-frame navigations.
+     * webNavigation.onCompleted fires for all frames including iframes.
+     * Passbolt must never inject content scripts into iframes.
+     */
+    if (details.frameId !== 0) {
+      return;
+    }
+
+    await TabService.handleNavigation(details.tabId, details.url);
+  }
+
+  /**
+   * Handle a completed top-frame navigation. Manages worker lifecycle and triggers pagemod identification.
+   * Shared by both tabs.onUpdated (exec) and webNavigation.onCompleted (execNavigationCompletion) entry points.
+   * @param {number} tabId The tab id
+   * @param {string} url The URL the tab navigated to
+   * @returns {Promise<void>}
+   */
+  static async handleNavigation(tabId, url) {
+    console.debug(`TabService::handleNavigation(id: ${tabId}, url: ${url}): Navigation detected.`);
 
     // Get the worker on the main frame
     const worker = await WorkersSessionStorage.getWorkerOnMainFrame(tabId);
@@ -64,19 +98,19 @@ class TabService {
       const workerEntity = new WorkerEntity(worker);
       /*
        * A pagemod might already trying to attach a worker to the tab and is awaiting the content script to open or
-       * reopen the port and connect to it. It can happen when the tabs onUpdated event send too many events with the
-       * complete status, especially happening when a user reloads the tab multiple times very fast.
+       * reopen the port and connect to it. It can happen when the navigation event fires too many events, especially
+       * happening when a user reloads the tab multiple times very fast.
        *
-       * To avoid this scenario, ensure that the worker attachment process triggered by the first tabs onUpdated
+       * To avoid this scenario, ensure that the worker attachment process triggered by the first navigation
        * event had time to complete its treatment. The attachment will be completed when the content script inserted
        * in the tab successfully opened the port and connect to the background script.
        *
        * To avoid any deadlock on the tab, if the content script was not able to connect to the background page within
-       * 300ms, treat the last tabs onUpdated event and trigger a pagemod identification process on it.
+       * 300ms, treat the last navigation event and trigger a pagemod identification process on it.
        */
       if (workerEntity.isWaitingConnection || workerEntity.isReconnecting) {
         console.debug(
-          `TabService::exec(id: ${tabId}): Waiting content script port initial connection or reconnection.`,
+          `TabService::handleNavigation(id: ${tabId}): Waiting content script port initial connection or reconnection.`,
         );
         await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(workerEntity);
         return;
@@ -94,16 +128,16 @@ class TabService {
          * origin of the application url referenced by the associated port. If the origin change, the tab DOM has
          * been flushed and within any application on it.
          */
-        if (hasUrlSameOrigin(port._port.sender.url, tab.url)) {
+        if (hasUrlSameOrigin(port._port.sender.url, url)) {
           try {
             await PromiseTimeoutService.exec(port.request("passbolt.port.check"));
             console.debug(
-              `TabService::exec(id: ${tabId}):  Content script application acknowledged presence on worker runtime memory port.`,
+              `TabService::handleNavigation(id: ${tabId}):  Content script application acknowledged presence on worker runtime memory port.`,
             );
             return;
           } catch (error) {
             console.debug(
-              `TabService::exec(id: ${tabId}): No content script application acknowledged presence on worker runtime memory port.`,
+              `TabService::handleNavigation(id: ${tabId}): No content script application acknowledged presence on worker runtime memory port.`,
               error,
             );
           }
@@ -118,11 +152,13 @@ class TabService {
           workerEntity.status = WorkerEntity.STATUS_RECONNECTING;
           await WorkersSessionStorage.updateWorker(workerEntity);
           await BrowserTabService.sendMessage(workerEntity, "passbolt.port.connect", workerEntity.id);
-          console.debug(`TabService::exec(id: ${tabId}): A content script application reconnected its port.`);
+          console.debug(
+            `TabService::handleNavigation(id: ${tabId}): A content script application reconnected its port.`,
+          );
           return;
         } catch (error) {
           console.debug(
-            `TabService::exec(id: ${tabId}): No content script application was able to reconnect its port.`,
+            `TabService::handleNavigation(id: ${tabId}): No content script application was able to reconnect its port.`,
             error,
           );
         }
@@ -130,24 +166,14 @@ class TabService {
     }
 
     // Execute the process of a web navigation to detect pagemod and script to insert
-    const frameDetails = mappingFrameDetailsFromTab(tab);
+    const frameDetails = {
+      frameId: 0,
+      tabId: tabId,
+      url: url,
+    };
     await WebNavigationService.exec(frameDetails);
-    console.debug(`TabService::exec(id: ${tabId}): Trigger pagemods identification process.`);
+    console.debug(`TabService::handleNavigation(id: ${tabId}): Trigger pagemods identification process.`);
   }
-}
-
-/**
- * Mapping tab as a frame details to be compliant with webNavigation API
- * @param tab
- * @return {{tabId, frameId: number, url}}
- */
-function mappingFrameDetailsFromTab(tab) {
-  return {
-    // Mapping the tab info as a frame details to be compliant with webNavigation API
-    frameId: 0,
-    tabId: tab.id,
-    url: tab.url,
-  };
 }
 
 export default TabService;

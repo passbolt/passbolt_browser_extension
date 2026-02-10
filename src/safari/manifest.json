@@ -37,7 +37,8 @@
     "*://*/*",
     "alarms",
     "cookies",
-    "nativeMessaging"
+    "nativeMessaging",
+    "webNavigation"
   ],
   "web_accessible_resources": [
     "webAccessibleResources/*"

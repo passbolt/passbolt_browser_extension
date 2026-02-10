@@ -76,9 +76,12 @@ browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 browser.runtime.onStartup.addListener(OnStartUpService.exec);
 
 /**
- * Add listener on tab updated
+ * Add listener on web navigation completed (replaces tabs.onUpdated for navigation detection).
+ * The URL filter ensures only http/https navigations reach the handler.
  */
-browser.tabs.onUpdated.addListener(TabService.exec);
+browser.webNavigation.onCompleted.addListener(TabService.execNavigationCompletion, {
+  url: [{ schemes: ["http", "https"] }],
+});
 
 /**
  * Add listener on connect port

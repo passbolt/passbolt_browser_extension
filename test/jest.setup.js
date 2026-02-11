@@ -18,10 +18,10 @@ import browser from "../src/all/common/polyfill/browserPolyfill";
 import "./mocks/mockTextEncoder";
 import "./mocks/mockCryptoKey";
 import "./matchers/extendExpect";
-import MockNavigatorLocks from './mocks/mockNavigatorLocks';
-import MockNavigatorClipboard from './mocks/mockNavigatorClipboard';
+import MockNavigatorLocks from "./mocks/mockNavigatorLocks";
+import MockNavigatorClipboard from "./mocks/mockNavigatorClipboard";
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
-import {Config} from "../src/all/background_page/model/config";
+import { Config } from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
 import ResourceLocalStorage from "../src/all/background_page/service/local_storage/resourceLocalStorage";
 import FolderLocalStorage from "../src/all/background_page/service/local_storage/folderLocalStorage";
@@ -30,7 +30,7 @@ import I18n from "../src/all/background_page/sdk/i18n";
 import GroupLocalStorage from "../src/all/background_page/service/local_storage/groupLocalStorage";
 
 //mocking i18n avoids some errors like `Error: connect ECONNREFUSED 127.0.0.1:80` in the console while running tests
-jest.mock('../src/all/background_page/sdk/i18n');
+jest.mock("../src/all/background_page/sdk/i18n");
 I18n.init = mockedI18n.init;
 I18n.initWithDefaultLocale = mockedI18n.initWithDefaultLocale;
 I18n.t = mockedI18n.t;
@@ -42,9 +42,9 @@ global.console = {
   ...console,
   debug: jest.fn(),
   error: jest.fn(),
-  warn: jest.fn()
+  warn: jest.fn(),
 };
-global.fetch = require('node-fetch');
+global.fetch = require("node-fetch");
 if (!global.navigator) {
   global.navigator = {};
 }
@@ -63,7 +63,7 @@ if (!global.structuredClone) {
   global.structuredClone = object => object;
 }
 
-beforeEach(async() => {
+beforeEach(async () => {
   // Before each test, ensure a new copy of the browser API is made available in the global scope.
   global.browser = browser;
   global.chrome = browser;

@@ -80,6 +80,9 @@ import UpdateTagController from "../controller/tag/updateTagController";
 import DeleteTagController from "../controller/tag/deleteTagController";
 import UpdateResourceTagsController from "../controller/tag/updateResourceTagsController";
 import AddTagsToResourcesController from "../controller/tag/addTagsToResourcesController";
+import OpenAdministrationPageController from "../controller/tab/openAdministrationPageController";
+import OpenTrustedDomainTabController from "../controller/tab/openTrustedDomainTabController";
+import OpenWebsiteGettingStartedPageController from "../controller/tab/openWebsiteGettingStartedPageController";
 
 const listen = function (worker, apiClientOptions, account) {
   /*
@@ -825,6 +828,37 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.tags.add-resources-tag", async (requestId, resourcesTagDto) => {
     const addTagsToResourcesController = new AddTagsToResourcesController(worker, requestId, apiClientOptions);
     await addTagsToResourcesController._exec(resourcesTagDto.resources, [resourcesTagDto.tag]);
+  });
+
+  /**
+   * Opens an administration page in the current tab.
+   * @param {string} requestId
+   * @param {string} pageName The name of the administration page to open
+   * @listens passbolt.tabs.open-admin-page
+   */
+  worker.port.on("passbolt.tabs.open-admin-page", async (requestId, pageName) => {
+    const controller = new OpenAdministrationPageController(worker, requestId);
+    await controller._exec(pageName);
+  });
+
+  /**
+   * Opens the trusted domain in a new tab.
+   * @param {string} requestId
+   * @listens passbolt.tabs.open-trusted-domain
+   */
+  worker.port.on("passbolt.tabs.open-trusted-domain", async (requestId) => {
+    const controller = new OpenTrustedDomainTabController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Opens the Passbolt getting started page in a new tab.
+   * @param {string} requestId
+   * @listens passbolt.tabs.open-website-getting-started-page
+   */
+  worker.port.on("passbolt.tabs.open-website-getting-started-page", async (requestId) => {
+    const controller = new OpenWebsiteGettingStartedPageController(worker, requestId);
+    await controller._exec();
   });
 };
 

@@ -334,4 +334,62 @@ describe("TabService", () => {
       expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
     });
   });
+
+  describe("TabService::execNavigationCompletion", () => {
+    it("exits if frameId is not 0 (iframe security guard)", async () => {
+      expect.assertions(3);
+      // process
+      await TabService.execNavigationCompletion({ tabId: 1, frameId: 1, url: "https://passbolt.dev" });
+      // expectations
+      expect(PortManager.getPortById).not.toHaveBeenCalled();
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).not.toHaveBeenCalled();
+      expect(WebNavigationService.exec).not.toHaveBeenCalled();
+    });
+
+    it("exits if frameId is a nested iframe (iframe security guard)", async () => {
+      expect.assertions(3);
+      // process
+      await TabService.execNavigationCompletion({ tabId: 1, frameId: 42, url: "https://evil.com" });
+      // expectations
+      expect(PortManager.getPortById).not.toHaveBeenCalled();
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).not.toHaveBeenCalled();
+      expect(WebNavigationService.exec).not.toHaveBeenCalled();
+    });
+
+    it("triggers the pagemods identification process for top-frame navigation", async () => {
+      expect.assertions(3);
+      // data mocked
+      const frameDetails = {
+        url: "https://localhost",
+        tabId: 1234,
+        frameId: 0,
+      };
+      // mock function
+      mockWorker.mockImplementationOnce(() => null);
+      // process
+      await TabService.execNavigationCompletion(frameDetails);
+      // expectations
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
+      expect(PortManager.getPortById).not.toHaveBeenCalled();
+      expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
+    });
+
+    it("delegates to handleNavigation for top-frame navigation and triggers worker lookup", async () => {
+      expect.assertions(3);
+      // data mocked
+      const frameDetails = {
+        url: "https://localhost",
+        tabId: 1234,
+        frameId: 0,
+      };
+      // mock function — no worker on tab, so handleNavigation will trigger pagemod identification
+      mockWorker.mockImplementationOnce(() => null);
+      // process
+      await TabService.execNavigationCompletion(frameDetails);
+      // expectations — verifies handleNavigation was called (worker lookup) and completed (WebNavigationService.exec)
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
+      expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
+      expect(PortManager.getPortById).not.toHaveBeenCalled();
+    });
+  });
 });

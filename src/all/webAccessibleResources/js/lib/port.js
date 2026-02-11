@@ -132,6 +132,23 @@ class Port {
   }
 
   /**
+   * Removes a listener given its name and its callback
+   *
+   * @param name
+   * @param callback
+   */
+  removeListener(name, callback) {
+    if (!this._listeners?.[name]) {
+      return;
+    }
+
+    const index = this._listeners[name].findIndex((listener) => listener.callback === callback);
+    if (index > -1) {
+      this._listeners[name].splice(index, 1);
+    }
+  }
+
+  /**
    * On message name triggers a callback only once,
    * e.g. remove the listener once the message has been received
    *

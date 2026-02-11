@@ -55,7 +55,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle']);
   grunt.registerTask('bundle-chromium-mv2', ['copy:manifest_chromium_mv2', 'bundle']);
   grunt.registerTask('bundle-chromium-mv3', ['copy:manifest_chromium_mv3', 'bundle-mv3']);
-  grunt.registerTask('bundle-safari', ['copy:manifest_safari', 'bundle-mv3']);
+  grunt.registerTask('bundle-safari', ['copy:manifest_safari', 'bundle']);
 
   grunt.registerTask('build', ['build-firefox-prod', 'build-chromium-mv2-prod', 'build-chromium-mv3-prod']);
 
@@ -72,8 +72,8 @@ module.exports = function (grunt) {
   grunt.registerTask('build-chromium-mv3-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chromium-mv3', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_chromium_mv3_prod']);
 
   grunt.registerTask('build-safari', ['build-safari-debug', 'build-safari-prod']);
-  grunt.registerTask('build-safari-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-safari', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug']);
-  grunt.registerTask('build-safari-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-safari', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod']);
+  grunt.registerTask('build-safari-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-safari', 'shell:build_background_page_safari_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug']);
+  grunt.registerTask('build-safari-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-safari', 'shell:build_background_page_safari_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod']);
 
   grunt.registerTask('externalize-locale-strings', ['shell:externalize']);
 
@@ -287,9 +287,19 @@ module.exports = function (grunt) {
           'npm run build:background-page'
         ].join(' && ')
       },
+      build_background_page_safari_prod: {
+        command: [
+          'npm run build:safari:background-page'
+        ].join(' && ')
+      },
       build_background_page_debug: {
         command: [
           'npm run dev:build:background-page'
+        ].join(' && ')
+      },
+      build_background_page_safari_debug: {
+        command: [
+          'npm run dev:build:safari:background-page'
         ].join(' && ')
       },
       /**

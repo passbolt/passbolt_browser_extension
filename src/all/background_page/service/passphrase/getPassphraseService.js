@@ -12,10 +12,12 @@ import { QuickAccessService } from "../ui/quickAccess.service";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import WorkerService from "../worker/workerService";
+import PortManager from "../../sdk/port/portManager";
 import UserRememberMeLatestChoiceLocalStorage from "../local_storage/userRememberMeLatestChoiceLocalStorage";
 import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
 import { assertPassphrase } from "../../utils/assertions";
 import KeepSessionAliveService from "../session_storage/keepSessionAliveService";
+import { v4 as uuidv4 } from "uuid";
 
 export default class GetPassphraseService {
   constructor(account) {
@@ -67,7 +69,11 @@ export default class GetPassphraseService {
   }
 
   /**
-   * Request the user passphrase from the Quick Access
+   * Request the user passphrase from the Quick Access in detached mode.
+   * This method intentionally uses openInDetachedMode directly (not open()) because it depends on the
+   * returned window object to find the QuickAccess tab/port and set up the passphrase response listener.
+   * On Safari, the passphrase is requested differently via the attached popup,
+   * see listenToAttachedQuickaccessPassphraseRequestResponse().
    * @returns {Promise<string>}
    */
   async requestPassphraseFromQuickAccess() {
@@ -76,23 +82,26 @@ export default class GetPassphraseService {
       return storedPassphrase;
     }
 
-    /*
-     * Open the quick access to request the master passphrase to the user.
-     * Then once the quick access will have captured the passphrase, it will communicate it to its worker using requestId
-     * as message name. Basically, without changing the way the passphrase will be returned if the quick access was already
-     * open and it will have to reply to the request "passbolt.passphrase.request".
-     */
-    const requestId = Math.round(Math.random() * Math.pow(2, 32)).toString();
+    const requestId = uuidv4();
     const queryParameters = [
-      { name: "uiMode", value: "detached" },
       { name: "feature", value: "request-passphrase" },
       { name: "requestId", value: requestId },
     ];
-    const quickAccessWindow = await QuickAccessService.openInDetachedMode(queryParameters);
-    const { passphrase, rememberMe } = await this.listenToDetachedQuickaccessPassphraseRequestResponse(
-      requestId,
-      quickAccessWindow,
-    );
+
+    let quickAccessResponse;
+    if (QuickAccessService.isAttachedModeAvailable()) {
+      // Open attached popup — returns the workerId used as the port name
+      const workerId = await QuickAccessService.open(queryParameters);
+      quickAccessResponse = await this.listenToAttachedQuickaccessPassphraseRequestResponse(requestId, workerId);
+    } else {
+      const quickAccessWindow = await QuickAccessService.openInDetachedMode(queryParameters);
+      quickAccessResponse = await this.listenToDetachedQuickaccessPassphraseRequestResponse(
+        requestId,
+        quickAccessWindow,
+      );
+    }
+
+    const { passphrase, rememberMe } = quickAccessResponse;
     await this.validatePassphrase(passphrase);
     await this.rememberPassphrase(passphrase, rememberMe);
 
@@ -109,11 +118,33 @@ export default class GetPassphraseService {
     const tabId = quickAccessWindow?.tabs?.[0]?.id;
     await WorkerService.waitExists("QuickAccess", tabId);
     const quickAccessWorker = await WorkerService.get("QuickAccess", tabId);
-    let isResolved = false;
 
+    return this.listenForPassphraseInQuickaccess(quickAccessWorker.port, requestId);
+  }
+
+  /**
+   * Listen to the attached quick access passphrase request response.
+   * Polls for the QuickAccess port to connect, then listens for the passphrase response.
+   * @param {string} requestId The requestId used by the quick access to return the user passphrase
+   * @param {string} workerId The worker id used as the port identifier
+   * @returns {Promise<{passphrase: string, rememberMe: string}>}
+   */
+  async listenToAttachedQuickaccessPassphraseRequestResponse(requestId, workerId) {
+    const port = await this.waitForPort(workerId);
+    return await this.listenForPassphraseInQuickaccess(port, requestId);
+  }
+
+  /**
+   * Listens for when the passphrase has been given in the quickaccess.
+   * @param {Port} port
+   * @param {string} requestId
+   * @returns {Promise<string>}
+   */
+  async listenForPassphraseInQuickaccess(port, requestId) {
+    let isResolved = false;
     return new Promise((resolve, reject) => {
-      // When the passphrase is entered and valid, the quickaccess responds on the port with the requestId that has been given to it when opening it.
-      quickAccessWorker.port.on(requestId, (status, requestResult) => {
+      // When the passphrase is entered and valid, the quickaccess responds on the port with the requestId.
+      port.on(requestId, (status, requestResult) => {
         isResolved = true;
         if (status === "SUCCESS") {
           resolve(requestResult);
@@ -121,8 +152,8 @@ export default class GetPassphraseService {
           reject(requestResult);
         }
       });
-      // If the users closes the window manually before entering their passphrase, the operation is aborted.
-      quickAccessWorker.port._port.onDisconnect.addListener(() => {
+      // If the user closes the popup before entering their passphrase, the operation is aborted.
+      port._port.onDisconnect.addListener(() => {
         if (!isResolved) {
           isResolved = true;
           const error = new UserAbortsOperationError("The dialog has been closed.");
@@ -130,6 +161,23 @@ export default class GetPassphraseService {
         }
       });
     });
+  }
+
+  /**
+   * Wait for a port to be available in the PortManager.
+   * @param {string} portId The port identifier to wait for
+   * @param {number} timeout The maximum time to wait in milliseconds
+   * @returns {Promise<Port>}
+   */
+  async waitForPort(portId, timeout = 5000) {
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeout) {
+      if (PortManager.isPortExist(portId)) {
+        return PortManager.getPortById(portId);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    throw new Error("The QuickAccess port did not connect in time.");
   }
 
   /**

@@ -71,11 +71,10 @@ class InformMenuController {
    */
   async createNewCredentials(requestId) {
     const queryParameters = [
-      { name: "uiMode", value: "detached" },
       { name: "feature", value: "create-new-credentials" },
       { name: "tabId", value: this.worker.tab.id },
     ];
-    await QuickAccessService.openInDetachedMode(queryParameters);
+    await QuickAccessService.open(queryParameters);
     const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
     webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
     this.worker.port.emit(requestId, "SUCCESS");
@@ -103,12 +102,11 @@ class InformMenuController {
     await ResourceInProgressCacheService.set(resource);
 
     // Open the quickaccess on the save credentials page.
-    const quickaccessDetachModeQueryParameters = [
-      { name: "uiMode", value: "detached" },
+    const queryParameters = [
       { name: "feature", value: "save-credentials" },
       { name: "tabId", value: this.worker.tab.id },
     ];
-    await QuickAccessService.openInDetachedMode(quickaccessDetachModeQueryParameters);
+    await QuickAccessService.open(queryParameters);
 
     this.worker.port.emit(requestId, "SUCCESS");
     webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
@@ -120,11 +118,10 @@ class InformMenuController {
    */
   async browseCredentials(requestId) {
     const queryParameters = [
-      { name: "uiMode", value: "detached" },
       { name: "feature", value: "browse-credentials" },
       { name: "tabId", value: this.worker.tab.id },
     ];
-    await QuickAccessService.openInDetachedMode(queryParameters);
+    await QuickAccessService.open(queryParameters);
     const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
     webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
     this.worker.port.emit(requestId, "SUCCESS");

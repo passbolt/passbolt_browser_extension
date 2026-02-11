@@ -21,6 +21,8 @@ import User from "../../../../all/background_page/model/user";
 import OpenWebsiteGettingStartedPageService from "../ui/openWebsiteGettingStartedPageService";
 import OpenTrustedDomainTabService from "../ui/openTrustedDomainTabService";
 
+export const QUICKACCESS_POPUP_URL = "webAccessibleResources/quickaccess.html?passbolt=quickaccess";
+
 class ToolbarService {
   constructor() {
     this.bindCallbacks();
@@ -134,7 +136,7 @@ class ToolbarService {
     }
 
     // if the user account is set, sets the popup to the expected URL and open it. The browser wiil not use that callback until it is restarted.
-    browser.browserAction.setPopup({ popup: "webAccessibleResources/quickaccess.html?passbolt=quickaccess" });
+    browser.browserAction.setPopup({ popup: QUICKACCESS_POPUP_URL });
     browser.browserAction.openPopup();
   }
 

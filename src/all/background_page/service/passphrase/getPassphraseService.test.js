@@ -175,14 +175,13 @@ describe("GetPassphraseService", () => {
 
       QuickAccessService.openInDetachedMode.mockImplementation((popupParameters) => {
         const expectedParameters = [
-          { name: "uiMode", value: "detached" },
           { name: "feature", value: "request-passphrase" },
           { name: "requestId", value: expect.any(String) },
         ];
 
         expect(popupParameters).toStrictEqual(expectedParameters);
 
-        requestId = popupParameters[2].value;
+        requestId = popupParameters[1].value;
         return mockedPopupWindow;
       });
 

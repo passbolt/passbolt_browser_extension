@@ -166,7 +166,7 @@ each(scenarios).describe("SsoAuthenticationController", (scenario) => {
         mockApiResponse(serverSsoKit),
       );
 
-      const spyOnOpenInDetachedMode = jest.spyOn(QuickAccessService, "openInDetachedMode").mockImplementation(() => {});
+      const spyOnOpen = jest.spyOn(QuickAccessService, "open").mockImplementation(() => {});
 
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       jest
@@ -189,13 +189,12 @@ each(scenarios).describe("SsoAuthenticationController", (scenario) => {
       expect(PostLoginService.exec).toHaveBeenCalled();
 
       const expectedQuickAccessCallParameters = [
-        { name: "uiMode", value: "detached" },
         { name: "feature", value: "login" },
         { name: "tabId", value: 1 },
       ];
 
-      expect(spyOnOpenInDetachedMode).toHaveBeenCalledTimes(1);
-      expect(spyOnOpenInDetachedMode).toHaveBeenCalledWith(expectedQuickAccessCallParameters);
+      expect(spyOnOpen).toHaveBeenCalledTimes(1);
+      expect(spyOnOpen).toHaveBeenCalledWith(expectedQuickAccessCallParameters);
     });
   });
 

@@ -139,11 +139,10 @@ class SsoAuthenticationController {
     // Get the current tab to add in the property of the detach quickaccess
     const tab = await BrowserTabService.getCurrent();
     const queryParameters = [
-      { name: "uiMode", value: "detached" },
       { name: "feature", value: "login" },
       { name: "tabId", value: tab.id },
     ];
-    await QuickAccessService.openInDetachedMode(queryParameters);
+    await QuickAccessService.open(queryParameters);
   }
 
   /**

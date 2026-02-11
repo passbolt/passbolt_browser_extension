@@ -58,11 +58,8 @@ class InformCallToActionController {
     try {
       const status = await this.checkAuthStatusService.checkAuthStatus(false);
       if (!status.isAuthenticated) {
-        const queryParameters = [
-          { name: "uiMode", value: "detached" },
-          { name: "feature", value: "login" },
-        ];
-        await QuickAccessService.openInDetachedMode(queryParameters);
+        const queryParameters = [{ name: "feature", value: "login" }];
+        await QuickAccessService.open(queryParameters);
         this.worker.port.emit(requestId, "SUCCESS");
       } else if (status.isMfaRequired) {
         await this.openTrustedDomainTabService.openTab();

@@ -32,10 +32,7 @@ class WebIntegrationController {
    * Request the initial configuration of the in-form menu
    */
   async autosave(resourceToSave) {
-    const queryParameters = [
-      { name: "uiMode", value: "detached" },
-      { name: "feature", value: "autosave-credentials" },
-    ];
+    const queryParameters = [{ name: "feature", value: "autosave-credentials" }];
     // Request username and password
     const url = new URL(resourceToSave.url);
     const resourceDto = {
@@ -46,7 +43,7 @@ class WebIntegrationController {
     };
     const resource = new ExternalResourceEntity(resourceDto);
     await ResourceInProgressCacheService.set(resource);
-    QuickAccessService.openInDetachedMode(queryParameters);
+    QuickAccessService.open(queryParameters);
   }
 }
 

@@ -111,13 +111,13 @@ class AutofillController {
    * @return {Promise<string>}
    */
   async getPassphrase() {
-    if (this.isInformMenuWorker) {
-      // Get the passphrase from the quickaccess in detached mode if not stored in memory
-      return await this.getPassphraseService.requestPassphraseFromQuickAccess();
-    } else {
+    if (!this.isInformMenuWorker) {
       // Get the passphrase from the worker (should be the quickacess already opened) if not stored in memory
       return await this.getPassphraseService.getPassphrase(this.worker);
     }
+
+    // Get the passphrase from the quickaccess in detached mode if not stored in memory
+    return await this.getPassphraseService.requestPassphraseFromQuickAccess();
   }
 
   /**

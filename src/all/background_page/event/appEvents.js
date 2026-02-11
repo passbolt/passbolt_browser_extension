@@ -72,6 +72,7 @@ import FindSecretRevisionsSettingsController from "../controller/secretRevision/
 import FindResourceSecretRevisionsForDisplayController from "../controller/secretRevision/findResourceSecretRevisionsForDisplayController";
 import DeleteSecretRevisionsSettingsController from "../controller/secretRevision/deleteSecretRevisionsSettingsController";
 import SaveSecretRevisionsSettingsController from "../controller/secretRevision/saveSecretRevisionsSettingsController";
+import FindExportPoliciesSettingsController from "../controller/exportPolicies/findExportPoliciesSettingsController";
 import FindSubscriptionKeyController from "../controller/subscription/findSubscriptionKeyController";
 import UpdateSubscriptionKeyController from "../controller/subscription/updateSubscriptionKeyController";
 import FindTagsController from "../controller/tag/findTagsController";
@@ -725,6 +726,22 @@ const listen = function (worker, apiClientOptions, account) {
       account,
     );
     await controller._exec(resourceId);
+  });
+
+  /*
+   * ==================================================================================
+   *  Export Policies Settings events
+   * ==================================================================================
+   */
+  /**
+   * Find export policies settings
+   *
+   * @listens passbolt.export-policies.get
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on("passbolt.export-policies.get", async (requestId) => {
+    const controller = new FindExportPoliciesSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
   });
 
   /**

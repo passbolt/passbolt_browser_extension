@@ -34,6 +34,18 @@ describe("CheckForPermissionUpdateService", () => {
       // expectations
       expect(browser.permissions.onAdded.addListener).toHaveBeenCalledWith(expect.any(Function));
     });
+
+    it("Should throw if start has already been called", () => {
+      expect.assertions(1);
+      // mock data
+      const worker = { port: { request: jest.fn() } };
+      // process
+      CheckForPermissionUpdateService.start(worker);
+      // expectations
+      expect(() => CheckForPermissionUpdateService.start(worker)).toThrow(
+        "CheckForPermissionUpdateService has already been started.",
+      );
+    });
   });
 
   describe("::stop", () => {

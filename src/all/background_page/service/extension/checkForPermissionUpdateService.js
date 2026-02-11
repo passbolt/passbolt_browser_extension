@@ -29,6 +29,11 @@ export default class CheckForPermissionUpdateService {
    * @returns {void}
    */
   static start(worker) {
+    if (_boundHandler) {
+      //start has been called already in that case.
+      throw new Error("CheckForPermissionUpdateService has already been started.");
+    }
+
     _worker = worker;
     _boundHandler = CheckForPermissionUpdateService._onPermissionAdded;
     browser.permissions.onAdded.addListener(_boundHandler);

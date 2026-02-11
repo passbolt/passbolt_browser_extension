@@ -1,23 +1,22 @@
 {
-  "manifest_version": 3,
-  "name": "__MSG_appName__",
+  "manifest_version": 2,
+  "name": "Passbolt - password manager",
   "short_name": "passbolt",
-  "version": "5.9.0",
-  "description": "__MSG_appDescription__",
+  "version": "5.10.0.0",
+  "description": "Passbolt extension for the open source password manager.",
   "default_locale": "en",
-  "externally_connectable": {},
   "icons": {
     "16": "webAccessibleResources/img/icons/icon-16.png",
     "48": "webAccessibleResources/img/icons/icon-48.png",
     "128": "webAccessibleResources/img/icons/icon-128.png"
   },
   "background": {
-    "service_worker": "serviceWorker/serviceWorker.js"
+    "page": "index.html"
   },
-  "action": {
+  "browser_action": {
     "default_icon": "webAccessibleResources/img/icons/icon-32.png",
     "default_title": "Passbolt Quickaccess",
-    "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
+    "default_popup": ""
   },
   "commands": {
     "passbolt-open": {
@@ -29,22 +28,20 @@
     }
   },
   "permissions": [
+    "activeTab",
+    "tabs",
     "unlimitedStorage",
     "storage",
-    "tabs",
-    "scripting",
+    "background",
+    "clipboardWrite",
+    "*://*/*",
     "alarms",
-    "downloads",
+    "cookies",
+    "nativeMessaging",
     "webNavigation"
   ],
-  "host_permissions": [
-    "*://*/*"
+  "web_accessible_resources": [
+    "webAccessibleResources/*"
   ],
-  "web_accessible_resources": [{
-    "resources": ["webAccessibleResources/*"],
-    "matches": ["*://*/*"]
-  }],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'"
-  }
+  "content_security_policy": "default-src 'none'; script-src 'self'; style-src 'self' ; style-src-attr 'unsafe-inline'; img-src 'self' data: https: http: ; font-src 'self'; connect-src 'self' https: http: ; form-action 'self' https: ; frame-src 'self' ; frame-ancestors 'self' https: http: ; worker-src 'self' ; base-uri 'none' ;"
 }

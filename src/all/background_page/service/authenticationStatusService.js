@@ -19,6 +19,7 @@ import GetActiveAccountService from "./account/getActiveAccountService";
 import BuildApiClientOptionsService from "./account/buildApiClientOptionsService";
 
 const AUTH_RESOURCE_NAME = "/auth";
+const MFA_VERIFY_ERROR_REGEXP = /mfa\/verify\/error\.json$/;
 
 class AuthenticationStatusService {
   /**
@@ -52,8 +53,8 @@ class AuthenticationStatusService {
       return true;
     }
 
-    // MFA required.
-    if (/mfa\/verify\/error\.json$/.test(response.url)) {
+    // MFA required. @note: on safari response.url is an empty string in that case
+    if (MFA_VERIFY_ERROR_REGEXP.test(responseJson.header.url) || MFA_VERIFY_ERROR_REGEXP.test(response.url)) {
       //Retrieve the message error details from json
       throw new MfaAuthenticationRequiredError(null, responseJson.body);
     } else if (response.status === 404) {

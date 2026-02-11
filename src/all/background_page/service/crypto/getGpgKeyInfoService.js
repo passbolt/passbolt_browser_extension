@@ -13,7 +13,7 @@
  */
 
 import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
-import goog from "../../utils/format/emailaddress";
+import { parseGpgUserId } from "../../utils/format/gpgUserIdParser";
 import GpgKeyError from "../../error/GpgKeyError";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
@@ -36,10 +36,10 @@ class GetGpgKeyInfoService {
 
     for (const i in userIds) {
       if (Object.prototype.hasOwnProperty.call(userIds, i)) {
-        const result = goog.format.EmailAddress.parse(userIds[i]);
+        const result = parseGpgUserId(userIds[i]);
         userIdsSplited.push({
-          name: result.name_,
-          email: result.address_,
+          name: result.name,
+          email: result.email,
         });
       }
     }

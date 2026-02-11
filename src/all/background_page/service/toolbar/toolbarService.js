@@ -12,13 +12,14 @@
  * @since         2.0.0
  */
 import { BrowserExtensionIconService } from "../ui/browserExtensionIcon.service";
-import Toolbar from "../../model/toolbar";
-import { TabController as tabsController } from "../../controller/tabsController";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import CheckAuthStatusService from "../auth/checkAuthStatusService";
 import Log from "../../model/log";
 import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
+import User from "../../../../all/background_page/model/user";
+import OpenWebsiteGettingStartedPageService from "../ui/openWebsiteGettingStartedPageService";
+import OpenTrustedDomainTabService from "../ui/openTrustedDomainTabService";
 
 class ToolbarService {
   constructor() {
@@ -37,6 +38,7 @@ class ToolbarService {
     this.handleSuggestedResourcesOnUpdatedTab = this.handleSuggestedResourcesOnUpdatedTab.bind(this);
     this.handleSuggestedResourcesOnActivatedTab = this.handleSuggestedResourcesOnActivatedTab.bind(this);
     this.handleSuggestedResourcesOnFocusedWindow = this.handleSuggestedResourcesOnFocusedWindow.bind(this);
+    this.handleIconToolbarClicked = this.handleIconToolbarClicked.bind(this);
   }
 
   /**
@@ -50,10 +52,19 @@ class ToolbarService {
    * Handle the shortcut pressed event.
    * @private
    */
-  handleShortcutPressed(command) {
-    if (command === "passbolt-open") {
-      this.openPassboltTab();
+  async handleShortcutPressed(command) {
+    if (command !== "passbolt-open") {
+      return;
     }
+
+    const user = User.getInstance();
+    if (!user.isValid()) {
+      // if the user is not set, a tab on passbolt start page is opened
+      await this.openGettingStartedPage();
+      return;
+    }
+
+    await this.openTrustedDomainPage();
   }
 
   /**
@@ -109,11 +120,38 @@ class ToolbarService {
   }
 
   /**
-   * Open a new tab and go to passbolt.
+   * Handles click on the icon in the toolbar.
+   * The event is called by the browser only if no quickaccess popup URL is set (neither from the manifest nor in script).
+   * The popup is set when clicking the first and if an account is configured, otherwise this handler always triggers a tab open.
+   * note: Only used for Safari right now
    */
-  openPassboltTab() {
-    const url = Toolbar.getToolbarUrl();
-    tabsController.open(url);
+  async handleIconToolbarClicked() {
+    const user = User.getInstance();
+    if (!user.isValid()) {
+      // if the user is not set, a tab on passbolt start page is opened
+      await this.openGettingStartedPage();
+      return;
+    }
+
+    // if the user account is set, sets the popup to the expected URL and open it. The browser wiil not use that callback until it is restarted.
+    browser.browserAction.setPopup({ popup: "webAccessibleResources/quickaccess.html?passbolt=quickaccess" });
+    browser.browserAction.openPopup();
+  }
+
+  /**
+   * Opens the https://www.passbolt.com/start page in a new tab.
+   */
+  async openGettingStartedPage() {
+    const service = new OpenWebsiteGettingStartedPageService();
+    await service.openTab();
+  }
+
+  /**
+   * Opens the user's current instance domain URL in a new tab.
+   */
+  async openTrustedDomainPage() {
+    const service = new OpenTrustedDomainTabService();
+    await service.openTab();
   }
 
   /**

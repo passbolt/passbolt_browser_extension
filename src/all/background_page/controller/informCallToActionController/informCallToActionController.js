@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-import User from "../../model/user";
 import ResourceModel from "../../model/resource/resourceModel";
 import { QuickAccessService } from "../../service/ui/quickAccess.service";
 import WorkerService from "../../service/worker/workerService";
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
+import OpenTrustedDomainTabService from "../../service/ui/openTrustedDomainTabService";
 
 /**
  * Controller related to the in-form call-to-action
@@ -33,6 +33,7 @@ class InformCallToActionController {
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.checkAuthStatusService = new CheckAuthStatusService();
     this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
+    this.openTrustedDomainTabService = new OpenTrustedDomainTabService();
   }
 
   /**
@@ -64,7 +65,7 @@ class InformCallToActionController {
         await QuickAccessService.openInDetachedMode(queryParameters);
         this.worker.port.emit(requestId, "SUCCESS");
       } else if (status.isMfaRequired) {
-        browser.tabs.create({ url: User.getInstance().settings.getDomain(), active: true });
+        await this.openTrustedDomainTabService.openTab();
         this.worker.port.emit(requestId, "SUCCESS");
       } else {
         const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);

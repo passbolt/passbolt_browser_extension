@@ -1,0 +1,83 @@
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         5.6.0
+ */
+
+const SAFARI_APP_ID = "com.passbolt.safari";
+
+/**
+ * Custom error class for Safari native messaging errors.
+ * Formats all error details in the message for better debugging visibility.
+ */
+class SafariNativeError extends Error {
+  constructor(errorData) {
+    // Compact message: [Domain:Code] Message @ File:Line
+    const compactMessage = [
+      `[${errorData.domain}:${errorData.code}]`,
+      errorData.message,
+      errorData.file ? `@ ${errorData.file}:${errorData.line}` : null,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    super(compactMessage);
+    this.name = "SafariNativeError";
+  }
+}
+
+/**
+ * Send Native Message service for Safari
+ */
+export class SendNativeMessageService {
+  /**
+   * Send message to the Safari application part.
+   * @param {string} action
+   * @param {object} args
+   * @return {Promise<any>}
+   */
+  static async sendNativeMessage(action, args) {
+    /*
+     * @todo: find another approach for the lock, the `fetch` request are much slower when they are numerous.
+     * The reason for the lock is to ensure that there are not too many calls to the native applications
+     * At some point, without limitations, the native application is not started or shut down during its preocessing
+     * and as a result, the messaging is failing and some process does not work in the app.
+     */
+    return await navigator.locks.request(action, async () => await SendNativeMessageService._exec(action, args));
+  }
+
+  /**
+   * The service executor.
+   * @param {string} action
+   * @param {object} args
+   * @return {Promise<any>}
+   * @private
+   */
+  static async _exec(action, args) {
+    const message = { action, ...args };
+    //@note: SAFARI_APP_ID is actually ignored when used by Safari. It is still set here to respect `sendNativeMessage` standard.
+    const resp = await chrome.runtime.sendNativeMessage(SAFARI_APP_ID, message);
+
+    if (!resp.success) {
+      const errorData = resp.error;
+
+      // Handle structured error objects from the native application
+      if (typeof errorData === "object" && errorData.message) {
+        throw new SafariNativeError(errorData);
+      }
+
+      // Fallback for unexpected format (string or other types)
+      throw new Error(errorData ? String(errorData) : "Safari native application execution failed");
+    }
+
+    return resp?.returnedValue;
+  }
+}

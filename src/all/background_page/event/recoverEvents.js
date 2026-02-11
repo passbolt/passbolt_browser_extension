@@ -32,6 +32,10 @@ import HasRecoverUserEnabledAccountRecoveryController from "../controller/recove
 import GetUserPassphrasePoliciesController from "../controller/setup/getUserPassphrasePoliciesController";
 import ReloadTabController from "../controller/tab/reloadTabController";
 import RedirectPostLoginController from "../controller/auth/redirectPostLoginController";
+import IsExtensionAllowedOnEveryWebsiteController from "../controller/extension/isExtensionAllowedOnEveryWebsiteController";
+import OpenSafariExtensionSettingsController from "../controller/extension/openSafariExtensionSettingsController";
+import StartCheckingForPermissionUpdateController from "../controller/extension/startCheckingForPermissionUpdateController";
+import StopCheckingForPermissionUpdateController from "../controller/extension/stopCheckingForPermissionUpdateController";
 
 const listen = (worker, apiClientOptions, account) => {
   worker.port.on("passbolt.recover.first-install", async (requestId) => {
@@ -137,6 +141,46 @@ const listen = (worker, apiClientOptions, account) => {
    */
   worker.port.on("passbolt.auth.post-login-redirect", async (requestId) => {
     const controller = new RedirectPostLoginController(worker, requestId, account);
+    await controller._exec();
+  });
+
+  /**
+   * Checks if the extension is allowed on every website.
+   * @param {string} requestId
+   * @listens passbolt.extension.is-allowed-on-every-website
+   */
+  worker.port.on("passbolt.extension.is-allowed-on-every-website", async (requestId) => {
+    const controller = new IsExtensionAllowedOnEveryWebsiteController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Opens the Safari extension settings page.
+   * @param {string} requestId
+   * @listens passbolt.safari.open-extension-settings
+   */
+  worker.port.on("passbolt.safari.open-extension-settings", async (requestId) => {
+    const controller = new OpenSafariExtensionSettingsController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Starts checking for permission updates.
+   * @param {string} requestId
+   * @listens passbolt.extension.start-checking-for-permission-update
+   */
+  worker.port.on("passbolt.extension.start-checking-for-permission-update", async (requestId) => {
+    const controller = new StartCheckingForPermissionUpdateController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Stops checking for permission updates.
+   * @param {string} requestId
+   * @listens passbolt.extension.stop-checking-for-permission-update
+   */
+  worker.port.on("passbolt.extension.stop-checking-for-permission-update", async (requestId) => {
+    const controller = new StopCheckingForPermissionUpdateController(worker, requestId);
     await controller._exec();
   });
 };

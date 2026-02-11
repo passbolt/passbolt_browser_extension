@@ -46,8 +46,8 @@ class FetchController: AbstractController {
         let options = payload["options"] as? [String: Any] ?? [:]
 
         Task {
-            let httpResponse = try await FetchService.fetch(url: url, options: options, profileUUID: profileUUID)
             do {
+                let httpResponse = try await FetchService.fetch(url: url, options: options, profileUUID: profileUUID)
                 self.respondAsSuccess(context, ["httpResponse": httpResponse])
             } catch {
                 self.respondAsError(context, error)

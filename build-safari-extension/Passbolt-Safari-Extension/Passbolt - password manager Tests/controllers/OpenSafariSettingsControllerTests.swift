@@ -24,7 +24,11 @@
 import Foundation
 import Testing
 
-@Suite("ErrorSerializer")
-struct ErrorSerializerTests {
+@Suite("OpenSafariSettingsController")
+struct OpenSafariSettingsControllerTests {
 
+    @Test("OpenSafariSettingsController conforms to AbstractController")
+    func conformance() {
+        let _: any AbstractController = OpenSafariSettingsController()
+    }
 }

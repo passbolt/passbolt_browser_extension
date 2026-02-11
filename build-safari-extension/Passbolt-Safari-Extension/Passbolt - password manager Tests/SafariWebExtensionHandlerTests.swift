@@ -24,7 +24,28 @@
 import Foundation
 import Testing
 
-@Suite("SecureProfileSessionManager")
-struct SecureProfileSessionManagerTests {
+@Suite("SafariWebExtensionHandler")
+struct SafariWebExtensionHandlerTests {
 
+    @Test("SafariExtensionError raw values are stable")
+    func errorRawValues() {
+        #expect(SafariExtensionError.missingMessage.rawValue == 1)
+        #expect(SafariExtensionError.missingAction.rawValue == 2)
+        #expect(SafariExtensionError.unsupportedAction.rawValue == 3)
+        #expect(SafariExtensionError.controllerExecutionFailed.rawValue == 4)
+        #expect(SafariExtensionError.unknownError.rawValue == 999)
+    }
+
+    @Test("routes map each action to the correct controller")
+    func routesMappings() {
+        #expect(routes["save-file"] == SaveFileController.self)
+        #expect(routes["fetch"] == FetchController.self)
+        #expect(routes["open-safari-settings"] == OpenSafariSettingsController.self)
+        #expect(routes.count == 3)
+    }
+
+    @Test("routes returns nil for unknown action")
+    func routesUnknownAction() {
+        #expect(routes["nonexistent-action"] == nil)
+    }
 }

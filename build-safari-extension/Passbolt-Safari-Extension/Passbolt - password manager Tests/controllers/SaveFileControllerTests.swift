@@ -24,7 +24,11 @@
 import Foundation
 import Testing
 
-@Suite("SaveFileService")
-struct SaveFileServiceTests {
+@Suite("SaveFileController")
+struct SaveFileControllerTests {
 
+    @Test("SaveFileController conforms to AbstractController")
+    func conformance() {
+        let _: any AbstractController = SaveFileController()
+    }
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		82EE77922F3C9FAE000B30B5 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978962732E27D39300F48BDD /* SafariWebExtensionHandler.swift */; };
 		977E15742E7AE6FD00445DD3 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 977E15732E7AE6FD00445DD3 /* index.html */; };
 		977E15772E7AE71F00445DD3 /* vendors.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 977E15762E7AE71F00445DD3 /* vendors.min.js */; };
 		977E15782E7AE71F00445DD3 /* index.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 977E15752E7AE71F00445DD3 /* index.min.js */; };
@@ -28,6 +29,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		82EE777A2F3C9D57000B30B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 978962332E27D39200F48BDD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9789623A2E27D39200F48BDD;
+			remoteInfo = "Passbolt - password manager";
+		};
 		978962702E27D39300F48BDD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 978962332E27D39200F48BDD /* Project object */;
@@ -52,6 +60,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		82EE77762F3C9D57000B30B5 /* Passbolt - password manager Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Passbolt - password manager Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		977E15732E7AE6FD00445DD3 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = index.html; path = ../../../build/all/index.html; sourceTree = "<group>"; };
 		977E15752E7AE71F00445DD3 /* index.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = index.min.js; path = ../../../build/all/index.min.js; sourceTree = "<group>"; };
 		977E15762E7AE71F00445DD3 /* vendors.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = vendors.min.js; path = ../../../build/all/vendors.min.js; sourceTree = "<group>"; };
@@ -83,6 +92,11 @@
 			path = utils;
 			sourceTree = "<group>";
 		};
+		82EE77772F3C9D57000B30B5 /* Passbolt - password manager Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Passbolt - password manager Tests";
+			sourceTree = "<group>";
+		};
 		979642262EC5D7850002E98F /* services */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = services;
@@ -96,6 +110,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		82EE77732F3C9D57000B30B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		978962382E27D39200F48BDD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -118,6 +139,7 @@
 			children = (
 				9789623D2E27D39200F48BDD /* Passbolt - password manager */,
 				978962722E27D39300F48BDD /* Passbolt - password manager Extension */,
+				82EE77772F3C9D57000B30B5 /* Passbolt - password manager Tests */,
 				9789623C2E27D39200F48BDD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -127,6 +149,7 @@
 			children = (
 				9789623B2E27D39200F48BDD /* Passbolt - password manager.app */,
 				9789626E2E27D39300F48BDD /* Passbolt - password manager Extension.appex */,
+				82EE77762F3C9D57000B30B5 /* Passbolt - password manager Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -189,6 +212,32 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		82EE77752F3C9D57000B30B5 /* Passbolt - password manager Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 82EE777C2F3C9D57000B30B5 /* Build configuration list for PBXNativeTarget "Passbolt - password manager Tests" */;
+			buildPhases = (
+				82EE77722F3C9D57000B30B5 /* Sources */,
+				82EE77732F3C9D57000B30B5 /* Frameworks */,
+				82EE77742F3C9D57000B30B5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				82EE777B2F3C9D57000B30B5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				8260C00A2F2A652400C30185 /* utils */,
+				82EE77772F3C9D57000B30B5 /* Passbolt - password manager Tests */,
+				979642262EC5D7850002E98F /* services */,
+				9796422B2EC5D7890002E98F /* controllers */,
+			);
+			name = "Passbolt - password manager Tests";
+			packageProductDependencies = (
+			);
+			productName = "Passbolt Extension Tests";
+			productReference = 82EE77762F3C9D57000B30B5 /* Passbolt - password manager Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		9789623A2E27D39200F48BDD /* Passbolt - password manager */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9789627D2E27D39300F48BDD /* Build configuration list for PBXNativeTarget "Passbolt - password manager" */;
@@ -241,9 +290,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1610;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					82EE77752F3C9D57000B30B5 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 9789623A2E27D39200F48BDD;
+					};
 					9789623A2E27D39200F48BDD = {
 						CreatedOnToolsVersion = 16.1;
 					};
@@ -268,11 +321,19 @@
 			targets = (
 				9789623A2E27D39200F48BDD /* Passbolt - password manager */,
 				9789626D2E27D39300F48BDD /* Passbolt - password manager Extension */,
+				82EE77752F3C9D57000B30B5 /* Passbolt - password manager Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		82EE77742F3C9D57000B30B5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		978962392E27D39200F48BDD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -304,6 +365,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		82EE77722F3C9D57000B30B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82EE77922F3C9FAE000B30B5 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		978962372E27D39200F48BDD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -324,6 +393,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		82EE777B2F3C9D57000B30B5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9789623A2E27D39200F48BDD /* Passbolt - password manager */;
+			targetProxy = 82EE777A2F3C9D57000B30B5 /* PBXContainerItemProxy */;
+		};
 		978962712E27D39300F48BDD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9789626D2E27D39300F48BDD /* Passbolt - password manager Extension */;
@@ -351,6 +425,47 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		82EE777D2F3C9D57000B30B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.passbolt.safari.Extension-Tests.Passbolt-Extension-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Passbolt - password manager";
+			};
+			name = Debug;
+		};
+		82EE777E2F3C9D57000B30B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.passbolt.safari.Extension-Tests.Passbolt-Extension-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Passbolt - password manager";
+			};
+			name = Release;
+		};
 		978962772E27D39300F48BDD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -638,6 +753,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		82EE777C2F3C9D57000B30B5 /* Build configuration list for PBXNativeTarget "Passbolt - password manager Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				82EE777D2F3C9D57000B30B5 /* Debug */,
+				82EE777E2F3C9D57000B30B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		978962362E27D39200F48BDD /* Build configuration list for PBXProject "Passbolt - password manager" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

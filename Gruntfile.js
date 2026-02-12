@@ -72,8 +72,8 @@ module.exports = function (grunt) {
   grunt.registerTask('build-chromium-mv3-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chromium-mv3', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_chromium_mv3_prod']);
 
   grunt.registerTask('build-safari', ['build-safari-debug', 'build-safari-prod']);
-  grunt.registerTask('build-safari-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-safari', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug']);
-  grunt.registerTask('build-safari-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-safari', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod']);
+  grunt.registerTask('build-safari-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-safari', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug', 'shell:build_safari_debug']);
+  grunt.registerTask('build-safari-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-safari', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_safari_prod']);
 
   grunt.registerTask('externalize-locale-strings', ['shell:externalize']);
 
@@ -454,6 +454,31 @@ module.exports = function (grunt) {
           'zip -q -1 -r ' + path.dist_chromium_mv3 + 'passbolt-' + pkg.version + '.zip ' + path.build,
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chromium_mv3 + 'passbolt-' + pkg.version + '.crx ',
           "echo '\nZip and Crx files generated in " + path.dist_chromium_mv3 + "'"
+        ].join(' && ')
+      },
+
+      /**
+       * Safari
+       * The Xcode wrapper app can be generated separately via `safari-web-extension-converter`.
+       */
+      build_safari_debug: {
+        options: {
+          stderr: false
+        },
+        command: [
+          'mkdir -p ' + path.dist_safari,
+          'zip -q -1 -r ' + path.dist_safari + 'passbolt-' + pkg.version + '-debug.zip ' + path.build,
+          "echo '\nZip generated in " + path.dist_safari + "'"
+        ].join(' && ')
+      },
+      build_safari_prod: {
+        options: {
+          stderr: false
+        },
+        command: [
+          'mkdir -p ' + path.dist_safari,
+          'zip -q -1 -r ' + path.dist_safari + 'passbolt-' + pkg.version + '.zip ' + path.build,
+          "echo '\nZip generated in " + path.dist_safari + "'"
         ].join(' && ')
       }
     }

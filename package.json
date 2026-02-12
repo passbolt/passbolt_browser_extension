@@ -91,6 +91,8 @@
   },
   "scripts": {
     "build": "npx grunt build",
+    "build:safari": "grunt build-safari-prod",
+    "build:safari:debug": "grunt build-safari-debug",
     "build:background-page": "webpack --config webpack.background-page.config.js",
     "build:service-worker": "webpack --config webpack.service-worker.config.js; webpack --config webpack-offscreens.config.js",
     "build:content-scripts": "npm run build:content-scripts:app; npm run build:content-scripts:browser-integration; npm run build:content-scripts:public-website",
@@ -110,7 +112,7 @@
     "dev:build:web-accessible-resources:app": "webpack --env debug=true --config webpack-data.config.js; webpack --env debug=true --config webpack-data.download.config.js",
     "dev:build:web-accessible-resources:browser-integration": "webpack --env debug=true --config webpack-data.in-form-call-to-action.config.js; webpack --env debug=true --config webpack-data.in-form-menu.config.js",
     "dev:safari:build": "grunt build-safari-debug; npm run dev:safari:convert",
-    "dev:safari:convert": "xcrun safari-web-extension-converter --app-name Passbolt-Safari-Extension --swift --macos-only --project-location ./build-safari-extension --bundle-identifier com.passbolt.safari-extension --force --no-open build/all/",
+    "dev:safari:convert": "xcrun safari-web-extension-converter --app-name Passbolt-Safari-Extension --swift --macos-only --project-location ./build-safari-extension --bundle-identifier com.passbolt.safari-extension --force --no-open --no-prompt --copy-resources build/all/",
     "dev:watch:build:background-page": "npm run dev:build:background-page -- -w",
     "dev:watch:build:service-worker": "npm run dev:build:service-worker -- -w",
     "dev:watch:build:content-scripts:app": "npm run dev:build:content-scripts:app -- -w",

@@ -21,8 +21,9 @@ export const formDataString = () => {
 
 export const formDataFile = () => {
   const formDataBody = new FormData();
-  const file1 = new File(["test"], "file 1", { type: "image/png" });
-  const file2 = new File(["test"], "file 2", { type: "image/png" });
+  // Use Blob + filename to avoid File/FormData realm mismatches (jsdom vs Node/undici).
+  const file1 = new Blob(["test"], { type: "text/plain" });
+  const file2 = new Blob(["test"], { type: "text/plain" });
   formDataBody.append("file", file1, "file 1");
   formDataBody.append("file", file2, "file 2");
   return formDataBody;

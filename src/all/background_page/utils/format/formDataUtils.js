@@ -19,6 +19,20 @@ import Base64Utils from "./base64";
  */
 class FormDataUtils {
   /**
+   * Check if a value looks like a Blob/File across realms (jsdom vs undici vs browser).
+   * We avoid `instanceof` because it breaks when FormData/File come from different globals.
+   * @param {*} value
+   * @return {boolean}
+   */
+  static isBlobLike(value) {
+    return !!value
+      && typeof value === "object"
+      && typeof value.arrayBuffer === "function"
+      && typeof value.type === "string"
+      && typeof value.size === "number";
+  }
+
+  /**
    * Transform a form data to an array of object
    * @param {FormData} formData The form data
    * @return {Promise<Array<Object>>}
@@ -29,10 +43,14 @@ class FormDataUtils {
       const formDataObject = {
         key: key,
       };
-      // BLOB in FormData is transformed into a File
-      if (value instanceof File) {
+      // BLOBs in FormData are typically returned as File objects, but the constructor can
+      // differ across environments (browser vs jsdom vs Node/undici).
+      if (FormDataUtils.isBlobLike(value)) {
         formDataObject.value = await Base64Utils.blobToBase64(value);
-        formDataObject.name = value.name;
+        // `name` is only present on File, not Blob. Keep it optional.
+        if (typeof value.name === "string") {
+          formDataObject.name = value.name;
+        }
         formDataObject.type = FormDataUtils.TYPE_FILE;
       } else {
         formDataObject.value = value;

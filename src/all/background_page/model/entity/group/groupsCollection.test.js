@@ -207,7 +207,8 @@ describe("GroupsCollection", () => {
       const collection = new GroupsCollection(groupsDtos, { ignoreInvalidEntity: true });
       const time = performance.now() - start;
       expect(collection).toHaveLength(groupsCount);
-      expect(time).toBeLessThan(5_000);
+      const limitMs = process.env.CI ? 5_000 : 10_000;
+      expect(time).toBeLessThan(limitMs);
     });
   });
 

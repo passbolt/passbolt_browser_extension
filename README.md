@@ -132,6 +132,33 @@ grunt build
 ```
 The build can be found under ```dist/chromium-mv3``` or ```dist/chromium-mv2``` or ```dist/firefox```.
 
+## Safari
+
+The repository includes a Safari (MV3) manifest at `src/safari/manifest.json`.
+
+### Build the Safari WebExtension bundle (zip)
+
+This produces a zip suitable for local testing or as an input to Apple's converter:
+
+```sh
+npm ci
+npm run build:safari
+```
+
+Artifacts:
+- `build/all/` (the bundled extension sources)
+- `dist/safari/passbolt-<version>.zip`
+
+### Generate the Xcode project (optional)
+
+On macOS with Xcode installed:
+
+```sh
+npm run dev:safari:convert
+```
+
+This generates `./build-safari-extension/` (ignored by git).
+
 ## Updating the vendors or the styleguide
 
 You can update the vendors or the styleguide in the ```package.json``` and run the copy task

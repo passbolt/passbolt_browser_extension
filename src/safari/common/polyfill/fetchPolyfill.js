@@ -84,6 +84,8 @@ class FetchSafariPolyfill {
       requestOptions.headers["X-Csrf-Token"] = await cookieService.getCsrfToken();
     }
 
+    requestOptions.headers["User-Agent"] = navigator.userAgent;
+
     return requestOptions;
   }
 

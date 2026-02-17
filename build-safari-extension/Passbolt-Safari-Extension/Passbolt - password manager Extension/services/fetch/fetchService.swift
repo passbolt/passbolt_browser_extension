@@ -67,17 +67,27 @@ final class FetchService {
 
         let (data, response) = try await session.data(for: request)
 
-        let responseJSON = try JSONSerialization.jsonObject(with: data, options: [])
         guard let httpResponse = response as? HTTPURLResponse else {
             throw NSError(domain: "FetchService", code: 500,
                           userInfo: [NSLocalizedDescriptionKey: "Response is not HTTP"])
         }
+        
+        // Try to parse as JSON, fallback to string representation
+        let body: Any
+        if let jsonBody = try? JSONSerialization.jsonObject(with: data, options: []) {
+            body = jsonBody
+        } else if let stringBody = String(data: data, encoding: .utf8) {
+            body = stringBody
+        } else {
+            body = NSNull()
+        }
+        
         let headers = httpResponse.allHeaderFields
         let statusCode = httpResponse.statusCode
 
         return [
             "headers": headers,
-            "body": responseJSON,
+            "body": body,
             "status": statusCode
         ]
     }

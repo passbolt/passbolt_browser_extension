@@ -58,7 +58,14 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
         // SECURITY: Extract profile UUID for session isolation
         // SFExtensionProfileKey provides the Safari profile identifier (macOS 14+)
-        let profileUUID = item.userInfo?[SFExtensionProfileKey] as? String ?? "default"
+        let profileUUID: String
+        if let uuid = item.userInfo?[SFExtensionProfileKey] as? UUID {
+            profileUUID = uuid.uuidString
+        } else if let str = item.userInfo?[SFExtensionProfileKey] as? String {
+            profileUUID = str
+        } else {
+            profileUUID = "default"
+        }
 
         guard let action = payload["action"] as? String else {
             let error = locatedNSError(

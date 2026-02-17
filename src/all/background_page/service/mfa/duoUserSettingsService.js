@@ -55,7 +55,7 @@ export default class DuoUserSettingsService {
     this.assertDuoConfiguration(settings);
 
     const response = await this.duoApiService.promptUserForDuoSignin();
-    const location = response.headers.get("Location");
+    const location = response.headers.get("Location"); // works only for Safari
 
     this.assertDuoUrl(location, settings.duoHostname);
     return location;

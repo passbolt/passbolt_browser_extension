@@ -48,10 +48,11 @@ export default class DuoApiService extends AbstractService {
     const url = `${this.apiClient.baseUrl.toString()}/prompt?redirect=/app/settings/mfa/duo`;
     // eslint-disable-next-line no-undef
     const fetchStrategy = typeof customApiClientFetch !== "undefined" ? customApiClientFetch : fetch;
+    const apiClientOptionsHeader = await this.apiClient.options.getHeaders();
     const options = {
       credentials: "include",
       method: "POST",
-      headers: {},
+      headers: { ...apiClientOptionsHeader },
     };
     return await fetchStrategy(url, options);
   }

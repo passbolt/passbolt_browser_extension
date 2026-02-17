@@ -16,8 +16,6 @@ import MFAService from "passbolt-styleguide/src/shared/services/api/Mfa/MfaServi
 import { assertString } from "../../utils/assertions";
 import DuoApiService from "../api/mfa/duoApiService";
 import BrowserTabService from "../ui/browserTab.service";
-import MfaModel from "passbolt-styleguide/src/shared/models/Mfa/MfaModel";
-
 /**
  * The service aims to orchestrate the Duo MFA setup for the current user.
  */
@@ -46,29 +44,11 @@ export default class DuoUserSettingsService {
    * @private
    */
   async getLocation() {
-    const settingsDto = await this.mfaService.findAllSettings();
-    const settings = new MfaModel(settingsDto);
-
-    this.assertDuoConfiguration(settings);
-
     const response = await this.duoApiService.promptUserForDuoSignin();
     const location = response.headers.get("Location"); // works only for Safari
 
     this.assertDuoUrl(location);
     return location;
-  }
-
-  /**
-   * Asserts that the given Duo MFA is set properly before going on.
-   * @param {MfaModel} settingsEntity
-   * @throws {Error} if any of the configuration is not valid.
-   * @private
-   */
-  assertDuoConfiguration(settingsEntity) {
-    const errorMessage = "The MFA Duo settings is not valid";
-    assertString(settingsEntity.duoHostname, errorMessage);
-    assertString(settingsEntity.duoClientId, errorMessage);
-    assertString(settingsEntity.duoClientSecret, errorMessage);
   }
 
   /**
@@ -83,10 +63,5 @@ export default class DuoUserSettingsService {
     if (url.protocol !== "https:") {
       throw new Error("The given URL must use the protocol https:");
     }
-
-    // @todo: add later when we are sure the url.host must be the same as in the configuration.
-    // if (url.host !== expectedHost) {
-    //   throw new Error("The given URL must use the configured domain to sign in with Duo");
-    // }
   }
 }

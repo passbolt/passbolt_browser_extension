@@ -19,12 +19,11 @@ import BrowserTabService from "../ui/browserTab.service";
 import MfaModel from "passbolt-styleguide/src/shared/models/Mfa/MfaModel";
 
 /**
- * The service aims to orchestrate the enablement of the metadata encryption.
+ * The service aims to orchestrate the Duo MFA setup for the current user.
  */
 export default class DuoUserSettingsService {
   /**
    * @constructor
-   * @param {AccountEntity} account The user account
    * @param {ApiClientOptions} apiClientOptions The api client options
    */
   constructor(apiClientOptions) {
@@ -33,10 +32,8 @@ export default class DuoUserSettingsService {
   }
 
   /**
-   * Enables metadata encryption with confuguration that matches a new instance.
-   * @param {string} passphrase
+   * Starts the Duo MFA setup by redirecting the user to the Duo sign-in page.
    * @return {Promise<void>}
-   * @throws {TypeError} if the `passphrase` is not a valid string
    */
   async startSetup() {
     const location = await this.getLocation();
@@ -57,7 +54,7 @@ export default class DuoUserSettingsService {
     const response = await this.duoApiService.promptUserForDuoSignin();
     const location = response.headers.get("Location"); // works only for Safari
 
-    this.assertDuoUrl(location, settings.duoHostname);
+    this.assertDuoUrl(location);
     return location;
   }
 

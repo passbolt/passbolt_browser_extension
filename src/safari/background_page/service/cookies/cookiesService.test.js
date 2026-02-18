@@ -22,6 +22,22 @@ beforeEach(() => {
 });
 
 describe("CookieService", () => {
+  describe("::constructor", () => {
+    it("should set domain without port for non-standard port URLs", () => {
+      expect.assertions(2);
+      const service = new CookiesService("https://localhost:8443/setup/start", TEST_STORE_ID);
+      expect(service.domain).toStrictEqual("localhost");
+      expect(service.url).toStrictEqual("https://localhost:8443/setup/start");
+    });
+
+    it("should set domain without port for standard port URLs", () => {
+      expect.assertions(2);
+      const service = new CookiesService("https://www.passbolt.com/", TEST_STORE_ID);
+      expect(service.domain).toStrictEqual("www.passbolt.com");
+      expect(service.url).toStrictEqual("https://www.passbolt.com/");
+    });
+  });
+
   describe("::getSerialisedCookies", () => {
     it("should serialize the given set of cookies", async () => {
       expect.assertions(3);
@@ -235,6 +251,16 @@ describe("CookieService", () => {
       expect(cookieList).toHaveLength(1);
       // expirationDate should be within a reasonable range of now + 3600 seconds
       expect(cookieList[0].expirationDate).toBeGreaterThanOrEqual(nowInSeconds + 3600);
+    });
+
+    it("should use hostname without port in cookie domain for non-standard port URLs", () => {
+      expect.assertions(2);
+      const service = new CookiesService("https://localhost:8443/", TEST_STORE_ID);
+      const cookieString = simpleThemeCookie();
+
+      const cookieList = service.deserialisedCookie(cookieString);
+      expect(cookieList[0].domain).toStrictEqual("localhost");
+      expect(cookieList[0].url).toStrictEqual("https://localhost:8443/");
     });
 
     it("should assert its parameter", () => {

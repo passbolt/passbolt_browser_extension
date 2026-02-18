@@ -593,7 +593,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager Extension/Passbolt - password manager Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -631,7 +631,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager Extension/Passbolt - password manager Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -672,7 +672,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager/Passbolt - password manager.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -715,7 +715,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager/Passbolt - password manager.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;

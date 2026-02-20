@@ -75,6 +75,7 @@
     "jest-webextension-mock": "^3.8.9",
     "lockfile-lint": "^4.14.1",
     "prettier": "3.6.2",
+    "terser-webpack-plugin": "^5.3.16",
     "text-encoding-utf-8": "^1.0.2",
     "web-ext": "^9.2.0",
     "webpack": "^5.94.0",

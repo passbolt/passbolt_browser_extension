@@ -20,7 +20,6 @@ import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import SessionKeysBundlesCollection from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection";
 import { defaultSessionKeysBundlesDtos } from "passbolt-styleguide/src/shared/models/entity/sessionKey/sessionKeysBundlesCollection.test.data";
-import expect from "expect";
 
 beforeEach(() => {
   jest.clearAllMocks();

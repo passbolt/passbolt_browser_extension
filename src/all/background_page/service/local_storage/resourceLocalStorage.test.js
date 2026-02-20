@@ -17,7 +17,6 @@ import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
-import expect from "expect";
 
 describe("ResourceLocalStorage", () => {
   describe("::get", () => {

@@ -60,7 +60,7 @@ class ImportResourcesFileEntity extends EntityV2 {
       properties: {
         ref: {
           type: "string",
-          pattern: /^[a-zA-Z0-9\-_]*$/,
+          pattern: /^[\w\-]*$/,
         },
         file: {
           type: "string",

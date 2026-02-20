@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-import i18next from "i18next";
+import { createInstance } from "i18next";
 import HttpApi from "i18next-http-backend";
 
 /**
@@ -26,7 +26,7 @@ class I18n {
    * @param {array<string>} locales The supported locales. i.e. ['en-UK', 'fr-FR']
    */
   static init(locale, locales) {
-    _i18next = i18next.createInstance();
+    _i18next = createInstance();
     _i18next.use(HttpApi).init({
       lng: locale,
       load: "currentOnly",

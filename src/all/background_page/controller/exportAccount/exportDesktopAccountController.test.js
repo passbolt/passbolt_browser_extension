@@ -42,7 +42,9 @@ describe("ExportDesktopAccountController", () => {
 
       try {
         await controller.exec();
-      } catch {}
+      } catch {
+        // Expected to throw, error is intentionally ignored
+      }
 
       expect(controller.getPassphraseService.requestPassphrase).toHaveBeenCalledWith(worker);
       expect(controller.desktopTransferModel.getAccountKit).not.toHaveBeenCalled();

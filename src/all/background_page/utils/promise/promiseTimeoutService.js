@@ -26,7 +26,7 @@ class PromiseTimeoutService {
       // Clear promise timeout alarm
       const clearTimeoutWithId = () => clearTimeout(timeoutId);
       // return the promise resolved else reject and finally clear timeout
-      promise.then(resolve).catch(reject).finally(clearTimeoutWithId);
+      return promise.then(resolve).catch(reject).finally(clearTimeoutWithId);
     });
   }
 }

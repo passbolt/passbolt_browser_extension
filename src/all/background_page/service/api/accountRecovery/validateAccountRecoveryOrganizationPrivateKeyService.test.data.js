@@ -13,7 +13,7 @@
  */
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
-exports.dummyData = {
+export const dummyData = {
   correctKeyPair: {
     publicKey: {
       policy: "opt-in",

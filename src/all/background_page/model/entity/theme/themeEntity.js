@@ -31,7 +31,7 @@ class ThemeEntity extends EntityV2 {
         },
         name: {
           type: "string",
-          pattern: /^[a-zA-Z0-9-_]*$/,
+          pattern: /^[\w-]*$/,
         },
       },
     };

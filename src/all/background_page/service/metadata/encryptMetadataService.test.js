@@ -26,7 +26,10 @@ import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 import UserPassphraseRequiredError from "passbolt-styleguide/src/shared/error/userPassphraseRequiredError";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import ResourceEntity, {
+  METADATA_KEY_TYPE_METADATA_KEY,
+  METADATA_KEY_TYPE_USER_KEY,
+} from "../../model/entity/resource/resourceEntity";
 import EncryptMetadataService from "./encryptMetadataService";
 import { TEST_RESOURCE_TYPE_V5_DEFAULT } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
@@ -37,7 +40,6 @@ import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entit
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
-import passphraseStorageService from "../session_storage/passphraseStorageService";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 
@@ -77,9 +79,9 @@ describe("EncryptMetadataService", () => {
 
       await encryptService.encryptOneForForeignModel(resourceEntity, null);
 
-      expect(passphraseStorageService.get).toHaveBeenCalledTimes(1);
+      expect(PassphraseStorageService.get).toHaveBeenCalledTimes(1);
       expect(resourceEntity.isMetadataDecrypted()).toBeFalsy();
-      expect(resourceEntity.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
+      expect(resourceEntity.metadataKeyType).toEqual(METADATA_KEY_TYPE_METADATA_KEY);
       expect(resourceEntity.metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
 
       await decryptService.decryptOneWithSharedKey(resourceEntity);
@@ -104,7 +106,7 @@ describe("EncryptMetadataService", () => {
 
       await encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase);
 
-      expect(passphraseStorageService.get).not.toHaveBeenCalled();
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
     });
 
     it("should encrypt the metadata of a ResourcesEntity with user private key", async () => {
@@ -133,9 +135,9 @@ describe("EncryptMetadataService", () => {
 
       await encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase);
 
-      expect(passphraseStorageService.get).not.toHaveBeenCalled();
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
       expect(resourceEntity.isMetadataDecrypted()).toBeFalsy();
-      expect(resourceEntity.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_USER_KEY);
+      expect(resourceEntity.metadataKeyType).toEqual(METADATA_KEY_TYPE_USER_KEY);
       expect(resourceEntity.metadataKeyId).toBeNull();
 
       const adasPrivateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
@@ -167,15 +169,15 @@ describe("EncryptMetadataService", () => {
           "findSettings",
         )
         .mockImplementationOnce(() => metadataKeysSettingsDto);
-      jest.spyOn(passphraseStorageService, "get");
+      jest.spyOn(PassphraseStorageService, "get");
 
       expect(resourceEntity.isMetadataDecrypted()).toBeTruthy();
 
       await encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase);
 
-      expect(passphraseStorageService.get).not.toHaveBeenCalled();
+      expect(PassphraseStorageService.get).not.toHaveBeenCalled();
       expect(resourceEntity.isMetadataDecrypted()).toBeFalsy();
-      expect(resourceEntity.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
+      expect(resourceEntity.metadataKeyType).toEqual(METADATA_KEY_TYPE_METADATA_KEY);
       expect(resourceEntity.metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
 
       await decryptService.decryptOneWithSharedKey(resourceEntity);
@@ -203,7 +205,7 @@ describe("EncryptMetadataService", () => {
       await encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase);
 
       expect(resourceEntity.isMetadataDecrypted()).toBeFalsy();
-      expect(resourceEntity.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
+      expect(resourceEntity.metadataKeyType).toEqual(METADATA_KEY_TYPE_METADATA_KEY);
       expect(resourceEntity.metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
 
       const resourceEntityClone = new ResourceEntity(resourceEntity.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS));
@@ -332,7 +334,7 @@ describe("EncryptMetadataService", () => {
       const expectedResult = collection.items[0];
 
       expect(expectedResult.isMetadataDecrypted()).toBeFalsy();
-      expect(expectedResult.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
+      expect(expectedResult.metadataKeyType).toEqual(METADATA_KEY_TYPE_METADATA_KEY);
       expect(expectedResult.metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
 
       await decryptService.decryptOneWithSharedKey(expectedResult);
@@ -407,7 +409,7 @@ describe("EncryptMetadataService", () => {
       const expectedResult = collection.items[0];
 
       expect(expectedResult.isMetadataDecrypted()).toBeFalsy();
-      expect(expectedResult.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_USER_KEY);
+      expect(expectedResult.metadataKeyType).toEqual(METADATA_KEY_TYPE_USER_KEY);
       expect(expectedResult.metadataKeyId).toBeNull();
 
       const adasPrivateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
@@ -450,7 +452,7 @@ describe("EncryptMetadataService", () => {
       const expectedResult = collection.items[0];
 
       expect(expectedResult.isMetadataDecrypted()).toBeFalsy();
-      expect(expectedResult.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
+      expect(expectedResult.metadataKeyType).toEqual(METADATA_KEY_TYPE_METADATA_KEY);
       expect(expectedResult.metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
 
       await decryptService.decryptOneWithSharedKey(expectedResult);
@@ -569,7 +571,7 @@ describe("EncryptMetadataService", () => {
       const expectedResult = collection.items[0];
 
       expect(expectedResult.isMetadataDecrypted()).toBeFalsy();
-      expect(expectedResult.metadataKeyType).toEqual(ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY);
+      expect(expectedResult.metadataKeyType).toEqual(METADATA_KEY_TYPE_METADATA_KEY);
       expect(expectedResult.metadataKeyId).toEqual(metadataKeys.getFirstByLatestCreated().id);
 
       const resourceEntityClone = new ResourceEntity(expectedResult.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS));

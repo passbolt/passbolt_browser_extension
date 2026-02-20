@@ -12,7 +12,7 @@
  */
 import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
 import * as kdbxweb from "kdbxweb";
-import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
+import { FORMAT_KDBX, FORMAT_KDBX_OTHERS } from "../../entity/export/exportResourcesFileEntity";
 import { ICON_TYPE_KEEPASS_ICON_SET } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
 
 class ResourcesKdbxExporter {
@@ -181,7 +181,7 @@ class ResourcesKdbxExporter {
   setTotpField(kdbxEntry, externalResourceEntity) {
     const totp = externalResourceEntity.totp;
     switch (this.exportEntity.format) {
-      case ExportResourcesFileEntity.FORMAT_KDBX: {
+      case FORMAT_KDBX: {
         kdbxEntry.fields.set("TimeOtp-Secret-Base32", kdbxweb.ProtectedValue.fromString(totp.secretKey));
         const algorithm = `HMAC-${totp.algorithm.substring(0, 3)}-${totp.algorithm.substring(3)}`;
         kdbxEntry.fields.set("TimeOtp-Algorithm", algorithm);
@@ -189,7 +189,7 @@ class ResourcesKdbxExporter {
         kdbxEntry.fields.set("TimeOtp-Period", totp.period.toString());
         break;
       }
-      case ExportResourcesFileEntity.FORMAT_KDBX_OTHERS: {
+      case FORMAT_KDBX_OTHERS: {
         const totpUrl = totp.createUrlFromExternalResource(externalResourceEntity);
         kdbxEntry.fields.set("otp", kdbxweb.ProtectedValue.fromString(totpUrl.toString()));
         break;

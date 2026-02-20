@@ -24,7 +24,6 @@ import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/model
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import { v4 as uuidv4 } from "uuid";
 import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
-import expect from "expect";
 import PermissionEntity from "../permission/permissionEntity";
 
 describe("Resource entity", () => {

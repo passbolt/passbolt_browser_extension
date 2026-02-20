@@ -37,7 +37,6 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import ResourceEntity, { METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY } from "./resourceEntity";
 import { defaultTagDto } from "../tag/tagEntity.test.data";
-import expect from "expect";
 import {
   ownerPermissionDto,
   readPermissionDto,

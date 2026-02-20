@@ -175,6 +175,29 @@ export default [
       "jest/prefer-expect-assertions": "off", // Not always needed
       "security/detect-non-literal-fs-filename": "off",
 
+      // Forbid explicit imports of Jest globals (they are injected automatically)
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "expect",
+              message: "Use Jest's global `expect` instead.",
+            },
+            {
+              name: "jest",
+              message: "Use Jest's global `jest` instead.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["@jest/globals"],
+              message: "Use Jest's injected globals instead of importing from '@jest/globals'.",
+            },
+          ],
+        },
+      ],
+
       // Rules muted during migration
       "jest/no-conditional-expect": "off",
       "jest/valid-title": "off",

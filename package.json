@@ -78,7 +78,7 @@
     "terser-webpack-plugin": "^5.3.16",
     "text-encoding-utf-8": "^1.0.2",
     "web-ext": "^9.2.0",
-    "webpack": "^5.94.0",
+    "webpack": "^5.105.2",
     "webpack-cli": "^5.1.4"
   },
   "scripts": {

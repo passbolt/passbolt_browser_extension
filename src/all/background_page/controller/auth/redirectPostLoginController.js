@@ -48,7 +48,7 @@ export default class RedirectPostLoginController {
     const workerUrl = new URL(this.worker.tab.url);
     const redirectTo = workerUrl.searchParams.get("redirect");
 
-    const url = /^\/[A-Za-z0-9\-\/]*$/.test(redirectTo) ? `${this.account.domain}${redirectTo}` : this.account.domain;
+    const url = /^\/[A-Z/-9\-]*$/i.test(redirectTo) ? `${this.account.domain}${redirectTo}` : this.account.domain;
 
     chrome.tabs.update(this.worker.tab.id, { url });
   }

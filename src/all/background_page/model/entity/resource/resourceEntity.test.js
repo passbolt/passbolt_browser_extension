@@ -389,8 +389,8 @@ describe("Resource entity", () => {
 
       expect(entityV5.metadataKeyType).toBeNull();
 
-      entityV5.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
-      const expectedDto = { ...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_USER_KEY };
+      entityV5.metadataKeyType = METADATA_KEY_TYPE_USER_KEY;
+      const expectedDto = { ...resourceDTO, metadata_key_type: METADATA_KEY_TYPE_USER_KEY };
 
       expect(entityV5._props.metadata_key_type).toBeDefined();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);
@@ -404,8 +404,8 @@ describe("Resource entity", () => {
 
       expect(entityV5.metadataKeyType).toBeNull();
 
-      entityV5.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
-      const expectedDto = { ...resourceDTO, metadata_key_type: ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY };
+      entityV5.metadataKeyType = METADATA_KEY_TYPE_METADATA_KEY;
+      const expectedDto = { ...resourceDTO, metadata_key_type: METADATA_KEY_TYPE_METADATA_KEY };
 
       expect(entityV5._props.metadata_key_type).toBeDefined();
       expect(entityV5.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS)).toEqual(expectedDto);

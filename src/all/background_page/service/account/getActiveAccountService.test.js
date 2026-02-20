@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.8.2
  */
-import { GetActiveAccountService } from "./getActiveAccountService";
+import getActiveAccountService from "./getActiveAccountService";
 import GetLegacyAccountService from "./getLegacyAccountService";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import UserModel from "../../model/user/userModel";
@@ -24,8 +24,6 @@ describe("GetActiveAccountService", () => {
 
   it("GetActiveAccountService:get", async () => {
     expect.assertions(1);
-    // data
-    const getActiveAccountService = new GetActiveAccountService();
     // spy function
     jest.spyOn(GetLegacyAccountService, "get");
     // execution
@@ -36,8 +34,6 @@ describe("GetActiveAccountService", () => {
 
   it("GetActiveAccountService:get should call GetLegacyAccountService each time", async () => {
     expect.assertions(3);
-    // data
-    const getActiveAccountService = new GetActiveAccountService();
     // spy function
     jest.spyOn(UserModel.prototype, "findOne").mockImplementation(() => ({ role: { name: "admin" } }));
     jest.spyOn(GetLegacyAccountService, "get");

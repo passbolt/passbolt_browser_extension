@@ -210,7 +210,7 @@ class ExternalFoldersCollection extends EntityV2Collection {
   removeByPath(path) {
     for (let i = this._items.length - 1; i >= 0; i--) {
       const externalFolderEntity = this._items[i];
-      const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, "\\$&");
+      const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\/]/g, "\\$&");
       const regex = new RegExp(`^${escapedPath}($|\/)`);
       if (regex.exec(externalFolderEntity.path)) {
         this._items.splice(i, 1);

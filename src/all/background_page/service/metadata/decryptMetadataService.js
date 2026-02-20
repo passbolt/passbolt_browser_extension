@@ -15,7 +15,7 @@ import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import { assertType } from "../../utils/assertions";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import { METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY } from "../../model/entity/resource/resourceEntity";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
@@ -152,8 +152,7 @@ class DecryptMetadataService {
    */
   async decryptAllFromForeignModelsWithSharedKey(collection, passphrase = null, options = {}) {
     const filteredCollection = collection.items.filter(
-      (entity) =>
-        entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY && !entity.isMetadataDecrypted(),
+      (entity) => entity.metadataKeyType === METADATA_KEY_TYPE_METADATA_KEY && !entity.isMetadataDecrypted(),
     );
     if (!filteredCollection.length) {
       return [];
@@ -230,7 +229,7 @@ class DecryptMetadataService {
    */
   async decryptAllFromForeignModelsWithUserKey(collection, passphrase, options = {}) {
     const filteredItems = collection.items.filter(
-      (entity) => entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_USER_KEY && !entity.isMetadataDecrypted(),
+      (entity) => entity.metadataKeyType === METADATA_KEY_TYPE_USER_KEY && !entity.isMetadataDecrypted(),
     );
     if (!filteredItems.length) {
       return [];

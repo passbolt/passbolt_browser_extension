@@ -15,7 +15,10 @@ import PassphraseStorageService from "../session_storage/passphraseStorageServic
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import ResourceEntity, {
+  METADATA_KEY_TYPE_METADATA_KEY,
+  METADATA_KEY_TYPE_USER_KEY,
+} from "../../model/entity/resource/resourceEntity";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import { assertAnyTypeOf, assertType } from "../../utils/assertions";
 import FolderEntity from "../../model/entity/folder/folderEntity";
@@ -83,7 +86,7 @@ class EncryptMetadataService {
       const userPublicKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPublicArmoredKey);
       encryptedMetadata = await EncryptMessageService.encrypt(serializedMetadata, userPublicKey, [userPrivateKey]);
       entity._props.metadata_key_id = null;
-      entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
+      entity.metadataKeyType = METADATA_KEY_TYPE_USER_KEY;
     } else {
       const { metadataKeyId, metadataPublicKey, metadataPrivateKey } =
         await this.getLatestMetadataKeysAndId(passphrase);
@@ -92,7 +95,7 @@ class EncryptMetadataService {
         metadataPrivateKey,
       ]);
       entity.metadataKeyId = metadataKeyId;
-      entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
+      entity.metadataKeyType = METADATA_KEY_TYPE_METADATA_KEY;
     }
     entity.metadata = encryptedMetadata;
   }
@@ -183,7 +186,7 @@ class EncryptMetadataService {
         metadataPrivateKey,
       ]);
       entity.metadataKeyId = metadataKeyId;
-      entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY;
+      entity.metadataKeyType = METADATA_KEY_TYPE_METADATA_KEY;
       entity.metadata = encryptedMetadata;
     }
   }
@@ -223,7 +226,7 @@ class EncryptMetadataService {
         userDecryptedPrivateKey,
       ]);
       entity.metadataKeyId = null;
-      entity.metadataKeyType = ResourceEntity.METADATA_KEY_TYPE_USER_KEY;
+      entity.metadataKeyType = METADATA_KEY_TYPE_USER_KEY;
       entity.metadata = encryptedMetadata;
     }
   }

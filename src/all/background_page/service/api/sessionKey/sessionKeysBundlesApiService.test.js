@@ -105,7 +105,7 @@ describe("SessionKeysBundlesApiService", () => {
       expect.assertions(1);
 
       const sessionKeysBundleId = uuidv4();
-      fetch.doMockOnceIf(new RegExp(`/metadata\/session-keys\/${sessionKeysBundleId}\.json`), async (req) => {
+      fetch.doMockOnceIf(new RegExp(`/metadata/session-keys/${sessionKeysBundleId}\\.json`), async (req) => {
         expect(req.method).toEqual("DELETE");
         return mockApiResponse({});
       });
@@ -129,7 +129,7 @@ describe("SessionKeysBundlesApiService", () => {
 
       const sessionKeysBundleDto = defaultSessionKeysBundleDto();
       const sessionKeysBundle = new SessionKeysBundleEntity(sessionKeysBundleDto);
-      fetch.doMockOnceIf(new RegExp(`/metadata\/session-keys\/${sessionKeysBundleDto.id}\.json`), async (req) => {
+      fetch.doMockOnceIf(new RegExp(`/metadata/session-keys/${sessionKeysBundleDto.id}\\.json`), async (req) => {
         expect(req.method).toEqual("PUT");
         const reqPayload = await req.json();
         return mockApiResponse(reqPayload);

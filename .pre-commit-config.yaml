@@ -4,6 +4,7 @@ repos:
     hooks:
       -   id: trailing-whitespace
   - repo: https://github.com/gitleaks/gitleaks
-    rev: 2ca41cc1372d1e939a6a879f18cdc19fc1cac1ce  # v8.30.0
+    rev: v8.30.0  # v8.30.0
     hooks:
       - id: gitleaks
+        args: ["--verbose", "--redact"]

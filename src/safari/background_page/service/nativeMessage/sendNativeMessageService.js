@@ -65,6 +65,7 @@ export class SendNativeMessageService {
     const message = { action, ...args };
     //@note: SAFARI_APP_ID is actually ignored when used by Safari. It is still set here to respect `sendNativeMessage` standard.
     const resp = await chrome.runtime.sendNativeMessage(SAFARI_APP_ID, message);
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     if (!resp.success) {
       const errorData = resp.error;

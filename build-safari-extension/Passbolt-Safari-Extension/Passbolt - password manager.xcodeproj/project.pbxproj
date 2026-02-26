@@ -64,7 +64,7 @@
 		977E15732E7AE6FD00445DD3 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = index.html; path = ../../../build/all/index.html; sourceTree = "<group>"; };
 		977E15752E7AE71F00445DD3 /* index.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = index.min.js; path = ../../../build/all/index.min.js; sourceTree = "<group>"; };
 		977E15762E7AE71F00445DD3 /* vendors.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = vendors.min.js; path = ../../../build/all/vendors.min.js; sourceTree = "<group>"; };
-		9789623B2E27D39200F48BDD /* Passbolt - password manager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Passbolt - password manager.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9789623B2E27D39200F48BDD /* [DEBUG] Passbolt - password manager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "[DEBUG] Passbolt - password manager.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9789623E2E27D39200F48BDD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		978962422E27D39200F48BDD /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
 		978962442E27D39200F48BDD /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
@@ -147,7 +147,7 @@
 		9789623C2E27D39200F48BDD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9789623B2E27D39200F48BDD /* Passbolt - password manager.app */,
+				9789623B2E27D39200F48BDD /* [DEBUG] Passbolt - password manager.app */,
 				9789626E2E27D39300F48BDD /* Passbolt - password manager Extension.appex */,
 				82EE77762F3C9D57000B30B5 /* Passbolt - password manager Tests.xctest */,
 			);
@@ -256,7 +256,7 @@
 			packageProductDependencies = (
 			);
 			productName = "Passbolt - password manager";
-			productReference = 9789623B2E27D39200F48BDD /* Passbolt - password manager.app */;
+			productReference = 9789623B2E27D39200F48BDD /* [DEBUG] Passbolt - password manager.app */;
 			productType = "com.apple.product-type.application";
 		};
 		9789626D2E27D39300F48BDD /* Passbolt - password manager Extension */ = {
@@ -599,8 +599,16 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Passbolt - password manager Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Passbolt - Open source password manager Extension";
@@ -612,7 +620,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.10.0;
+				MARKETING_VERSION = 5.10.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -637,8 +645,16 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Passbolt - password manager Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Passbolt - Open source password manager Extension";
@@ -650,7 +666,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.10.0;
+				MARKETING_VERSION = 5.10.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -677,8 +693,16 @@
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Passbolt - password manager/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Passbolt - Open source password manager";
@@ -692,7 +716,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.10.0;
+				MARKETING_VERSION = 5.10.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -700,7 +724,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.passbolt.safari;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "[DEBUG] $(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -720,8 +744,16 @@
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Passbolt - password manager/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Passbolt - Open source password manager";
@@ -735,7 +767,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.10.0;
+				MARKETING_VERSION = 5.10.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,

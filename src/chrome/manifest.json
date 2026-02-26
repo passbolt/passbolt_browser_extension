@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "__MSG_appName__",
   "short_name": "passbolt",
-  "version": "5.10.0.0",
+  "version": "5.10.1",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
   "externally_connectable": {},
@@ -48,5 +48,5 @@
   "web_accessible_resources": [
     "webAccessibleResources/*"
   ],
-  "content_security_policy": "default-src 'none'; script-src 'self'; style-src 'self' ; style-src-attr 'unsafe-inline'; img-src 'self' data: https: http: ; font-src 'self'; connect-src 'self' https: http: ; form-action 'self' https: ; frame-src 'self' ; frame-ancestors 'self' https: http: ; worker-src 'self' ; base-uri 'none' ;"
+  "content_security_policy": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http: ; font-src 'self'; connect-src 'self' https: http: ; form-action 'self' https: ; frame-src 'self' ; frame-ancestors 'self' https: http: ; worker-src 'self' ; base-uri 'none' ;"
 }

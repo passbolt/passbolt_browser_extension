@@ -31,7 +31,7 @@ export class CookiesService {
   constructor(urlString, storeId) {
     assertNonEmptyString(storeId, "The storeId is required for Safari profile isolation");
     const url = new URL(urlString);
-    this.domain = url.host;
+    this.domain = url.hostname;
     this.url = `${url.protocol}//${url.host}${url.pathname}`;
     this.storeId = storeId;
   }

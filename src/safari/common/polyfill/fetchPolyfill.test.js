@@ -48,7 +48,7 @@ describe("FetchSafariPolyfill", () => {
       expect(SendNativeMessageService.sendNativeMessage).toHaveBeenCalledTimes(1);
       expect(SendNativeMessageService.sendNativeMessage).toHaveBeenCalledWith("fetch", {
         resource: TEST_URL,
-        options: expect.objectContaining({ method: "GET", headers: {} }),
+        options: expect.objectContaining({ method: "GET", headers: { "User-Agent": navigator.userAgent } }),
       });
     });
 

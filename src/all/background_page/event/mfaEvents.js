@@ -21,6 +21,7 @@ import MfaSetupVerifyProviderController from "../controller/mfaSetup/MfaSetupVer
 import MfaSetupRemoveProviderController from "../controller/mfaSetup/MfaSetupRemoveProviderController";
 import MfaSetupVerifyYubikeyCodeController from "../controller/mfaSetup/MfaSetupVerifyYubikeyCodeController";
 import MfaSetupGetTotpCodeController from "../controller/mfaSetup/MfaSetupGetTotpCodeController";
+import GetStartedWithDuoController from "../controller/mfaSetup/GetStartedWithDuoController";
 
 /**
  * Listens to the MFA events
@@ -71,6 +72,11 @@ const listen = function (worker, apiClientOptions) {
   worker.port.on("passbolt.mfa-setup.get-totp-code", async (requestId, providerDto) => {
     const controller = new MfaSetupGetTotpCodeController(worker, requestId, apiClientOptions);
     await controller._exec(providerDto);
+  });
+
+  worker.port.on("passbolt.mfa-setup.start-with-duo", async (requestId) => {
+    const controller = new GetStartedWithDuoController(worker, requestId, apiClientOptions);
+    await controller._exec();
   });
 };
 

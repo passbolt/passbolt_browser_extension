@@ -43,7 +43,7 @@ class InformMenuController {
 
   /**
    * Request the initial configuration of the in-form menu
-   * @param {string} requestId The identifier of the request
+   * @param requestId The identifier of the request
    */
   async getInitialConfiguration(requestId) {
     try {
@@ -52,18 +52,12 @@ class InformMenuController {
       const callToActionInput = await webIntegrationWorker.port.request(
         "passbolt.web-integration.last-performed-call-to-action-input",
       );
-
-      const suggestedResources = await this.getOrFindResourcesService.getOrFindSuggested(
-        this.worker.tab.url,
-        callToActionInput.type,
-      );
-
+      const suggestedResources = await this.getOrFindResourcesService.getOrFindSuggested(this.worker.tab.url);
       const configuration = {
         inputType: callToActionInput.type,
         inputValue: callToActionInput.value,
         suggestedResources: suggestedResources.toDto(),
       };
-
       this.worker.port.emit(requestId, "SUCCESS", configuration);
     } catch (error) {
       console.error(error);

@@ -103,10 +103,13 @@ class DecryptMetadataService {
         collection.ids,
         passphrase,
       );
+      // Pre-build an id-to-index map to avoid O(n) linear scans on each session key lookup.
+      const collectionIndexById = new Map(collection.items.map((entity, index) => [entity.id, index]));
       for (let i = sessionKeys.items.length - 1; i >= 0; i--) {
         const sessionKey = sessionKeys.items[i];
         try {
-          const entity = collection.getFirst("id", sessionKey.foreignId);
+          const entityIndex = collectionIndexById.get(sessionKey.foreignId);
+          const entity = entityIndex !== undefined ? collection.items[entityIndex] : undefined;
           await this.decryptMetadataWithSessionKey(entity, sessionKey.sessionKey);
         } catch (error) {
           sessionKeys.items.splice(i, 1);

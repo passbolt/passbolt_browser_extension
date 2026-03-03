@@ -36,11 +36,12 @@ const listen = function (worker, apiClientOptions, account) {
    * Whenever the in-form call-to-action suggested resources is required
    * @listens passbolt.in-form-cta.suggested-resources
    * @param requestId {uuid} The request identifier
+   * @param fieldType {"username"|"password"|"otp"} The field type for which to provide suggestions
    * @returns {*[]|number}
    */
-  worker.port.on("passbolt.in-form-cta.suggested-resources", async (requestId) => {
+  worker.port.on("passbolt.in-form-cta.suggested-resources", async (requestId, fieldType) => {
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
-    await informCallToActionController.countSuggestedResourcesCount(requestId);
+    await informCallToActionController.getSuggestedResourcesCount(requestId, fieldType);
   });
 
   /*

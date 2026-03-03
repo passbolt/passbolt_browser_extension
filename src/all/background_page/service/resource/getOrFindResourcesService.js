@@ -56,18 +56,25 @@ export default class GetOrFindResourcesService {
   /**
    * Returns the possible resources to suggest given an url.
    * @param {string} url The url to suggest for.
+   * @param {"username"|"password"|"otp"} fieldType The field type to suggest for
    * @return {Promise<ResourcesCollection>}
    */
-  async getOrFindSuggested(url) {
+  async getOrFindSuggested(url, fieldType) {
     if (!url) {
       return new ResourcesCollection([]);
     }
 
     const resourcesCollection = await this.getOrFindAll();
-
-    // Filter by resource types behaving as a password.
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    resourceTypesCollection.filterByPasswordResourceTypes();
+
+    // Filter resource types according to what we need
+    if (fieldType === "otp") {
+      resourceTypesCollection.filterByTOTPResourceTypes();
+    } else {
+      resourceTypesCollection.filterByPasswordResourceTypes();
+    }
+
+    // Filter by resource types.
     resourcesCollection.filterByResourceTypes(resourceTypesCollection);
 
     // Filter by suggested resources.

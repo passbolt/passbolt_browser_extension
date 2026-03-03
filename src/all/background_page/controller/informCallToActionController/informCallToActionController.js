@@ -38,11 +38,15 @@ class InformCallToActionController {
 
   /**
    * Whenever one intends to know the count of suggested resources
-   * @param requestId The identifier of the request
+   * @param {string} requestId The identifier of the request
+   * @param {"username"|"password"|"otp"} fieldType The type of field requesting the count
    */
-  async countSuggestedResourcesCount(requestId) {
+  async getSuggestedResourcesCount(requestId, fieldType) {
     try {
-      const suggestedResourcesCount = await this.getOrFindResourcesService.getOrFindSuggested(this.worker.tab.url);
+      const suggestedResourcesCount = await this.getOrFindResourcesService.getOrFindSuggested(
+        this.worker.tab.url,
+        fieldType,
+      );
       this.worker.port.emit(requestId, "SUCCESS", suggestedResourcesCount.length);
     } catch (error) {
       console.error(error);

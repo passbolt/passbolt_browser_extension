@@ -61,6 +61,7 @@ class AutofillController {
    * @param resourceId {string} A resource identifier
    * @param tabId {string} A tab identifier
    * @return {Promise<void>} The credential.
+   * @throws {Error} if the passphrase is not valid.
    */
   async exec(resourceId, tabId) {
     // WebIntegration Worker
@@ -79,7 +80,9 @@ class AutofillController {
       );
       const username = resource.metadata?.username || "";
       const password = plaintextSecret?.password;
-      this.fillCredential(webIntegrationWorker, { username, password });
+      const totp = plaintextSecret?.totp;
+
+      this.fillCredentials(webIntegrationWorker, { username, password, totp });
     } finally {
       if (this.isInformMenuWorker) {
         webIntegrationWorker.port.emit("passbolt.in-form-menu.close");
@@ -109,6 +112,7 @@ class AutofillController {
    * Get the passphrase
    * @private
    * @return {Promise<string>}
+   * @throws {Error} if the passphrase is not valid.
    */
   async getPassphrase() {
     if (!this.isInformMenuWorker) {
@@ -121,22 +125,23 @@ class AutofillController {
   }
 
   /**
-   * Fill the credential
+   * Fill the credentials
    * @private
    * @param {Worker} webIntegrationWorker
-   * @param {Object} credential
+   * @param {Object} credentials
    */
-  fillCredential(webIntegrationWorker, credential) {
+  fillCredentials(webIntegrationWorker, credentials) {
     // TODO Should use the same method to autofill in the future
     if (this.isInformMenuWorker) {
-      webIntegrationWorker.port.emit("passbolt.web-integration.fill-credentials", credential);
+      webIntegrationWorker.port.emit("passbolt.web-integration.fill-credentials", credentials);
     } else if (this.isQuickAccessWorker) {
       // Get the url from the worker port to have the tab url for the quickaccess
       const url = webIntegrationWorker.port._port.sender.url;
       webIntegrationWorker.port.request(
         "passbolt.quickaccess.fill-form",
-        credential.username,
-        credential.password,
+        credentials.username,
+        credentials.password,
+        credentials.totp,
         url,
       );
     }

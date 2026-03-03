@@ -322,7 +322,7 @@ describe("ResourcesCollection", () => {
         metadata: defaultResourceMetadataDto({ uris: ["passbolt.com"] }),
       });
       const notSuggestedResource1 = defaultResourceDto({
-        metadata: defaultResourceMetadataDto({ uris: ["nost-passbolt.com"] }),
+        metadata: defaultResourceMetadataDto({ uris: ["not-passbolt.com"] }),
       });
       const notSuggestedResource2 = defaultResourceDto({ metadata: defaultResourceMetadataDto({ uris: [""] }) });
       const resources = new ResourcesCollection([

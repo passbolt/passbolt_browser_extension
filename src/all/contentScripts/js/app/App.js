@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import React from "react";
-import ReactDOM from "react-dom";
 import ExtBootstrapApp from "passbolt-styleguide/src/react-extension/ExtBootstrapApp";
 import Port from "../../../webAccessibleResources/js/lib/port";
 import MessageService from "../service/messageService";
 import MessageEventHandler from "../message/messageEventHandler";
 import ConnectPortController from "../controller/connectPortController";
+import { createRoot } from "react-dom/client";
 
 async function main() {
   // Port connection
@@ -34,12 +34,9 @@ async function main() {
   const domContainer = document.createElement("div");
 
   document.body.appendChild(domContainer);
-  // TODO: update to createRoot for react 18 when ready
-  /* eslint-disable react/no-deprecated */
-  ReactDOM.render(
-    <ExtBootstrapApp port={port} storage={storage} browserExtensionUrl={browserExtensionUrl} />,
-    domContainer,
-  );
+
+  const root = createRoot(domContainer);
+  root.render(<ExtBootstrapApp port={port} storage={storage} browserExtensionUrl={browserExtensionUrl} />);
 }
 
 main();

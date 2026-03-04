@@ -91,7 +91,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param path The relative navigated-to path
    */
   worker.port.on("passbolt.app.route-changed", async (path) => {
-    if (/^\/[A-Za-z0-9\-\/]*$/.test(path)) {
+    if (/^\/[A-Z/-9\-]*$/i.test(path)) {
       const appBoostrapWorker = await WorkerService.get("AppBootstrap", worker.tab.id);
       appBoostrapWorker.port.emit("passbolt.app-bootstrap.change-route", path);
     }

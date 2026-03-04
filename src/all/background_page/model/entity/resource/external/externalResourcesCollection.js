@@ -165,7 +165,7 @@ class ExternalResourcesCollection extends EntityV2Collection {
   removeByPath(path) {
     for (let i = this._items.length - 1; i >= 0; i--) {
       const externalResourceEntity = this._items[i];
-      const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, "\\$&");
+      const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\/]/g, "\\$&");
       const regex = new RegExp(`^${escapedPath}\/`);
       if (regex.exec(externalResourceEntity.path)) {
         this._items.splice(i, 1);

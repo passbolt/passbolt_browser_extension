@@ -15,7 +15,7 @@ import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import { assertType } from "../../utils/assertions";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import { METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY } from "../../model/entity/resource/resourceEntity";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import GetOrFindMetadataKeysService from "./getOrFindMetadataKeysService";
@@ -103,10 +103,13 @@ class DecryptMetadataService {
         collection.ids,
         passphrase,
       );
+      // Pre-build an id-to-index map to avoid O(n) linear scans on each session key lookup.
+      const collectionIndexById = new Map(collection.items.map((entity, index) => [entity.id, index]));
       for (let i = sessionKeys.items.length - 1; i >= 0; i--) {
         const sessionKey = sessionKeys.items[i];
         try {
-          const entity = collection.getFirst("id", sessionKey.foreignId);
+          const entityIndex = collectionIndexById.get(sessionKey.foreignId);
+          const entity = entityIndex !== undefined ? collection.items[entityIndex] : undefined;
           await this.decryptMetadataWithSessionKey(entity, sessionKey.sessionKey);
         } catch (error) {
           sessionKeys.items.splice(i, 1);
@@ -152,8 +155,7 @@ class DecryptMetadataService {
    */
   async decryptAllFromForeignModelsWithSharedKey(collection, passphrase = null, options = {}) {
     const filteredCollection = collection.items.filter(
-      (entity) =>
-        entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_METADATA_KEY && !entity.isMetadataDecrypted(),
+      (entity) => entity.metadataKeyType === METADATA_KEY_TYPE_METADATA_KEY && !entity.isMetadataDecrypted(),
     );
     if (!filteredCollection.length) {
       return [];
@@ -230,7 +232,7 @@ class DecryptMetadataService {
    */
   async decryptAllFromForeignModelsWithUserKey(collection, passphrase, options = {}) {
     const filteredItems = collection.items.filter(
-      (entity) => entity.metadataKeyType === ResourceEntity.METADATA_KEY_TYPE_USER_KEY && !entity.isMetadataDecrypted(),
+      (entity) => entity.metadataKeyType === METADATA_KEY_TYPE_USER_KEY && !entity.isMetadataDecrypted(),
     );
     if (!filteredItems.length) {
       return [];

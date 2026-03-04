@@ -15,7 +15,6 @@ import UserAndGroupSearchResultsCollection from "./userAndGroupSearchResultColle
 import UserAndGroupSearchResultEntity from "./userAndGroupSearchResultEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import { defaultGroupSearchResultDto, defaultUserSearchResultDto } from "./userAndGroupSearchResultEntity.test.data";
-import expect from "expect";
 import { defaultUserAndGroupSearchResultsDtos } from "./userAndGroupSearchResultCollection.test.data";
 
 describe("UserAndGroupSearchResultCollection", () => {

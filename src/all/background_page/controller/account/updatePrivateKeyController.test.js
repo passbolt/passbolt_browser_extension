@@ -184,10 +184,10 @@ describe("UpdatePrivateKeyController", () => {
       mockOrganisationSettingCall(true);
 
       const shouldNotHaveBeenCalledError = new Error("This API request should not have been made");
-      fetch.doMockOnceIf(new RegExp(`/sso/keys/[a-fA-F0-9-].*\.json`), () => {
+      fetch.doMockOnceIf(/\/sso\/keys\/[a-fA-F0-9-]+\.json/, () => {
         throw shouldNotHaveBeenCalledError;
       });
-      fetch.doMockOnceIf(new RegExp("/sso/keys.json"), () => {
+      fetch.doMockOnceIf(/\/sso\/keys\.json/, () => {
         throw shouldNotHaveBeenCalledError;
       });
 
@@ -239,7 +239,9 @@ describe("UpdatePrivateKeyController", () => {
       const oldPassphrase = pgpKeys.ada.passphrase;
       try {
         await controller.exec(oldPassphrase, newPassphrase);
-      } catch {}
+      } catch {
+        // Expected to throw, error is intentionally ignored
+      }
 
       expect(SsoDataStorage.save).not.toHaveBeenCalled();
       expect(PassphraseStorageService.flushPassphrase).not.toHaveBeenCalled();
@@ -303,10 +305,10 @@ describe("UpdatePrivateKeyController", () => {
       mockOrganisationSettingCall(true);
 
       const shouldNotHaveBeenCalledError = new Error("This API request should not have been made");
-      fetch.doMockOnceIf(new RegExp(`/sso/keys/[a-fA-F0-9-].*\.json`), () => {
+      fetch.doMockOnceIf(/\/sso\/keys\/[a-fA-F0-9-]+\.json/, () => {
         throw shouldNotHaveBeenCalledError;
       });
-      fetch.doMockOnceIf(new RegExp("/sso/keys.json"), () => {
+      fetch.doMockOnceIf(/\/sso\/keys\.json/, () => {
         throw shouldNotHaveBeenCalledError;
       });
 

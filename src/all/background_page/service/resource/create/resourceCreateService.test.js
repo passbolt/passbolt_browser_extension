@@ -51,7 +51,6 @@ import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity
 import { defaultDecryptedSharedMetadataKeysDtos } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
-import expect from "expect";
 import GetDecryptedUserPrivateKeyService from "../../account/getDecryptedUserPrivateKeyService";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import ShareModel from "../../../model/share/shareModel";

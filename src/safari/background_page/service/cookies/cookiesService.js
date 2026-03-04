@@ -171,7 +171,7 @@ export class CookiesService {
          * Cookie names are tokens: alphanumeric plus - and _
          * Must be followed by = to be a new cookie (not a date continuation)
          */
-        if (/^[a-zA-Z0-9_-]+=/.test(remainder)) {
+        if (/^[\w-]+=/.test(remainder)) {
           cookieStrings.push(currentCookie.trim());
           currentCookie = "";
           i += 2; // Skip ", "

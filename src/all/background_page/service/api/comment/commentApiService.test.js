@@ -14,7 +14,7 @@
 
 import { enableFetchMocks } from "jest-fetch-mock";
 import { v4 as uuidv4 } from "uuid";
-import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
+import { mockApiResponse, mockApiResponseError } from "../../../../../../test/mocks/mockApiResponse";
 import CommentApiService from "./commentApiService";
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../../model/entity/account/accountEntity.test.data";
@@ -23,7 +23,6 @@ import { defaultCommentCollectionDto } from "passbolt-styleguide/src/shared/mode
 import { defaultCommentDto } from "passbolt-styleguide/src/shared/models/entity/comment/commentEntity.test.data";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import CommentEntity from "../../../model/entity/comment/commentEntity";
-import { mockApiResponseError } from "../../../../../../test/mocks/mockApiResponse";
 
 describe("ActionLogService", () => {
   let apiClientOptions, account;
@@ -105,7 +104,7 @@ describe("ActionLogService", () => {
       expect.assertions(1);
 
       const deleteCommentId = uuidv4();
-      fetch.doMockOnceIf(new RegExp(`/comments\/${deleteCommentId}\.json`), async (req) => {
+      fetch.doMockOnceIf(new RegExp(`/comments/${deleteCommentId}\\.json`), async (req) => {
         expect(req.method).toEqual("DELETE");
         return mockApiResponse({});
       });

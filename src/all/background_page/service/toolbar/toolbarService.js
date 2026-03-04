@@ -198,7 +198,20 @@ class ToolbarService {
       this.tabUrl = tabUrl;
 
       if (!this.isUrlPassboltDomain(this.tabUrl, account) && !this.isUrlPassboltExtension(this.tabUrl)) {
-        suggestedResourcesCount = (await this.getOrFindResourcesService.getOrFindSuggested(this.tabUrl)).length;
+        // Get the suggested resources for the current tab
+        // As we don't know if the page is using OTP or password, we need to check both
+        const [otpSuggestedResources, passwordSuggestedResources] = await Promise.all([
+          this.getOrFindResourcesService.getOrFindSuggested(this.tabUrl, "otp"),
+          this.getOrFindResourcesService.getOrFindSuggested(this.tabUrl, "password"),
+        ]);
+
+        // De-duplicate the resources
+        const resourcesIds = new Set();
+        [...otpSuggestedResources, ...passwordSuggestedResources].forEach(({ id }) => {
+          resourcesIds.add(id);
+        });
+
+        suggestedResourcesCount = resourcesIds.size;
       }
 
       BrowserExtensionIconService.setSuggestedResourcesCount(suggestedResourcesCount);

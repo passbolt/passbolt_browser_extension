@@ -25,7 +25,7 @@ export function parseGpgUserId(addr) {
   const { name: rawName, email: rawEmail } = extractParts(addr);
 
   const name = cleanName(rawName);
-  const email = rawEmail.replace(/[\s\xa0]+/g, " ").trim();
+  const email = rawEmail.replace(/\s+/g, " ").trim();
 
   return { name, email };
 }
@@ -118,7 +118,7 @@ export function findClosingQuote(input, openingQuotePosition) {
  * @returns {string}
  */
 export function cleanName(name) {
-  name = name.replace(/[\s\xa0]+/g, " ").trim();
+  name = name.replace(/\s+/g, " ").trim();
 
   // Strip matching outer quotes
   if (name.length >= 2) {

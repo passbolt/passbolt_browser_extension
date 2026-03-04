@@ -12,12 +12,12 @@
  * @since         3.0.0
  */
 import React from "react";
-import ReactDOM from "react-dom";
 import ExtApp from "passbolt-styleguide/src/react-extension/ExtApp";
 import Port from "../lib/port";
 import MessageService from "../../../contentScripts/js/service/messageService";
 import MessageEventHandler from "../../../contentScripts/js/message/messageEventHandler";
 import ConnectPortController from "../../../contentScripts/js/controller/connectPortController";
+import { createRoot } from "react-dom/client";
 
 async function main() {
   const query = new URLSearchParams(window.location.search);
@@ -32,9 +32,9 @@ async function main() {
   const domContainer = document.createElement("div");
 
   document.body.appendChild(domContainer);
-  // TODO: update to createRoot for react 18 when ready
-  /* eslint-disable react/no-deprecated */
-  ReactDOM.render(React.createElement(ExtApp, { port: port, storage: storage }), domContainer);
+
+  const root = createRoot(domContainer);
+  root.render(React.createElement(ExtApp, { port: port, storage: storage }));
 }
 
 main();

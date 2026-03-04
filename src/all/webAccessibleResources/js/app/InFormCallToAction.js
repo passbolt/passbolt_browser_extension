@@ -19,6 +19,7 @@ import Port from "../lib/port";
 async function main() {
   const query = new URLSearchParams(window.location.search);
   const portname = query.get("passbolt");
+  const fieldType = query.get("fieldType");
   const applicationId = query.get("applicationId");
   const port = new Port(portname);
   await port.connect();
@@ -26,7 +27,7 @@ async function main() {
 
   document.body.appendChild(domContainer);
   const root = createRoot(domContainer);
-  root.render(<ExtInFormCallToAction port={port} applicationId={applicationId} />);
+  root.render(<ExtInFormCallToAction port={port} applicationId={applicationId} fieldType={fieldType} />);
 }
 
 main();

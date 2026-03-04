@@ -12,7 +12,6 @@
  * @since         5.5.0
  */
 
-import expect from "expect";
 import CreateScimSettingsController from "./createScimSettingsController";
 import ScimSettingsEntity from "passbolt-styleguide/src/shared/models/entity/scimSettings/scimSettingsEntity";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";

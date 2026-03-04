@@ -44,7 +44,6 @@ global.console = {
   error: jest.fn(),
   warn: jest.fn(),
 };
-global.fetch = require("node-fetch");
 if (!global.navigator) {
   global.navigator = {};
 }

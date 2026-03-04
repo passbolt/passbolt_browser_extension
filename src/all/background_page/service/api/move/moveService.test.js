@@ -36,7 +36,7 @@ describe("MoveService", () => {
       const folderId = uuidv4();
       const destinationFolderId = uuidv4();
 
-      fetch.doMockOnceIf(new RegExp(`/move\/folder\/${folderId}\.json`), async (req) => {
+      fetch.doMockOnceIf(new RegExp(`/move/folder/${folderId}\\.json`), async (req) => {
         expect(req.method).toEqual("PUT");
         const body = await req.json();
         expect(body).toEqual({ folder_parent_id: destinationFolderId });
@@ -66,7 +66,7 @@ describe("MoveService", () => {
       const resourceId = uuidv4();
       const destinationFolderId = uuidv4();
 
-      fetch.doMockOnceIf(new RegExp(`/move\/resource\/${resourceId}\.json`), async (req) => {
+      fetch.doMockOnceIf(new RegExp(`/move/resource/${resourceId}\\.json`), async (req) => {
         expect(req.method).toEqual("PUT");
         const body = await req.json();
         expect(body).toEqual({ folder_parent_id: destinationFolderId });

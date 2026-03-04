@@ -35,7 +35,7 @@ describe("DeletePasswordExpirySettingsController", () => {
   it("Should delete the entity from the API given an ID", () => {
     expect.assertions(1);
     const passwordExpiryId = uuid();
-    fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${passwordExpiryId}\.json`), () => mockApiResponse({}));
+    fetch.doMockOnceIf(new RegExp(`/password-expiry/settings/${passwordExpiryId}\\.json`), () => mockApiResponse({}));
 
     const controller = new DeletePasswordExpirySettingsController(null, null, account, apiClientOptions);
     expect(() => controller.exec(passwordExpiryId)).not.toThrow();
@@ -47,7 +47,7 @@ describe("DeletePasswordExpirySettingsController", () => {
     const passwordExpiryId = uuid();
     const errorMessage = "Unable to reach the server, an unexpected error occurred";
     const expectedError = new PassboltApiFetchError(errorMessage);
-    fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${passwordExpiryId}\.json`), () =>
+    fetch.doMockOnceIf(new RegExp(`/password-expiry/settings/${passwordExpiryId}\\.json`), () =>
       mockApiResponseError(500, errorMessage),
     );
 
@@ -60,7 +60,7 @@ describe("DeletePasswordExpirySettingsController", () => {
 
     const passwordExpiryId = uuid();
     const expectedError = new Error("Unable to reach the server, an unexpected error occurred");
-    fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${passwordExpiryId}\.json`), async () => {
+    fetch.doMockOnceIf(new RegExp(`/password-expiry/settings/${passwordExpiryId}\\.json`), async () => {
       throw expectedError;
     });
 

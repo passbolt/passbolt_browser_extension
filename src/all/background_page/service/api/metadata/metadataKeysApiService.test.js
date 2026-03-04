@@ -107,7 +107,7 @@ describe("MetadataKeysApiService", () => {
     it("should delete the metadata key with the given id from the API", async () => {
       expect.assertions(2);
       const expectedId = uuidv4();
-      fetch.doMockOnceIf(new RegExp(`/metadata\/keys\/${expectedId}\.json`), async (req) => {
+      fetch.doMockOnceIf(new RegExp(`/metadata/keys/${expectedId}\\.json`), async (req) => {
         expect(req.method).toEqual("DELETE");
         return mockApiResponse({});
       });

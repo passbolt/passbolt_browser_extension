@@ -129,7 +129,7 @@ describe("PasswordExpiry service", () => {
     it("should delete the resource with the given id from the API", async () => {
       expect.assertions(1);
       const expectedId = uuid();
-      fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${expectedId}\.json`), () => mockApiResponse({}));
+      fetch.doMockOnceIf(new RegExp(`/password-expiry/settings/${expectedId}\\.json`), () => mockApiResponse({}));
 
       const service = new PasswordExpirySettingsService(apiClientOptions);
       await expect(service.delete(expectedId)).resolves.not.toThrow();
@@ -139,7 +139,7 @@ describe("PasswordExpiry service", () => {
       expect.assertions(1);
 
       const expectedId = uuid();
-      fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${expectedId}\.json`), () =>
+      fetch.doMockOnceIf(new RegExp(`/password-expiry/settings/${expectedId}\\.json`), () =>
         mockApiResponseError(500, "Something went wrong!"),
       );
 

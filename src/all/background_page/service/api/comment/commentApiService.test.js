@@ -104,7 +104,7 @@ describe("ActionLogService", () => {
       expect.assertions(1);
 
       const deleteCommentId = uuidv4();
-      fetch.doMockOnceIf(new RegExp(`/comments\/${deleteCommentId}\.json`), async (req) => {
+      fetch.doMockOnceIf(new RegExp(`/comments/${deleteCommentId}\\.json`), async (req) => {
         expect(req.method).toEqual("DELETE");
         return mockApiResponse({});
       });

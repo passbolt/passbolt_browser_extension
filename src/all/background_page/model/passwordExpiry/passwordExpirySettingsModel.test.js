@@ -162,9 +162,7 @@ describe("PasswordExpiry model", () => {
   describe("::delete", () => {
     it("should delete the entity from the API given an ID", async () => {
       const passwordExpiryId = uuid();
-      fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${passwordExpiryId}\.json`), () =>
-        mockApiResponse({}),
-      );
+      fetch.doMockOnceIf(new RegExp(`/password-expiry/settings/${passwordExpiryId}\\.json`), () => mockApiResponse({}));
 
       await expect(model.delete(passwordExpiryId)).resolves.not.toThrow();
     });
@@ -180,7 +178,7 @@ describe("PasswordExpiry model", () => {
       expect.assertions(1);
       const passwordExpiryId = uuid();
       fetch.doMockOnceIf(
-        new RegExp(`/password-expiry\/settings\/${passwordExpiryId}\.json`),
+        new RegExp(`/password-expiry/settings/${passwordExpiryId}\\.json`),
         mockApiResponseError(500, "Something wrong happened"),
       );
 
@@ -194,7 +192,7 @@ describe("PasswordExpiry model", () => {
     it("should throw an Error if something goes wrong when request the API", async () => {
       expect.assertions(1);
       const passwordExpiryId = uuid();
-      fetch.doMockOnceIf(new RegExp(`/password-expiry\/settings\/${passwordExpiryId}\.json`), () => {
+      fetch.doMockOnceIf(new RegExp(`/password-expiry/settings/${passwordExpiryId}\\.json`), () => {
         throw new Error("Something went wrong");
       });
 

@@ -1,76 +1,123 @@
-Release song: https://www.youtube.com/watch?v=QNa5o85Q-FE
+Passbolt 5.10.0 is the first version of Passbolt that officially supports Safari. Also, this version comes with tags in the grid and security improvements regarding CSV exports.
 
-Passbolt 5.9 is designed to keep upgrades predictable and everyday use reliable. It expands runtime compatibility with PHP 8.5, makes environment risks easier to spot earlier through health checks, and closes a couple of security gaps that could otherwise be used to probe accounts or mislead users during navigation.
+# Safari is now supported
 
-**Warning**: If you run MariaDB 10.3 or 10.5, or MySQL 5, pay particular attention to the environment section below. Support for these versions is planned to stop in January 2027, and this release starts flagging them proactively so you can schedule upgrades before they become urgent.
+Passbolt 5.10.0 adds Safari as a supported browser. Safari has its own specificities and limitations, therefore features like avatars are disabled.
 
-### Environment support and deprecation signals you can act on early
+# TOTP Autofill
 
-Passbolt 5.9 adds PHP 8.5 support, helping administrators and platform teams validate upcoming runtime upgrades in advance. Moreover, while PHP 8.2 is still supported until 2027, it has entered security maintenance, and administrators should plan its upgrade this year.
+Passbolt 5.10.0 now automatically fills the one-time password directly into login forms, just like it does with usernames and passwords. This seamless integration simplifies your multi-factor authentication by eliminating manual copying.
 
-At the same time, this release improves environment health checks to surface database versions that have reached end of life. MariaDB 10.3 and 10.5, and MySQL 5, are now flagged as deprecated allowing administrators to identify risky deployments during routine maintenance rather than responding under time pressure. These notices are explicitly tied to a planned end of support in January 2027, giving teams  a clear runway to align database upgrades with regular change windows and internal upgrade policies.
+# Tags are visible in the grid
 
-### Safer account recovery responses to reduce email enumeration risk
+This version also releases modernization of the tag codebase. This allows us to present these tags in the grid but also paves the way for further improvement of this feature.
 
-Account recovery endpoints can unintentionally reveal whether a user exists, which makes targeted attacks easier. In Passbolt 5.9, the recover endpoint no longer leaks information when a user does not exist in the database, reducing the signal attackers rely on for email or username enumeration.
+# CSV export security update
 
-### Stronger protection against clickjacking and deceptive overlays
+CSV export has been updated to reinforce Passbolt's security postures. Some spreadsheet software that supports CSV also executes formulas when opening these files. It's a security issue that has been tackled in this version in 2 ways:
+the CSV exports are disabled by default (import is still working) and can be reenabled via a server configuration
+When CSV exports are enabled, a confirmation checkbox is displayed to ensure the users know what are the risks of this kind of export. Exported values are not modified to keep data integrity
 
-Clickjacking and overlay techniques aim to trick users into clicking something different from what they believe they are interacting with. Passbolt 5.9 reinforces defenses against these UI-level attacks in edge-case conditions, including scenarios where a compromised website tries to influence user interactions when a password could be suggested.
+# React 18 migration
 
-In practice, this extra hardening helps ensure users cannot be guided into interacting with sensitive Passbolt components when those components are not fully visible and clearly presented to them.
+The migration to React 18 is a significant step toward modernizing the application's entire codebase. This update improves the code and brings performance optimizations for our users.
 
-### Better visibility and efficiency around email digest operations
+# Conclusion
+3 long awaited features are finally out: Safari, TOTP autofill and tags in the grid.
 
-Large folder operations can generate a lot of email activity and can be difficult  to reason about as  queues grow. Passbolt 5.9 improves digest handling related to folder operations, helping reduce unnecessary mail churn in workspaces where folder structure and permissions evolve frequently.
-
-In addition, the passbolt *email_digest* command now reports how many emails were sent and how many remain in the queue. This makes it easier for administrators to confirm progress, anticipate bursts, and troubleshoot queue behavior using logs.
-
-### Maintenance work that improves stability over time
-
-Passbolt 5.9 continues the migration work of its UI framework for authentication-related applications. The first applications have been migrated as  part of a larger foundation effort aimed at improving stability and long-term performance as more areas move to the new framework.
-
-### Conclusion
-This release also includes additional fixes and improvements beyond the highlights above. Check out the changelogs to learn more. Thanks to the community members and teams who reported issues and helped validate fixes.
-
+### Added
+- PB-28063 Activate Safari support in the styleguide
+- PB-29275 SAF - WP2.10 Add Safari as supported extension
+- PB-29292 SAF - WP2.11 Fix quickaccess opening on Safari
+- PB-29605 SAF - WP2.7 Fix detached quickaccess not being closed after "use on this page" click
+- PB-36503 Browser extension causes performance degradation on some websites
+- PB-36503 Browser extension causes performance degradation on some websites
+- PB-43353 SAF - WP2.8 Fix file download on Safari
+- PB-43355 SAF - WP2.9 Fix quickaccess animations
+- PB-43997 SAF - WP1 Update the Safari browser extension build
+- PB-44342 SAF - WP2.1 Provide Safari with its own polyfill
+- PB-44343 SAF - WP2.2 Remove unsupported index.js callback
+- PB-44345 SAF - WP2.4 fix the CSS injection in styleguide.js
+- PB-45869 SAF - WP2.13 Implement file download using the native messaging
+- PB-45870 SAF - WP2.14 Implement a custom fetch using the native messaging
+- PB-46265 SAF - WP2.15 Fix authentication with MFA in the quickaccess
+- PB-46679 SAF - Fix bold font rendering
+- PB-47765 Tags modernization
+- PB-47777 Migrate tags logic from components to TagServiceWorkerService
+- PB-47789 REACT18 - Update ReactDom render to createRoot
+- PB-47992 REACT 18 - migration of ResourceWorkspaceContext
+- PB-48158 REACT 18 - Implement the migration of Dialog and Progress Contexts
+- PB-48240 REACT18 - UserWorkspace migration
+- PB-48252 REACT18 - Migrate ExtAppContext
+- PB-48253 SAF - Temporarily remove Avatar download to avoid user being signed out
+- PB-48258 SAF - Temporarily remove "upload avatar" feature
+- PB-48337 REACT18 - Update contexts that should use functional update
+- PB-48338 REACT18 - Update shared components that should use functional update
+- PB-48339 REACT18 - Update quickaccess components that should use functional update
+- PB-48340 REACT18 - Update authentication components that should use functional update
+- PB-48342 REACT18 - Update user setting components that should use functional update
+- PB-48343 REACT18 - Update administration components that should use functional update
+- PB-48360 REACT18 - Update resource components that should use functional update
+- PB-48363 REACT18 - Update user components that should use functional update
+- PB-48366 REACT18 - Remove await set state in contexts
+- PB-48384 REACT18 - Remove await setState in components and apps
+- PB-48404 REACT18 - Object.assign should use functional set state for context
+- PB-48408 CSV - WP1.2 Add a warning message when user is selecting a CSV format on the button
+- PB-48416 CSV - WP2.9 Check if the setting is enabled when displaying the csv format on exportFormats
+- PB-48419 REACT18 - Update the components to use functional setState
+- PB-48425 REACT18 - Form validation should not check errors in the state for component
+- PB-48470 Create ColumnTagsModel component
+- PB-48471 TAGRID-1.2 Create CellTags component and make it resizable
+- PB-48472 TAGRID-1.3 Add ColumnTagsModel and CellTags to DisplayResourcesList
+- PB-48473 TAGRID-1.4 Clicking on a tag should filter the workspace
+- PB-48521 Harmonise tags style
+- PB-48553 SAF - Use webNavigation instead of tab update to improve navigation performances
+- PB-49070 REACT18 - Migrate SSOContext for react-extension
+- PB-49085 REACT18 - Migrate tests to remove legacyRoot true
+- PB-49092 TAGRID-1.6 Hovering the tag on the resource detail should display tooltip
+- PB-49106 CSV - WP2.2 Implement the exportPoliciesSettingsEntity
+- PB-49107 CSV - WP2.3 Implement the exportPoliciesSettingsApiService
+- PB-49108 CSV - WP2.4 Implement the findExportPoliciesSettingsService
+- PB-49109 CSV - WP2.5 Implement findExportPoliciesSettingsController
+- PB-49110 CSV - WP2.7 Implement exportPoliciesSettingsServiceWorkerService
+- PB-49134 REACT18 - Migrate ApiAppContext
+- PB-49137 CSV - WP2.8 Implement the ExportPoliciesContext
+- PB-49138 CSV - WP2.6 Add event to find export policies settings
+- PB-49172 REACT18 - Rename method in DisplaySelfRegistrationAdminstration
+- PB-49248 REACT 18 - Revert functional setstate
+- PB-49262 REACT18 - revert functional setstate in contexts and components
+- PB-49270 SAF - Fix Safari Users settings for Duo MFA configuration
+- PB-49293 TOTP Autofill
+- PB-49294 Send TOTP through port to fill from in-form menu or quickaccess
 
 ### Fixed
-- PB-43511 Display the "Migrate metadata" admin home page card icon with a 2px stroke width
+- PB-48468 Fix layout when an announcement is visible
+- PB-49330 Alignment issues in 2FA Yubikey login page
 
 ### Maintenance
-- PB-6069 Moving folders should not send unnecessary data to the API
-- PB-44598 Replaced links from old help site with new docs links
-- PB-46314 REACT18 Implement migration for Login Content Script
-- PB-46361 REACT18 Implement migration for Login WAR file
-- PB-46364 REACT18 Implement migration for Account Recovery
-- PB-46664 First browser extension build has missing dist folder for browsers that cause issue
-- PB-46665 Browser extension build should add chrome-mv3 in the global build command
-- PB-47012 Add prettier to replace ESLINT styling rules
-- PB-47073 Add SubscriptionKeyServiceWorkerService
-- PB-47074 Rename subscriptionService to subscriptionApiService
-- PB-47075 Migrate subscription key finder business logic
-- PB-47100 Move find controller logic from SubscriptionController
-- PB-47101 Migrate subscription logic from SubscriptionController to UpdateSubscriptionKeyController
-- PB-47103 Remove grunt-contrib-clean dependency
-- PB-47351 Chrome Bext is killed and not restarted on upgrade
-- PB-47606 Add eslint-plugin-security
-- PB-47607 Add eslint-plugin-n
-- PB-47608 Add eslint-plugin-regexp
-- PB-47609 Add eslint-plugin-promise
-- PB-47621 Move SubscriptionEntity from browser extension to styleguide
-- PB-47692 Fix prettier warning
-- PB-47707 REACT18 Implement migration for Recover
-- PB-47711 REACT18 Implement migration for Setup
-- PB-47719 REACT18 Implement migration for Inform Menu
-- PB-47783 REACT18 Implement migration for API Triage Feedback
-- PB-47785 REACT18 Implement migration for Setup/Recover Account recovery
-- PB-47867 Align dynamic roles to work with the windows application
-- PB-47902 Add a ResponseEntity factory for the unit tests
-- PB-47905 Refactor test mock for subscription refactoring
-- PB-47931 Cleanup ResourceModel
-- PB-47955 Update overlay calculation detection on inform
-- PB-48014 Remove dead code from Google Closure library
-- PB-48038 Small upgrade for validator
+- PB-47191 Review Dependabot alert for useless regular expression escape in browser extension
+- PB-47542 Add unit tests to roleApiService
+- PB-47713 REACT18- 10.2 Implement migration for QuickAccess
+- PB-48088 Remove console errors related to pagemod page detection
+- PB-48242 Remove dev phantom dependencies
+- PB-48375 Add tests to gpg user id parser
+- PB-48467 Add unit test to improve coverage on Allowed Content type page
+- PB-49472 Remove unnecessary permissions from entitlements and project
+- PB-49631 Optimize getFirst function
 
 ### Security
-- PB-46637 Prevent in-form menu to be displayed when overlaid by other components
+- PB-48025 Major upgrade for pino (Medium) - passbolt-browser-extension
+- PB-48039 Small upgrade for validator (Medium) - styleguide
+- PB-48256 Small upgrade for lodash-es (Medium) - all-projects
+- PB-48257 Small upgrade for lodash (Medium) - all projects
+- PB-48527 Small upgrade for locutus (Critical) - passbolt-windows
+- PB-48535 NPM - Remove now unnecessary overrides in package.json for styleguide and bext
+- PB-49119 Remove dev phantom dependencies - node-fetch
+- PB-49120 Remove dev phantom dependencies - history
+- PB-49121 Remove dev phantom dependencies - expect
+- PB-49369 Fix GCVE-0-2026-2391 - Medium CVSS4.0
+- PB-49372 Fix GCVE-0-2025-68458 & GCVE-0-2025-68157 - LOW CVSS3.1
+- PB-49373 Fix GCVE-0-2026-25547 - CRITICAL CVSS4.0
+- PB-49432 Fix GCVE-0-2025-69873 - MEDIUM CVSS4.0
+- PB-49452 Fix GHSA-3ppc-4f35-3m26 - HIGH CVSS4.0
+- PB-49454 Update CSPs to allow inline <style> in SVGs

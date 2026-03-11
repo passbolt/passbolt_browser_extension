@@ -19,7 +19,6 @@ import { adminAccountDto } from "../../model/entity/account/accountEntity.test.d
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import expect from "expect";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 import { v4 as uuidv4 } from "uuid";

@@ -14,6 +14,8 @@
 import { v4 as uuidv4 } from "uuid";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
+import BrowserService from "../browser/browserService";
+import { QUICKACCESS_POPUP_URL } from "../toolbar/toolbarService";
 
 /** The default quickaccesss window height */
 const QUICKACCESS_WINDOW_HEIGHT = 400;
@@ -30,7 +32,8 @@ async function openInDetachedMode(queryParameters = []) {
   // Generate the worker id
   const workerId = uuidv4();
 
-  const url = await buildDetachedQuickacessUrl(queryParameters, workerId);
+  const detachedQuickAccessqueryParameters = [...queryParameters, { name: "uiMode", value: "detached" }];
+  const url = await buildDetachedQuickaccessUrl(detachedQuickAccessqueryParameters, workerId);
   const { top, left } = await buildDetachedQuickaccessPosition();
 
   const type = "popup";
@@ -70,8 +73,8 @@ async function addWorkerQuickAccess(workerId, tabId) {
  * @param {string} workerId The worker id
  * @returns {Promise<string>}
  */
-async function buildDetachedQuickacessUrl(queryParameters, workerId) {
-  const browserExtensionUrl = await browser.action.getPopup({});
+async function buildDetachedQuickaccessUrl(queryParameters, workerId) {
+  const browserExtensionUrl = await browser.runtime.getURL(QUICKACCESS_POPUP_URL);
   const quickaccessUrl = new URL(browserExtensionUrl);
   quickaccessUrl.searchParams.set("passbolt", workerId);
   queryParameters.forEach((queryParameter) =>
@@ -91,6 +94,52 @@ async function buildDetachedQuickaccessPosition() {
   return { top: top, left: left };
 }
 
+/**
+ * Check if attached mode is available for the current browser.
+ * Attached mode opens the quickaccess as the browser action popup (attached to the toolbar icon).
+ * Currently only supported on Safari.
+ * @returns {boolean}
+ */
+function isAttachedModeAvailable() {
+  return BrowserService.isSafari();
+}
+
+/**
+ * Open the quick access in attached mode (as the browser action popup).
+ * Builds the URL with query parameters, opens it as the browser action popup,
+ * then resets the popup URL back to the default.
+ * @param {array<{name: string, value: string}>} queryParameters The query parameters to attach to the popup url
+ * @returns {Promise<string>} The worker id used as port identifier
+ */
+async function openInAttachedMode(queryParameters = []) {
+  const workerId = uuidv4();
+  const url = await buildDetachedQuickaccessUrl(queryParameters, workerId);
+
+  browser.browserAction.setPopup({ popup: url });
+  await browser.browserAction.openPopup();
+  browser.browserAction.setPopup({ popup: QUICKACCESS_POPUP_URL });
+
+  return workerId;
+}
+
+/**
+ * Open the quick access.
+ * Determines the best mode (attached or detached) based on browser capabilities.
+ * In attached mode, opens as the browser action popup.
+ * In detached mode, opens as a detached popup window with uiMode=detached query parameter.
+ * @param {array<{name: string, value: string}>} queryParameters The query parameters to attach to the quick access popup url
+ * @returns {Promise<windows.Window|string>} The quickaccess window in detached mode, the worker id in attached mode.
+ */
+async function open(queryParameters = []) {
+  if (isAttachedModeAvailable()) {
+    return openInAttachedMode(queryParameters);
+  }
+  return openInDetachedMode(queryParameters);
+}
+
 export const QuickAccessService = {
-  openInDetachedMode: openInDetachedMode,
+  openInDetachedMode,
+  openInAttachedMode,
+  isAttachedModeAvailable,
+  open,
 };

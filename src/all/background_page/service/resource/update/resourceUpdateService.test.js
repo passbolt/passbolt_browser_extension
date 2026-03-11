@@ -49,7 +49,6 @@ import {
   TEST_RESOURCE_TYPE_V5_TOTP,
   TEST_RESOURCE_TYPE_V5_PASSWORD_STRING,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
-import expect from "expect";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";

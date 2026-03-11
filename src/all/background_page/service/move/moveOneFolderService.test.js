@@ -36,7 +36,6 @@ import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import { defaultPermissionsDtos } from "passbolt-styleguide/src/shared/models/entity/permission/permissionCollection.test.data";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import FolderLocalStorage from "../local_storage/folderLocalStorage";
-import expect from "expect";
 import ProgressService from "../progress/progressService";
 import { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../share/shareResourceService";
 import { PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE } from "../share/shareFoldersService";

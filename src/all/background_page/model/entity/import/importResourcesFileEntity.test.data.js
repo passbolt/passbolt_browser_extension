@@ -13,7 +13,6 @@
  */
 
 import BinaryConvert from "../../../utils/format/binaryConvert";
-import fs from "fs";
 
 export const defaultCsvData = [
   "Title,Username,URL,Password,Notes,Group",
@@ -48,18 +47,6 @@ export const importResourceFileWithAllOptionsDto = (data = {}) => {
     options,
     ...data,
   });
-};
-
-export const defaultImportResourceFileKDBXDto = (data = {}) => {
-  const defaultPath = "./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx";
-  const file = fs.readFileSync(data.path || defaultPath, { encoding: "base64" });
-
-  return {
-    ref: "import-ref",
-    file_type: "kdbx",
-    file: file,
-    ...data,
-  };
 };
 
 export const defaultImportResourceFileOptionsDto = (data = {}) => ({

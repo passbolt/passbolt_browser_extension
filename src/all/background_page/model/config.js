@@ -5,8 +5,9 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-import defaultConfig from "../config/config.json";
 import _config from "../config/config.json";
+
+const defaultConfig = { ..._config };
 import storage from "../sdk/storage";
 
 /**

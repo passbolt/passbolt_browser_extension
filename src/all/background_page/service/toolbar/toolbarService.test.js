@@ -22,6 +22,8 @@ import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypeLocalStorage from "../local_storage/resourceTypeLocalStorage";
 import CheckAuthStatusService from "../auth/checkAuthStatusService";
+import User from "../../../../all/background_page/model/user";
+import OpenWebsiteGettingStartedPageService from "../ui/openWebsiteGettingStartedPageService";
 
 jest.useFakeTimers();
 
@@ -214,6 +216,35 @@ describe("ToolbarService", () => {
 
       await toolbarService.handleSuggestedResourcesOnActivatedTab();
       expect(browserExtensionIconServiceSetCountMock).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe("handleIconToolbarClicked", () => {
+    it("Given that no account is set on the local storage, a tab should be opened on the passbolt start URL.", async () => {
+      expect.assertions(1);
+
+      jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => {});
+      jest.spyOn(OpenWebsiteGettingStartedPageService.prototype, "openTab").mockImplementation(() => {});
+
+      toolbarService.handleIconToolbarClicked();
+
+      expect(OpenWebsiteGettingStartedPageService.prototype.openTab).toHaveBeenCalledTimes(1);
+    });
+
+    it("Given that an account is set on the local storage, the popup should be set with the right URL and the popup should be opened", async () => {
+      expect.assertions(3);
+
+      jest.spyOn(User, "getInstance").mockImplementation(() => ({ isValid: () => true }));
+      jest.spyOn(browser.browserAction, "setPopup").mockImplementation(() => {});
+      jest.spyOn(browser.browserAction, "openPopup").mockImplementation(() => {});
+
+      toolbarService.handleIconToolbarClicked();
+
+      expect(browser.browserAction.setPopup).toHaveBeenCalledTimes(1);
+      expect(browser.browserAction.setPopup).toHaveBeenCalledWith({
+        popup: "webAccessibleResources/quickaccess.html?passbolt=quickaccess",
+      });
+      expect(browser.browserAction.openPopup).toHaveBeenCalledTimes(1);
     });
   });
 });

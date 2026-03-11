@@ -66,6 +66,11 @@ export default [
       react: {
         version: "detect",
       },
+      regexp: {
+        // Allow PGP armor header character ranges (RFC 4880)
+        // !-9 and ;-~ match all printable ASCII except colon
+        allowedCharacterRanges: ["alphanumeric", "!-9", ";-~"],
+      },
       "import/resolver": {
         node: {
           paths: [__dirname], // Add project root to resolution paths
@@ -97,8 +102,14 @@ export default [
       "no-console": "off", // Allow console.log in dev
       "react/display-name": "off", // Don't require display names
       "react/prop-types": "off", // Skip PropTypes (future TypeScript)
+      "react/jsx-uses-react": "error", // Marks React as used when JSX is present
       "no-useless-escape": "off", // Too many false positives
       "func-names": ["error", "never"],
+      "import/no-named-as-default": "off",
+      "security/detect-object-injection": "off",
+      "security/detect-non-literal-regexp": "off",
+      "security/detect-unsafe-regex": "off",
+      "prefer-regex-literals": "off",
 
       // Phantom dependency detection (CRITICAL)
       "import/no-extraneous-dependencies": [
@@ -123,69 +134,6 @@ export default [
       "n/no-unsupported-features/node-builtins": "off", // We use browser APIs
       "n/no-missing-import": "off", // Handled by import plugin
       "n/no-missing-require": "off", // Handled by import plugin
-
-      // Muted during migration
-      "import/no-named-as-default-member": "off",
-      "import/no-duplicates": "off",
-      "import/named": "off",
-      "import/no-named-as-default": "off",
-      "no-empty": "off",
-      "react/jsx-uses-react": "error", // Marks React as used when JSX is present
-      "react/jsx-uses-vars": "error", // Marks JSX components as used
-      "react/react-in-jsx-scope": "error", // Ensures React is in scope for JSX
-      "security/detect-object-injection": "off",
-      "security/detect-non-literal-regexp": "off",
-      "security/detect-unsafe-regex": "off",
-      "security/detect-non-literal-fs-filename": "off",
-      "security/detect-possible-timing-attacks": "off",
-      "n/no-unpublished-import": [
-        "error",
-        {
-          allowModules: [
-            "jest-fetch-mock",
-            "jest-useragent-mock",
-            "jest-each",
-            "@testing-library/dom",
-            "@testing-library/jest-dom",
-            "@testing-library/react",
-            "@testing-library/user-event",
-            "fetch-mock",
-            "@babel/core",
-            "@storybook/test",
-          ],
-        },
-      ],
-      "n/no-unpublished-require": [
-        "error",
-        {
-          allowModules: ["jest-fetch-mock"],
-        },
-      ],
-      "n/no-extraneous-import": [
-        "error",
-        {
-          allowModules: ["expect", "history"],
-        },
-      ],
-      "prefer-regex-literals": "off",
-      "regexp/strict": "off",
-      "regexp/no-useless-escape": "off",
-      "regexp/no-dupe-characters-character-class": "off",
-      "regexp/use-ignore-case": "off",
-      "regexp/prefer-d": "off",
-      "regexp/prefer-character-class": "off",
-      "regexp/prefer-w": "off",
-      "regexp/no-obscure-range": "off",
-      "regexp/prefer-range": "off",
-      "regexp/no-dupe-disjunctions": "off",
-      "regexp/no-useless-assertions": "off",
-      "regexp/optimal-quantifier-concatenation": "off",
-      "regexp/no-unused-capturing-group": "off",
-      "regexp/sort-flags": "off",
-      "regexp/negation": "off",
-      "regexp/no-useless-flag": "off",
-      "promise/param-names": "off",
-      "promise/catch-or-return": "off",
     },
   },
   /*
@@ -221,7 +169,34 @@ export default [
       // Test-specific overrides
       "no-console": "off", // Allow console in tests
       "import/no-extraneous-dependencies": "off", // Dev deps OK in tests
+      "n/no-unpublished-import": "off", // Dev deps OK in tests
+      "n/no-unpublished-require": "off",
+      "n/no-extraneous-import": "off",
       "jest/prefer-expect-assertions": "off", // Not always needed
+      "security/detect-non-literal-fs-filename": "off",
+
+      // Forbid explicit imports of Jest globals (they are injected automatically)
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "expect",
+              message: "Use Jest's global `expect` instead.",
+            },
+            {
+              name: "jest",
+              message: "Use Jest's global `jest` instead.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["@jest/globals"],
+              message: "Use Jest's injected globals instead of importing from '@jest/globals'.",
+            },
+          ],
+        },
+      ],
 
       // Rules muted during migration
       "jest/no-conditional-expect": "off",

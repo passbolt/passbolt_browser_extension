@@ -255,7 +255,9 @@ class FoldersCollection extends EntityV2Collection {
     for (const folder of foldersCollection) {
       try {
         this.push(folder);
-      } catch {}
+      } catch {
+        // Ignore folders that cannot be added (e.g., duplicates)
+      }
     }
     return this;
   }

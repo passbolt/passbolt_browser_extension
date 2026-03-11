@@ -19,7 +19,7 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import AccountEntity from "../../model/entity/account/accountEntity";
 import FolderService from "../../service/api/folder/folderService";
 import ResourceService from "../../service/api/resource/resourceService";
-import TagService from "../../service/api/tag/tagService";
+import TagApiService from "../../service/api/tag/tagApiService";
 import ImportResourcesFileController from "./importResourcesFileController";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
@@ -112,7 +112,7 @@ describe("ImportResourcesFileController", () => {
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => defaultResourceDto());
       jest.spyOn(FolderService.prototype, "create").mockImplementation(() => defaultFolderDto());
       jest
-        .spyOn(TagService.prototype, "updateResourceTags")
+        .spyOn(TagApiService.prototype, "updateResourceTags")
         .mockImplementation(() => [defaultTagDto({ slug: "import-ref" })]);
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({ armored_key: pgpKeys.metadataKey.public });
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);

@@ -12,7 +12,6 @@
  * @since         5.5.0
  */
 
-import expect from "expect";
 import DisableScimSettingsController from "./disableScimSettingsController";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import { v4 as uuidv4 } from "uuid";

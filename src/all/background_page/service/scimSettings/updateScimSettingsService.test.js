@@ -36,7 +36,7 @@ describe("UpdateScimSettingsService", () => {
       expect.assertions(2);
       const id = uuidv4();
       const apiResponse = scimSettingsWithoutSecretTokenDto();
-      fetch.doMockOnceIf(new RegExp(`scim/settings/${id}\.json`), () => mockApiResponse(apiResponse));
+      fetch.doMockOnceIf(new RegExp(`scim/settings/${id}\\.json`), () => mockApiResponse(apiResponse));
       const expected = {
         ...apiResponse,
         secret_token: ScimSettingsEntity.EMPTY_SECRET_VALUE,
@@ -70,7 +70,7 @@ describe("UpdateScimSettingsService", () => {
     it("throws service unavailable error if an error occurred but not from the API", async () => {
       expect.assertions(1);
       const id = uuidv4();
-      fetch.doMockOnceIf(new RegExp(`scim/settings/${id}\.json`), () => {
+      fetch.doMockOnceIf(new RegExp(`scim/settings/${id}\\.json`), () => {
         throw new Error("Service unavailable");
       });
 
@@ -83,7 +83,7 @@ describe("UpdateScimSettingsService", () => {
     it("throws API error if the API encountered an issue", async () => {
       expect.assertions(1);
       const id = uuidv4();
-      fetch.doMockOnceIf(new RegExp(`scim/settings/${id}\.json`), () =>
+      fetch.doMockOnceIf(new RegExp(`scim/settings/${id}\\.json`), () =>
         mockApiResponseError(500, "Something wrong happened!"),
       );
 

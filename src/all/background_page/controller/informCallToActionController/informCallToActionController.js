@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-import User from "../../model/user";
 import ResourceModel from "../../model/resource/resourceModel";
 import { QuickAccessService } from "../../service/ui/quickAccess.service";
 import WorkerService from "../../service/worker/workerService";
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
+import OpenTrustedDomainTabService from "../../service/ui/openTrustedDomainTabService";
 
 /**
  * Controller related to the in-form call-to-action
@@ -33,15 +33,20 @@ class InformCallToActionController {
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.checkAuthStatusService = new CheckAuthStatusService();
     this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
+    this.openTrustedDomainTabService = new OpenTrustedDomainTabService();
   }
 
   /**
    * Whenever one intends to know the count of suggested resources
-   * @param requestId The identifier of the request
+   * @param {string} requestId The identifier of the request
+   * @param {"username"|"password"|"otp"} fieldType The type of field requesting the count
    */
-  async countSuggestedResourcesCount(requestId) {
+  async getSuggestedResourcesCount(requestId, fieldType) {
     try {
-      const suggestedResourcesCount = await this.getOrFindResourcesService.getOrFindSuggested(this.worker.tab.url);
+      const suggestedResourcesCount = await this.getOrFindResourcesService.getOrFindSuggested(
+        this.worker.tab.url,
+        fieldType,
+      );
       this.worker.port.emit(requestId, "SUCCESS", suggestedResourcesCount.length);
     } catch (error) {
       console.error(error);
@@ -57,14 +62,11 @@ class InformCallToActionController {
     try {
       const status = await this.checkAuthStatusService.checkAuthStatus(false);
       if (!status.isAuthenticated) {
-        const queryParameters = [
-          { name: "uiMode", value: "detached" },
-          { name: "feature", value: "login" },
-        ];
-        await QuickAccessService.openInDetachedMode(queryParameters);
+        const queryParameters = [{ name: "feature", value: "login" }];
+        await QuickAccessService.open(queryParameters);
         this.worker.port.emit(requestId, "SUCCESS");
       } else if (status.isMfaRequired) {
-        browser.tabs.create({ url: User.getInstance().settings.getDomain(), active: true });
+        await this.openTrustedDomainTabService.openTab();
         this.worker.port.emit(requestId, "SUCCESS");
       } else {
         const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);

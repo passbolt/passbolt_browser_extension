@@ -61,8 +61,7 @@ class ParseRecoverUrlService {
     try {
       this.parse(url);
       return true;
-    } catch (error) {
-      console.error(error);
+    } catch {
       return false;
     }
   }

@@ -17,7 +17,7 @@ import GetLegacyAccountService from "./getLegacyAccountService";
 
 const ACTIVE_ACCOUNT_KEY = "active-account";
 
-export class GetActiveAccountService {
+class GetActiveAccountService {
   /**
    * Get the active account associated with this extension.
    * @param {Object} options The option to add more data in the account

@@ -26,7 +26,6 @@ import { v4 as uuidv4 } from "uuid";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
-import expect from "expect";
 import ShareFoldersService from "./shareFoldersService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";

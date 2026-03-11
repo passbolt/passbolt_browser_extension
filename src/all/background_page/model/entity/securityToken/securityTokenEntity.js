@@ -37,7 +37,7 @@ class SecurityTokenEntity extends Entity {
       properties: {
         code: {
           type: "string",
-          pattern: /^[a-zA-Z0-9-_]{3}$/,
+          pattern: /^[\w-]{3}$/,
         },
         color: {
           type: "string",

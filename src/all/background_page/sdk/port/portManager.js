@@ -75,11 +75,11 @@ class PortManager {
     if (sender.tab) {
       // Tab property will only be present when the connection was opened from a tab
       return false;
-    } else {
-      // The sender is a script running in an extension page
-      const popupUrl = await browser.action.getPopup({});
-      return sender.url === popupUrl;
     }
+
+    const quickAppUrl = await browser.runtime.getURL("/webAccessibleResources/quickaccess.html");
+    const isPortUrlAQuickAppUrl = sender.url.startsWith(quickAppUrl);
+    return isPortUrlAQuickAppUrl;
   }
 
   /**

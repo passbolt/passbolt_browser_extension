@@ -17,7 +17,6 @@ import { AuthEvents } from "../event/authEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { QuickAccessEvents } from "../event/quickAccessEvents";
 import { GroupEvents } from "../event/groupEvents";
-import { TagEvents } from "../event/tagEvents";
 import { ResourceEvents } from "../event/resourceEvents";
 import { SecretEvents } from "../event/secretEvents";
 import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
@@ -37,7 +36,6 @@ jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(QuickAccessEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(GroupEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(TagEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ResourceEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
@@ -57,7 +55,7 @@ describe("QuickAccess", () => {
 
   describe("QuickAccess::attachEvents", () => {
     it("Should attach events", async () => {
-      expect.assertions(18);
+      expect.assertions(17);
       // data mocked
       const port = {
         _port: {
@@ -78,7 +76,6 @@ describe("QuickAccess", () => {
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(QuickAccessEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(GroupEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
-      expect(TagEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ResourceEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(SecretEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
@@ -94,7 +91,6 @@ describe("QuickAccess", () => {
         KeyringEvents,
         QuickAccessEvents,
         GroupEvents,
-        TagEvents,
         ResourceEvents,
         SecretEvents,
         OrganizationSettingsEvents,

@@ -72,8 +72,17 @@ import FindSecretRevisionsSettingsController from "../controller/secretRevision/
 import FindResourceSecretRevisionsForDisplayController from "../controller/secretRevision/findResourceSecretRevisionsForDisplayController";
 import DeleteSecretRevisionsSettingsController from "../controller/secretRevision/deleteSecretRevisionsSettingsController";
 import SaveSecretRevisionsSettingsController from "../controller/secretRevision/saveSecretRevisionsSettingsController";
+import FindExportPoliciesSettingsController from "../controller/exportPolicies/findExportPoliciesSettingsController";
 import FindSubscriptionKeyController from "../controller/subscription/findSubscriptionKeyController";
 import UpdateSubscriptionKeyController from "../controller/subscription/updateSubscriptionKeyController";
+import FindTagsController from "../controller/tag/findTagsController";
+import UpdateTagController from "../controller/tag/updateTagController";
+import DeleteTagController from "../controller/tag/deleteTagController";
+import UpdateResourceTagsController from "../controller/tag/updateResourceTagsController";
+import AddTagsToResourcesController from "../controller/tag/addTagsToResourcesController";
+import OpenAdministrationPageController from "../controller/tab/openAdministrationPageController";
+import OpenTrustedDomainTabController from "../controller/tab/openTrustedDomainTabController";
+import OpenWebsiteGettingStartedPageController from "../controller/tab/openWebsiteGettingStartedPageController";
 
 const listen = function (worker, apiClientOptions, account) {
   /*
@@ -82,7 +91,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param path The relative navigated-to path
    */
   worker.port.on("passbolt.app.route-changed", async (path) => {
-    if (/^\/[A-Za-z0-9\-\/]*$/.test(path)) {
+    if (/^\/[A-Z/-9\-]*$/i.test(path)) {
       const appBoostrapWorker = await WorkerService.get("AppBootstrap", worker.tab.id);
       appBoostrapWorker.port.emit("passbolt.app-bootstrap.change-route", path);
     }
@@ -722,6 +731,22 @@ const listen = function (worker, apiClientOptions, account) {
     await controller._exec(resourceId);
   });
 
+  /*
+   * ==================================================================================
+   *  Export Policies Settings events
+   * ==================================================================================
+   */
+  /**
+   * Find export policies settings
+   *
+   * @listens passbolt.export-policies.get
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on("passbolt.export-policies.get", async (requestId) => {
+    const controller = new FindExportPoliciesSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
   /**
    * Find the subscription key
    *
@@ -742,7 +767,99 @@ const listen = function (worker, apiClientOptions, account) {
    */
   worker.port.on("passbolt.subscription.update", async (requestId, subscriptionKeyDto) => {
     const subscriptionController = new UpdateSubscriptionKeyController(worker, requestId, apiClientOptions);
-    return await subscriptionController._exec(subscriptionKeyDto);
+    await subscriptionController._exec(subscriptionKeyDto);
+  });
+
+  /**
+   * Find all the tags
+   *
+   * @listens passbolt.tags.find-all
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on("passbolt.tags.find-all", async (requestId) => {
+    const findTagsController = new FindTagsController(worker, requestId, apiClientOptions);
+    await findTagsController._exec();
+  });
+
+  /**
+   * Update a tag
+   *
+   * @listens passbolt.tags.update
+   * @param requestId {uuid} The request identifier
+   * @param tagDto {object} The tag object
+   */
+  worker.port.on("passbolt.tags.update", async (requestId, tagDto) => {
+    const updateTagController = new UpdateTagController(worker, requestId, apiClientOptions);
+    await updateTagController._exec(tagDto);
+  });
+
+  /**
+   * Delete a tag
+   *
+   * @listens passbolt.tags.delete
+   * @param requestId {uuid} The request identifier
+   * @param tagId {uuid} The tag identifier
+   */
+  worker.port.on("passbolt.tags.delete", async (requestId, tagId) => {
+    const deleteTagController = new DeleteTagController(worker, requestId, apiClientOptions);
+    await deleteTagController._exec(tagId);
+  });
+
+  /**
+   * Update resource tags
+   *
+   * @listens passbolt.tags.update-resource-tags
+   * @param requestId {uuid} The request identifier
+   * @param resourceId {uuid} The resource identifier
+   * @param tagsDto {Object} tags dto
+   */
+  worker.port.on("passbolt.tags.update-resource-tags", async (requestId, resourceId, tagsDto) => {
+    const updateResourceTagsController = new UpdateResourceTagsController(worker, requestId, apiClientOptions);
+    await updateResourceTagsController._exec(resourceId, tagsDto);
+  });
+
+  /**
+   * Add resources tag
+   *
+   * @listens passbolt.tags.add-resource-tags
+   * @param requestId {uuid} The request identifier
+   * @param {object} resourcesTagDto {resources: array of uuids, tag: {object}} the tag to add for the resources
+   */
+  worker.port.on("passbolt.tags.add-resources-tag", async (requestId, resourcesTagDto) => {
+    const addTagsToResourcesController = new AddTagsToResourcesController(worker, requestId, apiClientOptions);
+    await addTagsToResourcesController._exec(resourcesTagDto.resources, [resourcesTagDto.tag]);
+  });
+
+  /**
+   * Opens an administration page in the current tab.
+   * @param {string} requestId
+   * @param {string} pageName The name of the administration page to open
+   * @listens passbolt.tabs.open-admin-page
+   */
+  worker.port.on("passbolt.tabs.open-admin-page", async (requestId, pageName) => {
+    const controller = new OpenAdministrationPageController(worker, requestId);
+    await controller._exec(pageName);
+  });
+
+  /**
+   * Opens the trusted domain in a new tab.
+   * @param {string} requestId
+   * @listens passbolt.tabs.open-trusted-domain
+   */
+  worker.port.on("passbolt.tabs.open-trusted-domain", async (requestId) => {
+    const controller = new OpenTrustedDomainTabController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Opens the Passbolt getting started page in a new tab.
+   * @param {string} requestId
+   * @listens passbolt.tabs.open-website-getting-started-page
+   */
+  worker.port.on("passbolt.tabs.open-website-getting-started-page", async (requestId) => {
+    const controller = new OpenWebsiteGettingStartedPageController(worker, requestId);
+    await controller._exec();
   });
 };
+
 export const AppEvents = { listen };

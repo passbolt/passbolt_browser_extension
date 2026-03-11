@@ -1,0 +1,94 @@
+//
+// Passbolt - Open source password manager for teams
+// Copyright (c) Passbolt SA
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
+// Public License (AGPL) as published by the Free Software Foundation version 3.
+//
+// The name "Passbolt" is a registered trademark of Passbolt SA, and Passbolt SA hereby declines to grant a trademark
+// license to "Passbolt" pursuant to the GNU Affero General Public License version 3 Section 7(e), without a separate
+// agreement with Passbolt SA.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License along with this program. If not,
+// see GNU Affero General Public License v3 (http://www.gnu.org/licenses/agpl-3.0.html).
+//
+// @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+// @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+// @link          https://www.passbolt.com Passbolt (tm)
+// @since         v5.6.0
+//
+
+import Foundation
+
+final class FetchService {
+
+    // Runs a fetch on the API with profile isolation.
+    // It expects a payload set from the extention with the possible property
+    //   url: The URL to send to request to
+    //   options["method"]: the HTTP method to use
+    //   options["body"]: the HTTP body of the request
+    //   options["headers"]: the HTTP headers to send along with the request
+    //   options["cookies"]: the specific Cookies (HTTP serialized) to set on the request
+    //   profileUUID: The Safari profile UUID for session isolation
+    static func fetch(url: URL, options: [String: Any], profileUUID: String) async throws -> [String: Any] {
+        let method = options["method"] as? String ?? "GET"
+        let body = options["body"] as? String ?? ""
+        let headers = options["headers"] as? [String: String] ?? [:]
+        let cookies = options["cookies"] as? String
+
+        var httpRequest = URLRequest(url: url)
+        httpRequest.httpMethod = method
+        httpRequest.httpBody = body.data(using: .utf8)
+
+        // SECURITY: Add cache-control headers to prevent response caching
+        httpRequest.setValue("no-cache, no-store, must-revalidate", forHTTPHeaderField: "Cache-Control")
+        httpRequest.setValue("no-cache", forHTTPHeaderField: "Pragma")
+
+        for header in headers {
+            httpRequest.setValue(String(describing: header.value), forHTTPHeaderField: String(describing: header.key))
+        }
+
+        // Cookies from extension (already profile-isolated via browser.cookies)
+        if (cookies != nil) {
+            httpRequest.setValue(cookies, forHTTPHeaderField: "Cookie")
+        }
+
+        return try await doFetch(request: httpRequest, profileUUID: profileUUID)
+    }
+
+    // The actual fetch sent to the API using a profile-isolated session
+    private static func doFetch(request: URLRequest, profileUUID: String) async throws -> [String: Any] {
+        // SECURITY: Use profile-specific session, NEVER URLSession.shared
+        // This ensures cookies from one profile cannot leak to another
+        let session = SecureProfileSessionManager.session(forProfile: profileUUID)
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "FetchService", code: 500,
+                          userInfo: [NSLocalizedDescriptionKey: "Response is not HTTP"])
+        }
+        
+        // Try to parse as JSON, fallback to string representation
+        let body: Any
+        if let jsonBody = try? JSONSerialization.jsonObject(with: data, options: []) {
+            body = jsonBody
+        } else if let stringBody = String(data: data, encoding: .utf8) {
+            body = stringBody
+        } else {
+            body = NSNull()
+        }
+        
+        let headers = httpResponse.allHeaderFields
+        let statusCode = httpResponse.statusCode
+
+        return [
+            "headers": headers,
+            "body": body,
+            "status": statusCode
+        ]
+    }
+}

@@ -20,7 +20,6 @@ import {
   readPermissionDto,
   updatePermissionDto,
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
-import expect from "expect";
 import { v4 as uuidv4 } from "uuid";
 import PermissionEntity from "../permission/permissionEntity";
 

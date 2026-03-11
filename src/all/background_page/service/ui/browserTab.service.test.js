@@ -95,5 +95,96 @@ describe("BrowserTabService", () => {
       // expectations
       expect(browser.tabs.reload).toHaveBeenCalledWith(tab.id);
     });
+
+    it("Should assert its parameter", async () => {
+      expect.assertions(1);
+      // mock data
+      const tab = { id: "1" };
+      // process
+      await expect(() => BrowserTabService.reloadTab(tab.id)).rejects.toThrowError();
+    });
+  });
+
+  describe("BrowserTabService::closeTab", () => {
+    it("Should close the tab by id", async () => {
+      expect.assertions(1);
+      // mock data
+      const tab = { id: 1 };
+      // mock functions
+      jest.spyOn(browser.tabs, "remove");
+      // process
+      await BrowserTabService.closeTab(tab.id);
+      // expectations
+      expect(browser.tabs.remove).toHaveBeenCalledWith(tab.id);
+    });
+
+    it("Should assert its parameter", async () => {
+      expect.assertions(1);
+      // mock data
+      const tab = { id: "1" };
+      // process
+      await expect(() => BrowserTabService.closeTab(tab.id)).rejects.toThrowError();
+    });
+  });
+
+  describe("BrowserTabService::openTab", () => {
+    it("Should open a new tab given a URL", async () => {
+      expect.assertions(1);
+      // mock data
+      const url = "https://www.passbolt.com/";
+      // mock functions
+      jest.spyOn(browser.tabs, "create");
+      // process
+      await BrowserTabService.openTab(url);
+      // expectations
+      expect(browser.tabs.create).toHaveBeenCalledWith({ url });
+    });
+
+    it("Should throw an error if the URL is not valid", async () => {
+      expect.assertions(4);
+      // mock functions
+      jest.spyOn(browser.tabs, "create");
+
+      await expect(() => BrowserTabService.openTab(null)).rejects.toThrowError();
+      await expect(() => BrowserTabService.openTab("url")).rejects.toThrowError();
+      await expect(() => BrowserTabService.openTab("ftp://www.passbolt.com")).rejects.toThrowError();
+      await expect(() => BrowserTabService.openTab("javascript:void(0")).rejects.toThrowError();
+    });
+  });
+
+  describe("BrowserTabService::updateCurrentTabUrl", () => {
+    it("Should update the current tab with the given URL", async () => {
+      expect.assertions(2);
+      // mock data
+      const url = "https://www.passbolt.com/";
+      const currentTab = { id: 42 };
+      // mock functions
+      jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [currentTab]);
+      jest.spyOn(browser.tabs, "update");
+      // process
+      await BrowserTabService.updateCurrentTabUrl(url);
+      // expectations
+      expect(browser.tabs.query).toHaveBeenCalledWith({ active: true, currentWindow: true });
+      expect(browser.tabs.update).toHaveBeenCalledWith(currentTab.id, { url });
+    });
+
+    it("Should throw an error if the URL is not valid", async () => {
+      expect.assertions(4);
+      // mock functions
+      jest.spyOn(browser.tabs, "update");
+
+      await expect(() => BrowserTabService.updateCurrentTabUrl(null)).rejects.toThrowError(
+        "Cannot update the current tab due to an invalid URL",
+      );
+      await expect(() => BrowserTabService.updateCurrentTabUrl("url")).rejects.toThrowError(
+        "Cannot update the current tab due to an invalid URL",
+      );
+      await expect(() => BrowserTabService.updateCurrentTabUrl("ftp://www.passbolt.com")).rejects.toThrowError(
+        "Cannot update the current tab due to an invalid URL",
+      );
+      await expect(() => BrowserTabService.updateCurrentTabUrl("javascript:void(0")).rejects.toThrowError(
+        "Cannot update the current tab due to an invalid URL",
+      );
+    });
   });
 });

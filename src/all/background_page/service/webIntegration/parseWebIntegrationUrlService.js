@@ -22,7 +22,7 @@ class ParseWebIntegrationUrlService {
     const user = User.getInstance();
     const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
     // Regex to check this is not our domain or chrome and about page
-    return new RegExp(`^(?!(${escapedDomain}|chrome:|about:|https:\/\/(www\.passbolt|mail\.google)\.com)).*$`);
+    return new RegExp(`^(?!(${escapedDomain}|chrome:|about:|https:\\/\\/(www\\.passbolt|mail\\.google)\\.com)).*$`);
   }
 
   /**
@@ -35,8 +35,7 @@ class ParseWebIntegrationUrlService {
       // Check if the url is valid
       new URL(url);
       return this.regex.test(url);
-    } catch (error) {
-      console.error(error);
+    } catch {
       return false;
     }
   }

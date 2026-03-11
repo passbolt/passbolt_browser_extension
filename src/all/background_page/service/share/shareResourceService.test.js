@@ -52,7 +52,6 @@ import { v4 as uuidv4 } from "uuid";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
-import expect from "expect";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 import ProgressService from "../progress/progressService";
 import { METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY } from "../../model/entity/resource/resourceEntity";

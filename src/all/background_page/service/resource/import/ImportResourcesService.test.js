@@ -40,7 +40,7 @@ import ImportError from "../../../error/importError";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import FolderService from "../../api/folder/folderService";
 import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
-import TagService from "../../api/tag/tagService";
+import TagApiService from "../../api/tag/tagApiService";
 import { defaultTagDto } from "../../../model/entity/tag/tagEntity.test.data";
 import ExternalResourceEntity from "../../../model/entity/resource/external/externalResourceEntity";
 import { defaultExternalResourceImportMinimalDto } from "../../../model/entity/resource/external/externalResourceEntity.test.data";
@@ -77,6 +77,7 @@ import {
   defaultProOrganizationSettings,
 } from "../../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import OrganizationSettingsService from "../../api/organizationSettings/organizationSettingsService";
+import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -130,8 +131,8 @@ describe("ImportResourcesService", () => {
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => defaultResourceDto());
       jest.spyOn(FolderService.prototype, "create").mockImplementation(() => defaultFolderDto());
       jest
-        .spyOn(TagService.prototype, "updateResourceTags")
-        .mockImplementation(() => [defaultTagDto({ slug: "import-ref" })]);
+        .spyOn(TagApiService.prototype, "updateResourceTags")
+        .mockResolvedValue(new PassboltResponseEntity({ header: {}, body: [defaultTagDto({ slug: "import-ref" })] }));
       const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({ armored_key: pgpKeys.metadataKey.public });
       metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const collection = resourceTypesCollectionDto();

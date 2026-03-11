@@ -23,4 +23,11 @@ export default class BrowserService {
   static isFirefox() {
     return browser.runtime.getURL("/").startsWith("moz-extension://");
   }
+  /**
+   * Returns true if the current browser is Safari.
+   * @returns {boolean}
+   */
+  static isSafari() {
+    return browser.runtime.getURL("/").startsWith("safari-web-extension://");
+  }
 }

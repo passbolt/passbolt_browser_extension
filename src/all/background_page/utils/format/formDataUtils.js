@@ -44,6 +44,22 @@ class FormDataUtils {
   }
 
   /**
+   * Transform a form data to an array of object
+   * @param {FormData} formData The form data
+   * @return {Promise<Array<Object>>}
+   */
+  static async formDataToString(formData) {
+    const result = [];
+    const formDataArray = await FormDataUtils.formDataToArray(formData);
+
+    for (let i = 0; i < formDataArray.length; i++) {
+      result.push(`${encodeURIComponent(formDataArray[i].key)}=${encodeURIComponent(formDataArray[i].value)}`);
+    }
+
+    return result.join("&");
+  }
+
+  /**
    * Transform an array of object to a form data
    * @param {Array<Object>} array
    * @return {FormData}

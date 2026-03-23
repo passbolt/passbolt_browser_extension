@@ -66,5 +66,43 @@ describe("OpenResourceUriTabController", () => {
       expect.assertions(1);
       await expect(controller.exec(123)).rejects.toThrow();
     });
+
+    it("Should throw with the expected error message when sanitizeUrl returns false for a javascript: URL", async () => {
+      const controller = new OpenResourceUriTabController(null, null);
+
+      expect.assertions(1);
+      await expect(controller.exec("javascript:alert(1)")).rejects.toThrow(
+        "The given URL is not valid for opening in a new tab.",
+      );
+    });
+
+    it("Should throw with the expected error message when sanitizeUrl returns false for an empty string", async () => {
+      const controller = new OpenResourceUriTabController(null, null);
+
+      expect.assertions(1);
+      await expect(controller.exec("")).rejects.toThrow("The given URL is not valid for opening in a new tab.");
+    });
+
+    it("Should throw with the expected error message when sanitizeUrl returns false for a ssh: URL", async () => {
+      const controller = new OpenResourceUriTabController(null, null);
+
+      expect.assertions(1);
+      await expect(controller.exec("ssh://example.com")).rejects.toThrow(
+        "The given URL is not valid for opening in a new tab.",
+      );
+    });
+
+    it("Should not call browser.tabs.create when sanitizeUrl returns false", async () => {
+      const controller = new OpenResourceUriTabController(null, null);
+      jest.spyOn(browser.tabs, "create");
+
+      expect.assertions(1);
+      try {
+        await controller.exec("javascript:alert(1)");
+      } catch {
+        // Expected to throw
+      }
+      expect(browser.tabs.create).not.toHaveBeenCalled();
+    });
   });
 });

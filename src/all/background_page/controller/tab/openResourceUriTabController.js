@@ -41,7 +41,7 @@ export default class OpenResourceUriTabController {
   }
 
   /**
-   * Opens the trusted domain in a new tab
+   * Opens the given url in a new tab
    * @param {string} uriString the URI to try to open on a new tab
    * @returns {Promise<void>}
    */
@@ -50,6 +50,11 @@ export default class OpenResourceUriTabController {
       whiteListedProtocols: [urlProtocols.HTTPS, urlProtocols.HTTP],
       defaultProtocol: urlProtocols.HTTPS,
     });
+
+    if (!url) {
+      throw new Error("The given URL is not valid for opening in a new tab.");
+    }
+
     await BrowserTabService.openTab(url);
   }
 }

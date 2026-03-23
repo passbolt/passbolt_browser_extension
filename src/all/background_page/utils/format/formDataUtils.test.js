@@ -11,13 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.8.0
  */
-import {
-  formDataMixed,
-  formDataString,
-  formDataBlob,
-  formDataFile,
-  formDataWithSpecialChars,
-} from "./formDataUtils.test.data";
+import { formDataMixed, formDataString, formDataBlob, formDataFile } from "./formDataUtils.test.data";
 import FormDataUtils from "./formDataUtils";
 
 describe("FormDataUtils", () => {

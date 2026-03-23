@@ -92,24 +92,41 @@ final class FetchService {
                 continue
             }
 
+            let sanitizedKey = sanitizeHeaderValue(key)
             body.append("--\(boundary)\r\n")
 
             if type == "FILE" {
-                let filename = entry["name"] as? String ?? "file"
+                let rawFilename = entry["name"] as? String ?? "file"
+                let sanitizedFilename = sanitizeFilename(rawFilename)
                 let (mimeType, fileData) = decodeDataURL(value)
+                let sanitizedMimeType = sanitizeHeaderValue(mimeType)
 
-                body.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(filename)\"\r\n")
-                body.append("Content-Type: \(mimeType)\r\n\r\n")
+                body.append("Content-Disposition: form-data; name=\"\(sanitizedKey)\"; filename=\"\(sanitizedFilename)\"\r\n")
+                body.append("Content-Type: \(sanitizedMimeType)\r\n\r\n")
                 body.append(fileData)
                 body.append("\r\n")
             } else {
-                body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
+                body.append("Content-Disposition: form-data; name=\"\(sanitizedKey)\"\r\n\r\n")
                 body.append("\(value)\r\n")
             }
         }
 
         body.append("--\(boundary)--\r\n")
         return body
+    }
+
+    /// Sanitize a filename for use in Content-Disposition headers.
+    /// Strips path traversal components, quotes, and CRLF characters.
+    private static func sanitizeFilename(_ raw: String) -> String {
+        let nameOnly = raw.components(separatedBy: CharacterSet(charactersIn: "/\\")).last ?? "file"
+        return sanitizeHeaderValue(nameOnly)
+    }
+
+    /// Sanitize a value interpolated into an HTTP header by removing quotes and CRLF.
+    private static func sanitizeHeaderValue(_ raw: String) -> String {
+        raw.replacingOccurrences(of: "\"", with: "")
+           .replacingOccurrences(of: "\r", with: "")
+           .replacingOccurrences(of: "\n", with: "")
     }
 
     /// Decode a data URL (e.g. "data:image/png;base64,iVBOR...") into its MIME type and binary data.

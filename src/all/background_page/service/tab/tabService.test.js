@@ -194,7 +194,7 @@ describe("TabService", () => {
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
     });
 
-    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. A port is found in runtime memory 3. No content script application was able to aknowledge presence on the port", async () => {
+    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. A port is found in runtime memory 3. No content script application was able to acknowledge presence on the port", async () => {
       expect.assertions(5);
       // data mocked
       const worker = readWorker();
@@ -225,6 +225,137 @@ describe("TabService", () => {
       // Called 1 times during the execution
       expect(global.setTimeout).toHaveBeenCalledTimes(1);
       expect(global.clearTimeout).toHaveBeenCalledTimes(1);
+    });
+
+    it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. A port is found in runtime memory 3. No content script application was able to acknowledge presence on the port due to the timeout", async () => {
+      expect.assertions(5);
+      // data mocked
+      const worker = readWorker();
+      const frameDetails = {
+        url: "https://localhost",
+        tabId: worker.tabId,
+        frameId: 0,
+      };
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url });
+      const portWrapper = new Port(port);
+      jest.spyOn(portWrapper, "request").mockImplementation(() => new Promise(() => null));
+      jest.spyOn(global, "setTimeout");
+      jest.spyOn(global, "clearTimeout");
+      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({
+        url: frameDetails.url,
+      }));
+      // mock function
+      mockWorker.mockImplementationOnce(() => worker);
+      mockIsPortExist.mockImplementation(() => true);
+      mockGetPort.mockImplementationOnce(() => portWrapper);
+      // process
+      const promise = TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: frameDetails.url },
+      );
+      // Await pending promise for timeout
+      await Promise.resolve();
+      // start the timeout promise
+      jest.runOnlyPendingTimers();
+      // Await pending promise for timeout
+      await Promise.resolve();
+      await Promise.resolve();
+      jest.runOnlyPendingTimers();
+      await promise;
+      // expectations
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
+      expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
+      expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
+      // Called 2 times during the execution
+      expect(global.setTimeout).toHaveBeenCalledTimes(2);
+      // Called 0 times during the execution
+      expect(global.clearTimeout).toHaveBeenCalledTimes(0);
+    });
+
+    it("do not triggers the pagemods identification process if 1. a worker was attached to the tab 2. A port is found in runtime memory 3. No content script application was able to acknowledge presence on the port due to the timeout but the url has changed", async () => {
+      expect.assertions(5);
+      // data mocked
+      const worker = readWorker();
+      const frameDetails = {
+        url: "https://localhost",
+        tabId: worker.tabId,
+        frameId: 0,
+      };
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url });
+      const portWrapper = new Port(port);
+      jest.spyOn(portWrapper, "request").mockImplementation(() => new Promise(() => null));
+      jest.spyOn(global, "setTimeout");
+      jest.spyOn(global, "clearTimeout");
+      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({
+        url: "https://localhost/new",
+      }));
+      // mock function
+      mockWorker.mockImplementationOnce(() => worker);
+      mockIsPortExist.mockImplementation(() => true);
+      mockGetPort.mockImplementationOnce(() => portWrapper);
+      // process
+      const promise = TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: frameDetails.url },
+      );
+      // Await pending promise for timeout
+      await Promise.resolve();
+      // start the timeout promise
+      jest.runOnlyPendingTimers();
+      await promise;
+      // expectations
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenNthCalledWith(1, frameDetails.tabId);
+      expect(PortManager.getPortById).toHaveBeenNthCalledWith(1, worker.id);
+      expect(WebNavigationService.exec).toHaveBeenCalledTimes(0);
+      // Called 1 times during the execution
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
+      // Called 0 times during the execution
+      expect(global.clearTimeout).toHaveBeenCalledTimes(0);
+    });
+
+    it("do not triggers the pagemods identification process if 1. a worker was attached to the tab 2. A port is found in runtime memory 3. No content script application was able to acknowledge presence on the port due to the timeout but the port does not exist anymore", async () => {
+      expect.assertions(5);
+      // data mocked
+      const worker = readWorker();
+      const frameDetails = {
+        url: "https://localhost",
+        tabId: worker.tabId,
+        frameId: 0,
+      };
+      const port = mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url });
+      const portWrapper = new Port(port);
+      jest.spyOn(portWrapper, "request").mockImplementation(() => new Promise(() => null));
+      jest.spyOn(global, "setTimeout");
+      jest.spyOn(global, "clearTimeout");
+      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({
+        url: frameDetails.url,
+      }));
+      // mock function
+      mockWorker.mockImplementationOnce(() => worker);
+      mockIsPortExist.mockImplementationOnce(() => true);
+      mockGetPort.mockImplementationOnce(() => portWrapper);
+      // process
+      const promise = TabService.exec(
+        frameDetails.tabId,
+        { status: "complete" },
+        { id: frameDetails.tabId, url: frameDetails.url },
+      );
+      // Await pending promise for timeout
+      await Promise.resolve();
+      mockIsPortExist.mockImplementationOnce(() => false);
+      // start the timeout promise
+      jest.runOnlyPendingTimers();
+      await promise;
+      // expectations
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenNthCalledWith(1, frameDetails.tabId);
+      expect(PortManager.getPortById).toHaveBeenNthCalledWith(1, worker.id);
+      expect(WebNavigationService.exec).toHaveBeenCalledTimes(0);
+      // Called 1 times during the execution
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
+      // Called 0 times during the execution
+      expect(global.clearTimeout).toHaveBeenCalledTimes(0);
     });
 
     it("triggers the pagemods identification process if 1. a worker was attached to the tab 2. No port is found in runtime memory 3. No content script application was not able to reconnect its port.", async () => {

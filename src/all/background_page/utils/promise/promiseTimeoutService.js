@@ -1,3 +1,5 @@
+import TimeoutError from "../../error/timeoutError";
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
@@ -22,7 +24,7 @@ class PromiseTimeoutService {
   static exec(promise, timeout = PROMISE_TIMEOUT) {
     return new Promise((resolve, reject) => {
       // Schedule promise timeout
-      const timeoutId = setTimeout(reject, timeout);
+      const timeoutId = setTimeout(() => reject(new TimeoutError("Promise timeout exceeded")), timeout);
       // Clear promise timeout alarm
       const clearTimeoutWithId = () => clearTimeout(timeoutId);
       // return the promise resolved else reject and finally clear timeout

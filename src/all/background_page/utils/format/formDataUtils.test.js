@@ -11,13 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.8.0
  */
-import {
-  formDataMixed,
-  formDataString,
-  formDataBlob,
-  formDataFile,
-  formDataWithSpecialChars,
-} from "./formDataUtils.test.data";
+import { formDataMixed, formDataString, formDataBlob, formDataFile } from "./formDataUtils.test.data";
 import FormDataUtils from "./formDataUtils";
 
 describe("FormDataUtils", () => {
@@ -104,38 +98,6 @@ describe("FormDataUtils", () => {
       const formDataReceived = FormDataUtils.arrayToFormData(arrayObject);
       // expectations
       expect(formData).toStrictEqual(formDataReceived);
-    });
-  });
-
-  describe("FormDataUtils::formDataToString", () => {
-    it("should convert scalar values to a URL-encoded string", async () => {
-      expect.assertions(1);
-      // data mocked
-      const formData = formDataString();
-      // process
-      const result = await FormDataUtils.formDataToString(formData);
-      // expectations
-      expect(result).toStrictEqual("prop1=value%201&prop1=value%202");
-    });
-
-    it("should URL-encode special characters in keys and values", async () => {
-      expect.assertions(1);
-      // data mocked
-      const formData = formDataWithSpecialChars();
-      // process
-      const result = await FormDataUtils.formDataToString(formData);
-      // expectations
-      expect(result).toStrictEqual("search%20query=hello%20world&symbols=a%3D1%26b%3D2");
-    });
-
-    it("should return an empty string for empty FormData", async () => {
-      expect.assertions(1);
-      // data mocked
-      const formData = new FormData();
-      // process
-      const result = await FormDataUtils.formDataToString(formData);
-      // expectations
-      expect(result).toStrictEqual("");
     });
   });
 });

@@ -14,7 +14,6 @@
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
-import { urlencode } from "locutus/php/url";
 import AuthVerifyLoginChallengeService from "./authVerifyLoginChallengeService";
 import {
   defaultGpgAuthTokenLoginCompleteHeadersDto,
@@ -23,6 +22,7 @@ import {
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import GpgAuthToken from "../../model/gpgAuthToken";
+import { urlencode } from "../../vendors/locutus/urlencode.test.data";
 
 beforeEach(async () => {
   jest.clearAllMocks();

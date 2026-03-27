@@ -16,8 +16,8 @@ import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import GpgAuthToken from "../../model/gpgAuthToken";
-import stripslashes from "locutus/php/strings/stripslashes";
-import urldecode from "locutus/php/url/urldecode";
+import { urldecode } from "../../vendors/locutus/urldecode";
+import { stripslashes } from "../../vendors/locutus/stripslashes";
 
 class DecryptUserAuthTokenService {
   /**

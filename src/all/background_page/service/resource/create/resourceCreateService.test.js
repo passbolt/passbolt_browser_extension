@@ -89,7 +89,7 @@ describe("ResourceCreateService", () => {
       await resourceCreateService.create(resourceDto, secret, pgpKeys.ada.passphrase);
 
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledTimes(2);
-      expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith("Creating password", true);
+      expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith("Creating resource", true);
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith("Encrypting secret", true);
       expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledWith(3);
     });

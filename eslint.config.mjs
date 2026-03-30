@@ -1,5 +1,4 @@
 import globals from "globals";
-import babelParser from "@babel/eslint-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -32,17 +31,12 @@ export default [
     files: ["**/*.{js,jsx,mjs,cjs}"],
 
     languageOptions: {
-      parser: babelParser,
       ecmaVersion: 2024,
       sourceType: "module",
 
       parserOptions: {
-        requireConfigFile: false,
         ecmaFeatures: {
           jsx: true,
-        },
-        babelOptions: {
-          presets: ["@babel/preset-react"],
         },
       },
 

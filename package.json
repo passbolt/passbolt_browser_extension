@@ -35,6 +35,7 @@
     "@babel/helpers": "^7.26.10",
     "@babel/plugin-transform-runtime": "^7.22.9",
     "@babel/preset-env": "^7.22.9",
+    "@babel/preset-react": "^7.28.5",
     "@babel/runtime": "^7.27.0",
     "@babel/runtime-corejs3": "^7.26.10",
     "@eslint/js": "^9.39.4",

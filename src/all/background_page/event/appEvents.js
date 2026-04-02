@@ -83,6 +83,7 @@ import AddTagsToResourcesController from "../controller/tag/addTagsToResourcesCo
 import OpenAdministrationPageController from "../controller/tab/openAdministrationPageController";
 import OpenTrustedDomainTabController from "../controller/tab/openTrustedDomainTabController";
 import OpenWebsiteGettingStartedPageController from "../controller/tab/openWebsiteGettingStartedPageController";
+import OpenResourceUriTabController from "../controller/tab/openResourceUriTabController";
 
 const listen = function (worker, apiClientOptions, account) {
   /*
@@ -859,6 +860,17 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.tabs.open-website-getting-started-page", async (requestId) => {
     const controller = new OpenWebsiteGettingStartedPageController(worker, requestId);
     await controller._exec();
+  });
+
+  /**
+   * Opens the given URI in a new tab.
+   * @param {string} requestId
+   * @param {string} uri
+   * @listens passbolt.tabs.open-resource-uri
+   */
+  worker.port.on("passbolt.tabs.open-resource-uri", async (requestId, uri) => {
+    const controller = new OpenResourceUriTabController(worker, requestId);
+    await controller._exec(uri);
   });
 };
 

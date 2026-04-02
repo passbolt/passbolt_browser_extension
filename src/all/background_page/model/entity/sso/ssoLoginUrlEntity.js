@@ -17,11 +17,13 @@ import AdfsSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
 import OAuth2SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/OAuth2SsoSettingsEntity";
+import PingOneSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/PingOneSsoSettingsEntity";
 
 const ENTITY_NAME = "SsoLoginUrl";
 const SSO_LOGIN_SUPPORTED_URLS = {
   [AzureSsoSettingsEntity.PROVIDER_ID]: AzureSsoSettingsEntity.SUPPORTED_URLS,
   [GoogleSsoSettingsEntity.PROVIDER_ID]: GoogleSsoSettingsEntity.SUPPORTED_URLS,
+  [PingOneSsoSettingsEntity.PROVIDER_ID]: PingOneSsoSettingsEntity.SUPPORTED_URLS,
 };
 
 /**

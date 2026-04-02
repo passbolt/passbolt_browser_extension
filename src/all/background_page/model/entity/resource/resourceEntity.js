@@ -172,7 +172,7 @@ class ResourceEntity extends EntityV2 {
             {
               type: "string",
               pattern:
-                /^-----BEGIN PGP MESSAGE-----\r?\n((?:[!-9;-~]+:\s?.*\r?\n)*\r?\n)((?:[A-Za-z/-9+]{1,76}\r?\n)*)([A-Za-z/-9+]{1,76}={0,2}\r?\n)(=[A-Za-z/-9+]{4}\r?\n)-----END PGP MESSAGE-----\s*$/,
+                /^-----BEGIN PGP MESSAGE-----\r?\n((?:[!-9;-~]+: [^\r\n]*\r?\n)*\r?\n)((?:[A-Za-z/-9+]{1,76}\r?\n)*)([A-Za-z/-9+]{1,76}={0,2}\r?\n)(=[A-Za-z/-9+]{4}\r?\n)-----END PGP MESSAGE-----\s*$/,
             },
             ResourceMetadataEntity.getSchema(),
           ],

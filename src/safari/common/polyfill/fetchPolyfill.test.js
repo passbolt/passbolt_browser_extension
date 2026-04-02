@@ -83,17 +83,21 @@ describe("FetchSafariPolyfill", () => {
   });
 
   describe("FetchSafariPolyfill::prepareOptions", () => {
-    it("should convert FormData body to URL-encoded string", async () => {
+    it("should convert FormData body to an array of objects", async () => {
       expect.assertions(2);
+      const expectedArray = [
+        { key: "username", value: "test-user", type: "SCALAR" },
+        { key: "password", value: "test-password", type: "SCALAR" },
+      ];
       jest.spyOn(SendNativeMessageService, "sendNativeMessage").mockResolvedValue(defaultAppResponse());
-      jest.spyOn(FormDataUtils, "formDataToString").mockResolvedValue("username=test-user&password=test-password");
+      jest.spyOn(FormDataUtils, "formDataToArray").mockResolvedValue(expectedArray);
 
       await FetchSafariPolyfill(TEST_URL, fetchOptionsWithFormData());
 
-      expect(FormDataUtils.formDataToString).toHaveBeenCalledTimes(1);
+      expect(FormDataUtils.formDataToArray).toHaveBeenCalledTimes(1);
       expect(SendNativeMessageService.sendNativeMessage).toHaveBeenCalledWith("fetch", {
         resource: TEST_URL,
-        options: expect.objectContaining({ body: "username=test-user&password=test-password" }),
+        options: expect.objectContaining({ body: expectedArray }),
       });
     });
 

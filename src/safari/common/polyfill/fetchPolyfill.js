@@ -75,7 +75,7 @@ class FetchSafariPolyfill {
    */
   static async prepareOptions(options, cookieService) {
     const bodyData =
-      options.body instanceof FormData ? await FormDataUtils.formDataToString(options.body) : options.body;
+      options.body instanceof FormData ? await FormDataUtils.formDataToArray(options.body) : options.body;
 
     const requestOptions = { ...options, body: bodyData };
 

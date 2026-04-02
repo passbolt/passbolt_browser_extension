@@ -120,13 +120,16 @@ class GroupApiService extends AbstractService {
    * Create a group using Passbolt API
    *
    * @param {Object} data
+   * @param {Object} [contains] optional example: {permissions: true}
    * @returns {Promise<*>} Response body
    * @public
    */
-  async create(data) {
+  async create(data, contains) {
     this.assertNonEmptyData(data);
-    data = GroupApiService.remapV2DataToV1(data); // crassette
-    const response = await this.apiClient.create(data);
+    const urlOptions = contains
+      ? this.formatContainOptions(contains, GroupApiService.getSupportedContainOptions())
+      : {};
+    const response = await this.apiClient.create(data, urlOptions);
     return response.body;
   }
 

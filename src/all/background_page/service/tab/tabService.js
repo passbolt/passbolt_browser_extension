@@ -130,16 +130,48 @@ class TabService {
          */
         if (hasUrlSameOrigin(port._port.sender.url, url)) {
           try {
-            await PromiseTimeoutService.exec(port.request("passbolt.port.check"));
+            await PromiseTimeoutService.exec(port.request("passbolt.port.check"), 1000);
             console.debug(
               `TabService::handleNavigation(id: ${tabId}):  Content script application acknowledged presence on worker runtime memory port.`,
             );
             return;
           } catch (error) {
-            console.debug(
-              `TabService::handleNavigation(id: ${tabId}): No content script application acknowledged presence on worker runtime memory port.`,
-              error,
-            );
+            console.error(error);
+            /*
+             * Timeout could be reached if the application is slow and do not receive acknowledgement from the port in 1000ms.
+             * Detect if url or port has been changed and do nothing if it's  the case.
+             * If nothing change could be related to a very slow performance issue or same url navigation same port.
+             * Then retry for 1500ms if any error or timeout start a new navigation
+             */
+            if (error?.name === "TimeoutError") {
+              console.debug(
+                `TabService::handleNavigation(id: ${tabId}):  Content script application timeout reached on worker runtime memory port.`,
+              );
+              const tab = await BrowserTabService.getById(tabId);
+              if (tab.url !== url) {
+                return;
+              } else if (!PortManager.isPortExist(worker.id)) {
+                return;
+              } else {
+                try {
+                  await PromiseTimeoutService.exec(port.request("passbolt.port.check"), 1500);
+                  console.debug(
+                    `TabService::handleNavigation(id: ${tabId}):  Content script application acknowledged presence on worker runtime memory port after retry.`,
+                  );
+                  return;
+                } catch (error) {
+                  console.debug(
+                    `TabService::handleNavigation(id: ${tabId}): No content script application acknowledged presence on worker runtime memory port after retry.`,
+                    error,
+                  );
+                }
+              }
+            } else {
+              console.debug(
+                `TabService::handleNavigation(id: ${tabId}): No content script application acknowledged presence on worker runtime memory port.`,
+                error,
+              );
+            }
           }
         }
       } else {

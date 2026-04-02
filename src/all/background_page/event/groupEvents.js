@@ -13,7 +13,7 @@
  */
 import GroupModel from "../model/group/groupModel";
 import GroupsUpdateController from "../controller/group/groupUpdateController";
-import GroupEntity from "../model/entity/group/groupEntity";
+import GroupCreateController from "../controller/group/groupCreateController";
 import GroupDeleteTransferEntity from "../model/entity/group/transfer/groupDeleteTransferEntity";
 import FindMyGroupsController from "../controller/group/findMyGroupsController";
 import UpdateAllGroupsLocalStorageController from "../controller/group/updateAllGroupsLocalStorageController";
@@ -62,15 +62,8 @@ const listen = function (worker, apiClientOptions, account) {
    *  {name: 'group name', groups_users: [{user_id: <UUID>, is_admin: <boolean>}]}
    */
   worker.port.on("passbolt.groups.create", async (requestId, groupDto) => {
-    try {
-      const groupModel = new GroupModel(apiClientOptions, account);
-      const groupEntity = new GroupEntity(groupDto);
-      const newGroup = await groupModel.create(groupEntity);
-      worker.port.emit(requestId, "SUCCESS", newGroup);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, "ERROR", error);
-    }
+    const controller = new GroupCreateController(worker, requestId, apiClientOptions, account);
+    controller._exec(groupDto);
   });
 
   /*

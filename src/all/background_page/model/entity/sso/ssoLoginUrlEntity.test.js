@@ -29,6 +29,7 @@ describe("Sso Login URL Entity", () => {
       { providerId: "google", url: "https://accounts.google.com" },
       { providerId: "oauth2", url: "https://oauth2.generic.provider.com" },
       { providerId: "adfs", url: "https://adfs.partner.microsoft.com" },
+      { providerId: "pingone", url: "https://auth.pingone.com" },
     ];
 
     expect.assertions(availableUrl.length);
@@ -47,6 +48,7 @@ describe("Sso Login URL Entity", () => {
     { scenario: "US microsoft online url", url: "https://login.microsoftonline.us", providerId: "azure" },
     { scenario: "China microsoft online url", url: "https://login.partner.microsoftonline.cn", providerId: "azure" },
     { scenario: "Google url", url: "https://accounts.google.com", providerId: "google" },
+    { scenario: "PingOne url", url: "https://auth.pingone.com", providerId: "pingone" },
   ]).describe("Should accept supported url", (test) => {
     it(`Should accept supported url: ${test.scenario}`, async () => {
       const dto = {

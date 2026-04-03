@@ -13,7 +13,6 @@
  */
 import PopupHandlerService from "./popupHandlerService";
 import { v4 as uuid } from "uuid";
-import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
@@ -108,9 +107,7 @@ describe("PopupHandlerService", () => {
       await runPendingPromises();
 
       browser.tabs.onRemoved.triggers(originTabIdCall);
-      return expect(promise).rejects.toThrowError(
-        new UserAbortsOperationError("The user closed the tab from where the SSO sign-in initiated"),
-      );
+      return expect(promise).rejects.toThrow("The user closed the tab from where the SSO sign-in initiated");
     });
 
     it("Should return SSO token when navigation is done to a correct URL in sign-in mode", async () => {
@@ -171,9 +168,7 @@ describe("PopupHandlerService", () => {
       await runPendingPromises();
 
       browser.tabs.onRemoved.triggers(tabId);
-      return expect(promise).rejects.toThrowError(
-        new UserAbortsOperationError("The user closed the SSO sign-in popup"),
-      );
+      return expect(promise).rejects.toThrow("The user closed the SSO sign-in popup");
     });
 
     it("Should clean up the listeners when the handler is asked to be closed", async () => {

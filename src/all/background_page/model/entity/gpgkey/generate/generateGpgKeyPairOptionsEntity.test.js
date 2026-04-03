@@ -126,7 +126,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
 
       const expectedError = new EntityValidationError();
       expectedError.addError("curve", "unwanted_curve", "The curve should not be set when the type is set to 'rsa'");
-      expect(() => new GenerateGpgKeyPairOptionsEntity(dto)).toThrow(expectedError);
+      expect(() => new GenerateGpgKeyPairOptionsEntity(dto)).toThrow(expectedError.message);
     });
 
     it("throws validation error if the type is 'ecc' and the keySize is set", () => {
@@ -142,7 +142,7 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
         "unwanted_keySize",
         "The keySize should not be set with the type is set to 'ecc'",
       );
-      expect(() => new GenerateGpgKeyPairOptionsEntity(dto)).toThrow(expectedError);
+      expect(() => new GenerateGpgKeyPairOptionsEntity(dto)).toThrow(expectedError.message);
     });
 
     it("allows non-standard email if custom validation is configured", () => {

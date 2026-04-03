@@ -29,7 +29,7 @@ describe("EncryptPrivateKeyService service", () => {
     expect.assertions(scenarios.length);
     for (let i = 0; i < scenarios.length; i++) {
       const promise = EncryptPrivateKeyService.encrypt(scenarios[i], "new-passphrase");
-      await expect(promise).rejects.toThrowError(privateKeyFormatError);
+      await expect(promise).rejects.toThrow(privateKeyFormatError.message);
     }
   });
 

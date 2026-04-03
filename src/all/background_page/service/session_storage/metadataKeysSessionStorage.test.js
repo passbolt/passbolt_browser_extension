@@ -116,7 +116,7 @@ describe("MetadataKeysSessionStorage", () => {
       // missing metadata private keys association
       const collection = new MetadataKeysCollection(defaultMetadataKeysDtos());
       await expect(() => storage.set(collection)).rejects.toThrow(
-        new TypeError("The parameter 'metadataKey' should have the association '_metadata_private_keys' set."),
+        "The parameter 'metadataKey' should have the association '_metadata_private_keys' set.",
       );
     });
 
@@ -125,7 +125,7 @@ describe("MetadataKeysSessionStorage", () => {
       // missing metadata private keys association
       const collection = new MetadataKeysCollection(defaultMetadataKeysDtos(2, {}, { withMetadataPrivateKeys: true }));
       await expect(() => storage.set(collection)).rejects.toThrow(
-        new TypeError("The parameter `collection` should contain only decrypted keys."),
+        "The parameter `collection` should contain only decrypted keys.",
       );
     });
 
@@ -205,7 +205,7 @@ describe("MetadataKeysSessionStorage", () => {
       expect.assertions(1);
       const metadataPrivateKey = new MetadataPrivateKeyEntity(defaultMetadataPrivateKeyDto());
       await expect(() => storage.updatePrivateKey(metadataPrivateKey)).rejects.toThrow(
-        new TypeError("The metadata private key should be decrypted."),
+        "The metadata private key should be decrypted.",
       );
     });
 
@@ -213,7 +213,7 @@ describe("MetadataKeysSessionStorage", () => {
       expect.assertions(1);
       const metadataPrivateKey = new MetadataPrivateKeyEntity(decryptedMetadataPrivateKeyDto());
       await expect(() => storage.updatePrivateKey(metadataPrivateKey)).rejects.toThrow(
-        new TypeError("The metadata key could not be found in the session storage"),
+        "The metadata key could not be found in the session storage",
       );
     });
   });

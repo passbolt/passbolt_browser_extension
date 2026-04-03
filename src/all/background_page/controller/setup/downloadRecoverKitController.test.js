@@ -33,7 +33,7 @@ describe("DownloadRecoveryKitController", () => {
 
       expect.assertions(1);
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError("An account user private armored key is required.");
+      await expect(promise).rejects.toThrow("An account user private armored key is required.");
     });
 
     it("Should trigger the recovery kit download.", async () => {

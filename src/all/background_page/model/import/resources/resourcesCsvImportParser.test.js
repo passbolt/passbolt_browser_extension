@@ -40,7 +40,6 @@ import {
   defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
-import each from "jest-each";
 
 describe("ResourcesCsvImportParser", () => {
   let resourceTypesCollection;
@@ -67,7 +66,7 @@ describe("ResourcesCsvImportParser", () => {
     expect(ResourcesCsvImportParser.register).toEqual(expect.arrayContaining(supportedRowParsers));
   });
 
-  each([
+  describe.each([
     {
       scenario: "v4 resource type",
       metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -76,7 +75,7 @@ describe("ResourcesCsvImportParser", () => {
       scenario: "v5 resource type",
       metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
     },
-  ]).describe("::readCsv", (test) => {
+  ])("::readCsv", (test) => {
     it(`should read import file encoded in base64 <${test.scenario}>`, () => {
       expect.assertions(2);
 
@@ -105,7 +104,7 @@ describe("ResourcesCsvImportParser", () => {
     });
   });
 
-  each([
+  describe.each([
     {
       scenario: "v4 resource type",
       metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -114,7 +113,7 @@ describe("ResourcesCsvImportParser", () => {
       scenario: "v5 resource type",
       metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
     },
-  ]).describe("::getRowParser", (test) => {
+  ])("::getRowParser", (test) => {
     it(`should determine row parser to use <${test.scenario}>`, () => {
       expect.assertions(1);
 
@@ -157,7 +156,7 @@ describe("ResourcesCsvImportParser", () => {
     });
   });
 
-  each([
+  describe.each([
     {
       scenario: "v4 resource type",
       metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -168,7 +167,7 @@ describe("ResourcesCsvImportParser", () => {
       metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       resourceType: "v5-default",
     },
-  ]).describe("::parseImport", (test) => {
+  ])("::parseImport", (test) => {
     it(`should parse resources <${test.scenario}>`, async () => {
       expect.assertions(2);
 

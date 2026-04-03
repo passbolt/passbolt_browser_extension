@@ -130,7 +130,7 @@ describe("FindAllIdsByIsSharedWithGroupController", () => {
 
       const promise = controller.exec("groupId");
 
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid UUID");
     });
   });
 });

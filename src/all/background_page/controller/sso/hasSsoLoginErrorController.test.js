@@ -14,7 +14,6 @@
 import "../../../../../test/mocks/mockSsoDataStorage";
 import { enableFetchMocks } from "jest-fetch-mock";
 import HasSsoLoginErrorController from "./hasSsoLoginErrorController";
-import each from "jest-each";
 
 beforeAll(() => {
   enableFetchMocks();
@@ -29,7 +28,7 @@ const scenarios = [
   { url: "https://passbolt.test/auth/login/?case=sso-login-error", expectedResult: true },
 ];
 
-each(scenarios).describe("HasSsoLoginErrorController", (scenario) => {
+describe.each(scenarios)("HasSsoLoginErrorController", (scenario) => {
   it(`Should return '${scenario.expectedResult}' with the URL: ${scenario.url}`, async () => {
     expect.assertions(1);
     const worker = {

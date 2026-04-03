@@ -12,12 +12,11 @@
  * @since         3.6.0
  */
 
-import each from "jest-each";
 import ParseSetupUrlService from "./parseSetupUrlService";
 
 describe("ParseSetupUrlService", () => {
   describe("ParseSetupUrlService:parse", () => {
-    each([
+    describe.each([
       {
         scenario: "Legacy url",
         url: "https://passbolt.dev/setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -68,7 +67,7 @@ describe("ParseSetupUrlService", () => {
         url: "https://clould.passbolt.dev/acme//setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         domain: "https://clould.passbolt.dev/acme",
       },
-    ]).describe("should parse", (_props) => {
+    ])("should parse", (_props) => {
       it(`should parse: ${_props.scenario}`, () => {
         const parseResult = ParseSetupUrlService.parse(_props.url);
 
@@ -79,7 +78,7 @@ describe("ParseSetupUrlService", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "No domain",
         url: "setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -91,10 +90,10 @@ describe("ParseSetupUrlService", () => {
         url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         domain: "https://passbolt.dev",
       },
-    ]).describe("should not parse", (_props) => {
+    ])("should not parse", (_props) => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);
-        expect(() => ParseSetupUrlService.parse(_props.url)).toThrowError(
+        expect(() => ParseSetupUrlService.parse(_props.url)).toThrow(
           "Cannot parse setup url. The url does not match the pattern.",
         );
       });
@@ -104,9 +103,7 @@ describe("ParseSetupUrlService", () => {
       const url = "http://setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0";
 
       expect.assertions(1);
-      await expect(() => ParseSetupUrlService.parse(url)).toThrowError(
-        "Cannot parse setup url. The domain is not valid.",
-      );
+      await expect(() => ParseSetupUrlService.parse(url)).toThrow("Cannot parse setup url. The domain is not valid.");
     });
   });
 });

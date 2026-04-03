@@ -31,7 +31,7 @@ describe("PlaintextEntity", () => {
       expect.assertions(1);
 
       expect(() => PlaintextEntity.getSchema()).toThrow(
-        new TypeError("Plaintext only support dynamic schemas, defined from resource type."),
+        "Plaintext only support dynamic schemas, defined from resource type.",
       );
     });
   });

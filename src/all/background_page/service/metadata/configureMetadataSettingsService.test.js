@@ -75,7 +75,7 @@ describe("ConfigureMetadataSettingsService", () => {
         throw new Error("unexpected error");
       });
 
-      await expect(() => orchestrator.enableEncryptedMetadataForNewInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForNewInstance(passphrase)).rejects.toThrow();
     });
 
     it("should not intercept errors if anything goes wrong and let the caller manage it: errors from the key save", async () => {
@@ -90,7 +90,7 @@ describe("ConfigureMetadataSettingsService", () => {
         throw new Error("unexpected error");
       });
 
-      await expect(() => orchestrator.enableEncryptedMetadataForNewInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForNewInstance(passphrase)).rejects.toThrow();
     });
 
     it("should not intercept errors if anything goes wrong and let the caller manage it: errors from saving the key settings", async () => {
@@ -106,7 +106,7 @@ describe("ConfigureMetadataSettingsService", () => {
         throw new Error("unexpected error");
       });
 
-      await expect(() => orchestrator.enableEncryptedMetadataForNewInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForNewInstance(passphrase)).rejects.toThrow();
     });
 
     it("should not intercept errors if anything goes wrong and let the caller manage it: errors from saving the types settings", async () => {
@@ -123,7 +123,7 @@ describe("ConfigureMetadataSettingsService", () => {
         throw new Error("unexpected error");
       });
 
-      await expect(() => orchestrator.enableEncryptedMetadataForNewInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForNewInstance(passphrase)).rejects.toThrow();
     });
   });
 
@@ -185,7 +185,7 @@ describe("ConfigureMetadataSettingsService", () => {
         .spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings")
         .mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
-      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrow();
     });
 
     it("should not intercept errors if anything goes wrong and let the caller manage it: errors from the key save", async () => {
@@ -203,7 +203,7 @@ describe("ConfigureMetadataSettingsService", () => {
         .spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings")
         .mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
-      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrow();
     });
 
     it("should not intercept errors if anything goes wrong and let the caller manage it: errors from saving the key settings", async () => {
@@ -222,7 +222,7 @@ describe("ConfigureMetadataSettingsService", () => {
         .spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings")
         .mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
-      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrow();
     });
 
     it("should not intercept errors if anything goes wrong and let the caller manage it: errors from saving the types settings", async () => {
@@ -242,7 +242,7 @@ describe("ConfigureMetadataSettingsService", () => {
         .spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings")
         .mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
-      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrow();
     });
 
     it("should not proceed if a strategy has already been defined", async () => {
@@ -257,7 +257,7 @@ describe("ConfigureMetadataSettingsService", () => {
         .spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings")
         .mockImplementation(() => new MetadataGettingStartedSettingsEntity(defaultMetadataGettingStartedSettingsDto()));
 
-      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrowError();
+      await expect(() => orchestrator.enableEncryptedMetadataForExistingInstance(passphrase)).rejects.toThrow();
     });
   });
 
@@ -296,7 +296,7 @@ describe("ConfigureMetadataSettingsService", () => {
         .spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings")
         .mockImplementation(() => new MetadataGettingStartedSettingsEntity(enableMetadataGettingStartedSettingsDto()));
 
-      await expect(() => orchestrator.keepCleartextMetadataForExistingInstance()).rejects.toThrowError();
+      await expect(() => orchestrator.keepCleartextMetadataForExistingInstance()).rejects.toThrow();
     });
 
     it("should not intercept errors if anything goes wrong and let the caller manage it: errors from saving the types settings", async () => {
@@ -310,7 +310,7 @@ describe("ConfigureMetadataSettingsService", () => {
         .spyOn(orchestrator.findMetadataGettingStartedSettingsService, "findGettingStartedSettings")
         .mockImplementation(() => new MetadataGettingStartedSettingsEntity(defaultMetadataGettingStartedSettingsDto()));
 
-      await expect(() => orchestrator.keepCleartextMetadataForExistingInstance()).rejects.toThrowError();
+      await expect(() => orchestrator.keepCleartextMetadataForExistingInstance()).rejects.toThrow();
     });
   });
 });

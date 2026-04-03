@@ -148,9 +148,7 @@ describe("FindAndDecryptSecretRevisionsService", () => {
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => encryptedSecretDto);
 
-      await expect(() =>
-        service.findAllByResourceIdAndDecryptForDisplay(resource_id, passphrase),
-      ).rejects.toThrowError();
+      await expect(() => service.findAllByResourceIdAndDecryptForDisplay(resource_id, passphrase)).rejects.toThrow();
     });
 
     it("should assert its parameters", async () => {
@@ -158,10 +156,10 @@ describe("FindAndDecryptSecretRevisionsService", () => {
 
       const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
 
-      await expect(() => service.findAllByResourceIdAndDecryptForDisplay(42, "passphrase")).rejects.toThrowError();
-      await expect(() => service.findAllByResourceIdAndDecryptForDisplay(null, "passphrase")).rejects.toThrowError();
-      await expect(() => service.findAllByResourceIdAndDecryptForDisplay("42", "passphrase")).rejects.toThrowError();
-      await expect(() => service.findAllByResourceIdAndDecryptForDisplay(uuidv4(), 42)).rejects.toThrowError();
+      await expect(() => service.findAllByResourceIdAndDecryptForDisplay(42, "passphrase")).rejects.toThrow();
+      await expect(() => service.findAllByResourceIdAndDecryptForDisplay(null, "passphrase")).rejects.toThrow();
+      await expect(() => service.findAllByResourceIdAndDecryptForDisplay("42", "passphrase")).rejects.toThrow();
+      await expect(() => service.findAllByResourceIdAndDecryptForDisplay(uuidv4(), 42)).rejects.toThrow();
     });
   });
 });

@@ -86,7 +86,7 @@ describe("DecryptSecretsService", () => {
           resourceTypeCollection,
           pgpKeys.ada.private_decrypted,
         ),
-      ).rejects.toThrowError();
+      ).rejects.toThrow();
     });
 
     it("should not throw an error if something wrong happens during decryption and the errors are ignored", async () => {
@@ -149,7 +149,7 @@ describe("DecryptSecretsService", () => {
     });
 
     it("should throw an error if the resource type slug is unknown", async () => {
-      expect(() => DecryptSecretsService.getSecretEntityClassByResourceType("test")).toThrowError();
+      expect(() => DecryptSecretsService.getSecretEntityClassByResourceType("test")).toThrow();
     });
   });
 });

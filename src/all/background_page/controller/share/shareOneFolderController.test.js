@@ -38,14 +38,12 @@ describe("ShareOneFolderController", () => {
 
     it("throws if the parameters are not valid.", async () => {
       expect.assertions(4);
-      await expect(() => controller.exec("wrong", [])).rejects.toThrow(
-        new TypeError('The parameter "folderId" should be a UUID'),
-      );
+      await expect(() => controller.exec("wrong", [])).rejects.toThrow('The parameter "folderId" should be a UUID');
       await expect(() => controller.exec([uuidv4()], "not-valid")).rejects.toThrow(
-        new TypeError('The parameter "permissionChangesDto" should be an array'),
+        'The parameter "permissionChangesDto" should be an array',
       );
       await expect(() => controller.exec([uuidv4()], [])).rejects.toThrow(
-        new TypeError('The parameter "permissionChangesDto" should be a non empty array'),
+        'The parameter "permissionChangesDto" should be a non empty array',
       );
       const execPromiseEntityValidationError = controller.exec([uuidv4()], [{}]);
       await expect(execPromiseEntityValidationError).rejects.toThrowEntityValidationErrorOnProperties([

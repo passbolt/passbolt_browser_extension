@@ -14,7 +14,6 @@
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ExternalTotpEntity from "./externalTotpEntity";
-import each from "jest-each";
 import { defaultTotpDto } from "./totpDto.test.data";
 import ExternalResourceEntity from "../resource/external/externalResourceEntity";
 import { lowerCaseAlgorithmSetupTotpData } from "../mfa/mfaSetupTotpEntity.test.data";
@@ -66,13 +65,13 @@ describe("Totp entity", () => {
       expect(entity.toDto()).toStrictEqual(dto);
     });
 
-    each([
+    describe.each([
       { scenario: "empty dto", dto: {} },
       { scenario: "secret key not base32", dto: defaultTotpDto({ secret_key: " 871H KBKB " }) },
       { scenario: "digits is not valid", dto: defaultTotpDto({ digits: 10 }) },
       { scenario: "period is not valid", dto: defaultTotpDto({ period: 0 }) },
       { scenario: "algorithm is not valid", dto: defaultTotpDto({ algorithm: "AAA" }) },
-    ]).describe("constructor returns validation error if dto is not valid", (test) => {
+    ])("constructor returns validation error if dto is not valid", (test) => {
       it(`Should not validate: ${test.scenario}`, async () => {
         expect.assertions(1);
         expect(() => new ExternalTotpEntity(test.dto)).toThrow(EntityValidationError);

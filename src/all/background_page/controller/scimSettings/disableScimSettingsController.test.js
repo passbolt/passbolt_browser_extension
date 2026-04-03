@@ -43,7 +43,7 @@ describe("DisableScimSettingsController", () => {
       const id = uuidv4();
       jest.spyOn(controller.disableScimSettingsService, "disable").mockRejectedValue(error);
 
-      await expect(controller.exec(id)).rejects.toThrow(error);
+      await expect(controller.exec(id)).rejects.toThrow(error.message);
       expect(controller.disableScimSettingsService.disable).toHaveBeenCalledWith(id);
     });
   });

@@ -43,7 +43,7 @@ describe("SignMessageService service", () => {
       const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
       const promise = SignMessageService.signMessage("", [adminDecryptedKey]);
 
-      return expect(promise).rejects.toThrowError(new TypeError("The message should be a valid openpgp message."));
+      return expect(promise).rejects.toThrow("The message should be a valid openpgp message.");
     });
 
     it("should throw an error in case an invalid private key", async () => {
@@ -51,9 +51,7 @@ describe("SignMessageService service", () => {
       const messageToSign = await openpgp.createMessage({ text: "my-account-kit" });
       const promise = SignMessageService.signMessage(messageToSign, "");
 
-      return expect(promise).rejects.toThrowError(
-        new Error("The keys should be an array of valid decrypted openpgp private keys."),
-      );
+      return expect(promise).rejects.toThrow("The keys should be an array of valid decrypted openpgp private keys.");
     });
   });
 
@@ -81,9 +79,7 @@ describe("SignMessageService service", () => {
       const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
       const promise = SignMessageService.signClearMessage("", [adminDecryptedKey]);
 
-      return expect(promise).rejects.toThrowError(
-        new TypeError("The message should be a valid openpgp clear text message."),
-      );
+      return expect(promise).rejects.toThrow("The message should be a valid openpgp clear text message.");
     });
 
     it("should throw an error in case an invalid private key", async () => {
@@ -91,9 +87,7 @@ describe("SignMessageService service", () => {
       const messageToSign = await openpgp.createCleartextMessage({ text: "my-account-kit" });
       const promise = SignMessageService.signClearMessage(messageToSign, "");
 
-      return expect(promise).rejects.toThrowError(
-        new Error("The keys should be an array of valid decrypted openpgp private keys."),
-      );
+      return expect(promise).rejects.toThrow("The keys should be an array of valid decrypted openpgp private keys.");
     });
   });
 });

@@ -26,7 +26,6 @@ import { defaultEmptySettings, withAzureSsoSettings } from "../sso/getCurrentSso
 import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
 import PostLoginService from "../../service/auth/postLoginService";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
-import each from "jest-each";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
@@ -58,10 +57,10 @@ describe("AccountRecoveryLoginController", () => {
       fetch.doMockOnceIf(new RegExp("/sso/settings/current.json"), () => mockApiResponse(ssoSettings));
     };
 
-    each([
+    describe.each([
       { scenario: "remember me true", passphrase: passphrase, rememberMe: true },
       { scenario: "remember me false", passphrase: passphrase, rememberMe: false },
-    ]).describe("Should sign-in the user.", (test) => {
+    ])("Should sign-in the user.", (test) => {
       it(`Sign in with ${test.scenario}`, async () => {
         mockOrganisationSettings(false);
 
@@ -119,10 +118,10 @@ describe("AccountRecoveryLoginController", () => {
       expect.assertions(2);
       jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
       const promiseMissingParameter = controller.exec();
-      await expect(promiseMissingParameter).rejects.toThrowError("A passphrase is required.");
+      await expect(promiseMissingParameter).rejects.toThrow("A passphrase is required.");
       jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
       const promiseInvalidTypeParameter = controller.exec(2);
-      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The passphrase should be a string.");
+      await expect(promiseInvalidTypeParameter).rejects.toThrow("The passphrase should be a string.");
     }, 10000);
 
     it("Should throw an exception if the provided remember me is not a valid boolean.", async () => {
@@ -137,7 +136,7 @@ describe("AccountRecoveryLoginController", () => {
 
       expect.assertions(1);
       const promiseInvalidTypeParameter = controller.exec("passphrase", 42);
-      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The rememberMe should be a boolean.");
+      await expect(promiseInvalidTypeParameter).rejects.toThrow("The rememberMe should be a boolean.");
     }, 10000);
 
     it("Should sign-in the user and not generate an SSO kit if SSO organization settings is disabled.", async () => {

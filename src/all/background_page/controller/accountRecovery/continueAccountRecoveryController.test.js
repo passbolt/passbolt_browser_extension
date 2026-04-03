@@ -80,7 +80,7 @@ describe("ContinueAccountRecoveryController", () => {
       const promise = controller.exec();
 
       expect.assertions(2);
-      await expect(promise).rejects.toThrowError("Unable to reach the server, an unexpected error occurred");
+      await expect(promise).rejects.toThrow("Unable to reach the server, an unexpected error occurred");
       expect(mockedBootstrapAccountRecoveryWorkerPortEmit).toHaveBeenCalledWith(
         "passbolt.account-recovery-bootstrap.remove-iframe",
       );

@@ -41,7 +41,7 @@ describe("FindScimSettingsController", () => {
       const error = new Error("Failed to find SCIM settings");
       jest.spyOn(controller.findScimSettingsService, "get").mockRejectedValue(error);
 
-      await expect(controller.exec()).rejects.toThrow(error);
+      await expect(controller.exec()).rejects.toThrow(error.message);
       expect(controller.findScimSettingsService.get).toHaveBeenCalled();
     });
   });

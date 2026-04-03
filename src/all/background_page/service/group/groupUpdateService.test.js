@@ -26,7 +26,6 @@ import { defaultGroupDto } from "passbolt-styleguide/src/shared/models/entity/gr
 import { createGroupUser } from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data";
 import { defaultResourcesSecretsDtos } from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection.test.data";
 import DecryptMessageService from "../crypto/decryptMessageService";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import GroupUserEntity from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity";
 import { plaintextSecretPasswordAndDescriptionDto } from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 import GroupLocalStorage from "../local_storage/groupLocalStorage";
@@ -370,9 +369,7 @@ describe("GroupUpdateService", () => {
     const progressService = {};
 
     const service = new GroupUpdateService(apiClientOptions, account, progressService);
-    await expect(() => service.exec([], "")).rejects.toThrow(
-      new EntityValidationError("The given data is not of the expected type"),
-    );
+    await expect(() => service.exec([], "")).rejects.toThrow("The given data is not of the expected type");
   });
 
   it("should throw an error if the given dto is not valid as a GroupEntity", async () => {
@@ -387,7 +384,7 @@ describe("GroupUpdateService", () => {
 
     const service = new GroupUpdateService(apiClientOptions, account, progressService);
     await expect(() => service.exec(groupUpdateEntity, 42)).rejects.toThrow(
-      new EntityValidationError("The given parameter is not a valid string"),
+      "The given parameter is not a valid string",
     );
   });
 });

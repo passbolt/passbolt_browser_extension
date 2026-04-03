@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 
-import each from "jest-each";
 import { Config } from "../../model/config";
 import ParseAppUrlService from "./parseAppUrlService";
 
@@ -27,7 +26,7 @@ beforeEach(() => {
 
 describe("ParseAppUrlService", () => {
   describe("ParseAppUrlService:parse", () => {
-    each([
+    describe.each([
       {
         scenario: "TLD",
         url: "https://passbolt.dev/app/folders/view/5452ecb2-0625-50d1-b1ef-d2038f5830b6",
@@ -78,7 +77,7 @@ describe("ParseAppUrlService", () => {
         url: "https://demo.passbolt.com/app/users#hash",
         domain: `https://demo.passbolt.com`,
       },
-    ]).describe("should parse", (_props) => {
+    ])("should parse", (_props) => {
       beforeEach(() => {
         Config.write("user.settings.trustedDomain", _props.domain);
       });
@@ -89,7 +88,7 @@ describe("ParseAppUrlService", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "No domain",
         url: "/passwords",
@@ -122,10 +121,10 @@ describe("ParseAppUrlService", () => {
         scenario: "Domain look alike as hash attack",
         url: `https://www.attacker.com#${domain}`,
       },
-    ]).describe("should not parse", (_props) => {
+    ])("should not parse", (_props) => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);
-        expect(() => ParseAppUrlService.parse(_props.url)).toThrowError(errorMatchPattern);
+        expect(() => ParseAppUrlService.parse(_props.url)).toThrow(errorMatchPattern);
       });
     });
   });

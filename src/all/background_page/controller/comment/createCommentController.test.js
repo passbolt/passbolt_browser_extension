@@ -41,7 +41,7 @@ const mockedWorker = {
 describe("CreateCommentController", () => {
   const validationError = new EntityValidationError("Could not validate entity CommentEntity.");
   const expectInvalidField = (controller, mockCreation) =>
-    expect(controller.exec(mockCreation)).rejects.toThrowError(validationError);
+    expect(controller.exec(mockCreation)).rejects.toThrow(validationError.message);
 
   describe("CreateCommentController::constructor", () => {
     it("Should init all properties.", async () => {
@@ -79,7 +79,7 @@ describe("CreateCommentController", () => {
 
       expect.assertions(2);
 
-      await expect(controller.exec(mockApiCreation)).rejects.toThrowError(mockedError);
+      await expect(controller.exec(mockApiCreation)).rejects.toThrow(mockedError.message);
       expect(spy).toHaveBeenCalled();
     });
     it("Should raise error if user_id is missing.", async () => {
@@ -102,7 +102,7 @@ describe("CreateCommentController", () => {
 
       expect.assertions(2);
 
-      await expect(controller.exec(mockApiCreation)).rejects.toThrowError(mockedError);
+      await expect(controller.exec(mockApiCreation)).rejects.toThrow(mockedError.message);
       expect(spy).toHaveBeenCalled();
     });
   });

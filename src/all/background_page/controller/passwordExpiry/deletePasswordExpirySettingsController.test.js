@@ -52,7 +52,7 @@ describe("DeletePasswordExpirySettingsController", () => {
     );
 
     const controller = new DeletePasswordExpirySettingsController(null, null, account, apiClientOptions);
-    await expect(() => controller.exec(passwordExpiryId)).rejects.toThrowError(expectedError);
+    await expect(() => controller.exec(passwordExpiryId)).rejects.toThrow(expectedError.message);
   });
 
   it("Should return the default value if something goes when requesting the API", async () => {
@@ -65,6 +65,6 @@ describe("DeletePasswordExpirySettingsController", () => {
     });
 
     const controller = new DeletePasswordExpirySettingsController(null, null, account, apiClientOptions);
-    await expect(() => controller.exec(passwordExpiryId)).rejects.toThrowError(expectedError);
+    await expect(() => controller.exec(passwordExpiryId)).rejects.toThrow(expectedError.message);
   });
 });

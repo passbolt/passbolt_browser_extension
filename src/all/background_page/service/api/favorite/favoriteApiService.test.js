@@ -61,8 +61,8 @@ describe("FavoriteApiService", () => {
     it("throws an invalid parameter error if the foreignId key parameter is not valid", async () => {
       expect.assertions(2);
 
-      await expect(() => service.create("Resource", 42)).rejects.toThrowError("The id '42' is not a valid uuid.");
-      await expect(() => service.create("Resource", "not a uuid")).rejects.toThrowError(
+      await expect(() => service.create("Resource", 42)).rejects.toThrow("The id '42' is not a valid uuid.");
+      await expect(() => service.create("Resource", "not a uuid")).rejects.toThrow(
         "The id 'not a uuid' is not a valid uuid.",
       );
     });
@@ -72,13 +72,13 @@ describe("FavoriteApiService", () => {
 
       const expectedId = uuidv4();
 
-      await expect(() => service.create(42, expectedId)).rejects.toThrowError(
+      await expect(() => service.create(42, expectedId)).rejects.toThrow(
         "Favorite foreign model should be a valid string.",
       );
-      await expect(() => service.create("", expectedId)).rejects.toThrowError(
+      await expect(() => service.create("", expectedId)).rejects.toThrow(
         "Favorite foreign model should be a valid string.",
       );
-      await expect(() => service.create("not a valid foreign key", expectedId)).rejects.toThrowError(
+      await expect(() => service.create("not a valid foreign key", expectedId)).rejects.toThrow(
         "Favorite foreign model 'not a valid foreign key' is not in the list of supported models.",
       );
     });
@@ -114,8 +114,8 @@ describe("FavoriteApiService", () => {
     it("throws an invalid parameter error if the foreignId key parameter is not valid", async () => {
       expect.assertions(2);
 
-      await expect(() => service.delete(42)).rejects.toThrowError("The id '42' is not a valid uuid.");
-      await expect(() => service.delete("not a uuid")).rejects.toThrowError("The id 'not a uuid' is not a valid uuid.");
+      await expect(() => service.delete(42)).rejects.toThrow("The id '42' is not a valid uuid.");
+      await expect(() => service.delete("not a uuid")).rejects.toThrow("The id 'not a uuid' is not a valid uuid.");
     });
   });
 
@@ -136,14 +136,14 @@ describe("FavoriteApiService", () => {
     it("should throw an error for invalid foreign models", () => {
       const invalidModels = ["InvalidModel", ""];
       invalidModels.forEach((model) => {
-        expect(() => service.assertValidForeignModel(model)).toThrowError(TypeError);
+        expect(() => service.assertValidForeignModel(model)).toThrow(TypeError);
       });
     });
 
     it("should throw an error for non-string inputs", () => {
       const nonStringInputs = [42, {}, null, undefined];
       nonStringInputs.forEach((input) => {
-        expect(() => service.assertValidForeignModel(input)).toThrowError(TypeError);
+        expect(() => service.assertValidForeignModel(input)).toThrow(TypeError);
       });
     });
   });

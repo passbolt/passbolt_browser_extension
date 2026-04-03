@@ -51,7 +51,7 @@ describe("EnableMetadataSetupSettingsController", () => {
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const controller = new EnableMetadataSetupSettingsController(null, null, apiClientOptions, account);
 
-      await expect(() => controller.exec()).rejects.toThrowError("No passphrase found in the session storage.");
+      await expect(() => controller.exec()).rejects.toThrow("No passphrase found in the session storage.");
     });
 
     it("should not intercept unexpected error if something goes wrong when enabling the metadata encryption", async () => {
@@ -68,7 +68,7 @@ describe("EnableMetadataSetupSettingsController", () => {
           throw new Error("Something went wrong!");
         });
 
-      await expect(() => controller.exec()).rejects.toThrowError("Something went wrong!");
+      await expect(() => controller.exec()).rejects.toThrow("Something went wrong!");
     });
   });
 });

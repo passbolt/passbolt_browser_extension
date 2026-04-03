@@ -141,7 +141,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(QuickAccessService, "open").mockRejectedValue(error);
 
-      await expect(() => controller.createNewCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.createNewCredentials(requestId)).rejects.toThrow(error.message);
     });
 
     it("Should throw when WorkerService throws an error", async () => {
@@ -150,7 +150,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(WorkerService, "get").mockRejectedValue(error);
 
-      await expect(() => controller.createNewCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.createNewCredentials(requestId)).rejects.toThrow(error.message);
     });
   });
 
@@ -221,7 +221,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(WorkerService, "get").mockRejectedValue(error);
 
-      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error.message);
     });
 
     it("Should throw when webIntegrationWorker throws an error", async () => {
@@ -230,7 +230,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(webIntegrationPort, "request").mockRejectedValue(error);
 
-      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error.message);
     });
 
     it("Should throw when BrowserTabService throws an error", async () => {
@@ -239,7 +239,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(BrowserTabService, "getCurrent").mockRejectedValue(error);
 
-      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error.message);
     });
 
     it("Should throw when ResourceInProgressCacheService throws an error", async () => {
@@ -248,7 +248,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(ResourceInProgressCacheService, "set").mockRejectedValue(error);
 
-      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error.message);
     });
 
     it("Should throw when QuickAccessService throws an error", async () => {
@@ -257,7 +257,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(QuickAccessService, "open").mockRejectedValue(error);
 
-      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.saveCredentials(requestId)).rejects.toThrow(error.message);
     });
   });
 
@@ -285,7 +285,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(QuickAccessService, "open").mockRejectedValue(error);
 
-      await expect(() => controller.browseCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.browseCredentials(requestId)).rejects.toThrow(error.message);
     });
 
     it("Should throw when WorkerService throws an error", async () => {
@@ -294,7 +294,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(WorkerService, "get").mockRejectedValue(error);
 
-      await expect(() => controller.browseCredentials(requestId)).rejects.toThrow(error);
+      await expect(() => controller.browseCredentials(requestId)).rejects.toThrow(error.message);
     });
   });
 
@@ -316,7 +316,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(WorkerService, "get").mockRejectedValue(error);
 
-      await expect(() => controller.fillPassword(requestId, "my-password")).rejects.toThrow(error);
+      await expect(() => controller.fillPassword(requestId, "my-password")).rejects.toThrow(error.message);
     });
   });
 
@@ -338,7 +338,7 @@ describe("InformMenuController", () => {
       const error = new Error();
       jest.spyOn(WorkerService, "get").mockRejectedValue(error);
 
-      await expect(() => controller.close(requestId)).rejects.toThrow(error);
+      await expect(() => controller.close(requestId)).rejects.toThrow(error.message);
     });
   });
 });

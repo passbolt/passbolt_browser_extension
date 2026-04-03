@@ -51,7 +51,7 @@ describe("OpenSafariExtensionSettingsService", () => {
       jest.spyOn(BrowserService, "isSafari").mockReturnValue(true);
       jest.spyOn(SendNativeMessageService, "sendNativeMessage").mockRejectedValue(error);
       // expectations
-      await expect(OpenSafariExtensionSettingsService.openSettings()).rejects.toThrow(error);
+      await expect(OpenSafariExtensionSettingsService.openSettings()).rejects.toThrow(error.message);
     });
   });
 });

@@ -47,14 +47,12 @@ describe("AuthenticationStatusService::isAuthenticated", () => {
   it("should throw an Error if the endpoint is not found", async () => {
     expect.assertions(1);
     mockIsAuthenticated(() => mockApiResponseError(404, "Endpoint is not found"));
-    await expect(AuthenticationStatusService.isAuthenticated()).rejects.toThrowError(new NotFoundError());
+    await expect(AuthenticationStatusService.isAuthenticated()).rejects.toThrow(NotFoundError);
   });
 
   it("should throw an MfaAuthenticationRequiredError if the user miss the Mfa authentication", async () => {
     expect.assertions(1);
     mockIsAuthenticated(() => mockApiRedirectResponse("/mfa/verify/error.json"));
-    await expect(AuthenticationStatusService.isAuthenticated()).rejects.toThrowError(
-      new MfaAuthenticationRequiredError(),
-    );
+    await expect(AuthenticationStatusService.isAuthenticated()).rejects.toThrow(MfaAuthenticationRequiredError);
   });
 });

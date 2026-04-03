@@ -82,7 +82,7 @@ describe("DeleteTagService", () => {
 
       const error = new Error();
       jest.spyOn(service.tagService, "delete").mockRejectedValue(error);
-      await expect(() => service._deleteTagApi(tagToDeleteId)).rejects.toThrow(error);
+      await expect(() => service._deleteTagApi(tagToDeleteId)).rejects.toThrow(error.message);
     });
   });
 
@@ -131,7 +131,7 @@ describe("DeleteTagService", () => {
       const error = new Error();
       jest.spyOn(ResourceLocalStorage, "get").mockRejectedValue(error);
 
-      await expect(service._deleteTagLocalStorage(tagToDeleteId)).rejects.toThrow(error);
+      await expect(service._deleteTagLocalStorage(tagToDeleteId)).rejects.toThrow(error.message);
     });
 
     it("should throw any error thrown by the underlying service when setting the values", async () => {
@@ -141,7 +141,7 @@ describe("DeleteTagService", () => {
       jest.spyOn(ResourceLocalStorage, "get").mockResolvedValue(resourcesCollectionDto);
       jest.spyOn(ResourceLocalStorage, "set").mockRejectedValue(error);
 
-      await expect(service._deleteTagLocalStorage(tagToDeleteId)).rejects.toThrow(error);
+      await expect(service._deleteTagLocalStorage(tagToDeleteId)).rejects.toThrow(error.message);
     });
   });
 
@@ -174,7 +174,7 @@ describe("DeleteTagService", () => {
       jest.spyOn(ResourceLocalStorage, "get");
       jest.spyOn(ResourceLocalStorage, "set");
 
-      await expect(() => service.delete(tagToDeleteId)).rejects.toThrow(error);
+      await expect(() => service.delete(tagToDeleteId)).rejects.toThrow(error.message);
 
       expect(ResourceLocalStorage.get).not.toHaveBeenCalled();
       expect(ResourceLocalStorage.set).not.toHaveBeenCalled();
@@ -189,7 +189,7 @@ describe("DeleteTagService", () => {
       jest.spyOn(ResourceLocalStorage, "get").mockRejectedValue(error);
       jest.spyOn(ResourceLocalStorage, "set");
 
-      await expect(() => service.delete(tagToDeleteId)).rejects.toThrow(error);
+      await expect(() => service.delete(tagToDeleteId)).rejects.toThrow(error.message);
 
       expect(service.tagService.delete).toHaveBeenCalledWith(tagToDeleteId);
       expect(ResourceLocalStorage.get).toHaveBeenCalled();
@@ -205,7 +205,7 @@ describe("DeleteTagService", () => {
       jest.spyOn(ResourceLocalStorage, "get").mockResolvedValue(resourcesCollectionDto);
       jest.spyOn(ResourceLocalStorage, "set").mockRejectedValue(error);
 
-      await expect(() => service.delete(tagToDeleteId)).rejects.toThrow(error);
+      await expect(() => service.delete(tagToDeleteId)).rejects.toThrow(error.message);
 
       expect(service.tagService.delete).toHaveBeenCalledWith(tagToDeleteId);
       expect(ResourceLocalStorage.get).toHaveBeenCalled();

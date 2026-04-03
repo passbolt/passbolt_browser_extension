@@ -34,7 +34,7 @@ describe("VerifyAccountPassphraseController", () => {
 
       expect.assertions(1);
       const promise = controller.exec();
-      return expect(promise).rejects.toThrowError(new TypeError("The passphrase should be a string."));
+      return expect(promise).rejects.toThrow("The passphrase should be a string.");
     }, 10000);
 
     it("Should throw an exception if the passphrase is incorrect.", () => {
@@ -43,7 +43,7 @@ describe("VerifyAccountPassphraseController", () => {
 
       expect.assertions(1);
       const promise = controller.exec("wrong passphrase");
-      return expect(promise).rejects.toThrowError(new InvalidMasterPasswordError());
+      return expect(promise).rejects.toThrow(InvalidMasterPasswordError);
     }, 10000);
 
     it("Should throw an exception if the setupEntity doesn't have a private key set.", () => {
@@ -53,7 +53,7 @@ describe("VerifyAccountPassphraseController", () => {
 
       expect.assertions(1);
       const promise = controller.exec("whatever passphrase");
-      return expect(promise).rejects.toThrowError(new Error("An account user private key is required."));
+      return expect(promise).rejects.toThrow("An account user private key is required.");
     });
   });
 });

@@ -50,7 +50,7 @@ describe("metadataSetupSettingsApiService", () => {
         throw new Error("Something went wrong");
       });
 
-      await expect(() => service.find()).rejects.toThrowError();
+      await expect(() => service.find()).rejects.toThrow();
     });
   });
 });

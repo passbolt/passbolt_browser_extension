@@ -549,26 +549,24 @@ describe("OpenPGP Assertions", () => {
       const sessionKeyString = "9:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC";
       const readSessionKey = await OpenpgpAssertion.readSessionKeyOrFail(sessionKeyString);
 
-      expect(() => OpenpgpAssertion.assertSessionKey(readSessionKey)).not.toThrowError();
+      expect(() => OpenpgpAssertion.assertSessionKey(readSessionKey)).not.toThrow();
     });
 
     it("Should throw an Error if the session key is not an object", async () => {
       expect.assertions(1);
-      expect(() => OpenpgpAssertion.assertSessionKey("error")).toThrowError(
-        Error("The session keys should be an object."),
-      );
+      expect(() => OpenpgpAssertion.assertSessionKey("error")).toThrow(Error("The session keys should be an object."));
     });
 
     it("Should throw an Error if the session key is not valid", async () => {
       expect.assertions(1);
-      expect(() => OpenpgpAssertion.assertSessionKey({})).toThrowError(
+      expect(() => OpenpgpAssertion.assertSessionKey({})).toThrow(
         Error("The session keys should be a valid openpgp session key aes256."),
       );
     });
 
     it("Should throw an Error if the session key has not AES256 algoithm", async () => {
       expect.assertions(1);
-      expect(() => OpenpgpAssertion.assertSessionKey({ data: new Uint8Array(32), algorithm: "aes128" })).toThrowError(
+      expect(() => OpenpgpAssertion.assertSessionKey({ data: new Uint8Array(32), algorithm: "aes128" })).toThrow(
         Error("The session keys should be a valid openpgp session key aes256."),
       );
     });
@@ -588,15 +586,13 @@ describe("OpenPGP Assertions", () => {
 
     it("Should throw an Error if the session key is not string", async () => {
       expect.assertions(1);
-      expect(() => OpenpgpAssertion.readSessionKeyOrFail({})).toThrowError(
-        TypeError("The session key should be a string."),
-      );
+      expect(() => OpenpgpAssertion.readSessionKeyOrFail({})).toThrow("The session key should be a string.");
     });
 
     it("Should throw an Error if the session key not following the format integer:hexadecimal-string", async () => {
       expect.assertions(1);
       const sessionKey = "error";
-      expect(() => OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).toThrowError(
+      expect(() => OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).toThrow(
         Error('The parameter session key does not match the expected format "integer:hexadecimal-string".'),
       );
     });
@@ -604,10 +600,8 @@ describe("OpenPGP Assertions", () => {
     it("Should throw an Error if the session key is not valid", async () => {
       expect.assertions(1);
       const sessionKey = "11:901D6ED579AFF935F9F157A5198BCE48B50AD87345DEADBA06F42C5D018C78CC";
-      expect(() => OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).toThrowError(
-        new Error("The session key should be a valid openpgp session key.", {
-          cause: new Error("Invalid enum value."),
-        }),
+      expect(() => OpenpgpAssertion.readSessionKeyOrFail(sessionKey)).toThrow(
+        "The session key should be a valid openpgp session key.",
       );
     });
   });
@@ -623,7 +617,7 @@ describe("OpenPGP Assertions", () => {
       await DecryptMessageService.decrypt(messageEncrypted, privateKey);
 
       expect(messageEncrypted).toBeInstanceOf(openpgp.Message);
-      expect(() => OpenpgpAssertion.assertDecryptedMessage(messageEncrypted)).not.toThrowError();
+      expect(() => OpenpgpAssertion.assertDecryptedMessage(messageEncrypted)).not.toThrow();
     });
 
     it("Should throw an Error if the message does not contain session key", async () => {
@@ -631,7 +625,7 @@ describe("OpenPGP Assertions", () => {
 
       const message = await OpenpgpAssertion.createMessageOrFail("Message");
 
-      expect(() => OpenpgpAssertion.assertDecryptedMessage(message)).toThrowError(
+      expect(() => OpenpgpAssertion.assertDecryptedMessage(message)).toThrow(
         Error("The message should contain at least one session key."),
       );
     });
@@ -643,7 +637,7 @@ describe("OpenPGP Assertions", () => {
       const message = await EncryptMessageService.encrypt("Message", publicKey);
       const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(message);
 
-      expect(() => OpenpgpAssertion.assertDecryptedMessage(messageEncrypted)).toThrowError(
+      expect(() => OpenpgpAssertion.assertDecryptedMessage(messageEncrypted)).toThrow(
         Error("The message should be decrypted."),
       );
     });

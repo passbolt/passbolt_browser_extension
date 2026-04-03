@@ -184,7 +184,7 @@ describe("GroupUpdatesCollections", () => {
 
       jest.spyOn(groupUpdateDto.groupsUsers.items[0], "scenario", "get").mockImplementation(() => "unknown");
 
-      expect(() => GroupUpdatesCollection.createFromGroupUpdateEntity(groupUpdateDto)).toThrowError(
+      expect(() => GroupUpdatesCollection.createFromGroupUpdateEntity(groupUpdateDto)).toThrow(
         "Unsupported Group user membership update operation type.",
       );
     });

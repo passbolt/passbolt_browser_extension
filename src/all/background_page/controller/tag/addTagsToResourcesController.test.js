@@ -66,9 +66,7 @@ describe("AddTagsToResourcesController", () => {
       jest.spyOn(controller.progressService, "start").mockImplementation(() => {});
       jest.spyOn(controller.progressService, "close").mockImplementation(() => {});
 
-      await expect(() => controller.exec("not-an-array", tagsDto)).rejects.toThrow(
-        new TypeError("resourceIds is not an Array"),
-      );
+      await expect(() => controller.exec("not-an-array", tagsDto)).rejects.toThrow("resourceIds is not an Array");
       expect(controller.updateResourceTagsService.addTagsToResources).not.toHaveBeenCalled();
     });
 
@@ -81,7 +79,7 @@ describe("AddTagsToResourcesController", () => {
       jest.spyOn(controller.progressService, "close").mockImplementation(() => {});
 
       await expect(() => controller.exec(["invalid-uuid", ...resourceIds], tagsDto)).rejects.toThrow(
-        new Error("The given parameter is not a valid UUID"),
+        "The given parameter is not a valid UUID",
       );
       expect(controller.updateResourceTagsService.addTagsToResources).not.toHaveBeenCalled();
     });
@@ -94,7 +92,7 @@ describe("AddTagsToResourcesController", () => {
       jest.spyOn(controller.progressService, "start").mockImplementation(() => {});
       jest.spyOn(controller.progressService, "close").mockImplementation(() => {});
 
-      await expect(() => controller.exec(resourceIds, {})).rejects.toThrow(new TypeError("tagsDto is not an Array"));
+      await expect(() => controller.exec(resourceIds, {})).rejects.toThrow("tagsDto is not an Array");
       expect(controller.updateResourceTagsService.addTagsToResources).not.toHaveBeenCalled();
     });
 
@@ -121,7 +119,7 @@ describe("AddTagsToResourcesController", () => {
       jest.spyOn(controller.progressService, "finishStep").mockImplementation(() => {});
       jest.spyOn(controller.progressService, "close").mockImplementation(() => {});
 
-      await expect(() => controller.exec(resourceIds, tagsDto)).rejects.toThrow(expectedError);
+      await expect(() => controller.exec(resourceIds, tagsDto)).rejects.toThrow(expectedError.message);
     });
 
     it("should close progressService in case of success", async () => {

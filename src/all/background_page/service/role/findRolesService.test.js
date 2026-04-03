@@ -61,7 +61,7 @@ describe("FindRolesService", () => {
         throw new Error("Something went wrong");
       });
 
-      await expect(() => service.findAll()).rejects.toThrowError();
+      await expect(() => service.findAll()).rejects.toThrow();
     });
 
     it("should throw an error if the data is invalid", async () => {
@@ -77,7 +77,7 @@ describe("FindRolesService", () => {
         .spyOn(service.roleApiService, "findAll")
         .mockImplementation(async () => new PassboltResponseEntity({ header: {}, body: collectionDto }));
 
-      await expect(() => service.findAll()).rejects.toThrowError();
+      await expect(() => service.findAll()).rejects.toThrow();
     });
 
     it("should ignore entities that are invalid an error if the data is invalid", async () => {

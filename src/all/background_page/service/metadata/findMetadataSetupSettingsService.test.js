@@ -64,7 +64,7 @@ describe("FindMetadataSetupSettingsService", () => {
 
       fetch.doMockOnce(/\/metadata\/setup\/settings.json/, () => mockApiResponseError(500, "Something went wrong!"));
 
-      await expect(() => service.findSetupSettings()).rejects.toThrowError();
+      await expect(() => service.findSetupSettings()).rejects.toThrow();
     });
   });
 });

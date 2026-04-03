@@ -134,21 +134,21 @@ describe("ResourceSecretRevisionApiService", () => {
       expect.assertions(1);
       const apiClientOptions = defaultApiClientOptions();
       const apiService = new ResourceSecretRevisionApiService(apiClientOptions);
-      await expect(() => apiService.findAllByResourceId(42)).rejects.toThrowError();
+      await expect(() => apiService.findAllByResourceId(42)).rejects.toThrow();
     });
 
     it("should throw an error if a resourceId is null", async () => {
       expect.assertions(1);
       const apiClientOptions = defaultApiClientOptions();
       const apiService = new ResourceSecretRevisionApiService(apiClientOptions);
-      await expect(() => apiService.findAllByResourceId(null)).rejects.toThrowError();
+      await expect(() => apiService.findAllByResourceId(null)).rejects.toThrow();
     });
 
     it("should throw an error if a contains is not an object", async () => {
       expect.assertions(1);
       const apiClientOptions = defaultApiClientOptions();
       const apiService = new ResourceSecretRevisionApiService(apiClientOptions);
-      await expect(() => apiService.findAllByResourceId(uuidv4(), 42)).rejects.toThrowError();
+      await expect(() => apiService.findAllByResourceId(uuidv4(), 42)).rejects.toThrow();
     });
 
     it("should throw an error if a wrong contain is passed", async () => {
@@ -156,7 +156,7 @@ describe("ResourceSecretRevisionApiService", () => {
       const contains = { wrong: true };
       const apiClientOptions = defaultApiClientOptions();
       const apiService = new ResourceSecretRevisionApiService(apiClientOptions);
-      await expect(() => apiService.findAllByResourceId(uuidv4(), contains)).rejects.toThrowError();
+      await expect(() => apiService.findAllByResourceId(uuidv4(), contains)).rejects.toThrow();
     });
   });
 });

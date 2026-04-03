@@ -12,12 +12,11 @@
  * @since         3.6.0
  */
 
-import each from "jest-each";
 import ParseRecoverUrlService from "./parseRecoverUrlService";
 
 describe("ParseRecoverUrlService", () => {
   describe("ParseRecoverUrlService:test", () => {
-    each([
+    describe.each([
       {
         scenario: "Legacy url",
         url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -58,14 +57,14 @@ describe("ParseRecoverUrlService", () => {
         scenario: "Trailing /",
         url: "https://clould.passbolt.dev/acme//setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
       },
-    ]).describe("should match", (_props) => {
+    ])("should match", (_props) => {
       it(`should match: ${_props.scenario}`, () => {
         expect.assertions(1);
         expect(ParseRecoverUrlService.test(_props.url)).toBeTruthy();
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "No domain",
         url: "setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -80,7 +79,7 @@ describe("ParseRecoverUrlService", () => {
         scenario: "Not a valid domain provided",
         url: "https://setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
       },
-    ]).describe("should not match", (_props) => {
+    ])("should not match", (_props) => {
       it(`should not match: ${_props.scenario}`, () => {
         expect.assertions(1);
         expect(ParseRecoverUrlService.test(_props.url)).toBeFalsy();
@@ -89,7 +88,7 @@ describe("ParseRecoverUrlService", () => {
   });
 
   describe("ParseRecoverUrlService:parse", () => {
-    each([
+    describe.each([
       {
         scenario: "Legacy url",
         url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -140,7 +139,7 @@ describe("ParseRecoverUrlService", () => {
         url: "https://clould.passbolt.dev/acme//setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         domain: "https://clould.passbolt.dev/acme",
       },
-    ]).describe("should parse", (_props) => {
+    ])("should parse", (_props) => {
       it(`should parse: ${_props.scenario}`, () => {
         const parseResult = ParseRecoverUrlService.parse(_props.url);
 
@@ -151,7 +150,7 @@ describe("ParseRecoverUrlService", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "No domain",
         url: "setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -162,10 +161,10 @@ describe("ParseRecoverUrlService", () => {
         scenario: "Not targeting recover start",
         url: "https://passbolt.dev/setup/recover/doit/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
       },
-    ]).describe("should not parse", (_props) => {
+    ])("should not parse", (_props) => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);
-        expect(() => ParseRecoverUrlService.parse(_props.url)).toThrowError("The url does not match the pattern.");
+        expect(() => ParseRecoverUrlService.parse(_props.url)).toThrow("The url does not match the pattern.");
       });
     });
 
@@ -174,7 +173,7 @@ describe("ParseRecoverUrlService", () => {
         "http://setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0";
 
       expect.assertions(1);
-      await expect(() => ParseRecoverUrlService.parse(url)).toThrowError("The domain is not valid.");
+      await expect(() => ParseRecoverUrlService.parse(url)).toThrow("The domain is not valid.");
     });
   });
 });

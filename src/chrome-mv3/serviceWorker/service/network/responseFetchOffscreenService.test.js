@@ -12,7 +12,6 @@
  * @since         4.7.0
  */
 
-import each from "jest-each";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { RequestFetchOffscreenService } from "./requestFetchOffscreenService";
 import {
@@ -32,10 +31,10 @@ beforeEach(() => {
 
 describe("ResponseFetchOffscreenService", () => {
   describe("::assertMessage", () => {
-    each([
+    describe.each([
       { scenario: "success", type: FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS },
       { scenario: "error", type: FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR },
-    ]).describe("should accept if message type is valid", (_props) => {
+    ])("should accept if message type is valid", (_props) => {
       it(`should validate message type: ${_props.scenario}`, () => {
         const message = defaultResponseMessage({ type: _props.type });
         try {
@@ -47,13 +46,13 @@ describe("ResponseFetchOffscreenService", () => {
       });
     });
 
-    each([
+    describe.each([
       { scenario: "undefined", type: undefined },
       { scenario: "null", type: null },
       { scenario: "invalid string", type: "invalid" },
       { scenario: "boolean", type: true },
       { scenario: "object", type: { data: FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS } },
-    ]).describe("should throw if message type is not valid", (_props) => {
+    ])("should throw if message type is not valid", (_props) => {
       it(`should trow if message type: ${_props.scenario}`, () => {
         const message = defaultResponseMessage({ type: _props.type });
         try {
@@ -71,13 +70,13 @@ describe("ResponseFetchOffscreenService", () => {
       ).not.toThrow();
     });
 
-    each([
+    describe.each([
       { scenario: "undefined", id: undefined },
       { scenario: "null", id: null },
       { scenario: "invalid string", id: "invalid" },
       { scenario: "boolean", id: true },
       { scenario: "object", id: { data: crypto.randomUUID() } },
-    ]).describe("should throw if message id is not valid", (_props) => {
+    ])("should throw if message id is not valid", (_props) => {
       it(`should trow if message id: ${_props.scenario}`, () => {
         const message = defaultResponseMessage({ id: _props.id });
         try {
@@ -93,12 +92,12 @@ describe("ResponseFetchOffscreenService", () => {
       expect(() => defaultResponseMessage({ data: { prop: "value" } })).not.toThrow();
     });
 
-    each([
+    describe.each([
       { scenario: "undefined", data: undefined },
       { scenario: "null", data: null },
       { scenario: "invalid string", data: "invalid" },
       { scenario: "boolean", data: true },
-    ]).describe("should throw if message data is not valid", (_props) => {
+    ])("should throw if message data is not valid", (_props) => {
       it(`should trow if message id: ${_props.scenario}`, () => {
         const message = defaultResponseMessage({ data: _props.data });
         try {

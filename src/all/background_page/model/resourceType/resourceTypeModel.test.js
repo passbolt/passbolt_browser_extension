@@ -94,7 +94,7 @@ describe("ResourceTypeModel", () => {
       expect.assertions(1);
 
       expect(() => resourceTypeModel.getSecretSchemaById("non-uuid")).rejects.toThrow(
-        new Error("The resource type id should be a valid UUID"),
+        "The resource type id should be a valid UUID",
       );
     });
   });

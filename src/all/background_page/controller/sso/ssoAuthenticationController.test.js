@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import each from "jest-each";
 import "../../../../../test/mocks/mockSsoDataStorage";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { v4 as uuid } from "uuid";
@@ -74,7 +73,7 @@ const scenarios = [
   },
 ];
 
-each(scenarios).describe("SsoAuthenticationController", (scenario) => {
+describe.each(scenarios)("SsoAuthenticationController", (scenario) => {
   describe(`SsoAuthenticationController::exec (with provider: '${scenario.providerId}')`, () => {
     it(`Should sign the user using a third party: ${scenario.providerId}`, async () => {
       expect.assertions(5);

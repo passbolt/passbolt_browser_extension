@@ -90,7 +90,7 @@ describe("RolesUpdateLocalStorageController", () => {
 
       fetch.doMockOnceIf(/roles\.json/, () => mockApiResponseError(500, "Something went wrong!"));
 
-      await expect(() => controller.exec()).rejects.toThrowError("Something went wrong!");
+      await expect(() => controller.exec()).rejects.toThrow("Something went wrong!");
     });
   });
 });

@@ -63,16 +63,14 @@ describe("IsApplicationOverlaidController", () => {
 
       const applicationId = uuidv4();
       const controller = new IsApplicationOverlaidController({ tab: { id: worker.tabId } }, null);
-      await expect(() => controller.exec(applicationId)).rejects.toThrowError(new Error("error"));
+      await expect(() => controller.exec(applicationId)).rejects.toThrow("error");
     });
 
     it("Should throw an error if application id is not a uuid.", async () => {
       expect.assertions(1);
 
       const controller = new IsApplicationOverlaidController(null, null);
-      await expect(() => controller.exec("test")).rejects.toThrowError(
-        new Error("The given parameter is not a valid UUID"),
-      );
+      await expect(() => controller.exec("test")).rejects.toThrow("The given parameter is not a valid UUID");
     });
   });
 });

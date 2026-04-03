@@ -220,12 +220,8 @@ describe("GroupLocalStorage", () => {
       const collectionDto = defaultGroupsDtos();
       browser.storage.local.set({ [storage.storageKey]: collectionDto });
 
-      await expect(storage.addGroup()).rejects.toThrow(
-        TypeError("The parameter `groupEntity` should be of type GroupEntity."),
-      );
-      await expect(storage.addGroup({})).rejects.toThrow(
-        TypeError("The parameter `groupEntity` should be of type GroupEntity."),
-      );
+      await expect(storage.addGroup()).rejects.toThrow("The parameter `groupEntity` should be of type GroupEntity.");
+      await expect(storage.addGroup({})).rejects.toThrow("The parameter `groupEntity` should be of type GroupEntity.");
     });
   });
 
@@ -262,7 +258,7 @@ describe("GroupLocalStorage", () => {
       browser.storage.local.set({ [storage.storageKey]: collectionDto });
       const groupEntity = new GroupEntity(unknownGroupDto);
       await expect(storage.updateGroup(groupEntity)).rejects.toThrow(
-        TypeError("The group could not be found in the local storage"),
+        "The group could not be found in the local storage",
       );
     });
 
@@ -272,11 +268,9 @@ describe("GroupLocalStorage", () => {
       const collectionDto = defaultGroupsDtos();
       // Insert groups in local storage
       browser.storage.local.set({ [storage.storageKey]: collectionDto });
-      await expect(storage.updateGroup()).rejects.toThrow(
-        TypeError("The parameter `groupEntity` should be of type GroupEntity."),
-      );
+      await expect(storage.updateGroup()).rejects.toThrow("The parameter `groupEntity` should be of type GroupEntity.");
       await expect(storage.updateGroup({})).rejects.toThrow(
-        TypeError("The parameter `groupEntity` should be of type GroupEntity."),
+        "The parameter `groupEntity` should be of type GroupEntity.",
       );
     });
   });
@@ -319,14 +313,14 @@ describe("GroupLocalStorage", () => {
     it("throws an error if the entity is not set.", async () => {
       expect.assertions(1);
       expect(() => GroupLocalStorage.assertEntityBeforeSave()).toThrow(
-        TypeError("GroupLocalStorage expects a GroupEntity to be set"),
+        "GroupLocalStorage expects a GroupEntity to be set",
       );
     });
 
     it("throws an error if the entity is not a GroupEntity.", async () => {
       expect.assertions(1);
       expect(() => GroupLocalStorage.assertEntityBeforeSave({})).toThrow(
-        TypeError("GroupLocalStorage expects an object of type GroupEntity"),
+        "GroupLocalStorage expects an object of type GroupEntity",
       );
     });
 
@@ -336,11 +330,11 @@ describe("GroupLocalStorage", () => {
       const groupEntity = new GroupEntity(groupDto);
       groupEntity._props.id = "";
       expect(() => GroupLocalStorage.assertEntityBeforeSave(groupEntity)).toThrow(
-        TypeError("GroupLocalStorage expects GroupEntity id to be set"),
+        "GroupLocalStorage expects GroupEntity id to be set",
       );
       groupEntity._props.id = null;
       expect(() => GroupLocalStorage.assertEntityBeforeSave(groupEntity)).toThrow(
-        TypeError("GroupLocalStorage expects GroupEntity id to be set"),
+        "GroupLocalStorage expects GroupEntity id to be set",
       );
     });
   });

@@ -30,7 +30,7 @@ class ResourceCreateController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.progressService = new ProgressService(this.worker, i18n.t("Creating password"));
+    this.progressService = new ProgressService(this.worker, i18n.t("Creating resource"));
     this.resourceCreateService = new ResourceCreateService(account, apiClientOptions, this.progressService);
     this.getPassphraseService = new GetPassphraseService(account);
     this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);

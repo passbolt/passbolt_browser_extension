@@ -98,7 +98,7 @@ class ResourceCreateService {
    * @private
    */
   async save(resource, resourceType) {
-    await this.progressService.finishStep(i18n.t("Creating password"), true);
+    await this.progressService.finishStep(i18n.t("Creating resource"), true);
 
     const resourceDto = resourceType.isV5() ? resource.toDto({ secrets: true }) : resource.toV4Dto({ secrets: true });
     const contain = { permission: true, favorite: true, tags: true, folder: true };

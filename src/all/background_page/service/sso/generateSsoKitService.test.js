@@ -66,7 +66,7 @@ describe("GenerateSsoKitService", () => {
       });
       jest.spyOn(SsoKitTemporaryStorageService, "flush");
 
-      await expect(GenerateSsoKitService.generate("test", "azure")).rejects.toThrow(exepctedError);
+      await expect(GenerateSsoKitService.generate("test", "azure")).rejects.toThrow(exepctedError.message);
 
       expect(SsoDataStorage.flush).toHaveBeenCalledTimes(1);
       expect(SsoKitTemporaryStorageService.flush).toHaveBeenCalledTimes(1);

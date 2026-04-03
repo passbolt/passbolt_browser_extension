@@ -51,7 +51,7 @@ describe("CommentService", () => {
     it("should throw an error if id is not defined", async () => {
       expect.assertions(1);
       const promise = service.findAllByResourceId();
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid UUID");
     });
   });
 
@@ -72,7 +72,7 @@ describe("CommentService", () => {
       const commentDto = new CommentEntity(defaultCommentDto());
       jest.spyOn(CommentApiService.prototype, "create").mockImplementation(() => null);
       const promise = service.create(commentDto);
-      await expect(promise).rejects.toThrowError("Could not validate entity CommentEntity. No data provided.");
+      await expect(promise).rejects.toThrow("Could not validate entity CommentEntity. No data provided.");
     });
   });
 
@@ -91,7 +91,7 @@ describe("CommentService", () => {
       expect.assertions(1);
 
       const expectedError = new Error("The given parameter is not a valid UUID");
-      expect(() => service.delete("test")).rejects.toThrow(expectedError);
+      expect(() => service.delete("test")).rejects.toThrow(expectedError.message);
     });
   });
 });

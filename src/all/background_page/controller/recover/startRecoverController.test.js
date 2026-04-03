@@ -132,7 +132,7 @@ describe("StartRecoverController", () => {
 
       expect.assertions(2);
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError("The key should be a valid openpgp armored key string.");
+      await expect(promise).rejects.toThrow("The key should be a valid openpgp armored key string.");
       expect(mockedBootstrapRecoverWorkerPortEmit).toHaveBeenCalledWith("passbolt.recover-bootstrap.remove-iframe");
     });
 
@@ -158,7 +158,7 @@ describe("StartRecoverController", () => {
 
       expect.assertions(2);
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError("Could not validate property username.");
+      await expect(promise).rejects.toThrow("Could not validate property username.");
       expect(mockedBootstrapRecoverWorkerPortEmit).toHaveBeenCalledWith("passbolt.recover-bootstrap.remove-iframe");
     });
   });

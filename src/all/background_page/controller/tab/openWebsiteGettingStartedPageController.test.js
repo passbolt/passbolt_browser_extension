@@ -40,7 +40,7 @@ describe("OpenWebsiteGettingStartedPageController", () => {
       // process
       const controller = new OpenWebsiteGettingStartedPageController(null, null);
       // expectations
-      await expect(controller.exec()).rejects.toThrow(error);
+      await expect(controller.exec()).rejects.toThrow(error.message);
     });
   });
 });

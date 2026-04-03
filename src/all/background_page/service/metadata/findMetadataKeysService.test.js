@@ -111,7 +111,7 @@ describe("FindMetadataKeysApiService", () => {
       jest.spyOn(service.metadataKeysApiService, "findAll").mockImplementation(() => apiMetadataKeysCollection);
 
       const expectedError = new Error("The metadata private keys should not be decrypted.");
-      await expect(() => service.findAll()).rejects.toThrow(expectedError);
+      await expect(() => service.findAll()).rejects.toThrow(expectedError.message);
     });
 
     it("throws API error if the API encountered an issue", async () => {
@@ -142,7 +142,7 @@ describe("FindMetadataKeysApiService", () => {
 
       const expectedError = new Error("Unsupported contains parameter used, please check supported contains");
 
-      await expect(() => service.findAll(fakeContains)).rejects.toThrow(expectedError);
+      await expect(() => service.findAll(fakeContains)).rejects.toThrow(expectedError.message);
     });
 
     it("throws an error if the given filters are not supported", async () => {
@@ -153,7 +153,7 @@ describe("FindMetadataKeysApiService", () => {
 
       const expectedError = new Error("Unsupported filter parameter used, please check supported filters");
 
-      await expect(() => service.findAll({}, filters)).rejects.toThrow(expectedError);
+      await expect(() => service.findAll({}, filters)).rejects.toThrow(expectedError.message);
     });
   });
 
@@ -214,7 +214,7 @@ describe("FindMetadataKeysApiService", () => {
       jest.spyOn(service.metadataKeysApiService, "findAll").mockImplementation(() => apiMetadataKeysCollection);
 
       const expectedError = new Error("The metadata private keys should not be decrypted.");
-      await expect(() => service.findAllForSessionStorage()).rejects.toThrow(expectedError);
+      await expect(() => service.findAllForSessionStorage()).rejects.toThrow(expectedError.message);
     });
 
     it("throws API error if the API encountered an issue", async () => {

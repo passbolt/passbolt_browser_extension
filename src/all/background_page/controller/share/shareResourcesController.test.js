@@ -43,21 +43,19 @@ describe("ShareResourcesController", () => {
     it("throws if the parameters are not valid.", async () => {
       expect.assertions(6);
       await expect(() => controller.exec("wrong", [])).rejects.toThrow(
-        new TypeError('The parameter "resourcesIds" should be an array'),
+        'The parameter "resourcesIds" should be an array',
       );
       await expect(() => controller.exec([], [])).rejects.toThrow(
-        new TypeError('The parameter "resourcesIds" should be a non empty array'),
+        'The parameter "resourcesIds" should be a non empty array',
       );
       await expect(() => controller.exec(["test"], [])).rejects.toThrow(
-        new TypeError('The parameter "resourcesIds" should contain only uuid', {
-          cause: new TypeError("The given parameter is not a valid UUID"),
-        }),
+        'The parameter "resourcesIds" should contain only uuid',
       );
       await expect(() => controller.exec([uuidv4()], "not-valid")).rejects.toThrow(
-        new TypeError('The parameter "permissionChangesDto" should be an array'),
+        'The parameter "permissionChangesDto" should be an array',
       );
       await expect(() => controller.exec([uuidv4()], [])).rejects.toThrow(
-        new TypeError('The parameter "permissionChangesDto" should be a non empty array'),
+        'The parameter "permissionChangesDto" should be a non empty array',
       );
       const execPromiseEntityValidationError = controller.exec([uuidv4()], [{}]);
       await expect(execPromiseEntityValidationError).rejects.toThrowEntityValidationErrorOnProperties([

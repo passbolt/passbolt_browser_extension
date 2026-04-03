@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.0
  */
-import each from "jest-each";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { adminAccountDto, defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
@@ -91,7 +90,7 @@ describe("ShareResourceService", () => {
   });
 
   describe("::shareAll", () => {
-    each([
+    describe.each([
       {
         title: "with password string",
         secretClear: plaintextSecretPasswordStringDto(),
@@ -108,7 +107,7 @@ describe("ShareResourceService", () => {
         resourceTypeId: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
       },
       { title: "with standalone totp", secretClear: plaintextSecretTotpDto(), resourceTypeId: TEST_RESOURCE_TYPE_TOTP },
-    ]).describe("should share a single resource in format v4", (scenario) => {
+    ])("should share a single resource in format v4", (scenario) => {
       it(`::${scenario.title}`, async () => {
         expect.assertions(19);
         const resourceIdToShare = uuidv4();
@@ -224,7 +223,7 @@ describe("ShareResourceService", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         title: "with password string V5",
         secretClear: plaintextSecretPasswordStringDto(),
@@ -245,7 +244,7 @@ describe("ShareResourceService", () => {
         secretClear: plaintextSecretTotpDto(),
         resourceTypeId: TEST_RESOURCE_TYPE_V5_TOTP,
       },
-    ]).describe("should share a single resource in format v5", (scenario) => {
+    ])("should share a single resource in format v5", (scenario) => {
       it(`::${scenario.title}: with metadata already shared`, async () => {
         expect.assertions(19);
         const resourceIdToShare = uuidv4();
@@ -909,24 +908,22 @@ describe("ShareResourceService", () => {
       const service = new ShareResourceService(apiClientOptions, account, progressService);
 
       await expect(() => service.shareAll("wrong", [])).rejects.toThrow(
-        new TypeError('The parameter "resourcesIds" should be an array'),
+        'The parameter "resourcesIds" should be an array',
       );
       await expect(() => service.shareAll([], [])).rejects.toThrow(
-        new TypeError('The parameter "resourcesIds" should be a non empty array'),
+        'The parameter "resourcesIds" should be a non empty array',
       );
       await expect(() => service.shareAll(["test"], [])).rejects.toThrow(
-        new TypeError('The parameter "resourcesIds" should contain only uuid', {
-          cause: new TypeError("The given parameter is not a valid UUID"),
-        }),
+        'The parameter "resourcesIds" should contain only uuid',
       );
       await expect(() => service.shareAll([uuidv4()], "not-valid")).rejects.toThrow(
-        new TypeError('The parameter "permissionChanges" should be of type PermissionChangesCollection'),
+        'The parameter "permissionChanges" should be of type PermissionChangesCollection',
       );
       await expect(() => service.shareAll([uuidv4()], new PermissionChangesCollection([]))).rejects.toThrow(
-        new TypeError('The parameter "passphrase" should be a string'),
+        'The parameter "passphrase" should be a string',
       );
       await expect(() => service.shareAll([uuidv4()], new PermissionChangesCollection([]), "")).rejects.toThrow(
-        new TypeError('The parameter "passphrase" should not be empty'),
+        'The parameter "passphrase" should not be empty',
       );
     });
   });

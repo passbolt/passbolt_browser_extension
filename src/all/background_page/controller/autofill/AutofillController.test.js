@@ -296,7 +296,7 @@ describe("AutofillController", () => {
       jest.spyOn(controller.getPassphraseService, "requestPassphraseFromQuickAccess");
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockRejectedValue(error);
 
-      await expect(controller.getPassphrase()).rejects.toThrow(error);
+      await expect(controller.getPassphrase()).rejects.toThrow(error.message);
 
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledWith(worker);
@@ -315,7 +315,7 @@ describe("AutofillController", () => {
       jest.spyOn(controller.getPassphraseService, "requestPassphraseFromQuickAccess").mockRejectedValue(error);
       jest.spyOn(controller.getPassphraseService, "getPassphrase");
 
-      await expect(controller.getPassphrase()).rejects.toThrow(error);
+      await expect(controller.getPassphrase()).rejects.toThrow(error.message);
 
       expect(controller.getPassphraseService.requestPassphraseFromQuickAccess).toHaveBeenCalledTimes(1);
       expect(controller.getPassphraseService.getPassphrase).not.toHaveBeenCalled();

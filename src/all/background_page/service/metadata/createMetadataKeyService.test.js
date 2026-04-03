@@ -200,7 +200,7 @@ describe("CreateMetadataKeyService", () => {
     it("throws if the given metadata key pair is not of type ExternalGpgKeyPairEntity.", async () => {
       expect.assertions(1);
       const expectedError = new TypeError("The given data is not of the expected type");
-      await expect(() => service.create("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.create("test")).rejects.toThrow(expectedError.message);
     });
 
     it("throws if the given passphrase is not a valid string.", async () => {
@@ -211,7 +211,7 @@ describe("CreateMetadataKeyService", () => {
         public_key: { armored_key: pgpKeys.eddsa_ed25519.public },
       };
       const metadataKeyPair = new ExternalGpgKeyPairEntity(metadataKeyPairDto);
-      await expect(() => service.create(metadataKeyPair, 42)).rejects.toThrowError(expectedError);
+      await expect(() => service.create(metadataKeyPair, 42)).rejects.toThrow(expectedError.message);
     });
   });
 });

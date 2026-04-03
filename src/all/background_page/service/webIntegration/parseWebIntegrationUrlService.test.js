@@ -12,7 +12,6 @@
  * @since         3.10.0
  */
 
-import each from "jest-each";
 import ParseWebIntegrationUrlService from "./parseWebIntegrationUrlService";
 import { Config } from "../../model/config";
 
@@ -24,12 +23,12 @@ describe("ParseWebIntegrationUrlService", () => {
   });
 
   describe("ParseWebIntegrationUrlService:test", () => {
-    each([
+    describe.each([
       { scenario: "Web page", url: "https://test.com/auth/login" },
       { scenario: "Web page with parameters", url: "https://test.com/auth/login?locale=en-UK" },
       { scenario: "Web page with anchors", url: "https://test.com/auth/login#test" },
       { scenario: "Web page with no domain", url: "https://auth/login" },
-    ]).describe("should parse", (_props) => {
+    ])("should parse", (_props) => {
       it(`should match: ${_props.scenario}`, () => {
         const parseResult = ParseWebIntegrationUrlService.test(_props.url);
         expect.assertions(1);
@@ -37,7 +36,7 @@ describe("ParseWebIntegrationUrlService", () => {
       });
     });
 
-    each([
+    describe.each([
       { scenario: "No protocol given", url: "passbolt.dev/auth/login" },
       { scenario: "Passbolt domain", url: domain },
       { scenario: "Chrome page", url: "chrome://settings/" },
@@ -45,7 +44,7 @@ describe("ParseWebIntegrationUrlService", () => {
       { scenario: "Config page", url: "about:config" },
       { scenario: "Passbolt page", url: "https://www.passbolt.com/" },
       { scenario: "gmail page", url: "https://mail.google.com/" },
-    ]).describe("should not parse", (_props) => {
+    ])("should not parse", (_props) => {
       it(`should not match: ${_props.scenario}`, () => {
         const parseResult = ParseWebIntegrationUrlService.test(_props.url);
         expect.assertions(1);

@@ -127,7 +127,7 @@ describe("PasswordExpiry model", () => {
 
       const entity = PasswordPoliciesEntity.createFromDefault();
       const expectedError = new Error("The given entity is not a PasswordExpirySettingsEntity");
-      expect(() => model.save(entity)).rejects.toThrow(expectedError);
+      expect(() => model.save(entity)).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an Error if something goes wrong on the API", async () => {
@@ -171,7 +171,7 @@ describe("PasswordExpiry model", () => {
       expect.assertions(1);
 
       const expectedError = new Error("The password expiry settings id should be a valid uuid.");
-      expect(() => model.delete("test")).rejects.toThrow(expectedError);
+      expect(() => model.delete("test")).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an Error if something goes wrong on the API", async () => {

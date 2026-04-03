@@ -111,7 +111,7 @@ describe("UserPassphrasePolicies model", () => {
       const model = new UserPassphrasePoliciesModel(apiClientOptions);
       const entity = PasswordPoliciesEntity.createFromDefault();
       const expectedError = new Error("The given entity is not a UserPassphrasePoliciesEntity");
-      expect(() => model.save(entity)).rejects.toThrow(expectedError);
+      expect(() => model.save(entity)).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an Error if the API returns an HTTP error", async () => {

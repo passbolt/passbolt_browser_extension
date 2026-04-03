@@ -25,7 +25,7 @@ describe("AccountRecoveryGenerateOrganizationKeyController", () => {
       const promise = controller.exec();
 
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("Could not validate entity GenerateGpgKeyPairOptionsEntity.");
+      await expect(promise).rejects.toThrow("Could not validate entity GenerateGpgKeyPairOptionsEntity.");
     });
 
     it("Should generate an account recovery organization key pair.", async () => {

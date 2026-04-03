@@ -574,7 +574,7 @@ describe("FindResourcesService", () => {
 
       const promise = service.findOneById("Not an uuid");
 
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
     it("should validate the contains parameter", async () => {
@@ -583,9 +583,7 @@ describe("FindResourcesService", () => {
 
       const promise = service.findOneById(ressource.id, { "not-valid": true });
 
-      await expect(promise).rejects.toThrowError(
-        "Unsupported contains parameter used, please check supported contains",
-      );
+      await expect(promise).rejects.toThrow("Unsupported contains parameter used, please check supported contains");
     });
 
     it("should throw an error in case of api error", async () => {
@@ -599,7 +597,7 @@ describe("FindResourcesService", () => {
 
       const promise = service.findOneById(ressource.id);
 
-      await expect(promise).rejects.toThrowError("API error");
+      await expect(promise).rejects.toThrow("API error");
     });
   });
 
@@ -633,7 +631,7 @@ describe("FindResourcesService", () => {
 
       const promise = service.findOneByIdForDetails("Not an uuid");
 
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
     it("should throw an error in case of api error", async () => {
@@ -647,7 +645,7 @@ describe("FindResourcesService", () => {
 
       const promise = service.findOneByIdForDetails(ressource.id);
 
-      await expect(promise).rejects.toThrowError("API error");
+      await expect(promise).rejects.toThrow("API error");
     });
   });
 
@@ -684,7 +682,7 @@ describe("FindResourcesService", () => {
       expect.assertions(1);
 
       const resourcesIds = [uuidv4(), "test"];
-      await expect(() => service.findAllByIdsForLocalStorage(resourcesIds)).rejects.toThrowError();
+      await expect(() => service.findAllByIdsForLocalStorage(resourcesIds)).rejects.toThrow();
     });
   });
 
@@ -721,7 +719,7 @@ describe("FindResourcesService", () => {
 
     it("should assert the given id", async () => {
       expect.assertions(1);
-      await expect(() => service.findAllByParentFolderIdForLocalStorage("test")).rejects.toThrowError();
+      await expect(() => service.findAllByParentFolderIdForLocalStorage("test")).rejects.toThrow();
     });
   });
 

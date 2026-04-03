@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 
-import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountRecoveryOrganizationPolicyEntity from "./accountRecoveryOrganizationPolicyEntity";
@@ -86,7 +85,7 @@ describe("AccountRecoveryOrganizationPolicy entity", () => {
     });
   });
 
-  each([
+  describe.each([
     { scenario: "Create disabled policy", dto: createDisabledAccountRecoveryOrganizationPolicyDto() },
     { scenario: "Read disabled policy", dto: disabledAccountRecoveryOrganizationPolicyDto() },
     { scenario: "Create enabled policy", dto: createEnabledAccountRecoveryOrganizationPolicyDto() },
@@ -101,7 +100,7 @@ describe("AccountRecoveryOrganizationPolicy entity", () => {
     },
     { scenario: "Create rotate key policy", dto: createRotateKeyAccountRecoveryOrganizationPolicyDto() },
     { scenario: "Read rotate key policy", dto: rotateKeyAccountRecoveryOrganizationPolicyDto() },
-  ]).describe("constructor works with data", (_props) => {
+  ])("constructor works with data", (_props) => {
     it(`it supports scenario ${_props.scenario}`, () => {
       expect.assertions(1);
       let entity;

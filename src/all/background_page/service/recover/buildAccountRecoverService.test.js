@@ -20,13 +20,13 @@ describe("BuildAccountRecoverService", () => {
     it("should not build if parameter url is not a string.", () => {
       const url = 42;
       expect.assertions(1);
-      expect(() => BuildAccountRecoverService.buildFromRecoverUrl(url)).toThrowError("Url should be a valid string.");
+      expect(() => BuildAccountRecoverService.buildFromRecoverUrl(url)).toThrow("Url should be a valid string.");
     });
 
     it("should not build if url cannot be parsed.", () => {
       const url = "https://passbolt.dev/setup/recover/start";
       expect.assertions(1);
-      expect(() => BuildAccountRecoverService.buildFromRecoverUrl(url)).toThrowError();
+      expect(() => BuildAccountRecoverService.buildFromRecoverUrl(url)).toThrow();
     });
 
     it("should build.", () => {

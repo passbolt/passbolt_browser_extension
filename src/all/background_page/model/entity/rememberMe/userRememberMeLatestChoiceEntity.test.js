@@ -50,7 +50,7 @@ describe("UserRememberMeLatestChoiceEntity", () => {
 
     for (let i = 0; i < forbiddenCases.length; i++) {
       const dto = defaultRememberMeLatestChoiceDto({ duration: forbiddenCases[i] });
-      expect(() => new UserRememberMeLatestChoiceEntity(dto)).toThrow(expectedError);
+      expect(() => new UserRememberMeLatestChoiceEntity(dto)).toThrow(expectedError.message);
     }
   });
 });

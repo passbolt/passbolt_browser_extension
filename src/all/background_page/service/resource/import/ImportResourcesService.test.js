@@ -66,7 +66,6 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
   RESOURCE_TYPE_V5_TOTP_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
-import each from "jest-each";
 import GetOrFindMetadataSettingsService from "../../metadata/getOrFindMetadataSettingsService";
 import ResourcesCollection from "../../../model/entity/resource/resourcesCollection";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
@@ -143,7 +142,7 @@ describe("ImportResourcesService", () => {
         .spyOn(MetadataKeysSettingsApiService.prototype, "findSettings")
         .mockImplementation(() => defaultMetadataKeysSettingsDto());
     });
-    each([
+    describe.each([
       {
         scenario: "Default content type v4",
         metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
@@ -152,7 +151,7 @@ describe("ImportResourcesService", () => {
         scenario: "Default content type v5",
         metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
       },
-    ]).describe("Should parse the file", (test) => {
+    ])("Should parse the file", (test) => {
       beforeEach(() => {
         jest
           .spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
@@ -423,7 +422,7 @@ describe("ImportResourcesService", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: RESOURCE_TYPE_V5_DEFAULT_SLUG,
         importResourcesFile: new ImportResourcesFileEntity(defaultImportResourceFileCSVDto()),
@@ -444,7 +443,7 @@ describe("ImportResourcesService", () => {
           }),
         ),
       },
-    ]).describe("Should encrypt the metadata", (test) => {
+    ])("Should encrypt the metadata", (test) => {
       it(`Should encrypt the metadata - <${test.scenario}>`, async () => {
         expect.assertions(10);
         jest

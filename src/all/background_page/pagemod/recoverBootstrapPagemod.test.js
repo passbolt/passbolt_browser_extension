@@ -15,7 +15,6 @@ import WorkersSessionStorage from "../service/sessionStorage/workersSessionStora
 import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
 import RecoverBootstrap from "./recoverBootstrapPagemod";
-import each from "jest-each";
 import Pagemod from "./pagemod";
 import { PortEvents } from "../event/portEvents";
 
@@ -81,7 +80,7 @@ describe("RecoverBootstrap", () => {
   });
 
   describe("RecoverBootstrap::canBeAttachedTo", () => {
-    each([
+    describe.each([
       {
         scenario: "Legacy url & top frame",
         url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -92,7 +91,7 @@ describe("RecoverBootstrap", () => {
         url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         frameId: Pagemod.TOP_FRAME_ID,
       },
-    ]).describe("Should be able to attach a pagemod to browser frame", (_props) => {
+    ])("Should be able to attach a pagemod to browser frame", (_props) => {
       it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         const result = await RecoverBootstrap.canBeAttachedTo({ frameId: _props.frameId, url: _props.url });
@@ -100,7 +99,7 @@ describe("RecoverBootstrap", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "No domain",
         url: "setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -116,7 +115,7 @@ describe("RecoverBootstrap", () => {
         url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         frameId: 1,
       },
-    ]).describe("Should not be able to attach a pagemod to browser frame", (_props) => {
+    ])("Should not be able to attach a pagemod to browser frame", (_props) => {
       it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         const result = await RecoverBootstrap.canBeAttachedTo({ frameId: _props.frameId, url: _props.url });

@@ -159,7 +159,7 @@ describe("EncryptMetadataPrivateKeysService", () => {
       );
       const dto = decryptedMetadataPrivateKeyDto({ user_id: pgpKeys.ada.userId });
       const metadataPrivateKey = new MetadataPrivateKeyEntity(dto);
-      await expect(() => service.encryptOne(metadataPrivateKey, userPrivateKey)).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptOne(metadataPrivateKey, userPrivateKey)).rejects.toThrow(expectedError.message);
     });
 
     it("throws if the key for the user defined the metadata private key is expired.", async () => {
@@ -168,7 +168,7 @@ describe("EncryptMetadataPrivateKeysService", () => {
       const expectedError = new TypeError(`The public key for the user with ID ${pgpKeys.lynne.userId} is expired.`);
       const dto = decryptedMetadataPrivateKeyDto({ user_id: pgpKeys.lynne.userId });
       const metadataPrivateKey = new MetadataPrivateKeyEntity(dto);
-      await expect(() => service.encryptOne(metadataPrivateKey, userPrivateKey)).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptOne(metadataPrivateKey, userPrivateKey)).rejects.toThrow(expectedError.message);
     });
 
     it("throws if the given metadata private key is not of type MetadataKeyPrivateKeyEntity.", async () => {
@@ -176,7 +176,7 @@ describe("EncryptMetadataPrivateKeysService", () => {
       const expectedError = new TypeError(
         "The 'metadataPrivateKey' parameter should be of type MetadataPrivateKeysEntity.",
       );
-      await expect(() => service.encryptOne("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptOne("test")).rejects.toThrow(expectedError.message);
     });
 
     it("throws if the given user private key is not an openpgp decrypted private key.", async () => {
@@ -184,7 +184,7 @@ describe("EncryptMetadataPrivateKeysService", () => {
       const expectedError = new Error("The key should be a valid openpgp private key.");
       const dto = defaultMetadataPrivateKeyDto();
       const metadataPrivateKey = new MetadataPrivateKeyEntity(dto);
-      await expect(() => service.encryptOne(metadataPrivateKey, "test")).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptOne(metadataPrivateKey, "test")).rejects.toThrow(expectedError.message);
     });
 
     it("throws an error if the optional date parameter is not of Date type.", async () => {
@@ -247,7 +247,9 @@ describe("EncryptMetadataPrivateKeysService", () => {
       );
       const dto = [decryptedMetadataPrivateKeyDto({ user_id: pgpKeys.ada.userId })];
       const metadataPrivateKeys = new MetadataPrivateKeysCollection(dto);
-      await expect(() => service.encryptAll(metadataPrivateKeys, userPrivateKey)).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptAll(metadataPrivateKeys, userPrivateKey)).rejects.toThrow(
+        expectedError.message,
+      );
     });
 
     it("throws if the key for one of the user defined in the metadata private keys is expired.", async () => {
@@ -256,7 +258,9 @@ describe("EncryptMetadataPrivateKeysService", () => {
       const expectedError = new TypeError(`The public key for the user with ID ${pgpKeys.lynne.userId} is expired.`);
       const dto = [decryptedMetadataPrivateKeyDto({ user_id: pgpKeys.lynne.userId })];
       const metadataPrivateKeys = new MetadataPrivateKeysCollection(dto);
-      await expect(() => service.encryptAll(metadataPrivateKeys, userPrivateKey)).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptAll(metadataPrivateKeys, userPrivateKey)).rejects.toThrow(
+        expectedError.message,
+      );
     });
 
     it("throws if the given metadata private keys are not of type MetadataKeyPrivateKeyCollection.", async () => {
@@ -264,7 +268,7 @@ describe("EncryptMetadataPrivateKeysService", () => {
       const expectedError = new TypeError(
         "The 'metadataPrivateKeys' parameter should be of type MetadataPrivateKeysCollection.",
       );
-      await expect(() => service.encryptAll("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptAll("test")).rejects.toThrow(expectedError.message);
     });
 
     it("throws if the given user private key is not an openpgp decrypted private key.", async () => {
@@ -272,7 +276,7 @@ describe("EncryptMetadataPrivateKeysService", () => {
       const expectedError = new Error("The key should be a valid openpgp private key.");
       const dto = [defaultMetadataPrivateKeyDto()];
       const metadataPrivateKeys = new MetadataPrivateKeysCollection(dto);
-      await expect(() => service.encryptAll(metadataPrivateKeys, "test")).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptAll(metadataPrivateKeys, "test")).rejects.toThrow(expectedError.message);
     });
   });
 
@@ -322,14 +326,14 @@ describe("EncryptMetadataPrivateKeysService", () => {
     it("throws if the given metadata key are not of type MetadataKeyEntity.", async () => {
       expect.assertions(1);
       const expectedError = new TypeError("The 'metadataKey' parameter should be of type MetadataKeyEntity.");
-      await expect(() => service.encryptAllFromMetadataKeyEntity("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.encryptAllFromMetadataKeyEntity("test")).rejects.toThrow(expectedError.message);
     });
 
     it("throws if the given user private key is not an openpgp decrypted private key.", async () => {
       expect.assertions(1);
       const expectedError = new Error("The key should be a valid openpgp private key.");
       const metadataPrivateKeys = new MetadataKeyEntity(defaultMetadataKeyDto());
-      await expect(() => service.encryptAllFromMetadataKeyEntity(metadataPrivateKeys, "test")).rejects.toThrowError(
+      await expect(() => service.encryptAllFromMetadataKeyEntity(metadataPrivateKeys, "test")).rejects.toThrow(
         expectedError,
       );
     });

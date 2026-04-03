@@ -51,7 +51,7 @@ describe("KeepCleartextMetadataForExistingInstanceController", () => {
           throw new Error("Something went wrong!");
         });
 
-      await expect(() => controller.exec()).rejects.toThrowError("Something went wrong!");
+      await expect(() => controller.exec()).rejects.toThrow("Something went wrong!");
     });
   });
 });

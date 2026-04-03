@@ -40,7 +40,7 @@ describe("FindMetadataSetupSettingsController", () => {
         throw new Error("Something went wrong!");
       });
 
-      await expect(() => controller.exec()).rejects.toThrowError();
+      await expect(() => controller.exec()).rejects.toThrow();
     });
   });
 });

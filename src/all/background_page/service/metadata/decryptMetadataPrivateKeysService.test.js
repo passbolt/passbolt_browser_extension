@@ -117,7 +117,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
       const account = new AccountEntity(defaultAccountDto());
 
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptOne("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptOne("test")).rejects.toThrow(expectedError.message);
     });
 
     it("should ensure metadataPrivateKeyEntity is not decrypted already", async () => {
@@ -142,7 +142,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptOne(metadataPrivateKeyEntity, "test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptOne(metadataPrivateKeyEntity, "test")).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if the passphrase is not available", async () => {
@@ -158,7 +158,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptOne(metadataPrivateKeyEntity)).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptOne(metadataPrivateKeyEntity)).rejects.toThrow(expectedError.message);
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
   });
@@ -232,7 +232,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptAll("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAll("test")).rejects.toThrow(expectedError.message);
     });
 
     it("should ensure metadataPrivateKeyEntity data is a valid PGP message", async () => {
@@ -247,7 +247,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptAll(collection, "test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAll(collection, "test")).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if the passphrase is not available", async () => {
@@ -266,7 +266,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptAll(collection)).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAll(collection)).rejects.toThrow(expectedError.message);
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
   });
@@ -379,7 +379,7 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptAllFromMetadataKeysCollection("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAllFromMetadataKeysCollection("test")).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if the passphrase is not available", async () => {
@@ -396,7 +396,9 @@ describe("DecryptMetadataPrivateKeysService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptMetadataPrivateKeysService(account);
-      await expect(() => service.decryptAllFromMetadataKeysCollection(collection)).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAllFromMetadataKeysCollection(collection)).rejects.toThrow(
+        expectedError.message,
+      );
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
   });

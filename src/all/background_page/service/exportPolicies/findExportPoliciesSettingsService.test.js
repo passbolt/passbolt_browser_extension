@@ -64,7 +64,7 @@ describe("FindExportPoliciesSettingsService", () => {
 
       fetch.doMockOnce(/\/export-policies\/settings\.json/, () => mockApiResponseError(500, "Something went wrong!"));
 
-      await expect(() => service.find()).rejects.toThrowError();
+      await expect(() => service.find()).rejects.toThrow();
     });
   });
 });

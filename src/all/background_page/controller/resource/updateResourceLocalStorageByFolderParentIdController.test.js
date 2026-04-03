@@ -83,7 +83,7 @@ describe("UpdateResourceLocalStorageByFolderParentIdController", () => {
 
       const promise = controller.exec(42);
 
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid UUID");
     });
   });
 });

@@ -33,7 +33,7 @@ describe("DecryptPrivateKey service", () => {
       expect.assertions(1);
       const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
       await expect(DecryptPrivateKeyService.decrypt(key, "wrong passphrase")).rejects.toThrow(
-        new InvalidMasterPasswordError(),
+        InvalidMasterPasswordError,
       );
     },
     10 * 1000,

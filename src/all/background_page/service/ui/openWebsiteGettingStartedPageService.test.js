@@ -40,7 +40,7 @@ describe("OpenWebsiteGettingStartedPageService", () => {
       // process
       const service = new OpenWebsiteGettingStartedPageService();
       // expectations
-      await expect(service.openTab()).rejects.toThrow(error);
+      await expect(service.openTab()).rejects.toThrow(error.message);
     });
   });
 });

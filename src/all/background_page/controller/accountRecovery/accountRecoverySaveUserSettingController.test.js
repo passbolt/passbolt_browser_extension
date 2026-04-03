@@ -104,7 +104,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       const result = controller.exec(accountRecoveryUserSettingDto);
 
       expect.assertions(1);
-      await expect(result).rejects.toThrowError("Account recovery organization policy not found.");
+      await expect(result).rejects.toThrow("Account recovery organization policy not found.");
     });
 
     it("Should throw an error if the account recovery organization policy is disabled.", async () => {
@@ -121,7 +121,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       const result = controller.exec(accountRecoveryUserSettingDto);
 
       expect.assertions(1);
-      await expect(result).rejects.toThrowError("The Account recovery organization policy should be enabled.");
+      await expect(result).rejects.toThrow("The Account recovery organization policy should be enabled.");
     });
   });
 });

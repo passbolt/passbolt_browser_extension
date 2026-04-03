@@ -133,17 +133,13 @@ describe("resourceUpdateLocalStorageService", () => {
       expect.assertions(1);
       expect(() =>
         resourceUpdateLocalStorageService.updateFolderParentId([uuidv4(), "non-uuid"], null),
-      ).rejects.toThrow(
-        new TypeError('The parameter "resourcesIds" should contain only uuid', {
-          cause: new TypeError("The given parameter is not a valid UUID"),
-        }),
-      );
+      ).rejects.toThrow('The parameter "resourcesIds" should contain only uuid');
     });
 
     it("Should throw an error if resource id is not a uuid", async () => {
       expect.assertions(1);
       expect(() => resourceUpdateLocalStorageService.updateFolderParentId([uuidv4()], "non-uuid")).rejects.toThrow(
-        new TypeError("The folder parent id should be a valid UUID"),
+        "The folder parent id should be a valid UUID",
       );
     });
   });

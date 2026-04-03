@@ -68,7 +68,7 @@ describe("DecryptPrivateKeyPasswordDataService", () => {
         verificationPublicKey,
       );
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "The decryption key fingerprint does not match the private key password recipient fingerprint.",
       );
     });
@@ -88,7 +88,7 @@ describe("DecryptPrivateKeyPasswordDataService", () => {
         verificationPublicKey,
       );
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("The message should be a valid openpgp message.");
+      await expect(promise).rejects.toThrow("The message should be a valid openpgp message.");
     });
 
     it("should fail if the decrypted private key password data cannot be parsed.", async () => {
@@ -107,7 +107,7 @@ describe("DecryptPrivateKeyPasswordDataService", () => {
         verificationPublicKey,
       );
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("Unable to parse the decrypted private key password data.");
+      await expect(promise).rejects.toThrow("Unable to parse the decrypted private key password data.");
     });
 
     it("should fail if the decrypted private key password data entity cannot be created with the decrypted data.", async () => {
@@ -151,7 +151,7 @@ describe("DecryptPrivateKeyPasswordDataService", () => {
         verificationPublicKey,
       );
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "The user id contained in the private key password data does not match the private key target used id.",
       );
     });
@@ -175,7 +175,7 @@ describe("DecryptPrivateKeyPasswordDataService", () => {
         verificationPublicKey,
       );
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "The domain contained in the private key password data does not match the expected target domain.",
       );
     });
@@ -199,7 +199,7 @@ describe("DecryptPrivateKeyPasswordDataService", () => {
         verificationPublicKey,
       );
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "The private key password data fingerprint should match the user public fingerprint.",
       );
     });

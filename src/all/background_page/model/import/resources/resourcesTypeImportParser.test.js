@@ -33,7 +33,6 @@ import {
   defaultMetadataTypesSettingsV4Dto,
   defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import each from "jest-each";
 import { defaultTotpDto } from "../../entity/totp/totpDto.test.data";
 import {
   resourceTypeTotpDto,
@@ -46,7 +45,7 @@ describe("ResourcesTypeImportParser", () => {
       secret_clear: "Password",
     });
 
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -55,7 +54,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with totp disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutTOTP()),
       },
-    ]).describe("should return password-description", (test) => {
+    ])("should return password-description", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -69,7 +68,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -78,7 +77,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with totp disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutTOTP()),
       },
-    ]).describe("should return v5-default", (test) => {
+    ])("should return v5-default", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
         test.resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
@@ -92,7 +91,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
-    each([
+    describe.each([
       {
         scenario: "should fallback to default when Password is disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -101,7 +100,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should fallback to default when Password is disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
         const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionWithoutPassword());
@@ -117,7 +116,7 @@ describe("ResourcesTypeImportParser", () => {
 
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
     });
   });
@@ -128,7 +127,7 @@ describe("ResourcesTypeImportParser", () => {
       unknown_prop: "Description",
     });
 
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -137,7 +136,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with totp disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutTOTP()),
       },
-    ]).describe("should return password-description", (test) => {
+    ])("should return password-description", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -151,7 +150,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -160,7 +159,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with totp disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutTOTP()),
       },
-    ]).describe("should return v5-default", (test) => {
+    ])("should return v5-default", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -174,7 +173,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
-    each([
+    describe.each([
       {
         scenario: "should fallback to default when Password is disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -183,7 +182,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should fallback to default when Password is disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
         const resourceTypesCollection = new ResourceTypesCollection([resourceTypeTotpDto(), resourceTypeV5TotpDto()]);
@@ -199,7 +198,7 @@ describe("ResourcesTypeImportParser", () => {
 
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
     });
   });
@@ -209,7 +208,7 @@ describe("ResourcesTypeImportParser", () => {
       totp: defaultTotpDto(),
     });
 
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -218,7 +217,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("should return password-description", (test) => {
+    ])("should return password-description", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -233,7 +232,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -242,7 +241,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("should return v5-totp-standalone", (test) => {
+    ])("should return v5-totp-standalone", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -258,7 +257,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "should fallback to default when totp is disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -269,7 +268,7 @@ describe("ResourcesTypeImportParser", () => {
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
         fallbackDefault: RESOURCE_TYPE_V5_DEFAULT_SLUG,
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
 
@@ -303,7 +302,7 @@ describe("ResourcesTypeImportParser", () => {
       totp: defaultTotpDto(),
       secret_clear: "Password",
     });
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -319,7 +318,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V4 default resource type", (test) => {
+    ])("V4 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -334,7 +333,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -350,7 +349,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V5 default resource type", (test) => {
+    ])("V5 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -365,7 +364,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "should match with nothing when totp and password are disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -374,7 +373,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should match with nothing when totp and password are disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
 
@@ -390,7 +389,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toBeUndefined();
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
     });
   });
@@ -401,7 +400,7 @@ describe("ResourcesTypeImportParser", () => {
       description: "Description",
       secret_clear: "Password",
     });
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -417,7 +416,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V4 default resource type", (test) => {
+    ])("V4 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -432,7 +431,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -448,7 +447,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V5 default resource type", (test) => {
+    ])("V5 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -463,7 +462,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "should match with nothing when totp and password are disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -472,7 +471,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should match with nothing when totp and password are disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
 
@@ -489,7 +488,7 @@ describe("ResourcesTypeImportParser", () => {
 
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
     });
   });
@@ -499,7 +498,7 @@ describe("ResourcesTypeImportParser", () => {
       totp: defaultTotpDto(),
       description: "Description",
     });
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -510,7 +509,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V4 default resource type", (test) => {
+    ])("V4 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -525,7 +524,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -536,7 +535,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V5 default resource type", (test) => {
+    ])("V5 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -551,7 +550,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "should match with nothing when totp and password are disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -560,7 +559,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should match with nothing when totp and password are disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
 
@@ -577,7 +576,7 @@ describe("ResourcesTypeImportParser", () => {
 
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
     });
   });

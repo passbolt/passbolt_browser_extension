@@ -45,7 +45,7 @@ describe("DeleteMetadataKeyService", () => {
 
       const service = new DeleteMetadataKeyService(apiClientOptions);
 
-      await expect(() => service.delete(42)).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(() => service.delete(42)).rejects.toThrow("The given parameter is not a valid UUID");
     });
   });
 });

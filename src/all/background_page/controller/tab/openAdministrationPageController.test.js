@@ -43,7 +43,7 @@ describe("OpenAdministrationPageController", () => {
       const controller = new OpenAdministrationPageController(null, null);
       jest.spyOn(controller.openAdministrationApiPageService, "openPage").mockRejectedValue(error);
       // expectations
-      await expect(controller.exec(pageName)).rejects.toThrow(error);
+      await expect(controller.exec(pageName)).rejects.toThrow(error.message);
     });
   });
 });

@@ -100,7 +100,7 @@ describe("UpdateTagService", () => {
 
       const error = new Error();
       jest.spyOn(service.tagService, "update").mockRejectedValue(error);
-      await expect(() => service._updateTagApi(tagToUpdate)).rejects.toThrow(error);
+      await expect(() => service._updateTagApi(tagToUpdate)).rejects.toThrow(error.message);
     });
   });
 
@@ -157,7 +157,7 @@ describe("UpdateTagService", () => {
       const error = new Error();
       jest.spyOn(ResourceLocalStorage, "get").mockRejectedValue(error);
 
-      await expect(service._updateTagLocalStorage(tagToUpdate.id, updatedTag)).rejects.toThrow(error);
+      await expect(service._updateTagLocalStorage(tagToUpdate.id, updatedTag)).rejects.toThrow(error.message);
     });
 
     it("should throw any error thrown by the underlying service when setting the values", async () => {
@@ -167,7 +167,7 @@ describe("UpdateTagService", () => {
       jest.spyOn(ResourceLocalStorage, "get").mockResolvedValue(resourcesCollectionDto);
       jest.spyOn(ResourceLocalStorage, "set").mockRejectedValue(error);
 
-      await expect(service._updateTagLocalStorage(tagToUpdate.id, updatedTag)).rejects.toThrow(error);
+      await expect(service._updateTagLocalStorage(tagToUpdate.id, updatedTag)).rejects.toThrow(error.message);
     });
   });
 
@@ -203,7 +203,7 @@ describe("UpdateTagService", () => {
       jest.spyOn(ResourceLocalStorage, "get").mockResolvedValue(resourcesCollectionDto);
       jest.spyOn(ResourceLocalStorage, "set");
 
-      await expect(() => service.update(tagToUpdate)).rejects.toThrow(error);
+      await expect(() => service.update(tagToUpdate)).rejects.toThrow(error.message);
 
       expect(ResourceLocalStorage.get).not.toHaveBeenCalled();
       expect(ResourceLocalStorage.set).not.toHaveBeenCalled();
@@ -218,7 +218,7 @@ describe("UpdateTagService", () => {
       jest.spyOn(ResourceLocalStorage, "get").mockRejectedValue(error);
       jest.spyOn(ResourceLocalStorage, "set");
 
-      await expect(() => service.update(tagToUpdate)).rejects.toThrow(error);
+      await expect(() => service.update(tagToUpdate)).rejects.toThrow(error.message);
 
       expect(service.tagService.update).toHaveBeenCalledWith(tagToUpdate.id, tagToUpdate.toDto());
       expect(ResourceLocalStorage.get).toHaveBeenCalled();
@@ -233,7 +233,7 @@ describe("UpdateTagService", () => {
       jest.spyOn(ResourceLocalStorage, "get").mockResolvedValue(resourcesCollectionDto);
       jest.spyOn(ResourceLocalStorage, "set").mockRejectedValue(error);
 
-      await expect(() => service.update(tagToUpdate)).rejects.toThrow(error);
+      await expect(() => service.update(tagToUpdate)).rejects.toThrow(error.message);
 
       expect(service.tagService.update).toHaveBeenCalledWith(tagToUpdate.id, tagToUpdate.toDto());
       expect(ResourceLocalStorage.get).toHaveBeenCalled();

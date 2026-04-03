@@ -14,7 +14,6 @@
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
-import each from "jest-each";
 import Pagemod from "./pagemod";
 import { PublicWebsiteSignInEvents } from "../event/publicWebsiteSignInEvents";
 import PublicWebsiteSignIn from "./publicWebsiteSignInPagemod";
@@ -67,10 +66,10 @@ describe("PublicWebsiteSign", () => {
       expect(result).toBeTruthy();
     });
 
-    each([
+    describe.each([
       { scenario: "No domain", url: "https://passolt.dev", frameId: Pagemod.TOP_FRAME_ID },
       { scenario: "Not top frame", url: "https://www.passbolt.com", frameId: 1 },
-    ]).describe("Should not be able to attach a pagemod to browser frame", (_props) => {
+    ])("Should not be able to attach a pagemod to browser frame", (_props) => {
       it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         const result = await PublicWebsiteSignIn.canBeAttachedTo({ frameId: _props.frameId, url: _props.url });

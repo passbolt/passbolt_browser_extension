@@ -17,7 +17,6 @@ import WorkersSessionStorage from "../service/sessionStorage/workersSessionStora
 import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
 import { PortEvents } from "../event/portEvents";
-import each from "jest-each";
 import Pagemod from "./pagemod";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
@@ -70,10 +69,10 @@ describe("AuthBootstrap", () => {
       expect(result).toBeTruthy();
     });
 
-    each([
+    describe.each([
       { scenario: "No domain", url: "auth/login", frameId: Pagemod.TOP_FRAME_ID },
       { scenario: "Not top frame", url: "https://passbolt.dev/auth/login", frameId: 1 },
-    ]).describe("Should not be able to attach a pagemod to browser frame", (_props) => {
+    ])("Should not be able to attach a pagemod to browser frame", (_props) => {
       it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         // mock functions

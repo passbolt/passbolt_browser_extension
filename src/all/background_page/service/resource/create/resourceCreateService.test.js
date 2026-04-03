@@ -359,7 +359,7 @@ describe("ResourceCreateService", () => {
       const resourceDto = defaultResourceDto();
       const promise = resourceCreateService.create(resourceDto, "a".repeat(4097), pgpKeys.ada.passphrase);
 
-      return expect(promise).rejects.toThrow(new TypeError("The secret should be maximum 4096 characters in length."));
+      return expect(promise).rejects.toThrow("The secret should be maximum 4096 characters in length.");
     });
 
     it("Should create the resource into shared folder parent", async () => {

@@ -13,7 +13,6 @@
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
 import { enableFetchMocks } from "jest-fetch-mock";
-import each from "jest-each";
 import User from "../../model/user";
 import Keyring from "../../model/keyring";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
@@ -95,10 +94,10 @@ describe("RecoverAccountController", () => {
       expect(userPublicKeyFingerprint).toStrictEqual(keyringPrivateKeyFingerprint);
     });
 
-    each([
+    describe.each([
       { expectedError: "A passphrase is required.", passphrase: undefined },
       { expectedError: "The passphrase should be a string.", passphrase: 42 },
-    ]).describe("Should assert the signed-in user passphrase parameter.", (scenario) => {
+    ])("Should assert the signed-in user passphrase parameter.", (scenario) => {
       it(`Should validate the scenario: ${scenario.expectedError}`, async () => {
         // Mock temporary account
         jest
@@ -107,11 +106,11 @@ describe("RecoverAccountController", () => {
         const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
         const promise = controller.exec(scenario.passphrase);
         expect.assertions(1);
-        await expect(promise).rejects.toThrowError(scenario.expectedError);
+        await expect(promise).rejects.toThrow(scenario.expectedError);
       });
     });
 
-    each([
+    describe.each([
       {
         expectedError:
           "The account recovery request id should match the request id associated to the account being recovered.",
@@ -136,7 +135,7 @@ describe("RecoverAccountController", () => {
           account_recovery_responses: [],
         }),
       },
-    ]).describe("Should assert the signed-in user passphrase parameter.", (scenario) => {
+    ])("Should assert the signed-in user passphrase parameter.", (scenario) => {
       it(`Should validate the scenario: ${scenario.expectedError}`, async () => {
         // Mock API fetch account recovery request get response.
         fetch.doMockOnce(() => mockApiResponse(scenario.findRequestMock));
@@ -148,7 +147,7 @@ describe("RecoverAccountController", () => {
         const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
         const promise = controller.exec(passphrase);
         expect.assertions(1);
-        await expect(promise).rejects.toThrowError(scenario.expectedError);
+        await expect(promise).rejects.toThrow(scenario.expectedError);
       });
     });
 
@@ -163,7 +162,7 @@ describe("RecoverAccountController", () => {
       const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
       const promise = controller.exec("wrong passphrase");
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError(InvalidMasterPasswordError);
+      await expect(promise).rejects.toThrow(InvalidMasterPasswordError);
     });
 
     it("Should not add the account to the local storage if the complete API request fails.", async () => {

@@ -111,7 +111,7 @@ describe("ResourceUpdateController", () => {
         throw new Error("Cannot retrieve key");
       });
       const promise = controller.exec(defaultResourceDto(), secret);
-      await expect(promise).rejects.toThrowError("Cannot retrieve key");
+      await expect(promise).rejects.toThrow("Cannot retrieve key");
     });
 
     it("Should close progressService when update succeed", async () => {

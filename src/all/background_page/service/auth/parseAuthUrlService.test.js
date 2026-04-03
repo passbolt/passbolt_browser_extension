@@ -12,7 +12,6 @@
  * @since         3.10.0
  */
 
-import each from "jest-each";
 import ParseAuthUrlService from "./parseAuthUrlService";
 import { Config } from "../../model/config";
 
@@ -24,11 +23,11 @@ describe("ParseAuthUrlService", () => {
   });
 
   describe("ParseAuthUrlService:test", () => {
-    each([
+    describe.each([
       { scenario: "Passbolt login page", url: `${domain}/auth/login` },
       { scenario: "Passbolt login page with parameters", url: `${domain}/auth/login?locale=en-UK` },
       { scenario: "Passbolt login page with anchors", url: `${domain}/auth/login#test` },
-    ]).describe("should parse", (_props) => {
+    ])("should parse", (_props) => {
       it(`should match: ${_props.scenario}`, () => {
         const parseResult = ParseAuthUrlService.regex.test(_props.url);
         expect.assertions(1);
@@ -36,7 +35,7 @@ describe("ParseAuthUrlService", () => {
       });
     });
 
-    each([
+    describe.each([
       { scenario: "No domain given", url: "https://auth/login" },
       { scenario: "No protocol given", url: "passbolt.dev/auth/login" },
       { scenario: "Wrong protocol given", url: "http://passbolt.dev/auth/login" },
@@ -45,7 +44,7 @@ describe("ParseAuthUrlService", () => {
       { scenario: "Regex wild mark attack", url: "https://passboltxdev/auth/login" },
       { scenario: "Domain look alike as hash attack", url: `https://www.attacker.com#${domain}` },
       { scenario: "Wrong entry point", url: `${domain}/auth/login/wrong-entry-point` },
-    ]).describe("should not parse", (_props) => {
+    ])("should not parse", (_props) => {
       it(`should not match: ${_props.scenario}`, () => {
         const parseResult = ParseAuthUrlService.regex.test(_props.url);
         expect.assertions(1);

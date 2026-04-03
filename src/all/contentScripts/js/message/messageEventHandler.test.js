@@ -41,10 +41,10 @@ describe("MessageEventHandler", () => {
 
     it("Should not instantiate the class if the message service is not valid", async () => {
       expect.assertions(2);
-      expect(() => new MessageEventHandler(null)).toThrowError(
+      expect(() => new MessageEventHandler(null)).toThrow(
         "The messageService should be a valid MessageService instance.",
       );
-      expect(() => new MessageEventHandler({ messageService: "not a valid message service" })).toThrowError(
+      expect(() => new MessageEventHandler({ messageService: "not a valid message service" })).toThrow(
         "The messageService should be a valid MessageService instance.",
       );
     });
@@ -146,10 +146,10 @@ describe("MessageEventHandler", () => {
       expect.assertions(2);
       const messageService = new MessageService();
       const messageEventHandler = new MessageEventHandler(messageService);
-      expect(() => messageEventHandler.listen(null, ControllerMessageEventHandlerMock)).toThrowError(
+      expect(() => messageEventHandler.listen(null, ControllerMessageEventHandlerMock)).toThrow(
         "The message should be a valid string.",
       );
-      expect(() => messageEventHandler.listen(() => {}, ControllerMessageEventHandlerMock)).toThrowError(
+      expect(() => messageEventHandler.listen(() => {}, ControllerMessageEventHandlerMock)).toThrow(
         "The message should be a valid string.",
       );
     });
@@ -159,7 +159,7 @@ describe("MessageEventHandler", () => {
       const messageService = new MessageService();
       const messageEventHandler = new MessageEventHandler(messageService);
       class ControllerMessageEventHandlerTestClass {}
-      expect(() => messageEventHandler.listen("", ControllerMessageEventHandlerTestClass)).toThrowError(
+      expect(() => messageEventHandler.listen("", ControllerMessageEventHandlerTestClass)).toThrow(
         "The message should not be empty.",
       );
     });
@@ -168,12 +168,8 @@ describe("MessageEventHandler", () => {
       expect.assertions(2);
       const messageService = new MessageService();
       const messageEventHandler = new MessageEventHandler(messageService);
-      expect(() => messageEventHandler.listen("message", null)).toThrowError(
-        "The ControllerClass should be a valid class",
-      );
-      expect(() => messageEventHandler.listen("message", 12)).toThrowError(
-        "The ControllerClass should be a valid class",
-      );
+      expect(() => messageEventHandler.listen("message", null)).toThrow("The ControllerClass should be a valid class");
+      expect(() => messageEventHandler.listen("message", 12)).toThrow("The ControllerClass should be a valid class");
     });
   });
 });

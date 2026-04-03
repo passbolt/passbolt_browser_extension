@@ -47,7 +47,7 @@ describe("FindTagsController", () => {
       const controller = new FindTagsController(null, null, defaultApiClientOptions());
       jest.spyOn(controller.findTagsService, "findAll").mockRejectedValue(expectedError);
 
-      await expect(() => controller.exec()).rejects.toThrow(expectedError);
+      await expect(() => controller.exec()).rejects.toThrow(expectedError.message);
     });
   });
 });

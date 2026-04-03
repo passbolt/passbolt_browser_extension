@@ -11,13 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import each from "jest-each";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import ValidatePrivateGpgKeySetupController from "./validatePrivateGpgKeySetupController";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 
 describe("ValidatePrivateGpgKeySetupController", () => {
-  each([
+  describe.each([
     { scenario: "rsa_3072", key: pgpKeys.rsa_3072.private },
     { scenario: "rsa_4096", key: pgpKeys.rsa_4096.private },
     { scenario: "eddsa_ed25519", key: pgpKeys.eddsa_ed25519.private },
@@ -28,7 +27,7 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     { scenario: "ecc_brainpoolp256r1", key: pgpKeys.ecdsa_brainpoolp256r1.private },
     { scenario: "ecc_brainpoolp384r1", key: pgpKeys.ecdsa_brainpoolp384r1.private },
     { scenario: "ecc_brainpoolp512r1", key: pgpKeys.ecdsa_brainpoolp512r1.private },
-  ]).describe("Should pass if a supported key given.", (props) => {
+  ])("Should pass if a supported key given.", (props) => {
     it(`should accept: ${props.scenario}`, async () => {
       expect.assertions(1);
       const controller = new ValidatePrivateGpgKeySetupController();
@@ -36,7 +35,7 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     });
   });
 
-  each([{ scenario: "dsa_3072", key: pgpKeys.dsa_3072.private }]).describe(
+  describe.each([{ scenario: "dsa_3072", key: pgpKeys.dsa_3072.private }])(
     "Should throw if the key uses an unsupported algorithm.",
     (props) => {
       it(`should reject: ${props.scenario}`, async () => {
@@ -106,10 +105,10 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The private key should be encrypted."));
   });
 
-  each([
+  describe.each([
     { scenario: "rsa_1024", key: pgpKeys.rsa_1024.private },
     { scenario: "rsa_2048", key: pgpKeys.rsa_2048.private },
-  ]).describe("Should throw if the private key is a too weak RSA key.", (props) => {
+  ])("Should throw if the private key is a too weak RSA key.", (props) => {
     it(`should reject: ${props.scenario}`, async () => {
       expect.assertions(1);
       const controller = new ValidatePrivateGpgKeySetupController();

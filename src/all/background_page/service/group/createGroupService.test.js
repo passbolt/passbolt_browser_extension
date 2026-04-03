@@ -62,7 +62,7 @@ describe("CreateGroupService", () => {
 
       jest.spyOn(createGroupService.groupApiService, "create").mockRejectedValue(error);
 
-      await expect(createGroupService.create(groupEntity)).rejects.toThrow(error);
+      await expect(createGroupService.create(groupEntity)).rejects.toThrow(error.message);
     });
   });
 });

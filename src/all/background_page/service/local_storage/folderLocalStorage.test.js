@@ -66,7 +66,7 @@ describe("FolderLocalStorage", () => {
   describe("::set", () => {
     it("Should throw if parameter is invalid.", async () => {
       expect.assertions(1);
-      await expect(() => FolderLocalStorage.set(42)).rejects.toThrowError(
+      await expect(() => FolderLocalStorage.set(42)).rejects.toThrow(
         "FolderLocalStorage::set expects a FoldersCollection",
       );
     });

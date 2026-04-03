@@ -44,7 +44,7 @@ describe("StartCheckingForPermissionUpdateController", () => {
       // process
       const controller = new StartCheckingForPermissionUpdateController(null, null);
       // expectations
-      await expect(controller.exec()).rejects.toThrow(error);
+      await expect(controller.exec()).rejects.toThrow(error.message);
     });
   });
 });

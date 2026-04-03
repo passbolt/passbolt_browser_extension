@@ -66,9 +66,9 @@ describe("FindResourceSecretRevisionsForDisplayController", () => {
         account,
       );
 
-      await expect(() => controller.exec(42)).rejects.toThrowError();
-      await expect(() => controller.exec("42")).rejects.toThrowError();
-      await expect(() => controller.exec(null)).rejects.toThrowError();
+      await expect(() => controller.exec(42)).rejects.toThrow();
+      await expect(() => controller.exec("42")).rejects.toThrow();
+      await expect(() => controller.exec(null)).rejects.toThrow();
     });
 
     it("should not catch errors and let it throw from the service", async () => {

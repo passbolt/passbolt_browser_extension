@@ -11,14 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import each from "jest-each";
 import GenerateSsoKeyService from "./generateSsoKeyService";
 
 describe("GenerateSsoKeyService service", () => {
-  each([
+  describe.each([
     { isExtractable: false, scenario: "non extractable" },
     { isExtractable: true, scenario: "extractable" },
-  ]).describe("Should generate a key according to the SSO specification", (props) => {
+  ])("Should generate a key according to the SSO specification", (props) => {
     it(`for a key of type: ${props.scenario}`, async () => {
       expect.assertions(1);
       const exepctedAlgo = {

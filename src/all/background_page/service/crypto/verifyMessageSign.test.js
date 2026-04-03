@@ -39,14 +39,14 @@ describe("VerifyMessageService service", () => {
       const adminDecryptedKey = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.admin.private_decrypted]);
       const promise = VerifyMessageService.verifyMessage("", adminDecryptedKey);
 
-      return expect(promise).rejects.toThrowError(new TypeError("The message should be a valid openpgp message."));
+      return expect(promise).rejects.toThrow("The message should be a valid openpgp message.");
     });
     it("should throw an error in case an invalid private key", async () => {
       expect.assertions(1);
       const messageToSign = await openpgp.createMessage({ text: "my-account-kit" });
       const promise = VerifyMessageService.verifyMessage(messageToSign, [""]);
 
-      return expect(promise).rejects.toThrowError(new Error("The key should be a valid openpgp key."));
+      return expect(promise).rejects.toThrow("The key should be a valid openpgp key.");
     });
 
     it("should throw an error in case the signature cannot be verified", async () => {
@@ -63,8 +63,8 @@ describe("VerifyMessageService service", () => {
 
       const verificationKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.public]);
 
-      await expect(VerifyMessageService.verifyMessage(readSignedMessage, verificationKeys)).rejects.toThrowError(
-        new Error("Could not find signing key with key ID 5b1b332ed06426d3"),
+      await expect(VerifyMessageService.verifyMessage(readSignedMessage, verificationKeys)).rejects.toThrow(
+        "Could not find signing key with key ID 5b1b332ed06426d3",
       );
     });
   });
@@ -88,16 +88,14 @@ describe("VerifyMessageService service", () => {
       const adminDecryptedKey = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.admin.private_decrypted]);
       const promise = VerifyMessageService.verifyClearMessage("", adminDecryptedKey);
 
-      return expect(promise).rejects.toThrowError(
-        new TypeError("The message should be a valid openpgp clear text message."),
-      );
+      return expect(promise).rejects.toThrow("The message should be a valid openpgp clear text message.");
     });
     it("should throw an error in case an invalid private key", async () => {
       expect.assertions(1);
       const messageToSign = await openpgp.createCleartextMessage({ text: "my-account-kit" });
       const promise = VerifyMessageService.verifyClearMessage(messageToSign, [""]);
 
-      return expect(promise).rejects.toThrowError(new Error("The key should be a valid openpgp key."));
+      return expect(promise).rejects.toThrow("The key should be a valid openpgp key.");
     });
 
     it("should throw an error in case the signature cannot be verified", async () => {
@@ -114,8 +112,8 @@ describe("VerifyMessageService service", () => {
 
       const verificationKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.ada.public]);
 
-      await expect(VerifyMessageService.verifyClearMessage(readSignedMessage, verificationKeys)).rejects.toThrowError(
-        new Error("Could not find signing key with key ID 5b1b332ed06426d3"),
+      await expect(VerifyMessageService.verifyClearMessage(readSignedMessage, verificationKeys)).rejects.toThrow(
+        "Could not find signing key with key ID 5b1b332ed06426d3",
       );
     });
   });

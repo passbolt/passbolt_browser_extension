@@ -82,7 +82,7 @@ Many thanks to everyone who provided feedback, reported bugs, and contributed to
 - PB-49705 Add missing TOTP unit tests
 - PB-49730 Setup an environment for publishing to npmjs registry
 - PB-49998 Add required `data_collection_permissions` for Firefox and set it to `none`
-- PB-50013 Make Safari download custom avatars test of quick fix for CI
+- PB-50013 Make Safari download custom avatars
 - PB-50118 Major upgrade for locutus (Critical) - passbolt-browser-extension
 - PB-50158 Add Safari enablement through a feature flag
 - PB-50200 Move the logic of passbolt.groups.create to GroupCreateController

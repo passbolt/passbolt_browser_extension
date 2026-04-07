@@ -59,21 +59,6 @@ class GroupModel {
    */
 
   /**
-   * Create a group using Passbolt API and add result to local storage
-   *
-   * @param {GroupEntity} groupEntity
-   * @returns {Promise<GroupEntity>}
-   * @public
-   */
-  async create(groupEntity) {
-    const data = groupEntity.toDto({ groups_users: true });
-    const groupDto = await this.groupApiService.create(data);
-    const newGroupEntity = new GroupEntity(groupDto);
-    await this.groupLocalStorage.addGroup(newGroupEntity);
-    return newGroupEntity;
-  }
-
-  /**
    * Simulate update a group using Passbolt API
    *
    * @param {GroupUpdateEntity} groupUpdateEntity

@@ -1,4 +1,4 @@
-Passbolt 5.11.0 “Song Name” introduces improvements to enterprise authentication and integration capabilities, alongside continued security hardening.
+Passbolt 5.11.0 introduces improvements to enterprise authentication and integration capabilities, alongside continued security hardening.
 
 This release adds support for OAuth-based SMTP authentication for Microsoft Exchange Online and expands SSO coverage with PingOne. It also includes the finalisation of SCIM following external audit fixes.
 

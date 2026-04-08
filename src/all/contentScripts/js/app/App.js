@@ -35,6 +35,9 @@ async function main() {
 
   document.body.appendChild(domContainer);
 
+  // TODO Remove once bfcache properly handled
+  window.addEventListener("unload", () => {});
+
   const root = createRoot(domContainer);
   root.render(<ExtBootstrapApp port={port} storage={storage} browserExtensionUrl={browserExtensionUrl} />);
 }

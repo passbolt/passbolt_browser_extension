@@ -34,6 +34,8 @@ async function main() {
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
 
+  window.addEventListener("unload", () => {});
+
   const root = createRoot(domContainer);
   root.render(<ExtBootstrapLogin port={port} browserExtensionUrl={browserExtensionUrl} />);
 }

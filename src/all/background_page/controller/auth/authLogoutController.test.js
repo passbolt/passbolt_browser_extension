@@ -34,7 +34,7 @@ describe("AuthLogoutController", () => {
     });
 
     it("Should sign-out the user and redirect after.", async () => {
-      expect.assertions(3);
+      expect.assertions(2);
       const logoutSpy = jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
 
       const worker = {
@@ -48,10 +48,19 @@ describe("AuthLogoutController", () => {
       await controller.exec(true);
 
       expect(logoutSpy).toHaveBeenCalledTimes(1);
-      expect(browser.tabs.update).toHaveBeenCalledTimes(1);
-      expect(browser.tabs.update).toHaveBeenCalledWith(worker.tab.id, {
-        url: apiClientOptions.getBaseUrl().toString(),
-      });
+      expect(browser.tabs.reload).toHaveBeenCalledTimes(1);
+      /*
+       * Use tabs.reload instead of tabs.update to ensure the page is fully
+       * reloaded from the server. A tabs.update navigation may restore the
+       * page from the browser's Back/Forward Cache (BFCache), resulting in
+       * a stale page with a dead extension message port after sign-out.
+       *
+       * See: PB-50644
+       */
+      // expect(browser.tabs.update).toHaveBeenCalledTimes(1);
+      // expect(browser.tabs.update).toHaveBeenCalledWith(worker.tab.id, {
+      //   url: apiClientOptions.getBaseUrl().toString(),
+      // });
     });
   });
 });

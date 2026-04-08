@@ -34,6 +34,15 @@ async function main() {
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
 
+  /*
+   * Empty unload handler to prevent Chrome from caching this page in BFCache.
+   * Without this, navigating away and back to an API-served page may restore
+   * it from BFCache with a dead extension message port, preventing the
+   * extension from re-initializing.
+   *
+   * Temporary: Chrome is deprecating unload, replace with proper BFCache handling.
+   * See: PB-50644
+   */
   window.addEventListener("unload", () => {});
 
   const root = createRoot(domContainer);

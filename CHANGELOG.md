@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.11.0] - 2026-04-09
+### Fixed
+-  PB-50644 - Fix browser extension port messaging failure after logout caused by Chrome 147 BFCache changes
+
 ## [5.11.0] - 2026-04-07
 ### Added
 - PB-49733 SMTP-OAUTH - WP2.1 Update SmtpSettingsService to SmtpSettingsApiService

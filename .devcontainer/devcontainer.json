@@ -24,6 +24,6 @@
   },
   "remoteUser": "node",
   "initializeCommand": "mkdir -p ${localEnv:HOME}/.claude/managed-settings && cp \"/Library/Application Support/ClaudeCode/managed-settings.json\" ${localEnv:HOME}/.claude/managed-settings/ 2>/dev/null || true",
-  "postCreateCommand": "echo 'Dev environment is ready!'",
+  "postCreateCommand": "npm install && echo 'Dev environment is ready!'",
   "postStartCommand": "chmod +x .devcontainer/post-start.sh && .devcontainer/post-start.sh"
 }

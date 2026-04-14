@@ -16,5 +16,5 @@ if [ "$ERRORS" -gt 0 ]; then
 fi
 
 echo "==> Updating Claude Code..."
-curl -fsSL https://claude.ai/install.sh | bash
+curl -fsSL https://claude.ai/install.sh | bash -s stable
 claude --version

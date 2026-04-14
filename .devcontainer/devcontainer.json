@@ -18,7 +18,9 @@
     },
     "jetbrains": {
       "plugins": [
-        "com.anthropic.claudeCode"
+        "com.anthropic.code.plugin",
+        "com.intellij.reactivestreams",
+        "intellij.prettierJS"
       ]
     }
   },

@@ -51,6 +51,7 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
     }
 
     resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+    ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
     const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
     let resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
 

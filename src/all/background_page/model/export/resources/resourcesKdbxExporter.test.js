@@ -305,6 +305,74 @@ describe("ResourcesKdbxExporter", () => {
     await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
   });
 
+  it("should export a standalone PIN code resource with PIN in Password field for keepass windows", async () => {
+    expect.assertions(5);
+
+    const exportResource = buildImportResourceDto(1, {
+      secret_clear: "1234",
+      username: "",
+      uris: [],
+      totp: undefined,
+      custom_fields: undefined,
+      description: "My ATM PIN",
+    });
+    const exportDto = {
+      format: "kdbx",
+      export_resources: [exportResource],
+      export_folders: [],
+    };
+
+    const exportEntity = new ExportResourcesFileEntity(exportDto);
+    const exporter = new ResourcesKdbxExporter(exportEntity);
+    await exporter.export();
+
+    const kdbxCredentials = new kdbxweb.Credentials(null, null);
+    const kdbxDb = await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
+
+    const kdbxRoot = kdbxDb.groups[0];
+    const entry = kdbxRoot.entries[0];
+
+    expect(entry.fields.get("Title")).toEqual("Password 1");
+    expect(entry.fields.get("Password").getText()).toEqual("1234");
+    expect(entry.fields.get("Notes")).toEqual("My ATM PIN");
+    expect(entry.fields.get("UserName")).toBeFalsy();
+    expect(entry.fields.get("TimeOtp-Secret-Base32")).toBeUndefined();
+  });
+
+  it("should export a standalone PIN code resource with PIN in Password field for other keepass", async () => {
+    expect.assertions(5);
+
+    const exportResource = buildImportResourceDto(1, {
+      secret_clear: "1234",
+      username: "",
+      uris: [],
+      totp: undefined,
+      custom_fields: undefined,
+      description: "My ATM PIN",
+    });
+    const exportDto = {
+      format: "kdbx-others",
+      export_resources: [exportResource],
+      export_folders: [],
+    };
+
+    const exportEntity = new ExportResourcesFileEntity(exportDto);
+    const exporter = new ResourcesKdbxExporter(exportEntity);
+    await exporter.export();
+
+    const kdbxCredentials = new kdbxweb.Credentials(null, null);
+    const kdbxDb = await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
+
+    const kdbxRoot = kdbxDb.groups[0];
+    const entry = kdbxRoot.entries[0];
+
+    expect(entry.fields.get("Title")).toEqual("Password 1");
+    expect(entry.fields.get("Password").getText()).toEqual("1234");
+    expect(entry.fields.get("Notes")).toEqual("My ATM PIN");
+    expect(entry.fields.get("UserName")).toBeFalsy();
+    expect(entry.fields.get("otp")).toBeUndefined();
+  });
+
   it("should protect an export with a keyfile", async () => {
     const keyfile = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-keyfile.key", {
       encoding: "base64",

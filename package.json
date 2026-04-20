@@ -78,6 +78,9 @@
     "webpack": "^5.105.2",
     "webpack-cli": "^7.0.2"
   },
+  "overrides": {
+    "@xmldom/xmldom": "0.8.12"
+  },
   "scripts": {
     "build": "npx grunt build",
     "build:background-page": "webpack --config webpack.background-page.config.js",

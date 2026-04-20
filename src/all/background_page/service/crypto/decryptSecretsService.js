@@ -29,6 +29,7 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
   RESOURCE_TYPE_V5_CUSTOM_FIELDS_SLUG,
   RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import SecretDataV5DefaultEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5DefaultEntity";
 import SecretDataV5DefaultTotpEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5DefaultTotpEntity";
@@ -40,6 +41,7 @@ import SecretDataV4StandaloneTotpEntity from "passbolt-styleguide/src/shared/mod
 import SecretDataV4PasswordStringEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV4PasswordStringEntity";
 import SecretDataV5StandaloneCustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5StandaloneCustomFieldsCollection";
 import SecretDataV5StandaloneNoteEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5StandaloneNoteEntity";
+import SecretDataV5StandalonePinCodeEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5StandalonePinCodeEntity";
 import ResourceSecretRevisionsCollection from "passbolt-styleguide/src/shared/models/entity/secretRevision/resourceSecretRevisionsCollection";
 import Logger from "passbolt-styleguide/src/shared/utils/logger";
 
@@ -135,6 +137,8 @@ export default class DecryptSecretsService {
         return SecretDataV5StandaloneCustomFieldsCollection;
       case RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG:
         return SecretDataV5StandaloneNoteEntity;
+      case RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG:
+        return SecretDataV5StandalonePinCodeEntity;
       default:
         throw new Error("There is no matching secret entity matching the given resource type");
     }

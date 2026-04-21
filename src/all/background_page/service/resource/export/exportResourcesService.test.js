@@ -46,8 +46,13 @@ import {
   RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
-import { resourceCollectionV4ToExport, resourceCollectionV5ToExport } from "./exportResourcesService.test.data";
+import {
+  resourceCollectionV4ToExport,
+  resourceCollectionV5ToExport,
+  chromiumCsvWithPinCodeFile,
+} from "./exportResourcesService.test.data";
 import {
   KdbxCsvFile,
   bitwardenCsvFile,
@@ -220,6 +225,37 @@ describe("ExportResourcesService", () => {
             expect(exportResourcesFileEntity.file).toEqual(test.expected);
           });
         });
+      });
+    });
+    describe("Should export the csv file with pin code mapped to password field.", () => {
+      it("v5 pin code", async () => {
+        expect.assertions(1);
+        const resourceType = resourceTypeCollection.find(
+          (resourceType) => resourceType.slug === RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
+        );
+        const file = {
+          format: FORMAT_CSV_CHROMIUM,
+          resources_ids: [uuidv4()],
+          folders_ids: [foldersDto[0].id],
+        };
+        const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
+
+        const resourceCollectionDto = await resourceCollectionV5ToExport({
+          resourceType: resourceType,
+          folder_parent_id: foldersDto[0].id,
+          pin_code: "123456",
+        });
+
+        const resourceCollection = new ResourcesCollection(resourceCollectionDto);
+        await encryptMetadataService.encryptAllFromForeignModels(resourceCollection, pgpKeys.ada.passphrase);
+        const encryptedResourceCollectionDto = resourceCollection.resources;
+
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => encryptedResourceCollectionDto);
+
+        await service.prepareExportContent(exportResourcesFileEntity);
+        await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
+
+        expect(exportResourcesFileEntity.file).toEqual(chromiumCsvWithPinCodeFile);
       });
     });
     describe("Should export the KDBX file.", () => {

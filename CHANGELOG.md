@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.11.2] - 2026-04-22
+### Fixed
+- PB-51067 - Rework TOTP selectors
+
 ## [5.11.1] - 2026-04-09
 ### Fixed
 -  PB-50644 - Fix browser extension port messaging failure after logout caused by Chrome 147 BFCache changes

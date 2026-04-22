@@ -54,8 +54,17 @@ class AuthLogoutController {
       return;
     }
 
-    const url = this.apiClientOptions.getBaseUrl().toString();
-    await browser.tabs.update(this.worker.tab.id, { url });
+    /*
+     * Use tabs.reload instead of tabs.update to ensure the page is fully
+     * reloaded from the server. A tabs.update navigation may restore the
+     * page from the browser's Back/Forward Cache (BFCache), resulting in
+     * a stale page with a dead extension message port after sign-out.
+     *
+     * See: PB-50644
+     */
+    await browser.tabs.reload(this.worker.tab.id);
+    // const url = this.apiClientOptions.getBaseUrl().toString();
+    // await browser.tabs.update(this.worker.tab.id, { url });
   }
 }
 

@@ -1,7 +1,4 @@
-Passbolt 5.10.4 is a hotfix release. It resolves a bug on the resources workspace where filtering resources by URIs would cause the application to crash, a regression surfaced by the latest upgrade of the UI framework.
-
-If you encountered the issue before updating, resetting your column customization in the workspace will restore normal behavior.
+Passbolt 5.11.1 fixes an issue where the browser extension could become unresponsive after navigating within the application or signing out on Chromium 147+. This was caused by a change in how Chromium handles page caching (BFCache). A fix is included in both the API and the browser extension. Users who cannot update the API immediately will still benefit from a partial fix in the browser extension covering the sign out scenario.
 
 ### Fixed
-- PB-50034 As a user I should be able to sort by uris
-- PB-49459 Timeouts not cleared properly when filtering resources/users grids by keywords
+-  PB-50644 - Fix browser extension port messaging failure after logout caused by Chrome 147 BFCache changes

@@ -6,7 +6,7 @@ set -eu
 
 CI_SCRIPTS_DIR=$(dirname "$0")/..
 
-# shellcheck source=.gitlab-ci/scripts/lib/version-check.sh
+# shellcheck source=ci-scripts/lib/version-check.sh
 source "$CI_SCRIPTS_DIR"/lib/version-check.sh
 
 if is_release_candidate "$CI_COMMIT_TAG"; then

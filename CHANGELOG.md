@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [5.11.3] - 2026-05-04
+### Maintenance
+- PB-50013 - Remove avatar handling on Safari
 
 ## [5.11.2] - 2026-04-22
 ### Fixed
@@ -2663,7 +2666,17 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.9.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.11.3...HEAD
+[5.11.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.11.2...v5.11.3
+[5.11.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.11.1...v5.11.0
+[5.11.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.11.0...v5.11.1
+[5.11.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.11.0...v5.11.1
+[5.11.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.10.4...5.11.0
+[5.10.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.10.3...5.10.4
+[5.10.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.10.2...5.10.3
+[5.10.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.10.1...5.10.2
+[5.10.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.10.0...5.10.1
+[5.10.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.9.0...5.10.0
 [5.9.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.8.0...5.9.0
 [5.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.7.0...5.8.0
 [5.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.6.0...5.7.0

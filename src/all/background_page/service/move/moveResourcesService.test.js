@@ -1119,6 +1119,78 @@ describe("MoveResourcesService", () => {
       expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
     });
 
+    /*
+     * Regression test for PB-50166: a non-owned resource iterated before an owned one used to
+     * `break` the loop in `calculateChanges()`, silently skipping permission recalculation for
+     * every subsequent resource.
+     */
+    it("recalculates permissions for an owned resource ordered after a non-owned resource in a batch move to root", async () => {
+      expect.assertions(3);
+
+      // Shared parent folder: the user owns it, plus one other member whose permission both resources inherit.
+      const parentFolderPerm = ownerFolderPermissionDto({ aro_foreign_key: account.id });
+      const parentFolderOtherMemberPerm = ownerFolderPermissionDto({
+        aco_foreign_key: parentFolderPerm.aco_foreign_key,
+      });
+      const parentFolderDto = defaultFolderDto({
+        id: parentFolderPerm.aco_foreign_key,
+        permission: parentFolderPerm,
+        permissions: [parentFolderPerm, parentFolderOtherMemberPerm],
+      });
+
+      // Resource 1: user has UPDATE only -> hits the !isOwner() branch. With the bug, the loop would `break` here.
+      const resource1Perm = updatePermissionDto({ aro_foreign_key: account.id });
+      const resource1InheritedPerm = ownerPermissionDto({
+        aco_foreign_key: resource1Perm.aco_foreign_key,
+        aro_foreign_key: parentFolderOtherMemberPerm.aro_foreign_key,
+      });
+      const resource1Dto = defaultResourceDto({
+        id: resource1Perm.aco_foreign_key,
+        folder_parent_id: parentFolderDto.id,
+        permission: resource1Perm,
+        permissions: [resource1Perm, resource1InheritedPerm],
+      });
+
+      // Resource 2: user is owner; moving to root must strip the inherited shared permission.
+      const resource2Perm = ownerPermissionDto({ aro_foreign_key: account.id });
+      const resource2InheritedPerm = ownerPermissionDto({
+        aco_foreign_key: resource2Perm.aco_foreign_key,
+        aro_foreign_key: parentFolderOtherMemberPerm.aro_foreign_key,
+      });
+      const resource2Dto = defaultResourceDto({
+        id: resource2Perm.aco_foreign_key,
+        folder_parent_id: parentFolderDto.id,
+        permission: resource2Perm,
+        permissions: [resource2Perm, resource2InheritedPerm],
+      });
+
+      // Order matters: the non-owned resource is iterated first.
+      const resourcesDto = [resource1Dto, resource2Dto];
+
+      await FolderLocalStorage.set(new FoldersCollection([parentFolderDto]));
+      await ResourceLocalStorage.set(new ResourcesCollection(resourcesDto));
+      jest
+        .spyOn(service.findFoldersService, "findAllByIdsWithPermissions")
+        .mockResolvedValue(new FoldersCollection([parentFolderDto]));
+      jest
+        .spyOn(service.findResourcesService, "findAllByIdsWithPermissions")
+        .mockResolvedValue(new ResourcesCollection(resourcesDto));
+      jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
+      jest.spyOn(service.moveApiService, "moveResource").mockImplementation(jest.fn);
+
+      await service.moveAll([resource1Dto.id, resource2Dto.id], null, "");
+
+      // Both resources move.
+      expect(service.moveApiService.moveResource).toHaveBeenCalledTimes(2);
+      // Only resource 2 contributes a permission change; without the fix `shareAll` would not be called at all.
+      expect(service.shareResourceService.shareAll).toHaveBeenCalledTimes(1);
+      expect(service.shareResourceService.shareAll).toHaveBeenCalledWith(
+        [resource1Dto.id, resource2Dto.id],
+        new PermissionChangesCollection([{ ...resource2InheritedPerm, delete: true }]),
+        "",
+      );
+    });
+
     it("do not move and do not update permissions with: read resources, in owner or update folders, to private folder", async () => {
       expect.assertions(8);
 

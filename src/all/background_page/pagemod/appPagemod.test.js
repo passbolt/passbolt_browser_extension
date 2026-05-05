@@ -40,10 +40,11 @@ import BuildApiClientOptionsService from "../service/account/buildApiClientOptio
 import { enableFetchMocks } from "jest-fetch-mock";
 import { RememberMeEvents } from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
-import { userLoggedInAuthStatus } from "../controller/auth/authCheckStatus.test.data";
+import { userLoggedInAuthStatus, userLoggedOutAuthStatus } from "../controller/auth/authCheckStatus.test.data";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
+import { AppSignOutEvents } from "../event/appSignOutEvents";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -71,6 +72,7 @@ jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PermissionEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(AppSignOutEvents, "listen").mockImplementation(jest.fn());
 
 describe("App", () => {
   beforeEach(() => {
@@ -80,7 +82,7 @@ describe("App", () => {
   });
 
   describe("App::attachEvents", () => {
-    it("Should attach events", async () => {
+    it("Should attach app events", async () => {
       expect.assertions(30);
       // data mocked
       const port = {
@@ -163,6 +165,34 @@ describe("App", () => {
         PermissionEvents,
         AccountEvents,
       ]);
+      expect(App.mustReloadOnExtensionUpdate).toBeFalsy();
+      expect(App.appName).toBe("App");
+    });
+
+    it("Should attach app sign out events", async () => {
+      expect.assertions(5);
+      // data mocked
+      const port = {
+        _port: {
+          sender: {
+            tab: {
+              url: "https://localhost",
+            },
+          },
+        },
+      };
+      // mock functions
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
+      jest
+        .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
+        .mockImplementation(async () => userLoggedOutAuthStatus());
+      // process
+      await App.attachEvents(port);
+      // expectations
+      const expectedPortAndTab = { port: port, tab: port._port.sender.tab };
+      expect(AppSignOutEvents.listen).toHaveBeenCalledWith(expectedPortAndTab);
+      expect(AppEvents.listen).not.toHaveBeenCalled();
+      expect(App.appSignOutEvent).toStrictEqual([AppSignOutEvents]);
       expect(App.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(App.appName).toBe("App");
     });

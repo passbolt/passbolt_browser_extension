@@ -298,6 +298,7 @@ class ResourcesKdbxImportParser {
   getResourceType(externalResourceDto) {
     this.resourceTypesCollection.filterByResourceTypeVersion(this.metadataTypesSettings.defaultResourceTypes);
 
+    ResourcesTypeImportParser.parsePinCode(externalResourceDto, this.resourceTypesCollection);
     const scores = ResourcesTypeImportParser.getScores(externalResourceDto, this.resourceTypesCollection);
     let resourceType = ResourcesTypeImportParser.findMatchingResourceType(this.resourceTypesCollection, scores);
 

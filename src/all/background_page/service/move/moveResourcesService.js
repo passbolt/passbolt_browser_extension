@@ -177,7 +177,7 @@ class MoveResourcesService {
        * But to change the rights they need to be owner
        */
       if (!resource.isOwner()) {
-        break;
+        continue;
       }
 
       /*
@@ -191,7 +191,7 @@ class MoveResourcesService {
         (destinationFolder === null || destinationFolder.isPersonal()) &&
         (resource.folderParentId === null || resource.isPersonal())
       ) {
-        break;
+        continue;
       }
 
       const parentFolder = resource.folderParentId ? resourcesParentFolders.getById(resource.folderParentId) : null;

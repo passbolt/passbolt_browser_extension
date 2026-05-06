@@ -14,7 +14,7 @@
   "Could not verify the server key.": "Kunde inte verifiera servernyckeln.",
   "Creating folder...": "Skapar mapp...",
   "Creating metadata key": "Skapar metadata-nyckel",
-  "Creating password": "Skapar lösenord",
+  "Creating resource": "Creating resource",
   "Decrypting ...": "Dekrypterar ...",
   "Decrypting {{counter}}/{{total}}": "Dekrypterar {{counter}}/{{total}}",
   "Decrypting secrets": "Dekrypterar hemligheter",

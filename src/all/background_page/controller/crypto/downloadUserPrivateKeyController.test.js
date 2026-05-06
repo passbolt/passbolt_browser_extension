@@ -14,7 +14,6 @@
 
 import DownloadUserPrivateKeyController from "./downloadUserPrivateKeyController";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
-import GpgKeyError from "../../error/GpgKeyError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
@@ -63,7 +62,7 @@ describe("DownloadUserPrivateKeyController", () => {
     const controller = new DownloadUserPrivateKeyController(mockedWorker, null);
     controller.getPassphraseService.requestPassphrase.mockResolvedValue("");
 
-    await expect(controller.exec()).rejects.toThrowError(new GpgKeyError("Private key not found."));
+    await expect(controller.exec()).rejects.toThrow("Private key not found.");
     expect(mockedSaveFile).not.toHaveBeenCalled();
     expect(controller.getPassphraseService.requestPassphrase).toHaveBeenCalledTimes(1);
   });

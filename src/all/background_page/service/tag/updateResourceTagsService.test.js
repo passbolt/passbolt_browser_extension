@@ -124,7 +124,9 @@ describe("UpdateResourceTagsService", () => {
 
       const error = new Error();
       jest.spyOn(service.tagService, "updateResourceTags").mockRejectedValue(error);
-      await expect(() => service._updateResourceTagsApi(resourceDto.id, updatedTagsCollection)).rejects.toThrow(error);
+      await expect(() => service._updateResourceTagsApi(resourceDto.id, updatedTagsCollection)).rejects.toThrow(
+        error.message,
+      );
     });
   });
 
@@ -172,7 +174,7 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(ResourceLocalStorage, "getResourceById").mockResolvedValue(undefined);
       await expect(() =>
         service._updateResourceTagsLocalStorage(resourceDto.id, updatedTagsCollection),
-      ).rejects.toThrow(new Error(`Resource with id ${resourceDto.id} does not exist.`));
+      ).rejects.toThrow(`Resource with id ${resourceDto.id} does not exist.`);
     });
 
     it("should throw a EntityValidationError if the local resource is malformed", async () => {
@@ -262,7 +264,9 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(ResourceLocalStorage, "getResourceById");
       jest.spyOn(ResourceLocalStorage, "updateResource");
 
-      await expect(() => service.updateResourceTags(resourceDto.id, updatedTagsCollection)).rejects.toThrow(error);
+      await expect(() => service.updateResourceTags(resourceDto.id, updatedTagsCollection)).rejects.toThrow(
+        error.message,
+      );
 
       expect(service.tagService.updateResourceTags).toHaveBeenCalledTimes(1);
       expect(ResourceLocalStorage.getResourceById).not.toHaveBeenCalled();
@@ -277,7 +281,9 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(ResourceLocalStorage, "getResourceById").mockRejectedValue(error);
       jest.spyOn(ResourceLocalStorage, "updateResource");
 
-      await expect(() => service.updateResourceTags(resourceDto.id, updatedTagsCollection)).rejects.toThrow(error);
+      await expect(() => service.updateResourceTags(resourceDto.id, updatedTagsCollection)).rejects.toThrow(
+        error.message,
+      );
 
       expect(service.tagService.updateResourceTags).toHaveBeenCalledTimes(1);
       expect(ResourceLocalStorage.getResourceById).toHaveBeenCalledTimes(1);
@@ -292,7 +298,9 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(ResourceLocalStorage, "getResourceById").mockResolvedValue(resourceDto);
       jest.spyOn(ResourceLocalStorage, "updateResource").mockRejectedValue(error);
 
-      await expect(() => service.updateResourceTags(resourceDto.id, updatedTagsCollection)).rejects.toThrow(error);
+      await expect(() => service.updateResourceTags(resourceDto.id, updatedTagsCollection)).rejects.toThrow(
+        error.message,
+      );
 
       expect(service.tagService.updateResourceTags).toHaveBeenCalledTimes(1);
       expect(ResourceLocalStorage.getResourceById).toHaveBeenCalledTimes(1);
@@ -342,7 +350,7 @@ describe("UpdateResourceTagsService", () => {
       expect.assertions(1);
 
       await expect(() => service._prepareResourcesWithTags([], resourceIds, updatedTagsCollection)).rejects.toThrow(
-        new Error("localResources is not a ResourcesCollection"),
+        "localResources is not a ResourcesCollection",
       );
     });
 
@@ -352,7 +360,7 @@ describe("UpdateResourceTagsService", () => {
       const tests = FAIL_ARRAY_SCENARIOS.map(async ({ value }) => {
         await expect(() =>
           service._prepareResourcesWithTags(resourcesToUpdate, value, updatedTagsCollection),
-        ).rejects.toThrow(new TypeError("resourceIds is not an array"));
+        ).rejects.toThrow("resourceIds is not an array");
       });
       await Promise.all(tests);
     });
@@ -362,14 +370,14 @@ describe("UpdateResourceTagsService", () => {
 
       await expect(() =>
         service._prepareResourcesWithTags(resourcesToUpdate, ["", ...resourceIds], updatedTagsCollection),
-      ).rejects.toThrow(new Error("The given parameter is not a valid UUID"));
+      ).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
     it("should throw a TypeError if the tags parameter is not a TagsCollection", async () => {
       expect.assertions(1);
 
       await expect(() => service._prepareResourcesWithTags(resourcesToUpdate, resourceIds, [])).rejects.toThrow(
-        new TypeError("tags is not a TagsCollection"),
+        "tags is not a TagsCollection",
       );
     });
 
@@ -379,7 +387,7 @@ describe("UpdateResourceTagsService", () => {
       const uuid = uuidv4();
       await expect(() =>
         service._prepareResourcesWithTags(resourcesToUpdate, [uuid], updatedTagsCollection),
-      ).rejects.toThrow(new TypeError(`Resource ${uuid} doesn't exist locally`));
+      ).rejects.toThrow(`Resource ${uuid} doesn't exist locally`);
     });
   });
 
@@ -421,7 +429,7 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(service.tagService, "updateResourceTags");
 
       await expect(() => service._addTagsToResourcesApi([])).rejects.toThrow(
-        new TypeError("resourcesToUpdate is not a ResourcesCollection"),
+        "resourcesToUpdate is not a ResourcesCollection",
       );
 
       expect(service.tagService.updateResourceTags).not.toHaveBeenCalled();
@@ -524,7 +532,7 @@ describe("UpdateResourceTagsService", () => {
 
       const tests = FAIL_ARRAY_SCENARIOS.map(async ({ value }) => {
         await expect(() => service.addTagsToResources(value, updatedTagsCollection)).rejects.toThrow(
-          new TypeError("resourceIds is not an array"),
+          "resourceIds is not an array",
         );
       });
 
@@ -543,7 +551,7 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(ResourceLocalStorage, "set");
 
       await expect(() => service.addTagsToResources(["", ...resourceIds], updatedTagsCollection)).rejects.toThrow(
-        new Error("The given parameter is not a valid UUID"),
+        "The given parameter is not a valid UUID",
       );
 
       expect(ResourceLocalStorage.get).toHaveBeenCalledTimes(1);
@@ -558,9 +566,7 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(service.tagService, "updateResourceTags");
       jest.spyOn(ResourceLocalStorage, "set");
 
-      await expect(() => service.addTagsToResources(resourceIds, [])).rejects.toThrow(
-        new TypeError("tags is not a TagsCollection"),
-      );
+      await expect(() => service.addTagsToResources(resourceIds, [])).rejects.toThrow("tags is not a TagsCollection");
 
       expect(ResourceLocalStorage.get).toHaveBeenCalledTimes(1);
       expect(service.tagService.updateResourceTags).not.toHaveBeenCalled();
@@ -576,7 +582,7 @@ describe("UpdateResourceTagsService", () => {
 
       const uuid = uuidv4();
       await expect(() => service.addTagsToResources([uuid], updatedTagsCollection)).rejects.toThrow(
-        new TypeError(`Resource ${uuid} doesn't exist locally`),
+        `Resource ${uuid} doesn't exist locally`,
       );
 
       expect(ResourceLocalStorage.get).toHaveBeenCalledTimes(1);
@@ -609,7 +615,7 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(service.tagService, "updateResourceTags");
       jest.spyOn(ResourceLocalStorage, "set");
 
-      await expect(() => service.addTagsToResources(resourceIds, updatedTagsCollection)).rejects.toThrow(error);
+      await expect(() => service.addTagsToResources(resourceIds, updatedTagsCollection)).rejects.toThrow(error.message);
 
       expect(ResourceLocalStorage.get).toHaveBeenCalledTimes(1);
       expect(service.tagService.updateResourceTags).not.toHaveBeenCalled();
@@ -624,7 +630,7 @@ describe("UpdateResourceTagsService", () => {
       jest.spyOn(service.tagService, "updateResourceTags").mockResolvedValue(updateResponse);
       jest.spyOn(ResourceLocalStorage, "set").mockRejectedValue(error);
 
-      await expect(() => service.addTagsToResources(resourceIds, updatedTagsCollection)).rejects.toThrow(error);
+      await expect(() => service.addTagsToResources(resourceIds, updatedTagsCollection)).rejects.toThrow(error.message);
 
       expect(ResourceLocalStorage.get).toHaveBeenCalledTimes(1);
       expect(service.tagService.updateResourceTags).toHaveBeenCalledTimes(2);

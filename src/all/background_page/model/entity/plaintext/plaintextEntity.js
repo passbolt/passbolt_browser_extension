@@ -77,6 +77,15 @@ class PlaintextEntity extends EntityV2 {
   }
 
   /**
+   * Return pin code prop if any
+   *
+   * @returns {string|null} pin code
+   */
+  get pinCode() {
+    return this._props.pin_code || null;
+  }
+
+  /**
    * Return custom fields prop if any
    *
    * @returns {object|null} custom fields

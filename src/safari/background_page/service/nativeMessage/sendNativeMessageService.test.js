@@ -146,8 +146,8 @@ describe("SendNativeMessageService", () => {
         .spyOn(chrome.runtime, "sendNativeMessage")
         .mockReturnValue({ success: false, error: "Something went wrong!" });
 
-      await expect(() => SendNativeMessageService.sendNativeMessage(action, args)).rejects.toThrowError(
-        new Error("Something went wrong!"),
+      await expect(() => SendNativeMessageService.sendNativeMessage(action, args)).rejects.toThrow(
+        "Something went wrong!",
       );
     });
 
@@ -159,8 +159,8 @@ describe("SendNativeMessageService", () => {
 
       jest.spyOn(chrome.runtime, "sendNativeMessage").mockReturnValue({ success: false });
 
-      await expect(() => SendNativeMessageService.sendNativeMessage(action, args)).rejects.toThrowError(
-        new Error("Safari native application execution failed"),
+      await expect(() => SendNativeMessageService.sendNativeMessage(action, args)).rejects.toThrow(
+        "Safari native application execution failed",
       );
     });
   });

@@ -34,6 +34,6 @@ describe("GetKeyInfoController", () => {
     expect.assertions(1);
     const controller = new GetKeyInfoController();
     const externalGpgKeyEntityPromise = controller.exec();
-    await expect(externalGpgKeyEntityPromise).rejects.toThrowError("An armored key must be provided");
+    await expect(externalGpgKeyEntityPromise).rejects.toThrow("An armored key must be provided");
   });
 });

@@ -48,12 +48,12 @@ describe("SignInSetupController", () => {
       expect.assertions(2);
       jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({ account: account }));
       const promiseMissingParameter = controller.exec();
-      await expect(promiseMissingParameter).rejects.toThrowError("A passphrase is required.");
+      await expect(promiseMissingParameter).rejects.toThrow("A passphrase is required.");
       jest
         .spyOn(AccountTemporarySessionStorageService, "get")
         .mockImplementationOnce(() => ({ account: account, passphrase: {} }));
       const promiseInvalidTypeParameter = controller.exec();
-      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The passphrase should be a string.");
+      await expect(promiseInvalidTypeParameter).rejects.toThrow("The passphrase should be a string.");
     }, 10000);
 
     it("Should throw an exception if the provided remember me is not a valid boolean.", async () => {
@@ -69,7 +69,7 @@ describe("SignInSetupController", () => {
 
       expect.assertions(1);
       const promiseInvalidTypeParameter = controller.exec(42);
-      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The rememberMe should be a boolean.");
+      await expect(promiseInvalidTypeParameter).rejects.toThrow("The rememberMe should be a boolean.");
     }, 10000);
 
     it("Should throw an exception if the provided passphrase can't decrypt the current private key.", async () => {

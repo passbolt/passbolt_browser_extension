@@ -14,7 +14,6 @@
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import SsoLoginUrlEntity from "./ssoLoginUrlEntity";
-import each from "jest-each";
 
 describe("Sso Login URL Entity", () => {
   it("schema must validate", () => {
@@ -43,13 +42,13 @@ describe("Sso Login URL Entity", () => {
     }
   });
 
-  each([
+  describe.each([
     { scenario: "Global microsoft online url", url: "https://login.microsoftonline.com", providerId: "azure" },
     { scenario: "US microsoft online url", url: "https://login.microsoftonline.us", providerId: "azure" },
     { scenario: "China microsoft online url", url: "https://login.partner.microsoftonline.cn", providerId: "azure" },
     { scenario: "Google url", url: "https://accounts.google.com", providerId: "google" },
     { scenario: "PingOne url", url: "https://auth.pingone.com", providerId: "pingone" },
-  ]).describe("Should accept supported url", (test) => {
+  ])("Should accept supported url", (test) => {
     it(`Should accept supported url: ${test.scenario}`, async () => {
       const dto = {
         url: test.url,
@@ -59,7 +58,7 @@ describe("Sso Login URL Entity", () => {
     });
   });
 
-  each([
+  describe.each([
     { scenario: "Authorize domain with insecure protocol", url: "http://login.microsoftonline.com" },
     { scenario: "Authorize domain with wrong protocol", url: "ftp://login.microsoftonline.us" },
     { scenario: "Authorize domain with no protocol", url: "login.microsoftonline.us" },
@@ -72,7 +71,7 @@ describe("Sso Login URL Entity", () => {
     { scenario: "Hash attack", url: "https://attacker.com#https://login.microsoftonline.com" },
     { scenario: "Mixing provider URL attack", url: "https://login.microsoftonline.com", providerId: "google" },
     { scenario: "Not using HTTPS", url: "http://not.secure.com", providerId: "oauth2" },
-  ]).describe("Should not accept unsupported or attacker url", (test) => {
+  ])("Should not accept unsupported or attacker url", (test) => {
     it(`Should not accept unsupported or attacker url: ${test.scenario}`, async () => {
       const dto = {
         url: test.url,

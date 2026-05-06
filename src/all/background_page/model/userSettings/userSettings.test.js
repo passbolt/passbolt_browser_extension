@@ -123,7 +123,7 @@ describe("User settings validation security token", () => {
 
       const service = new UserSettings();
       for (let i = 0; i < wrongUrls.length; i++) {
-        expect(() => service.validateDomain(wrongUrls[i])).toThrowError();
+        expect(() => service.validateDomain(wrongUrls[i])).toThrow();
       }
     });
 
@@ -152,7 +152,7 @@ describe("User settings validation security token", () => {
 
       const service = new UserSettings();
       for (let i = 0; i < validUrls.length; i++) {
-        expect(() => service.validateDomain(validUrls[i])).not.toThrowError();
+        expect(() => service.validateDomain(validUrls[i])).not.toThrow();
       }
     });
   });

@@ -31,7 +31,7 @@ describe("PlaintextEntity", () => {
       expect.assertions(1);
 
       expect(() => PlaintextEntity.getSchema()).toThrow(
-        new TypeError("Plaintext only support dynamic schemas, defined from resource type."),
+        "Plaintext only support dynamic schemas, defined from resource type.",
       );
     });
   });
@@ -120,8 +120,38 @@ describe("PlaintextEntity", () => {
       expect(entity.totp).toStrictEqual(dto.totp);
     });
 
+    it("should return the expected pin code value", () => {
+      expect.assertions(1);
+
+      const dto = { object_type: "PASSBOLT_SECRET_DATA", pin_code: "1234" };
+      const schema = {
+        type: "object",
+        required: ["pin_code", "object_type"],
+        properties: {
+          object_type: {
+            type: "string",
+            enum: ["PASSBOLT_SECRET_DATA"],
+          },
+          pin_code: {
+            type: "string",
+            minLength: 4,
+            maxLength: 12,
+            pattern: "^\\d+$",
+          },
+          description: {
+            type: "string",
+            maxLength: 50000,
+            nullable: true,
+          },
+        },
+      };
+      const entity = new PlaintextEntity(dto, { schema });
+
+      expect(entity.pinCode).toStrictEqual("1234");
+    });
+
     it("should return null if the data does not exist", () => {
-      expect.assertions(3);
+      expect.assertions(4);
 
       const dto = { test: "test" };
       const schema = {
@@ -138,6 +168,7 @@ describe("PlaintextEntity", () => {
       expect(entity.password).toBeNull();
       expect(entity.description).toBeNull();
       expect(entity.totp).toBeNull();
+      expect(entity.pinCode).toBeNull();
     });
   });
 });

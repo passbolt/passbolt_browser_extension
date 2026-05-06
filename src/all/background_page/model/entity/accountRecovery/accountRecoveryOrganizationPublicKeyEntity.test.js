@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 
-import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountRecoveryOrganizationPublicKeyEntity from "./accountRecoveryOrganizationPublicKeyEntity";
 import {
@@ -89,14 +88,14 @@ describe("AccountRecoveryOrganizationPublicKey entity", () => {
     });
   });
 
-  each([
+  describe.each([
     { scenario: "Create", dto: createAccountRecoveryOrganizationPublicKeyDto() },
     { scenario: "Read", dto: defaultAccountRecoveryOrganizationPublicKeyDto() },
     { scenario: "Create revoked", dto: createRevokedAccountRecoveryOrganizationPublicKeyDto() },
     { scenario: "Read revoked", dto: revokedAccountRecoveryOrganizationPublicKeyDto() },
     { scenario: "Create alternative", dto: createAlternativeAccountRecoveryOrganizationPublicKeyDto() },
     { scenario: "Read alternative", dto: alternativeAccountRecoveryOrganizationPublicKeyDto() },
-  ]).describe("constructor works with data", (_props) => {
+  ])("constructor works with data", (_props) => {
     it(`it supports scenario ${_props.scenario}`, () => {
       const entity = new AccountRecoveryOrganizationPublicKeyEntity(_props.dto);
       expect(entity.toJSON()).toEqual(_props.dto);

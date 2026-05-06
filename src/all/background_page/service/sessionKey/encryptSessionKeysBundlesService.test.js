@@ -76,12 +76,12 @@ describe("EncryptSessionKeysBundlesService", () => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
       const service = new EncryptSessionKeysBundlesService(account);
-      await expect(() => service.encryptOne(42)).rejects.toThrowError(
-        new TypeError('The parameter "sessionKeysBundle" should be a SessionKeysBundleEntity.'),
+      await expect(() => service.encryptOne(42)).rejects.toThrow(
+        'The parameter "sessionKeysBundle" should be a SessionKeysBundleEntity.',
       );
       await expect(() =>
         service.encryptOne(new SessionKeysBundleEntity(defaultSessionKeysBundleDto()), 42),
-      ).rejects.toThrowError(new TypeError('The parameter "passphrase" should be a string.'));
+      ).rejects.toThrow('The parameter "passphrase" should be a string.');
     });
 
     it("throws if the session key bundle entity is encrypted", async () => {
@@ -106,7 +106,7 @@ describe("EncryptSessionKeysBundlesService", () => {
 
       spyOnPassphraseStorage.mockImplementation(() => null);
 
-      await expect(() => service.encryptOne(sessionKeysBundle)).rejects.toThrowError(new UserPassphraseRequiredError());
+      await expect(() => service.encryptOne(sessionKeysBundle)).rejects.toThrow(UserPassphraseRequiredError);
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
   });

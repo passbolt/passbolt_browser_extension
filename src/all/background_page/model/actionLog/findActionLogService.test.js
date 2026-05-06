@@ -47,14 +47,14 @@ describe("FindActionLogService", () => {
     it("should throw an error if id is not defined", async () => {
       expect.assertions(1);
       const promise = service.findAllFor({ unknown: true });
-      await expect(promise).rejects.toThrowError("ActionLog foreign model should be a valid string.");
+      await expect(promise).rejects.toThrow("ActionLog foreign model should be a valid string.");
     });
 
     it("should throw an error if foreign model is unsupported", async () => {
       expect.assertions(1);
       const foreignId = uuidv4();
       const promise = service.findAllFor("ChangeTheme", foreignId, 1, 5);
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "ActionLog foreign model ChangeTheme is not in the list of supported models.",
       );
     });

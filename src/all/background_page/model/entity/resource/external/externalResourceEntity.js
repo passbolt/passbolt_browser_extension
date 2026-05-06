@@ -130,6 +130,13 @@ class ExternalResourceEntity extends EntityV2 {
           ...CustomFieldsCollection.getSchema(),
           nullable: true,
         },
+        pin_code: {
+          type: "string",
+          minLength: 4,
+          maxLength: 12,
+          pattern: "^\\d+$",
+          nullable: true,
+        },
       },
     };
   }
@@ -275,6 +282,11 @@ class ExternalResourceEntity extends EntityV2 {
       dto.custom_fields = this.customFields.toSecretDto();
     }
 
+    // Extract pin code if present.
+    if (this.pinCode && resourceType.hasPinCode()) {
+      dto.pin_code = this.pinCode;
+    }
+
     if (resourceType.isV5()) {
       dto.object_type = SECRET_DATA_OBJECT_TYPE;
     }
@@ -367,6 +379,14 @@ class ExternalResourceEntity extends EntityV2 {
     return this._props.expired || null;
   }
 
+  /**
+   * Return pin code prop if any
+   * @returns {string|null} pin code
+   */
+  get pinCode() {
+    return this._props.pin_code || null;
+  }
+
   /*
    * ==================================================
    * Calculated properties getters
@@ -438,6 +458,15 @@ class ExternalResourceEntity extends EntityV2 {
   set folderParentPath(folderParentPath) {
     const propSchema = this.cachedSchema.properties.folder_parent_path;
     this._props.folder_parent_path = EntitySchema.validateProp("folder_parent_path", folderParentPath, propSchema);
+  }
+
+  /**
+   * Set pin code
+   * @param {string|null} pinCode The pin code
+   */
+  set pinCode(pinCode) {
+    const propSchema = this.cachedSchema.properties.pin_code;
+    this._props.pin_code = EntitySchema.validateProp("pin_code", pinCode, propSchema);
   }
 
   /**
@@ -540,6 +569,10 @@ class ExternalResourceEntity extends EntityV2 {
     this.secretClear = "";
     this.totp = null;
     // this.customFields = null;
+
+    if (resourceType?.hasPinCode()) {
+      delete this._props.pin_code;
+    }
 
     /*
      * In the case the resource is a password string, the description will be stored in the metadata.

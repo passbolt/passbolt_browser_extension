@@ -39,7 +39,6 @@ import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/en
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { adminAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
-import each from "jest-each";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 jest.mock("../../service/progress/progressService");
@@ -129,7 +128,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       expect(apiResponse.privateKeyPasswords).toBeNull();
     });
 
-    each([
+    describe.each([
       {
         scenario: "private key decrypted",
         accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private_decrypted,
@@ -140,7 +139,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
         accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private,
         accountRecoveryOrganizationPrivateKeyPassphrase: pgpKeys.account_recovery_organization.passphrase,
       },
-    ]).describe("Should disable an account recovery organization policy previously enabled.", (test) => {
+    ])("Should disable an account recovery organization policy previously enabled.", (test) => {
       it(`Should disable an account recovery organization policy previously enabled: ${test.scenario}`, async () => {
         const controller = new AccountRecoverySaveOrganizationPolicyController(
           null,
@@ -362,7 +361,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       );
 
       expect.assertions(1);
-      await expect(controllerPromise).rejects.toThrowError(EntityValidationError);
+      await expect(controllerPromise).rejects.toThrow(EntityValidationError);
     });
 
     it("Should assert the provided account recovery private key dto is valid.", async () => {
@@ -381,7 +380,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       );
 
       expect.assertions(1);
-      await expect(controllerPromise).rejects.toThrowError(EntityValidationError);
+      await expect(controllerPromise).rejects.toThrow(EntityValidationError);
     });
   });
 });

@@ -14,7 +14,6 @@
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
-import each from "jest-each";
 import Pagemod from "./pagemod";
 import { PortEvents } from "../event/portEvents";
 import AccountRecoveryBootstrap from "./accountRecoveryBootstrapPagemod";
@@ -138,7 +137,7 @@ describe("AccountRecoveryBootstrap", () => {
       expect(result).toBeFalsy();
     });
 
-    each([
+    describe.each([
       {
         scenario: "No domain",
         url: "account-recovery/continue/d57c10f5-639d-5160-9c81-8a0c6c4ec856",
@@ -154,7 +153,7 @@ describe("AccountRecoveryBootstrap", () => {
         url: "https://passbolt.dev/account-recovery/continue/d57c10f5-639d-5160-9c81-8a0c6c4ec856/cb66b7ca-bb85-4088-b0da-c50f6f0c2a13",
         frameId: 1,
       },
-    ]).describe("Should not be able to attach a pagemod to browser frame", (_props) => {
+    ])("Should not be able to attach a pagemod to browser frame", (_props) => {
       it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         const result = await AccountRecoveryBootstrap.canBeAttachedTo({ frameId: _props.frameId, url: _props.url });

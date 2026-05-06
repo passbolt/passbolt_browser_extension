@@ -113,7 +113,7 @@ describe("SessionKeysBundlesSessionStorageService", () => {
       // missing metadata private keys association
       const collection = new SessionKeysBundlesCollection(defaultSessionKeysBundlesDtos());
       await expect(() => storage.set(collection)).rejects.toThrow(
-        new TypeError("The parameter `collection` should contain only decrypted keys."),
+        "The parameter `collection` should contain only decrypted keys.",
       );
     });
 

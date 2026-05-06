@@ -82,7 +82,7 @@ describe("SetSetupAccountRecoveryUserSettingController", () => {
       const promise = controller.exec(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
 
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("A passphrase is required.");
+      await expect(promise).rejects.toThrow("A passphrase is required.");
     });
 
     it("Should raise an error if no account has been found.", async () => {

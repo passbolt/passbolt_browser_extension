@@ -47,7 +47,7 @@ describe("FindFolderDetailsController", () => {
       expect.assertions(1);
 
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid UUID");
     });
   });
 });

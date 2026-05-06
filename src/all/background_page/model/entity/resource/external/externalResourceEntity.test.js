@@ -43,6 +43,7 @@ import {
   RESOURCE_TYPE_V5_TOTP_SLUG,
   RESOURCE_TYPE_V5_CUSTOM_FIELDS_SLUG,
   RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition.js";
 import { SECRET_DATA_OBJECT_TYPE } from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataEntity";
 
@@ -158,6 +159,14 @@ describe("ExternalResourceEntity", () => {
       );
       assertEntityProperty.notRequired(ExternalResourceEntity, "custom_fields");
       assertEntityProperty.nullable(ExternalResourceEntity, "custom_fields");
+    });
+
+    it("validates pin_code property", () => {
+      assertEntityProperty.string(ExternalResourceEntity, "pin_code");
+      assertEntityProperty.minLength(ExternalResourceEntity, "pin_code", 4);
+      assertEntityProperty.maxLength(ExternalResourceEntity, "pin_code", 12);
+      assertEntityProperty.nullable(ExternalResourceEntity, "pin_code");
+      assertEntityProperty.notRequired(ExternalResourceEntity, "pin_code");
     });
   });
 
@@ -581,6 +590,30 @@ describe("ExternalResourceEntity", () => {
       expect(secretDto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
       expect(secretDto.description).toStrictEqual(dto.description);
     });
+
+    it("builds a secret dto for a v5 pin code.", () => {
+      expect.assertions(7);
+
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG);
+
+      // Variation with populated description
+      const dto = defaultExternalResourceDto({ pin_code: "123456" });
+      const entity = new ExternalResourceEntity(dto);
+      const secretDto = entity.toSecretDto(resourceType);
+      expect(Object.keys(secretDto).length).toStrictEqual(3);
+      expect(secretDto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secretDto.pin_code).toStrictEqual("123456");
+      expect(secretDto.description).toStrictEqual(dto.description);
+
+      // Variation without description
+      const dto2 = defaultExternalResourceDto({ pin_code: "123456" });
+      delete dto2.description;
+      const entity2 = new ExternalResourceEntity(dto2);
+      const secret2Dto = entity2.toSecretDto(resourceType);
+      expect(Object.keys(secret2Dto).length).toStrictEqual(2);
+      expect(secret2Dto.object_type).toStrictEqual(SECRET_DATA_OBJECT_TYPE);
+      expect(secret2Dto.pin_code).toStrictEqual("123456");
+    });
   });
 
   describe("::getters", () => {
@@ -605,7 +638,7 @@ describe("ExternalResourceEntity", () => {
     });
 
     it("should provide the default values with minimal dto", () => {
-      expect.assertions(12);
+      expect.assertions(13);
 
       const dto = minimalExternalResourceDto();
       const entity = new ExternalResourceEntity(dto);
@@ -622,6 +655,7 @@ describe("ExternalResourceEntity", () => {
       expect(entity.expired).toBeNull();
       expect(entity.path).toStrictEqual(dto.name);
       expect(entity.customFields).toBeNull();
+      expect(entity.pinCode).toBeNull();
     });
   });
 
@@ -703,6 +737,25 @@ describe("ExternalResourceEntity", () => {
       const entity = new ExternalResourceEntity(minimalExternalResourceDto());
       expect(() => {
         entity.folderParentPath = 42;
+      }).toThrow(EntityValidationError);
+    });
+
+    it("should set pinCode when using the setter", () => {
+      expect.assertions(2);
+
+      const entity = new ExternalResourceEntity(minimalExternalResourceDto());
+      entity.pinCode = "1234";
+      expect(entity.pinCode).toStrictEqual("1234");
+      entity.pinCode = null;
+      expect(entity.pinCode).toBeNull();
+    });
+
+    it("should validate pinCode when using the setter", () => {
+      expect.assertions(1);
+
+      const entity = new ExternalResourceEntity(minimalExternalResourceDto());
+      expect(() => {
+        entity.pinCode = 42;
       }).toThrow(EntityValidationError);
     });
 
@@ -789,6 +842,16 @@ describe("ExternalResourceEntity", () => {
       const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_TOTP_SLUG);
       entity.resetSecretProps(resourceType);
       expect(entity.totp).toBeNull();
+    });
+
+    it("resets secret pin code.", () => {
+      expect.assertions(1);
+
+      const dto = defaultExternalResourceDto({ pin_code: "123456" });
+      const entity = new ExternalResourceEntity(dto);
+      const resourceType = resourceTypesCollection.getFirstBySlug(RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG);
+      entity.resetSecretProps(resourceType);
+      expect(entity.pinCode).toBeNull();
     });
 
     /**

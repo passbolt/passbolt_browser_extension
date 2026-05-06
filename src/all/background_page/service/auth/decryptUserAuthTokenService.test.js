@@ -36,21 +36,21 @@ describe("DecryptUserAuthTokenService", () => {
       expect.assertions(1);
       await expect(() =>
         DecryptUserAuthTokenService.decryptToken(42, pgpKeys.betty.private, pgpKeys.betty.passphrase),
-      ).rejects.toThrow(new TypeError("The encrypted user auth token should be string."));
+      ).rejects.toThrow("The encrypted user auth token should be string.");
     });
 
     it("should throw if the user private armored key parameter is not a valid string", async () => {
       expect.assertions(1);
       await expect(() =>
         DecryptUserAuthTokenService.decryptToken(bettyEncryptedAuthToken, 42, pgpKeys.betty.passphrase),
-      ).rejects.toThrow(new TypeError("The user private armored key should be string."));
+      ).rejects.toThrow("The user private armored key should be string.");
     });
 
     it("should throw if the user passphrase parameter is not a valid string", async () => {
       expect.assertions(1);
       await expect(() =>
         DecryptUserAuthTokenService.decryptToken(bettyEncryptedAuthToken, pgpKeys.betty.private, 42),
-      ).rejects.toThrow(new TypeError("The passphrase should be string."));
+      ).rejects.toThrow("The passphrase should be string.");
     });
 
     it("should throw if the user private key cannot be read", async () => {
@@ -61,7 +61,7 @@ describe("DecryptUserAuthTokenService", () => {
           "not-valid-user-private-key",
           pgpKeys.betty.passphrase,
         ),
-      ).rejects.toThrow(new TypeError("The key should be a valid openpgp armored key string."));
+      ).rejects.toThrow("The key should be a valid openpgp armored key string.");
     });
 
     it("should throw if the user private key cannot be decrypted", async () => {
@@ -72,7 +72,7 @@ describe("DecryptUserAuthTokenService", () => {
           pgpKeys.betty.private,
           "not-valid-passphrase",
         ),
-      ).rejects.toThrow(new TypeError("This is not a valid passphrase"));
+      ).rejects.toThrow("This is not a valid passphrase");
     });
 
     it("should throw if the encrypted token is not a valid gpg message", async () => {
@@ -83,14 +83,14 @@ describe("DecryptUserAuthTokenService", () => {
           pgpKeys.betty.private,
           pgpKeys.betty.passphrase,
         ),
-      ).rejects.toThrow(new TypeError("The message should be a valid openpgp message."));
+      ).rejects.toThrow("The message should be a valid openpgp message.");
     });
 
     it("should throw if the encrypted message cannot be decrypted if the user private key", async () => {
       expect.assertions(1);
       await expect(() =>
         DecryptUserAuthTokenService.decryptToken(bettyEncryptedAuthToken, pgpKeys.ada.private, pgpKeys.ada.passphrase),
-      ).rejects.toThrow(new TypeError("Error decrypting message: No decryption key packets found"));
+      ).rejects.toThrow("Error decrypting message: No decryption key packets found");
     });
 
     it("should throw if the token does not validate", async () => {
@@ -102,9 +102,7 @@ describe("DecryptUserAuthTokenService", () => {
           pgpKeys.betty.passphrase,
         ),
       ).rejects.toThrow(
-        new TypeError(
-          "Passbolt does not support GPGAuth token nonce longer than 36 characters: A37B2216-0484-3610-a6E3-5F47B704FD0F",
-        ),
+        "Passbolt does not support GPGAuth token nonce longer than 36 characters: A37B2216-0484-3610-a6E3-5F47B704FD0F",
       );
     });
   });

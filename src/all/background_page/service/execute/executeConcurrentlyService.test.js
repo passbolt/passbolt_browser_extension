@@ -71,7 +71,7 @@ describe("ExecuteConcurrentlyService", () => {
       const arrayOfPromises = defaultRejectAllPromises(10);
       const service = new ExecuteConcurrentlyService();
       const promise = service.execute(arrayOfPromises, 5);
-      await expect(promise).rejects.toThrowError();
+      await expect(promise).rejects.toThrow();
     });
 
     it("execute reject and success promises in parallel and throw error", async () => {
@@ -80,7 +80,7 @@ describe("ExecuteConcurrentlyService", () => {
       arrayOfPromises.splice(5, 0, rejectPromise("ERROR"));
       const service = new ExecuteConcurrentlyService();
       const promise = service.execute(arrayOfPromises, 5);
-      await expect(promise).rejects.toThrowError(new Error("ERROR"));
+      await expect(promise).rejects.toThrow("ERROR");
     });
 
     it("should trhow an error if execute twice", async () => {
@@ -90,8 +90,8 @@ describe("ExecuteConcurrentlyService", () => {
       const service = new ExecuteConcurrentlyService();
       const promise = service.execute(arrayOfPromises, 5);
       const promise2 = service.execute(arrayOfPromises, 5);
-      await expect(promise2).rejects.toThrowError(new Error("ExecuteConcurrentlyService should be executed only once"));
-      await expect(promise).rejects.toThrowError(new Error("ERROR"));
+      await expect(promise2).rejects.toThrow("ExecuteConcurrentlyService should be executed only once");
+      await expect(promise).rejects.toThrow("ERROR");
     });
   });
 });

@@ -77,7 +77,7 @@ describe("GetCommentsByRessourceController", () => {
 
       expect.assertions(1);
 
-      await expect(controller.exec(null)).rejects.toThrowError(new TypeError("A resource id is required."));
+      await expect(controller.exec(null)).rejects.toThrow("A resource id is required.");
     });
     it("Should raise an error when resourceId is not a valid uuid", async () => {
       const uuid = "12345-6789";
@@ -85,9 +85,7 @@ describe("GetCommentsByRessourceController", () => {
 
       expect.assertions(1);
 
-      await expect(controller.exec(uuid)).rejects.toThrowError(
-        new TypeError("The resource id should be a valid uuid."),
-      );
+      await expect(controller.exec(uuid)).rejects.toThrow("The resource id should be a valid uuid.");
     });
     it("Should raise an error when service is not unavailable", async () => {
       fetch.doMock(() => {
@@ -98,7 +96,7 @@ describe("GetCommentsByRessourceController", () => {
       const spy = jest.spyOn(controller, "exec");
       expect.assertions(3);
 
-      await expect(controller.exec(uuidv4())).rejects.toThrowError(mockedError);
+      await expect(controller.exec(uuidv4())).rejects.toThrow(mockedError.message);
       expect(spy).toHaveBeenCalled();
       expect(spy).toHaveBeenCalledTimes(1);
     });

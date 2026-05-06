@@ -12,7 +12,6 @@
  * @since         4.7.0
  */
 
-import each from "jest-each";
 import Validator from "validator";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY, RequestFetchOffscreenService } from "./requestFetchOffscreenService";
@@ -41,10 +40,10 @@ describe("RequestFetchOffscreenService", () => {
       expect(await RequestFetchOffscreenService.isFetchOffscreenPreferred()).toBeFalsy();
     });
 
-    each([
+    describe.each([
       { label: "true", value: true },
       { label: "false", value: false },
-    ]).describe("should return the runtime cached value", (scenario) => {
+    ])("should return the runtime cached value", (scenario) => {
       it(`should return the runtime cached value for scenario: ${scenario.label}`, async () => {
         expect.assertions(1);
         // Mock runtime cached value.
@@ -53,10 +52,10 @@ describe("RequestFetchOffscreenService", () => {
       });
     });
 
-    each([
+    describe.each([
       { label: "true", value: true },
       { label: "false", value: false },
-    ]).describe("should return the session storage value if no runtime value is present", (scenario) => {
+    ])("should return the session storage value if no runtime value is present", (scenario) => {
       it(`should return the runtime cached value for scenario: ${scenario.label}`, async () => {
         expect.assertions(1);
         // Mock session storage cached value.
@@ -65,21 +64,18 @@ describe("RequestFetchOffscreenService", () => {
       });
     });
 
-    each([
+    describe.each([
       { label: "true", value: true },
       { label: "false", value: false },
-    ]).describe(
-      "should return the runtime cached value if set and if the session storage value is also set",
-      (scenario) => {
-        it(`should return the runtime cached value for scenario: ${scenario.label}`, async () => {
-          expect.assertions(1);
-          // Mock runtime cached value.
-          RequestFetchOffscreenService.isFetchOffscreenPreferredCache = scenario.value;
-          browser.storage.session.set({ [IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: !scenario.value });
-          expect(await RequestFetchOffscreenService.isFetchOffscreenPreferred()).toEqual(scenario.value);
-        });
-      },
-    );
+    ])("should return the runtime cached value if set and if the session storage value is also set", (scenario) => {
+      it(`should return the runtime cached value for scenario: ${scenario.label}`, async () => {
+        expect.assertions(1);
+        // Mock runtime cached value.
+        RequestFetchOffscreenService.isFetchOffscreenPreferredCache = scenario.value;
+        browser.storage.session.set({ [IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: !scenario.value });
+        expect(await RequestFetchOffscreenService.isFetchOffscreenPreferred()).toEqual(scenario.value);
+      });
+    });
   });
 
   describe("::buildOffscreenData", () => {

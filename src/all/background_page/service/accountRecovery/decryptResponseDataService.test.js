@@ -59,7 +59,7 @@ describe("DecryptResponseDataService", () => {
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({ data }));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("The message should be a valid openpgp message.");
+      await expect(promise).rejects.toThrow("The message should be a valid openpgp message.");
     });
 
     it("should fail if the response data cannot be parsed.", async () => {
@@ -69,7 +69,7 @@ describe("DecryptResponseDataService", () => {
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({ data }));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("Unable to parse the decrypted response data.");
+      await expect(promise).rejects.toThrow("Unable to parse the decrypted response data.");
     });
 
     it("should fail if the decrypted response data cannot be used to create a private key password decrypted data entity.", async () => {
@@ -95,7 +95,7 @@ describe("DecryptResponseDataService", () => {
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({ data }));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "The user id contained in the response data does not match the verification user id.",
       );
     });
@@ -117,9 +117,7 @@ describe("DecryptResponseDataService", () => {
         verificationKey,
       );
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError(
-        "The response data fingerprint should match the verification fingerprint.",
-      );
+      await expect(promise).rejects.toThrow("The response data fingerprint should match the verification fingerprint.");
     });
 
     it("should fail if the domain contained in the decrypted response data does not match the verification domain.", async () => {
@@ -137,7 +135,7 @@ describe("DecryptResponseDataService", () => {
         verificationKey,
       );
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "The domain contained in the private key password data does not match the expected target domain.",
       );
     });

@@ -40,7 +40,7 @@ describe("OpenSafariExtensionSettingsController", () => {
       // process
       const controller = new OpenSafariExtensionSettingsController(null, null);
       // expectations
-      await expect(controller.exec()).rejects.toThrow(error);
+      await expect(controller.exec()).rejects.toThrow(error.message);
     });
   });
 });

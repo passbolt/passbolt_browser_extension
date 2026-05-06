@@ -73,7 +73,7 @@ describe("FindSecretRevisionsService", () => {
         throw new Error("Something went wrong!");
       });
 
-      await expect(() => service.findAllByResourceId(uuidv4())).rejects.toThrowError();
+      await expect(() => service.findAllByResourceId(uuidv4())).rejects.toThrow();
     });
 
     it("should throw an error if the API respond with invalid data", async () => {
@@ -85,18 +85,18 @@ describe("FindSecretRevisionsService", () => {
 
       jest.spyOn(service.resourceSecretRevisionApiService, "findAllByResourceId").mockReturnValue(apiServiceResponse);
 
-      await expect(() => service.findAllByResourceId(uuidv4())).rejects.toThrowError(TypeError);
+      await expect(() => service.findAllByResourceId(uuidv4())).rejects.toThrow(TypeError);
     });
 
     it("should assert its parameters", async () => {
       expect.assertions(5);
 
       const service = new FindSecretRevisionsService(defaultApiClientOptions());
-      await expect(() => service.findAllByResourceId(42)).rejects.toThrowError();
-      await expect(() => service.findAllByResourceId(null)).rejects.toThrowError();
-      await expect(() => service.findAllByResourceId("wrong string")).rejects.toThrowError();
-      await expect(() => service.findAllByResourceId(uuidv4(), 42)).rejects.toThrowError();
-      await expect(() => service.findAllByResourceId(uuidv4())).rejects.toThrowError();
+      await expect(() => service.findAllByResourceId(42)).rejects.toThrow();
+      await expect(() => service.findAllByResourceId(null)).rejects.toThrow();
+      await expect(() => service.findAllByResourceId("wrong string")).rejects.toThrow();
+      await expect(() => service.findAllByResourceId(uuidv4(), 42)).rejects.toThrow();
+      await expect(() => service.findAllByResourceId(uuidv4())).rejects.toThrow();
     });
   });
 });

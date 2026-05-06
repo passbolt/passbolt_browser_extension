@@ -121,7 +121,7 @@ describe("MetadataKeysApiService", () => {
 
       const service = new MetadataKeysApiService(apiClientOptions);
       const promise = service.delete("not a uuid");
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
     it("should throw an error if the API returns an error response", async () => {
@@ -133,7 +133,7 @@ describe("MetadataKeysApiService", () => {
       const service = new MetadataKeysApiService(apiClientOptions);
       const promise = service.delete(expectedId);
       await expect(promise).rejects.toThrow(PassboltApiFetchError);
-      await expect(promise).rejects.toThrowError("Something went wrong!");
+      await expect(promise).rejects.toThrow("Something went wrong!");
     });
 
     it("should throw an error if the API returns an error response", async () => {
@@ -147,7 +147,7 @@ describe("MetadataKeysApiService", () => {
       const service = new MetadataKeysApiService(apiClientOptions);
       const promise = service.delete(expectedId);
       await expect(promise).rejects.toThrow(PassboltServiceUnavailableError);
-      await expect(promise).rejects.toThrowError("Unable to reach the server, an unexpected error occurred");
+      await expect(promise).rejects.toThrow("Unable to reach the server, an unexpected error occurred");
     });
   });
 
@@ -179,7 +179,7 @@ describe("MetadataKeysApiService", () => {
 
       const service = new MetadataKeysApiService(apiClientOptions);
       const promise = service.update("not a uuid");
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
     it("should throw an error if the metadata data is empty", async () => {
@@ -201,7 +201,7 @@ describe("MetadataKeysApiService", () => {
       const service = new MetadataKeysApiService(apiClientOptions);
       const promise = service.update(expectedId, metadataKey);
       await expect(promise).rejects.toThrow(PassboltApiFetchError);
-      await expect(promise).rejects.toThrowError("Something went wrong!");
+      await expect(promise).rejects.toThrow("Something went wrong!");
     });
 
     it("should throw an error if the API returns an error response", async () => {
@@ -217,7 +217,7 @@ describe("MetadataKeysApiService", () => {
       const service = new MetadataKeysApiService(apiClientOptions);
       const promise = service.update(expectedId, metadataKey);
       await expect(promise).rejects.toThrow(PassboltServiceUnavailableError);
-      await expect(promise).rejects.toThrowError("Unable to reach the server, an unexpected error occurred");
+      await expect(promise).rejects.toThrow("Unable to reach the server, an unexpected error occurred");
     });
   });
 });

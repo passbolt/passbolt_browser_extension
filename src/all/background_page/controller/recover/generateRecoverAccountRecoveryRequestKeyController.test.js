@@ -36,7 +36,7 @@ describe("GenerateRecoverAccountRecoveryRequestKeyController", () => {
 
       expect.assertions(2);
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError("Could not validate entity GenerateGpgKeyPairOptionsEntity.");
+      await expect(promise).rejects.toThrow("Could not validate entity GenerateGpgKeyPairOptionsEntity.");
       await expect(promise).rejects.toThrowEntityValidationErrorOnProperties(["passphrase", "email"]);
     });
 

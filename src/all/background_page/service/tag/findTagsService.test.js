@@ -70,7 +70,7 @@ describe("FindTagsService", () => {
       const error = new Error("unexpected error");
       jest.spyOn(service.tagService, "findAll").mockRejectedValue(error);
 
-      await expect(() => service.findAll()).rejects.toThrow(error);
+      await expect(() => service.findAll()).rejects.toThrow(error.message);
     });
   });
 });

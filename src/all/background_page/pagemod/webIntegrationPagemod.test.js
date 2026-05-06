@@ -17,7 +17,6 @@ import WebIntegration from "./webIntegrationPagemod";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
-import each from "jest-each";
 import Pagemod from "./pagemod";
 import { ConfigEvents } from "../event/configEvents";
 import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
@@ -76,10 +75,10 @@ describe("WebIntegration", () => {
       expect(result).toBeFalsy();
     });
 
-    each([
+    describe.each([
       { scenario: "Passbolt domain", url: "https://passbolt.dev/auth/login", frameId: Pagemod.TOP_FRAME_ID },
       { scenario: "No domain", url: "about:blank", frameId: 1 },
-    ]).describe("Should not be able to attach a pagemod to browser frame", (_props) => {
+    ])("Should not be able to attach a pagemod to browser frame", (_props) => {
       it(`Should not be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         // mock functions

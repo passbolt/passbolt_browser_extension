@@ -34,7 +34,7 @@ describe("CheckPassphraseController", () => {
     mockFindPrivate.mockImplementation(() => new ExternalGpgKeyEntity({ armored_key: pgpKeys.ada.private }));
     const controller = new CheckPassphraseController();
     const promise = controller.exec("wrong passphrase");
-    return expect(promise).rejects.toThrowError(new InvalidMasterPasswordError());
+    return expect(promise).rejects.toThrow(InvalidMasterPasswordError);
   });
 
   it(`Should throw an exception if no private key is found`, async () => {
@@ -42,6 +42,6 @@ describe("CheckPassphraseController", () => {
     mockFindPrivate.mockImplementation(() => null);
     const controller = new CheckPassphraseController();
     const promise = controller.exec("wrong passphrase");
-    return expect(promise).rejects.toThrowError(new Error("Private key not found."));
+    return expect(promise).rejects.toThrow("Private key not found.");
   });
 });

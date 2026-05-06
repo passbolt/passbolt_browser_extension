@@ -49,7 +49,7 @@ describe("MoveResourcesController", () => {
     const wrongResourcesIds = uuidv4();
 
     const controller = new MoveResourcesController(null, null, defaultApiClientOptions(), account);
-    await expect(() => controller.exec(wrongResourcesIds, "")).rejects.toThrowError(
+    await expect(() => controller.exec(wrongResourcesIds, "")).rejects.toThrow(
       "The resourceIds should be a valid array of UUID",
     );
   });
@@ -61,7 +61,7 @@ describe("MoveResourcesController", () => {
     const wrongResourcesIds = [uuidv4()];
 
     const controller = new MoveResourcesController(null, null, defaultApiClientOptions(), account);
-    await expect(() => controller.exec(wrongResourcesIds, "")).rejects.toThrowError(
+    await expect(() => controller.exec(wrongResourcesIds, "")).rejects.toThrow(
       "The destinationFolderId should be a valid UUID",
     );
   });

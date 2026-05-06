@@ -76,7 +76,7 @@ describe("GenerateGpgKeyPair service", () => {
       jest.useFakeTimers();
       const currentTime = new Date();
       currentTime.setMilliseconds(0);
-      jest.setSystemTime(currentTime);
+      jest.setSystemTime(currentTime.getTime());
       expect.assertions(18);
       const generateGpgKeyPairOptionsDto = defaultDto();
 

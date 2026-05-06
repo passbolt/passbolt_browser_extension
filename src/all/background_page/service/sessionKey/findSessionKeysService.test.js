@@ -86,7 +86,7 @@ describe("FindSessionKeysService", () => {
       spyOnFindService.mockImplementation(() => apiSessionKeysBundlesCollection);
 
       const expectedError = new Error("The session keys bundles should not be decrypted.");
-      await expect(() => service.findAllBundles()).rejects.toThrow(expectedError);
+      await expect(() => service.findAllBundles()).rejects.toThrow(expectedError.message);
     });
 
     it("throws API error if the API encountered an issue", async () => {

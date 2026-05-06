@@ -91,7 +91,7 @@ describe("FindAllByIdsForDisplayPermissionsController", () => {
 
       const promise = controller.exec([1]);
 
-      await expect(promise).rejects.toThrowError("The given parameter is not a valid array of uuid");
+      await expect(promise).rejects.toThrow("The given parameter is not a valid array of uuid");
     });
   });
 });

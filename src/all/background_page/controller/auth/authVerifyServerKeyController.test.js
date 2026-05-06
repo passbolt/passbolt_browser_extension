@@ -15,7 +15,6 @@
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AuthVerifyServerKeyController from "./authVerifyServerKeyController";
 import { Uuid } from "../../utils/uuid";
-import ServerKeyChangedError from "../../error/serverKeyChangedError";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
@@ -68,9 +67,7 @@ describe("AuthVerifyServerKeyController", () => {
         .mockImplementationOnce(() => ({ armored_key: pgpKeys.server.public }));
 
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError(
-        new ServerKeyChangedError("Could not verify the server key. The server key has changed."),
-      );
+      await expect(promise).rejects.toThrow("Could not verify the server key. The server key has changed.");
     });
 
     it("Should throw a server key expired error", async () => {
@@ -84,9 +81,7 @@ describe("AuthVerifyServerKeyController", () => {
         .mockImplementationOnce(() => ({ armored_key: pgpKeys.expired.public }));
 
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError(
-        new ServerKeyChangedError("Could not verify the server key. The server key is expired."),
-      );
+      await expect(promise).rejects.toThrow("Could not verify the server key. The server key is expired.");
     });
 
     it("Should throw a server key changed error if the server key cannot be parsed.", async () => {
@@ -120,9 +115,7 @@ describe("AuthVerifyServerKeyController", () => {
       const controller = new AuthVerifyServerKeyController(null, null, defaultApiClientOptions(), account);
 
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError(
-        new ServerKeyChangedError("Could not verify the server key. The server key cannot be parsed."),
-      );
+      await expect(promise).rejects.toThrow("Could not verify the server key. The server key cannot be parsed.");
     });
 
     it("Should throw a server error if the server cannot be verified", async () => {
@@ -136,10 +129,8 @@ describe("AuthVerifyServerKeyController", () => {
       });
 
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError(
-        new ServerKeyChangedError(
-          "Could not verify the server key. Server internal error. Check with your administrator.",
-        ),
+      await expect(promise).rejects.toThrow(
+        "Could not verify the server key. Server internal error. Check with your administrator.",
       );
     });
 
@@ -151,7 +142,7 @@ describe("AuthVerifyServerKeyController", () => {
       fetch.doMockOnceIf(/auth\/verify\.json\?api-version=v2/, async () => mockApiResponseError(500, expectedError));
 
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError(expectedError);
+      await expect(promise).rejects.toThrow(expectedError);
     });
 
     it("Should throw a the message error in case of no content status", async () => {
@@ -167,7 +158,7 @@ describe("AuthVerifyServerKeyController", () => {
         });
 
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError(expectedError);
+      await expect(promise).rejects.toThrow(expectedError);
     });
   });
 });

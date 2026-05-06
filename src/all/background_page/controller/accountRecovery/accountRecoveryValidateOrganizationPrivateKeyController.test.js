@@ -20,7 +20,6 @@ import { enabledAccountRecoveryOrganizationPolicyDto } from "../../model/entity/
 import WrongOrganizationRecoveryKeyError from "../../error/wrongOrganizationRecoveryKeyError";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
-import each from "jest-each";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -40,7 +39,7 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
       const resultPromise = controller.exec(accountRecoveryPrivateKeyDto);
 
       expect.assertions(1);
-      await expect(resultPromise).rejects.toThrowError(EntityValidationError);
+      await expect(resultPromise).rejects.toThrow(EntityValidationError);
     });
 
     it("Should throw an error if no account recovery organization policy is found.", async () => {
@@ -60,7 +59,7 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
       const result = controller.exec(privateKeyDto);
 
       expect.assertions(1);
-      await expect(result).rejects.toThrowError("Account recovery organization policy not found.");
+      await expect(result).rejects.toThrow("Account recovery organization policy not found.");
     });
 
     it("Should throw an error if the key doesn't validate.", async () => {
@@ -80,10 +79,10 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
       const result = controller.exec(privateKeyDto);
 
       expect.assertions(1);
-      await expect(result).rejects.toThrowError(WrongOrganizationRecoveryKeyError);
+      await expect(result).rejects.toThrow(WrongOrganizationRecoveryKeyError);
     });
 
-    each([
+    describe.each([
       {
         scenario: "private key decrypted",
         accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private_decrypted,
@@ -94,7 +93,7 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
         accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private,
         accountRecoveryOrganizationPrivateKeyPassphrase: pgpKeys.account_recovery_organization.passphrase,
       },
-    ]).describe("Should disable an account recovery organization policy previously enabled.", (test) => {
+    ])("Should disable an account recovery organization policy previously enabled.", (test) => {
       it(`Should validate a valid account organization private key: ${test.scenario}.`, async () => {
         const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(
           null,

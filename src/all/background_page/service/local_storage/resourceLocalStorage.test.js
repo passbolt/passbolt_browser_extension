@@ -67,7 +67,7 @@ describe("ResourceLocalStorage", () => {
   describe("::set", () => {
     it("Should throw if parameter is invalid.", async () => {
       expect.assertions(1);
-      await expect(() => ResourceLocalStorage.set(42)).rejects.toThrowError(
+      await expect(() => ResourceLocalStorage.set(42)).rejects.toThrow(
         "ResourceLocalStorage::set expects a ResourcesCollection",
       );
     });

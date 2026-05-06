@@ -87,19 +87,19 @@ describe("SecretRevisionsSettingsApiService", () => {
     it("should assert its parameters: wrong type", async () => {
       expect.assertions(1);
       const apiService = new SecretRevisionsSettingsApiService(apiClientOptions);
-      await expect(() => apiService.save(42)).rejects.toThrowError();
+      await expect(() => apiService.save(42)).rejects.toThrow();
     });
 
     it("should assert its parameters: null", async () => {
       expect.assertions(1);
       const apiService = new SecretRevisionsSettingsApiService(apiClientOptions);
-      await expect(() => apiService.save(null)).rejects.toThrowError();
+      await expect(() => apiService.save(null)).rejects.toThrow();
     });
 
     it("should assert its parameters: wrong string", async () => {
       expect.assertions(1);
       const apiService = new SecretRevisionsSettingsApiService(apiClientOptions);
-      await expect(() => apiService.save("wrong")).rejects.toThrowError();
+      await expect(() => apiService.save("wrong")).rejects.toThrow();
     });
   });
 
@@ -125,19 +125,19 @@ describe("SecretRevisionsSettingsApiService", () => {
     it("should assert its parameters: wrong type", async () => {
       expect.assertions(1);
       const apiService = new SecretRevisionsSettingsApiService(apiClientOptions);
-      await expect(() => apiService.delete(42)).rejects.toThrowError();
+      await expect(() => apiService.delete(42)).rejects.toThrow();
     });
 
     it("should assert its parameters: null", async () => {
       expect.assertions(1);
       const apiService = new SecretRevisionsSettingsApiService(apiClientOptions);
-      await expect(() => apiService.delete(null)).rejects.toThrowError();
+      await expect(() => apiService.delete(null)).rejects.toThrow();
     });
 
     it("should assert its parameters: wrong string", async () => {
       expect.assertions(1);
       const apiService = new SecretRevisionsSettingsApiService(apiClientOptions);
-      await expect(() => apiService.delete("wrong")).rejects.toThrowError();
+      await expect(() => apiService.delete("wrong")).rejects.toThrow();
     });
   });
 });

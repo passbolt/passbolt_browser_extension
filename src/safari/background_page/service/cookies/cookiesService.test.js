@@ -133,7 +133,7 @@ describe("CookieService", () => {
     it("should assert its parameter", async () => {
       expect.assertions(1);
       const service = new CookiesService("https://www.passbolt.com", TEST_STORE_ID);
-      await expect(() => service.updateCookiesWithSetCookieHeader(42)).rejects.toThrowError();
+      await expect(() => service.updateCookiesWithSetCookieHeader(42)).rejects.toThrow();
     });
   });
 
@@ -266,7 +266,7 @@ describe("CookieService", () => {
     it("should assert its parameter", () => {
       expect.assertions(1);
       const service = new CookiesService("https://www.passbolt.com", TEST_STORE_ID);
-      expect(() => service.deserialisedCookie(42)).toThrowError();
+      expect(() => service.deserialisedCookie(42)).toThrow();
     });
   });
 

@@ -74,7 +74,7 @@ describe("AccountRecoveryGetUserRequestsController", () => {
       const result = controller.exec(userId);
 
       expect.assertions(1);
-      expect(result).rejects.toThrowError("The user id is not valid");
+      expect(result).rejects.toThrow("The user id is not valid");
     });
   });
 });

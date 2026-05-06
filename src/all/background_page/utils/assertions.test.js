@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.10.0
  */
-import each from "jest-each";
 import {
   assertUuid,
   assertBase64String,
@@ -178,23 +177,23 @@ describe("Assertions", () => {
   });
 
   describe("Assertions::assertBoolean", () => {
-    each([
+    describe.each([
       { scenario: "True", value: true },
       { scenario: "False", value: false },
       { scenario: "undefined", value: undefined },
-    ]).describe(`Should not throw an error if the parameter is valid`, (props) => {
+    ])(`Should not throw an error if the parameter is valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertBoolean(props.value)).not.toThrow();
       });
     });
 
-    each([
+    describe.each([
       { scenario: "1", value: 1 },
       { scenario: "0", value: 0 },
       { scenario: "null", value: null },
       { scenario: "true", value: "true" },
-    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
+    ])(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertBoolean(props.value)).toThrow();
@@ -217,7 +216,7 @@ describe("Assertions", () => {
       const expectedError = new TypeError(expectedMessage);
       for (let i = 0; i < scenarios.length; i++) {
         const data = scenarios[i];
-        expect(() => assertType(data, AccountRecoveryPrivateKeyEntity, expectedMessage)).toThrow(expectedError);
+        expect(() => assertType(data, AccountRecoveryPrivateKeyEntity, expectedMessage)).toThrow(expectedError.message);
       }
     });
   });
@@ -237,27 +236,27 @@ describe("Assertions", () => {
   });
 
   describe("Assertions::assertNumber", () => {
-    each([
+    describe.each([
       { scenario: "Positive number", value: 42 },
       { scenario: "Negative number", value: -42 },
       { scenario: "0", value: 0 },
       { scenario: "Float", value: 42.2 },
       { scenario: "undefined", value: undefined },
-    ]).describe(`Should not throw an error if the parameter is valid`, (props) => {
+    ])(`Should not throw an error if the parameter is valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertNumber(props.value)).not.toThrow();
       });
     });
 
-    each([
+    describe.each([
       { scenario: "String number", value: "1" },
       { scenario: "true", value: true },
       { scenario: "false", value: false },
       { scenario: "null", value: null },
       { scenario: "object", value: {} },
       { scenario: "array", value: {} },
-    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
+    ])(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertNumber(props.value)).toThrow();
@@ -266,22 +265,22 @@ describe("Assertions", () => {
   });
 
   describe("Assertions::assertArrayUUID", () => {
-    each([
+    describe.each([
       { scenario: "Array of uuid", value: [uuid(), uuid()] },
       { scenario: "Empty array", value: [] },
-    ]).describe(`Should not throw an error if the parameter is valid`, (props) => {
+    ])(`Should not throw an error if the parameter is valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArrayUUID(props.value)).not.toThrow();
       });
     });
 
-    each([
+    describe.each([
       { scenario: "object", value: {} },
       { scenario: "null", value: null },
       { scenario: "array of number", value: [1, 2] },
       { scenario: "array of string", value: ["1", "2"] },
-    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
+    ])(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArrayUUID(props.value)).toThrow();
@@ -290,20 +289,20 @@ describe("Assertions", () => {
   });
 
   describe("Assertions:assertArray", () => {
-    each([
+    describe.each([
       { scenario: "Array", value: [false, true, 42, "42", {}, []] },
       { scenario: "Empty array", value: [] },
-    ]).describe(`Should not throw an error if the parameter is valid`, (props) => {
+    ])(`Should not throw an error if the parameter is valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArray(props.value)).not.toThrow();
       });
     });
 
-    each([
+    describe.each([
       { scenario: "object", value: {} },
       { scenario: "null", value: null },
-    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
+    ])(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertArray(props.value)).toThrow();
@@ -312,7 +311,7 @@ describe("Assertions", () => {
   });
 
   describe("Assertions:assertNonEmptyArray", () => {
-    each([{ scenario: "Array", value: [false, true, 42, "42", {}, []] }]).describe(
+    describe.each([{ scenario: "Array", value: [false, true, 42, "42", {}, []] }])(
       `Should not throw an error if the parameter is valid`,
       (props) => {
         it(`Scenario: ${props.scenario}`, () => {
@@ -322,11 +321,11 @@ describe("Assertions", () => {
       },
     );
 
-    each([
+    describe.each([
       { scenario: "object", value: {} },
       { scenario: "null", value: null },
       { scenario: "Empty array", value: [] },
-    ]).describe(`Should throw an error if the parameter is not valid`, (props) => {
+    ])(`Should throw an error if the parameter is not valid`, (props) => {
       it(`Scenario: ${props.scenario}`, () => {
         expect.assertions(1);
         expect(() => assertNonEmptyArray(props.value)).toThrow();

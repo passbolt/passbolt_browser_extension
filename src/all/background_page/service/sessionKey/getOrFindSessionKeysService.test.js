@@ -313,7 +313,7 @@ describe("GetOrFindSessionKeysService", () => {
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
 
       await expect(() => getOrFindSessionKeysService.getOrFindAllByForeignModelAndForeignIds({}, [])).rejects.toThrow(
-        new TypeError('The parameter "foreignModel" should not be an empty string'),
+        'The parameter "foreignModel" should not be an empty string',
       );
     });
 
@@ -333,11 +333,7 @@ describe("GetOrFindSessionKeysService", () => {
 
       await expect(() =>
         getOrFindSessionKeysService.getOrFindAllByForeignModelAndForeignIds("Resource", ["not a uuid"]),
-      ).rejects.toThrow(
-        new TypeError('The parameter "foreignIds" should contain only uuid', {
-          cause: new TypeError("The given parameter is not a valid UUID"),
-        }),
-      );
+      ).rejects.toThrow('The parameter "foreignIds" should contain only uuid');
     });
   });
 });

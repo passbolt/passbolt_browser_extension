@@ -14,7 +14,7 @@
   "Could not verify the server key.": "Ključa strežnika ni bilo mogoče preveriti.",
   "Creating folder...": "Ustvarjanje mape...",
   "Creating metadata key": "Ustvarjanje ključa metapodatkov",
-  "Creating password": "Ustvarjanje gesla",
+  "Creating resource": "Creating resource",
   "Decrypting ...": "Dešifriranje ...",
   "Decrypting {{counter}}/{{total}}": "Dešifriranje {{counter}}/{{total}}",
   "Decrypting secrets": "Dešifriranje gesel",

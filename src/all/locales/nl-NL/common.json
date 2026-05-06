@@ -14,7 +14,7 @@
   "Could not verify the server key.": "De serversleutel kon niet worden geverifieerd.",
   "Creating folder...": "Map wordt aangemaakt...",
   "Creating metadata key": "Metadata-sleutel maken",
-  "Creating password": "Wachtwoord wordt aangemaakt",
+  "Creating resource": "Creating resource",
   "Decrypting ...": "Ontsleutelen ...",
   "Decrypting {{counter}}/{{total}}": "Ontsleutelen van {{counter}}/{{total}}",
   "Decrypting secrets": "Geheimen ontsleutelen",

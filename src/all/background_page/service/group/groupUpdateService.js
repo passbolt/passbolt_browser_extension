@@ -37,6 +37,7 @@ import GroupApiService from "../api/group/groupApiService";
  * - Done
  */
 const PROGRESS_GOAL = 6;
+const YIELD_INTERVAL_MS = 25000; // yield avant 30s pour avoir une marge
 
 class GroupUpdateService {
   /**
@@ -117,7 +118,7 @@ class GroupUpdateService {
    */
   async encryptSecrets(privateKey, neededSecretsCollection, decryptedSecrets) {
     const groupUpdateSecrets = new GroupUpdateSecretsCollection([]);
-
+    let lastYield = Date.now();
     this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
     const usersPublicKeys = await this.retrieveAndReadUserPublicKeys(neededSecretsCollection);
 
@@ -127,7 +128,7 @@ class GroupUpdateService {
       const user_id = neededSecret.userId;
       const resource_id = neededSecret.resourceId;
 
-      await this.progressService.updateStepMessage(
+      this.progressService.updateStepMessage(
         i18n.t("Encrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }),
       );
       const data = await EncryptMessageService.encrypt(decryptedSecrets[resource_id], usersPublicKeys[user_id], [
@@ -136,6 +137,21 @@ class GroupUpdateService {
 
       const secret = new SecretEntity({ resource_id, user_id, data });
       groupUpdateSecrets.push(secret);
+
+      /*
+       * PB-51434
+       * Force a timeout promise to let the service worker respond to chromium
+       *
+       * Starting with Chrome 147, the regular check of the service worker on the event lop seems more strict
+       * If the service worker do a process that consume too much time and performance that it can not respond
+       * It will be killed by the browser as it is not responding at time.
+       *
+       * Using promise set timeout will solve the issue it releases the even loop enough time to respond
+       */
+      if (Date.now() - lastYield >= YIELD_INTERVAL_MS) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        lastYield = Date.now();
+      }
     }
 
     return groupUpdateSecrets;
@@ -150,6 +166,7 @@ class GroupUpdateService {
    */
   async decryptSecrets(privateKey, secretsCollection) {
     const result = [];
+    let lastYield = Date.now();
 
     const collectionLength = secretsCollection.length;
     for (let i = 0; i < collectionLength; i++) {
@@ -160,6 +177,21 @@ class GroupUpdateService {
         i18n.t("Decrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }),
       );
       result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
+
+      /*
+       * PB-51434
+       * Force a timeout promise to let the service worker respond to chromium
+       *
+       * Starting with Chrome 147, the regular check of the service worker on the event lop seems more strict
+       * If the service worker do a process that consume too much time and performance that it can not respond
+       * It will be killed by the browser as it is not responding at time.
+       *
+       * Using promise set timeout will solve the issue it releases the even loop enough time to respond
+       */
+      if (Date.now() - lastYield >= YIELD_INTERVAL_MS) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        lastYield = Date.now();
+      }
     }
 
     return result;

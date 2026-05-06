@@ -14,7 +14,7 @@
   "Could not verify the server key.": "Nu s-a putut verifica cheia serverului.",
   "Creating folder...": "Se creează folderul...",
   "Creating metadata key": "Se creează cheia de metadate",
-  "Creating password": "Se creează parola",
+  "Creating resource": "Creating resource",
   "Decrypting ...": "Se decriptează...",
   "Decrypting {{counter}}/{{total}}": "Decriptare {{counter}}/{{total}}",
   "Decrypting secrets": "Se decriptează secretele",

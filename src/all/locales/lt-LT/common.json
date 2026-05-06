@@ -14,7 +14,7 @@
   "Could not verify the server key.": "Nepavyko patvirtinti serverio rakto.",
   "Creating folder...": "Kuriamas aplankas...",
   "Creating metadata key": "Kuriamas metaduomenų raktas",
-  "Creating password": "Sukurti slaptažodį",
+  "Creating resource": "Creating resource",
   "Decrypting ...": "Iššifruojama ...",
   "Decrypting {{counter}}/{{total}}": "Iššifruoti {{counter}}/{{total}}",
   "Decrypting secrets": "Iššifruojamos paslaptys",

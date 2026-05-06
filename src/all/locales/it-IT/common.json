@@ -14,7 +14,7 @@
   "Could not verify the server key.": "Impossibile verificare la chiave del server.",
   "Creating folder...": "Creazione cartella...",
   "Creating metadata key": "Creazione della chiave dei metadati",
-  "Creating password": "Creazione password",
+  "Creating resource": "Creating resource",
   "Decrypting ...": "Decriptaggio...",
   "Decrypting {{counter}}/{{total}}": "Decriptazione {{counter}}/{{total}}",
   "Decrypting secrets": "Decriptazione dei segreti",

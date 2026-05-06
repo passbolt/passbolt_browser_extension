@@ -14,7 +14,7 @@
   "Could not verify the server key.": "Не удалось проверить ключ сервера.",
   "Creating folder...": "Создание папки...",
   "Creating metadata key": "Создание ключа метаданных",
-  "Creating password": "Создание пароля",
+  "Creating resource": "Creating resource",
   "Decrypting ...": "Расшифровка ...",
   "Decrypting {{counter}}/{{total}}": "Расшифровка {{counter}}/{{total}}",
   "Decrypting secrets": "Расшифровка паролей",

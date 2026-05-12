@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.12.1] - 2026-05-12
+### Fixed
+- PB-51546 On Safari after log out, the login page does not show until the page is refreshed
+- PB-51547 On Safari after log in, some pages take a lot of time to display
+
 ## [5.12.0] - 2026-05-12
 ### Added
 - PB-51015 Add PIN code resource type in resourceTypeSchemasDefinition
@@ -2716,7 +2721,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.12.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.12.1...HEAD
+[5.12.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.12.0...v5.12.1
 [5.12.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.11.3...v5.12.0
 [5.11.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.11.2...v5.11.3
 [5.11.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.11.1...v5.11.0

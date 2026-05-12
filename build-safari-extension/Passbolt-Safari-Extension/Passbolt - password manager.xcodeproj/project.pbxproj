@@ -595,7 +595,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager Extension/Passbolt - password manager Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -622,7 +622,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.12.0;
+				MARKETING_VERSION = 5.12.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -641,7 +641,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager Extension/Passbolt - password manager Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -668,7 +668,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.12.0;
+				MARKETING_VERSION = 5.12.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -690,7 +690,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager/Passbolt - password manager.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -718,7 +718,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.12.0;
+				MARKETING_VERSION = 5.12.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -741,7 +741,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager/Passbolt - password manager.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -769,7 +769,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.12.0;
+				MARKETING_VERSION = 5.12.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,

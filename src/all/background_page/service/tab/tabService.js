@@ -53,28 +53,6 @@ class TabService {
   }
 
   /**
-   * Handle webNavigation.onCompleted events.
-   * Used by Safari entry point. The browser-level URL filter ensures only http/https URLs reach this handler.
-   * @param {object} details The webNavigation event details
-   * @param {number} details.tabId The tab id
-   * @param {number} details.frameId The frame id (0 for top frame)
-   * @param {string} details.url The URL of the navigation
-   * @returns {Promise<void>}
-   */
-  static async execNavigationCompletion(details) {
-    /*
-     * SECURITY: Only process top-frame navigations.
-     * webNavigation.onCompleted fires for all frames including iframes.
-     * Passbolt must never inject content scripts into iframes.
-     */
-    if (details.frameId !== 0) {
-      return;
-    }
-
-    await TabService.handleNavigation(details.tabId, details.url);
-  }
-
-  /**
    * Handle a completed top-frame navigation. Manages worker lifecycle and triggers pagemod identification.
    * Shared by both tabs.onUpdated (exec) and webNavigation.onCompleted (execNavigationCompletion) entry points.
    * @param {number} tabId The tab id

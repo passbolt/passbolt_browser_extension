@@ -21,10 +21,11 @@ class WebNavigationService {
    * @returns {Promise<void>}
    */
   static async exec(frameDetails) {
-    // Remove port and worker in session storage if the user navigate
-    if (frameDetails.frameId === 0) {
-      await PortManager.onTabRemoved(frameDetails.tabId);
+    if (frameDetails.frameId !== 0) {
+      return;
     }
+    // Remove port and worker in session storage if the user navigate
+    await PortManager.onTabRemoved(frameDetails.tabId);
     // Process to detect a pagemod and inject CSS, JS files
     await PagemodManager.exec(frameDetails);
   }

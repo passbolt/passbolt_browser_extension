@@ -14,7 +14,6 @@
 import PortManager from "../../all/background_page/sdk/port/portManager";
 import SystemRequirementService from "../../all/background_page/service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "../../all/background_page/controller/extension/onExtensionInstalledController";
-import TabService from "../../all/background_page/service/tab/tabService";
 import User from "../../all/background_page/model/user";
 import Log from "../../all/background_page/model/log";
 import CheckAuthStatusService from "../../all/background_page/service/auth/checkAuthStatusService";
@@ -23,6 +22,7 @@ import PostLoginService from "../../all/background_page/service/auth/postLoginSe
 import PostLogoutService from "../../all/background_page/service/auth/postLogoutService";
 import OnStartUpService from "../../all/background_page/service/extension/onStartUpService";
 import ToolbarService from "../../all/background_page/service/toolbar/toolbarService";
+import WebNavigationService from "../../all/background_page/service/webNavigation/webNavigationService";
 
 const main = async () => {
   /**
@@ -79,7 +79,7 @@ browser.runtime.onStartup.addListener(OnStartUpService.exec);
  * Add listener on web navigation completed (replaces tabs.onUpdated for navigation detection).
  * The URL filter ensures only http/https navigations reach the handler.
  */
-browser.webNavigation.onCompleted.addListener(TabService.execNavigationCompletion, {
+browser.webNavigation.onCompleted.addListener(WebNavigationService.exec, {
   url: [{ schemes: ["http", "https"] }],
 });
 

@@ -40,7 +40,7 @@ describe("NavigationService", () => {
       expect(PagemodManager.exec).toHaveBeenCalledWith(frameDetails);
     });
 
-    it("Should only exec pagemod manager", async () => {
+    it("Should exec nothing when frameId is not 0", async () => {
       expect.assertions(2);
       // data mocked
       const frameDetails = {
@@ -52,7 +52,7 @@ describe("NavigationService", () => {
       await WebNavigationService.exec(frameDetails);
       // expectations
       expect(PortManager.onTabRemoved).not.toHaveBeenCalled();
-      expect(PagemodManager.exec).toHaveBeenCalledWith(frameDetails);
+      expect(PagemodManager.exec).not.toHaveBeenCalledWith(frameDetails);
     });
   });
 });

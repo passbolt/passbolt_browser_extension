@@ -6,8 +6,18 @@ set -eu
 
 CI_SCRIPTS_DIR=$(dirname "$0")/..
 
-# shellcheck source=.gitlab-ci/scripts/lib/version-check.sh
+# shellcheck source=ci-scripts/lib/version-check.sh
 source "$CI_SCRIPTS_DIR"/lib/version-check.sh
+
+function send_to_firefox() {
+  echo "not supported yet"
+  exit 1
+}
+
+function send_to_edge() {
+  echo "not supported yet"
+  exit 1
+}
 
 function send_to_chrome() {
   local token
@@ -16,9 +26,9 @@ function send_to_chrome() {
   curl \
     -H "Authorization: Bearer $token"  \
     -H "x-goog-api-version: 2" \
-    -X PUT \
-    -T "dist/chromium-mv3/passbolt-${CI_COMMIT_TAG#v}.zip" \
-    https://www.googleapis.com/upload/chromewebstore/v1.1/items/"$id"
+    -H "Content-Length: 0" \
+    -X POST \
+    https://www.googleapis.com/chromewebstore/v1.1/items/"$id"/publish
 }
 
 if is_release_candidate "$CI_COMMIT_TAG"; then
@@ -29,6 +39,7 @@ if is_release_candidate "$CI_COMMIT_TAG"; then
     firefox)
       echo "We don't send RC for firefox to review"
     ;;
+
     edge)
       echo "We don't send RC for edge to review"
     ;;
@@ -36,17 +47,19 @@ if is_release_candidate "$CI_COMMIT_TAG"; then
     ;;
   esac
 elif is_stable "$CI_COMMIT_TAG"; then
-  case $1 in
+  case "$1" in
     chrome)
       send_to_chrome "$PASSBOLT_STABLE_CHROME_ID"
     ;;
     firefox)
-      echo "We don't send RC for firefox to review"
+      send_to_firefox
     ;;
     edge)
-      echo "We don't send RC for edge to review"
+      send_to_edge
     ;;
     *) echo "I don't recognize this option"
     ;;
   esac
+else
+  echo "The tag format is not supported"
 fi

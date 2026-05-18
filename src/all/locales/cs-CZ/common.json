@@ -14,7 +14,7 @@
   "Could not verify the server key.": "Nepodařilo se ověřit klíč serveru.",
   "Creating folder...": "Vytváření složky...",
   "Creating metadata key": "Vytváření klíče metadat",
-  "Creating password": "Vytváření hesla",
+  "Creating resource": "Creating resource",
   "Decrypting ...": "Dešifrování...",
   "Decrypting {{counter}}/{{total}}": "Dešifrování {{counter}}/{{total}}",
   "Decrypting secrets": "Dešifrování tajných klíčů",

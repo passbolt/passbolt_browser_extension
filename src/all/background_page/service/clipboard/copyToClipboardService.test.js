@@ -53,7 +53,7 @@ describe("CopyToClipboardService", () => {
       const account = new AccountEntity(defaultAccountDto());
       const service = new CopyToClipboardService(account);
 
-      await expect(() => service.copyTemporarily(42)).rejects.toThrowError();
+      await expect(() => service.copyTemporarily(42)).rejects.toThrow();
     });
   });
 
@@ -81,7 +81,7 @@ describe("CopyToClipboardService", () => {
       const account = new AccountEntity(defaultAccountDto());
       const service = new CopyToClipboardService(account);
 
-      await expect(() => service.copy(42)).rejects.toThrowError();
+      await expect(() => service.copy(42)).rejects.toThrow();
     });
   });
 

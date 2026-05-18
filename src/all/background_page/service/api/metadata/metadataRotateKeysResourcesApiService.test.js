@@ -86,8 +86,8 @@ describe("MetadataRotateKeysResourcesApiService", () => {
       const service = new MetadataRotateKeysResourcesApiService(apiClientOptions);
       const resultDto = await service.rotate(resourcesCollection);
 
-      expect(resultDto.body).toEqual(expect.objectContaining(dto));
-      expect(reqPayload).toEqual(expect.objectContaining(dto));
+      expect(resultDto.body).toEqual(expect.arrayContaining(dto));
+      expect(reqPayload).toEqual(expect.arrayContaining(dto));
     });
 
     it("throws an invalid parameter error if the resources collection parameter is not valid", async () => {

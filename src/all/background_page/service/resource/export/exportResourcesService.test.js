@@ -46,9 +46,13 @@ import {
   RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
-import each from "jest-each";
-import { resourceCollectionV4ToExport, resourceCollectionV5ToExport } from "./exportResourcesService.test.data";
+import {
+  resourceCollectionV4ToExport,
+  resourceCollectionV5ToExport,
+  chromiumCsvWithPinCodeFile,
+} from "./exportResourcesService.test.data";
 import {
   KdbxCsvFile,
   bitwardenCsvFile,
@@ -122,7 +126,7 @@ describe("ExportResourcesService", () => {
 
   describe("::exportToFile", () => {
     describe("Should export the csv file.", () => {
-      each([
+      describe.each([
         { format: FORMAT_CSV_LASTPASS, expected: lastpassCsvFile },
         { format: FORMAT_CSV_1PASSWORD, expected: onePasswordCsvFile },
         { format: FORMAT_CSV_CHROMIUM, expected: chromiumCsvFile },
@@ -131,12 +135,12 @@ describe("ExportResourcesService", () => {
         { format: FORMAT_CSV_DASHLANE, expected: dashlaneCsvFile },
         { format: FORMAT_CSV_NORDPASS, expected: nordPassCsvFile },
         { format: FORMAT_CSV_LOGMEONCE, expected: logMeOnceCsvFile },
-      ]).describe("Should export the csv file with password and description.", (test) => {
-        each([
+      ])("Should export the csv file with password and description.", (test) => {
+        describe.each([
           { version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG },
           { version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG, isShared: true },
           { version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG, isPrivate: true },
-        ]).describe(`Should export ${test.format}`, (iteration) => {
+        ])(`Should export ${test.format}`, (iteration) => {
           it(`${iteration.version}`, async () => {
             expect.assertions(1);
             const resourceType = resourceTypeCollection.find(
@@ -174,14 +178,14 @@ describe("ExportResourcesService", () => {
           });
         });
       });
-      each([
+      describe.each([
         { format: FORMAT_CSV_BITWARDEN, expected: bitwardenCsvFile },
         { format: FORMAT_CSV_KDBX, expected: KdbxCsvFile },
-      ]).describe("Should export the csv file with password, description and totp.", (test) => {
-        each([
+      ])("Should export the csv file with password, description and totp.", (test) => {
+        describe.each([
           { version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG },
           { version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG },
-        ]).describe(`Should export ${test.format}`, (iteration) => {
+        ])(`Should export ${test.format}`, (iteration) => {
           it(`${iteration.version}`, async () => {
             expect.assertions(1);
             const resourceType = resourceTypeCollection.find(
@@ -223,8 +227,39 @@ describe("ExportResourcesService", () => {
         });
       });
     });
+    describe("Should export the csv file with pin code mapped to password field.", () => {
+      it("v5 pin code", async () => {
+        expect.assertions(1);
+        const resourceType = resourceTypeCollection.find(
+          (resourceType) => resourceType.slug === RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
+        );
+        const file = {
+          format: FORMAT_CSV_CHROMIUM,
+          resources_ids: [uuidv4()],
+          folders_ids: [foldersDto[0].id],
+        };
+        const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
+
+        const resourceCollectionDto = await resourceCollectionV5ToExport({
+          resourceType: resourceType,
+          folder_parent_id: foldersDto[0].id,
+          pin_code: "123456",
+        });
+
+        const resourceCollection = new ResourcesCollection(resourceCollectionDto);
+        await encryptMetadataService.encryptAllFromForeignModels(resourceCollection, pgpKeys.ada.passphrase);
+        const encryptedResourceCollectionDto = resourceCollection.resources;
+
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => encryptedResourceCollectionDto);
+
+        await service.prepareExportContent(exportResourcesFileEntity);
+        await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
+
+        expect(exportResourcesFileEntity.file).toEqual(chromiumCsvWithPinCodeFile);
+      });
+    });
     describe("Should export the KDBX file.", () => {
-      each([{ format: FORMAT_KDBX }, { format: FORMAT_KDBX_OTHERS }]).describe(
+      describe.each([{ format: FORMAT_KDBX }, { format: FORMAT_KDBX_OTHERS }])(
         "Should export the KDBX file.",
         (test) => {
           /**
@@ -251,10 +286,10 @@ describe("ExportResourcesService", () => {
             await kdbxExporter.export(exportResourcesFileEntity);
           }
 
-          each([
+          describe.each([
             { version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG },
             { version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG },
-          ]).describe(`Should export ${test.format}`, (iteration) => {
+          ])(`Should export ${test.format}`, (iteration) => {
             it(`Should export KDBX ${test.format} without credentials - <${iteration.version}>`, async () => {
               expect.assertions(1);
               const resourceType = resourceTypeCollection.find(

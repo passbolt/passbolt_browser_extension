@@ -47,7 +47,7 @@ describe("FindRbacService", () => {
         throw new Error("Something went wrong");
       });
 
-      await expect(() => service.findMe()).rejects.toThrowError();
+      await expect(() => service.findMe()).rejects.toThrow();
     });
 
     it("should throw an error if the data is invalid", async () => {
@@ -61,7 +61,7 @@ describe("FindRbacService", () => {
         .spyOn(service.rbacApiService, "findMe")
         .mockImplementation(async () => new PassboltResponseEntity({ header: {}, body: collectionDto }));
 
-      await expect(() => service.findMe()).rejects.toThrowError();
+      await expect(() => service.findMe()).rejects.toThrow();
     });
   });
 });

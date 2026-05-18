@@ -73,7 +73,7 @@ describe("DeleteCommentController", () => {
 
       expect.assertions(3);
 
-      await expect(controller.exec(uuid)).rejects.toThrowError(unvalidUuid);
+      await expect(controller.exec(uuid)).rejects.toThrow(unvalidUuid.message);
       expect(spy).toHaveBeenCalled();
       expect(spy).toHaveBeenCalledTimes(1);
     });
@@ -85,7 +85,7 @@ describe("DeleteCommentController", () => {
 
       expect.assertions(3);
 
-      await expect(controller.exec(null)).rejects.toThrowError(unvalidUuid);
+      await expect(controller.exec(null)).rejects.toThrow(unvalidUuid.message);
       expect(spy).toHaveBeenCalled();
       expect(spy).toHaveBeenCalledTimes(1);
     });
@@ -99,7 +99,7 @@ describe("DeleteCommentController", () => {
 
       expect.assertions(3);
 
-      await expect(controller.exec(id)).rejects.toThrowError(mockedError);
+      await expect(controller.exec(id)).rejects.toThrow(mockedError.message);
       expect(spy).toHaveBeenCalled();
       expect(spy).toHaveBeenCalledTimes(1);
     });

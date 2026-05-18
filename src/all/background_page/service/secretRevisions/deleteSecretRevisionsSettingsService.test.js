@@ -43,7 +43,7 @@ describe("DeleteSecretRevisionsSettingsService", () => {
         throw new Error();
       });
 
-      await expect(() => service.deleteSettings()).rejects.toThrowError();
+      await expect(() => service.deleteSettings()).rejects.toThrow();
     });
   });
 });

@@ -38,10 +38,8 @@ import {
   safariCsvFile,
 } from "../../model/entity/import/importResourcesFileEntity.test.data";
 import BinaryConvert from "../../utils/format/binaryConvert";
-import each from "jest-each";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import FileTypeError from "../../error/fileTypeError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import fs from "fs";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
@@ -150,7 +148,7 @@ describe("ImportResourcesFileController", () => {
         await expect(promise).resolves.not.toThrow();
       });
 
-      each([
+      describe.each([
         { scenario: "empty file extension", extension: null },
         { scenario: "xls", extension: "xls" },
         { scenario: "xlsx", extension: "xlsx" },
@@ -159,13 +157,13 @@ describe("ImportResourcesFileController", () => {
         { scenario: "JSON", extension: "json" },
         { scenario: "XML", extension: "xml" },
         { scenario: "yaml", extension: "yaml" },
-      ]).describe("Should reject other extension.", (test) => {
+      ])("Should reject other extension.", (test) => {
         it(`Should reject ${test.scenario} extension`, async () => {
           expect.assertions(1);
 
           const promise = controller.exec(test.scenario, null);
 
-          await expect(promise).rejects.toThrow(new FileTypeError("The file type is not supported"));
+          await expect(promise).rejects.toThrow("The file type is not supported");
         });
       });
     });
@@ -184,7 +182,7 @@ describe("ImportResourcesFileController", () => {
         await expect(promise).resolves.not.toThrow();
       });
 
-      each([
+      describe.each([
         { scenario: "null", file: null },
         { scenario: "undefined", file: undefined },
         { scenario: "string", file: "not a base 64" },
@@ -193,23 +191,23 @@ describe("ImportResourcesFileController", () => {
         { scenario: "Array", file: [] },
         { scenario: "Boolean", file: true },
         { scenario: "Function", file: () => {} },
-      ]).describe("Should reject other file.", (test) => {
+      ])("Should reject other file.", (test) => {
         it(`Should reject ${test.scenario} file`, async () => {
           expect.assertions(1);
 
           const promise = controller.exec("csv", test.file);
 
           if (typeof test.file === "string") {
-            await expect(promise).rejects.toThrow(new TypeError("The given parameter is not a valid base64 string"));
+            await expect(promise).rejects.toThrow("The given parameter is not a valid base64 string");
           } else {
-            await expect(promise).rejects.toThrow(new TypeError(`Expected a string but received a ${test.scenario}`));
+            await expect(promise).rejects.toThrow(`Expected a string but received a ${test.scenario}`);
           }
         });
       });
     });
 
     describe("Should parse kdbx file and import resources.", () => {
-      each([
+      describe.each([
         {
           scenario: "default v4",
           metadataTypesSettings: defaultMetadataTypesSettingsV4Dto(),
@@ -220,7 +218,7 @@ describe("ImportResourcesFileController", () => {
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG,
         },
-      ]).describe("should parse minimal kbdx", (test) => {
+      ])("should parse minimal kbdx", (test) => {
         beforeEach(() => {
           jest
             .spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
@@ -462,7 +460,7 @@ describe("ImportResourcesFileController", () => {
     });
 
     describe("Should parse csv file and import resources.", () => {
-      each([
+      describe.each([
         {
           scenario: "chromium",
           file: chromiumCsvFile,
@@ -487,7 +485,7 @@ describe("ImportResourcesFileController", () => {
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG,
         },
-      ]).describe("should parse minimal csv", (test) => {
+      ])("should parse minimal csv", (test) => {
         beforeEach(() => {
           jest
             .spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
@@ -536,7 +534,7 @@ describe("ImportResourcesFileController", () => {
         });
       });
 
-      each([
+      describe.each([
         {
           scenario: "dashlane",
           file: dashlaneCsvFile,
@@ -573,7 +571,7 @@ describe("ImportResourcesFileController", () => {
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG,
         },
-      ]).describe("Should parse csv with description", (test) => {
+      ])("Should parse csv with description", (test) => {
         beforeEach(() => {
           jest
             .spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
@@ -623,7 +621,7 @@ describe("ImportResourcesFileController", () => {
         });
       });
 
-      each([
+      describe.each([
         {
           scenario: "1Password",
           file: onePasswordCsvFile,
@@ -660,7 +658,7 @@ describe("ImportResourcesFileController", () => {
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_SLUG,
         },
-      ]).describe("Should parse csv with description and folder", (test) => {
+      ])("Should parse csv with description and folder", (test) => {
         beforeEach(() => {
           jest
             .spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")
@@ -711,7 +709,7 @@ describe("ImportResourcesFileController", () => {
         });
       });
 
-      each([
+      describe.each([
         {
           scenario: "keypass",
           file: defaultKDBXCSVData(),
@@ -736,7 +734,7 @@ describe("ImportResourcesFileController", () => {
           metadataTypesSettings: defaultMetadataTypesSettingsV50FreshDto(),
           resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
         },
-      ]).describe("Should parse keypass with description, folder and totp", (test) => {
+      ])("Should parse keypass with description, folder and totp", (test) => {
         beforeEach(() => {
           jest
             .spyOn(GetOrFindMetadataSettingsService.prototype, "getOrFindTypesSettings")

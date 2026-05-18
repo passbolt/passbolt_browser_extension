@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 import { enableFetchMocks } from "jest-fetch-mock";
-import each from "jest-each";
 import Keyring from "../../model/keyring";
 import ValidateOrganizationPublicKeyService from "./validateOrganizationPublicKeyService";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
@@ -50,7 +49,7 @@ describe("ValidateOrganizationPublicKeyService::validatePublicKey", () => {
     return expect(validationPromise).resolves.not.toThrow();
   });
 
-  each([
+  describe.each([
     { key: pgpKeys.anita.public, expectedError: new Error("The key algorithm should be RSA.") },
     { key: pgpKeys.ada.private, expectedError: new Error("The key should be public.") },
     { key: pgpKeys.revokedKey.public, expectedError: new Error("The key should not be revoked.") },
@@ -72,7 +71,7 @@ describe("ValidateOrganizationPublicKeyService::validatePublicKey", () => {
       key: pgpKeys.account_recovery_organization_alternative.public,
       expectedError: new Error("The key is the current organization recovery key, you must provide a new one."),
     },
-  ]).describe("Should throw an error when the key cannot be validated", (scenario) => {
+  ])("Should throw an error when the key cannot be validated", (scenario) => {
     it(`Should throw an error with the scenario: ${scenario.expectedError.message}`, async () => {
       expect.assertions(1);
       const service = new ValidateOrganizationPublicKeyService(defaultApiClientOptions());

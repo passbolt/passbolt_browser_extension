@@ -32,11 +32,17 @@ export const resourceCollectionV4ToExport = async (data = {}, options = {}) => {
 };
 
 export const resourceCollectionV5ToExport = async (data = {}, options = {}) => {
-  const plaintextDto = {
-    password: data.password || "Password 1",
-    description: data.description || "Description 1",
-    totp: data.totp,
-  };
+  const plaintextDto = {};
+  if (data.pin_code) {
+    plaintextDto.pin_code = data.pin_code;
+    plaintextDto.object_type = "PASSBOLT_SECRET_DATA";
+  } else {
+    plaintextDto.password = data.password || "Password 1";
+  }
+  plaintextDto.description = data.description || "Description 1";
+  if (data.totp) {
+    plaintextDto.totp = data.totp;
+  }
   const id = uuidv4();
   const resourceType = data.resourceType || resourceTypePasswordAndDescriptionDto();
 
@@ -75,3 +81,8 @@ export const resourceCollectionV5ToExport = async (data = {}, options = {}) => {
 
   return [dto];
 };
+
+export const chromiumCsvWithPinCodeFile = [
+  '"name","url","username","password"',
+  '"Password 1","https://url1.com","Username 1","123456"',
+].join("\r\n");

@@ -57,7 +57,7 @@ describe("UpdateScimSettingsService", () => {
       const scimSetting = new ScimSettingsEntity(scimSettingsWithoutSecretTokenDto());
       const error = new Error("The given parameter is not a valid UUID");
 
-      await expect(() => service.update("invalid-uuid", scimSetting)).rejects.toThrow(error);
+      await expect(() => service.update("invalid-uuid", scimSetting)).rejects.toThrow(error.message);
     });
 
     it("throws an error for invalid scimSettings type", async () => {

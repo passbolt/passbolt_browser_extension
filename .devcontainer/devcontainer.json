@@ -1,0 +1,31 @@
+// @see: https://containers.dev/implementors/json_reference/#general-properties
+{
+  "name": "[passbolt-browser-extension] Devcontainer",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/passbolt-browser-extension",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Anthropic.claude-code",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Orta.vscode-jest"
+      ]
+    },
+    "jetbrains": {
+      "plugins": [
+        "com.anthropic.code.plugin",
+        "com.intellij.reactivestreams",
+        "intellij.prettierJS"
+      ]
+    }
+  },
+  "remoteUser": "node",
+  "initializeCommand": "mkdir -p ${localEnv:HOME}/.claude/managed-settings && cp \"/Library/Application Support/ClaudeCode/managed-settings.json\" ${localEnv:HOME}/.claude/managed-settings/ 2>/dev/null || true",
+  "postCreateCommand": "npm install && echo 'Dev environment is ready!'",
+  "postStartCommand": "chmod +x .devcontainer/post-start.sh && .devcontainer/post-start.sh"
+}

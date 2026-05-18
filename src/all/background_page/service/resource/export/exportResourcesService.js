@@ -110,7 +110,7 @@ class ExportResourcesService {
         secretSchema,
         privateKey,
       );
-      exportResourceEntity.secretClear = plaintextSecret.password || "";
+      exportResourceEntity.secretClear = plaintextSecret.password || plaintextSecret.pinCode || "";
       exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description || "";
       if (plaintextSecret.totp) {
         exportResourceEntity.totp = new ExternalTotpEntity(plaintextSecret.totp);

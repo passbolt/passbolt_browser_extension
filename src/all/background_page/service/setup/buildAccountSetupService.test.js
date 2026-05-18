@@ -20,13 +20,13 @@ describe("BuildAccountSetupService", () => {
     it("should not build if parameter url is not a string.", () => {
       const url = 42;
       expect.assertions(1);
-      expect(() => BuildAccountSetupService.buildFromSetupUrl(url)).toThrowError("Url should be a valid string.");
+      expect(() => BuildAccountSetupService.buildFromSetupUrl(url)).toThrow("Url should be a valid string.");
     });
 
     it("should not build if url cannot be parsed.", () => {
       const url = "https://passbolt.dev/setup/start";
       expect.assertions(1);
-      expect(() => BuildAccountSetupService.buildFromSetupUrl(url)).toThrowError();
+      expect(() => BuildAccountSetupService.buildFromSetupUrl(url)).toThrow();
     });
 
     it("should build.", () => {

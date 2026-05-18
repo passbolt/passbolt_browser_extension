@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 
-import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountRecoveryOrganizationPolicyChangeEntity from "./accountRecoveryOrganizationPolicyChangeEntity";
@@ -31,7 +30,7 @@ describe("AccountRecoveryOrganizationPolicyChange entity", () => {
     );
   });
 
-  each([
+  describe.each([
     { scenario: "Change to a disabled policy", dto: changeToADisabledAccountRecoveryOrganizationPolicyDto() },
     { scenario: "Change to an enabled policy", dto: changeToAndEnabledAccountRecoveryOrganizationPolicyDto() },
     {
@@ -39,7 +38,7 @@ describe("AccountRecoveryOrganizationPolicyChange entity", () => {
       dto: changeAnEnabledAccountRecoveryOrganizationPolicyTypeDto(),
     },
     { scenario: "Rotate key only (without policy change)", dto: rotateAccountRecoveryOrganizationPolicyKeyDto() },
-  ]).describe("constructor works with data", (_props) => {
+  ])("constructor works with data", (_props) => {
     it(`it supports scenario: ${_props.scenario}`, () => {
       expect.assertions(1);
       const entity = new AccountRecoveryOrganizationPolicyChangeEntity(_props.dto);

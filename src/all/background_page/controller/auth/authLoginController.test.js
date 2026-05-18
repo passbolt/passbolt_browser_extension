@@ -26,7 +26,6 @@ import { defaultEmptySettings, withAzureSsoSettings } from "../sso/getCurrentSso
 import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
 import PostLoginService from "../../service/auth/postLoginService";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
-import each from "jest-each";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 
@@ -53,7 +52,7 @@ describe("AuthLoginController", () => {
       fetch.doMockOnceIf(new RegExp("/sso/settings/current.json"), () => mockApiResponse(ssoSettings));
     };
 
-    each([
+    describe.each([
       { scenario: "remember me true", passphrase: passphrase, rememberMe: true, shouldRefreshCurrentTab: true },
       {
         scenario: "remember me true, no tab refresh",
@@ -68,7 +67,7 @@ describe("AuthLoginController", () => {
         rememberMe: false,
         shouldRefreshCurrentTab: false,
       },
-    ]).describe("Should sign-in the user.", (test) => {
+    ])("Should sign-in the user.", (test) => {
       it(`Sign in with ${test.scenario}`, async () => {
         mockOrganisationSettings(false);
 
@@ -112,9 +111,9 @@ describe("AuthLoginController", () => {
 
       expect.assertions(2);
       const promiseMissingParameter = controller.exec();
-      await expect(promiseMissingParameter).rejects.toThrowError("A passphrase is required.");
+      await expect(promiseMissingParameter).rejects.toThrow("A passphrase is required.");
       const promiseInvalidTypeParameter = controller.exec(2);
-      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The passphrase should be a string.");
+      await expect(promiseInvalidTypeParameter).rejects.toThrow("The passphrase should be a string.");
     }, 10000);
 
     it("Should throw an exception if the provided remember me is not a valid boolean.", async () => {
@@ -123,7 +122,7 @@ describe("AuthLoginController", () => {
 
       expect.assertions(1);
       const promiseInvalidTypeParameter = controller.exec("passphrase", 42);
-      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The rememberMe should be a boolean.");
+      await expect(promiseInvalidTypeParameter).rejects.toThrow("The rememberMe should be a boolean.");
     }, 10000);
 
     it("Should sign-in the user and not generate an SSO kit if SSO organization settings is disabled.", async () => {

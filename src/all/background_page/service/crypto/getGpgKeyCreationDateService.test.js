@@ -26,7 +26,7 @@ beforeEach(() => {
   jest.useFakeTimers();
   currentTime = new Date();
   currentTime.setMilliseconds(0);
-  jest.setSystemTime(currentTime);
+  jest.setSystemTime(currentTime.getTime());
 });
 
 describe("GetGpgCompatibleDate service", () => {

@@ -47,13 +47,11 @@ describe("AccountRecoveryGetRequestController", () => {
 
       expect.assertions(3);
       const promiseMissingParameter = controller.exec();
-      await expect(promiseMissingParameter).rejects.toThrowError("An account recovery request id is required");
+      await expect(promiseMissingParameter).rejects.toThrow("An account recovery request id is required");
       const promiseInvalidTypeParameter = controller.exec(2);
-      await expect(promiseInvalidTypeParameter).rejects.toThrowError(
-        "The account recovery request should be a string.",
-      );
+      await expect(promiseInvalidTypeParameter).rejects.toThrow("The account recovery request should be a string.");
       const promiseNotValidUuid = controller.exec("not-a-valid-uuid");
-      await expect(promiseNotValidUuid).rejects.toThrowError("The account recovery request should be a valid uuid.");
+      await expect(promiseNotValidUuid).rejects.toThrow("The account recovery request should be a valid uuid.");
     });
   });
 });

@@ -42,6 +42,7 @@ import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
+import { AppSignOutEvents } from "../event/appSignOutEvents";
 
 class App extends Pagemod {
   /**
@@ -86,6 +87,10 @@ class App extends Pagemod {
     ];
   }
 
+  get appSignOutEvent() {
+    return [AppSignOutEvents];
+  }
+
   /**
    * @inheritDoc
    */
@@ -95,7 +100,10 @@ class App extends Pagemod {
       const checkAuthStatusService = new CheckAuthStatusService();
       const authStatus = await checkAuthStatusService.checkAuthStatus(true);
       if (!authStatus.isAuthenticated || authStatus.isMfaRequired) {
-        console.error("Can not attach application if user is not logged in.");
+        console.error("Can not attach application if user is not logged in, connect only app sign-out events.");
+        for (const event of this.appSignOutEvent) {
+          event.listen({ port, tab });
+        }
         return;
       }
 

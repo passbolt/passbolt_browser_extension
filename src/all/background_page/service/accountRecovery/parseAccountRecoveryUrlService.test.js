@@ -12,12 +12,11 @@
  * @since         3.6.0
  */
 
-import each from "jest-each";
 import ParseAccountRecoveryUrlService from "./parseAccountRecoveryUrlService";
 
 describe("ParseAccountRecoveryUrlService", () => {
   describe("ParseAccountRecoveryUrlService:parse", () => {
-    each([
+    describe.each([
       {
         scenario: "TLD",
         url: "https://passbolt.dev/account-recovery/continue/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -63,7 +62,7 @@ describe("ParseAccountRecoveryUrlService", () => {
         url: "https://clould.passbolt.dev/acme//account-recovery/continue/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         domain: "https://clould.passbolt.dev/acme",
       },
-    ]).describe("should parse", (_props) => {
+    ])("should parse", (_props) => {
       it(`should parse: ${_props.scenario}`, () => {
         const parseResult = ParseAccountRecoveryUrlService.parse(_props.url);
 
@@ -74,7 +73,7 @@ describe("ParseAccountRecoveryUrlService", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "No domain",
         url: "setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
@@ -86,10 +85,10 @@ describe("ParseAccountRecoveryUrlService", () => {
         url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         domain: "https://passbolt.dev",
       },
-    ]).describe("should not parse", (_props) => {
+    ])("should not parse", (_props) => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);
-        expect(() => ParseAccountRecoveryUrlService.parse(_props.url)).toThrowError(
+        expect(() => ParseAccountRecoveryUrlService.parse(_props.url)).toThrow(
           "Cannot parse account recovery url. The url does not match the pattern.",
         );
       });
@@ -100,7 +99,7 @@ describe("ParseAccountRecoveryUrlService", () => {
         "http://account-recovery/continue/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0";
 
       expect.assertions(1);
-      await expect(() => ParseAccountRecoveryUrlService.parse(url)).toThrowError(
+      await expect(() => ParseAccountRecoveryUrlService.parse(url)).toThrow(
         "Cannot parse account recovery url. The domain is not valid.",
       );
     });

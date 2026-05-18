@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 
-import each from "jest-each";
 import { enableFetchMocks } from "jest-fetch-mock";
 import AccountRecoveryValidatePublicKeyController from "./accountRecoveryValidatePublicKeyController";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
@@ -58,7 +57,7 @@ describe("AccountRecoveryValidatePublicKeyController", () => {
       );
     }
 
-    each([
+    describe.each([
       { key: pgpKeys.anita.public, expectedError: new Error("The key algorithm should be RSA.") },
       { key: pgpKeys.ada.private, expectedError: new Error("The key should be public.") },
       { key: pgpKeys.revokedKey.public, expectedError: new Error("The key should not be revoked.") },
@@ -80,7 +79,7 @@ describe("AccountRecoveryValidatePublicKeyController", () => {
         key: pgpKeys.betty.public,
         expectedError: new Error("The key is the current organization recovery key, you must provide a new one."),
       },
-    ]).describe("Should throw an error when the key cannot be validated", (scenario) => {
+    ])("Should throw an error when the key cannot be validated", (scenario) => {
       it(`Should throw an error with the scenario: ${scenario.expectedError.message}`, async () => {
         expect.assertions(1);
         mockFetch();

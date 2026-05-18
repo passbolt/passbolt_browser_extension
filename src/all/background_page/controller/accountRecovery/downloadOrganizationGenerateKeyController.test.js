@@ -46,7 +46,7 @@ describe("DownloadOrganizationGeneratedKey", () => {
     it("Should throw an error if the given string is not a valid open pgp key.", async () => {
       expect.assertions(1);
       const controller = new DownloadOrganizationGeneratedKey();
-      await expect(() => controller.exec("test")).rejects.toThrowError();
+      await expect(() => controller.exec("test")).rejects.toThrow();
     });
   });
 });

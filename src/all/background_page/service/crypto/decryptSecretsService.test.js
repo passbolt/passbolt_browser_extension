@@ -24,6 +24,7 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
   RESOURCE_TYPE_V5_CUSTOM_FIELDS_SLUG,
   RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import SecretDataV5DefaultEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5DefaultEntity";
 import SecretDataV5DefaultTotpEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5DefaultTotpEntity";
@@ -35,6 +36,7 @@ import SecretDataV4StandaloneTotpEntity from "passbolt-styleguide/src/shared/mod
 import SecretDataV4PasswordStringEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV4PasswordStringEntity";
 import SecretDataV5StandaloneCustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5StandaloneCustomFieldsCollection";
 import SecretDataV5StandaloneNoteEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5StandaloneNoteEntity";
+import SecretDataV5StandalonePinCodeEntity from "passbolt-styleguide/src/shared/models/entity/secretData/secretDataV5StandalonePinCodeEntity";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import { defaultResourceSecretRevisionsDtos } from "passbolt-styleguide/src/shared/models/entity/secretRevision/resourceSecretRevisionsCollection.test.data";
@@ -86,7 +88,7 @@ describe("DecryptSecretsService", () => {
           resourceTypeCollection,
           pgpKeys.ada.private_decrypted,
         ),
-      ).rejects.toThrowError();
+      ).rejects.toThrow();
     });
 
     it("should not throw an error if something wrong happens during decryption and the errors are ignored", async () => {
@@ -113,7 +115,7 @@ describe("DecryptSecretsService", () => {
 
   describe("::getSecretEntityClassByResourceType", () => {
     it("should return the right secret data entity", async () => {
-      expect.assertions(10);
+      expect.assertions(11);
       expect(
         DecryptSecretsService.getSecretEntityClassByResourceType({ slug: RESOURCE_TYPE_PASSWORD_STRING_SLUG }),
       ).toBe(SecretDataV4PasswordStringEntity);
@@ -146,10 +148,13 @@ describe("DecryptSecretsService", () => {
       expect(
         DecryptSecretsService.getSecretEntityClassByResourceType({ slug: RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG }),
       ).toBe(SecretDataV5StandaloneNoteEntity);
+      expect(
+        DecryptSecretsService.getSecretEntityClassByResourceType({ slug: RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG }),
+      ).toBe(SecretDataV5StandalonePinCodeEntity);
     });
 
     it("should throw an error if the resource type slug is unknown", async () => {
-      expect(() => DecryptSecretsService.getSecretEntityClassByResourceType("test")).toThrowError();
+      expect(() => DecryptSecretsService.getSecretEntityClassByResourceType("test")).toThrow();
     });
   });
 });

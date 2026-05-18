@@ -213,7 +213,7 @@ describe("EncryptMetadataService", () => {
       const expectedError = new Error("Unable to encrypt the entity metadata, metadata is already encrypted.");
       await expect(() =>
         encryptService.encryptOneForForeignModel(resourceEntityClone, pgpKeys.ada.passphrase),
-      ).rejects.toThrow(expectedError);
+      ).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if the metadata object_type is not defined", async () => {
@@ -255,7 +255,7 @@ describe("EncryptMetadataService", () => {
       const expectedError = new Error("Unable to encrypt the entity metadata, no metadata key found.");
       await expect(() =>
         encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase),
-      ).rejects.toThrow(expectedError);
+      ).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if private metadata key is not decrypted", async () => {
@@ -275,7 +275,7 @@ describe("EncryptMetadataService", () => {
       const expectedError = new Error("Unable to encrypt the entity metadata, metadata private key is not decrypted.");
       await expect(() =>
         encryptService.encryptOneForForeignModel(resourceEntity, pgpKeys.ada.passphrase),
-      ).rejects.toThrow(expectedError);
+      ).rejects.toThrow(expectedError.message);
     });
 
     it("should assert that the entity is of type ResourcesEntity or FoldersEntity", async () => {
@@ -284,7 +284,7 @@ describe("EncryptMetadataService", () => {
       const resourceDto = defaultResourceDto();
 
       const expectedError = new Error("The given data type is not a ResourceEntity or a FolderEntity");
-      await expect(() => encryptService.encryptOneForForeignModel(resourceDto)).rejects.toThrow(expectedError);
+      await expect(() => encryptService.encryptOneForForeignModel(resourceDto)).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if the passphrase can't be found", async () => {
@@ -298,7 +298,9 @@ describe("EncryptMetadataService", () => {
       );
 
       const expectedError = new UserPassphraseRequiredError();
-      await expect(() => encryptService.encryptOneForForeignModel(resourceEntity)).rejects.toThrow(expectedError);
+      await expect(() => encryptService.encryptOneForForeignModel(resourceEntity)).rejects.toThrow(
+        expectedError.message,
+      );
     });
   });
 
@@ -584,7 +586,7 @@ describe("EncryptMetadataService", () => {
           new ResourcesCollection([resourceEntityClone]),
           pgpKeys.ada.passphrase,
         ),
-      ).rejects.toThrow(expectedError);
+      ).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if the metadata object type is not defined", async () => {
@@ -652,7 +654,7 @@ describe("EncryptMetadataService", () => {
       const expectedError = new Error("Unable to encrypt the entity metadata, no metadata key found.");
       await expect(() =>
         encryptService.encryptAllFromForeignModels(collection, pgpKeys.ada.passphrase),
-      ).rejects.toThrow(expectedError);
+      ).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if private metadata key is not decrypted", async () => {
@@ -682,7 +684,7 @@ describe("EncryptMetadataService", () => {
       const expectedError = new Error("Unable to encrypt the entity metadata, metadata private key is not decrypted.");
       await expect(() =>
         encryptService.encryptAllFromForeignModels(collection, pgpKeys.ada.passphrase),
-      ).rejects.toThrow(expectedError);
+      ).rejects.toThrow(expectedError.message);
     });
 
     it("should assert that the entity is of type ResourcesEntity or FoldersEntity", async () => {
@@ -691,7 +693,9 @@ describe("EncryptMetadataService", () => {
       const resourceDto = [defaultResourceDto()];
 
       const expectedError = new Error("The given data type is not a ResourcesCollection or a FoldersCollection");
-      await expect(() => encryptService.encryptAllFromForeignModels(resourceDto)).rejects.toThrow(expectedError);
+      await expect(() => encryptService.encryptAllFromForeignModels(resourceDto)).rejects.toThrow(
+        expectedError.message,
+      );
     });
 
     it("should throw an error if the passphrase can't be found", async () => {
@@ -715,7 +719,7 @@ describe("EncryptMetadataService", () => {
       const collection = new ResourcesCollection([resourceEntity]);
 
       const expectedError = new UserPassphraseRequiredError();
-      await expect(() => encryptService.encryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
+      await expect(() => encryptService.encryptAllFromForeignModels(collection)).rejects.toThrow(expectedError.message);
     });
   });
 });

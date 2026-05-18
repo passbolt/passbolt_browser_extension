@@ -47,14 +47,14 @@ describe("SaveSecretRevisionsSettingsService", () => {
       jest.spyOn(service.secretRevisionsSettingsApiService, "save").mockImplementation(() => {
         throw new Error();
       });
-      await expect(() => service.saveSettings(entity)).rejects.toThrowError();
+      await expect(() => service.saveSettings(entity)).rejects.toThrow();
     });
 
     it("should assert its parameters", async () => {
       expect.assertions(1);
 
       const service = new SaveSecretRevisionsSettingsService(defaultApiClientOptions());
-      await expect(() => service.saveSettings(42)).rejects.toThrowError();
+      await expect(() => service.saveSettings(42)).rejects.toThrow();
     });
   });
 });

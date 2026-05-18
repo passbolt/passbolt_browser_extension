@@ -48,7 +48,7 @@ describe("CreateScimSettingsController", () => {
       const error = new Error("Failed to create SCIM settings");
       jest.spyOn(controller.enableScimSettingsService, "enable").mockRejectedValue(error);
 
-      await expect(controller.exec(defaultScimSettingsDto())).rejects.toThrow(error);
+      await expect(controller.exec(defaultScimSettingsDto())).rejects.toThrow(error.message);
       expect(controller.enableScimSettingsService.enable).toHaveBeenCalled();
     });
 
@@ -59,7 +59,7 @@ describe("CreateScimSettingsController", () => {
       const scimSettingsDto = scimSettingsWithoutSecretTokenDto();
       delete scimSettingsDto.secret_token;
 
-      await expect(controller.exec(scimSettingsDto)).rejects.toThrowError(EntityValidationError);
+      await expect(controller.exec(scimSettingsDto)).rejects.toThrow(EntityValidationError);
       expect(controller.enableScimSettingsService.enable).not.toHaveBeenCalled();
     });
   });

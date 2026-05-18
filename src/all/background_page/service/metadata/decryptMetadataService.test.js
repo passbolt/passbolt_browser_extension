@@ -318,7 +318,7 @@ describe("DecryptMetadataService", () => {
       expectedError.cause = new Error(
         `No metadata key found with the id (${collection._items[0]._props.metadata_key_id}).`,
       );
-      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
+      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError.message);
     });
 
     it("throws an error if the matching metadata key does not have a metadata private key", async () => {
@@ -341,7 +341,7 @@ describe("DecryptMetadataService", () => {
       expectedError.cause = new Error(
         `No metadata private key found for the metadata key id (${collection._items[0]._props.metadata_key_id}).`,
       );
-      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
+      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError.message);
     });
 
     it("throws an error if the matching metadata key has an encrypted private key", async () => {
@@ -365,7 +365,7 @@ describe("DecryptMetadataService", () => {
       expectedError.cause = new Error(
         `The metadata private key for the metadata key id (${collection._items[0]._props.metadata_key_id}) should be decrypted.`,
       );
-      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
+      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError.message);
     });
 
     it("throws if the collection given in parameter is not of type ResourcesCollection", async () => {
@@ -385,7 +385,7 @@ describe("DecryptMetadataService", () => {
       const collection = new ResourcesCollection(collectionDto);
 
       const expectedError = new UserPassphraseRequiredError();
-      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
+      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError.message);
     });
 
     it("throws error if an error occurs during decryption with a shared key", async () => {
@@ -413,7 +413,7 @@ describe("DecryptMetadataService", () => {
         throw new Error("An error occurs during decryption process");
       });
 
-      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError);
+      await expect(() => service.decryptAllFromForeignModels(collection)).rejects.toThrow(expectedError.message);
     });
 
     it("ignores decryption error if an error occur while decrypting with the shared metadata key and the option ignore decryption error is set to true", async () => {
@@ -614,7 +614,9 @@ describe("DecryptMetadataService", () => {
         "required-v5",
         "The resource metadata object_type is required and must be set to 'PASSBOLT_RESOURCE_METADATA'.",
       ),
-        await expect(() => service.decryptMetadataWithGpgKey(entity, privateKey)).rejects.toThrowError(expectedError));
+        await expect(() => service.decryptMetadataWithGpgKey(entity, privateKey)).rejects.toThrow(
+          expectedError.message,
+        ));
     }, 10_000);
 
     it("should throw an exception if the object_type is not set properly when decrypting with a session key", async () => {
@@ -646,7 +648,7 @@ describe("DecryptMetadataService", () => {
         "required-v5",
         "The resource metadata object_type is required and must be set to 'PASSBOLT_RESOURCE_METADATA'.",
       ),
-        await expect(() => service.decryptMetadataWithSessionKey(entity, sessionKeyString)).rejects.toThrowError(
+        await expect(() => service.decryptMetadataWithSessionKey(entity, sessionKeyString)).rejects.toThrow(
           expectedError,
         ));
     }, 10_000);

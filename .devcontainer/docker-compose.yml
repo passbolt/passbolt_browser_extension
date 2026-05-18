@@ -1,0 +1,11 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: passbolt-browser-extension-devcontainer
+    volumes:
+      - ..:/workspaces/passbolt-browser-extension:cached
+      - ${HOME}/.claude:/home/node/.claude:cached
+      - ${HOME}/.claude/managed-settings:/etc/claude-code:ro
+    command: sleep infinity

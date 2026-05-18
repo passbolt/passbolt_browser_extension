@@ -65,7 +65,7 @@ describe("SetAccountLocaleController", () => {
       expect.assertions(1);
       const localeDto = { locale: "ma-MA" };
       const promise = controller.exec(localeDto);
-      await expect(promise).rejects.toThrowError("Unsupported locale.");
+      await expect(promise).rejects.toThrow("Unsupported locale.");
     });
   });
 });

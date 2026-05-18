@@ -19,6 +19,7 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
   RESOURCE_TYPE_V5_TOTP_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ResourcesTypeImportParser from "./resourcesTypeImportParser";
 import {
@@ -33,7 +34,6 @@ import {
   defaultMetadataTypesSettingsV4Dto,
   defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import each from "jest-each";
 import { defaultTotpDto } from "../../entity/totp/totpDto.test.data";
 import {
   resourceTypeTotpDto,
@@ -46,7 +46,7 @@ describe("ResourcesTypeImportParser", () => {
       secret_clear: "Password",
     });
 
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -55,7 +55,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with totp disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutTOTP()),
       },
-    ]).describe("should return password-description", (test) => {
+    ])("should return password-description", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -69,7 +69,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -78,7 +78,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with totp disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutTOTP()),
       },
-    ]).describe("should return v5-default", (test) => {
+    ])("should return v5-default", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
         test.resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
@@ -92,7 +92,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
-    each([
+    describe.each([
       {
         scenario: "should fallback to default when Password is disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -101,7 +101,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should fallback to default when Password is disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
         const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionWithoutPassword());
@@ -117,8 +117,25 @@ describe("ResourcesTypeImportParser", () => {
 
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
+    });
+
+    it("should return v5-default even when secret_clear matches pin code pattern", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        username: "john",
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(dto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(dto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
     });
   });
 
@@ -128,7 +145,7 @@ describe("ResourcesTypeImportParser", () => {
       unknown_prop: "Description",
     });
 
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -137,7 +154,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with totp disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutTOTP()),
       },
-    ]).describe("should return password-description", (test) => {
+    ])("should return password-description", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -151,7 +168,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -160,7 +177,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with totp disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutTOTP()),
       },
-    ]).describe("should return v5-default", (test) => {
+    ])("should return v5-default", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -174,7 +191,7 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
-    each([
+    describe.each([
       {
         scenario: "should fallback to default when Password is disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -183,7 +200,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should fallback to default when Password is disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
         const resourceTypesCollection = new ResourceTypesCollection([resourceTypeTotpDto(), resourceTypeV5TotpDto()]);
@@ -199,8 +216,26 @@ describe("ResourcesTypeImportParser", () => {
 
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
+    });
+
+    it("should return v5-default even when secret_clear matches pin code pattern", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "5678",
+        unknown_prop: "Description",
+        username: "ada",
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(dto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(dto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
     });
   });
 
@@ -209,7 +244,7 @@ describe("ResourcesTypeImportParser", () => {
       totp: defaultTotpDto(),
     });
 
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -218,7 +253,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("should return password-description", (test) => {
+    ])("should return password-description", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -233,7 +268,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "with all resource collection types",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionDto()),
@@ -242,7 +277,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("should return v5-totp-standalone", (test) => {
+    ])("should return v5-totp-standalone", (test) => {
       it(`${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -258,7 +293,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "should fallback to default when totp is disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -269,7 +304,7 @@ describe("ResourcesTypeImportParser", () => {
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
         fallbackDefault: RESOURCE_TYPE_V5_DEFAULT_SLUG,
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
 
@@ -296,6 +331,22 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toEqual(expectedResourceType);
       });
     });
+
+    it("should return v5-totp-standalone even when pin code pattern is present with totp", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceImportMinimalDto({
+        totp: defaultTotpDto(),
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(dto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(dto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_TOTP_SLUG);
+    });
   });
 
   describe(`External resource dto with password and totp fields`, () => {
@@ -303,7 +354,7 @@ describe("ResourcesTypeImportParser", () => {
       totp: defaultTotpDto(),
       secret_clear: "Password",
     });
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -319,7 +370,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V4 default resource type", (test) => {
+    ])("V4 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -334,7 +385,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -350,7 +401,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V5 default resource type", (test) => {
+    ])("V5 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -365,7 +416,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "should match with nothing when totp and password are disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -374,7 +425,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should match with nothing when totp and password are disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
 
@@ -390,8 +441,25 @@ describe("ResourcesTypeImportParser", () => {
         expect(resourceType).toBeUndefined();
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
+    });
+
+    it("should return v5-default-totp even when secret_clear matches pin code pattern", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        totp: defaultTotpDto(),
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(dto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(dto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
     });
   });
 
@@ -401,7 +469,7 @@ describe("ResourcesTypeImportParser", () => {
       description: "Description",
       secret_clear: "Password",
     });
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -417,7 +485,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V4 default resource type", (test) => {
+    ])("V4 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -432,7 +500,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -448,7 +516,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V5 default resource type", (test) => {
+    ])("V5 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -463,7 +531,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "should match with nothing when totp and password are disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -472,7 +540,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should match with nothing when totp and password are disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
 
@@ -489,8 +557,26 @@ describe("ResourcesTypeImportParser", () => {
 
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
+    });
+
+    it("should return v5-default-totp even when secret_clear matches pin code pattern", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        totp: defaultTotpDto(),
+        description: "Description",
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(dto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(dto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
     });
   });
 
@@ -499,7 +585,7 @@ describe("ResourcesTypeImportParser", () => {
       totp: defaultTotpDto(),
       description: "Description",
     });
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -510,7 +596,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V4 default resource type", (test) => {
+    ])("V4 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
 
@@ -525,7 +611,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
         scenario: "with all resource collection types",
@@ -536,7 +622,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "with password disabled",
         resourceTypesCollection: new ResourceTypesCollection(resourceTypesCollectionWithoutPassword()),
       },
-    ]).describe("V5 default resource type", (test) => {
+    ])("V5 default resource type", (test) => {
       it(`should return ${test.resourceType} ${test.scenario}`, () => {
         const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
 
@@ -551,7 +637,7 @@ describe("ResourcesTypeImportParser", () => {
       });
     });
 
-    each([
+    describe.each([
       {
         scenario: "should match with nothing when totp and password are disabled on v4",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
@@ -560,7 +646,7 @@ describe("ResourcesTypeImportParser", () => {
         scenario: "should match with nothing when totp and password are disabled on v5",
         metadataTypesSettings: new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto()),
       },
-    ]).describe("No resource type found scenario", (test) => {
+    ])("No resource type found scenario", (test) => {
       it(`${test.scenario}`, () => {
         expect.assertions(3);
 
@@ -577,8 +663,278 @@ describe("ResourcesTypeImportParser", () => {
 
         expect(() =>
           ResourcesTypeImportParser.fallbackDefaulResourceType(resourceTypesCollection, test.metadataTypesSettings),
-        ).toThrowError("No resource type associated to this row.");
+        ).toThrow("No resource type associated to this row.");
       });
+    });
+
+    it("should return v5-default-totp even when secret_clear matches pin code pattern", () => {
+      expect.assertions(1);
+      const dto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        totp: defaultTotpDto(),
+        description: "Description",
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(dto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(dto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
+    });
+  });
+
+  describe("::parsePinCode", () => {
+    it("should detect a 4-12 digit secret_clear as pin code on V5", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({ secret_clear: "123456" });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG);
+    });
+
+    it("should detect a pin code with description on V5", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        description: "My ATM PIN",
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG);
+    });
+
+    it("should not detect a 3-digit value as pin code", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({ secret_clear: "123" });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    });
+
+    it("should not detect a 13-digit value as pin code", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({ secret_clear: "1234567890123" });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    });
+
+    it("should not detect pin code when username is present", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        username: "john",
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    });
+
+    it("should not detect pin code when URI is present", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        uris: ["https://example.com"],
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    });
+
+    it("should not detect pin code when TOTP is present", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        totp: defaultTotpDto(),
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
+    });
+
+    it("should not detect pin code on V4 org", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({ secret_clear: "123456" });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
+    });
+  });
+
+  describe("::parsePinCode", () => {
+    it("should detect a 4-12 digit secret_clear as pin code on V5", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({ secret_clear: "123456" });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG);
+    });
+
+    it("should detect a pin code with description on V5", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        description: "My ATM PIN",
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG);
+    });
+
+    it("should not detect a 3-digit value as pin code", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({ secret_clear: "123" });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    });
+
+    it("should not detect a 13-digit value as pin code", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({ secret_clear: "1234567890123" });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    });
+
+    it("should not detect pin code when username is present", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        username: "john",
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    });
+
+    it("should not detect pin code when URI is present", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        uris: ["https://example.com"],
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_SLUG);
+    });
+
+    it("should not detect pin code when TOTP is present", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({
+        secret_clear: "1234",
+        totp: defaultTotpDto(),
+      });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV50FreshDto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG);
+    });
+
+    it("should not detect pin code on V4 org", () => {
+      expect.assertions(1);
+      const externalResourceDto = defaultExternalResourceImportMinimalDto({ secret_clear: "123456" });
+      const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+      const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+      resourceTypesCollection.filterByResourceTypeVersion(metadataTypesSettings.defaultResourceTypes);
+
+      ResourcesTypeImportParser.parsePinCode(externalResourceDto, resourceTypesCollection);
+      const scores = ResourcesTypeImportParser.getScores(externalResourceDto, resourceTypesCollection);
+      const resourceType = ResourcesTypeImportParser.findMatchingResourceType(resourceTypesCollection, scores);
+
+      expect(resourceType.slug).toEqual(RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG);
     });
   });
 });

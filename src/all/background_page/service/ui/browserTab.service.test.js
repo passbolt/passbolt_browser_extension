@@ -101,7 +101,7 @@ describe("BrowserTabService", () => {
       // mock data
       const tab = { id: "1" };
       // process
-      await expect(() => BrowserTabService.reloadTab(tab.id)).rejects.toThrowError();
+      await expect(() => BrowserTabService.reloadTab(tab.id)).rejects.toThrow();
     });
   });
 
@@ -123,7 +123,7 @@ describe("BrowserTabService", () => {
       // mock data
       const tab = { id: "1" };
       // process
-      await expect(() => BrowserTabService.closeTab(tab.id)).rejects.toThrowError();
+      await expect(() => BrowserTabService.closeTab(tab.id)).rejects.toThrow();
     });
   });
 
@@ -145,10 +145,10 @@ describe("BrowserTabService", () => {
       // mock functions
       jest.spyOn(browser.tabs, "create");
 
-      await expect(() => BrowserTabService.openTab(null)).rejects.toThrowError();
-      await expect(() => BrowserTabService.openTab("url")).rejects.toThrowError();
-      await expect(() => BrowserTabService.openTab("ftp://www.passbolt.com")).rejects.toThrowError();
-      await expect(() => BrowserTabService.openTab("javascript:void(0")).rejects.toThrowError();
+      await expect(() => BrowserTabService.openTab(null)).rejects.toThrow();
+      await expect(() => BrowserTabService.openTab("url")).rejects.toThrow();
+      await expect(() => BrowserTabService.openTab("ftp://www.passbolt.com")).rejects.toThrow();
+      await expect(() => BrowserTabService.openTab("javascript:void(0")).rejects.toThrow();
     });
   });
 
@@ -173,16 +173,16 @@ describe("BrowserTabService", () => {
       // mock functions
       jest.spyOn(browser.tabs, "update");
 
-      await expect(() => BrowserTabService.updateCurrentTabUrl(null)).rejects.toThrowError(
+      await expect(() => BrowserTabService.updateCurrentTabUrl(null)).rejects.toThrow(
         "Cannot update the current tab due to an invalid URL",
       );
-      await expect(() => BrowserTabService.updateCurrentTabUrl("url")).rejects.toThrowError(
+      await expect(() => BrowserTabService.updateCurrentTabUrl("url")).rejects.toThrow(
         "Cannot update the current tab due to an invalid URL",
       );
-      await expect(() => BrowserTabService.updateCurrentTabUrl("ftp://www.passbolt.com")).rejects.toThrowError(
+      await expect(() => BrowserTabService.updateCurrentTabUrl("ftp://www.passbolt.com")).rejects.toThrow(
         "Cannot update the current tab due to an invalid URL",
       );
-      await expect(() => BrowserTabService.updateCurrentTabUrl("javascript:void(0")).rejects.toThrowError(
+      await expect(() => BrowserTabService.updateCurrentTabUrl("javascript:void(0")).rejects.toThrow(
         "Cannot update the current tab due to an invalid URL",
       );
     });

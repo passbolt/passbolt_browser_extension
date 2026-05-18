@@ -1,4 +1,5 @@
-Passbolt 5.11.2 resolves several issues recently reported by customers and the community regarding the browser extension's detection of TOTP fields. We have refined the detection criteria to prevent the identification of unintended fields.
+Passbolt 5.12.1 fixes some slowlyness issues on Safari during navigation
 
 ### Fixed
-- PB-51067 - Rework TOTP selectors
+- PB-51546 On Safari after log out, the login page does not show until the page is refreshed
+- PB-51547 On Safari after log in, some pages take a lot of time to display

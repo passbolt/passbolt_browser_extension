@@ -36,8 +36,8 @@ describe("GetSessionKeyService", () => {
 
       expect(() =>
         EntitySchema.validateProp("session_key", sessionKey, SessionKeyEntity.getSchema().properties.session_key),
-      ).not.toThrowError();
-      expect(() => OpenpgpAssertion.assertSessionKey(openPgpSessionKey)).not.toThrowError();
+      ).not.toThrow();
+      expect(() => OpenpgpAssertion.assertSessionKey(openPgpSessionKey)).not.toThrow();
     });
 
     it("should throw an error if the message is not decrypted", async () => {
@@ -48,7 +48,7 @@ describe("GetSessionKeyService", () => {
       const messageEncryptedArmored = await EncryptMessageService.encrypt(messageClear, publicKey);
       const messageEncrypted = await OpenpgpAssertion.readMessageOrFail(messageEncryptedArmored);
 
-      expect(() => GetSessionKeyService.getFromGpgMessage(messageEncrypted)).toThrowError(
+      expect(() => GetSessionKeyService.getFromGpgMessage(messageEncrypted)).toThrow(
         Error("The message should be decrypted."),
       );
     });
@@ -58,14 +58,14 @@ describe("GetSessionKeyService", () => {
       const messageClear = "message clear";
       const message = await OpenpgpAssertion.createMessageOrFail(messageClear);
 
-      expect(() => GetSessionKeyService.getFromGpgMessage(message)).toThrowError(
+      expect(() => GetSessionKeyService.getFromGpgMessage(message)).toThrow(
         Error("The message should contain at least one session key."),
       );
     });
 
     it("should throw an error if the message is not valid", async () => {
       expect.assertions(1);
-      expect(() => GetSessionKeyService.getFromGpgMessage("message clear")).toThrowError(
+      expect(() => GetSessionKeyService.getFromGpgMessage("message clear")).toThrow(
         Error("The message should be a valid openpgp message."),
       );
     });

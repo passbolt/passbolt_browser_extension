@@ -14,7 +14,6 @@
 
 import DownloadUserPublicKeyController from "./downloadUserPublicKeyController";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
-import GpgKeyError from "../../error/GpgKeyError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
@@ -58,7 +57,7 @@ describe("DownloadUserPublicKeyController", () => {
     MockExtension.withMissingPrivateKeyAccount();
     const controller = new DownloadUserPublicKeyController(mockedWorker, null);
 
-    await expect(controller.exec()).rejects.toThrowError(new GpgKeyError("Public key can't be found."));
+    await expect(controller.exec()).rejects.toThrow("Public key can't be found.");
     expect(mockedSaveFile).not.toHaveBeenCalled();
   });
 });

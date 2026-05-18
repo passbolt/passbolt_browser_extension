@@ -29,7 +29,6 @@ import { defaultAccountDto } from "../../model/entity/account/accountEntity.test
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import ResourceService from "../../service/api/resource/resourceService";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import each from "jest-each";
 import { v4 as uuidv4 } from "uuid";
 import { KdbxCsvFile } from "../../model/entity/import/importResourcesFileEntity.test.data";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
@@ -94,10 +93,10 @@ describe("ExportResourcesFileController", () => {
       jest.spyOn(GetOrFindMetadataKeysService.prototype, "getOrFindAll").mockImplementation(() => metadataKeys);
     });
     describe("Should export the csv file.", () => {
-      each([
+      describe.each([
         { version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG },
         { version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG },
-      ]).describe("Should export csv file", (iteration) => {
+      ])("Should export csv file", (iteration) => {
         it(iteration.version, async () => {
           expect.assertions(2);
           const resourceType = resourceTypeCollection.find(
@@ -148,10 +147,10 @@ describe("ExportResourcesFileController", () => {
         );
         await kdbxExporter.export(exportResourcesFileEntity);
       }
-      each([
+      describe.each([
         { version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG },
         { version: "v5", resourceType: RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG },
-      ]).describe("Should export KDBX file", (iteration) => {
+      ])("Should export KDBX file", (iteration) => {
         it(`Should export KDBX with credentials - <${iteration.version}> `, async () => {
           expect.assertions(1);
           const resourceType = resourceTypeCollection.find(
@@ -180,7 +179,7 @@ describe("ExportResourcesFileController", () => {
       });
     });
 
-    each([
+    describe.each([
       { scenario: "xls", format: "xls" },
       { scenario: "xlsx", format: "xlsx" },
       { scenario: "tsv", format: "tsv" },
@@ -188,7 +187,7 @@ describe("ExportResourcesFileController", () => {
       { scenario: "JSON", format: "json" },
       { scenario: "XML", format: "xml" },
       { scenario: "yaml", format: "yaml" },
-    ]).describe("Should reject other format.", (test) => {
+    ])("Should reject other format.", (test) => {
       it(`Should reject ${test.scenario} format`, async () => {
         expect.assertions(2);
 

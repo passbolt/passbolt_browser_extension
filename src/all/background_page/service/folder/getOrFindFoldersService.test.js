@@ -141,9 +141,7 @@ describe("GetOrFindFoldersService", () => {
       expect.assertions(1);
 
       const service = new GetOrFindFoldersService(account, apiClientOptions);
-      await expect(() => service.getOrFindById("test")).rejects.toThrow(
-        new Error("The given parameter is not a valid UUID"),
-      );
+      await expect(() => service.getOrFindById("test")).rejects.toThrow("The given parameter is not a valid UUID");
     });
   });
 });

@@ -13,7 +13,6 @@
  */
 import { enableFetchMocks } from "jest-fetch-mock";
 import FetchOffscreenService from "./fetchOffscreenService";
-import each from "jest-each";
 import { defaultFetchMessage, defaultFetchResponse } from "./fetchOffscreenService.test.data";
 
 beforeEach(() => {
@@ -135,13 +134,13 @@ describe("FetchOffscreenService", () => {
       expect(validation).toBeNull();
     });
 
-    each([
+    describe.each([
       { scenario: "undefined", resource: undefined },
       { scenario: "null", resource: null },
       { scenario: "integer", resource: 42 },
       { scenario: "boolean", resource: true },
       { scenario: "object", resource: { data: "resource" } },
-    ]).describe("should fail if message resource is not valid", (_props) => {
+    ])("should fail if message resource is not valid", (_props) => {
       it(`should fail if message resource: ${_props.scenario}`, async () => {
         const message = defaultFetchMessage();
         message.data.resource = _props.resource;
@@ -155,13 +154,13 @@ describe("FetchOffscreenService", () => {
       });
     });
 
-    each([
+    describe.each([
       { scenario: "undefined", options: undefined },
       { scenario: "null", options: null },
       { scenario: "integer", options: 42 },
       { scenario: "boolean", options: true },
       { scenario: "string", options: "string" },
-    ]).describe("should fail if message options is not valid", (_props) => {
+    ])("should fail if message options is not valid", (_props) => {
       it(`should fail if message options: ${_props.scenario}`, async () => {
         const message = defaultFetchMessage();
         message.data.options = _props.options;

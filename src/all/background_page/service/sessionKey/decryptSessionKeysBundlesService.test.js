@@ -69,7 +69,7 @@ describe("DecryptSessionKeysBundlesService", () => {
       const account = new AccountEntity(defaultAccountDto());
 
       const service = new DecryptSessionKeysBundlesService(account);
-      await expect(() => service.decryptOne("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptOne("test")).rejects.toThrow(expectedError.message);
     });
 
     it("should ensure sessionKeysBundleEntity is not decrypted already", async () => {
@@ -98,7 +98,7 @@ describe("DecryptSessionKeysBundlesService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptSessionKeysBundlesService(account);
-      await expect(() => service.decryptOne(sessionKeysBundleEntity, pgpKeys.ada.passphrase)).rejects.toThrowError(
+      await expect(() => service.decryptOne(sessionKeysBundleEntity, pgpKeys.ada.passphrase)).rejects.toThrow(
         expectedError,
       );
     });
@@ -115,7 +115,7 @@ describe("DecryptSessionKeysBundlesService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptSessionKeysBundlesService(account);
-      await expect(() => service.decryptOne(sessionKeysBundleEntity)).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptOne(sessionKeysBundleEntity)).rejects.toThrow(expectedError.message);
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
   });
@@ -163,7 +163,7 @@ describe("DecryptSessionKeysBundlesService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptSessionKeysBundlesService(account);
-      await expect(() => service.decryptAll("test")).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAll("test")).rejects.toThrow(expectedError.message);
     });
 
     it("should ensure sessionKeysBundleEntity data is a valid PGP message", async () => {
@@ -180,7 +180,7 @@ describe("DecryptSessionKeysBundlesService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptSessionKeysBundlesService(account);
-      await expect(() => service.decryptAll(collection, pgpKeys.ada.passphrase)).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAll(collection, pgpKeys.ada.passphrase)).rejects.toThrow(expectedError.message);
     });
 
     it("should throw an error if the passphrase is not available", async () => {
@@ -195,7 +195,7 @@ describe("DecryptSessionKeysBundlesService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const service = new DecryptSessionKeysBundlesService(account);
-      await expect(() => service.decryptAll(collection)).rejects.toThrowError(expectedError);
+      await expect(() => service.decryptAll(collection)).rejects.toThrow(expectedError.message);
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
     });
   });

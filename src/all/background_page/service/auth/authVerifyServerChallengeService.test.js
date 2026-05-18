@@ -59,9 +59,7 @@ describe("AuthVerifyServerKeyController", () => {
         account.userKeyFingerprint,
         account.serverPublicArmoredKey,
       );
-      await expect(promise).rejects.toThrowError(
-        new Error("The server was unable to prove it can use the advertised OpenPGP key."),
-      );
+      await expect(promise).rejects.toThrow("The server was unable to prove it can use the advertised OpenPGP key.");
     });
 
     it("Should throw a server error if the server cannot be verified", async () => {
@@ -78,7 +76,7 @@ describe("AuthVerifyServerKeyController", () => {
         account.userKeyFingerprint,
         account.serverPublicArmoredKey,
       );
-      await expect(promise).rejects.toThrowError(new Error("Unknown error"));
+      await expect(promise).rejects.toThrow("Unknown error");
     });
   });
 });

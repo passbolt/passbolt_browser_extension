@@ -19,6 +19,7 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
   RESOURCE_TYPE_V5_PASSWORD_STRING_SLUG,
+  RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 
 class ResourcesTypeImportParser {
@@ -138,6 +139,65 @@ class ResourcesTypeImportParser {
     }
 
     return scores;
+  }
+
+  /**
+   * Properties allowed to have non-empty values for a standalone PIN code resource.
+   * Any other property with a non-empty value disqualifies the entry.
+   * @type {Set<string>}
+   */
+  static get PIN_CODE_ALLOWED_PROPERTIES() {
+    return new Set([
+      "name",
+      "secret_clear",
+      "description",
+      "folder_parent_path",
+      "id",
+      "resource_type_id",
+      "expired",
+      "icon",
+    ]);
+  }
+
+  /**
+   * Detect if the imported resource is a standalone PIN code and reclassify the DTO accordingly.
+   * A PIN code is detected when the secret_clear is a 4-12 digit string and the entry has no additional
+   * data beyond an optional description.
+   * @param {object} externalResourceDto The external resource DTO to evaluate and potentially mutate
+   * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
+   */
+  static parsePinCode(externalResourceDto, resourceTypesCollection) {
+    const hasPinCodeType = resourceTypesCollection.items.some(
+      (resourceType) => resourceType.slug === RESOURCE_TYPE_V5_STANDALONE_PIN_CODE_SLUG,
+    );
+    if (!hasPinCodeType) {
+      return;
+    }
+
+    const secretClear = externalResourceDto.secret_clear;
+    if (!secretClear || !/^\d{4,12}$/.test(secretClear)) {
+      return;
+    }
+
+    const hasExtraContent = Object.entries(externalResourceDto).some(([key, value]) => {
+      if (this.PIN_CODE_ALLOWED_PROPERTIES.has(key)) {
+        return false;
+      }
+      if (Array.isArray(value)) {
+        return value.some(Boolean);
+      }
+      if (typeof value === "string") {
+        return value.length > 0;
+      }
+      return Boolean(value);
+    });
+
+    if (hasExtraContent) {
+      return;
+    }
+
+    externalResourceDto.pin_code = secretClear;
+    externalResourceDto.secret_clear = "";
   }
 }
 

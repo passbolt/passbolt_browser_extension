@@ -80,7 +80,7 @@ describe("ExpireMetadataKeyService", () => {
 
       const service = new ExpireMetadataKeyService(account, apiClientOptions);
 
-      await expect(() => service.expire(42)).rejects.toThrowError("The given parameter is not a valid UUID");
+      await expect(() => service.expire(42)).rejects.toThrow("The given parameter is not a valid UUID");
     });
   });
 });

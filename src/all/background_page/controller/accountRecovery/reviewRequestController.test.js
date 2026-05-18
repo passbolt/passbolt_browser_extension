@@ -14,7 +14,6 @@
 
 import { v4 as uuidv4 } from "uuid";
 import { enableFetchMocks } from "jest-fetch-mock";
-import each from "jest-each";
 import ReviewRequestController from "./reviewRequestController";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
@@ -33,7 +32,6 @@ import { adminAccountDto } from "../../model/entity/account/accountEntity.test.d
 import AccountEntity from "../../model/entity/account/accountEntity";
 import Keyring from "../../model/keyring";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {
   disabledAccountRecoveryOrganizationPolicyDto,
   enabledAccountRecoveryOrganizationPolicyDto,
@@ -65,7 +63,7 @@ describe("ReviewRequestController", () => {
       passphrase: pgpKeys.account_recovery_organization.passphrase,
     };
 
-    each([
+    describe.each([
       {
         scenario: "private key decrypted",
         accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private_decrypted,
@@ -76,7 +74,7 @@ describe("ReviewRequestController", () => {
         accountRecoveryOrganizationPrivateKey: pgpKeys.account_recovery_organization.private,
         accountRecoveryOrganizationPrivateKeyPassphrase: pgpKeys.account_recovery_organization.passphrase,
       },
-    ]).describe("Should disable an account recovery organization policy previously enabled.", (test) => {
+    ])("Should disable an account recovery organization policy previously enabled.", (test) => {
       it(`Should save a review account recovery request if approved: ${test.scenario}.`, async () => {
         await MockExtension.withConfiguredAccount();
         // Add the user in the local storage.
@@ -189,7 +187,7 @@ describe("ReviewRequestController", () => {
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
 
       const promise = controller.exec("not-uuid");
-      await expect(promise).rejects.toThrow(new TypeError("requestId should be a valid uuid."));
+      await expect(promise).rejects.toThrow("requestId should be a valid uuid.");
     });
 
     it("Should assert the account recovery organization is enabled.", async () => {
@@ -204,9 +202,7 @@ describe("ReviewRequestController", () => {
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
 
       const promise = controller.exec(uuidv4());
-      await expect(promise).rejects.toThrowError(
-        "Sorry the account recovery feature is not enabled for this organization.",
-      );
+      await expect(promise).rejects.toThrow("Sorry the account recovery feature is not enabled for this organization.");
     });
 
     it("Should assert the provided organization private key dto is valid.", async () => {
@@ -223,7 +219,7 @@ describe("ReviewRequestController", () => {
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
 
       const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, {});
-      await expect(promise).rejects.toThrowError(new EntityValidationError("Could not validate entity PrivateGpgkey."));
+      await expect(promise).rejects.toThrow("Could not validate entity PrivateGpgkey.");
     });
 
     it("Should assert the account recovery organization private key can be decrypted.", async () => {
@@ -244,7 +240,7 @@ describe("ReviewRequestController", () => {
         passphrase: "wrong-passphrase",
       };
       const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
-      await expect(promise).rejects.toThrowError(InvalidMasterPasswordError);
+      await expect(promise).rejects.toThrow(InvalidMasterPasswordError);
     });
 
     it("Should assert the signed-in user private key can be decrypted.", async () => {
@@ -259,10 +255,10 @@ describe("ReviewRequestController", () => {
       // Mock signed in user wrong passphrase
       controller.getPassphraseService.getPassphrase.mockResolvedValue("wrong-passphrase");
       const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
-      await expect(promise).rejects.toThrowError(InvalidMasterPasswordError);
+      await expect(promise).rejects.toThrow(InvalidMasterPasswordError);
     });
 
-    each([
+    describe.each([
       {
         expectedError: "The request should have an associated private key.",
         findRequestMock: pendingAccountRecoveryRequestWithoutPrivateKeyDto(),
@@ -284,7 +280,7 @@ describe("ReviewRequestController", () => {
         expectedError: "The request private key password private key id should match the request private key id.",
         findRequestMock: pendingAccountRecoveryRequestWithWrongPrivateKeyIdDto(),
       },
-    ]).describe("Should assert the request returned by the API.", (scenario) => {
+    ])("Should assert the request returned by the API.", (scenario) => {
       it(`Should validate the scenario: ${scenario.expectedError}`, async () => {
         expect.assertions(1);
         await MockExtension.withConfiguredAccount();
@@ -295,7 +291,7 @@ describe("ReviewRequestController", () => {
 
         const controller = new ReviewRequestController(null, null, apiClientOptions, account);
         const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
-        await expect(promise).rejects.toThrowError(scenario.expectedError);
+        await expect(promise).rejects.toThrow(scenario.expectedError);
       });
     });
 
@@ -314,9 +310,7 @@ describe("ReviewRequestController", () => {
 
       const promise = controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
 
-      await expect(promise).rejects.toThrowError(
-        "Cannot find the public key of the user requesting an account recovery.",
-      );
+      await expect(promise).rejects.toThrow("Cannot find the public key of the user requesting an account recovery.");
     });
 
     it("Should assert the private key password data was encrypted for the user making the request, check the encrypted user id match the request user id.", async () => {
@@ -339,7 +333,7 @@ describe("ReviewRequestController", () => {
 
       const promise = controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
 
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "The user id contained in the private key password data does not match the private key target used id.",
       );
     });
@@ -362,7 +356,7 @@ describe("ReviewRequestController", () => {
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
 
       const promise = controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
-      await expect(promise).rejects.toThrowError(
+      await expect(promise).rejects.toThrow(
         "The private key password data fingerprint should match the user public fingerprint.",
       );
     });

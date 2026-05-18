@@ -41,7 +41,7 @@ describe("FindExportPoliciesSettingsController", () => {
       const error = new Error("Failed to find export policies settings");
       jest.spyOn(controller.findExportPoliciesSettingsService, "find").mockRejectedValue(error);
 
-      await expect(controller.exec()).rejects.toThrow(error);
+      await expect(controller.exec()).rejects.toThrow(error.message);
       expect(controller.findExportPoliciesSettingsService.find).toHaveBeenCalled();
     });
   });

@@ -12,7 +12,6 @@
  * @since         4.3.0
  */
 
-import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PassphraseGeneratorSettingsEntity from "./passphraseGeneratorSettingsEntity";
@@ -53,7 +52,7 @@ describe("PassphraseGeneratorSettings entity", () => {
     }
   });
 
-  each([
+  describe.each([
     /*
      * @todo: to put when minimum and maximum will be validated
      *
@@ -66,7 +65,7 @@ describe("PassphraseGeneratorSettings entity", () => {
     { dto: { word_case: "Something wrong" }, errorType: "enum" },
     { dto: { min_words: "Something wrong" }, errorType: "type" },
     { dto: { max_words: "Something wrong" }, errorType: "type" },
-  ]).describe("should throw an exception if DTO contains invalid values", (scenario) => {
+  ])("should throw an exception if DTO contains invalid values", (scenario) => {
     it(`scenario: ${JSON.stringify(scenario)}`, () => {
       expect.assertions(2);
       const fieldName = Object.keys(scenario.dto)[0];

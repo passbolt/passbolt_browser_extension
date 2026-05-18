@@ -89,7 +89,7 @@ describe("ResourceCreateService", () => {
       await resourceCreateService.create(resourceDto, secret, pgpKeys.ada.passphrase);
 
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledTimes(2);
-      expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith("Creating password", true);
+      expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith("Creating resource", true);
       expect(resourceCreateService.progressService.finishStep).toHaveBeenCalledWith("Encrypting secret", true);
       expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledWith(3);
     });
@@ -359,7 +359,7 @@ describe("ResourceCreateService", () => {
       const resourceDto = defaultResourceDto();
       const promise = resourceCreateService.create(resourceDto, "a".repeat(4097), pgpKeys.ada.passphrase);
 
-      return expect(promise).rejects.toThrow(new TypeError("The secret should be maximum 4096 characters in length."));
+      return expect(promise).rejects.toThrow("The secret should be maximum 4096 characters in length.");
     });
 
     it("Should create the resource into shared folder parent", async () => {

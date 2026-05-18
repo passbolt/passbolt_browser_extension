@@ -50,7 +50,7 @@ describe("UpdateScimSettingsController", () => {
       const id = uuidv4();
       jest.spyOn(controller.updateScimSettingsService, "update").mockRejectedValue(error);
 
-      await expect(controller.exec(id, defaultScimSettingsDto())).rejects.toThrow(error);
+      await expect(controller.exec(id, defaultScimSettingsDto())).rejects.toThrow(error.message);
       expect(controller.updateScimSettingsService.update).toHaveBeenCalled();
     });
   });

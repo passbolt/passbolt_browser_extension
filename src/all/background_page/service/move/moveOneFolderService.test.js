@@ -5355,7 +5355,7 @@ describe("MoveOneFolderService", () => {
 
       const folder = new FolderEntity(defaultFolderDto({ name: "Folder to move" }));
       expect(() => service.assertFolderCanBeMoved(folder, null, null)).toThrow(
-        new Error(`Folder ${folder.name} is already in the root folder.`),
+        `Folder ${folder.name} is already in the root folder.`,
       );
     });
 
@@ -5374,7 +5374,7 @@ describe("MoveOneFolderService", () => {
         }),
       );
       expect(() => service.assertFolderCanBeMoved(folder, destinationFolder, destinationFolder)).toThrow(
-        new Error(`Folder ${folder.name} is already in folder ${destinationFolder.name}.`),
+        `Folder ${folder.name} is already in folder ${destinationFolder.name}.`,
       );
     });
 
@@ -5392,7 +5392,7 @@ describe("MoveOneFolderService", () => {
       jest.spyOn(FolderEntity, "canFolderMove").mockImplementation(() => false);
 
       expect(() => service.assertFolderCanBeMoved(folder, destinationFolder, parentFolder)).toThrow(
-        new Error(`Folder ${folder.name} can not be moved.`),
+        `Folder ${folder.name} can not be moved.`,
       );
     });
   });

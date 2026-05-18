@@ -12,7 +12,6 @@
  * @since         4.3.0
  */
 
-import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PasswordPoliciesEntity from "./passwordPoliciesEntity";
@@ -50,7 +49,7 @@ describe("PasswordPolicies entity", () => {
     }
   });
 
-  each([
+  describe.each([
     { dto: { id: "string but not uuid" }, errorType: "format" },
     { dto: { id: -1 }, errorType: "type" },
 
@@ -70,7 +69,7 @@ describe("PasswordPolicies entity", () => {
 
     { dto: { modified_by: "string but not uuid" }, errorType: "format" },
     { dto: { modified_by: -1 }, errorType: "type" },
-  ]).describe("should throw an exception if DTO contains invalid values", (scenario) => {
+  ])("should throw an exception if DTO contains invalid values", (scenario) => {
     it(`scenario: ${JSON.stringify(scenario)}`, () => {
       expect.assertions(2);
       const fieldName = Object.keys(scenario.dto)[0];
@@ -85,10 +84,10 @@ describe("PasswordPolicies entity", () => {
     });
   });
 
-  each([
+  describe.each([
     { dto: { password_generator_settings: { length: "nested object" } }, errorType: "type" },
     { dto: { passphrase_generator_settings: { words: "nested object" } }, errorType: "type" },
-  ]).describe("should throw an exception if nested object in DTO contains invalid values", (scenario) => {
+  ])("should throw an exception if nested object in DTO contains invalid values", (scenario) => {
     it(`scenario: ${JSON.stringify(scenario)}`, () => {
       expect.assertions(2);
       const nestedPropertyName = Object.keys(scenario.dto)[0];

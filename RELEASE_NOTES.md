@@ -1,5 +1,4 @@
-Passbolt 5.12.1 fixes some slowlyness issues on Safari during navigation
+Passbolt 5.12.2 fixes an issue that arose in Chrome 148, which caused a service worker that did not respond within the specified time limit to be terminated.
 
 ### Fixed
-- PB-51546 On Safari after log out, the login page does not show until the page is refreshed
-- PB-51547 On Safari after log in, some pages take a lot of time to display
+- PB-51648 Fix add user to group reducing set timeout

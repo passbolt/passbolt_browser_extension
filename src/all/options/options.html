@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Passbolt — Autofill settings</title>
+  <script src="options.js" defer></script>
+  <style>
+    :root {
+      --bg: #f9f9f9;
+      --card: #ffffff;
+      --border: #e1e1e1;
+      --text: #161514;
+      --muted: #6a6a6a;
+      --accent: #d40101;
+      --accent-on: #2a9d3f;
+      --focus: #5a9bf6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      margin: 0; background: var(--bg); color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 46rem; margin: 0 auto; padding: 2.4rem 1.6rem; }
+    h1 { font-size: 1.5rem; font-weight: 600; margin: 0 0 .4rem; }
+    .subtitle { color: var(--muted); font-size: .95rem; margin: 0 0 2rem; }
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 1.6rem; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .setting { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.2rem; }
+    .setting-text { min-width: 0; }
+    .setting-title { font-weight: 600; font-size: 1.05rem; margin: 0 0 .25rem; }
+    .setting-desc { color: var(--muted); font-size: .9rem; line-height: 1.45; margin: 0; }
+    /* Toggle switch */
+    .switch { position: relative; flex: 0 0 auto; width: 4.4rem; height: 2.4rem; }
+    .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+    .slider {
+      position: absolute; inset: 0; background: #cfcfcf; border-radius: 999px;
+      transition: background .15s ease;
+    }
+    .slider::before {
+      content: ""; position: absolute; height: 1.8rem; width: 1.8rem; left: .3rem; top: .3rem;
+      background: #fff; border-radius: 50%; transition: transform .15s ease; box-shadow: 0 1px 2px rgba(0,0,0,.3);
+    }
+    .switch input:checked + .slider { background: var(--accent-on); }
+    .switch input:checked + .slider::before { transform: translateX(2rem); }
+    .switch input:focus-visible + .slider { box-shadow: 0 0 0 .2rem var(--focus); }
+    .note { margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .82rem; line-height: 1.5; }
+    .status { margin-top: 1rem; min-height: 1.2em; color: var(--accent-on); font-size: .9rem; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Autofill</h1>
+    <p class="subtitle">Control how passbolt fills credentials when you launch a resource from the quickaccess.</p>
+
+    <div class="card">
+      <div class="setting">
+        <div class="setting-text">
+          <p class="setting-title">Autofill on launch</p>
+          <p class="setting-desc">
+            When you launch a credential from the quickaccess search results, navigate to its saved
+            website and autofill the login form.
+          </p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="autofillOnLaunch" aria-describedby="autofill-note">
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+      </div>
+      <p class="note" id="autofill-note">
+        The form is filled, not submitted, and only when the loaded page's origin matches the saved
+        URL. This setting is stored locally in this browser only — it is never sent to your passbolt
+        server.
+      </p>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+</body>
+</html>

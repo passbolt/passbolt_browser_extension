@@ -31,6 +31,7 @@ module.exports = function (grunt) {
     src_firefox: 'src/firefox/',
     src_content_scripts: 'src/all/contentScripts/',
     src_web_accessible_resources: 'src/all/webAccessibleResources/',
+    src_options: 'src/all/options/',
   };
   const firefoxWebExtBuildName = 'passbolt_-_open_source_password_manager';
 
@@ -50,8 +51,8 @@ module.exports = function (grunt) {
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('pre-dist', ['copy:styleguide']);
 
-  grunt.registerTask('bundle', ['externalize-locale-strings', 'copy:background_page', 'copy:web_accessible_resources', 'copy:locales']);
-  grunt.registerTask('bundle-mv3', ['externalize-locale-strings', 'copy:service_worker', 'copy:web_accessible_resources', 'copy:locales']);
+  grunt.registerTask('bundle', ['externalize-locale-strings', 'copy:background_page', 'copy:web_accessible_resources', 'copy:options_page', 'copy:locales']);
+  grunt.registerTask('bundle-mv3', ['externalize-locale-strings', 'copy:service_worker', 'copy:web_accessible_resources', 'copy:options_page', 'copy:locales']);
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle']);
   grunt.registerTask('bundle-chromium-mv2', ['copy:manifest_chromium_mv2', 'bundle']);
   grunt.registerTask('bundle-chromium-mv3', ['copy:manifest_chromium_mv3', 'bundle-mv3']);
@@ -125,6 +126,14 @@ module.exports = function (grunt) {
       web_accessible_resources: {
         files: [
           { expand: true, cwd: path.src_web_accessible_resources, src: ['js/themes/**', '*.html'], dest: path.build_web_accessible_resources }
+        ]
+      },
+      // Extension options page (autofill preferences). Copied to a non-web-accessible path so it is
+      // reachable via options_ui but NOT exposed by the webAccessibleResources/* manifest entry.
+      // (Target cannot be named "options" — that key is reserved by grunt for task options.)
+      options_page: {
+        files: [
+          { expand: true, cwd: path.src_options, src: ['*.html', '*.js'], dest: path.build + 'options' }
         ]
       },
       locales: {

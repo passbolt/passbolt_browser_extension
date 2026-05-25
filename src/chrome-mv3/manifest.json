@@ -39,6 +39,10 @@
       "description": "Lock passbolt (clear the cached passphrase)"
     }
   },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
   "permissions": [
     "activeTab",
     "unlimitedStorage",

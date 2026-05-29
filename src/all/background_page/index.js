@@ -17,6 +17,8 @@ import PostLoginService from "./service/auth/postLoginService";
 import PostLogoutService from "./service/auth/postLogoutService";
 import OnStartUpService from "./service/extension/onStartUpService";
 import ToolbarService from "./service/toolbar/toolbarService";
+// Registers the keyboard-shortcut command listener (e.g. passbolt-lock) on import.
+import "./service/toolbar/keyboardShortcutsService";
 
 const main = async () => {
   /**

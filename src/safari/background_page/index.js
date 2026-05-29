@@ -22,6 +22,8 @@ import PostLoginService from "../../all/background_page/service/auth/postLoginSe
 import PostLogoutService from "../../all/background_page/service/auth/postLogoutService";
 import OnStartUpService from "../../all/background_page/service/extension/onStartUpService";
 import ToolbarService from "../../all/background_page/service/toolbar/toolbarService";
+// Registers the keyboard-shortcut command listener (e.g. passbolt-lock) on import.
+import "../../all/background_page/service/toolbar/keyboardShortcutsService";
 import WebNavigationService from "../../all/background_page/service/webNavigation/webNavigationService";
 
 const main = async () => {

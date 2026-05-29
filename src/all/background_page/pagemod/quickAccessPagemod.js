@@ -16,6 +16,7 @@ import { AuthEvents } from "../event/authEvents";
 import { ConfigEvents } from "../event/configEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { QuickAccessEvents } from "../event/quickAccessEvents";
+import { AutofillSettingsEvents } from "../event/autofillSettingsEvents";
 import { GroupEvents } from "../event/groupEvents";
 import { ResourceEvents } from "../event/resourceEvents";
 import { SecretEvents } from "../event/secretEvents";
@@ -47,6 +48,7 @@ class QuickAccess extends Pagemod {
       ConfigEvents,
       KeyringEvents,
       QuickAccessEvents,
+      AutofillSettingsEvents,
       GroupEvents,
       ResourceEvents,
       SecretEvents,

@@ -37,7 +37,7 @@ import GroupApiService from "../api/group/groupApiService";
  * - Done
  */
 const PROGRESS_GOAL = 6;
-const YIELD_INTERVAL_MS = 25000; // yield avant 30s pour avoir une marge
+const YIELD_INTERVAL_MS = 8000; // PB-51648 yield reduce to 8s due to chrome 148 more strict to ping service worker
 
 class GroupUpdateService {
   /**

@@ -45,6 +45,7 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
 import { AppSignOutEvents } from "../event/appSignOutEvents";
+import { InFormIntegrationSettingsEvents } from "../event/inFormIntegrationSettingsEvents";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -73,6 +74,7 @@ jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PermissionEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppSignOutEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(InFormIntegrationSettingsEvents, "listen").mockImplementation(jest.fn());
 
 describe("App", () => {
   beforeEach(() => {
@@ -83,7 +85,7 @@ describe("App", () => {
 
   describe("App::attachEvents", () => {
     it("Should attach app events", async () => {
-      expect.assertions(30);
+      expect.assertions(31);
       // data mocked
       const port = {
         _port: {
@@ -137,6 +139,11 @@ describe("App", () => {
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(PermissionEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AccountEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(InFormIntegrationSettingsEvents.listen).toHaveBeenCalledWith(
+        expectedPortAndTab,
+        mockApiClient,
+        mockedAccount,
+      );
       expect(App.events).toStrictEqual([
         ConfigEvents,
         AppEvents,
@@ -164,6 +171,7 @@ describe("App", () => {
         RememberMeEvents,
         PermissionEvents,
         AccountEvents,
+        InFormIntegrationSettingsEvents,
       ]);
       expect(App.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(App.appName).toBe("App");

@@ -21,6 +21,7 @@ import Pagemod from "./pagemod";
 import { ConfigEvents } from "../event/configEvents";
 import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
 import { WebIntegrationEvents } from "../event/webIntegrationEvents";
+import { InFormIntegrationSettingsEvents } from "../event/inFormIntegrationSettingsEvents";
 import { PortEvents } from "../event/portEvents";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
@@ -30,6 +31,7 @@ jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(WebIntegrationEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(InFormIntegrationSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("WebIntegration", () => {
@@ -58,6 +60,7 @@ describe("WebIntegration", () => {
         ConfigEvents,
         WebIntegrationEvents,
         OrganizationSettingsEvents,
+        InFormIntegrationSettingsEvents,
         PortEvents,
       ]);
       expect(WebIntegration.mustReloadOnExtensionUpdate).toBeFalsy();
@@ -102,7 +105,7 @@ describe("WebIntegration", () => {
 
   describe("WebIntegration::attachEvents", () => {
     it("Should attach events", async () => {
-      expect.assertions(4);
+      expect.assertions(5);
       // data mocked
       const port = {
         on: () => jest.fn(),
@@ -128,6 +131,11 @@ describe("WebIntegration", () => {
         name: WebIntegration.appName,
       });
       expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({
+        port: port,
+        tab: port._port.sender.tab,
+        name: WebIntegration.appName,
+      });
+      expect(InFormIntegrationSettingsEvents.listen).toHaveBeenCalledWith({
         port: port,
         tab: port._port.sender.tab,
         name: WebIntegration.appName,

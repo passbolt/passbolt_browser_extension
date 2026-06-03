@@ -43,6 +43,7 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
 import { AppSignOutEvents } from "../event/appSignOutEvents";
+import { InFormIntegrationSettingsEvents } from "../event/inFormIntegrationSettingsEvents";
 
 class App extends Pagemod {
   /**
@@ -84,6 +85,7 @@ class App extends Pagemod {
       RememberMeEvents,
       PermissionEvents,
       AccountEvents,
+      InFormIntegrationSettingsEvents,
     ];
   }
 

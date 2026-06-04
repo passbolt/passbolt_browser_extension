@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://www.passbolt.com/docs/contribute/security/vulnerability/
+    about: Do not report security issues as a public issue. Follow our responsible disclosure process.
+  - name: Feature request or change request
+    url: https://community.passbolt.com/c/backlog
+    about: Please post feature requests on the community forum so others can vote and comment. Popular ideas get moved to the roadmap.
+  - name: Question or help
+    url: https://community.passbolt.com/
+    about: For usage questions and help, please use the community forum.

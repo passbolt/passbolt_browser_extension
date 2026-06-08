@@ -13,25 +13,22 @@
  */
 
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import OrganizationSettingsEntity from "./organizationSettingsEntity";
-import {
-  customEmailValidationProOrganizationSettings,
-  defaultProOrganizationSettings,
-} from "./organizationSettingsEntity.test.data";
+import SiteSettingsEntity from "./siteSettingsEntity";
+import { customEmailValidationProSiteSettings, defaultProSiteSettings } from "./siteSettingsEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
-describe("OrganizationSettingsEntity entity", () => {
-  describe("OrganizationSettingsEntity::getSchema", () => {
+describe("SiteSettingsEntity entity", () => {
+  describe("SiteSettingsEntity::getSchema", () => {
     it("schema must validate", () => {
-      EntitySchema.validateSchema(OrganizationSettingsEntity.ENTITY_NAME, OrganizationSettingsEntity.getSchema());
+      EntitySchema.validateSchema(SiteSettingsEntity.ENTITY_NAME, SiteSettingsEntity.getSchema());
     });
 
     it("validates status property", () => {
       const successValues = ["enabled", "disabled", "not found"];
       const failValues = ["string"];
 
-      assertEntityProperty.enumeration(OrganizationSettingsEntity, "status", successValues, failValues);
-      assertEntityProperty.notRequired(OrganizationSettingsEntity, "status");
+      assertEntityProperty.enumeration(SiteSettingsEntity, "status", successValues, failValues);
+      assertEntityProperty.notRequired(SiteSettingsEntity, "status");
     });
 
     it("validates app property", () => {
@@ -42,8 +39,8 @@ describe("OrganizationSettingsEntity entity", () => {
        */
       const failingScenarios = [];
 
-      assertEntityProperty.assert(OrganizationSettingsEntity, "app", successScenarios, failingScenarios, "type");
-      assertEntityProperty.notRequired(OrganizationSettingsEntity, "app");
+      assertEntityProperty.assert(SiteSettingsEntity, "app", successScenarios, failingScenarios, "type");
+      assertEntityProperty.notRequired(SiteSettingsEntity, "app");
     });
 
     it("validates passbolt property", () => {
@@ -54,8 +51,8 @@ describe("OrganizationSettingsEntity entity", () => {
        */
       const failingScenarios = [];
 
-      assertEntityProperty.assert(OrganizationSettingsEntity, "passbolt", successScenarios, failingScenarios, "type");
-      assertEntityProperty.notRequired(OrganizationSettingsEntity, "passbolt");
+      assertEntityProperty.assert(SiteSettingsEntity, "passbolt", successScenarios, failingScenarios, "type");
+      assertEntityProperty.notRequired(SiteSettingsEntity, "passbolt");
     });
 
     it("validates serverTimeDiff property", () => {
@@ -66,52 +63,46 @@ describe("OrganizationSettingsEntity entity", () => {
         assertEntityProperty.SCENARIO_OBJECT,
       ];
 
-      assertEntityProperty.assert(
-        OrganizationSettingsEntity,
-        "serverTimeDiff",
-        successScenarios,
-        failingScenarios,
-        "type",
-      );
-      assertEntityProperty.notRequired(OrganizationSettingsEntity, "serverTimeDiff");
+      assertEntityProperty.assert(SiteSettingsEntity, "serverTimeDiff", successScenarios, failingScenarios, "type");
+      assertEntityProperty.notRequired(SiteSettingsEntity, "serverTimeDiff");
     });
   });
 
-  describe("OrganizationSettingsEntity::constructor", () => {
-    it("Should instantiate an OrganizationSettingsEntity with a minimal DTO", () => {
+  describe("SiteSettingsEntity::constructor", () => {
+    it("Should instantiate an SiteSettingsEntity with a minimal DTO", () => {
       expect.assertions(2);
       const dto = {};
-      expect(() => new OrganizationSettingsEntity(dto)).not.toThrow();
-      expect(new OrganizationSettingsEntity(dto).toDto()).toStrictEqual({
+      expect(() => new SiteSettingsEntity(dto)).not.toThrow();
+      expect(new SiteSettingsEntity(dto).toDto()).toStrictEqual({
         status: "enabled",
       });
     });
 
-    it("Should instantiate an OrganizationSettingsEntity with full DTO", () => {
+    it("Should instantiate an SiteSettingsEntity with full DTO", () => {
       expect.assertions(2);
-      const dto = defaultProOrganizationSettings();
-      expect(() => new OrganizationSettingsEntity(dto)).not.toThrow();
-      expect(new OrganizationSettingsEntity(dto).toDto()).toStrictEqual(dto);
+      const dto = defaultProSiteSettings();
+      expect(() => new SiteSettingsEntity(dto)).not.toThrow();
+      expect(new SiteSettingsEntity(dto).toDto()).toStrictEqual(dto);
     });
   });
 
-  describe("OrganizationSettingsEntity::sanitizeEmailValidateRegex", () => {
+  describe("SiteSettingsEntity::sanitizeEmailValidateRegex", () => {
     it("should sanitize API regex and remove starting and trailing slash", () => {
-      const organizationSettings = customEmailValidationProOrganizationSettings();
-      OrganizationSettingsEntity.sanitizeEmailValidateRegex(organizationSettings);
-      expect(organizationSettings.passbolt.email.validate.regex).toEqual(".*@passbolt.(c|com)$");
+      const siteSettings = customEmailValidationProSiteSettings();
+      SiteSettingsEntity.sanitizeEmailValidateRegex(siteSettings);
+      expect(siteSettings.passbolt.email.validate.regex).toEqual(".*@passbolt.(c|com)$");
     });
   });
 
-  describe("OrganizationSettingsEntity::emailValidateRegex", () => {
+  describe("SiteSettingsEntity::emailValidateRegex", () => {
     it("should return null if undefined", () => {
-      const organizationSettings = defaultProOrganizationSettings();
-      const entity = new OrganizationSettingsEntity(organizationSettings);
+      const siteSettings = defaultProSiteSettings();
+      const entity = new SiteSettingsEntity(siteSettings);
       expect(entity.emailValidateRegex).toBeNull();
     });
     it("should return the customized setting if any", () => {
-      const organizationSettings = customEmailValidationProOrganizationSettings();
-      const entity = new OrganizationSettingsEntity(organizationSettings);
+      const siteSettings = customEmailValidationProSiteSettings();
+      const entity = new SiteSettingsEntity(siteSettings);
       expect(entity.emailValidateRegex).toEqual(".*@passbolt.(c|com)$");
     });
   });

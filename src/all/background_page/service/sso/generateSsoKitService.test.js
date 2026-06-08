@@ -15,7 +15,7 @@ import "../../../../../test/mocks/mockSsoDataStorage";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import { withAzureSsoSettings } from "../../controller/sso/getCurrentSsoSettingsController.test.data";
 import GenerateSsoKitService from "./generateSsoKitService";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import { enableFetchMocks } from "jest-fetch-mock";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
@@ -30,7 +30,7 @@ beforeEach(async () => {
 describe("GenerateSsoKitService", () => {
   describe("GenerateSsoKitService::generate", () => {
     const mockOrganisationSettings = (withSsoEnabled = true) => {
-      const organizationSettings = anonymousOrganizationSettings();
+      const organizationSettings = anonymousSiteSettings();
       organizationSettings.passbolt.plugins.sso = {
         enabled: withSsoEnabled,
       };

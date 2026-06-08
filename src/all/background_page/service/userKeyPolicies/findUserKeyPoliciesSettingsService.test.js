@@ -20,10 +20,10 @@ import { v4 as uuidV4 } from "uuid";
 import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
 import { defaultUserKeyPoliciesSettingsDto } from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
 import {
-  anonymousOrganizationSettings,
-  defaultCeOrganizationSettings,
-} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
+  anonymousSiteSettings,
+  defaultCeSiteSettings,
+} from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "../../model/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -42,7 +42,7 @@ describe("FindUserKeyPoliciesSettingsService", () => {
 
       jest
         .spyOn(service.organizationSettingsModel, "getOrFind")
-        .mockImplementation(() => new OrganizationSettingsEntity(defaultCeOrganizationSettings()));
+        .mockImplementation(() => new SiteSettingsEntity(defaultCeSiteSettings()));
       jest
         .spyOn(service.userKeyPoliciesSettingsApiService, "findSettingsAsGuest")
         .mockImplementation(() => userKeyPoliciesDto);
@@ -65,12 +65,12 @@ describe("FindUserKeyPoliciesSettingsService", () => {
       const userKeyPoliciesDto = UserKeyPoliciesSettingsEntity.createFromDefault();
       const service = new FindUserKeyPoliciesSettingsService(apiClientOptions, account);
 
-      const orgSettings = anonymousOrganizationSettings();
+      const orgSettings = anonymousSiteSettings();
       delete orgSettings.passbolt.plugins?.userKeyPolicies;
 
       jest
         .spyOn(service.organizationSettingsModel, "getOrFind")
-        .mockImplementation(() => new OrganizationSettingsEntity(orgSettings));
+        .mockImplementation(() => new SiteSettingsEntity(orgSettings));
       jest.spyOn(service.userKeyPoliciesSettingsApiService, "findSettingsAsGuest").mockImplementation(() => {
         throw new Error("Something went wrong!");
       });
@@ -95,7 +95,7 @@ describe("FindUserKeyPoliciesSettingsService", () => {
 
       jest
         .spyOn(service.organizationSettingsModel, "getOrFind")
-        .mockImplementation(() => new OrganizationSettingsEntity(defaultCeOrganizationSettings()));
+        .mockImplementation(() => new SiteSettingsEntity(defaultCeSiteSettings()));
       jest.spyOn(service.userKeyPoliciesSettingsApiService, "findSettingsAsGuest").mockImplementation(() => {
         throw new Error("Something went wrong!");
       });

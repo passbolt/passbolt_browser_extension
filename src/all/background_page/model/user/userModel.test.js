@@ -27,7 +27,7 @@ import UserEntity from "../entity/user/userEntity";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import { adminAccountDto } from "../entity/account/accountEntity.test.data";
 import AccountEntity from "../entity/account/accountEntity";
-import { defaultCeOrganizationSettings } from "../entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "../entity/siteSettings/siteSettingsEntity.test.data";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
 beforeAll(() => {
@@ -147,7 +147,7 @@ describe("UserModel", () => {
 
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       siteSettingsDto.passbolt.plugins.metadata = false;
 
       jest
@@ -195,7 +195,7 @@ describe("UserModel", () => {
 
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
 
       jest
         .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
@@ -309,7 +309,7 @@ describe("UserModel", () => {
       await MockExtension.withConfiguredAccount();
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       siteSettingsDto.passbolt.plugins.metadata = false;
 
       jest
@@ -352,7 +352,7 @@ describe("UserModel", () => {
       await MockExtension.withConfiguredAccount();
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       siteSettingsDto.passbolt.plugins.metadata = true;
 
       jest

@@ -19,7 +19,7 @@ import UpdateUserLocalStorageController from "./updateUserLocalStorageController
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { adminAccountDto, defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
-import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
 
 beforeEach(() => {
@@ -28,7 +28,7 @@ beforeEach(() => {
 
 describe("UpdateUserLocalStorageController", () => {
   beforeEach(() => {
-    const siteSettingsDto = defaultCeOrganizationSettings();
+    const siteSettingsDto = defaultCeSiteSettings();
 
     jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => siteSettingsDto);
   });

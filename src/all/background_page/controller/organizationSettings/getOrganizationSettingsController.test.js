@@ -15,7 +15,7 @@
 import { enableFetchMocks } from "jest-fetch-mock";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
 import GetOrganizationSettingsController from "./getOrganizationSettingsController";
 
 beforeEach(() => {
@@ -29,7 +29,7 @@ describe("GetOrganizationSettingsController", () => {
       const timeDiff = 3600000;
       // Mock API fetch account recovery organization policy response.
       const servertime = new Date().getTime() + timeDiff;
-      const mockApiResult = anonymousOrganizationSettings();
+      const mockApiResult = anonymousSiteSettings();
       fetch.doMock(() => mockApiResponse(mockApiResult, { servertime: servertime / 1000 }));
 
       const controller = new GetOrganizationSettingsController(null, null, defaultApiClientOptions());

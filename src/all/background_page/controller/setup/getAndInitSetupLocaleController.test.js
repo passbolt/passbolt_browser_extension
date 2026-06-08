@@ -16,7 +16,7 @@ import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GetAndInitSetupLocaleController from "./getAndInitSetupLocaleController";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
 import { initialAccountSetupDto } from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
@@ -32,7 +32,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings();
+      const mockOrganizationSettings = anonymousSiteSettings();
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
 
       expect.assertions(1);
@@ -45,7 +45,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings();
+      const mockOrganizationSettings = anonymousSiteSettings();
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
       const languageGetterMock = jest.spyOn(self.navigator, "language", "get");
@@ -61,7 +61,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings();
+      const mockOrganizationSettings = anonymousSiteSettings();
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
       const languageGetterMock = jest.spyOn(self.navigator, "language", "get");
@@ -77,7 +77,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings({ app: { locale: "ja-JP" } });
+      const mockOrganizationSettings = anonymousSiteSettings({ app: { locale: "ja-JP" } });
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
       const languageGetterMock = jest.spyOn(self.navigator, "language", "get");
@@ -93,7 +93,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings({ app: { locale: null } });
+      const mockOrganizationSettings = anonymousSiteSettings({ app: { locale: null } });
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
       const languageGetterMock = jest.spyOn(self.navigator, "language", "get");

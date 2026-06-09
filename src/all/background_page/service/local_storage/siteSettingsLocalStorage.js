@@ -92,6 +92,21 @@ class SiteSettingsLocalStorage {
   }
 
   /**
+   * Update only the in-memory runtime cache, leaving browser.storage.local untouched.
+   * Use when site settings are fetched in an unauthenticated context (e.g. login or setup
+   * flows) so subsequent reads in the same session can skip the network without persisting
+   * data into the per-account browser storage.
+   * @param {SiteSettingsEntity} settings
+   * @throws {TypeError} If parameter settings is not of type SiteSettingsEntity.
+   */
+  setRuntimeCache(settings) {
+    if (!settings || !(settings instanceof SiteSettingsEntity)) {
+      throw new TypeError("Parameter `settings` should be of type SiteSettingsEntity.");
+    }
+    SiteSettingsLocalStorage._runtimeCachedData[this.account.id] = settings.toDto();
+  }
+
+  /**
    * @param {object} data
    * @returns {Promise<void>}
    * @private

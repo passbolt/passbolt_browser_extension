@@ -13,9 +13,8 @@
  */
 
 import { enableFetchMocks } from "jest-fetch-mock";
-import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
+import { mockApiResponse, mockApiResponseError } from "../../../../../../test/mocks/mockApiResponse";
 import { defaultSharedResourcesWithEncryptedMetadataDtos } from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
-import { mockApiResponseError } from "passbolt-styleguide/test/mocks/mockApiResponse";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import MetadataRotateKeysResourcesApiService from "./metadataRotateKeysResourcesApiService";

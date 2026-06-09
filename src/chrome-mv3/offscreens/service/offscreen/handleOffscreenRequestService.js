@@ -17,6 +17,9 @@ import WriteClipobardOffscreenService, {
   SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN,
 } from "../clipboard/writeClipobardOffscreenService";
 import { assertUuid } from "../../../../all/background_page/utils/assertions";
+import AddUsersToGroupOffscreenService, {
+  SEND_MESSAGE_TARGET_ADD_USERS_TO_GROUP_OFFSCREEN,
+} from "../group/addUsersToGroupOffscreenService";
 
 export const SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER = "service-worker-offscreen-error-response-handler";
 
@@ -32,6 +35,7 @@ export default class HandleOffscreenRequestService {
     const REQUEST_HANDLE_MAP = {
       [SEND_MESSAGE_TARGET_FETCH_OFFSCREEN]: FetchOffscreenService.handleFetchRequest,
       [SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN]: WriteClipobardOffscreenService.handleClipboardRequest,
+      [SEND_MESSAGE_TARGET_ADD_USERS_TO_GROUP_OFFSCREEN]: AddUsersToGroupOffscreenService.handleRequest,
     };
 
     const requestHandler = REQUEST_HANDLE_MAP[message.target];

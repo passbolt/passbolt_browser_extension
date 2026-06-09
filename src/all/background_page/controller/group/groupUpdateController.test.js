@@ -96,6 +96,7 @@ describe("GroupsUpdateController", () => {
     it("Add 2 users in a group with 1 secret being unknown for both users and 2 other secrets known by only one user each", async () => {
       expect.assertions(20);
 
+      chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 2 }));
       const getResourceId = (data, index) => data["dry-run"].Secrets[index].Secret[0].resource_id;
       const findSecret = (secrets, userId, resource1Id) => {
         for (const i in secrets) {

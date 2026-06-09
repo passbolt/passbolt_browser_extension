@@ -41,7 +41,6 @@ export class RequestFetchOffscreenService {
     const fetchStrategy = (await RequestFetchOffscreenService.isFetchOffscreenPreferred())
       ? RequestFetchOffscreenService.fetchOffscreen
       : RequestFetchOffscreenService.fetchNative;
-
     return fetchStrategy(resource, options);
   }
 

@@ -11,21 +11,19 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.10.1
  */
-import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
-import EncryptMessageService from "../../service/crypto/encryptMessageService";
-import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import GroupModel from "../../model/group/groupModel";
 import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 import GroupUpdateEntity from "../../model/entity/group/update/groupUpdateEntity";
 import i18n from "../../sdk/i18n";
-import SecretEntity from "passbolt-styleguide/src/shared/models/entity/secret/secretEntity";
 import GroupUpdateSecretsCollection from "../../model/entity/secret/groupUpdate/groupUpdateSecretsCollection";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import { assertString, assertType } from "../../utils/assertions";
 import GroupUpdatesCollection from "../../model/entity/group/update/groupUpdatesCollection";
 import GroupLocalStorage from "../local_storage/groupLocalStorage";
 import GroupApiService from "../api/group/groupApiService";
+import GroupUpdateSecretsCryptoService from "./groupUpdateSecretsCryptoService";
+import { RequestAddUsersToGroupOffscreenService } from "../../../../chrome-mv3/serviceWorker/service/addUsersToGroup/requestAddUsersToGroupOffscreenService";
 
 /**
  * Progress goals are:
@@ -37,7 +35,6 @@ import GroupApiService from "../api/group/groupApiService";
  * - Done
  */
 const PROGRESS_GOAL = 6;
-const YIELD_INTERVAL_MS = 8000; // PB-51648 yield reduce to 8s due to chrome 148 more strict to ping service worker
 
 class GroupUpdateService {
   /**
@@ -103,9 +100,18 @@ class GroupUpdateService {
    */
   async encryptNeededSecrets(passphrase, groupUpdateDryRunResultEntity) {
     this.progressService.finishStep(i18n.t("Encrypt required secrets for new users"), true);
-    const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-    const decryptedSecrets = await this.decryptSecrets(privateKey, groupUpdateDryRunResultEntity.secrets);
-    return await this.encryptSecrets(privateKey, groupUpdateDryRunResultEntity.neededSecrets, decryptedSecrets);
+
+    const isMV3 = chrome.runtime.getManifest().manifest_version === 3;
+    if (isMV3) {
+      return await this.decryptAndEncryptSecretsFromOffscreen(passphrase, groupUpdateDryRunResultEntity);
+    } else {
+      const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(
+        this.account.userPrivateArmoredKey,
+        passphrase,
+      );
+      const decryptedSecrets = await this.decryptSecrets(privateKey, groupUpdateDryRunResultEntity.secrets);
+      return await this.encryptSecrets(privateKey, groupUpdateDryRunResultEntity.neededSecrets, decryptedSecrets);
+    }
   }
 
   /**
@@ -117,44 +123,16 @@ class GroupUpdateService {
    * @private
    */
   async encryptSecrets(privateKey, neededSecretsCollection, decryptedSecrets) {
-    const groupUpdateSecrets = new GroupUpdateSecretsCollection([]);
-    let lastYield = Date.now();
     this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
     const usersPublicKeys = await this.retrieveAndReadUserPublicKeys(neededSecretsCollection);
 
-    const collectionLength = neededSecretsCollection.length;
-    for (let i = 0; i < collectionLength; i++) {
-      const neededSecret = neededSecretsCollection.items[i];
-      const user_id = neededSecret.userId;
-      const resource_id = neededSecret.resourceId;
-
-      this.progressService.updateStepMessage(
-        i18n.t("Encrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }),
-      );
-      const data = await EncryptMessageService.encrypt(decryptedSecrets[resource_id], usersPublicKeys[user_id], [
-        privateKey,
-      ]);
-
-      const secret = new SecretEntity({ resource_id, user_id, data });
-      groupUpdateSecrets.push(secret);
-
-      /*
-       * PB-51434
-       * Force a timeout promise to let the service worker respond to chromium
-       *
-       * Starting with Chrome 147, the regular check of the service worker on the event lop seems more strict
-       * If the service worker do a process that consume too much time and performance that it can not respond
-       * It will be killed by the browser as it is not responding at time.
-       *
-       * Using promise set timeout will solve the issue it releases the even loop enough time to respond
-       */
-      if (Date.now() - lastYield >= YIELD_INTERVAL_MS) {
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        lastYield = Date.now();
-      }
-    }
-
-    return groupUpdateSecrets;
+    return GroupUpdateSecretsCryptoService.encryptSecrets(
+      privateKey,
+      usersPublicKeys,
+      neededSecretsCollection,
+      decryptedSecrets,
+      (message) => this.progressService.updateStepMessage(message),
+    );
   }
 
   /**
@@ -165,36 +143,9 @@ class GroupUpdateService {
    * @private
    */
   async decryptSecrets(privateKey, secretsCollection) {
-    const result = [];
-    let lastYield = Date.now();
-
-    const collectionLength = secretsCollection.length;
-    for (let i = 0; i < collectionLength; i++) {
-      const secret = secretsCollection.items[i];
-      const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
-
-      this.progressService.updateStepMessage(
-        i18n.t("Decrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }),
-      );
-      result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
-
-      /*
-       * PB-51434
-       * Force a timeout promise to let the service worker respond to chromium
-       *
-       * Starting with Chrome 147, the regular check of the service worker on the event lop seems more strict
-       * If the service worker do a process that consume too much time and performance that it can not respond
-       * It will be killed by the browser as it is not responding at time.
-       *
-       * Using promise set timeout will solve the issue it releases the even loop enough time to respond
-       */
-      if (Date.now() - lastYield >= YIELD_INTERVAL_MS) {
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        lastYield = Date.now();
-      }
-    }
-
-    return result;
+    return GroupUpdateSecretsCryptoService.decryptSecrets(privateKey, secretsCollection, (message) =>
+      this.progressService.updateStepMessage(message),
+    );
   }
 
   /**
@@ -225,10 +176,10 @@ class GroupUpdateService {
   }
 
   /**
-   * Retrieve and read the user public keys.
+   * Retrieve the user public keys.
    * @param {NeededSecretsCollection} neededSecrets The needed secrets
-   * @returns {Promise<object>} User public key organized in an object where the property name represents the user id,
-   * and the value contains the user openpgp public key.
+   * @returns {Promise<object>} User public keys organized in an object where the property name represents the user id,
+   * and the value contains the user public armored key.
    * @private
    */
   async retrieveAndReadUserPublicKeys(neededSecrets) {
@@ -239,11 +190,31 @@ class GroupUpdateService {
     await keyring.sync();
 
     for (const userId of userIds) {
-      const userPublicArmoredKey = keyring.findPublic(userId).armoredKey;
-      userOpenpgpPublicKeys[userId] = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
+      // Keep armored key to send it through a message for offscreen
+      userOpenpgpPublicKeys[userId] = keyring.findPublic(userId).armoredKey;
     }
 
     return userOpenpgpPublicKeys;
+  }
+
+  /**
+   * Delegate the decryption and encryption secrets to the offscreen
+   * @param {string} passphrase
+   * @param {GroupUpdateDryRunResultEntity} groupUpdateDryRunResultEntity
+   * @return {Promise<GroupUpdateSecretsCollection>}
+   */
+  async decryptAndEncryptSecretsFromOffscreen(passphrase, groupUpdateDryRunResultEntity) {
+    this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
+    // User public key are stored in local storage that is not accessible from offscreen
+    const usersPublicKeys = await this.retrieveAndReadUserPublicKeys(groupUpdateDryRunResultEntity.neededSecrets);
+    const groupUpdateSecrets = await RequestAddUsersToGroupOffscreenService.decryptAndEncryptSecrets(
+      this.account,
+      passphrase,
+      groupUpdateDryRunResultEntity,
+      usersPublicKeys,
+      this.progressService,
+    );
+    return new GroupUpdateSecretsCollection(groupUpdateSecrets, { validate: false });
   }
 }
 

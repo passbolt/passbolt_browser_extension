@@ -20,6 +20,11 @@ import {
 import { SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER } from "../../../offscreens/service/offscreen/handleOffscreenRequestService";
 import ResponseClipboardOffscreenService from "../clipboard/responseClipboardOffscreenService";
 import ResponseFetchOffscreenService from "../network/responseFetchOffscreenService";
+import {
+  SEND_MESSAGE_TARGET_ADD_USERS_TO_GROUP_OFFSCREEN_RESPONSE_HANDLER,
+  SEND_MESSAGE_TARGET_OFFSCREEN_PROGRESS_SERVICE_HANDLER,
+} from "../../../offscreens/service/group/addUsersToGroupOffscreenService";
+import ResponseAddUsersToGroupOffscreenService from "../addUsersToGroup/responseAddUsersToGroupOffscreenService";
 
 export default class HandleOffscreenResponseService {
   /**
@@ -36,6 +41,10 @@ export default class HandleOffscreenResponseService {
     [SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER]: ResponseFetchOffscreenService.handleFetchResponse,
     [SEND_MESSAGE_TARGET_CLIPBOARD_WRITE_OFFSCREEN_RESPONSE_HANDLER]:
       ResponseClipboardOffscreenService.handleClipboardResponse,
+    [SEND_MESSAGE_TARGET_ADD_USERS_TO_GROUP_OFFSCREEN_RESPONSE_HANDLER]:
+      ResponseAddUsersToGroupOffscreenService.handleAddUsersToGroupResponse,
+    [SEND_MESSAGE_TARGET_OFFSCREEN_PROGRESS_SERVICE_HANDLER]:
+      ResponseAddUsersToGroupOffscreenService.handleAddUsersToGroupProgress,
     [SEND_MESSAGE_TARGET_OFFSCREEN_ERROR_RESPONSE_HANDLER]: HandleOffscreenResponseService.handleOffscreenError,
   };
 
@@ -50,6 +59,12 @@ export default class HandleOffscreenResponseService {
     }
 
     const responseHandler = HandleOffscreenResponseService.REPONSE_HANDLE_MAP[message.target];
+
+    if (message.target === SEND_MESSAGE_TARGET_OFFSCREEN_PROGRESS_SERVICE_HANDLER) {
+      responseHandler(message);
+      return;
+    }
+
     if (!responseHandler) {
       console.debug("HandleOffscreenResponseService received response not specific to offscreen.");
       return;

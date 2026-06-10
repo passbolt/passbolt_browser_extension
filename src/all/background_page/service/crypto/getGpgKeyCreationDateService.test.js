@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import GetGpgKeyCreationDateService from "./getGpgKeyCreationDateService";
-import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import { enableFetchMocks } from "jest-fetch-mock";

@@ -15,7 +15,7 @@ import "../../../../../test/mocks/mockSsoDataStorage";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import { withAzureSsoSettings } from "../../controller/sso/getCurrentSsoSettingsController.test.data";
 import GenerateSsoKitService from "./generateSsoKitService";
-import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import { enableFetchMocks } from "jest-fetch-mock";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";

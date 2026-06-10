@@ -30,7 +30,7 @@ import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {

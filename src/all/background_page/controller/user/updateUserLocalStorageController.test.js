@@ -19,7 +19,7 @@ import UpdateUserLocalStorageController from "./updateUserLocalStorageController
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { adminAccountDto, defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
-import { defaultCeSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
 
 beforeEach(() => {

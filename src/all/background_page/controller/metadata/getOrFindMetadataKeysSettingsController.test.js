@@ -19,7 +19,7 @@ import GetOrFindMetadataKeysController from "./getOrFindMetadataKeysSettingsCont
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 import { enableFetchMocks } from "jest-fetch-mock";
-import { defaultCeSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();

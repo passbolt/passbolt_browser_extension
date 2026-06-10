@@ -22,8 +22,8 @@ import { defaultUserKeyPoliciesSettingsDto } from "passbolt-styleguide/src/share
 import {
   anonymousSiteSettings,
   defaultCeSiteSettings,
-} from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
-import SiteSettingsEntity from "../../model/entity/siteSettings/siteSettingsEntity";
+} from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();

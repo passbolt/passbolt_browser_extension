@@ -16,8 +16,8 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import OrganizationSettingsModel from "../../../organizationSettings/organizationSettingsModel";
-import SiteSettingsEntity from "../../siteSettings/siteSettingsEntity";
-import { customEmailValidationProSiteSettings } from "../../siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import { customEmailValidationProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import GenerateGpgKeyPairOptionsEntity from "./generateGpgKeyPairOptionsEntity";
 import { defaultDto, minimalDto } from "./generateGpgKeyPairOptionsEntity.test.data";
 import {

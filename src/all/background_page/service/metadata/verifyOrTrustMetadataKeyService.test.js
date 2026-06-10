@@ -25,7 +25,7 @@ import { v4 as uuidv4 } from "uuid";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import VerifyOrTrustMetadataKeyService from "./verifyOrTrustMetadataKeyService";
 import UntrustedMetadataKeyError from "../../error/UntrustedMetadataKeyError";
-import { defaultCeSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 
 describe("VerifyOrTrustMetadataKeyService", () => {
   let account, apiClientOptions, service;

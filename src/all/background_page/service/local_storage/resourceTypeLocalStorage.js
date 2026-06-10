@@ -14,56 +14,17 @@
 import Log from "../../model/log";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import { assertType } from "../../utils/assertions";
+import AbstractLocalStorage from "./abstractLocalStorage";
 
-const RESOURCE_TYPES_LOCAL_STORAGE_KEY = "resourceTypes";
+const RESOURCE_TYPES_LOCAL_STORAGE_KEY = "resource_types";
 
-class ResourceTypeLocalStorage {
-  /**
-   * Get the storage key.
-   * @private
-   */
-  static get storageKey() {
+class ResourceTypeLocalStorage extends AbstractLocalStorage {
+  get key() {
     return RESOURCE_TYPES_LOCAL_STORAGE_KEY;
   }
 
-  /**
-   * Flush the resourceTypes local storage
-   *
-   * @throws {Error} if operation failed
-   * @return {Promise<void>}
-   */
-  static async flush() {
-    Log.write({ level: "debug", message: "ResourceTypeLocalStorage flushed" });
-    return await browser.storage.local.remove(this.storageKey);
-  }
-
-  /**
-   * Set the resourceTypes local storage.
-   *
-   * @throws {Error} if operation failed
-   * @return {Promise<ResourceTypesCollectionDto>} results object, containing every object in keys that was found in the storage area.
-   * If storage is not set, undefined will be returned.
-   */
-  static async get() {
-    const { resourceTypes } = await browser.storage.local.get([this.storageKey]);
-    return resourceTypes;
-  }
-
-  /**
-   * Set the resourceTypes in local storage.
-   * @param {ResourceTypesCollection} resourceTypesCollection The folders to insert in the local storage.
-   * @return {Promise<void>}
-   * @throws {TypeError} if the given argument is not a ResourceTypesCollection
-   */
-  static async set(resourceTypesCollection) {
-    assertType(
-      resourceTypesCollection,
-      ResourceTypesCollection,
-      "ResourceTypeLocalStorage::set expects a ResourceTypesCollection",
-    );
-    await navigator.locks.request(this.storageKey, async () => {
-      await browser.storage.local.set({ [this.storageKey]: resourceTypesCollection.toDto() });
-    });
+  get entityClass() {
+    return ResourceTypesCollection;
   }
 }
 

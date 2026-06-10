@@ -13,7 +13,7 @@
  */
 
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import UserModel from "../../model/user/userModel";
+import GetOrFindUsersService from "../user/getOrFindUsersService";
 import { assertString, assertUuid } from "../../utils/assertions";
 import MetadataPrivateKeyApiService from "../api/metadata/metadataPrivateKeyApiService";
 import ShareMetadataPrivateKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/shareMetadataPrivateKeysCollection";
@@ -36,7 +36,7 @@ export default class ShareMetadataKeyPrivateService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
-    this.userModel = new UserModel(apiClientOptions);
+    this.getOrFindUsersService = new GetOrFindUsersService(this.account, apiClientOptions);
     this.keyring = new Keyring();
     this.metadataPrivateKeyApiService = new MetadataPrivateKeyApiService(apiClientOptions);
     this.getOrFindMetadataKeysService = new GetOrFindMetadataKeysService(account, apiClientOptions);
@@ -62,7 +62,7 @@ export default class ShareMetadataKeyPrivateService {
     }
 
     //Users should be stored into localstorage
-    const users = await this.userModel.getOrFindAll();
+    const users = await this.getOrFindUsersService.getOrFindAll();
     const targettedUser = users.getFirst("id", userId);
     let missingMetadataKeysIds = targettedUser.missingMetadataKeysIds;
 

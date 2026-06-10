@@ -29,7 +29,7 @@ describe("RbacLocalStorage", () => {
     it("Should return undefined if nothing stored in the storage", async () => {
       expect.assertions(1);
       const rbacLocalstorage = new RbacLocalStorage(account);
-      const result = await rbacLocalstorage.get();
+      const result = await rbacLocalstorage.getData();
       expect(result).toEqual(undefined);
     });
 
@@ -37,20 +37,20 @@ describe("RbacLocalStorage", () => {
       const rbacs = [defaultRbacWithUiActionData()];
       expect.assertions(1);
       const rbacLocalstorage = new RbacLocalStorage(account);
-      browser.storage.local.set({ [rbacLocalstorage.storageKey]: rbacs });
-      const result = await rbacLocalstorage.get();
+      browser.storage.local.set({ [rbacLocalstorage.storageDataKey]: rbacs });
+      const result = await rbacLocalstorage.getData();
       expect(result).toEqual(rbacs);
     });
   });
 
-  describe("RbacLocalStorage::set", () => {
-    it("Should set a rbac colection in the local storage", async () => {
+  describe("RbacLocalStorage::setData", () => {
+    it("Should setData a rbac colection in the local storage", async () => {
       expect.assertions(2);
       const rbacLocalstorage = new RbacLocalStorage(account);
       const rbac = new RbacEntity(defaultRbacWithUiActionData());
       const rbacsCollection = new RbacsCollection([rbac]);
-      await rbacLocalstorage.set(rbacsCollection);
-      const rbacs = await rbacLocalstorage.get();
+      await rbacLocalstorage.setData(rbacsCollection);
+      const rbacs = await rbacLocalstorage.getData();
       expect(rbacs).toHaveLength(1);
       expect(rbacs[0]).toEqual(rbac.toDto(RbacEntity.ALL_CONTAIN_OPTIONS));
     });
@@ -61,7 +61,7 @@ describe("RbacLocalStorage", () => {
       expect.assertions(1);
       const rbacLocalstorage = new RbacLocalStorage(account);
       await rbacLocalstorage.flush();
-      const rbacs = await rbacLocalstorage.get();
+      const rbacs = await rbacLocalstorage.getData();
       expect(rbacs).toEqual(undefined);
     });
   });

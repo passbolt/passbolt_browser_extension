@@ -17,7 +17,7 @@ import GetLegacyAccountService from "../account/getLegacyAccountService";
 import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import { RBACS_LOCAL_STORAGE_KEY } from "../local_storage/rbacLocalStorage";
+import RbacLocalStorage, { RBACS_LOCAL_STORAGE_KEY } from "../local_storage/rbacLocalStorage";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import PostponeUserSettingInvitationService from "../invitation/postponeUserSettingInvitationService";
 import { PASSWORD_POLICIES_LOCAL_STORAGE_KEY } from "../local_storage/passwordPoliciesLocalStorage";
@@ -42,7 +42,7 @@ beforeEach(() => {
 describe("LocalStorageService", () => {
   describe("LocalStorageService::flush", () => {
     it("Should flush all storage (with no account set)", async () => {
-      expect.assertions(22);
+      expect.assertions(23);
       // spy on
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
@@ -54,6 +54,7 @@ describe("LocalStorageService", () => {
       jest.spyOn(MetadataKeysSessionStorage.prototype, "flush");
       jest.spyOn(SessionKeysBundlesSessionStorageService.prototype, "flush");
       jest.spyOn(GroupLocalStorage.prototype, "flush");
+      jest.spyOn(RbacLocalStorage.prototype, "flush");
       jest.spyOn(SiteSettingsLocalStorage.prototype, "flush");
       // process
       await LocalStorageService.flush();
@@ -79,11 +80,12 @@ describe("LocalStorageService", () => {
       expect(MetadataKeysSessionStorage.prototype.flush).not.toHaveBeenCalled();
       expect(SessionKeysBundlesSessionStorageService.prototype.flush).not.toHaveBeenCalled();
       expect(GroupLocalStorage.prototype.flush).not.toHaveBeenCalled();
+      expect(RbacLocalStorage.prototype.flush).not.toHaveBeenCalled();
       expect(SiteSettingsLocalStorage.prototype.flush).not.toHaveBeenCalled();
     });
 
     it("Should flush all storage (with an account set)", async () => {
-      expect.assertions(27);
+      expect.assertions(28);
       // mock data
       MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -96,8 +98,10 @@ describe("LocalStorageService", () => {
       jest.spyOn(UserMeSessionStorageService, "remove");
       // process
       await LocalStorageService.flush();
+      // Need to wait metadata and data to be removed
+      await Promise.resolve();
       // expectations
-      expect(browser.storage.local.remove).toHaveBeenCalledTimes(14);
+      expect(browser.storage.local.remove).toHaveBeenCalledTimes(16);
       expect(browser.storage.session.remove).toHaveBeenCalledTimes(5);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
@@ -114,6 +118,7 @@ describe("LocalStorageService", () => {
       expect(browser.alarms.clear).toHaveBeenCalledWith("SessionKeepAlive");
       expect(browser.storage.session.remove).toHaveBeenCalledWith("temp_server_part_sso_kit");
       expect(GetLegacyAccountService.get).toHaveBeenCalled();
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-metadata-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_POLICIES_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(

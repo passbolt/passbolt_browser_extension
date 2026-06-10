@@ -53,7 +53,7 @@ export default class FindAndUpdateRbacLocalStorageService {
       // Lock is granted, retrieve the current user's Rbac and update the local storage.
       const rbacsCollection = await this.findRbacService.findMe();
 
-      await this.rbacLocalStorage.set(rbacsCollection);
+      await this.rbacLocalStorage.setData(rbacsCollection);
       return rbacsCollection;
     });
   }

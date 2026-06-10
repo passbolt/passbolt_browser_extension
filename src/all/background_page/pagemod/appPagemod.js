@@ -22,7 +22,7 @@ import { ResourceTypeEvents } from "../event/resourceTypeEvents";
 import { RoleEvents } from "../event/roleEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { SecretEvents } from "../event/secretEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { ShareEvents } from "../event/shareEvents";
 import { UserEvents } from "../event/userEvents";
 import { GroupEvents } from "../event/groupEvents";
@@ -67,7 +67,7 @@ class App extends Pagemod {
       RoleEvents,
       KeyringEvents,
       SecretEvents,
-      OrganizationSettingsEvents,
+      SiteSettingsEvents,
       ShareEvents,
       UserEvents,
       GroupEvents,

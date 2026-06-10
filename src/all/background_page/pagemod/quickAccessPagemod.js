@@ -19,7 +19,7 @@ import { QuickAccessEvents } from "../event/quickAccessEvents";
 import { GroupEvents } from "../event/groupEvents";
 import { ResourceEvents } from "../event/resourceEvents";
 import { SecretEvents } from "../event/secretEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { TabEvents } from "../event/tabEvents";
 import { LocaleEvents } from "../event/localeEvents";
 import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
@@ -50,7 +50,7 @@ class QuickAccess extends Pagemod {
       GroupEvents,
       ResourceEvents,
       SecretEvents,
-      OrganizationSettingsEvents,
+      SiteSettingsEvents,
       TabEvents,
       LocaleEvents,
       PownedPasswordEvents,

@@ -19,7 +19,7 @@ import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
 import Pagemod from "./pagemod";
 import { ConfigEvents } from "../event/configEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { WebIntegrationEvents } from "../event/webIntegrationEvents";
 import { PortEvents } from "../event/portEvents";
 
@@ -29,7 +29,7 @@ jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn())
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(WebIntegrationEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(SiteSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("WebIntegration", () => {
@@ -54,12 +54,7 @@ describe("WebIntegration", () => {
         "contentScripts/js/dist/browser-integration/vendors.js",
         "contentScripts/js/dist/browser-integration/browser-integration.js",
       ]);
-      expect(WebIntegration.events).toStrictEqual([
-        ConfigEvents,
-        WebIntegrationEvents,
-        OrganizationSettingsEvents,
-        PortEvents,
-      ]);
+      expect(WebIntegration.events).toStrictEqual([ConfigEvents, WebIntegrationEvents, SiteSettingsEvents, PortEvents]);
       expect(WebIntegration.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(WebIntegration.appName).toBe("WebIntegration");
     });
@@ -127,7 +122,7 @@ describe("WebIntegration", () => {
         tab: port._port.sender.tab,
         name: WebIntegration.appName,
       });
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({
+      expect(SiteSettingsEvents.listen).toHaveBeenCalledWith({
         port: port,
         tab: port._port.sender.tab,
         name: WebIntegration.appName,

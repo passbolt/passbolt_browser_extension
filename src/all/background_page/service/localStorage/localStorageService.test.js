@@ -33,6 +33,7 @@ import SessionKeysBundlesSessionStorageService, {
 } from "../sessionStorage/sessionKeysBundlesSessionStorageService";
 import { METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY } from "../local_storage/metadataKeysSettingsLocalStorage";
 import GroupLocalStorage, { GROUP_LOCAL_STORAGE_KEY } from "../local_storage/groupLocalStorage";
+import SiteSettingsLocalStorage, { SITE_SETTINGS } from "../local_storage/siteSettingsLocalStorage";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -41,7 +42,7 @@ beforeEach(() => {
 describe("LocalStorageService", () => {
   describe("LocalStorageService::flush", () => {
     it("Should flush all storage (with no account set)", async () => {
-      expect.assertions(21);
+      expect.assertions(22);
       // spy on
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
@@ -53,6 +54,7 @@ describe("LocalStorageService", () => {
       jest.spyOn(MetadataKeysSessionStorage.prototype, "flush");
       jest.spyOn(SessionKeysBundlesSessionStorageService.prototype, "flush");
       jest.spyOn(GroupLocalStorage.prototype, "flush");
+      jest.spyOn(SiteSettingsLocalStorage.prototype, "flush");
       // process
       await LocalStorageService.flush();
       // expectations
@@ -77,10 +79,11 @@ describe("LocalStorageService", () => {
       expect(MetadataKeysSessionStorage.prototype.flush).not.toHaveBeenCalled();
       expect(SessionKeysBundlesSessionStorageService.prototype.flush).not.toHaveBeenCalled();
       expect(GroupLocalStorage.prototype.flush).not.toHaveBeenCalled();
+      expect(SiteSettingsLocalStorage.prototype.flush).not.toHaveBeenCalled();
     });
 
     it("Should flush all storage (with an account set)", async () => {
-      expect.assertions(26);
+      expect.assertions(27);
       // mock data
       MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -94,7 +97,7 @@ describe("LocalStorageService", () => {
       // process
       await LocalStorageService.flush();
       // expectations
-      expect(browser.storage.local.remove).toHaveBeenCalledTimes(13);
+      expect(browser.storage.local.remove).toHaveBeenCalledTimes(14);
       expect(browser.storage.session.remove).toHaveBeenCalledTimes(5);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
@@ -128,6 +131,7 @@ describe("LocalStorageService", () => {
       );
       expect(UserMeSessionStorageService.remove).toHaveBeenCalledWith(account);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${GROUP_LOCAL_STORAGE_KEY}`);
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${SITE_SETTINGS}-${account.id}`);
       /**
        * TODO: Re-enable this test assertion once local storage flush operations are properly awaited.
        * Currently disabled because the storage flush for the second key may not complete

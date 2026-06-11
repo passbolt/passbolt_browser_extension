@@ -17,7 +17,7 @@ import UserEntity from "../entity/user/userEntity";
 import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 import Validator from "validator";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
+import UserMeSessionStorageService from "../../service/local_storage/userMeLocalStorageService";
 import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
 
 /**

@@ -24,7 +24,7 @@ import PassphraseStorageService from "../session_storage/passphraseStorageServic
 import SsoKitTemporaryStorageService from "../session_storage/ssoKitTemporaryStorageService";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
-import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
+import UserMeSessionStorageService from "../local_storage/userMeLocalStorageService";
 import User from "../../model/user";
 import PasswordPoliciesLocalStorage from "../local_storage/passwordPoliciesLocalStorage";
 import PasswordExpirySettingsLocalStorage from "../local_storage/passwordExpirySettingsLocalStorage";

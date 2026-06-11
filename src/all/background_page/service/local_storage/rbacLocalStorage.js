@@ -17,10 +17,18 @@ import AbstractLocalStorage from "./abstractLocalStorage";
 export const RBACS_LOCAL_STORAGE_KEY = "rbac";
 
 class RbacsLocalStorage extends AbstractLocalStorage {
+  /**
+   * Get the key property
+   * @return {string}
+   */
   get key() {
     return RBACS_LOCAL_STORAGE_KEY;
   }
 
+  /**
+   * Get the entity class
+   * @return {RbacsCollection}
+   */
   get entityClass() {
     return RbacsCollection;
   }

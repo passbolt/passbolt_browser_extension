@@ -118,7 +118,7 @@ class AbstractLocalStorage {
   async setData(data) {
     assertType(data, this.entityClass, `Parameter "data" should be of type ${this.entityClass.constructor.name}`);
     await navigator.locks.request(this.storageDataKey, async () => {
-      const dataDto = data.toDto();
+      const dataDto = data.toDto(this.constructor.CONTAIN_OPTIONS);
       await this._setBrowserStorage({ [this.storageDataKey]: dataDto });
       AbstractLocalStorage._runtimeCachedData[this.storageDataKey] = dataDto;
     });
@@ -178,6 +178,15 @@ class AbstractLocalStorage {
       message: "The local storage should implement entityClass. Default throw an error.",
     });
     throw new Error("The local storage should implement entityClass.");
+  }
+
+  /**
+   * Get the contain options
+   * @return {{}}
+   * @constructor
+   */
+  static get CONTAIN_OPTIONS() {
+    return {};
   }
 }
 

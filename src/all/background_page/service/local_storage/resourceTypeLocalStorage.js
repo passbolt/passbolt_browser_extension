@@ -19,10 +19,18 @@ import AbstractLocalStorage from "./abstractLocalStorage";
 const RESOURCE_TYPES_LOCAL_STORAGE_KEY = "resource_types";
 
 class ResourceTypeLocalStorage extends AbstractLocalStorage {
+  /**
+   * Get the key property
+   * @return {string}
+   */
   get key() {
     return RESOURCE_TYPES_LOCAL_STORAGE_KEY;
   }
 
+  /**
+   * Get the entityClass
+   * @return {ResourceTypesCollection}
+   */
   get entityClass() {
     return ResourceTypesCollection;
   }

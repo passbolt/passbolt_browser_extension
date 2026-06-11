@@ -14,7 +14,7 @@
 
 import LocalStorageService from "./localStorageService";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
-import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
+import UserMeSessionStorageService from "../local_storage/userMeLocalStorageService";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import RbacLocalStorage, { RBACS_LOCAL_STORAGE_KEY } from "../local_storage/rbacLocalStorage";

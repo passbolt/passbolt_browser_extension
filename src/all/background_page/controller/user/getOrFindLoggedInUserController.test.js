@@ -20,7 +20,7 @@ import GetOrFindLoggedInUserController from "./getOrFindLoggedInUserController";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import UserEntity from "../../model/entity/user/userEntity";
-import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
+import UserMeSessionStorageService from "../../service/local_storage/userMeLocalStorageService";
 
 beforeEach(() => {
   enableFetchMocks();

@@ -62,7 +62,12 @@ describe("ResourceUpdateController", () => {
       await controller._exec(resourceDTO, null);
 
       expect(controller.resourceUpdateService.exec).toHaveBeenCalledTimes(1);
-      expect(controller.resourceUpdateService.exec).toHaveBeenCalledWith(resourceDTO, null, pgpKeys.ada.passphrase);
+      expect(controller.resourceUpdateService.exec).toHaveBeenCalledWith(
+        resourceDTO,
+        null,
+        pgpKeys.ada.passphrase,
+        undefined,
+      );
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "SUCCESS", resourceDTO);
     });
 
@@ -74,7 +79,29 @@ describe("ResourceUpdateController", () => {
       await controller._exec(resourceDTO, secret);
 
       expect(controller.resourceUpdateService.exec).toHaveBeenCalledTimes(1);
-      expect(controller.resourceUpdateService.exec).toHaveBeenCalledWith(resourceDTO, secret, pgpKeys.ada.passphrase);
+      expect(controller.resourceUpdateService.exec).toHaveBeenCalledWith(
+        resourceDTO,
+        secret,
+        pgpKeys.ada.passphrase,
+        undefined,
+      );
+      expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "SUCCESS", resourceDTO);
+    });
+
+    it("Should forward the permission changes to the resourceUpdateService", async () => {
+      expect.assertions(2);
+
+      const resourceDTO = defaultResourceDto();
+      const permissionChanges = [{ aro_foreign_key: "aro-id", aco_foreign_key: null, type: 1, is_new: true }];
+      jest.spyOn(controller.resourceUpdateService, "exec").mockImplementationOnce(() => resourceDTO);
+      await controller._exec(resourceDTO, secret, permissionChanges);
+
+      expect(controller.resourceUpdateService.exec).toHaveBeenCalledWith(
+        resourceDTO,
+        secret,
+        pgpKeys.ada.passphrase,
+        permissionChanges,
+      );
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "SUCCESS", resourceDTO);
     });
 

@@ -14,7 +14,7 @@
 
 import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import SetSetupLocaleController from "./setSetupLocaleController";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
@@ -39,7 +39,7 @@ describe("SetAccountLocaleController", () => {
       );
 
       // Mock API fetch organization settings
-      const mockApiResult = anonymousOrganizationSettings();
+      const mockApiResult = anonymousSiteSettings();
       fetch.doMockOnce(() => mockApiResponse(mockApiResult));
 
       expect.assertions(1);
@@ -59,7 +59,7 @@ describe("SetAccountLocaleController", () => {
       );
 
       // Mock API fetch organization settings
-      const mockApiResult = anonymousOrganizationSettings();
+      const mockApiResult = anonymousSiteSettings();
       fetch.doMockOnce(() => mockApiResponse(mockApiResult));
 
       expect.assertions(1);

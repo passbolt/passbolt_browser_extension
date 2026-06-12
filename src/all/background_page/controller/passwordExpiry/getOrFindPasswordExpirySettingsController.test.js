@@ -21,9 +21,9 @@ import GetOrFindPasswordExpirySettingsController from "./getOrFindPasswordExpiry
 import { defaultPasswordExpirySettingsDtoFromApi } from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
 import {
-  defaultCeOrganizationSettings,
-  defaultProOrganizationSettings,
-} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+  defaultCeSiteSettings,
+  defaultProSiteSettings,
+} from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
 
@@ -40,7 +40,7 @@ describe("GetOrFindPasswordExpirySettingsController", () => {
 
   describe("CE version", () => {
     beforeEach(() => {
-      const organizationSettings = defaultCeOrganizationSettings();
+      const organizationSettings = defaultCeSiteSettings();
       jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
     });
     it("Should return the value from the API", async () => {
@@ -122,7 +122,7 @@ describe("GetOrFindPasswordExpirySettingsController", () => {
 
   describe("PRO version", () => {
     beforeEach(() => {
-      const organizationSettings = defaultProOrganizationSettings();
+      const organizationSettings = defaultProSiteSettings();
       jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
     });
     it("Should return the value from the API", async () => {

@@ -72,9 +72,9 @@ import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import { defaultPasswordExpirySettingsDtoFromApi } from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpirySettingsService from "../../api/passwordExpiry/passwordExpirySettingsService";
 import {
-  defaultCeOrganizationSettings,
-  defaultProOrganizationSettings,
-} from "../../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+  defaultCeSiteSettings,
+  defaultProSiteSettings,
+} from "../../../model/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsService from "../../api/organizationSettings/organizationSettingsService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 
@@ -710,9 +710,7 @@ describe("ImportResourcesService", () => {
         it("Should set expiry date when password expiry feature is enabled with default period", async () => {
           expect.assertions(3);
 
-          jest
-            .spyOn(OrganizationSettingsService.prototype, "find")
-            .mockImplementation(() => defaultProOrganizationSettings());
+          jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => defaultProSiteSettings());
 
           jest.spyOn(PasswordExpirySettingsService.prototype, "find").mockImplementation(() =>
             defaultPasswordExpirySettingsDtoFromApi({
@@ -737,7 +735,7 @@ describe("ImportResourcesService", () => {
           it("password expiry plugin is disabled", async () => {
             expect.assertions(3);
 
-            const organizationSettings = defaultProOrganizationSettings();
+            const organizationSettings = defaultProSiteSettings();
             organizationSettings.passbolt.plugins.passwordExpiry.enabled = false;
 
             jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
@@ -764,7 +762,7 @@ describe("ImportResourcesService", () => {
           it("password expiry policies feature is disabled", async () => {
             expect.assertions(3);
 
-            const organizationSettings = defaultProOrganizationSettings();
+            const organizationSettings = defaultProSiteSettings();
             organizationSettings.passbolt.plugins.passwordExpiryPolicies.enabled = false;
 
             jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
@@ -793,7 +791,7 @@ describe("ImportResourcesService", () => {
 
             jest
               .spyOn(OrganizationSettingsService.prototype, "find")
-              .mockImplementation(() => defaultProOrganizationSettings());
+              .mockImplementation(() => defaultProSiteSettings());
 
             jest
               .spyOn(PasswordExpirySettingsService.prototype, "find")
@@ -824,7 +822,7 @@ describe("ImportResourcesService", () => {
         it("Should not set expiry date even when password expiry plugin is enabled", async () => {
           expect.assertions(3);
 
-          const organizationSettings = defaultCeOrganizationSettings();
+          const organizationSettings = defaultCeSiteSettings();
           organizationSettings.passbolt.plugins.passwordExpiry = {
             version: "1.0.0",
             enabled: true,

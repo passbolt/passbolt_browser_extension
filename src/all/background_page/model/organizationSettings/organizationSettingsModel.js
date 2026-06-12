@@ -12,7 +12,7 @@
  * @since         3.2.0
  */
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
-import OrganizationSettingsEntity from "../entity/organizationSettings/organizationSettingsEntity";
+import SiteSettingsEntity from "../entity/siteSettings/siteSettingsEntity";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
 // Settings local cache.
@@ -34,18 +34,18 @@ class OrganizationSettingsModel {
 
   /**
    * Set the settings.
-   * @params {OrganizationSettingsEntity} settings The settings
+   * @params {SiteSettingsEntity} settings The settings
    */
   static set(settings) {
-    if (!(settings instanceof OrganizationSettingsEntity)) {
-      throw new Error("The settings should be an instance of OrganizationSettingsEntity");
+    if (!(settings instanceof SiteSettingsEntity)) {
+      throw new Error("The settings should be an instance of SiteSettingsEntity");
     }
     _settings = settings;
   }
 
   /**
    * get the cached settings if any.
-   * @return {OrganizationSettingsEntity|null}
+   * @return {SiteSettingsEntity|null}
    */
   static get() {
     return _settings || null;
@@ -55,7 +55,7 @@ class OrganizationSettingsModel {
    * Returns the organization settings from the local cache or requests the server.
    * @param {boolean} refreshCache Should request the API to retrieve the organization settings and refresh the cache.
    * Default false
-   * @returns {Promise<OrganizationSettingsEntity>}
+   * @returns {Promise<SiteSettingsEntity>}
    */
   async getOrFind(refreshCache = false) {
     if (refreshCache || !_settings) {
@@ -73,7 +73,7 @@ class OrganizationSettingsModel {
 
   /**
    * Find the organization settings.
-   * @returns {Promise<OrganizationSettingsEntity>}
+   * @returns {Promise<SiteSettingsEntity>}
    */
   async find() {
     let organizationSettingsDto;
@@ -83,10 +83,10 @@ class OrganizationSettingsModel {
     } catch (error) {
       // When the cloud organization is disabled or not found, the cloud API returns a 403.
       if (error instanceof PassboltApiFetchError && error?.data?.code === 403) {
-        organizationSettingsDto = OrganizationSettingsEntity.disabledOrganizationSettings;
+        organizationSettingsDto = SiteSettingsEntity.disabledOrganizationSettings;
       }
     }
-    return new OrganizationSettingsEntity(organizationSettingsDto);
+    return new SiteSettingsEntity(organizationSettingsDto);
   }
 }
 

@@ -12,7 +12,7 @@
  * @since         4.1.0
  */
 
-import UserMeLocalStorageService from "./userMeLocalStorageService";
+import UserMeLocalStorage from "./userMeLocalStorage";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
@@ -21,16 +21,16 @@ import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/
 import { v4 as uuidv4 } from "uuid";
 import browser from "../../../common/polyfill/browserPolyfill";
 
-describe("UserMeLocalStorageService", () => {
+describe("UserMeLocalStorage", () => {
   beforeEach(async () => {
     await browser.storage.local.clear();
   });
 
-  describe("UserMeLocalStorageService::get", () => {
+  describe("UserMeLocalStorage::get", () => {
     it("should return null if there is no data in the storage", async () => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
       const cachedUser = await userMeLocalStorage.getData();
       expect(cachedUser).toBeUndefined();
     });
@@ -39,7 +39,7 @@ describe("UserMeLocalStorageService", () => {
       expect.assertions(4);
       const account = new AccountEntity(defaultAccountDto());
       const user = new UserEntity(defaultUserDto());
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
       await userMeLocalStorage.setData(user);
 
       const cachedUser = new UserEntity(await userMeLocalStorage.getData());
@@ -60,8 +60,8 @@ describe("UserMeLocalStorageService", () => {
         }),
       );
 
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
-      const userMeLocalStorageOtherAccount = new UserMeLocalStorageService(otherAccount);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
+      const userMeLocalStorageOtherAccount = new UserMeLocalStorage(otherAccount);
       const user = new UserEntity(defaultUserDto());
       await userMeLocalStorage.setData(user);
 
@@ -73,12 +73,12 @@ describe("UserMeLocalStorageService", () => {
       expect.assertions(2);
       const otherAccount = new AccountEntity(defaultAccountDto());
       const userOtherAccount = new UserEntity(defaultUserDto());
-      const userMeLocalStorageOtherAccount = new UserMeLocalStorageService(otherAccount);
+      const userMeLocalStorageOtherAccount = new UserMeLocalStorage(otherAccount);
       await userMeLocalStorageOtherAccount.setData(userOtherAccount);
 
       const account = new AccountEntity(defaultAccountDto());
       const user = new UserEntity(defaultUserDto());
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
       await userMeLocalStorage.setData(user);
 
       const cachedUser = await userMeLocalStorage.getData();
@@ -87,13 +87,13 @@ describe("UserMeLocalStorageService", () => {
     });
   });
 
-  describe("UserMeLocalStorageService::set", () => {
+  describe("UserMeLocalStorage::set", () => {
     it("should override an existing cached user if one already present", async () => {
       expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
       const user = new UserEntity(defaultUserDto());
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
       await userMeLocalStorage.setData(user);
       await userMeLocalStorage.setData(user);
 
@@ -105,12 +105,12 @@ describe("UserMeLocalStorageService", () => {
     });
   });
 
-  describe("UserMeLocalStorageService::flush", () => {
+  describe("UserMeLocalStorage::flush", () => {
     it("should not crash if nothing to flush", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
       await userMeLocalStorage.flush();
       const cachedUser = await userMeLocalStorage.getData();
       expect(cachedUser).toBeUndefined();
@@ -121,7 +121,7 @@ describe("UserMeLocalStorageService", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const user = new UserEntity(defaultUserDto());
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
       await userMeLocalStorage.setData(user);
 
       await userMeLocalStorage.flush();
@@ -138,11 +138,11 @@ describe("UserMeLocalStorageService", () => {
         }),
       );
       const userOtherAccount = new UserEntity(defaultUserDto());
-      const userMeLocalStorageOtherAccount = new UserMeLocalStorageService(otherAccount);
+      const userMeLocalStorageOtherAccount = new UserMeLocalStorage(otherAccount);
       await userMeLocalStorageOtherAccount.setData(userOtherAccount);
 
       const account = new AccountEntity(defaultAccountDto());
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
       await userMeLocalStorage.flush();
 
       // One for data and another one for metadata
@@ -158,12 +158,12 @@ describe("UserMeLocalStorageService", () => {
         }),
       );
       const userOtherAccount = new UserEntity(defaultUserDto());
-      const userMeLocalStorageOtherAccount = new UserMeLocalStorageService(otherAccount);
+      const userMeLocalStorageOtherAccount = new UserMeLocalStorage(otherAccount);
       await userMeLocalStorageOtherAccount.setData(userOtherAccount);
 
       const account = new AccountEntity(defaultAccountDto());
       const user = new UserEntity(defaultUserDto());
-      const userMeLocalStorage = new UserMeLocalStorageService(account);
+      const userMeLocalStorage = new UserMeLocalStorage(account);
       await userMeLocalStorage.setData(user);
 
       await userMeLocalStorage.flush();

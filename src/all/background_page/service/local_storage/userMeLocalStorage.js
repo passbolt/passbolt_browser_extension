@@ -20,7 +20,7 @@ const USER_ME_STORAGE_KEY_PREFIX = "user-me";
 /**
  * A cache service used to store the result of the requests made on the users me entry point.
  */
-class UserMeLocalStorageService extends AbstractLocalStorage {
+class UserMeLocalStorage extends AbstractLocalStorage {
   /**
    * Get the key property
    * @return {string}
@@ -42,9 +42,9 @@ class UserMeLocalStorageService extends AbstractLocalStorage {
    * @return {{profile: function(): {avatar: boolean}, role: boolean, gpgkey: boolean, groups_users: boolean, account_recovery_user_setting: boolean, pending_account_recovery_request: boolean}}
    * @constructor
    */
-  static get CONTAIN_OPTIONS() {
+  static get DEFAULT_CONTAIN() {
     return UserEntity.ALL_CONTAIN_OPTIONS;
   }
 }
 
-export default UserMeLocalStorageService;
+export default UserMeLocalStorage;

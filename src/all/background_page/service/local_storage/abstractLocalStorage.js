@@ -95,7 +95,7 @@ class AbstractLocalStorage {
 
   /**
    * Get the data from the local storage.
-   * @return {Promise<object|undefined>}
+   * @return {Promise<object|Array|undefined>}
    */
   async getData() {
     if (!AbstractLocalStorage._runtimeCachedData[this.storageDataKey]) {
@@ -118,7 +118,7 @@ class AbstractLocalStorage {
   async setData(data) {
     assertType(data, this.entityClass, `Parameter "data" should be of type ${this.entityClass.constructor.name}`);
     await navigator.locks.request(this.storageDataKey, async () => {
-      const dataDto = data.toDto(this.constructor.CONTAIN_OPTIONS);
+      const dataDto = data.toDto(this.constructor.DEFAULT_CONTAIN);
       await this._setBrowserStorage({ [this.storageDataKey]: dataDto });
       AbstractLocalStorage._runtimeCachedData[this.storageDataKey] = dataDto;
     });
@@ -185,7 +185,7 @@ class AbstractLocalStorage {
    * @return {{}}
    * @constructor
    */
-  static get CONTAIN_OPTIONS() {
+  static get DEFAULT_CONTAIN() {
     return {};
   }
 }

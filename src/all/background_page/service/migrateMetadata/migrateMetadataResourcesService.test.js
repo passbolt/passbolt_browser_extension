@@ -41,7 +41,6 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import { enableFetchMocks } from "jest-fetch-mock";
 
 describe("MigrateMetadataResourcesService", () => {
@@ -88,7 +87,7 @@ describe("MigrateMetadataResourcesService", () => {
           : new PassboltResponseEntity(passboltReponseWithCollectionDto(nextBatchToMigrate)),
       ); //first migrate call, there is another page of resources to migrate
       jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
-      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.getOrFindResourceTypesService, "getOrFindAll").mockReturnValue(resourceTypesCollection);
       jest
         .spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings")
         .mockReturnValue(defaultMetadataKeysSettingsDto());
@@ -145,7 +144,7 @@ describe("MigrateMetadataResourcesService", () => {
       // Spy initialization
       jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
       jest
-        .spyOn(ResourceTypeModel.prototype, "getOrFindAll")
+        .spyOn(service.getOrFindResourceTypesService, "getOrFindAll")
         .mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
       jest.spyOn(service, "_migrateResources");
       jest
@@ -182,7 +181,7 @@ describe("MigrateMetadataResourcesService", () => {
 
       // Spy initialization
       jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
-      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.getOrFindResourceTypesService, "getOrFindAll").mockReturnValue(resourceTypesCollection);
       jest
         .spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings")
         .mockReturnValue(defaultMetadataKeysSettingsDto());
@@ -215,7 +214,7 @@ describe("MigrateMetadataResourcesService", () => {
       // Spy initialization
       jest.spyOn(service.migrateMetadataResourcesApiService, "migrate");
       jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
-      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.getOrFindResourceTypesService, "getOrFindAll").mockReturnValue(resourceTypesCollection);
       jest
         .spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings")
         .mockReturnValue(defaultMetadataKeysSettingsDto());
@@ -253,7 +252,7 @@ describe("MigrateMetadataResourcesService", () => {
         .spyOn(service.migrateMetadataResourcesApiService, "migrate")
         .mockImplementation(async () => new PassboltResponseEntity(passboltReponseWithCollectionDto([])));
       jest.spyOn(service.migrateMetadataResourcesApiService, "findAll").mockReturnValue(migrationDetails);
-      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.getOrFindResourceTypesService, "getOrFindAll").mockReturnValue(resourceTypesCollection);
       jest
         .spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings")
         .mockReturnValue(defaultMetadataKeysSettingsDto());

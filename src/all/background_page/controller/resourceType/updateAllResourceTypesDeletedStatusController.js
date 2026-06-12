@@ -21,11 +21,12 @@ export default class UpdateAllResourceTypesDeletedStatusController {
    * @param {Worker} worker
    * @param {string} requestId
    * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.updateResourceTypesService = new UpdateResourceTypesService(apiClientOptions);
+    this.updateResourceTypesService = new UpdateResourceTypesService(account, apiClientOptions);
   }
 
   /**

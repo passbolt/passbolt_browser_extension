@@ -24,8 +24,8 @@ import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
-import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import FindPermissionsService from "../../permission/findPermissionsService";
+import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 
 class ResourceUpdateService {
   /**
@@ -37,10 +37,10 @@ class ResourceUpdateService {
   constructor(account, apiClientOptions, progressService) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourcetypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.progressService = progressService;
     this.findPermissionsService = new FindPermissionsService(account, apiClientOptions);
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.encryptMetadataKeysService = new EncryptMetadataKeysService(apiClientOptions, this.account);
     this.userModel = new UserModel(apiClientOptions);
     this.keyring = new Keyring();
@@ -56,7 +56,7 @@ class ResourceUpdateService {
    */
   async exec(resourceDto, plaintextDto, passphrase) {
     const resourceEntity = new ResourceEntity(resourceDto);
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.getOrFindResourcetypesService.getOrFindAll();
     const resourceTypeEntity = resourceTypesCollection.getFirstById(resourceEntity.resourceTypeId);
     const permissionsCollection = await this.findPermissionsService.findAllByAcoForeignKey(resourceEntity.id);
 

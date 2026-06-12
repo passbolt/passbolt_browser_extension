@@ -18,13 +18,13 @@ import ExternalResourcesCollection from "../../../model/entity/resource/external
 import ExternalTotpEntity from "../../../model/entity/totp/externalTotpEntity";
 import ResourcesExporter from "../../../model/export/resourcesExporter";
 import FolderModel from "../../../model/folder/folderModel";
-import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import i18n from "../../../sdk/i18n";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import DecryptAndParseResourceSecretService from "../../secret/decryptAndParseResourceSecretService";
 import FindResourcesService from "../findResourcesService";
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
+import GetOrFindResourcesService from "../getOrFindResourcesService";
 
 /**
  * The service aim to export the resources to a file.
@@ -42,7 +42,7 @@ class ExportResourcesService {
     this.findResourcesService = new FindResourcesService(account, apiClientOptions);
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
     // Models
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrfindResourceTypesService = new GetOrFindResourcesService(account, apiClientOptions);
     this.folderModel = new FolderModel(apiClientOptions, account);
   }
 
@@ -94,7 +94,7 @@ class ExportResourcesService {
   async decryptSecrets(exportResourcesFileEntity, privateKey) {
     let i = 0;
 
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.getOrfindResourceTypesService.getOrFindAll();
     for (const exportResourceEntity of exportResourcesFileEntity.exportResources.items) {
       i++;
       await this.progressService.finishStep(

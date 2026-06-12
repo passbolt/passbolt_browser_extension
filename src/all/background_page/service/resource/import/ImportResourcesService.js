@@ -22,7 +22,6 @@ import FolderModel from "../../../model/folder/folderModel";
 import ResourcesImportParser from "../../../model/import/resourcesImportParser";
 import Keyring from "../../../model/keyring";
 import ResourceModel from "../../../model/resource/resourceModel";
-import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import ResourceService from "../../api/resource/resourceService";
 import EncryptMessageService from "../../crypto/encryptMessageService";
@@ -38,6 +37,7 @@ import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity
 import PasswordExpirySettingsGetOrFindService from "../../passwordExpirySettings/passwordExpirySettingsGetOrFindService";
 import OrganizationSettingsModel from "../../../model/organizationSettings/organizationSettingsModel";
 import UpdateResourceTagsService from "../../tag/updateResourceTagsService";
+import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 
 /**
  * The service aim to import the resources from a file and save it to the API / localstorage.
@@ -54,7 +54,6 @@ class ImportResourcesService {
     //Models
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.folderModel = new FolderModel(apiClientOptions, account);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     //Services
     this.resourceService = new ResourceService(apiClientOptions);
     this.executeConcurrentlyService = new ExecuteConcurrentlyService();
@@ -65,6 +64,7 @@ class ImportResourcesService {
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
     this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
     this.passwordExpirySettingsGetOrFindService = new PasswordExpirySettingsGetOrFindService(account, apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.account = account;
   }
 
@@ -102,7 +102,7 @@ class ImportResourcesService {
   async parseFile(importResourcesFile) {
     const metadataTypesSettings = await this.getOrFindMetadataSettingsService.getOrFindTypesSettings();
     const importParser = new ResourcesImportParser();
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.getOrFindResourceTypesService.getOrFindAll();
     await importParser.parseImport(importResourcesFile, resourceTypesCollection, metadataTypesSettings);
 
     // Now that we know about the content of the import, update the progress bar goals.
@@ -133,7 +133,7 @@ class ImportResourcesService {
     if (passwordExpirySettings?.isFeatureEnabled) {
       const passwordExpiryDate = passwordExpirySettings.calculateDefaultResourceExpiryDate();
       if (passwordExpiryDate) {
-        const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+        const resourceTypesCollection = await this.getOrFindResourceTypesService.getOrFindAll();
         resourcesCollection.setExpiryDateIfUnset(passwordExpiryDate, resourceTypesCollection);
       }
     }
@@ -165,7 +165,7 @@ class ImportResourcesService {
     let i = 0;
     const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
-    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypes = await this.getOrFindResourceTypesService.getOrFindAll();
     for (const importResourceEntity of importResourcesFile.importResources) {
       i++;
       await this.progressService.finishStep(
@@ -353,7 +353,7 @@ class ImportResourcesService {
    */
   async bulkImportResources(importResourcesFile, resourcesCollection, clearTextMetadataResourcesCollection) {
     let importedCount = 0;
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.getOrFindResourceTypesService.getOrFindAll();
 
     const callbacks = resourcesCollection.items.map((resourceEntity, index) => async () => {
       try {

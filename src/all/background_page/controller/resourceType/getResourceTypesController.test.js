@@ -32,7 +32,7 @@ describe("GetResourceTypesController", () => {
       const resourceTypesDto = resourceTypesCollectionDto();
       const controller = new GetResourceTypesController(null, null, defaultApiClientOptions());
       jest
-        .spyOn(controller.resourceTypeModel, "getOrFindAll")
+        .spyOn(controller.getOrFindResourceTypesService, "getOrFindAll")
         .mockImplementationOnce(() => new ResourceTypesCollection(resourceTypesDto));
 
       const resourceTypesCollection = await controller.exec();

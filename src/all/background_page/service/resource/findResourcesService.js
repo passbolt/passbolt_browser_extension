@@ -14,13 +14,13 @@
 import ResourceService from "../api/resource/resourceService";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import { assertArrayUUID, assertUuid } from "../../utils/assertions";
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import splitBySize from "../../utils/array/splitBySize";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import DecryptMetadataService from "../metadata/decryptMetadataService";
 import { assertNumber } from "passbolt-styleguide/src/shared/utils/assertions";
+import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceTypesService";
 
 const DEFAULT_PAGE_SIZE = 10_000;
 
@@ -36,8 +36,8 @@ export default class FindResourcesService {
   constructor(account, apiClientOptions) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
   }
 
   /**
@@ -145,7 +145,7 @@ export default class FindResourcesService {
       { "is-shared-with-group": groupId },
       true,
     );
-    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypes = await this.getOrFindResourceTypesService.getOrFindAll();
     resources.filterByResourceTypes(resourceTypes);
 
     await this.decryptMetadataService.decryptAllFromForeignModels(resources, passphrase, {

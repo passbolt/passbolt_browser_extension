@@ -58,7 +58,7 @@ describe("FindAndDecryptSecretRevisionsService", () => {
         defaultResourceSecretRevisionsDtos({ resource_id }, { count: 4, withSecrets: true, withCreator: true }),
       );
       const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
-      jest.spyOn(service.resourceTypeModel, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(service.getOrFindResourceTypesService, "getOrFindAll").mockReturnValue(resourceTypesCollection);
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(OpenpgpAssertion, "readMessageOrFail").mockReturnValue(pgpMessage);
 
@@ -90,7 +90,7 @@ describe("FindAndDecryptSecretRevisionsService", () => {
 
       const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
       jest
-        .spyOn(service.resourceTypeModel, "getOrFindAll")
+        .spyOn(service.getOrFindResourceTypesService, "getOrFindAll")
         .mockReturnValue(new ResourceTypesCollection(resourceTypesCollectionDto()));
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => encryptedSecretDto);
@@ -116,7 +116,7 @@ describe("FindAndDecryptSecretRevisionsService", () => {
 
       const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
       jest
-        .spyOn(service.resourceTypeModel, "getOrFindAll")
+        .spyOn(service.getOrFindResourceTypesService, "getOrFindAll")
         .mockReturnValue(new ResourceTypesCollection(resourceTypesCollectionDto()));
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => encryptedSecretDto);
@@ -143,7 +143,7 @@ describe("FindAndDecryptSecretRevisionsService", () => {
 
       const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
       jest
-        .spyOn(service.resourceTypeModel, "getOrFindAll")
+        .spyOn(service.getOrFindResourceTypesService, "getOrFindAll")
         .mockReturnValue(new ResourceTypesCollection(resourceTypesCollectionDto()));
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => encryptedSecretDto);

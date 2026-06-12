@@ -14,7 +14,6 @@
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourceTypeLocalStorage from "../local_storage/resourceTypeLocalStorage";
 import FolderLocalStorage from "../local_storage/folderLocalStorage";
-import AuthStatusLocalStorage from "../local_storage/authStatusLocalStorage";
 import UserLocalStorage from "../local_storage/userLocalStorage";
 import GroupLocalStorage from "../local_storage/groupLocalStorage";
 import RolesLocalStorage from "../local_storage/rolesLocalStorage";
@@ -24,7 +23,6 @@ import PassphraseStorageService from "../session_storage/passphraseStorageServic
 import SsoKitTemporaryStorageService from "../session_storage/ssoKitTemporaryStorageService";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
-import UserMeSessionStorageService from "../local_storage/userMeLocalStorageService";
 import User from "../../model/user";
 import PasswordPoliciesLocalStorage from "../local_storage/passwordPoliciesLocalStorage";
 import PasswordExpirySettingsLocalStorage from "../local_storage/passwordExpirySettingsLocalStorage";
@@ -33,6 +31,8 @@ import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSetti
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
+import ActiveSessionLocalStorage from "../local_storage/activeSessionLocalStorage";
+import UserMeLocalStorage from "../local_storage/userMeLocalStorage";
 import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage";
 
 /**
@@ -46,9 +46,7 @@ class LocalStorageService {
    */
   static async flush() {
     ResourceLocalStorage.flush();
-    ResourceTypeLocalStorage.flush();
     FolderLocalStorage.flush();
-    AuthStatusLocalStorage.flush();
     UserLocalStorage.flush();
     RolesLocalStorage.flush();
     PasswordGeneratorLocalStorage.flush();
@@ -66,7 +64,9 @@ class LocalStorageService {
     }
 
     const account = await GetLegacyAccountService.get();
+    new ActiveSessionLocalStorage(account).flush();
     new RbacsLocalStorage(account).flush();
+    new ResourceTypeLocalStorage(account).flush();
     new PasswordPoliciesLocalStorage(account).flush();
     new PasswordExpirySettingsLocalStorage(account).flush();
     new MetadataKeysSettingsLocalStorage(account).flush();
@@ -74,8 +74,8 @@ class LocalStorageService {
     new MetadataKeysSessionStorage(account).flush();
     new SessionKeysBundlesSessionStorageService(account).flush();
     new GroupLocalStorage(account).flush();
+    new UserMeLocalStorage(account).flush();
     new SiteSettingsLocalStorage(account).flush();
-    UserMeSessionStorageService.remove(account);
   }
 }
 

@@ -22,6 +22,7 @@ import WorkerService from "../../service/worker/workerService";
 import { readWorker } from "../../model/entity/worker/workerEntity.test.data";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 import { defaultResourceDtosCollection } from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
 
 describe("InformCallToActionController", () => {
   let requestId, worker, port, controller, suggestedResources;
@@ -123,7 +124,7 @@ describe("InformCallToActionController", () => {
 
       jest
         .spyOn(controller.checkAuthStatusService, "checkAuthStatus")
-        .mockResolvedValue({ isAuthenticated: true, isMfaRequired: false });
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: true, is_mfa_authenticated: true }));
       jest.spyOn(WorkerService, "get").mockResolvedValue({ port });
 
       await controller.execute(requestId);
@@ -150,7 +151,9 @@ describe("InformCallToActionController", () => {
       expect.assertions(1);
 
       const error = new Error();
-      jest.spyOn(controller.checkAuthStatusService, "checkAuthStatus").mockResolvedValue({ isAuthenticated: false });
+      jest
+        .spyOn(controller.checkAuthStatusService, "checkAuthStatus")
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: false }));
       jest.spyOn(QuickAccessService, "open").mockRejectedValue(error);
 
       await controller.execute();
@@ -164,7 +167,7 @@ describe("InformCallToActionController", () => {
       const error = new Error();
       jest
         .spyOn(controller.checkAuthStatusService, "checkAuthStatus")
-        .mockResolvedValue({ isAuthenticated: true, isMfaRequired: true });
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: true, is_mfa_authenticated: false }));
       jest.spyOn(controller.openTrustedDomainTabService, "openTab").mockRejectedValue(error);
 
       await controller.execute();
@@ -178,7 +181,7 @@ describe("InformCallToActionController", () => {
       const error = new Error();
       jest
         .spyOn(controller.checkAuthStatusService, "checkAuthStatus")
-        .mockResolvedValue({ isAuthenticated: true, isMfaRequired: false });
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: true, is_mfa_authenticated: true }));
       jest.spyOn(WorkerService, "get").mockRejectedValue(error);
 
       await controller.execute();

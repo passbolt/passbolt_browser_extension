@@ -13,9 +13,9 @@
  */
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage";
-import AuthStatusLocalStorage from "../local_storage/authStatusLocalStorage";
 import FindAndUpdateSiteSettingsLocalStorageService from "./findAndUpdateSiteSettingsLocalStorageService";
 import SiteSettingsRuntimeCache from "./siteSettingsRuntimeCache";
+import CheckAuthStatusService from "../auth/checkAuthStatusService";
 
 /**
  * Read entry point for site settings. Successor of the legacy
@@ -43,6 +43,7 @@ export default class GetOrFindSiteSettingsService {
       account,
       apiClientOptions,
     );
+    this.checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
   }
 
   /**
@@ -53,10 +54,9 @@ export default class GetOrFindSiteSettingsService {
    */
   async getOrFind(refreshCache = true) {
     if (!refreshCache) {
-      const authStatus = await AuthStatusLocalStorage.get();
-      const isAuthenticated = authStatus?.isAuthenticated === true;
+      const activeSession = await this.checkAuthStatusService.checkAuthStatus();
 
-      if (isAuthenticated) {
+      if (activeSession.isAuthenticated) {
         const lsDto = await this.siteSettingsLocalStorage.get();
         if (lsDto) {
           return new SiteSettingsEntity(lsDto);

@@ -15,7 +15,7 @@
 import UserEntity from "../../model/entity/user/userEntity";
 import AbstractLocalStorage from "./abstractLocalStorage";
 
-const USER_ME_STORAGE_KEY_PREFIX = "user-me";
+export const USER_ME_STORAGE_KEY_PREFIX = "user-me";
 
 /**
  * A cache service used to store the result of the requests made on the users me entry point.

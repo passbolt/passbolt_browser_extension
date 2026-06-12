@@ -13,16 +13,16 @@
  */
 
 export const userLoggedOutAuthStatus = () => ({
-  isAuthenticated: false,
-  isMfaRequired: false,
+  is_authenticated: false,
+  is_mfa_authenticated: true,
 });
 
 export const userLoggedInAuthStatus = () => ({
-  isAuthenticated: true,
-  isMfaRequired: false,
+  is_authenticated: true,
+  is_mfa_authenticated: true,
 });
 
 export const userRequireMfaAuthStatus = () => ({
-  isAuthenticated: true,
-  isMfaRequired: true,
+  is_authenticated: true,
+  is_mfa_authenticated: false,
 });

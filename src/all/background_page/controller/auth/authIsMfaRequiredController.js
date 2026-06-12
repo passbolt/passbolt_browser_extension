@@ -14,10 +14,18 @@
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 
 class AuthIsMfaRequiredController {
-  constructor(worker, requestId) {
+  /**
+   * AuthCheckStatusController Constructor
+   *
+   * @param {Worker} worker
+   * @param {string} requestId
+   * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} account
+   */
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.checkAuthStatusService = new CheckAuthStatusService();
+    this.checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
   }
 
   /**
@@ -38,7 +46,7 @@ class AuthIsMfaRequiredController {
    */
   async exec() {
     const authStatus = await this.checkAuthStatusService.checkAuthStatus(true);
-    return authStatus.isMfaRequired;
+    return !authStatus.isMfaAuthenticated;
   }
 }
 

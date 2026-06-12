@@ -11,12 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import Log from "../../model/log";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
-import { assertType } from "../../utils/assertions";
 import AbstractLocalStorage from "./abstractLocalStorage";
 
-const RESOURCE_TYPES_LOCAL_STORAGE_KEY = "resource_types";
+export const RESOURCE_TYPES_LOCAL_STORAGE_KEY = "resource_types";
 
 class ResourceTypeLocalStorage extends AbstractLocalStorage {
   /**

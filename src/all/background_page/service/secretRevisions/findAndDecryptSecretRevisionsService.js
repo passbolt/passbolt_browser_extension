@@ -21,9 +21,10 @@ import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceType
 export default class FindAndDecryptSecretRevisionsService {
   /**
    * @constructor
+   * @param {AccountEntity} account
    * @param {ApiClientOptions} apiClientOptions
    */
-  constructor(apiClientOptions) {
+  constructor(account, apiClientOptions) {
     this.findSecretRevisionsService = new FindSecretRevisionsService(apiClientOptions);
     this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
   }

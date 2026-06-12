@@ -19,6 +19,9 @@ import AuthModel from "../../model/auth/authModel";
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 import GetActiveAccountService from "../../service/account/getActiveAccountService";
 import User from "../../model/user";
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -149,12 +152,13 @@ describe("OnExtensionInstalledController", () => {
       jest.spyOn(OnExtensionInstalledController, "onBrowserUpdate");
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
       jest.spyOn(browser.tabs, "query").mockImplementation(() => Promise.resolve(tabs));
       jest.spyOn(browser.tabs, "reload");
       jest
         .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
-        .mockImplementation(() => ({ isAuthenticated: true }));
+        .mockImplementation(() => new OnlineSessionEntity({ is_authenticated: true }));
       // process
       await OnExtensionInstalledController.exec(details);
       // expectation

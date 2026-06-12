@@ -16,15 +16,10 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
-import AuthStatusLocalStorage from "../local_storage/authStatusLocalStorage";
 import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage";
 import SiteSettingsRuntimeCache from "./siteSettingsRuntimeCache";
 import FindAndUpdateSiteSettingsLocalStorageService from "./findAndUpdateSiteSettingsLocalStorageService";
-
-const mockAuthStatus = (isAuthenticated) =>
-  jest
-    .spyOn(AuthStatusLocalStorage, "get")
-    .mockResolvedValue(isAuthenticated === undefined ? undefined : { isAuthenticated, isMfaRequired: false });
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
 
 const readBrowserStorage = async (storageKey) => {
   const data = await browser.storage.local.get([storageKey]);
@@ -51,7 +46,9 @@ describe("FindAndUpdateSiteSettingsLocalStorageService", () => {
     it("always updates SiteSettingsRuntimeCache regardless of auth status", async () => {
       expect.assertions(2);
       const dto = defaultProSiteSettings();
-      mockAuthStatus(false);
+      jest
+        .spyOn(service.checkAuthStatusService, "checkAuthStatus")
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: false }));
       jest.spyOn(service.findSiteSettingsService, "findSiteSettings").mockResolvedValue(new SiteSettingsEntity(dto));
 
       const result = await service.findAndUpdateAll();
@@ -65,7 +62,9 @@ describe("FindAndUpdateSiteSettingsLocalStorageService", () => {
     it("writes SiteSettingsLocalStorage when authenticated", async () => {
       expect.assertions(2);
       const dto = defaultProSiteSettings();
-      mockAuthStatus(true);
+      jest
+        .spyOn(service.checkAuthStatusService, "checkAuthStatus")
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: true }));
       jest.spyOn(service.findSiteSettingsService, "findSiteSettings").mockResolvedValue(new SiteSettingsEntity(dto));
 
       await service.findAndUpdateAll();
@@ -77,7 +76,10 @@ describe("FindAndUpdateSiteSettingsLocalStorageService", () => {
     it("does not touch SiteSettingsLocalStorage when not authenticated", async () => {
       expect.assertions(2);
       const dto = defaultProSiteSettings();
-      mockAuthStatus(false);
+      jest
+        .spyOn(service.checkAuthStatusService, "checkAuthStatus")
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: false }));
+
       jest.spyOn(service.findSiteSettingsService, "findSiteSettings").mockResolvedValue(new SiteSettingsEntity(dto));
 
       await service.findAndUpdateAll();
@@ -91,7 +93,10 @@ describe("FindAndUpdateSiteSettingsLocalStorageService", () => {
     it("coalesces concurrent calls into one API hit per account", async () => {
       expect.assertions(4);
       const dto = defaultProSiteSettings();
-      mockAuthStatus(true);
+      jest
+        .spyOn(service.checkAuthStatusService, "checkAuthStatus")
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: true }));
+
       const apiSpy = jest
         .spyOn(service.findSiteSettingsService, "findSiteSettings")
         .mockResolvedValue(new SiteSettingsEntity(dto));
@@ -110,7 +115,10 @@ describe("FindAndUpdateSiteSettingsLocalStorageService", () => {
   describe("::findAndUpdateAll — error propagation", () => {
     it("propagates API errors and leaves both caches untouched", async () => {
       expect.assertions(4);
-      mockAuthStatus(true);
+      jest
+        .spyOn(service.checkAuthStatusService, "checkAuthStatus")
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: true }));
+
       jest.spyOn(service.findSiteSettingsService, "findSiteSettings").mockRejectedValue(new Error("API down"));
 
       await expect(service.findAndUpdateAll()).rejects.toThrow("API down");

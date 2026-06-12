@@ -16,22 +16,20 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
-import AuthStatusLocalStorage from "../local_storage/authStatusLocalStorage";
 import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage";
 import SiteSettingsRuntimeCache from "./siteSettingsRuntimeCache";
 import GetOrFindSiteSettingsService from "./getOrFindSiteSettingsService";
-
-const mockAuthStatus = (isAuthenticated) =>
-  jest
-    .spyOn(AuthStatusLocalStorage, "get")
-    .mockResolvedValue(isAuthenticated === undefined ? undefined : { isAuthenticated, isMfaRequired: false });
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
+import CheckAuthStatusService from "../auth/checkAuthStatusService";
 
 beforeEach(() => {
   jest.clearAllMocks();
   SiteSettingsRuntimeCache.flushAll();
   SiteSettingsLocalStorage._runtimeCachedData = {};
   // Default to "not authenticated" so anything that doesn't explicitly re-mock stays on the safe path.
-  mockAuthStatus(false);
+  jest
+    .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
+    .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: false }));
 });
 
 describe("GetOrFindSiteSettingsService", () => {
@@ -78,7 +76,9 @@ describe("GetOrFindSiteSettingsService", () => {
 
   describe("::getOrFind (refreshCache=false) — authenticated", () => {
     beforeEach(() => {
-      mockAuthStatus(true);
+      jest
+        .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
+        .mockResolvedValue(new OnlineSessionEntity({ is_authenticated: true }));
     });
 
     it("returns from local storage when populated; no API call", async () => {

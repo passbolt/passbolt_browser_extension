@@ -140,7 +140,7 @@ class AbstractLocalStorage {
       "Parameter 'metadata' should be of type LocalStorageMetadataEntity",
     );
     await navigator.locks.request(this.storageMetadataKey, async () => {
-      const metadataDto = metadata.toDto();
+      const metadataDto = metadata.toDto(this.constructor.DEFAULT_CONTAIN);
       await this._setBrowserStorage({ [this.storageMetadataKey]: metadataDto });
       AbstractLocalStorage._runtimeCachedMetadata[this.storageMetadataKey] = metadataDto;
     });

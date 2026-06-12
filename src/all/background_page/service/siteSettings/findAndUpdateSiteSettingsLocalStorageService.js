@@ -13,9 +13,9 @@
  */
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage";
-import AuthStatusLocalStorage from "../local_storage/authStatusLocalStorage";
 import FindSiteSettingsService from "./findSiteSettingsService";
 import SiteSettingsRuntimeCache from "./siteSettingsRuntimeCache";
+import CheckAuthStatusService from "../auth/checkAuthStatusService";
 
 const FIND_AND_UPDATE_SITE_SETTINGS_LS_LOCK_PREFIX = "FIND_AND_UPDATE_SITE_SETTINGS_LS_LOCK-";
 
@@ -36,6 +36,7 @@ export default class FindAndUpdateSiteSettingsLocalStorageService {
     this.account = account;
     this.findSiteSettingsService = new FindSiteSettingsService(apiClientOptions);
     this.siteSettingsLocalStorage = new SiteSettingsLocalStorage(account);
+    this.checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
   }
 
   /**
@@ -59,10 +60,8 @@ export default class FindAndUpdateSiteSettingsLocalStorageService {
 
       // Authenticated sessions persist to SiteSettingsLocalStorage (the offline-mode store);
       // Anonymous sessions only get the in-memory runtime cache below.
-      const authStatus = await AuthStatusLocalStorage.get();
-      const isAuthenticated = authStatus?.isAuthenticated === true;
-
-      if (isAuthenticated) {
+      const activeSession = await this.checkAuthStatusService.checkAuthStatus();
+      if (activeSession.isAuthenticated) {
         await this.siteSettingsLocalStorage.set(siteSettings);
       }
 

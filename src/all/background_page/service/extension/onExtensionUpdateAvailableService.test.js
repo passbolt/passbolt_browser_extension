@@ -47,7 +47,7 @@ describe("OnExtensionUpdateAvailableService", () => {
       const webIntegrationPortWrapper = new Port(webIntegrationPort);
       PortManager.registerPort(webIntegrationPortWrapper);
       // mock function
-      jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => false);
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(() => false);
       jest.spyOn(browser.runtime, "reload");
       jest.spyOn(webIntegrationPortWrapper, "emit");
       // process
@@ -73,7 +73,7 @@ describe("OnExtensionUpdateAvailableService", () => {
       expect.assertions(2);
       // mock function
       await MockExtension.withConfiguredAccount();
-      jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(() => true);
       jest.spyOn(browser.runtime, "reload");
       // process
       await OnExtensionUpdateAvailableService.exec();
@@ -109,7 +109,7 @@ describe("OnExtensionUpdateAvailableService", () => {
       PortManager.registerPort(webIntegrationPortWrapper2);
       PortManager.registerPort(publicWebsiteSignInPortWrapper);
       // mock function
-      jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(() => true);
       jest
         .spyOn(BrowserTabService, "sendMessage")
         .mockImplementation(() => PortManager.registerPort(webIntegrationPortWrapper));
@@ -144,7 +144,7 @@ describe("OnExtensionUpdateAvailableService", () => {
       expect.assertions(1);
       // mock function
       await MockExtension.withConfiguredAccount();
-      jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => {
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(() => {
         throw new Error("Error");
       });
       jest.spyOn(browser.runtime, "reload");
@@ -158,7 +158,7 @@ describe("OnExtensionUpdateAvailableService", () => {
       expect.assertions(2);
       // mock function
       await MockExtension.withConfiguredAccount();
-      jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => {
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(() => {
         throw new MfaAuthenticationRequiredError();
       });
       jest.spyOn(browser.runtime, "reload");

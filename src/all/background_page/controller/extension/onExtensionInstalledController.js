@@ -25,6 +25,8 @@ import storage from "../../sdk/storage";
 import { Config } from "../../model/config";
 import AuthModel from "../../model/auth/authModel";
 import AppBootstrapPagemod from "../../pagemod/appBootstrapPagemod";
+import GetActiveAccountService from "../../service/account/getActiveAccountService";
+import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 
 class OnExtensionInstalledController {
   /**
@@ -87,7 +89,9 @@ class OnExtensionInstalledController {
     }
     let authStatus;
     try {
-      const checkAuthStatusService = new CheckAuthStatusService();
+      const account = await GetActiveAccountService.get();
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+      const checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
       // use the cached data as the worker could wake up every 30 secondes.
       authStatus = await checkAuthStatusService.checkAuthStatus(false);
     } catch (error) {
@@ -130,7 +134,9 @@ class OnExtensionInstalledController {
 
     let authStatus;
     try {
-      const checkAuthStatusService = new CheckAuthStatusService();
+      const account = await GetActiveAccountService.get();
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+      const checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
       // use the cached data as the worker could wake up every 30 secondes.
       authStatus = await checkAuthStatusService.checkAuthStatus(false);
     } catch (error) {

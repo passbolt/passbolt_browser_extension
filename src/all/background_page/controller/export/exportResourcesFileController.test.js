@@ -51,6 +51,7 @@ import { defaultDecryptedSharedMetadataKeysDtos } from "passbolt-styleguide/src/
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import GetOrFindMetadataKeysService from "../../service/metadata/getOrFindMetadataKeysService";
 import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
+import GetOrFindResourceTypesService from "../../service/resourceType/getOrFindResourceTypesService";
 
 beforeEach(async () => {
   await MockExtension.withConfiguredAccount();
@@ -243,7 +244,7 @@ describe("ExportResourcesFileController", () => {
       expect.assertions(1);
 
       jest.spyOn(controller.progressService, "close");
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => {
+      jest.spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll").mockImplementation(() => {
         throw new Error("API error");
       });
       const file = {

@@ -24,7 +24,7 @@ import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import DecryptAndParseResourceSecretService from "../../secret/decryptAndParseResourceSecretService";
 import FindResourcesService from "../findResourcesService";
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
-import GetOrFindResourcesService from "../getOrFindResourcesService";
+import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 
 /**
  * The service aim to export the resources to a file.
@@ -42,7 +42,7 @@ class ExportResourcesService {
     this.findResourcesService = new FindResourcesService(account, apiClientOptions);
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
     // Models
-    this.getOrfindResourceTypesService = new GetOrFindResourcesService(account, apiClientOptions);
+    this.getOrfindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.folderModel = new FolderModel(apiClientOptions, account);
   }
 

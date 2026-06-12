@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import PermissionEntity from "../permission/permissionEntity";
-import PermissionsCollection from "../permission/permissionsCollection";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 import FavoriteEntity from "../favorite/favoriteEntity";
 import ResourceTypeEntity from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity";
 import TagsCollection from "../tag/tagsCollection";

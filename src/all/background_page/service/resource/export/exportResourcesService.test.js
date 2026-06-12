@@ -81,6 +81,7 @@ import EncryptMetadataService from "../../metadata/encryptMetadataService";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
 import { defaultCustomFieldsCollection } from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection.test.data";
+import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -169,7 +170,9 @@ describe("ExportResourcesService", () => {
               resourceCollectionDto = resourceCollection.resources;
             }
 
-            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionDto);
+            jest
+              .spyOn(ResourceService.prototype, "findAll")
+              .mockImplementation(() => mockPassboltResponse(resourceCollectionDto));
 
             await service.prepareExportContent(exportResourcesFileEntity);
             await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
@@ -217,7 +220,9 @@ describe("ExportResourcesService", () => {
               resourceCollectionDto = resourceCollection.resources;
             }
 
-            jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionDto);
+            jest
+              .spyOn(ResourceService.prototype, "findAll")
+              .mockImplementation(() => mockPassboltResponse(resourceCollectionDto));
 
             await service.prepareExportContent(exportResourcesFileEntity);
             await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
@@ -250,7 +255,9 @@ describe("ExportResourcesService", () => {
         await encryptMetadataService.encryptAllFromForeignModels(resourceCollection, pgpKeys.ada.passphrase);
         const encryptedResourceCollectionDto = resourceCollection.resources;
 
-        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => encryptedResourceCollectionDto);
+        jest
+          .spyOn(ResourceService.prototype, "findAll")
+          .mockImplementation(() => mockPassboltResponse(encryptedResourceCollectionDto));
 
         await service.prepareExportContent(exportResourcesFileEntity);
         await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);
@@ -405,7 +412,9 @@ describe("ExportResourcesService", () => {
         folder_parent_id: foldersDto[0].id,
       });
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
+      jest
+        .spyOn(ResourceService.prototype, "findAll")
+        .mockImplementation(() => mockPassboltResponse(resourceCollectionV4));
 
       await service.prepareExportContent(exportResourcesFileEntity);
       await service.exportToFile(exportResourcesFileEntity, pgpKeys.ada.passphrase);

@@ -24,7 +24,6 @@ import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
-import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import PermissionService from "../../service/api/permission/permissionService";
@@ -116,10 +115,10 @@ describe("ResourceUpdateController", () => {
 
     it("Should close progressService when update succeed", async () => {
       expect.assertions(2);
-      jest.spyOn(ResourceLocalStorage, "updateResource").mockImplementationOnce(jest.fn);
       jest
         .spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey")
         .mockImplementationOnce(jest.fn);
+      jest.spyOn(controller.resourceUpdateService, "exec").mockImplementationOnce(jest.fn);
       await controller.exec(defaultResourceDto(), null);
       expect(controller.progressService.close).toHaveBeenCalledTimes(1);
       expect(controller.progressService.close).toHaveBeenCalled();

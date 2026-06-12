@@ -4,6 +4,9 @@
 npm-debug.log
 /bower_components
 
+# Local env overrides (non-secret defaults are documented in webpack/passboltEnvPlugin.js)
+.env
+
 # Less files
 data/less
 
@@ -25,9 +28,6 @@ __snapshots__
 *.pem
 /dist
 /build-safari-extension
-
-# Config
-lib/config/config.json
 
 # OS generated files #
 ######################

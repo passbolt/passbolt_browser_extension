@@ -17,7 +17,7 @@ import Keyring from "../../model/keyring";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import EncryptMessageService from "../crypto/encryptMessageService";
-import ShareService from "../api/share/shareService";
+import ShareApiService from "../api/share/shareApiService";
 import FindAndUpdateResourcesLocalStorage from "../resource/findAndUpdateResourcesLocalStorageService";
 import {
   assertArray,
@@ -52,7 +52,7 @@ class ShareResourceService {
   constructor(apiClientOptions, account, progressService) {
     this.account = account;
     this.progressService = progressService;
-    this.shareService = new ShareService(apiClientOptions);
+    this.shareApiService = new ShareApiService(apiClientOptions);
     this.findResourcesService = new FindResourcesService(account, apiClientOptions);
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
@@ -170,7 +170,7 @@ class ShareResourceService {
       const resourcePermissionChanges = permissionChanges.items.filter(
         (permissionChange) => permissionChange.acoForeignKey === resourceId,
       );
-      const simulateResult = await this.shareService.simulateShareResource(resourceId, resourcePermissionChanges);
+      const simulateResult = await this.shareApiService.simulateShareResource(resourceId, resourcePermissionChanges);
       simulateResult.changes.added?.forEach((user) =>
         neededSecretsDto.push({ resource_id: resourceId, user_id: user.User.id }),
       );
@@ -286,7 +286,7 @@ class ShareResourceService {
         (permissionChange) => permissionChange.acoForeignKey === resourceId,
       );
       const resourceSecrets = secrets.items.filter((secret) => secret.resourceId === resourceId);
-      return this.shareService.shareResource(resourceId, {
+      return this.shareApiService.shareResource(resourceId, {
         permissions: resourcePermissionChanges,
         secrets: resourceSecrets,
       });

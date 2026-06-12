@@ -20,6 +20,9 @@ import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import splitBySize from "../../utils/array/splitBySize";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import DecryptMetadataService from "../metadata/decryptMetadataService";
+import { assertNumber } from "passbolt-styleguide/src/shared/utils/assertions";
+
+const DEFAULT_PAGE_SIZE = 10_000;
 
 /**
  * The service aims to find resources from the API.
@@ -50,8 +53,27 @@ export default class FindResourcesService {
     this.assertContains(contains);
     this.assertFilters(filters);
 
-    const resourcesDto = await this.resourceService.findAll(contains, filters);
+    const response = await this.resourceService.findAll(contains, filters);
+    const resourcesDto = response.body;
     return new ResourcesCollection(resourcesDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
+  }
+
+  /**
+   * Find all resources of a page
+   *
+   * @param {Object} [contains] optional example: {permissions: true}
+   * @param {Object} [filters] optional
+   * @param {Object} [pageOptions] optional
+   * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
+   * @returns {Promise<PassboltResponseEntity>}
+   * @private
+   */
+  async findAllPaginated(contains, filters, pageOptions) {
+    this.assertContains(contains);
+    this.assertFilters(filters);
+    this.assertPageOptions(pageOptions);
+
+    return await this.resourceService.findAll(contains, filters, pageOptions);
   }
 
   /**
@@ -88,7 +110,26 @@ export default class FindResourcesService {
    * @returns {Promise<ResourcesCollection>}
    */
   async findAllForLocalStorage() {
-    return await this.findAll(ResourceLocalStorage.DEFAULT_CONTAIN, null, true);
+    const pageOptions = {
+      limit: DEFAULT_PAGE_SIZE,
+      page: 1,
+      sorts: {
+        "Resources.modified": "desc",
+      },
+    };
+
+    const firstResponse = await this.findAllPaginated(ResourceLocalStorage.DEFAULT_CONTAIN, null, pageOptions);
+    /** @type {Array<Object>} */
+    let resourcesCollectionDto = firstResponse.body;
+
+    const pageCount = firstResponse.header.pagination.pageCount;
+    for (let i = 2; i <= pageCount; i++) {
+      pageOptions.page = i;
+      const response = await this.findAllPaginated(ResourceLocalStorage.DEFAULT_CONTAIN, null, pageOptions);
+      resourcesCollectionDto.push(...response.body);
+    }
+
+    return new ResourcesCollection(resourcesCollectionDto, { ignoreInvalidEntity: true });
   }
 
   /**
@@ -262,6 +303,41 @@ export default class FindResourcesService {
     const supportedFilter = ResourceService.getSupportedFiltersOptions();
     if (filters && !Object.keys(filters).every((filter) => supportedFilter.includes(filter))) {
       throw new Error("Unsupported filter parameter used, please check supported filters");
+    }
+  }
+
+  /**
+   * Assert the pageOptions.
+   * @param {object} pageOptions
+   * @private
+   * @throws {Error} if the 'limit' field is not a valid integer or is less than 1
+   * @throws {Error} if the 'page' field is not a valid integer or is less than 1 and if it is set without 'limit'
+   * @throws {Error} if the 'sorts' field refers to unsupported sortable fields
+   */
+  assertPageOptions(pageOptions) {
+    const { limit, page, sorts } = pageOptions;
+
+    if (limit) {
+      assertNumber(limit);
+      if (limit < 1) {
+        throw new Error("The 'limit' parameter must be an integer greater or equal to 1");
+      }
+    }
+
+    if (page) {
+      assertNumber(page);
+      if (page < 1) {
+        throw new Error("The 'page' parameter must be an integer greater or equal to 1");
+      }
+      if (!limit) {
+        throw new Error("The 'page' parameter must be set along with the 'limit' parameter");
+      }
+    }
+
+    const sortFields = Object.keys(sorts || {});
+    const supportedPageOptions = ResourceService.getSupportedSortsOptions();
+    if (sortFields && !sortFields.every((sortField) => supportedPageOptions.includes(sortField))) {
+      throw new Error("Unsupported sort field used, please check supported sort fields");
     }
   }
 }

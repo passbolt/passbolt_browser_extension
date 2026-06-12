@@ -37,6 +37,7 @@ import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity
 import { defaultDecryptedSharedMetadataKeysDtos } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -56,19 +57,19 @@ describe("FindResourcesService", () => {
       expect.assertions(2);
 
       const collection = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collection));
 
       const resources = await findResourcesService.findAll();
 
       expect(resources).toBeInstanceOf(ResourcesCollection);
-      expect(resources.toDto()).toEqual(collection);
+      expect(resources).toEqual(new ResourcesCollection(collection));
     });
 
     it("should filter collection when param is defined.", async () => {
       expect.assertions(3);
 
       const collection = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collection));
 
       const resources = await findResourcesService.findAll(null, {
         "has-tag": false,
@@ -80,14 +81,14 @@ describe("FindResourcesService", () => {
         "has-tag": false,
         "is-favorite": true,
       });
-      expect(resources.toDto()).toEqual(collection);
+      expect(resources).toEqual(new ResourcesCollection(collection));
     });
 
     it("should add field to collection when contains param is defined.", async () => {
       expect.assertions(3);
 
       const collection = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collection));
 
       const resources = await findResourcesService.findAll({ favorite: true, permission: true, tag: true }, null);
 
@@ -96,7 +97,7 @@ describe("FindResourcesService", () => {
         { favorite: true, permission: true, tag: true },
         null,
       );
-      expect(resources.toDto()).toEqual(collection);
+      expect(resources).toEqual(new ResourcesCollection(collection));
     });
 
     it("should skip invalid entity with ignore strategy.", async () => {
@@ -109,11 +110,14 @@ describe("FindResourcesService", () => {
         }),
       ]);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
+      jest
+        .spyOn(ResourceService.prototype, "findAll")
+        .mockImplementation(() => mockPassboltResponse(resourcesCollectionDto));
+
       const resources = await findResourcesService.findAll(null, null, true);
 
       expect(resources).toHaveLength(6);
-      expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(multipleResources);
+      expect(resources).toEqual(new ResourcesCollection(multipleResources));
     });
 
     it("should not skip invalid entity without ignore strategy.", async () => {
@@ -126,9 +130,11 @@ describe("FindResourcesService", () => {
         }),
       ]);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesCollectionDto);
-      const promise = findResourcesService.findAll(null, null, false);
+      jest
+        .spyOn(ResourceService.prototype, "findAll")
+        .mockImplementation(() => mockPassboltResponse(resourcesCollectionDto));
 
+      const promise = findResourcesService.findAll(null, null, false);
       await expect(promise).rejects.toThrow(CollectionValidationError);
     });
 
@@ -136,7 +142,7 @@ describe("FindResourcesService", () => {
       expect.assertions(1);
 
       const collection = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collection));
 
       const promise = findResourcesService.findAll({
         invalid: true,
@@ -149,7 +155,7 @@ describe("FindResourcesService", () => {
       expect.assertions(1);
 
       const collection = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collection));
 
       const promise = findResourcesService.findAll(null, {
         "is-not-supported": true,
@@ -159,11 +165,60 @@ describe("FindResourcesService", () => {
     });
   });
 
+  describe("::findAllPaginated", () => {
+    it("should return all items with pageOptions params.", async () => {
+      expect.assertions(4);
+
+      const pageOptions = {
+        page: 1,
+        limit: 100_000,
+        sorts: {
+          "Resources.modified": "asc",
+        },
+      };
+      const collectionDto = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collectionDto));
+
+      const responseEntity = await findResourcesService.findAllPaginated(null, null, pageOptions);
+      const collection = new ResourcesCollection(responseEntity.body);
+      expect(responseEntity.body).toBeInstanceOf(Array);
+      expect(collection).toEqual(new ResourcesCollection(collectionDto));
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledTimes(1);
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith(null, null, pageOptions);
+    });
+
+    it("should return items when calling all params.", async () => {
+      expect.assertions(3);
+
+      const pageOptions = {
+        page: 1,
+        limit: 1000,
+        sorts: {
+          "Resources.modified": "asc",
+        },
+      };
+      const filters = {
+        "has-tag": false,
+        "is-favorite": true,
+      };
+      const contains = { favorite: true, permission: true, tag: true };
+
+      const collectionDto = multipleResourceDtos();
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collectionDto));
+
+      const responseEntity = await findResourcesService.findAllPaginated(contains, filters, pageOptions);
+      const collection = new ResourcesCollection(responseEntity.body);
+      expect(collection).toEqual(new ResourcesCollection(collectionDto));
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledTimes(1);
+      expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith(contains, filters, pageOptions);
+    });
+  });
+
   describe("::findAllForLocalStorage", () => {
     it("uses the contains required by the local storage.", async () => {
       expect.assertions(2);
       jest.spyOn(findResourcesService, "findAll");
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse([]));
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
 
       const resources = await findResourcesService.findAllForLocalStorage();
@@ -171,6 +226,7 @@ describe("FindResourcesService", () => {
       expect(findResourcesService.resourceService.findAll).toHaveBeenCalledWith(
         { favorite: true, permission: true, tag: true },
         null,
+        { limit: 10_000, page: 1, sorts: { "Resources.modified": "desc" } },
       );
       expect(resources).toBeInstanceOf(ResourcesCollection);
     });
@@ -178,12 +234,12 @@ describe("FindResourcesService", () => {
     it("retrieves resources of all types.", async () => {
       expect.assertions(1);
       const resourcesDto = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
 
       const resources = await findResourcesService.findAllForLocalStorage();
 
-      expect(resources.toDto(ResourceLocalStorage.DEFAULT_CONTAIN)).toEqual(resourcesDto);
+      expect(resources).toEqual(new ResourcesCollection(resourcesDto));
     });
 
     it(
@@ -196,7 +252,7 @@ describe("FindResourcesService", () => {
         const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
         const resourceTypesDto = resourceTypesCollectionDto();
 
-        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
         jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
         jest.spyOn(PassphraseStorageService, "get");
         jest
@@ -225,7 +281,7 @@ describe("FindResourcesService", () => {
 
       jest
         .spyOn(ResourceService.prototype, "findAll")
-        .mockImplementation(() => [...resourcesDto, ...decryptedMetadataResourcesDto]);
+        .mockImplementation(() => mockPassboltResponse([...resourcesDto, ...decryptedMetadataResourcesDto]));
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
       jest
@@ -254,7 +310,7 @@ describe("FindResourcesService", () => {
       expect.assertions(1);
 
       const collection = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collection));
 
       const resourcesCollection = await service.findAllByIsSharedWithGroupForLocalStorage(groupId);
 
@@ -265,8 +321,7 @@ describe("FindResourcesService", () => {
       expect.assertions(2);
 
       const collection = multipleResourceDtos();
-
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collection);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collection));
       jest.spyOn(service, "findAll");
 
       await service.findAllByIsSharedWithGroupForLocalStorage(groupId);
@@ -311,7 +366,7 @@ describe("FindResourcesService", () => {
         const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
         const resourceTypesDto = resourceTypesCollectionDto();
 
-        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
         jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
         jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
         jest
@@ -339,7 +394,7 @@ describe("FindResourcesService", () => {
         const resourcesDto = multipleResourceWithMetadataEncrypted(metadataKeysDtos[0].id);
         const resourceTypesDto = resourceTypesCollectionDto();
 
-        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
         jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
         jest.spyOn(PassphraseStorageService, "get");
         jest
@@ -374,7 +429,7 @@ describe("FindResourcesService", () => {
       const dtos = Array.from({ length: 79 }, () => defaultResourceDto());
       const ids = dtos.map((dto) => dto.id);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => dtos);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(dtos));
       jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
       const result = await service.findAllByIds(ids, ResourceLocalStorage.DEFAULT_CONTAIN);
@@ -404,7 +459,7 @@ describe("FindResourcesService", () => {
       const dtos = Array.from({ length: 80 }, () => defaultResourceDto());
       const ids = dtos.map((dto) => dto.id);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => dtos);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(dtos));
       jest.spyOn(ExecuteConcurrentlyService.prototype, "execute");
 
       const result = await service.findAllByIdsForShare(ids);
@@ -426,7 +481,8 @@ describe("FindResourcesService", () => {
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
         expect(contains).toEqual(expectedContains);
-        return resultCollectionDto.splice(0, filters["has-id"].length);
+        const splicedResources = resultCollectionDto.splice(0, filters["has-id"].length);
+        return mockPassboltResponse(splicedResources);
       });
 
       const result = await service.findAllByIdsForShare(ids);
@@ -454,7 +510,7 @@ describe("FindResourcesService", () => {
       const collectionDto = Array.from({ length: 80 }, () => defaultResourceDto());
       const collectionIds = collectionDto.map((collection) => collection.id);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collectionDto));
 
       const result = await service.findAllByIdsForDisplayPermissions(collectionIds);
 
@@ -471,10 +527,12 @@ describe("FindResourcesService", () => {
       const collectionDto = Array.from({ length: 82 }, () => defaultResourceDto());
       const resultCollectionDto = [...collectionDto];
       const collectionIds = collectionDto.map((collection) => collection.id);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collectionDto));
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
         expect(contains).toEqual(expectedContains);
-        return resultCollectionDto.splice(0, filters["has-id"].length);
+        const splicedCollection = resultCollectionDto.splice(0, filters["has-id"].length);
+        return mockPassboltResponse(splicedCollection);
       });
 
       const result = await service.findAllByIdsForDisplayPermissions(collectionIds);
@@ -500,7 +558,7 @@ describe("FindResourcesService", () => {
       const collectionDto = Array.from({ length: 80 }, () => defaultResourceDto());
       const resourcesIds = collectionDto.map((resource) => resource.id);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => collectionDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collectionDto));
 
       const result = await service.findAllForDecrypt(resourcesIds);
 
@@ -520,7 +578,8 @@ describe("FindResourcesService", () => {
 
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
         expect(contains).toEqual(expectedContains);
-        return resultCollectionDto.splice(0, filters["has-id"].length);
+        const splicedCollection = resultCollectionDto.splice(0, filters["has-id"].length);
+        return mockPassboltResponse(splicedCollection);
       });
 
       const result = await service.findAllForDecrypt(resourcesIds);
@@ -667,7 +726,7 @@ describe("FindResourcesService", () => {
       const ressourcesDto = multipleResourceDtos();
       const resourcesIds = ressourcesDto.map((r) => r.id);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => ressourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(ressourcesDto));
 
       const result = await service.findAllByIdsForLocalStorage(resourcesIds);
 
@@ -708,7 +767,7 @@ describe("FindResourcesService", () => {
 
       const ressourcesDto = multipleResourceDtos();
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => ressourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(ressourcesDto));
 
       const result = await service.findAllByParentFolderIdForLocalStorage(parentFolderId);
 

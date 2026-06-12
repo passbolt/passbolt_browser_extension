@@ -19,12 +19,12 @@ import { multipleResourceDtos } from "../../service/resource/findResourcesServic
 import FindAllByIdsForDisplayPermissionsController from "./findAllByIdsForDisplayPermissionsController";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
-import ResourceService from "../../service/api/resource/resourceService";
 import { v4 as uuidv4 } from "uuid";
 import { TEST_RESOURCE_TYPE_V5_DEFAULT } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 import { METADATA_KEY_TYPE_USER_KEY } from "../../model/entity/resource/resourceEntity";
 import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/metadata";
+import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
 
 describe("FindAllByIdsForDisplayPermissionsController", () => {
   let controller, worker;
@@ -46,7 +46,9 @@ describe("FindAllByIdsForDisplayPermissionsController", () => {
 
       const resourcesDto = multipleResourceDtos();
       const resourceIds = resourcesDto.map((resource) => resource.id);
-      jest.spyOn(controller.findResourcesService.resourceService, "findAll").mockImplementation(() => resourcesDto);
+      jest
+        .spyOn(controller.findResourcesService.resourceService, "findAll")
+        .mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest
         .spyOn(controller.findResourcesService.decryptMetadataService, "decryptAllFromForeignModels")
         .mockImplementation((collection) => collection);
@@ -73,7 +75,10 @@ describe("FindAllByIdsForDisplayPermissionsController", () => {
         }),
       ];
       const resourceIds = resourcesDto.map((resource) => resource.id);
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest
+        .spyOn(controller.findResourcesService.resourceService, "findAll")
+        .mockImplementation(() => mockPassboltResponse(resourcesDto));
+
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockReturnValue(pgpKeys.ada.passphrase);
 
       const result = await controller.exec(resourceIds);

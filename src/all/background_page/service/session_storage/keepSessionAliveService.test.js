@@ -13,7 +13,7 @@
  */
 
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import UserService from "../api/user/userService";
+import UserApiService from "passbolt-styleguide/src/shared/services/api/user/userApiService";
 import KeepSessionAliveService from "./keepSessionAliveService";
 import PassphraseStorageService from "./passphraseStorageService";
 
@@ -127,14 +127,16 @@ describe("KeepSessionAliveService", () => {
       const spyOnPassphraseStorage = jest
         .spyOn(PassphraseStorageService, "get")
         .mockImplementation(async () => "what a passphrase!");
-      const spyOnUserService = jest.spyOn(UserService.prototype, "keepSessionAlive").mockImplementation(() => true);
+      const spyOnUserApiService = jest
+        .spyOn(UserApiService.prototype, "keepSessionAlive")
+        .mockImplementation(() => true);
 
       await KeepSessionAliveService.handleKeepSessionAlive({
         name: "SessionKeepAlive",
       });
 
       expect(spyOnPassphraseStorage).toHaveBeenCalledTimes(1);
-      expect(spyOnUserService).toHaveBeenCalledTimes(1);
+      expect(spyOnUserApiService).toHaveBeenCalledTimes(1);
     });
   });
 });

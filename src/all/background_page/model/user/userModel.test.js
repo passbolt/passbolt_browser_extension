@@ -169,7 +169,6 @@ describe("UserModel", () => {
           profile: true,
         },
         null,
-        null,
         true,
       );
     });
@@ -217,7 +216,6 @@ describe("UserModel", () => {
           pending_account_recovery_request: true,
           profile: true,
         },
-        null,
         null,
         true,
       );
@@ -431,7 +429,7 @@ describe("UserModel", () => {
 
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption);
-      const collection = await model.findAll({}, {}, {}, true);
+      const collection = await model.findAll({}, {}, true);
 
       expect(collection).toHaveLength(3);
       expect(collection.items[0]._props.id).toEqual(dto1.id);

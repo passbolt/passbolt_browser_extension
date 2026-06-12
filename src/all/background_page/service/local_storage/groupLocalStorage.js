@@ -12,8 +12,8 @@
  * @since         2.13.0
  */
 import Log from "../../model/log";
-import GroupsCollection from "../../model/entity/group/groupsCollection";
-import GroupEntity from "../../model/entity/group/groupEntity";
+import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 
 export const GROUP_LOCAL_STORAGE_KEY = "groups";

@@ -14,10 +14,10 @@
 import { defaultGroupDto } from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
-import GroupsCollection from "../../model/entity/group/groupsCollection";
-import { defaultGroupsDtos } from "../../model/entity/group/groupsCollection.test.data";
+import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
+import { defaultGroupsDtos } from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection.test.data";
 import GroupLocalStorage from "./groupLocalStorage";
-import GroupEntity from "../../model/entity/group/groupEntity";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();

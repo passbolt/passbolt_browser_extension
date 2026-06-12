@@ -13,8 +13,8 @@
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourcesCollection from "../entity/resource/resourcesCollection";
-import PermissionEntity from "../entity/permission/permissionEntity";
-import PermissionsCollection from "../entity/permission/permissionsCollection";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 import ResourceEntity from "../entity/resource/resourceEntity";
 import PermissionChangesCollection from "../entity/permission/change/permissionChangesCollection";
 import ResourceService from "../../service/api/resource/resourceService";
@@ -88,59 +88,6 @@ class ResourceModel {
    *  Permission changes
    * ==============================================================
    */
-  /**
-   * Calculate permission changes for a move
-   * From current permissions, remove the parent folder permissions, add the destination permissions
-   * From this new set of permission and the original permission calculate the needed changed
-   *
-   * NOTE: This function requires permissions to be set for all objects
-   *
-   * @param {ResourceEntity} resource
-   * @param {(FolderEntity|null)} parentFolder
-   * @param {(FolderEntity|null)} destFolder
-   * @returns {PermissionChangesCollection}
-   */
-  calculatePermissionsChangesForMove(resource, parentFolder, destFolder) {
-    let remainingPermissions = new PermissionsCollection([], { assertAtLeastOneOwner: false });
-
-    // Remove permissions from parent if any
-    if (parentFolder !== null) {
-      if (!resource.permissions || !parentFolder.permissions) {
-        throw new TypeError("Resource model calculatePermissionsChangesForMove requires permissions to be set.");
-      }
-      remainingPermissions = PermissionsCollection.diff(resource.permissions, parentFolder.permissions, false);
-    }
-    // Add parent permissions
-    let permissionsFromParent = new PermissionsCollection([], { assertAtLeastOneOwner: false });
-    if (destFolder) {
-      if (!destFolder.permissions) {
-        throw new TypeError(
-          "Resource model calculatePermissionsChangesForMove requires destination permissions to be set.",
-        );
-      }
-      permissionsFromParent = destFolder.permissions.cloneForAco(PermissionEntity.ACO_RESOURCE, resource.id, false);
-    }
-
-    const newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
-    if (!destFolder) {
-      /*
-       * If the move is toward the root
-       * Reuse highest permission
-       */
-      newPermissions.addOrReplace(
-        new PermissionEntity({
-          aco: PermissionEntity.ACO_RESOURCE,
-          aro: resource.permission.aro,
-          aco_foreign_key: resource.id,
-          aro_foreign_key: resource.permission.aroForeignKey,
-          type: PermissionEntity.PERMISSION_OWNER,
-        }),
-      );
-    }
-    newPermissions.assertAtLeastOneOwner();
-    return PermissionChangesCollection.calculateChanges(resource.permissions, newPermissions);
-  }
-
   /**
    * Calculate permission changes for a create
    * From current permissions add the destination permissions

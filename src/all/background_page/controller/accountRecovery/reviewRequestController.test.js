@@ -40,7 +40,7 @@ import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/ac
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
-import UsersCollection from "../../model/entity/user/usersCollection";
+import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../../service/passphrase/getPassphraseService");

@@ -130,7 +130,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -149,7 +149,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -193,7 +193,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(folderToMoveDto.id, null, moveStrategyService, pgpKeys.admin.passphrase);
@@ -206,7 +206,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, null);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, null);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -259,7 +259,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -278,7 +278,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -335,7 +335,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -367,7 +367,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -463,7 +463,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -491,7 +491,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -589,7 +589,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -617,7 +617,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -719,7 +719,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -807,7 +807,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -850,7 +850,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -868,7 +868,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -913,7 +913,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -931,7 +931,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -980,7 +980,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1011,7 +1011,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1093,7 +1093,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1120,7 +1120,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1204,7 +1204,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1231,7 +1231,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1319,7 +1319,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1406,7 +1406,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1449,7 +1449,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(folderToMoveDto.id, null, moveStrategyService, pgpKeys.admin.passphrase);
@@ -1462,7 +1462,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, null);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, null);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1514,7 +1514,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1533,7 +1533,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1586,7 +1586,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1605,7 +1605,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1670,7 +1670,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1702,7 +1702,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1797,7 +1797,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1825,7 +1825,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -1922,7 +1922,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -1950,7 +1950,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -2060,7 +2060,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -2148,7 +2148,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -2191,7 +2191,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(folderToMoveDto.id, null, moveStrategyService, pgpKeys.admin.passphrase);
@@ -2204,7 +2204,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, null);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, null);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -2256,7 +2256,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -2275,7 +2275,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -2329,7 +2329,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -2348,7 +2348,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -2411,7 +2411,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -2443,7 +2443,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -2570,7 +2570,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -2598,7 +2598,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -2735,7 +2735,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -2763,7 +2763,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -2900,7 +2900,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -2988,7 +2988,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -3041,7 +3041,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -3059,7 +3059,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -3121,7 +3121,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -3139,7 +3139,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -3201,7 +3201,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -3234,7 +3234,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -3349,7 +3349,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -3376,7 +3376,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -3498,7 +3498,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -3525,7 +3525,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -3647,7 +3647,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -3746,7 +3746,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -3806,7 +3806,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(folderToMoveDto.id, null, moveStrategyService, pgpKeys.admin.passphrase);
@@ -3819,7 +3819,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, null);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, null);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -3879,7 +3879,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(folderToMoveDto.id, null, moveStrategyService, pgpKeys.admin.passphrase);
@@ -3898,7 +3898,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, null);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, null);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -4031,7 +4031,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(folderToMoveDto.id, null, moveStrategyService, pgpKeys.admin.passphrase);
@@ -4053,7 +4053,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, null);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, null);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -4186,7 +4186,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(folderToMoveDto.id, null, moveStrategyService, pgpKeys.admin.passphrase);
@@ -4226,7 +4226,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, null);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, null);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -4292,7 +4292,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -4311,7 +4311,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -4377,7 +4377,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -4402,7 +4402,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -4548,7 +4548,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -4594,7 +4594,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -4669,7 +4669,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(false);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -4688,7 +4688,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).toHaveBeenCalledTimes(1);
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -4767,7 +4767,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -4800,7 +4800,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -4957,7 +4957,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -5060,7 +5060,7 @@ describe("MoveOneFolderService", () => {
         expect(service.shareFolderService.saveFoldersPermissionsChanges).toHaveBeenCalledWith(
           expectedFolderPermissionChanges,
         );
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
 
@@ -5113,7 +5113,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -5130,7 +5130,7 @@ describe("MoveOneFolderService", () => {
         expect(moveStrategyService.confirm).not.toHaveBeenCalled();
         expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
         expect(service.shareFolderService.saveFoldersPermissionsChanges).not.toHaveBeenCalled();
-        expect(service.folderModel.move).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
+        expect(service.moveApiService.moveFolder).toHaveBeenCalledWith(folderToMoveDto.id, destinationFolderDto.id);
         expect(service.findAndUpdateFoldersLocalStorage.findAndUpdateAll).toHaveBeenCalledTimes(1);
       });
     });
@@ -5197,7 +5197,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockImplementation(jest.fn);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(
@@ -5301,7 +5301,7 @@ describe("MoveOneFolderService", () => {
         jest.spyOn(service.shareResourceService, "shareAll").mockImplementation(jest.fn);
         jest.spyOn(service.shareFolderService, "saveFoldersPermissionsChanges").mockImplementation(jest.fn);
         jest.spyOn(moveStrategyService, "confirm").mockReturnValue(true);
-        jest.spyOn(service.folderModel, "move").mockImplementation(jest.fn);
+        jest.spyOn(service.moveApiService, "moveFolder").mockImplementation(jest.fn);
         jest.spyOn(service.findAndUpdateFoldersLocalStorage, "findAndUpdateAll").mockImplementation(jest.fn);
 
         await service.moveOne(

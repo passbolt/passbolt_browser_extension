@@ -153,7 +153,7 @@ describe("ShareResourceService", () => {
         // Mock request simulating the share.
         let simulateRequestPermissions;
         const simulationResult = simulateShareSecretsChangesDto([pgpKeys.betty.userId], [pgpKeys.ada.userId]);
-        jest.spyOn(service.shareService, "simulateShareResource").mockImplementation((resourceId, permissions) => {
+        jest.spyOn(service.shareApiService, "simulateShareResource").mockImplementation((resourceId, permissions) => {
           simulateRequestPermissions = permissions;
           return simulationResult;
         });
@@ -171,7 +171,7 @@ describe("ShareResourceService", () => {
         // Mock the share request.
 
         let shareRequestData;
-        jest.spyOn(service.shareService, "shareResource").mockImplementation((resourceId, data) => {
+        jest.spyOn(service.shareApiService, "shareResource").mockImplementation((resourceId, data) => {
           shareRequestData = data;
           return {};
         });
@@ -290,7 +290,7 @@ describe("ShareResourceService", () => {
         // Mock request simulating the share.
         let simulateRequestPermissions;
         const simulationResult = simulateShareSecretsChangesDto([pgpKeys.betty.userId], [pgpKeys.ada.userId]);
-        jest.spyOn(service.shareService, "simulateShareResource").mockImplementation((resourceId, permissions) => {
+        jest.spyOn(service.shareApiService, "simulateShareResource").mockImplementation((resourceId, permissions) => {
           simulateRequestPermissions = permissions;
           return simulationResult;
         });
@@ -308,7 +308,7 @@ describe("ShareResourceService", () => {
         // Mock the share request.
 
         let shareRequestData;
-        jest.spyOn(service.shareService, "shareResource").mockImplementation((resourceId, data) => {
+        jest.spyOn(service.shareApiService, "shareResource").mockImplementation((resourceId, data) => {
           shareRequestData = data;
           return {};
         });
@@ -449,7 +449,7 @@ describe("ShareResourceService", () => {
 
         let simulateRequestPermissions;
         const simulationResult = simulateShareSecretsChangesDto([pgpKeys.betty.userId], [pgpKeys.ada.userId]);
-        jest.spyOn(service.shareService, "simulateShareResource").mockImplementation((resourceId, permissions) => {
+        jest.spyOn(service.shareApiService, "simulateShareResource").mockImplementation((resourceId, permissions) => {
           simulateRequestPermissions = permissions;
           return simulationResult;
         });
@@ -457,7 +457,7 @@ describe("ShareResourceService", () => {
         // Mock the share request.
 
         let shareRequestData;
-        jest.spyOn(service.shareService, "shareResource").mockImplementation((resourceId, data) => {
+        jest.spyOn(service.shareApiService, "shareResource").mockImplementation((resourceId, data) => {
           shareRequestData = data;
           return {};
         });
@@ -723,7 +723,7 @@ describe("ShareResourceService", () => {
       const simulateR1V5Result = simulateShareSecretsChangesDto([pgpKeys.betty.userId, pgpKeys.carol.userId]);
       const simulateR2V5Result = simulateShareSecretsChangesDto([pgpKeys.betty.userId, pgpKeys.carol.userId]);
       const simulateR3V5Result = simulateShareSecretsChangesDto([pgpKeys.betty.userId, pgpKeys.carol.userId]);
-      jest.spyOn(service.shareService, "simulateShareResource").mockImplementation((resourceId, permissions) => {
+      jest.spyOn(service.shareApiService, "simulateShareResource").mockImplementation((resourceId, permissions) => {
         switch (resourceId) {
           case resourceId1V4:
             simulateR1V4RequestPermissions = permissions;
@@ -756,7 +756,7 @@ describe("ShareResourceService", () => {
       // Mock the share request.
 
       let shareR1V4RequestData, shareR2V4RequestData, shareR1V5RequestData, shareR2V5RequestData, shareR3V5RequestData;
-      jest.spyOn(service.shareService, "shareResource").mockImplementation((resourceId, data) => {
+      jest.spyOn(service.shareApiService, "shareResource").mockImplementation((resourceId, data) => {
         switch (resourceId) {
           case resourceId1V4:
             shareR1V4RequestData = data;

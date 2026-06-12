@@ -1,14 +1,24 @@
 /**
  * Config model.
  *
+ * Build-time keys (debug, log.*) are injected by webpack's EnvironmentPlugin
+ * (see webpack/passboltEnvPlugin.js). Other keys (user.*) are runtime-only and
+ * persisted in local storage.
+ *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+import storage from "../sdk/storage";
 
-import _config from "../config/config.json";
+const _config = {
+  debug: process.env.PASSBOLT_DEBUG === "true",
+  log: {
+    level: Number.parseInt(process.env.PASSBOLT_LOG_LEVEL, 10) || 0,
+    console: process.env.PASSBOLT_LOG_CONSOLE === "true",
+  },
+};
 
 const defaultConfig = { ..._config };
-import storage from "../sdk/storage";
 
 /**
  * Init the configuration.

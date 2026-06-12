@@ -12,10 +12,10 @@
  * @since         1.0.0
  */
 
-import FolderModel from "../model/folder/folderModel";
 import ShareResourcesController from "../controller/share/shareResourcesController";
 import ShareOneFolderController from "../controller/share/shareOneFolderController";
 import SearchUsersAndGroupsController from "../controller/share/searchUsersAndGroupsController";
+import FindFoldersForShareController from "../controller/share/findFoldersForShareController";
 
 /**
  * Listens the share events
@@ -30,14 +30,8 @@ const listen = function (worker, apiClientOptions, account) {
    * @param {array} foldersIds The ids of the folders to retrieve.
    */
   worker.port.on("passbolt.share.get-folders", async (requestId, foldersIds) => {
-    try {
-      const folderModel = new FolderModel(apiClientOptions, account);
-      const foldersCollection = await folderModel.findAllForShare(foldersIds);
-      worker.port.emit(requestId, "SUCCESS", foldersCollection);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, "ERROR", error);
-    }
+    const controller = new FindFoldersForShareController(worker, requestId, apiClientOptions);
+    await controller._exec(foldersIds);
   });
 
   /*

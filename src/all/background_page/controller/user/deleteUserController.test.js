@@ -31,7 +31,7 @@ import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity
 import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import DeleteUserController from "./deleteUserController";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
-import UsersCollection from "../../model/entity/user/usersCollection";
+import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 
 beforeEach(() => {
   enableFetchMocks();

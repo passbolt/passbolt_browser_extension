@@ -18,7 +18,7 @@ import ShareMetadataKeyPrivateController from "./shareMetadataKeyPrivateControll
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import GetOrFindMetadataKeysService from "../../service/metadata/getOrFindMetadataKeysService";
-import UsersCollection from "../../model/entity/user/usersCollection";
+import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 import {
   metadataKeysSignedByCurrentDto,
   usersWithMissingMetadataKeysDto,

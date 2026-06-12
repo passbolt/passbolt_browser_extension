@@ -12,9 +12,7 @@
  * @since         4.10.0
  */
 
-import FolderModel from "../../../model/folder/folderModel";
-import Keyring from "../../../model/keyring";
-import ShareModel from "../../../model/share/shareModel";
+import FindFoldersService from "../../folder/findFoldersService";
 import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
@@ -24,10 +22,10 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import i18n from "../../../sdk/i18n";
 import ResourceModel from "../../../model/resource/resourceModel";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
-import FindAndUpdateResourcesLocalStorage from "../findAndUpdateResourcesLocalStorageService";
 import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
 import PermissionChangesCollection from "../../../model/entity/permission/change/permissionChangesCollection";
+import ShareResourceService, { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../../share/shareResourceService";
 
 class ResourceCreateService {
   /**
@@ -39,13 +37,11 @@ class ResourceCreateService {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.folderModel = new FolderModel(apiClientOptions, account);
-    this.shareModel = new ShareModel(apiClientOptions);
-    this.keyring = new Keyring();
+    this.findFoldersService = new FindFoldersService(apiClientOptions);
     this.progressService = progressService;
     this.resourceModel = new ResourceModel(apiClientOptions, this.account);
     this.encryptMetadataKeysService = new EncryptMetadataKeysService(apiClientOptions, this.account);
-    this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
+    this.shareResourceService = new ShareResourceService(apiClientOptions, account, progressService);
   }
 
   /**
@@ -67,7 +63,7 @@ class ResourceCreateService {
     let permissionChanges = new PermissionChangesCollection([]);
     let destinationFolder;
     if (resource.folderParentId) {
-      destinationFolder = await this.folderModel.findForShare(resource.folderParentId);
+      destinationFolder = await this.findFoldersService.findByIdWithPermissions(resource.folderParentId);
       if (
         destinationFolder.permissions.length > 1 ||
         destinationFolder.permissions.items[0].aroForeignKey !== this.account.userId
@@ -85,7 +81,7 @@ class ResourceCreateService {
     }
     await ResourceLocalStorage.addResource(createdResource);
     // Share the resource with the metadata decrypted
-    await this.share(createdResource, privateKey, destinationFolder, permissionChanges);
+    await this.share(createdResource, passphrase, destinationFolder, permissionChanges);
     return createdResource;
   }
 
@@ -129,33 +125,19 @@ class ResourceCreateService {
    * Share the resource.
    *
    * @param {ResourceEntity} resource The resource to share.
-   * @param {openpgp.PrivateKey} privateKey The user decrypted private key
+   * @param {string} passphrase The user passphrase
    * @param {FolderEntity} folder The folder entity
    * @param {PermissionChangesCollection} permissionChangesFromFolder The permission changes
    * @returns {Promise<void>}
    * @private
    */
-  async share(resource, privateKey, folder, permissionChangesFromFolder) {
+  async share(resource, passphrase, folder, permissionChangesFromFolder) {
     if (!folder || !permissionChangesFromFolder.length) {
       return;
     }
-    // Calculate resource creation share permission changes.
     await this.progressService.finishStep(i18n.t("Calculate permissions"), true);
-    // Whenever a resource is created into a folder, its creation will be followed by a share operation
     const permissionChanges = await this.resourceModel.calculatePermissionsChangesForCreate(resource, folder);
-
-    await this.progressService?.finishStep(i18n.t("Synchronizing keys"), true);
-    await this.keyring.sync();
-
-    await this.progressService?.finishStep(i18n.t("Start sharing"), true);
-    const resourcesToShare = [resource.toDto({ secrets: true })];
-    await this.shareModel.bulkShareResources(
-      resourcesToShare,
-      permissionChanges.toDto(),
-      privateKey,
-      async (message) => await this.progressService?.finishStep(message),
-    );
-    await this.findAndUpdateResourcesLocalStorage.findAndUpdateAll();
+    await this.shareResourceService.shareAll([resource.id], permissionChanges, passphrase);
   }
 
   /**
@@ -182,10 +164,10 @@ class ResourceCreateService {
    * @private
    */
   updateGoals(shouldEncryptMetadata, changesLength = 0) {
-    const stepToCreate = shouldEncryptMetadata ? 4 : 3; // number of step to create a resource;
-    const stepPreparingShare = changesLength > 0 ? 3 : 0; // number of step preparing a share;
-    // Goals = number of share (with 3 steps each time) + number of step to create a resource
-    this.progressService.updateGoals(changesLength * 3 + stepPreparingShare + stepToCreate);
+    const stepToCreate = shouldEncryptMetadata ? 4 : 3;
+    // 1 inline step ("Calculate permissions") + shareAll's fixed internal steps.
+    const shareSteps = changesLength > 0 ? 1 + PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL : 0;
+    this.progressService.updateGoals(stepToCreate + shareSteps);
   }
 }
 

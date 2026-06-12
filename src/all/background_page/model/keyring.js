@@ -32,6 +32,8 @@ const PRIVATE = "PRIVATE";
 const MY_KEY_ID = "MY_KEY_ID";
 const STORAGE_KEY_PUBLIC = "passbolt-public-gpgkeys";
 const STORAGE_KEY_PRIVATE = "passbolt-private-gpgkeys";
+// Number of public keys parsed concurrently during a keyring sync, to bound peak memory.
+const SYNC_CHUNK_SIZE = 500;
 
 /**
  * The class that deals with Passbolt Keyring.
@@ -88,6 +90,31 @@ class Keyring {
    *  if the user id is not valid
    */
   async importPublic(armoredPublicKey, userId) {
+    const keyInfo = await this.buildPublicKeyInfo(armoredPublicKey, userId);
+
+    // Add the key in the keyring.
+    const publicKeys = this.getPublicKeysFromStorage();
+    publicKeys[userId] = keyInfo;
+    this.store(Keyring.PUBLIC, publicKeys);
+
+    return true;
+  }
+
+  /**
+   * Validate, parse and read the metadata of a public armored key, without persisting it.
+   * Used by importPublic (single key) and sync (batch), so the keyring is stored only once
+   * instead of once per key.
+   *
+   * @param {string} armoredPublicKey The key to read
+   * @param {string} userId The owner of the key
+   * @returns {Promise<object>} The key info DTO, with its user_id set.
+   * @throw Error
+   *  if the key cannot be read by openpgp
+   *  if the key is not public
+   *  if the user id is not valid
+   * @private
+   */
+  async buildPublicKeyInfo(armoredPublicKey, userId) {
     // Check user id
     if (typeof userId === "undefined") {
       throw new Error("The user id is undefined");
@@ -107,14 +134,9 @@ class Keyring {
 
     // Get the keyInfo.
     const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(primaryPublicKey)).toDto();
+    keyInfo.user_id = userId;
 
-    // Add the key in the keyring.
-    const publicKeys = this.getPublicKeysFromStorage();
-    publicKeys[userId] = keyInfo;
-    publicKeys[userId].user_id = userId;
-    this.store(Keyring.PUBLIC, publicKeys);
-
-    return true;
+    return keyInfo;
   }
 
   /**
@@ -259,20 +281,25 @@ class Keyring {
       throw new Error("Could not synchronize the keyring. The server response body is missing.");
     }
 
-    // Store all the new keys in the keyring.
-    let meta, i;
-    const imports = [];
-    for (i in json.body) {
-      if (Object.prototype.hasOwnProperty.call(json.body, i)) {
-        meta = json.body[i];
-        imports.push(this.importPublic(meta.armored_key, meta.user_id));
-      }
+    /*
+     * Build the keyring in memory and persist it once, rather than reading and re-serializing
+     * the whole keyring for every key (which is quadratic and exhausts memory on large orgs).
+     * Keys are read in bounded-size batches so we never parse the entire payload at once.
+     */
+    const publicKeys = this.getPublicKeysFromStorage();
+    const metas = Object.values(json.body).filter((meta) => meta?.armored_key && meta?.user_id);
+    for (let i = 0; i < metas.length; i += Keyring.SYNC_CHUNK_SIZE) {
+      const chunk = metas.slice(i, i + Keyring.SYNC_CHUNK_SIZE);
+      const keysInfo = await Promise.all(chunk.map((meta) => this.buildPublicKeyInfo(meta.armored_key, meta.user_id)));
+      keysInfo.forEach((keyInfo) => {
+        publicKeys[keyInfo.user_id] = keyInfo;
+      });
     }
-    await Promise.all(imports);
+    this.store(Keyring.PUBLIC, publicKeys);
 
     storage.setItem("latestSync", json.header.servertime);
 
-    return json.body.length;
+    return metas.length;
   }
 
   /*
@@ -400,6 +427,14 @@ class Keyring {
    */
   static get PUBLIC() {
     return PUBLIC;
+  }
+
+  /**
+   * Keyring.SYNC_CHUNK_SIZE
+   * @returns {number}
+   */
+  static get SYNC_CHUNK_SIZE() {
+    return SYNC_CHUNK_SIZE;
   }
 
   /**

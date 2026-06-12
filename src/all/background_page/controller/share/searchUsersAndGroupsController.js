@@ -12,12 +12,12 @@
  * @since         4.9.0
  */
 
-import ShareModel from "../../model/share/shareModel";
+import SearchUsersAndGroupsService from "../../service/share/searchUsersAndGroupsService";
 import { assertString } from "../../utils/assertions";
 
 class SearchUsersAndGroupsController {
   /**
-   * DeleteLocalSsoKitController constructor
+   * SearchUsersAndGroupsController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
@@ -25,7 +25,7 @@ class SearchUsersAndGroupsController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.shareModel = new ShareModel(apiClientOptions);
+    this.searchUsersAndGroupsService = new SearchUsersAndGroupsService(apiClientOptions);
   }
 
   /**
@@ -51,7 +51,7 @@ class SearchUsersAndGroupsController {
    */
   async exec(keyword) {
     assertString(keyword, "keyword is not a valid string");
-    return await this.shareModel.search(keyword);
+    return await this.searchUsersAndGroupsService.search(keyword);
   }
 }
 

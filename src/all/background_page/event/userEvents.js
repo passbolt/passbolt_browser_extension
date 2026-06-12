@@ -14,6 +14,7 @@ import SecurityTokenEntity from "../model/entity/securityToken/securityTokenEnti
 import AvatarUpdateEntity from "../model/entity/avatar/update/avatarUpdateEntity";
 import UpdateUserLocalStorageController from "../controller/user/updateUserLocalStorageController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
+import GetOrFindUsersController from "../controller/user/getOrFindUsersController";
 import UpdateUserController from "../controller/user/updateUserController";
 import DeleteDryRunUserController from "../controller/user/deleteDryRunUserController";
 import DeleteUserController from "../controller/user/deleteUserController";
@@ -44,6 +45,18 @@ const listen = function (worker, apiClientOptions, account) {
     } catch (error) {
       worker.port.emit(requestId, "ERROR", error);
     }
+  });
+
+  /*
+   * Find users by their ids.
+   *
+   * @listens passbolt.users.get-by-ids
+   * @param {uuid} requestId The request identifier
+   * @param {Array<uuid>} userIds The ids of the users to retrieve
+   */
+  worker.port.on("passbolt.users.get-by-ids", async (requestId, userIds) => {
+    const controller = new GetOrFindUsersController(worker, requestId, apiClientOptions, account);
+    controller._exec(userIds);
   });
 
   /*

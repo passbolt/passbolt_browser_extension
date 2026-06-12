@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import FindAllForActionLogController from "./findAllForActionLogController";
+import FindAllForActionLogController from "../controller/actionLog/findAllForActionLogController";
 
 /**
  * Listens to the action logs events

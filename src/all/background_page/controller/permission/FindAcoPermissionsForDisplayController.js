@@ -12,7 +12,7 @@
  * @since         4.9.4
  */
 import FindPermissionsService from "../../service/permission/findPermissionsService";
-import PermissionEntity from "../../model/entity/permission/permissionEntity";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 import FindFoldersService from "../../service/folder/findFoldersService";
 import { assertString, assertUuid } from "../../utils/assertions";
 

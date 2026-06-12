@@ -11,17 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import FolderLocalStorage from "../../service/local_storage/folderLocalStorage";
-import PermissionEntity from "../entity/permission/permissionEntity";
-import PermissionsCollection from "../entity/permission/permissionsCollection";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 import FolderEntity from "../entity/folder/folderEntity";
 import FoldersCollection from "../entity/folder/foldersCollection";
 import PermissionChangesCollection from "../entity/permission/change/permissionChangesCollection";
-import MoveService from "../../service/api/move/moveService";
 import FolderService from "../../service/api/folder/folderService";
-import ShareService from "../../service/api/share/shareService";
+import ShareApiService from "../../service/api/share/shareApiService";
 import splitBySize from "../../utils/array/splitBySize";
 import FindAndUpdateFoldersLocalStorageService from "../../service/folder/findAndUpdateFoldersLocalStorageService";
-import { assertUuid } from "../../utils/assertions";
 
 const BULK_OPERATION_SIZE = 5;
 
@@ -35,8 +33,7 @@ class FolderModel {
    */
   constructor(apiClientOptions, account) {
     this.folderService = new FolderService(apiClientOptions);
-    this.moveService = new MoveService(apiClientOptions);
-    this.shareService = new ShareService(apiClientOptions);
+    this.shareApiService = new ShareApiService(apiClientOptions);
     this.findAndUpdateFoldersLocalStorageService = new FindAndUpdateFoldersLocalStorageService(
       account,
       apiClientOptions,
@@ -90,113 +87,11 @@ class FolderModel {
     return outputCollection;
   }
 
-  /**
-   * Get all the children for the folder provided as input
-   *
-   * @param {array} folderIds The folder ids
-   * @return {FoldersCollection}
-   * @deprecated should use getOrFindFoldersService and collection filtering. See shareFoldersService usage.
-   */
-  async getAllChildren(folderIds) {
-    const foldersDto = await FolderLocalStorage.get();
-    const inputCollection = new FoldersCollection(foldersDto);
-    const outputCollection = new FoldersCollection([]);
-    for (const i in folderIds) {
-      const folderId = folderIds[i];
-      const children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
-      outputCollection.merge(children);
-    }
-    return outputCollection;
-  }
-
-  /*
-   * ============================================
-   * Finders
-   * ============================================
-   */
-  /**
-   * Get all folders from API and map API result to folder collection
-   *
-   * @returns {Promise<FoldersCollection>}
-   * @deprecated should use findFoldersService.
-   */
-  async findAllForShare(foldersIds) {
-    const foldersDtos = await this.folderService.findAllForShare(foldersIds);
-    return new FoldersCollection(foldersDtos);
-  }
-
-  /**
-   * Get folder from API and map API result to folder Entity
-   *
-   * @returns {Promise<FolderEntity>}
-   * @deprecated should use findFoldersService.
-   */
-  async findForShare(folderId) {
-    const foldersDtos = await this.folderService.findAllForShare([folderId]);
-    if (!foldersDtos.length) {
-      throw new Error(`Folder ${folderId} not found`);
-    }
-    return new FolderEntity(foldersDtos[0]);
-  }
-
   /*
    * ==============================================================
    *  Permission changes
    * ==============================================================
    */
-  /**
-   * Calculate permission changes for a move
-   * From current permissions, remove the parent folder permissions, add the destination permissions
-   * From this new set of permission and the original permission calculate the needed changed
-   *
-   * NOTE: This function requires permissions to be set for all objects
-   *
-   * @param {ResourceEntity} folderEntity
-   * @param {(FolderEntity|null)} parentFolder
-   * @param {(FolderEntity|null)} destFolder
-   * @returns {PermissionChangesCollection}
-   */
-  calculatePermissionsChangesForMove(folderEntity, parentFolder, destFolder) {
-    let remainingPermissions = new PermissionsCollection([], { assertAtLeastOneOwner: false });
-
-    // Remove permissions from parent if any
-    if (parentFolder) {
-      if (!folderEntity.permissions || !parentFolder.permissions) {
-        throw new TypeError("Resource model calculatePermissionsChangesForMove requires permissions to be set.");
-      }
-      remainingPermissions = PermissionsCollection.diff(folderEntity.permissions, parentFolder.permissions, false);
-    }
-    // Add parent permissions
-    let permissionsFromParent = new PermissionsCollection([], { assertAtLeastOneOwner: false });
-    if (destFolder) {
-      if (!destFolder.permissions) {
-        throw new TypeError(
-          "Resource model calculatePermissionsChangesForMove requires destination permissions to be set.",
-        );
-      }
-      permissionsFromParent = destFolder.permissions.cloneForAco(PermissionEntity.ACO_FOLDER, folderEntity.id, false);
-    }
-
-    const newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
-    if (!destFolder) {
-      /*
-       * If the move is toward the root
-       * Reuse highest permission
-       */
-      newPermissions.addOrReplace(
-        new PermissionEntity({
-          aco: PermissionEntity.ACO_FOLDER,
-          aco_foreign_key: folderEntity.id,
-          aro: folderEntity.permission.aro,
-          aro_foreign_key: folderEntity.permission.aroForeignKey,
-          type: PermissionEntity.PERMISSION_OWNER,
-        }),
-      );
-    }
-    newPermissions.assertAtLeastOneOwner();
-    return PermissionChangesCollection.calculateChanges(folderEntity.permissions, newPermissions);
-  }
-
   /**
    * Calculate permission changes for a create
    * From current permissions add the destination permissions
@@ -241,24 +136,6 @@ class FolderModel {
   }
 
   /**
-   * Move a folder using Passbolt API
-   *
-   * @param {string} folderId the folder to move
-   * @param {string} folderParentId the destination folder
-   * @returns {Promise<FolderEntity>}
-   */
-  async move(folderId, folderParentId) {
-    const folderDto = await FolderLocalStorage.getFolderById(folderId);
-    const folderEntity = new FolderEntity(folderDto);
-    folderEntity.folderParentId = folderParentId;
-    await this.moveService.moveFolder(folderId, folderParentId);
-    // TODO update modified date
-    await FolderLocalStorage.updateFolder(folderEntity);
-
-    return folderEntity;
-  }
-
-  /**
    * Update a folder using Passbolt API
    *
    * @param {FolderEntity} folderEntity
@@ -280,7 +157,7 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async share(folderEntity, changesCollection, updateStorage) {
-    await this.shareService.shareFolder(folderEntity.id, { permissions: changesCollection.toDto() });
+    await this.shareApiService.shareFolder(folderEntity.id, { permissions: changesCollection.toDto() });
     if (typeof updateStorage === "undefined" || updateStorage) {
       /*
        * update storage in case the folder becomes non visible to current user
@@ -368,32 +245,6 @@ class FolderModel {
       console.error(error);
       errorCallback(error, collectionIndex);
       throw error;
-    }
-  }
-
-  /*
-   * ============================================
-   * Assertions
-   * ============================================
-   */
-  /**
-   * Assert for a given folder id that the folder is in the local storage
-   *
-   * @param {(string|null)} folderId folderId
-   * @throws {Error} if the folder does not exist
-   * @deprecated should use getOrFindFoldersService.
-   */
-  async assertFolderExists(folderId) {
-    if (folderId === null) {
-      return;
-    }
-
-    assertUuid(folderId, `Folder exists check expect a uuid.`);
-
-    const folderDto = await FolderLocalStorage.getFolderById(folderId);
-    if (!folderDto) {
-      // TODO check remotely?
-      throw new Error(`Folder with id ${folderId} does not exist.`);
     }
   }
 }

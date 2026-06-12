@@ -121,7 +121,7 @@ describe("ShareResourceService", () => {
       // Mock the share request.
 
       let shareRequestData;
-      jest.spyOn(service.shareService, "shareFolder").mockImplementation((folderId, data) => {
+      jest.spyOn(service.shareApiService, "shareFolder").mockImplementation((folderId, data) => {
         shareRequestData = data;
         return {};
       });
@@ -210,7 +210,7 @@ describe("ShareResourceService", () => {
       // Mock the share request.
 
       let shareRequest1Data, shareRequest2Data;
-      jest.spyOn(service.shareService, "shareFolder").mockImplementation((folderId, data) => {
+      jest.spyOn(service.shareApiService, "shareFolder").mockImplementation((folderId, data) => {
         switch (folderId) {
           case folderIdToShare:
             shareRequest1Data = data;
@@ -319,7 +319,7 @@ describe("ShareResourceService", () => {
       // Mock the share request.
 
       let shareFolderRequest1Data, shareFolderRequest2Data;
-      jest.spyOn(service.shareService, "shareFolder").mockImplementation((folderId, data) => {
+      jest.spyOn(service.shareApiService, "shareFolder").mockImplementation((folderId, data) => {
         switch (folderId) {
           case folderIdToShare:
             shareFolderRequest1Data = data;

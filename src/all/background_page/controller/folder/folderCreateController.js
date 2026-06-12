@@ -12,6 +12,7 @@
  * @since         2.13.0
  */
 import FolderModel from "../../model/folder/folderModel";
+import FindFoldersService from "../../service/folder/findFoldersService";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 
@@ -28,6 +29,7 @@ class FolderCreateController {
     this.worker = worker;
     this.requestId = requestId;
     this.folderModel = new FolderModel(clientOptions, account);
+    this.findFoldersService = new FindFoldersService(clientOptions);
     this.progressService = new ProgressService(this.worker, i18n.t("Creating folder..."));
   }
 
@@ -52,7 +54,7 @@ class FolderCreateController {
          * TODO a remember me option to skip confirmation dialog
          */
         await this.progressService.finishStep(i18n.t("Fetching parent permissions"), true);
-        const targetFolder = await this.folderModel.findForShare(folderEntity.folderParentId);
+        const targetFolder = await this.findFoldersService.findByIdWithPermissions(folderEntity.folderParentId);
 
         await this.progressService.finishStep(i18n.t("Saving permissions..."), true);
         const changes = await this.folderModel.calculatePermissionsChangesForCreate(folderEntity, targetFolder);

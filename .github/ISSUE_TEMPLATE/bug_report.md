@@ -1,30 +1,38 @@
-##IMPORTANT: PLEASE READ
+---
+name: Report a bug
+about: Report a bug in the Passbolt browser extension.
+title: ""
+labels: bug
+assignees: ""
+---
 
-Only use github issues for bugs.
+<!--
+PLEASE READ
 
-We will be more than happy to help you on the community forum for:
-- feature requests: https://community.passbolt.com/c/backlog
-- issues related to an installation: https://community.passbolt.com/c/installation-issues
-- general questions: https://community.passbolt.com/c/uncategorized
+This tracker is only for browser extension bugs. For anything else:
 
-This is only a issue tracker for bugs related to the Passbolt Browser Extensions.
-For passbolt API, docker, command line interface, in short any other bugs 
-please use [the other relevant repositories](https://github.com/passbolt).
+- Security issues: https://www.passbolt.com/docs/contribute/security/vulnerability/
+- Feature requests: https://community.passbolt.com/c/backlog
+- Installation issues: https://community.passbolt.com/c/installation-issues
+- General questions: https://community.passbolt.com/c/uncategorized
 
-If you are certain this is a new Browser Extension bug please use the following format:
+If you are certain this is a browser extension bug, please fill in the format below.
+-->
 
-## ISSUE NAME
-* Passbolt Version: EXACT RELEASE VERSION OR COMMIT HASH, HERE.
-* Platform and Target:
--- Browser: NAME AND VERSION
--- Web server: NAME AND VERSION
--- etc.: OTHER RELEVANT PLATFORM INFO
+* Browser extension version: <!-- e.g. 5.13.0 -->
+* API edition & version: <!-- e.g. CE 5.12.0 -->
+* Environment
+  * Client: <!-- browser and OS, e.g. Chrome 148.1 on Ubuntu 26.04 -->
+  * Server: <!-- e.g. Debian 13, Docker latest-ce, or Passbolt Cloud -->
 
-### What you did
-EXPLAIN WHAT YOU DID, PREFERABLY WITH CODE EXAMPLES, HERE.
+### What you did?
 
-### What happened
-EXPLAIN WHAT IS ACTUALLY HAPPENING, HERE.
+<!-- Explain what you did, preferably with steps or code examples. -->
 
-### What you expected to happen
-EXPLAIN WHAT IS TO BE EXPECTED, HERE.
+### What happened?
+
+<!-- Explain what actually happened. -->
+
+### What you expected to happen?
+
+<!-- Explain what you expected instead. -->

@@ -13,11 +13,11 @@
  */
 
 import { enableFetchMocks } from "jest-fetch-mock";
-import { defaultGroupsDtos } from "../../model/entity/group/groupsCollection.test.data";
+import { defaultGroupsDtos } from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import FindMyGroupsController from "./findMyGroupsController";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import GroupsCollection from "../../model/entity/group/groupsCollection";
+import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import FindGroupsService from "../../service/group/findGroupsService";

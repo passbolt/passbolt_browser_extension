@@ -14,7 +14,7 @@
 import FolderEntity from "./folderEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import PermissionEntity from "../permission/permissionEntity";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 import {
   defaultFolderDto,
   folderWithReadPermissionDto,
@@ -22,7 +22,7 @@ import {
   minimalFolderDto,
 } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 import { ownerPermissionDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
-import PermissionsCollection from "../permission/permissionsCollection";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import UserEntity from "../user/userEntity";
 

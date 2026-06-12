@@ -15,7 +15,7 @@ import GetPassphraseService from "../../service/passphrase/getPassphraseService"
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import GroupUpdateService from "../../service/group/groupUpdateService";
-import GroupEntity from "../../model/entity/group/groupEntity";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 
 class GroupsUpdateController {
   /**

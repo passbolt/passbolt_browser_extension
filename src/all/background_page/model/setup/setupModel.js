@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import AccountRecoveryOrganizationPolicyEntity from "../entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
-import UserService from "../../service/api/user/userService";
+import UserApiService from "passbolt-styleguide/src/shared/services/api/user/userApiService";
 import SetupService from "../../service/api/setup/setupService";
 import UserEntity from "../entity/user/userEntity";
 import Validator from "validator";
@@ -26,7 +26,7 @@ class SetupModel {
    */
   constructor(apiClientOptions) {
     this.setupService = new SetupService(apiClientOptions);
-    this.userService = new UserService(apiClientOptions);
+    this.userService = new UserApiService(apiClientOptions);
   }
 
   /**

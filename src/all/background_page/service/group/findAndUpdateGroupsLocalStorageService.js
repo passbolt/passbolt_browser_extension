@@ -13,7 +13,10 @@
  */
 import GroupLocalStorage from "../local_storage/groupLocalStorage";
 import FindGroupsService from "./findGroupsService";
-import GroupsCollection from "../../model/entity/group/groupsCollection";
+import GroupApiService from "../api/group/groupApiService";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
+import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
+import { assertArrayUUID } from "../../utils/assertions";
 
 const GROUPS_UPDATE_ALL_LS_LOCK_PREFIX = "GROUPS_UPDATE_LS_LOCK_";
 
@@ -30,6 +33,7 @@ class FindAndUpdateGroupsLocalStorageService {
     this.account = account;
     this.groupLocalStorage = new GroupLocalStorage(account);
     this.findGroupsService = new FindGroupsService(apiClientOptions);
+    this.groupApiService = new GroupApiService(apiClientOptions);
     this.lockKey = `${GROUPS_UPDATE_ALL_LS_LOCK_PREFIX}-${this.account.id}`;
   }
 
@@ -58,6 +62,57 @@ class FindAndUpdateGroupsLocalStorageService {
 
       // Return the updated resources collection from the API
       return updatedResourcesCollection;
+    });
+  }
+
+  /**
+   * Retrieve groups from local storage for the given ids.
+   * If any requested group is missing from the local storage, the missing ones are fetched from the API,
+   * added to the local storage, and included in the returned collection.
+   *
+   * @param {Array<string>} groupIds The ids of the groups to retrieve.
+   * @returns {Promise<GroupsCollection>}
+   * @public
+   */
+  async findForLocalStorageByIds(groupIds) {
+    assertArrayUUID(groupIds);
+
+    const groupsDtos = (await this.groupLocalStorage.get()) ?? [];
+    const requestedIdsSet = new Set(groupIds);
+    const collection = new GroupsCollection(
+      groupsDtos.filter((dto) => requestedIdsSet.has(dto.id)),
+      { validate: false },
+    );
+
+    if (collection.length === groupIds.length) {
+      return collection;
+    }
+
+    // Missing groups need to be fetched from the API and stored.
+    // Use a lock to prevent concurrent writes to the local storage.
+    return await navigator.locks.request(this.lockKey, async () => {
+      // Re-check local storage after acquiring the lock, as another concurrent
+      // call may have already fetched and stored the missing groups.
+      const refreshedGroupsDtos = (await this.groupLocalStorage.get()) ?? [];
+      const refreshedCollection = new GroupsCollection(
+        refreshedGroupsDtos.filter((dto) => requestedIdsSet.has(dto.id)),
+        { validate: false },
+      );
+
+      if (refreshedCollection.length === groupIds.length) {
+        return refreshedCollection;
+      }
+
+      const foundIdsSet = new Set(refreshedCollection.items.map((entity) => entity.id));
+      const missingIds = groupIds.filter((id) => !foundIdsSet.has(id));
+      const response = await this.groupApiService.findAll(GroupLocalStorage.DEFAULT_CONTAIN, { "has-id": missingIds });
+      for (const groupDto of response.body ?? []) {
+        const groupEntity = new GroupEntity(groupDto);
+        await this.groupLocalStorage.addGroup(groupEntity);
+        refreshedCollection.push(groupEntity);
+      }
+
+      return refreshedCollection;
     });
   }
 }

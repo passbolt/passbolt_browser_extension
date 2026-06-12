@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import GroupEntity from "../groupEntity";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import GroupUpdateSecretsCollection from "../../secret/groupUpdate/groupUpdateSecretsCollection";
 import GroupUserChangesCollection from "../../groupUser/change/groupUserChangesCollection";

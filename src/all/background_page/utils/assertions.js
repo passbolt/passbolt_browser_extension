@@ -236,6 +236,7 @@ export const assertArrayUUID = (data, errorMessage = "The given parameter is not
  * @param {*} value the parameter to validate
  * @param {string} [errorMessage] the message to throw within the error if any
  * @throws {TypeError} if the parameter is not valid
+ * @deprecated: use the one from the styleguide instead
  */
 export const assertNumber = (value, errorMessage = "The given parameter is not a valid number") => {
   if (typeof value !== "undefined" && typeof value !== "number") {

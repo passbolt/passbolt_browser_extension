@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import GroupEntity from "../../group/groupEntity";
-import PermissionEntity from "../permissionEntity";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import LoggedUserEntity from "../../user/actionLog/loggedUserEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";

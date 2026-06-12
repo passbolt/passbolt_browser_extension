@@ -12,9 +12,9 @@
  * @since         3.0.0
  */
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
-import UserService from "../../service/api/user/userService";
+import UserApiService from "passbolt-styleguide/src/shared/services/api/user/userApiService";
 import UserEntity from "../entity/user/userEntity";
-import UsersCollection from "../entity/user/usersCollection";
+import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 import Validator from "validator";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
@@ -32,7 +32,7 @@ class UserModel {
    * @public
    */
   constructor(apiClientOptions, account = null) {
-    this.userService = new UserService(apiClientOptions);
+    this.userApiService = new UserApiService(apiClientOptions);
     this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
     this.account = account;
   }
@@ -62,7 +62,7 @@ class UserModel {
         contains.missing_metadata_key_ids = true;
       }
     }
-    const usersCollection = await this.findAll(contains, null, null, true);
+    const usersCollection = await this.findAll(contains, null, true);
     await UserLocalStorage.set(usersCollection);
     return usersCollection;
   }
@@ -75,7 +75,7 @@ class UserModel {
    * @public
    */
   async resendInvite(username) {
-    return this.userService.resendInvite(username);
+    return this.userApiService.resendInvite(username);
   }
 
   /**
@@ -128,7 +128,7 @@ class UserModel {
    * @returns {Promise<UserEntity>}
    */
   async findOne(userId, contains, ignoreInvalidEntity) {
-    const userDto = await this.userService.get(userId, contains);
+    const userDto = await this.userApiService.get(userId, contains);
     return new UserEntity(userDto, { ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
@@ -137,12 +137,11 @@ class UserModel {
    *
    * @param {Object} [contains] optional example: {groups_users: true}
    * @param {Object} [filters] optional
-   * @param {Object} [orders] optional
    * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<UsersCollection>}
    */
-  async findAll(contains, filters, orders, ignoreInvalidEntity) {
-    const usersDto = await this.userService.findAll(contains, filters, orders);
+  async findAll(contains, filters, ignoreInvalidEntity) {
+    const usersDto = (await this.userApiService.findAll(contains, filters)).body ?? [];
     return new UsersCollection(usersDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
@@ -157,9 +156,9 @@ class UserModel {
     if (!Validator.isUUID(userId)) {
       throw new TypeError("Error in find all users for users updates. The user id is not a valid uuid.");
     }
-    const usersDto = await this.userService.findAll(null, { "has-access": userId });
+    const usersDto = (await this.userApiService.findAll(null, { "has-access": userId })).body ?? [];
     const usersCollection = new UsersCollection(usersDto);
-    return usersCollection.ids;
+    return usersCollection.extract("id");
   }
 
   /*
@@ -176,7 +175,7 @@ class UserModel {
    */
   async create(userEntity) {
     const data = userEntity.toDto({ profile: { avatar: false } });
-    const userDto = await this.userService.create(data);
+    const userDto = await this.userApiService.create(data);
     const newUserEntity = new UserEntity(userDto);
     await UserLocalStorage.addUser(newUserEntity);
     return newUserEntity;
@@ -192,7 +191,7 @@ class UserModel {
    */
   async update(userEntity, ignoreInvalidEntity) {
     const data = userEntity.toDto({ profile: { avatar: false } });
-    const userDto = await this.userService.update(userEntity.id, data);
+    const userDto = await this.userApiService.update(userEntity.id, data);
     const updatedUserEntity = new UserEntity(userDto, { ignoreInvalidEntity });
     await UserLocalStorage.updateUser(updatedUserEntity);
     return updatedUserEntity;
@@ -208,7 +207,11 @@ class UserModel {
    * @public
    */
   async updateAvatar(userId, avatarUpdateEntity, ignoreInvalidEntity) {
-    const userDto = await this.userService.updateAvatar(userId, avatarUpdateEntity.file, avatarUpdateEntity.filename);
+    const userDto = await this.userApiService.updateAvatar(
+      userId,
+      avatarUpdateEntity.file,
+      avatarUpdateEntity.filename,
+    );
     return new UserEntity(userDto, { ignoreInvalidEntity });
   }
 
@@ -222,7 +225,7 @@ class UserModel {
       username: account.username,
       case: "lost-passphrase",
     };
-    await this.userService.requestHelpCredentialsLost(requestHelpDto);
+    await this.userApiService.requestHelpCredentialsLost(requestHelpDto);
   }
 }
 

@@ -73,6 +73,8 @@ import FindResourceSecretRevisionsForDisplayController from "../controller/secre
 import DeleteSecretRevisionsSettingsController from "../controller/secretRevision/deleteSecretRevisionsSettingsController";
 import SaveSecretRevisionsSettingsController from "../controller/secretRevision/saveSecretRevisionsSettingsController";
 import FindExportPoliciesSettingsController from "../controller/exportPolicies/findExportPoliciesSettingsController";
+import CreateSubscriptionKeyController from "../controller/subscription/createSubscriptionKeyController";
+import DeleteSubscriptionKeyController from "../controller/subscription/deleteSubscriptionKeyController";
 import FindSubscriptionKeyController from "../controller/subscription/findSubscriptionKeyController";
 import UpdateSubscriptionKeyController from "../controller/subscription/updateSubscriptionKeyController";
 import FindTagsController from "../controller/tag/findTagsController";
@@ -769,6 +771,29 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.subscription.update", async (requestId, subscriptionKeyDto) => {
     const subscriptionController = new UpdateSubscriptionKeyController(worker, requestId, apiClientOptions);
     await subscriptionController._exec(subscriptionKeyDto);
+  });
+
+  /**
+   * Create the subscription key (upgrade CE to PRO).
+   *
+   * @listens passbolt.subscription.create
+   * @param requestId {uuid} The request identifier
+   * @param subscriptionKeyDto {{ data: string }} The new subscription key
+   */
+  worker.port.on("passbolt.subscription.create", async (requestId, subscriptionKeyDto) => {
+    const subscriptionController = new CreateSubscriptionKeyController(worker, requestId, apiClientOptions);
+    await subscriptionController._exec(subscriptionKeyDto);
+  });
+
+  /**
+   * Delete the subscription (downgrade PRO to CE).
+   *
+   * @listens passbolt.subscription.downgrade
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on("passbolt.subscription.downgrade", async (requestId) => {
+    const subscriptionController = new DeleteSubscriptionKeyController(worker, requestId, apiClientOptions);
+    await subscriptionController._exec();
   });
 
   /**

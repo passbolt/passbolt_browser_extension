@@ -15,7 +15,7 @@
 import User from "../../model/user";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
-import GroupsCollection from "../../model/entity/group/groupsCollection";
+import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import FindGroupsService from "./findGroupsService";
 import MockExtension from "../../../../../test/mocks/mockExtension";
@@ -36,40 +36,35 @@ describe("FindGroupsService", () => {
     /**
      * Tests the findAll method of the findGroupsService
      */
-    const testFindAll = async (contains, filters, orders, ignoreInvalidEntity) => {
+    const testFindAll = async (contains, filters, ignoreInvalidEntity) => {
       // Setup mock data for the test
       const groupsDtos = setupMockData();
       // Create a spy on the findAll method of groupApiService and mock its return value
       const spy = jest.spyOn(findGroupsService.groupApiService, "findAll").mockResolvedValue(groupsDtos);
       // Call the findAll method of findGroupsService with the provided parameters
-      const result = await findGroupsService.findAll(contains, filters, orders, ignoreInvalidEntity);
+      const result = await findGroupsService.findAll(contains, filters, ignoreInvalidEntity);
       // Assert that the spy was called with the correct parameters
-      expect(spy).toHaveBeenCalledWith(contains, filters, orders);
+      expect(spy).toHaveBeenCalledWith(contains, filters);
       // Assert that the result is an instance of GroupsCollection
       expect(result).toBeInstanceOf(GroupsCollection);
       // Assert that the result's id matches the mock data's id
       expect(result.id).toBe(groupsDtos.id);
     };
 
-    it("should find groups with contains, filters, and orders", async () => {
-      await testFindAll(
-        { groups_users: true, my_group_user: true, modifier: false },
-        { "has-users": "user123" },
-        { name: "asc" },
-        true,
-      );
+    it("should find groups with contains and filters", async () => {
+      await testFindAll({ groups_users: true, my_group_user: true, modifier: false }, { "has-users": "user123" }, true);
     });
 
     it("should find groups with empty contains, filters, and orders", async () => {
-      await testFindAll({}, {}, {}, true);
+      await testFindAll({}, {}, true);
     });
 
     it("should find groups with null contains, filters, and orders", async () => {
-      await testFindAll(null, null, null, true);
+      await testFindAll(null, null, true);
     });
 
     it("should find groups with ignoreInvalidEntity set to false", async () => {
-      await testFindAll({ groups_users: true, my_group_user: true, modifier: false }, null, null, false);
+      await testFindAll({ groups_users: true, my_group_user: true, modifier: false }, null, false);
     });
 
     /*
@@ -125,7 +120,7 @@ describe("FindGroupsService", () => {
 
       const result = await findGroupsService.findAllForLocalStorage();
 
-      expect(findGroupsService.findAll).toHaveBeenCalledWith(contains, null, null, true);
+      expect(findGroupsService.findAll).toHaveBeenCalledWith(contains, null, true);
       expect(result).toBeInstanceOf(Array);
       expect(result.id).toBe(groupsDtos.id);
     });

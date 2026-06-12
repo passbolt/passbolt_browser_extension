@@ -21,7 +21,6 @@ Gruntfile.js
 CHANGELOG.MD
 README.MD
 npm-debug.log
-config.json.default
 
 #jest test coverage
 /coverage

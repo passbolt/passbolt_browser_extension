@@ -12,7 +12,7 @@
  * @since         5.7.0
  */
 
-import GroupsCollection from "../../model/entity/group/groupsCollection";
+import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
 import { assertBoolean, assertType } from "../../utils/assertions";
 import GroupApiService from "../api/group/groupApiService";
 import User from "../../model/user";
@@ -33,23 +33,19 @@ export default class FindGroupsService {
    *
    * @param {Object|null} [contains] optional
    * @param {Object|null} [filters] optional
-   * @param {Object|null} [orders] optional
    * @param {boolean?} [ignoreInvalidEntity] Should invalid entities be ignored.
    * @returns {Promise<GroupsCollection>}
    */
-  async findAll(contains, filters, orders, ignoreInvalidEntity) {
+  async findAll(contains, filters, ignoreInvalidEntity) {
     if (contains) {
       assertType(contains, Object);
     }
     if (filters) {
       assertType(filters, Object);
     }
-    if (orders) {
-      assertType(orders, Object);
-    }
     assertBoolean(ignoreInvalidEntity);
-    const groupsDto = await this.groupApiService.findAll(contains, filters, orders);
-    return new GroupsCollection(groupsDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
+    const response = await this.groupApiService.findAll(contains, filters);
+    return new GroupsCollection(response.body ?? [], { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
   }
 
   /**
@@ -72,6 +68,6 @@ export default class FindGroupsService {
    */
   async findAllForLocalStorage() {
     const contains = { groups_users: true, my_group_user: true, modifier: false };
-    return await this.findAll(contains, null, null, true);
+    return await this.findAll(contains, null, true);
   }
 }

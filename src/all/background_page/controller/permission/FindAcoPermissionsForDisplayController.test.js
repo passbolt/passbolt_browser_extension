@@ -17,10 +17,10 @@ import FindAcoPermissionsForDisplayController from "./FindAcoPermissionsForDispl
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
-import PermissionEntity from "../../model/entity/permission/permissionEntity";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 import { defaultPermissionsDtos } from "passbolt-styleguide/src/shared/models/entity/permission/permissionCollection.test.data";
-import PermissionsCollection from "../../model/entity/permission/permissionsCollection";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 import FolderService from "../../service/api/folder/folderService";
 
 describe("FindAcoPermissionsForDisplayController", () => {

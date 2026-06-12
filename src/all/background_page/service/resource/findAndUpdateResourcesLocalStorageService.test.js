@@ -41,6 +41,7 @@ import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import { v4 as uuidv4 } from "uuid";
+import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
 
 jest.useFakeTimers();
 
@@ -73,7 +74,8 @@ describe("UpdateResourcesLocalStorage", () => {
 
     it("updates local storage when no resources are returned by the API.", async () => {
       expect.assertions(3);
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse([]));
+
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
 
       const resourcesCollection = await service.findAndUpdateAll();
@@ -87,7 +89,7 @@ describe("UpdateResourcesLocalStorage", () => {
     it("updates local storage with a single resource.", async () => {
       expect.assertions(4);
       const resourcesDto = singleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
 
       const resourcesCollection = await service.findAndUpdateAll();
@@ -95,14 +97,14 @@ describe("UpdateResourcesLocalStorage", () => {
       const resourcesLSDto = await ResourceLocalStorage.get();
       expect(FindResourcesService.prototype.findAllForLocalStorage).toHaveBeenCalledTimes(1);
       expect(resourcesLSDto).toHaveLength(1);
-      expect(resourcesLSDto).toEqual(resourcesDto);
+      expect(new ResourcesCollection(resourcesLSDto)).toEqual(new ResourcesCollection(resourcesDto));
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesDto));
     });
 
     it("updates local storage with multiple resources.", async () => {
       expect.assertions(5);
       const resourcesDto = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
 
       expect(ResourceLocalStorage._cachedData).toBeNull();
@@ -111,14 +113,14 @@ describe("UpdateResourcesLocalStorage", () => {
       const resourcesLSDto = await ResourceLocalStorage.get();
       expect(FindResourcesService.prototype.findAllForLocalStorage).toHaveBeenCalledTimes(1);
       expect(resourcesLSDto).toHaveLength(4);
-      expect(resourcesLSDto).toEqual(resourcesDto);
+      expect(new ResourcesCollection(resourcesLSDto)).toEqual(new ResourcesCollection(resourcesDto));
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesDto));
     });
 
     it("overrides local storage with a second update call.", async () => {
       expect.assertions(5);
       const resourcesDto = singleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
       await ResourceLocalStorage.set(new ResourcesCollection(multipleResourceDtos()));
 
@@ -128,48 +130,51 @@ describe("UpdateResourcesLocalStorage", () => {
       const resourcesLSDto = await ResourceLocalStorage.get();
       expect(FindResourcesService.prototype.findAllForLocalStorage).toHaveBeenCalledTimes(1);
       expect(resourcesLSDto).toHaveLength(1);
-      expect(resourcesLSDto).toEqual(resourcesDto);
+      expect(new ResourcesCollection(resourcesLSDto)).toEqual(new ResourcesCollection(resourcesDto));
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesDto));
     });
 
     it("does not update the local storage if the update period threshold given in parameter is not overdue.", async () => {
       expect.assertions(6);
       const resourcesDto = singleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
       jest.spyOn(ResourceLocalStorage, "get");
       await ResourceLocalStorage.set(new ResourcesCollection(multipleResourceDtos()));
 
       const resourcesCollection = await service.findAndUpdateAll();
       const unexpectedDto = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => unexpectedDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(unexpectedDto));
       const resourcesCollectionWithThreshold = await service.findAndUpdateAll({ updatePeriodThreshold: 1000 });
 
       const resourcesLSDto = await ResourceLocalStorage.get();
       expect(FindResourcesService.prototype.findAllForLocalStorage).toHaveBeenCalledTimes(1);
       expect(ResourceLocalStorage.get).toHaveBeenCalledTimes(3);
       expect(resourcesLSDto).toHaveLength(1);
-      expect(resourcesLSDto).toEqual(resourcesDto);
+      expect(new ResourcesCollection(resourcesLSDto)).toEqual(new ResourcesCollection(resourcesDto));
       expect(resourcesCollection).toEqual(new ResourcesCollection(resourcesDto));
       expect(resourcesCollectionWithThreshold).not.toEqual(new ResourcesCollection(unexpectedDto));
     });
 
     it("updates the local storage if the update period threshold given in parameter is overdue.", async () => {
       expect.assertions(5);
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => singleResourceDtos());
+      const singleResourceDto = singleResourceDtos();
+      jest
+        .spyOn(ResourceService.prototype, "findAll")
+        .mockImplementation(() => mockPassboltResponse(singleResourceDto));
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
       await ResourceLocalStorage.set(new ResourcesCollection(multipleResourceDtos()));
 
       const resourcesCollection = await service.findAndUpdateAll();
       const resourcesDto = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.advanceTimersByTime(1001);
       const resourcesCollectionOverdue = await service.findAndUpdateAll({ updatePeriodThreshold: 1000 });
 
       const resourcesLSDto = await ResourceLocalStorage.get();
       expect(FindResourcesService.prototype.findAllForLocalStorage).toHaveBeenCalledTimes(2);
       expect(resourcesLSDto).toHaveLength(4);
-      expect(resourcesLSDto).toEqual(resourcesDto);
+      expect(new ResourcesCollection(resourcesLSDto)).toEqual(new ResourcesCollection(resourcesDto));
       expect(resourcesCollection).not.toEqual(resourcesCollectionOverdue);
       expect(resourcesCollectionOverdue).toEqual(new ResourcesCollection(resourcesDto));
     });
@@ -177,7 +182,7 @@ describe("UpdateResourcesLocalStorage", () => {
     it("should update the local storage without resources having unknown resource types.", async () => {
       expect.assertions(2);
       const apiResources = multipleResourceIncludingUnsupportedResourceTypesDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => apiResources);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(apiResources));
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
       await ResourceLocalStorage.set(new ResourcesCollection([]));
 
@@ -197,7 +202,7 @@ describe("UpdateResourcesLocalStorage", () => {
       const apiResources = [resourceWithEncryptedMetadata];
       await ResourceLocalStorage.set(new ResourcesCollection(localResource));
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => apiResources);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(apiResources));
       jest.spyOn(DecryptMessageService, "decrypt");
 
       const resourcesCollection = await service.findAndUpdateAll();
@@ -215,7 +220,7 @@ describe("UpdateResourcesLocalStorage", () => {
       const resourceWithError = defaultResourceDto({ resource_type_id: null });
       const apiResources = resourceWithUnsupportedResourceType.concat(resourceWithError);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => apiResources);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(apiResources));
       const storedResourceCollection = await service.findAndUpdateAll();
 
       expect(apiResources).toHaveLength(7);
@@ -232,7 +237,7 @@ describe("UpdateResourcesLocalStorage", () => {
 
         expect.assertions(2 + resourcesDto.length);
 
-        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+        jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
         jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
         jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
         jest
@@ -259,7 +264,7 @@ describe("UpdateResourcesLocalStorage", () => {
       const resourcesDto = multipleResourceWithMetadataEncrypted(metadata_key_id);
       const resourceTypesDto = resourceTypesCollectionDto();
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesDto);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
       jest
@@ -285,18 +290,19 @@ describe("UpdateResourcesLocalStorage", () => {
       const resourcesDto = singleResourceDtos();
       let resolve;
       const promise = new Promise((_resolve) => (resolve = _resolve));
+      const response = mockPassboltResponse(resourcesDto);
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => promise);
       jest.spyOn(FindResourcesService.prototype, "findAllForLocalStorage");
 
       service.findAndUpdateAll();
       const promiseSecondCall = service.findAndUpdateAll();
-      resolve(resourcesDto);
+      resolve(response);
       await promiseSecondCall;
       const resourcesLSDto = await ResourceLocalStorage.get();
 
       expect(FindResourcesService.prototype.findAllForLocalStorage).toHaveBeenCalledTimes(1);
       expect(resourcesLSDto).toHaveLength(1);
-      expect(resourcesLSDto).toEqual(resourcesDto);
+      expect(new ResourcesCollection(resourcesLSDto)).toEqual(new ResourcesCollection(resourcesDto));
     });
   });
 
@@ -313,7 +319,7 @@ describe("UpdateResourcesLocalStorage", () => {
 
       const resourcesDto = multipleResourceDtos();
       const expectedCollection = new ResourcesCollection(resourcesDto);
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.spyOn(service.findResourcesServices, "findAllByIsSharedWithGroupForLocalStorage");
 
       const resourcesCollection = await service.findAndUpdateByIsSharedWithGroup();
@@ -326,7 +332,7 @@ describe("UpdateResourcesLocalStorage", () => {
     it("should allow empty collection for a group ID", async () => {
       expect.assertions(1);
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => []);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse([]));
 
       const resourcesCollection = await service.findAndUpdateByIsSharedWithGroup();
 
@@ -351,7 +357,7 @@ describe("UpdateResourcesLocalStorage", () => {
         { ...resourceDto4, name: "Resource 4 name update" },
       ];
 
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resources);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resources));
 
       await service.findAndUpdateByIsSharedWithGroup();
 
@@ -379,8 +385,7 @@ describe("UpdateResourcesLocalStorage", () => {
       await ResourceLocalStorage.set(new ResourcesCollection(resourcesDtos));
 
       const resources = [resourceDto1, resourceDto2];
-
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resources);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resources));
 
       await service.findAndUpdateByIsSharedWithGroup();
 
@@ -407,7 +412,7 @@ describe("UpdateResourcesLocalStorage", () => {
       const parentFolderId = uuidv4();
 
       const resourcesDto = multipleResourceDtos();
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourcesDto);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(resourcesDto));
       jest.spyOn(service.findResourcesServices, "findAllByParentFolderIdForLocalStorage");
 
       await service.findAndUpdateAllByParentFolderId(parentFolderId);
@@ -462,8 +467,10 @@ describe("UpdateResourcesLocalStorage", () => {
 
         return isParentFolderSearchRequest ? apiResourcesDtoInFolder : allIdsApiResourcesDto;
       }
-
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(mockedFindAllApi);
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(async (contains, filters) => {
+        const resourcesDto = await mockedFindAllApi(contains, filters);
+        return mockPassboltResponse(resourcesDto);
+      });
 
       await service.findAndUpdateAllByParentFolderId(parentFolderId);
 

@@ -12,7 +12,7 @@
  * @since         4.10.1
  */
 import GroupUpdateService from "./groupUpdateService";
-import GroupEntity from "../../model/entity/group/groupEntity";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 import GroupUpdateEntity from "../../model/entity/group/update/groupUpdateEntity";
 import GroupUpdateDryRunResultEntity from "../../model/entity/group/update/groupUpdateDryRunResultEntity";
 import EncryptMessageService from "../crypto/encryptMessageService";
@@ -89,7 +89,11 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledTimes(1);
     const expectedDiffGropuUpdateEntityDto = diffGroupUpdateEntity.toDto();
     delete expectedDiffGropuUpdateEntityDto.groups_users;
-    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(diffGroupUpdateEntity.id, expectedDiffGropuUpdateEntityDto);
+    expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(
+      diffGroupUpdateEntity.id,
+      expectedDiffGropuUpdateEntityDto,
+      { my_group_user: true },
+    );
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);
@@ -171,10 +175,12 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(
       diffGroupUpdateEntity.id,
       expectedDiffGropuUpdateEntityDto1,
+      { my_group_user: true },
     );
     expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(
       diffGroupUpdateEntity.id,
       expectedDiffGropuUpdateEntityDto2,
+      { my_group_user: true },
     );
   });
 
@@ -243,10 +249,12 @@ describe("GroupUpdateService", () => {
     expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(
       diffGroupUpdateEntity.id,
       expectedDiffGropuUpdateEntityDto1,
+      { my_group_user: true },
     );
     expect(spyOnGroupApiServiceUpdate).toHaveBeenCalledWith(
       diffGroupUpdateEntity.id,
       expectedDiffGropuUpdateEntityDto2,
+      { my_group_user: true },
     );
   });
 

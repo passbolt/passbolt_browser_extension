@@ -1,6 +1,7 @@
 {
   "testEnvironment": "node",
   "setupFiles": [
+    "<rootDir>/test/jest.env-setup.js",
     "jest-webextension-mock",
     "<rootDir>/test/jest-webextension-force-runtime-id-setup-files.js"
   ],

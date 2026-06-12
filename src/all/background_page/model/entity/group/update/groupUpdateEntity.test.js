@@ -12,7 +12,7 @@
  */
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import GroupUpdateEntity from "./groupUpdateEntity";
-import GroupEntity from "../groupEntity";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 describe("Group update entity", () => {

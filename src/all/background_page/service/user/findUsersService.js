@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.11.0
  */
-import UsersCollection from "../../model/entity/user/usersCollection";
-import UserService from "../api/user/userService";
+import UserApiService from "passbolt-styleguide/src/shared/services/api/user/userApiService";
+import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 
 /**
  * The service aims to find resources from the API.
@@ -25,7 +25,7 @@ export default class FindUsersService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
-    this.userApiService = new UserService(apiClientOptions);
+    this.userApiService = new UserApiService(apiClientOptions);
   }
 
   /**
@@ -42,8 +42,8 @@ export default class FindUsersService {
    * @returns {Promise<UsersCollection>}
    */
   async findAll(contains = {}, filters = {}, ignoreInvalidEntity = false) {
-    const supportedOptions = UserService.getSupportedContainOptions();
-    const supportedFilter = UserService.getSupportedFiltersOptions();
+    const supportedOptions = UserApiService.getSupportedContainOptions();
+    const supportedFilter = UserApiService.getSupportedFiltersOptions();
 
     if (contains && !Object.keys(contains).every((option) => supportedOptions.includes(option))) {
       throw new Error("Unsupported contains parameter used, please check supported contains");
@@ -61,7 +61,7 @@ export default class FindUsersService {
       role: false,
       ...contains,
     };
-    const usersDto = await this.userApiService.findAll(sanitizedContains, filters);
+    const usersDto = (await this.userApiService.findAll(sanitizedContains, filters)).body ?? [];
 
     return new UsersCollection(usersDto, { clone: false, ignoreInvalidEntity: ignoreInvalidEntity });
   }

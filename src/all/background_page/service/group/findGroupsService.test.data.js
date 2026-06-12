@@ -12,7 +12,7 @@
  * @since         5.7.0
  */
 
-import { defaultGroupsDtos } from "../../model/entity/group/groupsCollection.test.data";
+import { defaultGroupsDtos } from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection.test.data";
 
 /**
  * Helper function to generate mock group data for testing.

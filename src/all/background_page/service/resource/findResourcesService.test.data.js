@@ -28,7 +28,7 @@ import { metadata } from "passbolt-styleguide/test/fixture/encryptedMetadata/met
 export const multipleResourceDtos = (data = {}, options = {}) => [
   resourceLegacyDto({ name: "Resource0", ...data }, options),
   defaultResourceDto({ name: "Resource1", ...data }, options),
-  resourceWithTotpDto({ name: "Resource2, ...data" }, options),
+  resourceWithTotpDto({ name: "Resource2", ...data }, options),
   resourceStandaloneTotpDto({ name: "Resource3", ...data }, options),
 ];
 

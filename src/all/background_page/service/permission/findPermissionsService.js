@@ -13,7 +13,7 @@
  */
 import PermissionService from "../api/permission/permissionService";
 import { assertUuid } from "../../utils/assertions";
-import PermissionsCollection from "../../model/entity/permission/permissionsCollection";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 
 class FindPermissionsService {
   /**

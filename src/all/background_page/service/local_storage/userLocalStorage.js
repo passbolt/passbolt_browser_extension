@@ -12,14 +12,27 @@
  * @since         2.13.0
  */
 import Log from "../../model/log";
-import UserEntity from "../../model/entity/user/userEntity";
-import UsersCollection from "../../model/entity/user/usersCollection";
-import Lock from "../../utils/lock";
-const lock = new Lock();
+import UserEntity from "passbolt-styleguide/src/shared/models/entity/user/userEntity";
+import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 
 const USER_LOCAL_STORAGE_KEY = "users";
 
 class UserLocalStorage {
+  /**
+   * Runtime cached data.
+   * @type {Array|null}
+   * @private
+   */
+  static _runtimeCachedData = null;
+
+  /**
+   * Check if there is cached data.
+   * @returns {boolean}
+   */
+  static hasCachedData() {
+    return UserLocalStorage._runtimeCachedData !== null && UserLocalStorage._runtimeCachedData !== undefined;
+  }
+
   /**
    * Flush the users local storage
    *
@@ -27,40 +40,50 @@ class UserLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
+    UserLocalStorage._runtimeCachedData = null;
     Log.write({ level: "debug", message: "UserLocalStorage flushed" });
     return await browser.storage.local.remove(UserLocalStorage.USER_LOCAL_STORAGE_KEY);
   }
 
   /**
-   * Set the users local storage.
+   * Get the users from the local storage.
    *
    * @throws {Error} if operation failed
    * @return {Promise} results object, containing every object in keys that was found in the storage area.
    * If storage is not set, undefined will be returned.
    */
   static async get() {
+    if (UserLocalStorage._runtimeCachedData) {
+      return UserLocalStorage._runtimeCachedData;
+    }
     const { users } = await browser.storage.local.get([UserLocalStorage.USER_LOCAL_STORAGE_KEY]);
-    return users;
+    if (!users) {
+      return undefined;
+    }
+    UserLocalStorage._runtimeCachedData = users;
+    return UserLocalStorage._runtimeCachedData;
   }
 
   /**
    * Set the users local storage.
    *
    * @param {UsersCollection} usersCollection The users to insert in the local storage.
-   * @return {void}
+   * @return {Promise<void>}
    */
   static async set(usersCollection) {
-    await lock.acquire();
-    const users = [];
     if (!(usersCollection instanceof UsersCollection)) {
       throw new TypeError("UserLocalStorage::set expects a UsersCollection");
     }
-    for (const userEntity of usersCollection) {
-      UserLocalStorage.assertEntityBeforeSave(userEntity);
-      users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
-    }
-    await browser.storage.local.set({ users: users });
-    lock.release();
+
+    await navigator.locks.request(USER_LOCAL_STORAGE_KEY, async () => {
+      const users = [];
+      for (const userEntity of usersCollection) {
+        UserLocalStorage.assertEntityBeforeSave(userEntity);
+        users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
+      }
+      await browser.storage.local.set({ users: users });
+      UserLocalStorage._runtimeCachedData = users;
+    });
   }
 
   /**
@@ -77,30 +100,35 @@ class UserLocalStorage {
   /**
    * Add a user in the local storage
    * @param {UserEntity} userEntity
+   * @throws {TypeError} If parameter userEntity is not of type UserEntity.
    */
   static async addUser(userEntity) {
-    await lock.acquire();
-    try {
+    if (!userEntity || !(userEntity instanceof UserEntity)) {
+      throw new TypeError("UserLocalStorage expects an object of type UserEntity");
+    }
+
+    await navigator.locks.request(USER_LOCAL_STORAGE_KEY, async () => {
       UserLocalStorage.assertEntityBeforeSave(userEntity);
       const users = await UserLocalStorage.get();
       users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({ users: users });
-      lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
-    }
+      UserLocalStorage._runtimeCachedData = users;
+    });
   }
 
   /**
    * Update a user in the local storage.
    *
    * @param {UserEntity} userEntity The user to update
+   * @throws {TypeError} If parameter userEntity is not of type UserEntity.
    * @throws {Error} if the user does not exist in the local storage
    */
   static async updateUser(userEntity) {
-    await lock.acquire();
-    try {
+    if (!userEntity || !(userEntity instanceof UserEntity)) {
+      throw new TypeError("UserLocalStorage expects an object of type UserEntity");
+    }
+
+    await navigator.locks.request(USER_LOCAL_STORAGE_KEY, async () => {
       UserLocalStorage.assertEntityBeforeSave(userEntity);
       const users = await UserLocalStorage.get();
       // If the local storage has been already initialized.
@@ -111,12 +139,9 @@ class UserLocalStorage {
         }
         users[userIndex] = Object.assign(users[userIndex], userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
         await browser.storage.local.set({ users: users });
+        UserLocalStorage._runtimeCachedData = users;
       }
-      lock.release();
-    } catch (error) {
-      lock.release();
-      throw error;
-    }
+    });
   }
 
   /**
@@ -124,8 +149,7 @@ class UserLocalStorage {
    * @param {string} userId user uuid
    */
   static async delete(userId) {
-    await lock.acquire();
-    try {
+    await navigator.locks.request(USER_LOCAL_STORAGE_KEY, async () => {
       const users = await UserLocalStorage.get();
       if (users) {
         const userIndex = users.findIndex((item) => item.id === userId);
@@ -133,12 +157,9 @@ class UserLocalStorage {
           users.splice(userIndex, 1);
         }
         await browser.storage.local.set({ users: users });
-        lock.release();
+        UserLocalStorage._runtimeCachedData = users;
       }
-    } catch (error) {
-      lock.release();
-      throw error;
-    }
+    });
   }
 
   /**

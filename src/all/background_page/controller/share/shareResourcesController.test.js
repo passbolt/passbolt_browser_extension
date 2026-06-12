@@ -89,7 +89,7 @@ describe("ShareResourcesController", () => {
         .mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
       // Mock request simulating the share.
       jest
-        .spyOn(controller.shareResourceService.shareService, "simulateShareResource")
+        .spyOn(controller.shareResourceService.shareApiService, "simulateShareResource")
         .mockImplementation(() => simulateShareSecretsChangesDto([pgpKeys.carol.userId], []));
       // Mock find all for share.
       const secretDto = plaintextSecretPasswordAndDescriptionDto();
@@ -111,7 +111,7 @@ describe("ShareResourcesController", () => {
       // Mock the share request.
       let shareRequestData;
       jest
-        .spyOn(controller.shareResourceService.shareService, "shareResource")
+        .spyOn(controller.shareResourceService.shareApiService, "shareResource")
         .mockImplementation((resourceId, data) => {
           shareRequestData = data;
           return {};

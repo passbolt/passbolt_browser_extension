@@ -2,13 +2,13 @@
   "manifest_version": 2,
   "name": "__MSG_appName__",
   "short_name": "passbolt",
-  "version": "5.12.2",
+  "version": "5.13.0",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
   "browser_specific_settings": {
     "gecko": {
       "id": "passbolt@passbolt.com",
-      "strict_min_version": "115.0",
+      "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": ["none"]
       }
@@ -65,5 +65,5 @@
   "web_accessible_resources": [
     "webAccessibleResources/*"
   ],
-  "content_security_policy": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http: ; font-src 'self'; connect-src 'self' https: http: ; form-action 'self' https: ; frame-src 'self' ; frame-ancestors 'self' https: http: ; worker-src 'self' ; base-uri 'none' ;"
+  "content_security_policy": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http: blob:; font-src 'self'; connect-src 'self' https: http: ; form-action 'self' https: ; frame-src 'self' ; frame-ancestors 'self' https: http: ; worker-src 'self' ; base-uri 'none' ;"
 }

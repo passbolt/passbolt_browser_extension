@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.7.0
  */
-import UserService from "../api/user/userService";
+import UserApiService from "passbolt-styleguide/src/shared/services/api/user/userApiService";
 import PassphraseStorageService from "./passphraseStorageService";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
@@ -66,8 +66,8 @@ class KeepSessionAliveService {
     }
     const account = await GetActiveAccountService.get();
     const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-    const userService = new UserService(apiClientOptions);
-    userService.keepSessionAlive();
+    const userApiService = new UserApiService(apiClientOptions);
+    userApiService.keepSessionAlive();
   }
 
   /**

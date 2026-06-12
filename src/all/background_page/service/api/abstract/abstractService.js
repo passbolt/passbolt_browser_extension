@@ -13,6 +13,9 @@
 import { ApiClient } from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
 import Validator from "validator";
 
+/**
+ * @deprecated: to be replaced with AbstractService from the styleguide
+ */
 class AbstractService {
   /**
    *
@@ -70,23 +73,6 @@ class AbstractService {
         } else {
           throw new TypeError(`Service error. Filter option should be an array or a string.`);
         }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Format contain orders
-   *
-   * @param {object} orders example: {"orders": ['Resources.name ASC']}
-   * @param {array} supportedOrders example: ['Resources.name ASC', 'Resources.name DESC']
-   * @returns {object} to be used in API request
-   */
-  formatOrderOptions(orders, supportedOrders) {
-    const result = {};
-    for (const order in orders) {
-      if (supportedOrders.includes(order)) {
-        result[`order[]`] = order;
       }
     }
     return result;

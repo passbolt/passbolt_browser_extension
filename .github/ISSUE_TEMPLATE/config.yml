@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Request a feature or change
+    url: https://community.passbolt.com/c/backlog
+    about: Suggest and vote on features in the community forum.
+  - name: Get installation help
+    url: https://community.passbolt.com/c/installation-issues
+    about: Ask installation and configuration questions in the community forum.
+  - name: Ask a question
+    url: https://community.passbolt.com/c/uncategorized
+    about: Ask usage questions in the community forum.

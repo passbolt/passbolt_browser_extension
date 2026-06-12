@@ -12,7 +12,7 @@
  * @since         5.11.0
  */
 import CreateGroupService from "../../service/group/createGroupService";
-import GroupEntity from "../../model/entity/group/groupEntity";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 
 class GroupCreateController {
   /**

@@ -21,7 +21,7 @@ import {
   updatePermissionDto,
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import { v4 as uuidv4 } from "uuid";
-import PermissionEntity from "../permission/permissionEntity";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 
 describe("Folders collection entity", () => {
   it("schema must validate", () => {

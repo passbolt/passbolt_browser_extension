@@ -13,8 +13,8 @@
  */
 import PermissionChangesCollection from "./permissionChangesCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import PermissionEntity from "../permissionEntity";
-import PermissionsCollection from "../permissionsCollection";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 
 describe("PermissionChangesCollection", () => {
   it("schema must validate", () => {

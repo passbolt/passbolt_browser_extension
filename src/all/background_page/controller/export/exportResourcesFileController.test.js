@@ -50,6 +50,7 @@ import { resourceCollectionV4ToExport } from "../../service/resource/export/expo
 import { defaultDecryptedSharedMetadataKeysDtos } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import GetOrFindMetadataKeysService from "../../service/metadata/getOrFindMetadataKeysService";
+import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
 
 beforeEach(async () => {
   await MockExtension.withConfiguredAccount();
@@ -112,7 +113,9 @@ describe("ExportResourcesFileController", () => {
             folder_parent_id: foldersDto[0].id,
             totp: defaultTotpDto({ secret_key: "THISISASECRET" }),
           });
-          jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
+          jest
+            .spyOn(ResourceService.prototype, "findAll")
+            .mockImplementation(() => mockPassboltResponse(resourceCollectionV4));
           const result = await controller.exec(file);
 
           const blobFile = new Blob([result.file], { type: "text/csv" });
@@ -169,7 +172,9 @@ describe("ExportResourcesFileController", () => {
           });
 
           const exportResourcesFileEntity = new ExportResourcesFileEntity(file);
-          jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => resourceCollectionV4);
+          jest
+            .spyOn(ResourceService.prototype, "findAll")
+            .mockImplementation(() => mockPassboltResponse(resourceCollectionV4));
           await getKDBXContent(exportResourcesFileEntity, new ResourcesCollection(resourceCollectionV4));
 
           const result = await controller.exec(file);

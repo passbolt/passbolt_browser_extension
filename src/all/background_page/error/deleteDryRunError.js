@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import GroupsCollection from "../model/entity/group/groupsCollection";
+import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
 import ResourcesCollection from "../model/entity/resource/resourcesCollection";
 import FoldersCollection from "../model/entity/folder/foldersCollection";
 import "./error.js";

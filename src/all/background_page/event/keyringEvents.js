@@ -11,6 +11,7 @@ import GetKeyInfoController from "../controller/crypto/getKeyInfoController";
 import DownloadUserPublicKeyController from "../controller/crypto/downloadUserPublicKeyController";
 import DownloadUserPrivateKeyController from "../controller/crypto/downloadUserPrivateKeyController";
 import GetUserPrivateKeyController from "../controller/crypto/getUserPrivateKeyController";
+import SynchroniseKeyringController from "../controller/keyring/synchroniseKeyringController";
 
 const listen = function (worker, _, account) {
   /*
@@ -59,6 +60,17 @@ const listen = function (worker, _, account) {
   worker.port.on("passbolt.keyring.private.checkpassphrase", async (requestId, passphrase) => {
     const controller = new CheckPassphraseController(worker, requestId);
     await controller._exec(passphrase);
+  });
+
+  /*
+   * Synchronise the keyring with the API.
+   *
+   * @listens passbolt.keyring.sync
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on("passbolt.keyring.sync", async (requestId) => {
+    const controller = new SynchroniseKeyringController(worker, requestId);
+    await controller._exec();
   });
 
   /*

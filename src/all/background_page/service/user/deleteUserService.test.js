@@ -42,11 +42,11 @@ describe("DeleteUserService", () => {
       expect.assertions(1);
 
       const usersId = uuidv4();
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {});
+      jest.spyOn(deleteUserService.userApiService, "delete").mockImplementationOnce(() => {});
 
       await deleteUserService.deleteDryRun(usersId);
 
-      expect(deleteUserService.userServiceApi.delete).toHaveBeenCalledWith(usersId, {}, true);
+      expect(deleteUserService.userApiService.delete).toHaveBeenCalledWith(usersId, {}, true);
     });
 
     it("Need to transfer ownership.", async () => {
@@ -64,7 +64,7 @@ describe("DeleteUserService", () => {
           },
         },
       };
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {
+      jest.spyOn(deleteUserService.userApiService, "delete").mockImplementationOnce(() => {
         throw new PassboltApiFetchError("Error", error);
       });
 
@@ -82,7 +82,7 @@ describe("DeleteUserService", () => {
       const error = {
         code: 404,
       };
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {
+      jest.spyOn(deleteUserService.userApiService, "delete").mockImplementationOnce(() => {
         throw new PassboltApiFetchError("Error", error);
       });
 
@@ -107,12 +107,12 @@ describe("DeleteUserService", () => {
       expect.assertions(2);
 
       const usersId = uuidv4();
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {});
+      jest.spyOn(deleteUserService.userApiService, "delete").mockImplementationOnce(() => {});
       jest.spyOn(UserLocalStorage, "delete").mockImplementationOnce(() => {});
 
       await deleteUserService.delete(usersId, null);
 
-      expect(deleteUserService.userServiceApi.delete).toHaveBeenCalledWith(usersId, {});
+      expect(deleteUserService.userApiService.delete).toHaveBeenCalledWith(usersId, {});
       expect(UserLocalStorage.delete).toHaveBeenCalledWith(usersId);
     });
 
@@ -122,12 +122,12 @@ describe("DeleteUserService", () => {
       const usersId = uuidv4();
       const dto = defaultUserDeleteTransferDto();
       const userDeleteTransfer = new UserDeleteTransferEntity(dto);
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {});
+      jest.spyOn(deleteUserService.userApiService, "delete").mockImplementationOnce(() => {});
       jest.spyOn(UserLocalStorage, "delete").mockImplementationOnce(() => {});
 
       await deleteUserService.delete(usersId, userDeleteTransfer);
 
-      expect(deleteUserService.userServiceApi.delete).toHaveBeenCalledWith(usersId, dto);
+      expect(deleteUserService.userApiService.delete).toHaveBeenCalledWith(usersId, dto);
       expect(UserLocalStorage.delete).toHaveBeenCalledWith(usersId);
     });
 
@@ -146,7 +146,7 @@ describe("DeleteUserService", () => {
           },
         },
       };
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {
+      jest.spyOn(deleteUserService.userApiService, "delete").mockImplementationOnce(() => {
         throw new PassboltApiFetchError("Error", error);
       });
 
@@ -164,7 +164,7 @@ describe("DeleteUserService", () => {
       const error = {
         code: 404,
       };
-      jest.spyOn(deleteUserService.userServiceApi, "delete").mockImplementationOnce(() => {
+      jest.spyOn(deleteUserService.userApiService, "delete").mockImplementationOnce(() => {
         throw new PassboltApiFetchError("Error", error);
       });
 

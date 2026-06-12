@@ -18,7 +18,7 @@ import EncryptMetadataService from "../metadata/encryptMetadataService";
 import { V4_TO_V5_RESOURCE_TYPE_MAPPING } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import i18n from "../../sdk/i18n";
-import PermissionEntity from "../../model/entity/permission/permissionEntity";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 
 const MAX_PROCESS_REPLAY = 3;
 

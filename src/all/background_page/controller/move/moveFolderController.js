@@ -16,7 +16,6 @@ import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import MoveOneFolderService, { PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE } from "../../service/move/moveOneFolderService";
 import ConfirmMoveStrategyService from "../../service/move/confirmMoveStrategyService";
-import FolderModel from "../../model/folder/folderModel";
 import { assertUuid } from "../../utils/assertions";
 import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
 
@@ -36,7 +35,6 @@ class MoveFolderController {
     this.getPassphraseService = new GetPassphraseService(account);
     this.moveOneFolderService = new MoveOneFolderService(apiClientOptions, account, this.progressService);
     this.confirmMoveStrategyService = new ConfirmMoveStrategyService(worker);
-    this.folderModel = new FolderModel(apiClientOptions, account);
     this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 

@@ -13,7 +13,7 @@
  */
 import GroupLocalStorage from "../../service/local_storage/groupLocalStorage";
 import DeleteDryRunError from "../../error/deleteDryRunError";
-import GroupEntity from "../entity/group/groupEntity";
+import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
 import GroupApiService from "../../service/api/group/groupApiService";
 import GroupUpdateDryRunResultEntity from "../entity/group/update/groupUpdateDryRunResultEntity";
 import GroupDeleteTransferEntity from "../entity/group/transfer/groupDeleteTransferEntity";

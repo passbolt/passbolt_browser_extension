@@ -71,7 +71,7 @@
     "prettier": "3.6.2",
     "terser-webpack-plugin": "^5.4.0",
     "text-encoding-utf-8": "^1.0.2",
-    "web-ext": "^10.3.0",
+    "web-ext": "^10.4.0",
     "webpack": "^5.107.2",
     "webpack-cli": "^7.0.2"
   },

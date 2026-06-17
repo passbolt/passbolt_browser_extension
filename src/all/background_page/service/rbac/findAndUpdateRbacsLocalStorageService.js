@@ -46,7 +46,7 @@ export default class FindAndUpdateRbacLocalStorageService {
         return await navigator.locks.request(
           lockKey,
           { mode: "shared" },
-          async () => new RbacsCollection(await this.rbacLocalStorage.get()),
+          async () => new RbacsCollection(await this.rbacLocalStorage.getData()),
         );
       }
 

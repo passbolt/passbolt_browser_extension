@@ -33,6 +33,7 @@ import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSetti
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
+import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage";
 
 /**
  * Flush storage data when:
@@ -73,6 +74,7 @@ class LocalStorageService {
     new MetadataKeysSessionStorage(account).flush();
     new SessionKeysBundlesSessionStorageService(account).flush();
     new GroupLocalStorage(account).flush();
+    new SiteSettingsLocalStorage(account).flush();
     UserMeSessionStorageService.remove(account);
   }
 }

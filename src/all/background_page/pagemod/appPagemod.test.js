@@ -16,7 +16,7 @@ import App from "./appPagemod";
 import { UserEvents } from "../event/userEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { AuthEvents } from "../event/authEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { LocaleEvents } from "../event/localeEvents";
 import { AppEvents } from "../event/appEvents";
 import { FolderEvents } from "../event/folderEvents";
@@ -55,7 +55,7 @@ jest.spyOn(ResourceTypeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RoleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(SiteSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ShareEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(GroupEvents, "listen").mockImplementation(jest.fn());
@@ -116,7 +116,7 @@ describe("App", () => {
       expect(RoleEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(SecretEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(SiteSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ShareEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(GroupEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
@@ -147,7 +147,7 @@ describe("App", () => {
         RoleEvents,
         KeyringEvents,
         SecretEvents,
-        OrganizationSettingsEvents,
+        SiteSettingsEvents,
         ShareEvents,
         UserEvents,
         GroupEvents,

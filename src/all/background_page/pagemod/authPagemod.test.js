@@ -16,7 +16,7 @@ import Auth from "./authPagemod";
 import { UserEvents } from "../event/userEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { AuthEvents } from "../event/authEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { LocaleEvents } from "../event/localeEvents";
 import { v4 as uuid } from "uuid";
 import { enableFetchMocks } from "jest-fetch-mock";
@@ -28,7 +28,7 @@ jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(SiteSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 
@@ -65,7 +65,7 @@ describe("Auth", () => {
       expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(SiteSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(LocaleEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(Auth.events).toStrictEqual([
@@ -73,7 +73,7 @@ describe("Auth", () => {
         UserEvents,
         KeyringEvents,
         AuthEvents,
-        OrganizationSettingsEvents,
+        SiteSettingsEvents,
         LocaleEvents,
         RememberMeEvents,
       ]);

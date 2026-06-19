@@ -12,7 +12,7 @@
  * @since         3.2.0
  */
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
-import SiteSettingsEntity from "../entity/siteSettings/siteSettingsEntity";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
 // Settings local cache.

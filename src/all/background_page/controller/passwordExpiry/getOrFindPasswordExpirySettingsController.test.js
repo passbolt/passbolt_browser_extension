@@ -23,7 +23,7 @@ import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/
 import {
   defaultCeSiteSettings,
   defaultProSiteSettings,
-} from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
 

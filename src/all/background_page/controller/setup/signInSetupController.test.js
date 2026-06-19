@@ -21,7 +21,7 @@ import SignInSetupController from "./signInSetupController";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";

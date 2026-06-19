@@ -17,9 +17,9 @@ import IsEmailValidator from "passbolt-styleguide/src/shared/lib/Validator/IsEma
 import {
   customEmailValidationProSiteSettings,
   defaultProSiteSettings,
-} from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
-import SiteSettingsEntity from "../../model/entity/siteSettings/siteSettingsEntity";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import IsRegexValidator from "passbolt-styleguide/src/shared/lib/Validator/IsRegexValidator";
 
 describe("AppEmailValidatorService", () => {

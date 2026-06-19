@@ -17,7 +17,7 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import GetAndInitializeAccountLocaleController from "./getAndInitializeAccountLocaleController";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 
 beforeEach(() => {

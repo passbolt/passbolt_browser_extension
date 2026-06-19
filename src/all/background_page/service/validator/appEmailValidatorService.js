@@ -12,7 +12,7 @@
  * @since         3.12.0
  */
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
-import SiteSettingsEntity from "../../model/entity/siteSettings/siteSettingsEntity";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import IsRegexValidator from "passbolt-styleguide/src/shared/lib/Validator/IsRegexValidator";
 import IsEmailValidator from "passbolt-styleguide/src/shared/lib/Validator/IsEmailValidator";
 

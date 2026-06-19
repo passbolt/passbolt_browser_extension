@@ -14,8 +14,8 @@
 import BextUserEntity from "./userEntity";
 import AppEmailValidatorService from "../../../service/validator/appEmailValidatorService";
 import OrganizationSettingsModel from "../../organizationSettings/organizationSettingsModel";
-import SiteSettingsEntity from "../siteSettings/siteSettingsEntity";
-import { customEmailValidationProSiteSettings } from "../siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import { customEmailValidationProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";

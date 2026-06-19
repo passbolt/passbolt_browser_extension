@@ -24,7 +24,7 @@ import FileService from "../../service/file/fileService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import { anonymousSiteSettings } from "../../model/entity/siteSettings/siteSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
 import { enableFetchMocks } from "jest-fetch-mock";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";

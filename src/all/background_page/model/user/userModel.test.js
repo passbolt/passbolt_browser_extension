@@ -27,7 +27,7 @@ import UserEntity from "../entity/user/userEntity";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import { adminAccountDto } from "../entity/account/accountEntity.test.data";
 import AccountEntity from "../entity/account/accountEntity";
-import { defaultCeSiteSettings } from "../entity/siteSettings/siteSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
 beforeAll(() => {
@@ -148,7 +148,7 @@ describe("UserModel", () => {
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
       const siteSettingsDto = defaultCeSiteSettings();
-      siteSettingsDto.passbolt.plugins.metadata = false;
+      siteSettingsDto.passbolt.plugins.metadata = { enabled: false };
 
       jest
         .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
@@ -310,7 +310,7 @@ describe("UserModel", () => {
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
       const siteSettingsDto = defaultCeSiteSettings();
-      siteSettingsDto.passbolt.plugins.metadata = false;
+      siteSettingsDto.passbolt.plugins.metadata = { enabled: false };
 
       jest
         .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
@@ -353,7 +353,7 @@ describe("UserModel", () => {
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
       const siteSettingsDto = defaultCeSiteSettings();
-      siteSettingsDto.passbolt.plugins.metadata = true;
+      siteSettingsDto.passbolt.plugins.metadata = { enabled: true };
 
       jest
         .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")

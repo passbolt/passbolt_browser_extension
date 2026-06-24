@@ -12,7 +12,7 @@
  * @since         6.0.0
  */
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
-import AccountEntity from "../../model/entity/account/accountEntity";
+import AbstractAccountEntity from "../../model/entity/account/abstractAccountEntity";
 
 export const SITE_SETTINGS = "site-settings";
 
@@ -33,8 +33,8 @@ class SiteSettingsLocalStorage {
    * @param {AccountEntity} account The user account.
    */
   constructor(account) {
-    if (!account || !(account instanceof AccountEntity)) {
-      throw new TypeError("Parameter `account` should be of type AccountEntity.");
+    if (!account || !(account instanceof AbstractAccountEntity)) {
+      throw new TypeError("Parameter `account` should be of type AbstractAccountEntity.");
     }
     this.account = account;
     this.storageKey = this.getStorageKey(account);

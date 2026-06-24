@@ -12,9 +12,9 @@
  * @since         6.0.0
  */
 import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
-import AccountEntity from "../../model/entity/account/accountEntity";
 import Log from "../../model/log";
 import { assertType } from "../../utils/assertions";
+import AbstractAccountEntity from "../../model/entity/account/abstractAccountEntity";
 
 export const ACTIVE_SESSION_LOCAL_STORAGE_KEY = "active_session";
 
@@ -31,8 +31,8 @@ class ActiveSessionLocalStorage {
    * @param account the user account
    */
   constructor(account) {
-    if (!account || !(account instanceof AccountEntity)) {
-      throw new TypeError("Parameter `account` should be of type AccountEntity.");
+    if (!account || !(account instanceof AbstractAccountEntity)) {
+      throw new TypeError("Parameter `account` should be of type AbstractAccountEntity.");
     }
     this.account = account;
     this.storageKey = this.getStorageKey(account);

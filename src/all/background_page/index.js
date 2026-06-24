@@ -8,13 +8,8 @@ import PortManager from "./sdk/port/portManager";
 import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "./controller/extension/onExtensionInstalledController";
 import TabService from "./service/tab/tabService";
-import User from "./model/user";
-import Log from "./model/log";
 import OnExtensionUpdateAvailableService from "./service/extension/onExtensionUpdateAvailableService";
-import CheckAuthStatusService from "./service/auth/checkAuthStatusService";
 import GlobalAlarmService from "./service/alarm/globalAlarmService";
-import PostLoginService from "./service/auth/postLoginService";
-import PostLogoutService from "./service/auth/postLogoutService";
 import OnStartUpService from "./service/extension/onStartUpService";
 import ToolbarService from "./service/toolbar/toolbarService";
 
@@ -23,38 +18,6 @@ const main = async () => {
    * Load all system requirement
    */
   await SystemRequirementService.get();
-
-  // When the extension is updated and the user is still connected, an event needs to be sent
-  checkAndProcessIfUserAuthenticated();
-};
-
-/**
- * Check and process event if the user is authenticated
- * @return {Promise<void>}
- */
-const checkAndProcessIfUserAuthenticated = async () => {
-  const user = User.getInstance();
-  // Check if user is valid
-  if (!user.isValid()) {
-    return;
-  }
-
-  let authStatus;
-  try {
-    const checkAuthStatusService = new CheckAuthStatusService();
-    authStatus = await checkAuthStatusService.checkAuthStatus(true);
-  } catch (error) {
-    console.error(error);
-    // Service is unavailable, do nothing...
-    Log.write({ level: "debug", message: "The Service is unavailable to check if the user is authenticated" });
-    return;
-  }
-
-  if (authStatus.isAuthenticated) {
-    PostLoginService.exec();
-  } else {
-    PostLogoutService.exec();
-  }
 };
 
 main();

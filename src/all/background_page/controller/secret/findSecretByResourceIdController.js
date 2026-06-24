@@ -13,13 +13,13 @@
  */
 import i18n from "../../sdk/i18n";
 import { assertUuid } from "../../utils/assertions";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import ProgressService from "../../service/progress/progressService";
 import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
 import FindSecretService from "../../service/secret/findSecretService";
+import GetSecretSchemaResourceTypeService from "../../service/resourceType/getSecretSchemaResourceTypeService";
 
 class FindSecretByResourceIdController {
   /**
@@ -35,7 +35,7 @@ class FindSecretByResourceIdController {
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.findSecretService = new FindSecretService(account, apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getSecretSchemaResourceTypeService = new GetSecretSchemaResourceTypeService(account, apiClientOptions);
     this.progressService = new ProgressService(this.worker, i18n.t("Decrypting ..."));
     this.getPassphraseService = new GetPassphraseService(account);
   }
@@ -67,7 +67,7 @@ class FindSecretByResourceIdController {
     const secret = await this.findSecretService.findByResourceId(resourceId);
     const decryptedPrivateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
     const resource = await resourcePromise;
-    const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);
+    const secretSchema = await this.getSecretSchemaResourceTypeService.getByResourceTypeId(resource.resourceTypeId);
 
     return DecryptAndParseResourceSecretService.decryptAndParse(secret, secretSchema, decryptedPrivateKey);
   }

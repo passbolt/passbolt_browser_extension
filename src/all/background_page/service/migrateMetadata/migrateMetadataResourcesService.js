@@ -12,13 +12,13 @@
  * @since         4.12.0
  */
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import MigrateMetadataResourcesApiService from "../api/migrateMetadata/migrateMetadataResourcesApiService";
 import EncryptMetadataService from "../metadata/encryptMetadataService";
 import { V4_TO_V5_RESOURCE_TYPE_MAPPING } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import i18n from "../../sdk/i18n";
 import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
+import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceTypesService";
 
 const MAX_PROCESS_REPLAY = 3;
 
@@ -34,7 +34,7 @@ export default class MigrateMetadataResourcesService {
   constructor(apiClientOptions, account, progressService) {
     this.account = account;
     this.migrateMetadataResourcesApiService = new MigrateMetadataResourcesApiService(apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
     this.progressService = progressService;
   }
@@ -97,7 +97,7 @@ export default class MigrateMetadataResourcesService {
     }
 
     this.progressService.finishStep(i18n.t("Retrieving resource types"));
-    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypes = await this.getOrFindResourceTypesService.getOrFindAll();
     const resourceTypesMapping = this._computeResourceTypesMapping(resourceTypes);
 
     let migrationDetailsPage = await this.migrateMetadataResourcesApiService.findAll(contains, filters);
@@ -132,7 +132,7 @@ export default class MigrateMetadataResourcesService {
 
   /**
    * Computes resource types v4 id mapping to resource types v5 id mapping.
-   * @param {ResourcesTypesCollection} resourceTypes
+   * @param {ResourceTypesCollection} resourceTypes
    * @returns {Object} a map of resource types v4 uuid to resource type v5 uuid
    * @private
    */

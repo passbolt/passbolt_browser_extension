@@ -85,7 +85,7 @@ describe("ShareResourcesController", () => {
         .mockImplementation(() => new ResourcesCollection([resourceDto]));
       // Mock request retrieving the resource types.
       jest
-        .spyOn(controller.shareResourceService.resourceTypeModel, "getOrFindAll")
+        .spyOn(controller.shareResourceService.getOrFindResourceTypesService, "getOrFindAll")
         .mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
       // Mock request simulating the share.
       jest

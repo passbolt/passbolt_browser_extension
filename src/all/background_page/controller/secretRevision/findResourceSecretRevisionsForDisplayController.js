@@ -22,11 +22,12 @@ export default class FindResourceSecretRevisionsForDisplayController {
    * @param {Worker} worker
    * @param {string} requestId
    * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account
    */
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndDecryptSecretRevisionsService = new FindAndDecryptSecretRevisionsService(apiClientOptions);
+    this.findAndDecryptSecretRevisionsService = new FindAndDecryptSecretRevisionsService(account, apiClientOptions);
     this.getPassphraseService = new GetPassphraseService(account);
   }
 

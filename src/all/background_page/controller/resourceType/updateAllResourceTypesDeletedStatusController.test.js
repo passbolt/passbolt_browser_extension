@@ -16,13 +16,20 @@ import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/model
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import UpdateAllResourceTypesDeletedStatusController from "./updateAllResourceTypesDeletedStatusController";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 describe("UpdateAllResourceTypesDeletedStatusController", () => {
   describe("::exec", () => {
     it("Should throw an error if the given parameter is not a valid resourceTypesCollection dto.", async () => {
       expect.assertions(1);
-
-      const controller = new UpdateAllResourceTypesDeletedStatusController(null, null, defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new UpdateAllResourceTypesDeletedStatusController(
+        null,
+        null,
+        defaultApiClientOptions(),
+        account,
+      );
 
       expect(() => controller.exec("42")).rejects.toThrow(EntityValidationError);
     });
@@ -30,8 +37,14 @@ describe("UpdateAllResourceTypesDeletedStatusController", () => {
     it("Should call for updating the resource types given a collection.", async () => {
       expect.assertions(2);
 
+      const account = new AccountEntity(defaultAccountDto());
       const resourceTypesDto = resourceTypesCollectionDto();
-      const controller = new UpdateAllResourceTypesDeletedStatusController(null, null, defaultApiClientOptions());
+      const controller = new UpdateAllResourceTypesDeletedStatusController(
+        null,
+        null,
+        defaultApiClientOptions(),
+        account,
+      );
 
       jest.spyOn(controller.updateResourceTypesService, "updateAllDeletedStatus").mockImplementationOnce(() => {});
 

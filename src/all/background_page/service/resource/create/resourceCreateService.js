@@ -22,10 +22,10 @@ import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import i18n from "../../../sdk/i18n";
 import ResourceModel from "../../../model/resource/resourceModel";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
-import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
 import PermissionChangesCollection from "../../../model/entity/permission/change/permissionChangesCollection";
 import ShareResourceService, { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../../share/shareResourceService";
+import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 
 class ResourceCreateService {
   /**
@@ -36,7 +36,7 @@ class ResourceCreateService {
   constructor(account, apiClientOptions, progressService) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.findFoldersService = new FindFoldersService(apiClientOptions);
     this.progressService = progressService;
     this.resourceModel = new ResourceModel(apiClientOptions, this.account);
@@ -54,7 +54,7 @@ class ResourceCreateService {
    */
   async create(resourceDto, secretDto, passphrase) {
     const resource = new ResourceEntity(resourceDto);
-    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypes = await this.getOrFindResourceTypesService.getOrFindAll();
     const resourceType = resourceTypes.getFirstById(resource.resourceTypeId);
     // Keep a copy of the metadata. It will be used after creation on the API, to persist it decrypted into the local storage.
     const resourceMetadata = resource.metadata;

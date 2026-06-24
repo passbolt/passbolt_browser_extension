@@ -17,7 +17,6 @@ import UserEntity from "../entity/user/userEntity";
 import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 import Validator from "validator";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
 import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
 
 /**
@@ -79,24 +78,17 @@ class UserModel {
   }
 
   /**
-   * Get or find the signed-in user information.
-   * @param {boolean} refreshCache (Optional) Should request the API and refresh the cache. Default false.
-   * @returns {Promise<UserEntity>}
+   * Get a collection of all users from the local storage.
+   * If the local storage is unset, initialize it.
+   *
+   * @return {UsersCollection}
    */
-  async getOrFindMe(refreshCache = false) {
-    let user = await UserMeSessionStorageService.get(this.account);
-    if (!user || refreshCache) {
-      const contains = { profile: true, role: true, account_recovery_user_setting: true };
-      const organizationSettings = await this.organisationSettingsModel.getOrFind();
-      if (organizationSettings.isPluginEnabled("metadata")) {
-        contains.missing_metadata_key_ids = true;
-      }
-      user = await this.findOne(this.account.userId, contains, true);
-
-      await UserMeSessionStorageService.set(this.account, user);
+  async getOrFindAll() {
+    const usersDto = await UserLocalStorage.get();
+    if (typeof usersDto !== "undefined") {
+      return new UsersCollection(usersDto);
     }
-
-    return user;
+    return this.updateLocalStorage();
   }
 
   /*

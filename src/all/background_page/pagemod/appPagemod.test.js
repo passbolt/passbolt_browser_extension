@@ -45,6 +45,7 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
 import { AppSignOutEvents } from "../event/appSignOutEvents";
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -73,6 +74,7 @@ jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PermissionEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppSignOutEvents, "listen").mockImplementation(jest.fn());
+jest.mock("../service/auth/checkAuthStatusService");
 
 describe("App", () => {
   beforeEach(() => {
@@ -98,7 +100,7 @@ describe("App", () => {
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
       jest
         .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
-        .mockImplementation(async () => userLoggedInAuthStatus());
+        .mockImplementation(async () => new OnlineSessionEntity(userLoggedInAuthStatus()));
       const mockedAccount = { user_id: uuid(), domain: "https://test-domain.passbolt.com" };
       const mockApiClient = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
@@ -185,7 +187,7 @@ describe("App", () => {
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
       jest
         .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
-        .mockImplementation(async () => userLoggedOutAuthStatus());
+        .mockImplementation(async () => new OnlineSessionEntity(userLoggedOutAuthStatus()));
       // process
       await App.attachEvents(port);
       // expectations

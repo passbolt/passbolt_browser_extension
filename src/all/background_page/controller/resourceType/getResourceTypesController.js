@@ -12,7 +12,7 @@
  * @since         4.9.4
  */
 
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import GetOrFindResourceTypesService from "../../service/resourceType/getOrFindResourceTypesService";
 
 class GetResourceTypesController {
   /**
@@ -21,11 +21,12 @@ class GetResourceTypesController {
    * @param {Worker} worker
    * @param {string} requestId
    * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
   }
 
   /**
@@ -47,7 +48,7 @@ class GetResourceTypesController {
    * @returns {Promise<ResourceTypesCollection>}
    */
   async exec() {
-    return this.resourceTypeModel.getOrFindAll();
+    return this.getOrFindResourceTypesService.getOrFindAll();
   }
 }
 

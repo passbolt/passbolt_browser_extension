@@ -38,7 +38,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.auth.is-mfa-required", async (requestId) => {
-    const controller = new AuthIsMfaRequiredController(worker, requestId);
+    const controller = new AuthIsMfaRequiredController(worker, requestId, apiClientOptions, account);
     controller._exec();
   });
 
@@ -49,7 +49,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.auth.check-status", async (requestId) => {
-    const controller = new AuthCheckStatusController(worker, requestId);
+    const controller = new AuthCheckStatusController(worker, requestId, apiClientOptions, account);
     controller._exec();
   });
 

@@ -12,14 +12,12 @@
  * @since         3.4.0
  */
 
-import ResourceModel from "../../model/resource/resourceModel";
 import { QuickAccessService } from "../../service/ui/quickAccess.service";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import BrowserTabService from "../../service/ui/browserTab.service";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
 import WorkerService from "../../service/worker/workerService";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 
@@ -35,8 +33,6 @@ class InformMenuController {
    */
   constructor(worker, apiClientOptions, account) {
     this.worker = worker;
-    this.resourceModel = new ResourceModel(apiClientOptions, account);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.getPassphraseService = new GetPassphraseService(account);
     this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
   }

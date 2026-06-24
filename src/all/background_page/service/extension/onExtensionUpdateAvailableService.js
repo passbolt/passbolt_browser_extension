@@ -19,6 +19,8 @@ import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequire
 import WebIntegrationPagemod from "../../pagemod/webIntegrationPagemod";
 import WorkerService from "../worker/workerService";
 import PublicWebsiteSignInPagemod from "../../pagemod/publicWebsiteSignInPagemod";
+import getActiveAccountService from "../account/getActiveAccountService";
+import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 
 const PASSBOLT_EXTENSION_UPDATE = "passboltExtensionUpdate";
 
@@ -59,14 +61,17 @@ class OnExtensionUpdateAvailableService {
 
 /**
  * Check and process event if the user is authenticated
- * @returns {Promise<bool>}
+ * @returns {Promise<boolean>}
  */
 const isUserAuthenticated = async () => {
   const user = User.getInstance();
   // Check if user is valid
   if (user.isValid()) {
     try {
-      return await AuthenticationStatusService.isAuthenticated();
+      const account = await getActiveAccountService.get();
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+      const authenticationService = new AuthenticationStatusService(apiClientOptions);
+      return authenticationService.isAuthenticated();
     } catch (error) {
       if (error instanceof MfaAuthenticationRequiredError) {
         /*

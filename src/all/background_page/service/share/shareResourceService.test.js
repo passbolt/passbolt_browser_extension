@@ -54,12 +54,12 @@ import PermissionChangesCollection from "../../model/entity/permission/change/pe
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
 import ProgressService from "../progress/progressService";
 import { METADATA_KEY_TYPE_METADATA_KEY, METADATA_KEY_TYPE_USER_KEY } from "../../model/entity/resource/resourceEntity";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import { defaultMetadataPrivateKeyDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataPrivateKeyEntity.test.data";
 import { defaultMetadataKeyDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeyEntity.test.data";
 import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceTypesService";
 
 beforeEach(() => {
   MetadataKeysSessionStorage._runtimeCachedData = {};
@@ -165,7 +165,7 @@ describe("ShareResourceService", () => {
 
         // Mock request retrieving the resource types.
         jest
-          .spyOn(service.resourceTypeModel, "getOrFindAll")
+          .spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll")
           .mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
 
         // Mock the share request.
@@ -302,7 +302,7 @@ describe("ShareResourceService", () => {
 
         // Mock request retrieving the resource types.
         jest
-          .spyOn(service.resourceTypeModel, "getOrFindAll")
+          .spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll")
           .mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
 
         // Mock the share request.
@@ -410,7 +410,7 @@ describe("ShareResourceService", () => {
 
         // Mock service retrieving the resource types.
         jest
-          .spyOn(ResourceTypeModel.prototype, "getOrFindAll")
+          .spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll")
           .mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
 
         // Mock service retrieving metadata keys settings.
@@ -670,7 +670,7 @@ describe("ShareResourceService", () => {
 
       // Mock service retrieving the resource types.
       jest
-        .spyOn(ResourceTypeModel.prototype, "getOrFindAll")
+        .spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll")
         .mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
 
       // Mock service retrieving metadata keys settings.
@@ -750,7 +750,7 @@ describe("ShareResourceService", () => {
 
       // Mock request retrieving the resource types.
       jest
-        .spyOn(service.resourceTypeModel, "getOrFindAll")
+        .spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll")
         .mockImplementation(() => new ResourceTypesCollection(resourceTypesCollectionDto()));
 
       // Mock the share request.

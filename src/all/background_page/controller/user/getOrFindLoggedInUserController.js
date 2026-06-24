@@ -12,7 +12,7 @@
  * @since         4.1.0
  */
 
-import UserModel from "../../model/user/userModel";
+import GetOrFindMeService from "../../service/user/getOrFindMeService";
 
 class GetOrFindLoggedInUserController {
   /**
@@ -26,7 +26,7 @@ class GetOrFindLoggedInUserController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.userModel = new UserModel(apiClientOptions, account);
+    this.getOrFindMeService = new GetOrFindMeService(account, apiClientOptions);
   }
 
   /**
@@ -49,7 +49,7 @@ class GetOrFindLoggedInUserController {
    * @return {Promise<UserEntity>}
    */
   async exec(refreshCache = false) {
-    return this.userModel.getOrFindMe(refreshCache);
+    return this.getOrFindMeService.getOrFindMe(refreshCache);
   }
 }
 

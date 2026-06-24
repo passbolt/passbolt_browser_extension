@@ -14,8 +14,8 @@
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import FindAndUpdateResourcesLocalStorage from "./findAndUpdateResourcesLocalStorageService";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import { assertArrayUUID } from "../../utils/assertions";
+import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceTypesService";
 
 /**
  * The service aims to get resources from the local storage if it is set, or retrieve them from the API and
@@ -29,7 +29,7 @@ export default class GetOrFindResourcesService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
   }
 
@@ -65,7 +65,7 @@ export default class GetOrFindResourcesService {
     }
 
     const resourcesCollection = await this.getOrFindAll();
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.getOrFindResourceTypesService.getOrFindAll();
 
     // Filter resource types according to what we need
     if (fieldType === "otp") {

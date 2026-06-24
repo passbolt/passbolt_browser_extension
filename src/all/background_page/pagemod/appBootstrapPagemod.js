@@ -16,6 +16,7 @@ import ParseAppUrlService from "../service/app/parseAppUrlService";
 import { PortEvents } from "../event/portEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
 class AppBootstrap extends Pagemod {
   /**
@@ -94,7 +95,9 @@ class AppBootstrap extends Pagemod {
    * @returns {Promise<boolean>}
    */
   async assertUserAuthenticated() {
-    const checkAuthStatusService = new CheckAuthStatusService();
+    const account = await GetActiveAccountService.get();
+    const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+    const checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
     const authStatus = await checkAuthStatusService.checkAuthStatus(true);
     return authStatus.isAuthenticated;
   }

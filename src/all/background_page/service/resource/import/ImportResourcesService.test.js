@@ -77,6 +77,8 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsService from "../../api/organizationSettings/organizationSettingsService";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
+import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
+import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -402,7 +404,9 @@ describe("ImportResourcesService", () => {
       it("Should throw an error if the resource type cannot be found", async () => {
         expect.assertions(5);
 
-        jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => []);
+        jest
+          .spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll")
+          .mockImplementationOnce(() => new ResourceTypesCollection([]));
 
         importResourceFileCSV = new ImportResourcesFileEntity(
           defaultImportResourceFileCSVDto({

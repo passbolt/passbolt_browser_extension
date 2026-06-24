@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         6.0.0
  */
-import AccountEntity from "../../model/entity/account/accountEntity";
 import Log from "../../model/log";
 import { assertType } from "../../utils/assertions";
 import LocalStorageMetadataEntity from "../../model/entity/localStorage/localStorageMetadataEntity";
+import AbstractAccountEntity from "../../model/entity/account/abstractAccountEntity";
 
 class AbstractLocalStorage {
   /**
@@ -36,8 +36,8 @@ class AbstractLocalStorage {
    * @param account the user account
    */
   constructor(account) {
-    if (!account || !(account instanceof AccountEntity)) {
-      throw new TypeError("Parameter `account` should be of type AccountEntity.");
+    if (!account || !(account instanceof AbstractAccountEntity)) {
+      throw new TypeError("Parameter `account` should be of type AbstractAccountEntity.");
     }
     this.account = account;
     this.storageMetadataKey = this.getMetadataStorageKey(account);

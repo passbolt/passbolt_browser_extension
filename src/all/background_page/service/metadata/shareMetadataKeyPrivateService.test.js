@@ -85,7 +85,7 @@ describe("ShareMetadataKeyPrivateService", () => {
       expect.assertions(1);
 
       const users = new UsersCollection(usersWithoutMissingMetadataKeysDto());
-      jest.spyOn(service.userModel, "getOrFindAll").mockImplementationOnce(() => users);
+      jest.spyOn(service.getOrFindUsersService, "getOrFindAll").mockImplementationOnce(() => users);
       jest.spyOn(service.getOrFindMetadataKeysService, "getOrFindAll");
 
       await service.shareOneMissing(pgpKeys.betty.userId, pgpKeys.ada.passphrase);

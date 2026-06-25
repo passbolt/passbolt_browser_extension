@@ -22,7 +22,7 @@ import { ResourceTypeEvents } from "../event/resourceTypeEvents";
 import { RoleEvents } from "../event/roleEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { SecretEvents } from "../event/secretEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { ShareEvents } from "../event/shareEvents";
 import { UserEvents } from "../event/userEvents";
 import { GroupEvents } from "../event/groupEvents";
@@ -67,7 +67,7 @@ class App extends Pagemod {
       RoleEvents,
       KeyringEvents,
       SecretEvents,
-      OrganizationSettingsEvents,
+      SiteSettingsEvents,
       ShareEvents,
       UserEvents,
       GroupEvents,
@@ -97,9 +97,11 @@ class App extends Pagemod {
   async attachEvents(port) {
     try {
       const tab = port._port.sender.tab;
-      const checkAuthStatusService = new CheckAuthStatusService();
+      let account = await GetActiveAccountService.get();
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+      const checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
       const authStatus = await checkAuthStatusService.checkAuthStatus(true);
-      if (!authStatus.isAuthenticated || authStatus.isMfaRequired) {
+      if (!authStatus.isAuthenticated || !authStatus.isMfaAuthenticated) {
         console.error("Can not attach application if user is not logged in, connect only app sign-out events.");
         for (const event of this.appSignOutEvent) {
           event.listen({ port, tab });
@@ -111,8 +113,7 @@ class App extends Pagemod {
       const appInitController = new AppInitController();
       await appInitController.main();
 
-      const account = await GetActiveAccountService.get({ role: true });
-      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+      account = await GetActiveAccountService.get({ role: true });
       for (const event of this.events) {
         event.listen({ port, tab }, apiClientOptions, account);
       }

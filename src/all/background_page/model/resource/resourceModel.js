@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourcesCollection from "../entity/resource/resourcesCollection";
 import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
@@ -19,6 +18,7 @@ import ResourceEntity from "../entity/resource/resourceEntity";
 import PermissionChangesCollection from "../entity/permission/change/permissionChangesCollection";
 import ResourceService from "../../service/api/resource/resourceService";
 import PlaintextEntity from "../entity/plaintext/plaintextEntity";
+import GetSecretSchemaResourceTypeService from "../../service/resourceType/getSecretSchemaResourceTypeService";
 
 const MAX_LENGTH_PLAINTEXT = 4096;
 
@@ -29,9 +29,9 @@ class ResourceModel {
    * @param {AccountEntity} account the user account
    * @public
    */
-  constructor(apiClientOptions) {
+  constructor(apiClientOptions, account) {
     this.resourceService = new ResourceService(apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getSecretSchemaResourceTypeService = new GetSecretSchemaResourceTypeService(account, apiClientOptions);
   }
 
   /*
@@ -151,7 +151,7 @@ class ResourceModel {
       return plaintextDto;
     }
 
-    const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
+    const schema = await this.getSecretSchemaResourceTypeService.getByResourceTypeId(resourceTypeId);
     if (!schema) {
       throw new TypeError("Could not find the schema definition for the requested resource type.");
     }

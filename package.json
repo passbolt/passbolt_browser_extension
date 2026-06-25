@@ -21,7 +21,7 @@
     "kdbxweb": "2.1.1",
     "openpgp": "^6.1.1",
     "papaparse": "^5.5.2",
-    "passbolt-styleguide": "^5.13.1",
+    "passbolt-styleguide": "^5.14.0-alpha.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
@@ -31,7 +31,7 @@
     "xregexp": "~5.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.2",
+    "@babel/core": "^7.29.7",
     "@babel/helpers": "^7.26.10",
     "@babel/plugin-transform-runtime": "^7.22.9",
     "@babel/preset-env": "^7.29.5",
@@ -71,13 +71,15 @@
     "prettier": "3.6.2",
     "terser-webpack-plugin": "^5.4.0",
     "text-encoding-utf-8": "^1.0.2",
-    "web-ext": "^10.3.0",
-    "webpack": "^5.105.2",
+    "web-ext": "^10.4.0",
+    "webpack": "^5.107.2",
     "webpack-cli": "^7.0.2"
   },
   "overrides": {
     "@xmldom/xmldom": "0.8.13",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "shell-quote": "1.8.4",
+    "js-yaml": "^4.2.0"
   },
   "scripts": {
     "build": "webpack",

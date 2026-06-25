@@ -16,7 +16,7 @@ import App from "./appPagemod";
 import { UserEvents } from "../event/userEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { AuthEvents } from "../event/authEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { LocaleEvents } from "../event/localeEvents";
 import { AppEvents } from "../event/appEvents";
 import { FolderEvents } from "../event/folderEvents";
@@ -45,6 +45,7 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
 import { AppSignOutEvents } from "../event/appSignOutEvents";
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -55,7 +56,7 @@ jest.spyOn(ResourceTypeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RoleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(SiteSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ShareEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(GroupEvents, "listen").mockImplementation(jest.fn());
@@ -73,6 +74,7 @@ jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PermissionEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppSignOutEvents, "listen").mockImplementation(jest.fn());
+jest.mock("../service/auth/checkAuthStatusService");
 
 describe("App", () => {
   beforeEach(() => {
@@ -98,7 +100,7 @@ describe("App", () => {
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
       jest
         .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
-        .mockImplementation(async () => userLoggedInAuthStatus());
+        .mockImplementation(async () => new OnlineSessionEntity(userLoggedInAuthStatus()));
       const mockedAccount = { user_id: uuid(), domain: "https://test-domain.passbolt.com" };
       const mockApiClient = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
@@ -116,7 +118,7 @@ describe("App", () => {
       expect(RoleEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(SecretEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(SiteSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ShareEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(GroupEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
@@ -147,7 +149,7 @@ describe("App", () => {
         RoleEvents,
         KeyringEvents,
         SecretEvents,
-        OrganizationSettingsEvents,
+        SiteSettingsEvents,
         ShareEvents,
         UserEvents,
         GroupEvents,
@@ -185,7 +187,7 @@ describe("App", () => {
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
       jest
         .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
-        .mockImplementation(async () => userLoggedOutAuthStatus());
+        .mockImplementation(async () => new OnlineSessionEntity(userLoggedOutAuthStatus()));
       // process
       await App.attachEvents(port);
       // expectations

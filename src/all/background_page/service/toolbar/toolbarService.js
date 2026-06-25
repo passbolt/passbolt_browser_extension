@@ -163,7 +163,9 @@ class ToolbarService {
   async resetSuggestedResourcesBadge() {
     this.tabUrl = null;
     // Should do nothing if the user is not authenticated
-    if (!(await this.isUserAuthenticated())) {
+    const account = await GetActiveAccountService.get();
+    const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+    if (!(await this.isUserAuthenticated(account, apiClientOptions))) {
       return;
     }
     BrowserExtensionIconService.setSuggestedResourcesCount(0);
@@ -178,7 +180,7 @@ class ToolbarService {
       const account = await GetActiveAccountService.get();
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       // Should do nothing if the user is not authenticated
-      if (!(await this.isUserAuthenticated())) {
+      if (!(await this.isUserAuthenticated(account, apiClientOptions))) {
         return;
       }
 
@@ -225,9 +227,9 @@ class ToolbarService {
    * Is the user authenticated
    * @returns {Promise<{boolean}|boolean>}
    */
-  async isUserAuthenticated() {
+  async isUserAuthenticated(account, apiClientOptions) {
     try {
-      const checkAuthStatusService = new CheckAuthStatusService();
+      const checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
       // use the cached data as the worker could wake up every 30 secondes.
       const authStatus = await checkAuthStatusService.checkAuthStatus(false);
       return authStatus.isAuthenticated;

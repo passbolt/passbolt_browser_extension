@@ -15,8 +15,8 @@ import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import { assertNumber, assertUuid } from "../../utils/assertions";
 import FindResourcesService from "./findResourcesService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import DecryptMetadataService from "../metadata/decryptMetadataService";
+import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceTypesService";
 
 const RESOURCES_UPDATE_ALL_LS_LOCK_PREFIX = "RESOURCES_UPDATE_LS_LOCK_";
 
@@ -39,7 +39,7 @@ class FindAndUpdateResourcesLocalStorage {
   constructor(account, apiClientOptions) {
     this.account = account;
     this.findResourcesServices = new FindResourcesService(account, apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
   }
 
@@ -89,7 +89,7 @@ class FindAndUpdateResourcesLocalStorage {
       });
 
       const updatedResourcesCollection = await this.findResourcesServices.findAllForLocalStorage();
-      const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+      const resourceTypes = await this.getOrFindResourceTypesService.getOrFindAll();
       updatedResourcesCollection.filterByResourceTypes(resourceTypes);
       updatedResourcesCollection.setDecryptedMetadataFromCollection(localResourcesCollection);
 
@@ -135,7 +135,7 @@ class FindAndUpdateResourcesLocalStorage {
    */
   async findAndUpdateAllByParentFolderId(parentFolderId, passphrase = null) {
     assertUuid(parentFolderId);
-    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypes = await this.getOrFindResourceTypesService.getOrFindAll();
 
     const apiResourcesCollection =
       await this.findResourcesServices.findAllByParentFolderIdForLocalStorage(parentFolderId);

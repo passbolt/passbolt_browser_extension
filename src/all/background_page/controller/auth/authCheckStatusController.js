@@ -14,10 +14,18 @@
 import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 
 class AuthCheckStatusController {
-  constructor(worker, requestId) {
+  /**
+   * AuthCheckStatusController Constructor
+   *
+   * @param {Worker} worker
+   * @param {string} requestId
+   * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} account
+   */
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.checkAuthStatusService = new CheckAuthStatusService();
+    this.checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
   }
 
   /**
@@ -38,7 +46,7 @@ class AuthCheckStatusController {
   /**
    * Controller executor.
    * @param {boolean} flushCache should the cache be flushed before
-   * @returns {Promise<{isAuthenticated: {bool}, isMfaRequired: {bool}}>}
+   * @returns {Promise<OnlineSessionEntity>}
    */
   async exec(flushCache) {
     return await this.checkAuthStatusService.checkAuthStatus(flushCache);

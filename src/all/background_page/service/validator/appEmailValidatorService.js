@@ -12,7 +12,7 @@
  * @since         3.12.0
  */
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
-import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import IsRegexValidator from "passbolt-styleguide/src/shared/lib/Validator/IsRegexValidator";
 import IsEmailValidator from "passbolt-styleguide/src/shared/lib/Validator/IsEmailValidator";
 
@@ -47,7 +47,7 @@ export default class AppEmailValidatorService {
   static getValidator() {
     const appSettings = OrganizationSettingsModel.get();
 
-    if (appSettings && appSettings instanceof OrganizationSettingsEntity && appSettings.emailValidateRegex) {
+    if (appSettings && appSettings instanceof SiteSettingsEntity && appSettings.emailValidateRegex) {
       return new IsRegexValidator(appSettings.emailValidateRegex);
     }
 

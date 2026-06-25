@@ -23,7 +23,7 @@ import ValidatePrivateGpgKeyRecoverController from "../controller/crypto/validat
 import AbortAndRequestHelp from "../controller/recover/abortAndRequestHelpController";
 import SignInSetupController from "../controller/setup/signInSetupController";
 import SetSetupLocaleController from "../controller/setup/setSetupLocaleController";
-import GetOrganizationSettingsController from "../controller/organizationSettings/getOrganizationSettingsController";
+import GetOrFindSiteSettingsController from "../controller/siteSettings/getOrFindSiteSettingsController";
 import GetAndInitializeAccountLocaleController from "../controller/account/getAndInitializeAccountLocaleController";
 import IsExtensionFirstInstallController from "../controller/extension/isExtensionFirstInstallController";
 import IsLostPassphraseCaseController from "../controller/accountRecovery/isLostPassphraseCaseController";
@@ -48,9 +48,9 @@ const listen = (worker, apiClientOptions, account) => {
     await controller._exec();
   });
 
-  worker.port.on("passbolt.organization-settings.get", async (requestId) => {
-    const controller = new GetOrganizationSettingsController(worker, requestId, apiClientOptions);
-    await controller._exec();
+  worker.port.on("passbolt.site-settings.get-or-find", async (requestId, refreshCache = true) => {
+    const controller = new GetOrFindSiteSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec(refreshCache);
   });
 
   worker.port.on("passbolt.recover.start", async (requestId) => {

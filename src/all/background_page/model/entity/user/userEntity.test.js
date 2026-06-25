@@ -14,8 +14,8 @@
 import BextUserEntity from "./userEntity";
 import AppEmailValidatorService from "../../../service/validator/appEmailValidatorService";
 import OrganizationSettingsModel from "../../organizationSettings/organizationSettingsModel";
-import OrganizationSettingsEntity from "../organizationSettings/organizationSettingsEntity";
-import { customEmailValidationProOrganizationSettings } from "../organizationSettings/organizationSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import { customEmailValidationProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
@@ -36,8 +36,8 @@ describe("BextUserEntity", () => {
 
     it("validates username with custom validation rule", () => {
       expect.assertions(2);
-      const organizationSettings = customEmailValidationProOrganizationSettings();
-      OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
+      const organizationSettings = customEmailValidationProSiteSettings();
+      OrganizationSettingsModel.set(new SiteSettingsEntity(organizationSettings));
       const dto = defaultUserDto({ username: "ada@passbolt.c" });
       const entity = new BextUserEntity(dto);
       expect(entity.username).toEqual("ada@passbolt.c");

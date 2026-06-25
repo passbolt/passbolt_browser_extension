@@ -45,7 +45,7 @@ class GetOrganizationSettingsController {
   /**
    * Get the organization settings.
    *
-   * @return {Promise<OrganizationSettingsEntity>}
+   * @return {Promise<SiteSettingsEntity>}
    */
   async exec() {
     return this.organizationSettingsModel.getOrFind(true);

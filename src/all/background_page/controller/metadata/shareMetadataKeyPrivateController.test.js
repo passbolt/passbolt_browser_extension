@@ -73,7 +73,9 @@ describe("ShareMetadataKeyPrivateController", () => {
 
       jest.spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey");
       jest.spyOn(controller.getPassphraseService, "getPassphrase");
-      jest.spyOn(controller.shareMetadataKeyPrivateService.userModel, "getOrFindAll").mockImplementation(() => users);
+      jest
+        .spyOn(controller.shareMetadataKeyPrivateService.getOrFindUsersService, "getOrFindAll")
+        .mockImplementation(() => users);
       jest.spyOn(GetOrFindMetadataKeysService.prototype, "getOrFindAll").mockImplementation(() => metadataKeys);
 
       await controller.exec(pgpKeys.betty.userId);
@@ -97,7 +99,9 @@ describe("ShareMetadataKeyPrivateController", () => {
 
       jest.spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey");
       jest.spyOn(controller.getPassphraseService, "getPassphrase");
-      jest.spyOn(controller.shareMetadataKeyPrivateService.userModel, "getOrFindAll").mockImplementation(() => users);
+      jest
+        .spyOn(controller.shareMetadataKeyPrivateService.getOrFindUsersService, "getOrFindAll")
+        .mockImplementation(() => users);
       jest
         .spyOn(controller.shareMetadataKeyPrivateService.getOrFindMetadataKeysService, "getOrFindAll")
         .mockImplementation(() => metadataKeys);

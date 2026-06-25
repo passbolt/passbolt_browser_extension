@@ -19,7 +19,7 @@ import { QuickAccessEvents } from "../event/quickAccessEvents";
 import { GroupEvents } from "../event/groupEvents";
 import { ResourceEvents } from "../event/resourceEvents";
 import { SecretEvents } from "../event/secretEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { TabEvents } from "../event/tabEvents";
 import { LocaleEvents } from "../event/localeEvents";
 import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
@@ -38,7 +38,7 @@ jest.spyOn(QuickAccessEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(GroupEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ResourceEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(SiteSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(TabEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
@@ -78,7 +78,7 @@ describe("QuickAccess", () => {
       expect(GroupEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ResourceEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(SecretEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(SiteSettingsEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(TabEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(LocaleEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(PownedPasswordEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
@@ -93,7 +93,7 @@ describe("QuickAccess", () => {
         GroupEvents,
         ResourceEvents,
         SecretEvents,
-        OrganizationSettingsEvents,
+        SiteSettingsEvents,
         TabEvents,
         LocaleEvents,
         PownedPasswordEvents,

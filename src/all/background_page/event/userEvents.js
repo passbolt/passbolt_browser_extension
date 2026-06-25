@@ -15,6 +15,7 @@ import AvatarUpdateEntity from "../model/entity/avatar/update/avatarUpdateEntity
 import UpdateUserLocalStorageController from "../controller/user/updateUserLocalStorageController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindUsersController from "../controller/user/getOrFindUsersController";
+import GetOrFindAllUsersController from "../controller/user/getOrFindAllUsersController";
 import UpdateUserController from "../controller/user/updateUserController";
 import DeleteDryRunUserController from "../controller/user/deleteDryRunUserController";
 import DeleteUserController from "../controller/user/deleteUserController";
@@ -38,13 +39,8 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.users.get-all", async (requestId) => {
-    try {
-      const userModel = new UserModel(apiClientOptions, account);
-      const users = await userModel.getOrFindAll();
-      worker.port.emit(requestId, "SUCCESS", users);
-    } catch (error) {
-      worker.port.emit(requestId, "ERROR", error);
-    }
+    const controller = new GetOrFindAllUsersController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
   });
 
   /*

@@ -20,7 +20,7 @@ import {
   defaultMetadataTypesSettingsV4Dto,
   defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
@@ -48,7 +48,7 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
     it("retrieves the metadata types settings from the API and store them into the local storage.", async () => {
       expect.assertions(2);
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       jest
         .spyOn(
           findAndUpdateMetadataSettingsService.findMetadataSettingsService.metadataTypesSettingsApiService,
@@ -69,7 +69,7 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
     it("retrieves partial metadata types settings from the API and store them marshalled into the local storage.", async () => {
       expect.assertions(2);
       const metadataTypesSettingsDto = {};
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       jest
         .spyOn(
           findAndUpdateMetadataSettingsService.findMetadataSettingsService.metadataTypesSettingsApiService,
@@ -91,7 +91,7 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
 
     it("with v4, retrieves default v4 metadata types settings without calling the API and store them into the local storage.", async () => {
       expect.assertions(3);
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       delete siteSettingsDto.passbolt.plugins.metadata;
       jest.spyOn(
         findAndUpdateMetadataSettingsService.findMetadataSettingsService.metadataTypesSettingsApiService,
@@ -116,7 +116,7 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
     it("overrides local storage with a second update call.", async () => {
       expect.assertions(2);
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       jest
         .spyOn(
           findAndUpdateMetadataSettingsService.findMetadataSettingsService.metadataTypesSettingsApiService,
@@ -140,7 +140,7 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
     it("waits any on-going call to the update and returns the result of the local storage.", async () => {
       expect.assertions(4);
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       let resolve;
       const promise = new Promise((_resolve) => (resolve = _resolve));
       jest

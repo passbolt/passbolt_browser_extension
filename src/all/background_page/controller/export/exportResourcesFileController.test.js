@@ -119,10 +119,10 @@ describe("ExportResourcesFileController", () => {
             .mockImplementation(() => mockPassboltResponse(resourceCollectionV4));
           const result = await controller.exec(file);
 
-          const blobFile = new Blob([result.file], { type: "text/csv" });
+          const blobFile = new Blob([KdbxCsvFile], { type: "text/csv" });
 
           expect(FileService.saveFile).toHaveBeenCalledWith(filename, blobFile, "text/csv", 1);
-          expect(result.file).toEqual(KdbxCsvFile);
+          expect(result).toEqual({ customFieldsConflicts: [] });
         });
       });
     });
@@ -180,9 +180,38 @@ describe("ExportResourcesFileController", () => {
 
           const result = await controller.exec(file);
 
-          expect(result.file).toEqual(exportResourcesFileEntity.file);
+          expect(result).toEqual({ customFieldsConflicts: [] });
         });
       });
+    });
+
+    it("should return the custom fields renamed to avoid conflicting with reserved field names", async () => {
+      expect.assertions(1);
+      const conflicts = [{ resourceName: "GitHub", originalKey: "Password", newKey: "Password (1)" }];
+      jest.spyOn(ResourcesKdbxExporter.prototype, "export").mockImplementation(async function () {
+        this.exportEntity.file = new ArrayBuffer(0);
+        return conflicts;
+      });
+      const resourceType = resourceTypeCollection.find(
+        (resourceType) => resourceType.slug === RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
+      );
+      const file = {
+        format: FORMAT_KDBX,
+        resources_ids: [uuidv4()],
+        folders_ids: [foldersDto[0].id],
+      };
+      const resourceCollectionV4 = await resourceCollectionV4ToExport({
+        resourceType: resourceType,
+        folder_parent_id: foldersDto[0].id,
+        totp: defaultTotpDto({ secret_key: "THISISASECRET" }),
+      });
+      jest
+        .spyOn(ResourceService.prototype, "findAll")
+        .mockImplementation(() => mockPassboltResponse(resourceCollectionV4));
+
+      const result = await controller.exec(file);
+
+      expect(result).toEqual({ customFieldsConflicts: conflicts });
     });
 
     describe.each([

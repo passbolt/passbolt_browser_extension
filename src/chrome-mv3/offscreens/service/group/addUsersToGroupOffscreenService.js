@@ -65,9 +65,9 @@ export default class AddUsersToGroupOffscreenService {
      * dialog refreshed while the offscreen processes the cryptographic operations.
      */
     let lastYield = Date.now();
-    const onProgress = (message) => {
+    const onProgress = async (message) => {
       if (Date.now() - lastYield >= PROGRESS_INTERVAL_MS) {
-        AddUsersToGroupOffscreenService.handleProgressResponse(requestId, { message });
+        await AddUsersToGroupOffscreenService.handleProgressResponse(requestId, { message });
         lastYield = Date.now();
       }
     };

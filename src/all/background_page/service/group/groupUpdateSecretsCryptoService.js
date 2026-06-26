@@ -42,7 +42,7 @@ class GroupUpdateSecretsCryptoService {
       const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
       result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
 
-      onProgress?.(i18n.t("Decrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }));
+      await onProgress?.(i18n.t("Decrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }));
     }
 
     return result;

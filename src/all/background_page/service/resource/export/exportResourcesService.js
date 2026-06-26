@@ -50,12 +50,12 @@ class ExportResourcesService {
    * Export resources to file and return the exported format
    * @param {ExportResourcesFileEntity} exportResourcesFileEntity The export entity
    * @param {String} passphrase the user passphrase
-   * @return {Promise<void>}
+   * @return {Promise<Array>} The custom fields renamed to avoid conflicting with reserved field names
    */
   async exportToFile(exportResourcesFileEntity, passphrase) {
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     await this.decryptSecrets(exportResourcesFileEntity, privateKey);
-    await this.export(exportResourcesFileEntity);
+    return await this.export(exportResourcesFileEntity);
   }
 
   /**
@@ -143,12 +143,12 @@ class ExportResourcesService {
   /**
    * Export
    * @param {ExportResourcesFileEntity} exportResourcesFileEntity The export object
-   * @returns {Promise<void>}
+   * @returns {Promise<Array>} The custom fields renamed to avoid conflicting with reserved field names
    * @private
    */
   async export(exportResourcesFileEntity) {
     const exporter = new ResourcesExporter();
-    await exporter.export(exportResourcesFileEntity);
+    return await exporter.export(exportResourcesFileEntity);
   }
 }
 

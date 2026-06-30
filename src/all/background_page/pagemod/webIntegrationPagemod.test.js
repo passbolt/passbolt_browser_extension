@@ -22,6 +22,9 @@ import { ConfigEvents } from "../event/configEvents";
 import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { WebIntegrationEvents } from "../event/webIntegrationEvents";
 import { PortEvents } from "../event/portEvents";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import { v4 as uuid } from "uuid";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -109,29 +112,22 @@ describe("WebIntegration", () => {
           },
         },
       };
+      // mock functions
+      const mockedAccount = { user_id: uuid(), domain: "https://test.passbolt.local" };
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
       // process
       await WebIntegration.attachEvents(port);
       // expectations
-      expect(ConfigEvents.listen).toHaveBeenCalledWith({
+      const expectedWorker = {
         port: port,
         tab: port._port.sender.tab,
         name: WebIntegration.appName,
-      });
-      expect(WebIntegrationEvents.listen).toHaveBeenCalledWith({
-        port: port,
-        tab: port._port.sender.tab,
-        name: WebIntegration.appName,
-      });
-      expect(SiteSettingsEvents.listen).toHaveBeenCalledWith({
-        port: port,
-        tab: port._port.sender.tab,
-        name: WebIntegration.appName,
-      });
-      expect(PortEvents.listen).toHaveBeenCalledWith({
-        port: port,
-        tab: port._port.sender.tab,
-        name: WebIntegration.appName,
-      });
+      };
+      expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedWorker, apiClientOptions, mockedAccount);
+      expect(WebIntegrationEvents.listen).toHaveBeenCalledWith(expectedWorker, apiClientOptions, mockedAccount);
+      expect(SiteSettingsEvents.listen).toHaveBeenCalledWith(expectedWorker, apiClientOptions, mockedAccount);
+      expect(PortEvents.listen).toHaveBeenCalledWith(expectedWorker, apiClientOptions, mockedAccount);
     });
   });
 });

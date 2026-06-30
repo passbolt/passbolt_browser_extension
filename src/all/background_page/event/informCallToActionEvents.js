@@ -28,7 +28,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @returns {*{isAuthenticated,isMfaRequired}
    */
   worker.port.on("passbolt.in-form-cta.check-status", async (requestId, flushCache = false) => {
-    const authIsAuthenticatedController = new AuthCheckStatusController(worker, requestId);
+    const authIsAuthenticatedController = new AuthCheckStatusController(worker, requestId, apiClientOptions, account);
     await authIsAuthenticatedController._exec(flushCache);
   });
 

@@ -19,6 +19,7 @@ import ExternalResourceEntity from "../../model/entity/resource/external/externa
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
 import WorkerService from "../../service/worker/workerService";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
+import { sortResourcesByUriMatchingScore } from "passbolt-styleguide/src/shared/utils/sortUtils";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 
 /**
@@ -57,7 +58,7 @@ class InformMenuController {
       const configuration = {
         inputType: callToActionInput.type,
         inputValue: callToActionInput.value,
-        suggestedResources: suggestedResources.toDto(),
+        suggestedResources: sortResourcesByUriMatchingScore(suggestedResources.toDto(), this.worker.tab.url),
       };
 
       this.worker.port.emit(requestId, "SUCCESS", configuration);

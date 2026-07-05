@@ -62,7 +62,7 @@ const buildSharedExtraPlugins = () => [
         to: resolveSrc('./build/all/webAccessibleResources/js/themes'),
       },
       {
-        from: '*.html',
+        from: '**/*.html',
         context: resolveSrc('./src/all/webAccessibleResources'),
         to: resolveSrc('./build/all/webAccessibleResources'),
       },
@@ -180,6 +180,15 @@ const buildCommonConfigs = () => [
     outputPath: './build/all/webAccessibleResources/js/dist/in-form-menu',
     withReact: true,
     withSvg: true,
+  }),
+  // Web-accessible resources — FIDO2 passkey provider MAIN-world page script + ceremony popup.
+  buildConfig({
+    entry: {
+      'fido2-page': resolveSrc('./src/all/contentScripts/js/app/fido2/fido2PageScript.js'),
+      'ceremony': resolveSrc('./src/all/webAccessibleResources/js/app/fido2/Fido2CeremonyApp.js'),
+    },
+    chunkLoadingGlobal: 'dataFido2PageChunkLoadingGlobal',
+    outputPath: './build/all/webAccessibleResources/js/dist/fido2',
   }),
 ];
 

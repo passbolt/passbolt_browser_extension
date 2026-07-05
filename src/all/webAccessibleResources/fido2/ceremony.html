@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Passbolt Passkeys</title>
+    <script id="stylesheet-manager" data-file="ext_quickaccess.min.css" src="../js/themes/stylesheet.js"></script>
+    <style>
+      /*
+       * Styled to match the passbolt quickaccess panel using its theme CSS variables, so the ceremony
+       * looks native in whatever theme (dark/light) the user picked — no hardcoded palette. Fallback
+       * colors approximate the default dark theme for the brief moment before the theme CSS loads.
+       */
+      body { margin: 0; background: var(--Quick-Access-Panel-background, #26211f); color: var(--Text-and-icons-Main-text, #ebeae8); font-size: 13px; }
+      .fido2-ceremony { display: flex; flex-direction: column; min-height: 100vh; }
+      .fido2-ceremony .fido2-header {
+        display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+        background: var(--Quick-Access-Header-and-footer-background, #1c1a19);
+      }
+      .fido2-ceremony .fido2-header img { width: 20px; height: 20px; }
+      .fido2-ceremony .fido2-header .fido2-title { font-weight: 600; flex: 1; font-size: 14px; }
+      .fido2-ceremony .fido2-close { background: none; border: none; font-size: 20px; line-height: 1; cursor: pointer; color: var(--Text-and-icons-Secondary-text, #9b9894); padding: 0 4px; }
+      .fido2-ceremony .fido2-close:hover { color: var(--Text-and-icons-Main-text, #fff); }
+      .fido2-ceremony .fido2-body { flex: 1; padding: 16px; }
+      .fido2-ceremony .fido2-body h1 { font-size: 15px; margin: 0 0 4px; font-weight: 600; }
+      .fido2-ceremony .fido2-body .fido2-hint { color: var(--Text-and-icons-Secondary-text, #9b9894); margin: 0 0 12px; font-size: 13px; }
+      .fido2-ceremony .fido2-footer { padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--Quick-Access-Header-and-footer-background, #1c1a19); }
+      .fido2-ceremony .fido2-picker { margin: 6px 0 4px; }
+      .fido2-ceremony .fido2-picker > label,
+      .fido2-ceremony .input.text label { display: block; margin: 0 0 6px; font-weight: 600; font-size: 13px; }
+      .fido2-ceremony .fido2-search,
+      .fido2-ceremony .input.text input {
+        display: block; width: 100%; padding: 9px 12px; box-sizing: border-box; font: inherit;
+        border: 1px solid var(--Workspace-Dividers, #45403d); border-radius: 4px;
+        background: var(--Quick-Access-Panel-background, #1c1a19); color: var(--Text-and-icons-Main-text, #ebeae8);
+      }
+      .fido2-ceremony .fido2-search { margin: 0 0 8px; }
+      .fido2-ceremony .input.text { display: block; margin: 12px 0 0; }
+      .fido2-ceremony .fido2-option-list {
+        display: flex; flex-direction: column; margin: 6px 0 4px; max-height: 220px; overflow-y: auto;
+        border: 1px solid var(--Workspace-Dividers, #45403d); border-radius: 4px;
+      }
+      .fido2-ceremony .fido2-option {
+        display: flex; align-items: center; padding: 12px 14px; cursor: pointer;
+        box-shadow: inset 0 -1px 0 var(--Workspace-Dividers, #45403d);
+      }
+      .fido2-ceremony .fido2-option:last-child { box-shadow: none; }
+      .fido2-ceremony .fido2-option:hover { background: var(--Quick-Access-Filter-hover, #322c29); }
+      .fido2-ceremony .fido2-option.selected { background: var(--Sections-Filter-selected, #3a332f); }
+      .fido2-ceremony .fido2-single { padding: 12px 14px; margin: 6px 0 4px; border: 1px solid var(--Workspace-Dividers, #45403d); border-radius: 4px; }
+      .fido2-ceremony .fido2-name { font-weight: 600; color: var(--Text-and-icons-Main-text, #ebeae8); font-size: 14px; }
+      .fido2-ceremony .fido2-meta { color: var(--Text-and-icons-Secondary-text, #9b9894); font-size: 12px; margin-top: 2px; }
+      .fido2-ceremony .error-message { color: var(--Text-and-icons-error-text, #e35f5f); font-size: 13px; margin: 8px 0 0; min-height: 1em; }
+      .fido2-ceremony .fido2-link { background: none; border: none; cursor: pointer; color: var(--Text-and-icons-Secondary-text, #9b9894); font: inherit; padding: 6px; text-align: center; }
+      .fido2-ceremony .fido2-link:hover { color: var(--Text-and-icons-Main-text, #fff); text-decoration: underline; }
+      .fido2-ceremony .button.primary {
+        background: var(--Quick-Access-Primary-button-background, #4661d6); color: var(--Quick-Access-Primary-button-text, #fff);
+        border: none; border-radius: 4px; padding: 12px 16px; width: 100%; font-weight: 600; cursor: pointer; font: inherit;
+      }
+      .fido2-ceremony .button.primary:hover { filter: brightness(1.08); }
+    </style>
+  </head>
+  <body spellcheck="false">
+    <div class="contain-item">
+      <div class="container-wrapper">
+        <div id="fido2-ceremony" class="fido2-ceremony">
+          <div class="fido2-header">
+            <img src="../img/logo/icon-without-badge.svg" alt="Passbolt" onerror="this.style.display='none'" />
+            <span class="fido2-title">Passbolt Passkeys</span>
+            <button type="button" id="fido2-close" class="fido2-close" title="Close" aria-label="Close">&times;</button>
+          </div>
+          <div id="main" class="fido2-body"><p class="fido2-hint">Loading…</p></div>
+          <div id="footer" class="fido2-footer"></div>
+        </div>
+      </div>
+    </div>
+    <script src="../js/dist/fido2/ceremony.js"></script>
+  </body>
+</html>

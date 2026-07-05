@@ -17,6 +17,7 @@ import PostLoginService from "./service/auth/postLoginService";
 import PostLogoutService from "./service/auth/postLogoutService";
 import OnStartUpService from "./service/extension/onStartUpService";
 import ToolbarService from "./service/toolbar/toolbarService";
+import Fido2CeremonyCoordinator from "./service/fido2/fido2CeremonyCoordinator";
 
 const main = async () => {
   /**
@@ -83,6 +84,12 @@ browser.tabs.onUpdated.addListener(TabService.exec);
  * Add listener on connect port
  */
 browser.runtime.onConnect.addListener(PortManager.onPortConnect);
+
+/**
+ * Add listener for the passkey provider ceremony popup messages (native runtime messaging,
+ * responding synchronously via sendResponse to stay compatible with the popup page).
+ */
+chrome.runtime.onMessage.addListener(Fido2CeremonyCoordinator.onMessage);
 
 /**
  * Add listener on tabs on removed

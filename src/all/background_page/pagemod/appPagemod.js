@@ -36,6 +36,7 @@ import { LocaleEvents } from "../event/localeEvents";
 import { MobileEvents } from "../event/mobileEvents";
 import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
 import { MfaEvents } from "../event/mfaEvents";
+import { PasskeyEvents } from "../event/passkeyEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import { RememberMeEvents } from "../event/rememberMeEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
@@ -43,6 +44,7 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
 import { AppSignOutEvents } from "../event/appSignOutEvents";
+import { Fido2PinEvents } from "../event/fido2PinEvents";
 
 class App extends Pagemod {
   /**
@@ -81,9 +83,11 @@ class App extends Pagemod {
       MobileEvents,
       PownedPasswordEvents,
       MfaEvents,
+      PasskeyEvents,
       RememberMeEvents,
       PermissionEvents,
       AccountEvents,
+      Fido2PinEvents,
     ];
   }
 

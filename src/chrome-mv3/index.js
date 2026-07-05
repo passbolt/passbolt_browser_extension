@@ -20,6 +20,7 @@ import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarm
 import OnStartUpService from "../all/background_page/service/extension/onStartUpService";
 import ToolbarService from "../all/background_page/service/toolbar/toolbarService";
 import HandleOffscreenResponseService from "./serviceWorker/service/offscreen/handleOffscreenResponseService";
+import Fido2CeremonyCoordinator from "../all/background_page/service/fido2/fido2CeremonyCoordinator";
 
 /**
  * Load all system requirement
@@ -70,6 +71,12 @@ browser.alarms.onAlarm.addListener(GlobalAlarmService.exec);
  * Handle offscreen responses.
  */
 chrome.runtime.onMessage.addListener(HandleOffscreenResponseService.handleOffscreenResponse);
+
+/**
+ * Handle the passkey provider ceremony popup messages (native runtime messaging, responding
+ * synchronously via sendResponse to stay compatible with the popup page).
+ */
+chrome.runtime.onMessage.addListener(Fido2CeremonyCoordinator.onMessage);
 
 /**
  * Handle suggested resources on toolbar icon

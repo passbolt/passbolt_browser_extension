@@ -16,6 +16,7 @@ import { ConfigEvents } from "../event/configEvents";
 import { WebIntegrationEvents } from "../event/webIntegrationEvents";
 import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
 import { PortEvents } from "../event/portEvents";
+import { Fido2Events } from "../event/fido2Events";
 import ParseWebIntegrationUrlService from "../service/webIntegration/parseWebIntegrationUrlService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
@@ -50,6 +51,22 @@ class WebIntegration extends Pagemod {
    */
   get events() {
     return [ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents, PortEvents];
+  }
+
+  /**
+   * Attach the standard web-integration events, plus the passkey provider ceremony events. The
+   * passkey handlers are registered unconditionally: the page script overrides navigator.credentials
+   * regardless of login state, so the service worker must always answer (resolving the account
+   * lazily per request), otherwise the relying party's create()/get() would hang. When the provider
+   * is inactive the handler returns null and the site falls back to the platform authenticator.
+   * @inheritDoc
+   */
+  async attachEvents(port) {
+    const tab = port._port.sender.tab;
+    for (const event of this.events) {
+      await event.listen({ port, tab, name: this.appName });
+    }
+    await Fido2Events.listen({ port, tab, name: this.appName });
   }
 
   /**

@@ -19,6 +19,7 @@ const ENTITY_NAME = "MfaProviderEntity";
 const YUBIKEY = "yubikey";
 const TOTP = "totp";
 const DUO = "duo";
+const WEBAUTHN = "webauthn";
 
 class MfaProviderEntity extends Entity {
   /**
@@ -39,7 +40,7 @@ class MfaProviderEntity extends Entity {
       properties: {
         provider: {
           type: "string",
-          enum: [YUBIKEY, TOTP, DUO],
+          enum: [YUBIKEY, TOTP, DUO, WEBAUTHN],
         },
       },
     };

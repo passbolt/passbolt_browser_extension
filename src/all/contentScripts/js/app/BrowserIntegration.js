@@ -16,6 +16,7 @@ import Port from "../../../webAccessibleResources/js/lib/port";
 import MessageService from "../service/messageService";
 import ConnectPortController from "../controller/connectPortController";
 import MessageEventHandler from "../message/messageEventHandler";
+import Fido2Relay from "./fido2/Fido2Relay";
 
 async function main() {
   // Make the port object as a global variable to use it directly (TODO the port could be use in props)
@@ -28,6 +29,8 @@ async function main() {
   const messageEventHandler = new MessageEventHandler(messageService);
   messageEventHandler.listen("passbolt.port.connect", ConnectPortController, port);
   BrowserIntegrationBootstrap.init();
+  // Passkey provider: override navigator.credentials and relay ceremonies to the service worker.
+  Fido2Relay.init(self.port);
 }
 
 main();

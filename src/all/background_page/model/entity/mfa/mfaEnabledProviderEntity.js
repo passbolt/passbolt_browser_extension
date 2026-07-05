@@ -35,7 +35,7 @@ class MfaEnabledProviderEntity extends Entity {
   static getSchema() {
     return {
       type: "object",
-      required: ["totp", "duo", "yubikey"],
+      required: ["totp", "duo", "yubikey", "webauthn"],
       properties: {
         yubikey: {
           type: "boolean",
@@ -44,6 +44,9 @@ class MfaEnabledProviderEntity extends Entity {
           type: "boolean",
         },
         duo: {
+          type: "boolean",
+        },
+        webauthn: {
           type: "boolean",
         },
       },
@@ -78,6 +81,14 @@ class MfaEnabledProviderEntity extends Entity {
    */
   get duo() {
     return this._props.duo;
+  }
+
+  /**
+   * get the webauthn prop
+   * @returns {boolean}
+   */
+  get webauthn() {
+    return this._props.webauthn;
   }
 
   /*

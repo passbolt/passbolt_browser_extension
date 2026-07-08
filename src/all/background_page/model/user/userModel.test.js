@@ -25,7 +25,7 @@ import UserModel from "./userModel";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import UserEntity from "../entity/user/userEntity";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
-import { adminAccountDto } from "../entity/account/accountEntity.test.data";
+import { adminAccountDto, defaultAccountDto } from "../entity/account/accountEntity.test.data";
 import AccountEntity from "../entity/account/accountEntity";
 import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 
@@ -212,6 +212,46 @@ describe("UserModel", () => {
           groups_users: false,
           is_mfa_enabled: true,
           missing_metadata_key_ids: true,
+          pending_account_recovery_request: true,
+          profile: true,
+        },
+        null,
+        true,
+      );
+    });
+
+    it("should not add contains last_logged_in and is_mfa_enabled if user is not an administrator", async () => {
+      expect.assertions(1);
+      const account = new AccountEntity(
+        defaultAccountDto({
+          role_name: RoleEntity.ROLE_USER,
+        }),
+      );
+
+      const dtoOptions = {
+        withRole: true,
+        withGroupsUsers: true,
+        withGpgkey: true,
+        withAccountRecoveryUserSetting: true,
+        withPendingAccountRecoveryUserRequest: true,
+      };
+      const dto1 = defaultUserDto({ username: "ada@passbolt.com" }, dtoOptions);
+      const dtos = [dto1];
+
+      fetch.doMockOnceIf(/users\.json/, async () => mockApiResponse(dtos));
+
+      const apiClientOption = defaultApiClientOptions();
+      const model = new UserModel(apiClientOption, account);
+
+      jest.spyOn(model, "findAll");
+
+      await model.updateLocalStorage();
+
+      expect(model.findAll).toHaveBeenCalledWith(
+        {
+          account_recovery_user_setting: true,
+          gpgkey: false,
+          groups_users: false,
           pending_account_recovery_request: true,
           profile: true,
         },

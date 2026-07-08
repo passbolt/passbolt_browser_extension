@@ -48,13 +48,13 @@ class UserModel {
       profile: true,
       gpgkey: false,
       groups_users: false,
-      last_logged_in: true,
       pending_account_recovery_request: true,
       account_recovery_user_setting: true,
     };
-    // Add is_mfa_enabled contain if the user account role name is admin
+    // last_logged_in and is_mfa_enabled contains are only available for admin.
 
     if (this.account && this.account.roleName === RoleEntity.ROLE_ADMIN) {
+      contains.last_logged_in = true;
       contains.is_mfa_enabled = true;
       const organizationSettings = await this.organisationSettingsModel.getOrFind();
       if (organizationSettings.isPluginEnabled("metadata")) {

@@ -28,7 +28,6 @@ import ResourceEntity from "../../../model/entity/resource/resourceEntity";
 import ResourceLocalStorage from "../../local_storage/resourceLocalStorage";
 import Keyring from "../../../model/keyring";
 import ProgressService from "../../progress/progressService";
-import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
 import ResourceService from "../../api/resource/resourceService";
 import DecryptMessageService from "../../crypto/decryptMessageService";
 import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
@@ -46,16 +45,11 @@ import {
   plaintextSecretTotpDto,
 } from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 import FindFoldersService from "../../folder/findFoldersService";
-import FolderEntity from "../../../model/entity/folder/folderEntity";
 import ShareApiService from "../../api/share/shareApiService";
-import MetadataKeysCollection from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection";
-import { defaultDecryptedSharedMetadataKeysDtos } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysCollection.test.data";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import GetDecryptedUserPrivateKeyService from "../../account/getDecryptedUserPrivateKeyService";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
-import { ownerFolderPermissionDto } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
-import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
 
 jest.mock("../../../service/progress/progressService");
 
@@ -363,30 +357,16 @@ describe("ResourceCreateService", () => {
       return expect(promise).rejects.toThrow("The secret should be maximum 4096 characters in length.");
     });
 
-    it("Should create the resource into shared folder parent", async () => {
-      expect.assertions(1);
+    it("Should create the resource operator-only and skip the share step when no permissionChanges are passed", async () => {
+      expect.assertions(3);
 
       const folderId = uuidv4();
       const resourceDto = defaultResourceDto({ folder_parent_id: folderId });
-      const shareResourceChanges = {
-        changes: {
-          added: [],
-          removed: [],
-        },
-      };
-
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse([resourceDto]));
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [resourceDto]);
       jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => resourceDto);
-      jest
-        .spyOn(FindFoldersService.prototype, "findByIdWithPermissions")
-        .mockImplementation(
-          async () => new FolderEntity(defaultFolderDto({ id: folderId }, { withPermissions: true })),
-        );
-      jest.spyOn(ShareApiService.prototype, "simulateShareResource").mockImplementation(() => shareResourceChanges);
-      jest.spyOn(ShareApiService.prototype, "shareFolder").mockImplementation(() => shareResourceChanges);
-      jest.spyOn(ShareApiService.prototype, "shareResource").mockImplementation(() => jest.fn());
-
-      jest.spyOn(resourceCreateService, "share");
+      jest.spyOn(FindFoldersService.prototype, "findByIdWithPermissions");
+      jest.spyOn(ShareApiService.prototype, "shareResource");
+      jest.spyOn(resourceCreateService.shareResourceService, "shareAll");
 
       await resourceCreateService.create(
         resourceDto,
@@ -394,80 +374,64 @@ describe("ResourceCreateService", () => {
         pgpKeys.ada.passphrase,
       );
 
-      expect(resourceCreateService.share).toHaveBeenCalledTimes(1);
+      // No parent folder permission lookup, no implicit inheritance, no share step — the resource
+      // is created with only the operator's secret encrypted. Sharing is opt-in via the new
+      // `permissionChanges` argument.
+      expect(FindFoldersService.prototype.findByIdWithPermissions).not.toHaveBeenCalled();
+      expect(ShareApiService.prototype.shareResource).not.toHaveBeenCalled();
+      expect(resourceCreateService.shareResourceService.shareAll).not.toHaveBeenCalled();
     });
 
-    it("Should create the resource V5 into shared folder parent", async () => {
-      expect.assertions(5);
+    it("Should create the resource operator-only and then run shareResourceService.shareAll when permissionChanges are passed", async () => {
+      expect.assertions(3);
 
-      let resourceToAPI, resourceLocalStorageExpected;
       const folderId = uuidv4();
-      const resourceDto = defaultResourceDto({
-        folder_parent_id: folderId,
-        resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
-      });
-      const plaintextDto = plaintextSecretPasswordDescriptionTotpDto();
-      const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
-      const shareResourceChanges = {
-        changes: {
-          added: [],
-          removed: [],
+      const createdResourceId = uuidv4();
+      const resourceDto = defaultResourceDto({ id: createdResourceId, folder_parent_id: folderId });
+      const aroForeignKey = uuidv4();
+      const permissionChanges = [
+        {
+          is_new: true,
+          aro: "User",
+          aro_foreign_key: aroForeignKey,
+          aco: "Resource",
+          aco_foreign_key: createdResourceId,
+          type: 1,
         },
-      };
-      const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({ armored_key: pgpKeys.metadataKey.public });
-      const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
+      ];
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [resourceDto]);
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => resourceDto);
+      jest.spyOn(resourceCreateService.shareResourceService, "shareAll").mockImplementation(() => {});
 
-      jest.spyOn(ResourceService.prototype, "create").mockImplementation((resource) => {
-        //Used to check the data sent to API
-        resourceToAPI = resource;
-        const resourceEntity = new ResourceEntity(resourceDto);
-        resourceEntity.secrets = new ResourceSecretsCollection([resourceToAPI.secrets[0]]);
-        resourceEntity.metadataKeyId = resourceToAPI.metadata_key_id;
-        resourceEntity.metadataKeyType = resourceToAPI.metadata_key_type;
-        resourceLocalStorageExpected = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
-        resourceEntity.metadata = resourceToAPI.metadata;
-        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
-      });
-      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse([resourceDto]));
-      jest
-        .spyOn(FindFoldersService.prototype, "findByIdWithPermissions")
-        .mockImplementation(
-          async () => new FolderEntity(defaultFolderDto({ id: folderId }, { withPermissions: { count: 2 } })),
-        );
-      jest.spyOn(ShareApiService.prototype, "simulateShareResource").mockImplementation(() => shareResourceChanges);
-      jest.spyOn(ShareApiService.prototype, "shareFolder").mockImplementation(() => shareResourceChanges);
-      jest.spyOn(ShareApiService.prototype, "shareResource").mockImplementation(() => jest.fn());
-      jest
-        .spyOn(resourceCreateService.encryptMetadataKeysService.getOrFindMetadataKeysService, "getOrFindAll")
-        .mockImplementation(() => metadataKeys);
-      jest
-        .spyOn(decryptMetadataService.getOrFindMetadataKeysService, "getOrFindAll")
-        .mockImplementation(() => metadataKeys);
+      await resourceCreateService.create(
+        resourceDto,
+        plaintextSecretPasswordStringDto().password,
+        pgpKeys.ada.passphrase,
+        permissionChanges,
+      );
 
-      jest.spyOn(resourceCreateService, "share");
-
-      await resourceCreateService.create(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
-
-      // Decrypt metadata
-      const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
-      expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
-      await decryptMetadataService.decryptOneWithSharedKey(resourceEntityUpdated);
-
-      expect(resourceCreateService.share).toHaveBeenCalledTimes(1);
-      //Metadata decrypted should be equal
-      expect(resourceEntityUpdated.metadata.toDto()).toEqual(resourceDto.metadata);
-      // Resource local storage should add the resource
-      expect(ResourceLocalStorage.addResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
-      expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledWith(13);
+      expect(resourceCreateService.shareResourceService.shareAll).toHaveBeenCalledTimes(1);
+      const [resourcesIds, changesCollection] = resourceCreateService.shareResourceService.shareAll.mock.calls[0];
+      expect(resourcesIds).toEqual([createdResourceId]);
+      // The service wraps the caller's plain DTO list into a PermissionChangesCollection before
+      // handing it to shareAll. We check the aro/aco wiring; `is_new` is implied for new rows and
+      // normalized away by the collection.
+      expect(changesCollection.toDto()).toEqual([
+        expect.objectContaining({
+          aro: "User",
+          aro_foreign_key: aroForeignKey,
+          aco: "Resource",
+          aco_foreign_key: createdResourceId,
+          type: 1,
+        }),
+      ]);
     });
 
-    it("Should create the resource V5 into personal folder parent", async () => {
-      expect.assertions(6);
+    it("Should create a V5 resource with personal metadata even when the parent folder is shared (workflow re-shares it afterwards)", async () => {
+      expect.assertions(4);
 
       let resourceToAPI, resourceLocalStorageExpected;
       const folderId = uuidv4();
-      const permissionDto = ownerFolderPermissionDto({ aco_foreign_key: folderId, aro_foreign_key: account.userId });
-      const folderDto = defaultFolderDto({ id: folderId, permission: permissionDto, permissions: [permissionDto] });
       const resourceDto = defaultResourceDto({
         folder_parent_id: folderId,
         resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
@@ -476,16 +440,6 @@ describe("ResourceCreateService", () => {
       const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
       const decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
 
-      jest.spyOn(ResourceService.prototype, "create").mockImplementation((resource) => {
-        //Used to check the data sent to API
-        resourceToAPI = resource;
-        const resourceEntity = new ResourceEntity(resourceDto);
-        resourceEntity.secrets = new ResourceSecretsCollection([resourceToAPI.secrets[0]]);
-        resourceEntity.metadataKeyType = resourceToAPI.metadata_key_type;
-        resourceLocalStorageExpected = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
-        resourceEntity.metadata = resourceToAPI.metadata;
-        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
-      });
       jest
         .spyOn(
           resourceCreateService.encryptMetadataKeysService.getOrFindMetadataSettingsService
@@ -494,30 +448,62 @@ describe("ResourceCreateService", () => {
           "findSettings",
         )
         .mockImplementation(() => metadataKeysSettingsDto);
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation((resource) => {
+        resourceToAPI = resource;
+        const resourceEntity = new ResourceEntity(resourceDto);
+        resourceEntity.secrets = new ResourceSecretsCollection([resourceToAPI.secrets[0]]);
+        resourceEntity.metadataKeyType = resourceToAPI.metadata_key_type;
+        resourceLocalStorageExpected = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        resourceEntity.metadata = resourceToAPI.metadata;
+        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [resourceDto]);
-      jest
-        .spyOn(FindFoldersService.prototype, "findByIdWithPermissions")
-        .mockImplementation(async () => new FolderEntity(folderDto));
-      jest.spyOn(resourceCreateService.shareResourceService, "shareAll");
-      jest.spyOn(resourceCreateService, "share");
-      //Decrypt secret
-      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
-      jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(async () => decryptionKey);
+      jest.spyOn(FindFoldersService.prototype, "findByIdWithPermissions");
+      jest.spyOn(ShareApiService.prototype, "shareResource");
 
       await resourceCreateService.create(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
 
-      // Decrypt metadata
+      // Decrypt metadata: the resource is created personal, so its metadata is encrypted with the
+      // operator's personal key, not the shared metadata key.
       const resourceEntityUpdated = new ResourceEntity(resourceToAPI);
-      expect(resourceEntityUpdated.isMetadataDecrypted()).toBeFalsy();
       const privateKeyDecrypted = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
       await decryptMetadataService.decryptMetadataWithGpgKey(resourceEntityUpdated, privateKeyDecrypted);
 
-      expect(resourceCreateService.share).toHaveBeenCalledTimes(1);
-      expect(resourceCreateService.shareResourceService.shareAll).toHaveBeenCalledTimes(0);
-      //Metadata decrypted should be equal
+      expect(FindFoldersService.prototype.findByIdWithPermissions).not.toHaveBeenCalled();
+      expect(ShareApiService.prototype.shareResource).not.toHaveBeenCalled();
       expect(resourceEntityUpdated.metadata.toDto()).toEqual(resourceDto.metadata);
-      // Resource local storage should add the resource
       expect(ResourceLocalStorage.addResource).toHaveBeenCalledWith(new ResourceEntity(resourceLocalStorageExpected));
+    });
+
+    it("Should call updateGoals with the operator-only step count regardless of whether the parent folder is set", async () => {
+      expect.assertions(1);
+
+      const folderId = uuidv4();
+      const resourceDto = defaultResourceDto({
+        folder_parent_id: folderId,
+        resource_type_id: TEST_RESOURCE_TYPE_V5_DEFAULT,
+      });
+      const plaintextDto = plaintextSecretPasswordDescriptionTotpDto();
+      const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
+
+      jest
+        .spyOn(
+          resourceCreateService.encryptMetadataKeysService.getOrFindMetadataSettingsService
+            .findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
+            .metadataKeysSettingsApiService,
+          "findSettings",
+        )
+        .mockImplementation(() => metadataKeysSettingsDto);
+      jest.spyOn(ResourceService.prototype, "create").mockImplementation(() => {
+        const resourceEntity = new ResourceEntity(resourceDto);
+        return resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      });
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [resourceDto]);
+
+      await resourceCreateService.create(resourceDto, plaintextDto, pgpKeys.ada.passphrase);
+
+      // Operator-only V5: 4 steps (encrypt metadata + encrypt secret + create + local storage),
+      // no share-related steps anymore.
       expect(resourceCreateService.progressService.updateGoals).toHaveBeenCalledWith(4);
     });
   });

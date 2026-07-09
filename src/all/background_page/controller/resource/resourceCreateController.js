@@ -40,11 +40,12 @@ class ResourceCreateController {
    * Controller executor.
    * @param {object} resourceDto The resource data
    * @param {string|object} plaintextDto The secret to encrypt
+   * @param {Array<object>} [permissionChanges] Optional permission changes applied after create.
    * @returns {Promise<void>}
    */
-  async _exec(resourceDto, plaintextDto) {
+  async _exec(resourceDto, plaintextDto, permissionChanges) {
     try {
-      const resource = await this.exec(resourceDto, plaintextDto);
+      const resource = await this.exec(resourceDto, plaintextDto, permissionChanges);
       this.worker.port.emit(this.requestId, "SUCCESS", resource);
     } catch (error) {
       console.error(error);
@@ -55,16 +56,22 @@ class ResourceCreateController {
   /**
    * @param {object} resourceDto The resource data
    * @param {string|object} plaintextDto The secret to encrypt
+   * @param {Array<object>} [permissionChanges] Optional permission changes applied after create.
    * @returns {Promise<void>}
    */
-  async exec(resourceDto, plaintextDto) {
+  async exec(resourceDto, plaintextDto, permissionChanges) {
     const goals = resourceDto.folder_parent_id ? 10 : 3;
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
     this.progressService.start(goals, i18n.t("Initializing"));
 
     try {
-      const resourceCreated = await this.resourceCreateService.create(resourceDto, plaintextDto, passphrase);
+      const resourceCreated = await this.resourceCreateService.create(
+        resourceDto,
+        plaintextDto,
+        passphrase,
+        permissionChanges,
+      );
       await this.progressService.finishStep(i18n.t("Done!"), true);
       return resourceCreated;
     } finally {

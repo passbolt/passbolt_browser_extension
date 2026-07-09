@@ -61,7 +61,12 @@ describe("ResourceCreateController", () => {
       await controller._exec(resourceDTO, secret);
 
       expect(controller.resourceCreateService.create).toHaveBeenCalledTimes(1);
-      expect(controller.resourceCreateService.create).toHaveBeenCalledWith(resourceDTO, secret, pgpKeys.ada.passphrase);
+      expect(controller.resourceCreateService.create).toHaveBeenCalledWith(
+        resourceDTO,
+        secret,
+        pgpKeys.ada.passphrase,
+        undefined,
+      );
       expect(controller.worker.port.emit).toHaveBeenCalledWith(null, "SUCCESS", resourceDTO);
     });
 

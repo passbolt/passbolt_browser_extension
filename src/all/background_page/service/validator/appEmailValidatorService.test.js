@@ -15,11 +15,11 @@
 import AppEmailValidatorService from "./appEmailValidatorService";
 import IsEmailValidator from "passbolt-styleguide/src/shared/lib/Validator/IsEmailValidator";
 import {
-  customEmailValidationProOrganizationSettings,
-  defaultProOrganizationSettings,
-} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+  customEmailValidationProSiteSettings,
+  defaultProSiteSettings,
+} from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
-import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import IsRegexValidator from "passbolt-styleguide/src/shared/lib/Validator/IsRegexValidator";
 
 describe("AppEmailValidatorService", () => {
@@ -31,15 +31,15 @@ describe("AppEmailValidatorService", () => {
 
     it("should return IsRegexValidator if the application settings customize the email regex validation.", async () => {
       expect.assertions(1);
-      const organizationSettings = customEmailValidationProOrganizationSettings();
-      OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
+      const organizationSettings = customEmailValidationProSiteSettings();
+      OrganizationSettingsModel.set(new SiteSettingsEntity(organizationSettings));
       expect(AppEmailValidatorService.getValidator()).toBeInstanceOf(IsRegexValidator);
     });
 
     it("should fallback on IsEmailValidator if application settings did not customize the email regex validation.", async () => {
       expect.assertions(1);
-      const organizationSettings = defaultProOrganizationSettings();
-      OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
+      const organizationSettings = defaultProSiteSettings();
+      OrganizationSettingsModel.set(new SiteSettingsEntity(organizationSettings));
       expect(AppEmailValidatorService.getValidator()).toBe(IsEmailValidator);
     });
   });
@@ -53,8 +53,8 @@ describe("AppEmailValidatorService", () => {
 
     it("should validate custom email if the application settings customize the email regex validation.", async () => {
       expect.assertions(2);
-      const organizationSettings = customEmailValidationProOrganizationSettings();
-      OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
+      const organizationSettings = customEmailValidationProSiteSettings();
+      OrganizationSettingsModel.set(new SiteSettingsEntity(organizationSettings));
       expect(AppEmailValidatorService.validate("ada@passbolt.c")).toBeTruthy();
       expect(AppEmailValidatorService.validate("ada@passbolt.lu")).toBeFalsy();
     });

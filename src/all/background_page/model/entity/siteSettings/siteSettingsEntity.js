@@ -14,30 +14,23 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-const ENTITY_NAME = "OrganizationSettings";
+const ENTITY_NAME = "SiteSettings";
 
 // Organization status
 const ORGANIZATION_ENABLED = "enabled";
 const ORGANIZATION_DISABLED = "disabled";
 const ORGANIZATION_NOT_FOUND = "not found";
 
-class OrganizationSettingsEntity extends Entity {
+class SiteSettingsEntity extends Entity {
   /**
    * @inheritDoc
    * Sanitize: Override default settings using the data provided in the DTO.
    */
-  constructor(organizationSettingsDto, options = {}) {
+  constructor(siteSettingsDto, options = {}) {
     // Default properties values
-    const props = Object.assign(OrganizationSettingsEntity.getDefault(), organizationSettingsDto);
-    const sanitizedDto = OrganizationSettingsEntity.sanitizeDto(props);
-    super(
-      EntitySchema.validate(
-        OrganizationSettingsEntity.ENTITY_NAME,
-        sanitizedDto,
-        OrganizationSettingsEntity.getSchema(),
-      ),
-      options,
-    );
+    const props = Object.assign(SiteSettingsEntity.getDefault(), siteSettingsDto);
+    const sanitizedDto = SiteSettingsEntity.sanitizeDto(props);
+    super(EntitySchema.validate(SiteSettingsEntity.ENTITY_NAME, sanitizedDto, SiteSettingsEntity.getSchema()), options);
   }
 
   /**
@@ -46,7 +39,7 @@ class OrganizationSettingsEntity extends Entity {
    */
   static getDefault() {
     return {
-      status: OrganizationSettingsEntity.ORGANIZATION_ENABLED,
+      status: SiteSettingsEntity.ORGANIZATION_ENABLED,
     };
   }
 
@@ -62,9 +55,9 @@ class OrganizationSettingsEntity extends Entity {
         status: {
           type: "string",
           enum: [
-            OrganizationSettingsEntity.ORGANIZATION_ENABLED,
-            OrganizationSettingsEntity.ORGANIZATION_DISABLED,
-            OrganizationSettingsEntity.ORGANIZATION_NOT_FOUND,
+            SiteSettingsEntity.ORGANIZATION_ENABLED,
+            SiteSettingsEntity.ORGANIZATION_DISABLED,
+            SiteSettingsEntity.ORGANIZATION_NOT_FOUND,
           ],
         },
         app: {
@@ -84,7 +77,7 @@ class OrganizationSettingsEntity extends Entity {
   /**
    * Return a disabled organization settings.
    */
-  static get disabledOrganizationSettings() {
+  static get disabledSiteSettings() {
     return {
       status: this.ORGANIZATION_DISABLED,
     };
@@ -100,7 +93,7 @@ class OrganizationSettingsEntity extends Entity {
   static sanitizeDto(dto) {
     const sanitizedDto = JSON.parse(JSON.stringify(dto));
 
-    OrganizationSettingsEntity.sanitizeEmailValidateRegex(sanitizedDto);
+    SiteSettingsEntity.sanitizeEmailValidateRegex(sanitizedDto);
 
     return sanitizedDto;
   }
@@ -215,7 +208,7 @@ class OrganizationSettingsEntity extends Entity {
    * ==================================================
    */
   /**
-   * OrganizationSettingsEntity.ENTITY_NAME
+   * SiteSettingsEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
@@ -223,7 +216,7 @@ class OrganizationSettingsEntity extends Entity {
   }
 
   /**
-   * OrganizationSettingsEntity.ORGANIZATION_ENABLED
+   * SiteSettingsEntity.ORGANIZATION_ENABLED
    * @returns {string}
    */
   static get ORGANIZATION_ENABLED() {
@@ -231,7 +224,7 @@ class OrganizationSettingsEntity extends Entity {
   }
 
   /**
-   * OrganizationSettingsEntity.ORGANIZATION_DISABLED
+   * SiteSettingsEntity.ORGANIZATION_DISABLED
    * @returns {string}
    */
   static get ORGANIZATION_DISABLED() {
@@ -239,7 +232,7 @@ class OrganizationSettingsEntity extends Entity {
   }
 
   /**
-   * OrganizationSettingsEntity.ORGANIZATION_NOT_FOUND
+   * SiteSettingsEntity.ORGANIZATION_NOT_FOUND
    * @returns {string}
    */
   static get ORGANIZATION_NOT_FOUND() {
@@ -247,4 +240,4 @@ class OrganizationSettingsEntity extends Entity {
   }
 }
 
-export default OrganizationSettingsEntity;
+export default SiteSettingsEntity;

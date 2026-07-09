@@ -18,13 +18,13 @@ import ExternalResourcesCollection from "../../../model/entity/resource/external
 import ExternalTotpEntity from "../../../model/entity/totp/externalTotpEntity";
 import ResourcesExporter from "../../../model/export/resourcesExporter";
 import FolderModel from "../../../model/folder/folderModel";
-import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import i18n from "../../../sdk/i18n";
 import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import DecryptAndParseResourceSecretService from "../../secret/decryptAndParseResourceSecretService";
 import FindResourcesService from "../findResourcesService";
 import CustomFieldsCollection from "passbolt-styleguide/src/shared/models/entity/customField/customFieldsCollection";
+import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 
 /**
  * The service aim to export the resources to a file.
@@ -42,7 +42,7 @@ class ExportResourcesService {
     this.findResourcesService = new FindResourcesService(account, apiClientOptions);
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
     // Models
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrfindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.folderModel = new FolderModel(apiClientOptions, account);
   }
 
@@ -50,12 +50,12 @@ class ExportResourcesService {
    * Export resources to file and return the exported format
    * @param {ExportResourcesFileEntity} exportResourcesFileEntity The export entity
    * @param {String} passphrase the user passphrase
-   * @return {Promise<void>}
+   * @return {Promise<Array>} The custom fields renamed to avoid conflicting with reserved field names
    */
   async exportToFile(exportResourcesFileEntity, passphrase) {
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     await this.decryptSecrets(exportResourcesFileEntity, privateKey);
-    await this.export(exportResourcesFileEntity);
+    return await this.export(exportResourcesFileEntity);
   }
 
   /**
@@ -94,7 +94,7 @@ class ExportResourcesService {
   async decryptSecrets(exportResourcesFileEntity, privateKey) {
     let i = 0;
 
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.getOrfindResourceTypesService.getOrFindAll();
     for (const exportResourceEntity of exportResourcesFileEntity.exportResources.items) {
       i++;
       await this.progressService.finishStep(
@@ -143,12 +143,12 @@ class ExportResourcesService {
   /**
    * Export
    * @param {ExportResourcesFileEntity} exportResourcesFileEntity The export object
-   * @returns {Promise<void>}
+   * @returns {Promise<Array>} The custom fields renamed to avoid conflicting with reserved field names
    * @private
    */
   async export(exportResourcesFileEntity) {
     const exporter = new ResourcesExporter();
-    await exporter.export(exportResourcesFileEntity);
+    return await exporter.export(exportResourcesFileEntity);
   }
 }
 

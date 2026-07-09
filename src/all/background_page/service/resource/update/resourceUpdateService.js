@@ -24,8 +24,10 @@ import { OpenpgpAssertion } from "../../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../crypto/encryptMessageService";
 import ResourceSecretsCollection from "../../../model/entity/secret/resource/resourceSecretsCollection";
 import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
-import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import FindPermissionsService from "../../permission/findPermissionsService";
+import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
+import PermissionChangesCollection from "../../../model/entity/permission/change/permissionChangesCollection";
+import ShareResourceService, { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../../share/shareResourceService";
 
 class ResourceUpdateService {
   /**
@@ -37,13 +39,14 @@ class ResourceUpdateService {
   constructor(account, apiClientOptions, progressService) {
     this.account = account;
     this.resourceService = new ResourceService(apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourcetypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.progressService = progressService;
     this.findPermissionsService = new FindPermissionsService(account, apiClientOptions);
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.encryptMetadataKeysService = new EncryptMetadataKeysService(apiClientOptions, this.account);
     this.userModel = new UserModel(apiClientOptions);
     this.keyring = new Keyring();
+    this.shareResourceService = new ShareResourceService(apiClientOptions, account, progressService);
   }
 
   /**
@@ -52,11 +55,15 @@ class ResourceUpdateService {
    * @param {object} resourceDto The resource data
    * @param {string|object|null} plaintextDto The secret to encrypt, or null to keep the existing secret
    * @param {string} passphrase The user passphrase
+   * @param {Array<object>} [permissionChanges] Optional permission changes applied after the update.
    * @return {Promise<ResourceEntity>} resourceEntity
    */
-  async exec(resourceDto, plaintextDto, passphrase) {
+  async exec(resourceDto, plaintextDto, passphrase, permissionChanges) {
+    // Port serialization replaces an omitted arg with `null`, sliding past a `= []` default;
+    // normalize defensively so the rest of the method can assume an array.
+    permissionChanges = permissionChanges ?? [];
     const resourceEntity = new ResourceEntity(resourceDto);
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.getOrFindResourcetypesService.getOrFindAll();
     const resourceTypeEntity = resourceTypesCollection.getFirstById(resourceEntity.resourceTypeId);
     const permissionsCollection = await this.findPermissionsService.findAllByAcoForeignKey(resourceEntity.id);
 
@@ -65,7 +72,7 @@ class ResourceUpdateService {
     // Set personal property only if resource is not shared with user and group
     resourceEntity.personal = usersIds.length === 1 && !permissionsCollection.hasGroupPermission;
     // Set goals
-    const goals = this.calculateGoals(plaintextDto, resourceTypeEntity, usersIds.length);
+    const goals = this.calculateGoals(plaintextDto, resourceTypeEntity, usersIds.length, permissionChanges.length);
     this.progressService.updateGoals(goals);
     // Keep metadata decrypted to update it in the local storage
     const metadataDecrypted = resourceEntity.metadata;
@@ -79,7 +86,22 @@ class ResourceUpdateService {
       await this.updateSecret(resourceEntity, plaintextDto, passphrase, usersIds);
     }
     // Update resource
-    return this.update(resourceEntity, resourceTypeEntity, metadataDecrypted);
+    const updatedResourceEntity = await this.update(resourceEntity, resourceTypeEntity, metadataDecrypted);
+    // Apply the operator-confirmed permission changes (re-share) in the spec-mandated safe order.
+    if (permissionChanges.length > 0) {
+      // The styleguide emits deltas with aco_foreign_key unset (or null); stamp the resource id
+      // before handing them to the share orchestration.
+      const stampedChanges = permissionChanges.map((change) => ({
+        ...change,
+        aco_foreign_key: updatedResourceEntity.id,
+      }));
+      await this.shareResourceService.shareAll(
+        [updatedResourceEntity.id],
+        new PermissionChangesCollection(stampedChanges),
+        passphrase,
+      );
+    }
+    return updatedResourceEntity;
   }
 
   /**
@@ -162,15 +184,17 @@ class ResourceUpdateService {
    * @param {string|object} plaintextDto The secret to encrypt
    * @param {ResourceTypeEntity} resourceType The resource type
    * @param {number} usersLength The number of users
+   * @param {number} [permissionChangesLength] The number of permission changes applied after the update
    * @returns {number}
    */
-  calculateGoals(plaintextDto, resourceType, usersLength) {
+  calculateGoals(plaintextDto, resourceType, usersLength, permissionChangesLength = 0) {
+    const shareSteps = permissionChangesLength > 0 ? PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL : 0;
     if (resourceType.isV5()) {
       // encrypt metadata + save + done or encrypt secret * users + encrypt metadata + keyring sync + save + done
-      return plaintextDto === null ? 3 : usersLength + 4;
+      return (plaintextDto === null ? 3 : usersLength + 4) + shareSteps;
     } else if (resourceType.isV4()) {
       // save + done or encrypt secret * users + keyring sync + save + done
-      return plaintextDto === null ? 2 : usersLength + 3;
+      return (plaintextDto === null ? 2 : usersLength + 3) + shareSteps;
     }
   }
 }

@@ -27,6 +27,9 @@ import { defaultResourcesDtos } from "passbolt-styleguide/src/shared/models/enti
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
+import { sortResourcesByUriMatchingScore } from "passbolt-styleguide/src/shared/utils/sortUtils";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 
 describe("InformMenuController", () => {
   let requestId, worker, port, controller, webIntegrationPort;
@@ -79,8 +82,35 @@ describe("InformMenuController", () => {
       expect(port.emit).toHaveBeenCalledWith(requestId, "SUCCESS", {
         inputType: "password",
         inputValue: "test",
-        suggestedResources: suggestedResourcesDtos,
+        suggestedResources: sortResourcesByUriMatchingScore(suggestedResourcesDtos, worker.tab.url),
       });
+    });
+
+    it("Should sort suggestedResources by URI matching score with the tab url, best match first", async () => {
+      expect.assertions(2);
+
+      const noMatch = defaultResourceDto({ metadata: defaultResourceMetadataDto({ uris: ["https://example.com"] }) });
+      const sameDomain = defaultResourceDto({ metadata: defaultResourceMetadataDto({ uris: ["passbolt.com"] }) });
+      const sameFqdn = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["https://www.passbolt.com/login"] }),
+      });
+      const exactMatch = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["https://www.passbolt.com"] }),
+      });
+
+      const unsortedCollection = new ResourcesCollection([noMatch, sameDomain, sameFqdn, exactMatch]);
+      jest.spyOn(controller.getOrFindResourcesService, "getOrFindSuggested").mockResolvedValue(unsortedCollection);
+
+      await controller.getInitialConfiguration(requestId);
+
+      const emittedConfiguration = port.emit.mock.calls[0][2];
+      expect(port.emit).toHaveBeenCalledWith(requestId, "SUCCESS", expect.anything());
+      expect(emittedConfiguration.suggestedResources.map((resource) => resource.id)).toEqual([
+        exactMatch.id,
+        sameFqdn.id,
+        sameDomain.id,
+        noMatch.id,
+      ]);
     });
 
     it("Should catch and emit ERROR when WorkerService throws an error", async () => {

@@ -21,7 +21,7 @@ import { CUSTOM_FIELD_TYPE } from "passbolt-styleguide/src/shared/models/entity/
 import { v4 as uuidv4 } from "uuid";
 import { RESOURCE_TYPE_VERSION_5 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 
-const KDBX_SUPPORTED_FIELDS = [
+export const KDBX_SUPPORTED_FIELDS = [
   "Title",
   "URL",
   "UserName",

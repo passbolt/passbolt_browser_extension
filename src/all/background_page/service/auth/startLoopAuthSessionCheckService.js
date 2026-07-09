@@ -13,6 +13,8 @@
  */
 import CheckAuthStatusService from "./checkAuthStatusService";
 import PostLogoutService from "./postLogoutService";
+import GetActiveAccountService from "../account/getActiveAccountService";
+import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
 const AUTH_SESSION_CHECK_ALARM = "AuthSessionCheck";
@@ -50,7 +52,9 @@ class StartLoopAuthSessionCheckService {
     if (alarm.name !== StartLoopAuthSessionCheckService.ALARM_NAME) {
       return;
     }
-    const checkAuthService = new CheckAuthStatusService();
+    const account = await GetActiveAccountService.get();
+    const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+    const checkAuthService = new CheckAuthStatusService(account, apiClientOptions);
     const authStatus = await checkAuthService.checkAuthStatus(true);
     if (!authStatus.isAuthenticated) {
       PostLogoutService.exec();

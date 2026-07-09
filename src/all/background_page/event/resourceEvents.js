@@ -63,10 +63,11 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param resourceDto {object} The resource meta data
    * @param plaintextDto {string|object} The plaintext data to encrypt
+   * @param permissionChanges {Array<object>} Optional permission changes applied after create
    */
-  worker.port.on("passbolt.resources.create", async (requestId, resourceDto, plaintextDto) => {
+  worker.port.on("passbolt.resources.create", async (requestId, resourceDto, plaintextDto, permissionChanges) => {
     const controller = new ResourceCreateController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourceDto, plaintextDto);
+    await controller._exec(resourceDto, plaintextDto, permissionChanges);
   });
 
   /*
@@ -88,10 +89,11 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param resource {array} The resource
    * @param plaintextDto {} The resource secret
+   * @param permissionChanges {Array<object>} Optional permission changes applied after the update
    */
-  worker.port.on("passbolt.resources.update", async (requestId, resourceDto, plaintextDto) => {
+  worker.port.on("passbolt.resources.update", async (requestId, resourceDto, plaintextDto, permissionChanges) => {
     const controller = new ResourceUpdateController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourceDto, plaintextDto);
+    await controller._exec(resourceDto, plaintextDto, permissionChanges);
   });
 
   /*

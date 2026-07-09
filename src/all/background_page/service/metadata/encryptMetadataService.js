@@ -25,13 +25,13 @@ import FolderEntity from "../../model/entity/folder/folderEntity";
 import GetOrFindMetadataSettingsService from "./getOrFindMetadataSettingsService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import { RESOURCE_TYPE_VERSION_5 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import Keyring from "../../model/keyring";
 import ExternalGpgKeyEntity from "passbolt-styleguide/src/shared/models/entity/gpgkey/externalGpgKeyEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceTypesService";
 
 class EncryptMetadataService {
   /**
@@ -42,7 +42,7 @@ class EncryptMetadataService {
   constructor(apiClientOptions, account) {
     this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
     this.getOrFindMetadataKeysService = new GetOrFindMetadataKeysService(account, apiClientOptions);
-    this.resourceTypesModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.account = account;
     this.keyring = new Keyring();
     this._usersPublicGpgKeys = {};
@@ -123,7 +123,7 @@ class EncryptMetadataService {
       throw new Error("Unable to encrypt the collection metadata, a resource metadata is already encrypted.");
     }
 
-    const resourceTypesV5Collection = await this.resourceTypesModel.getOrFindAll();
+    const resourceTypesV5Collection = await this.getOrFindResourceTypesService.getOrFindAll();
     resourceTypesV5Collection.filterByResourceTypeVersion(RESOURCE_TYPE_VERSION_5);
     // No need to encrypt metadata of resource type v4.
     if (

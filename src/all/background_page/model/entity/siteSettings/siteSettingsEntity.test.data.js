@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 
-import OrganizationSettingsEntity from "./organizationSettingsEntity";
+import SiteSettingsEntity from "./siteSettingsEntity";
 
-export const anonymousOrganizationSettings = (data = {}) => {
+export const anonymousSiteSettings = (data = {}) => {
   const defaultData = {
-    status: OrganizationSettingsEntity.ORGANIZATION_ENABLED,
+    status: SiteSettingsEntity.ORGANIZATION_ENABLED,
     app: {
       url: "http://127.0.0.1:3001",
       locale: "en-UK",
@@ -132,8 +132,8 @@ export const anonymousOrganizationSettings = (data = {}) => {
   return Object.assign(defaultData, data);
 };
 
-export const defaultCeOrganizationSettings = (siteSettings) => {
-  const defaultData = anonymousOrganizationSettings();
+export const defaultCeSiteSettings = (siteSettings) => {
+  const defaultData = anonymousSiteSettings();
   defaultData.app = {
     url: "http://127.0.0.1:3001",
     locale: "en-UK",
@@ -214,8 +214,8 @@ export const defaultCeOrganizationSettings = (siteSettings) => {
   return Object.assign(defaultData, siteSettings);
 };
 
-export const defaultProOrganizationSettings = (siteSettings) => {
-  const defaultData = defaultCeOrganizationSettings();
+export const defaultProSiteSettings = (siteSettings) => {
+  const defaultData = defaultCeSiteSettings();
   defaultData.passbolt.edition = "pro";
   defaultData.passbolt.plugins = Object.assign(defaultData.passbolt.plugins, {
     accountRecoveryRequestHelp: {
@@ -267,8 +267,8 @@ export const defaultProOrganizationSettings = (siteSettings) => {
   return Object.assign(defaultData, siteSettings);
 };
 
-export const customEmailValidationProOrganizationSettings = (siteSettings) => {
-  const defaultData = defaultProOrganizationSettings();
+export const customEmailValidationProSiteSettings = (siteSettings) => {
+  const defaultData = defaultProSiteSettings();
   defaultData.passbolt.email = {
     validate: {
       regex: "\/.*@passbolt.(c|com)$\/",

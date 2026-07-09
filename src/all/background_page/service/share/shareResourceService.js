@@ -29,7 +29,6 @@ import {
 } from "../../utils/assertions";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceService from "../api/resource/resourceService";
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import EncryptMetadataService from "../metadata/encryptMetadataService";
@@ -39,6 +38,7 @@ import { RESOURCE_TYPE_VERSION_5 } from "passbolt-styleguide/src/shared/models/e
 import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 import NeededSecretsCollection from "../../model/entity/secret/needed/neededSecretsCollection";
 import SecretsCollection from "passbolt-styleguide/src/shared/models/entity/secret/secretsCollection";
+import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceTypesService";
 
 export const PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL = 8;
 
@@ -55,7 +55,7 @@ class ShareResourceService {
     this.shareApiService = new ShareApiService(apiClientOptions);
     this.findResourcesService = new FindResourcesService(account, apiClientOptions);
     this.findAndUpdateResourcesLocalStorage = new FindAndUpdateResourcesLocalStorage(account, apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.resourceService = new ResourceService(apiClientOptions);
     this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
     this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
@@ -107,7 +107,7 @@ class ShareResourceService {
   async updatePersonalMetadataToSharedMetadata(resourcesIds, permissionChanges, passphrase) {
     this.progressService.finishStep(i18n.t("Updating resources metadata"), true);
     const resourcesToUpdate = await this.getOrFindResourcesService.getOrFindByIds(resourcesIds);
-    const resourceTypes = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypes = await this.getOrFindResourceTypesService.getOrFindAll();
     const resourceIdMetadataToShare = permissionChanges.items
       .filter((permissionChange) => !permissionChange.isDeleted)
       .map((permissionChange) => permissionChange.acoForeignKey);

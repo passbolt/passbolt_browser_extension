@@ -30,7 +30,7 @@ import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
@@ -48,7 +48,7 @@ describe("RecoverAccountController", () => {
     const passphrase = pgpKeys.account_recovery_request.passphrase;
 
     const mockOrganisationSettings = (isSsoEnabled) => {
-      const organizationSettings = anonymousOrganizationSettings();
+      const organizationSettings = anonymousSiteSettings();
       if (isSsoEnabled) {
         organizationSettings.passbolt.plugins.sso = { enabled: true };
       }
@@ -198,7 +198,7 @@ describe("RecoverAccountController", () => {
 
       expect.assertions(3);
       const expetedProvider = "azure";
-      const organizationSettings = anonymousOrganizationSettings();
+      const organizationSettings = anonymousSiteSettings();
       organizationSettings.passbolt.plugins.sso = { enabled: true };
 
       // Mock API fetch account recovery request get response.

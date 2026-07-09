@@ -19,7 +19,7 @@ import UpdateUserLocalStorageController from "./updateUserLocalStorageController
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { adminAccountDto, defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
-import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
 
 beforeEach(() => {
@@ -28,7 +28,7 @@ beforeEach(() => {
 
 describe("UpdateUserLocalStorageController", () => {
   beforeEach(() => {
-    const siteSettingsDto = defaultCeOrganizationSettings();
+    const siteSettingsDto = defaultCeSiteSettings();
 
     jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => siteSettingsDto);
   });
@@ -39,7 +39,7 @@ describe("UpdateUserLocalStorageController", () => {
       fetch.doMockOnceIf(new RegExp(`/users.json`), async (req) => {
         const url = new URL(req.url);
         expect(url.search).toStrictEqual(
-          "?api-version=v2&contain%5Bprofile%5D=1&contain%5Bgpgkey%5D=0&contain%5Bgroups_users%5D=0&contain%5Bpending_account_recovery_request%5D=1&contain%5Baccount_recovery_user_setting%5D=1&contain%5BLastLoggedIn%5D=1",
+          "?api-version=v2&contain%5Bprofile%5D=1&contain%5Bgpgkey%5D=0&contain%5Bgroups_users%5D=0&contain%5Bpending_account_recovery_request%5D=1&contain%5Baccount_recovery_user_setting%5D=1",
         );
         return mockApiResponse([]);
       });

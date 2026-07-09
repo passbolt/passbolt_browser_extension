@@ -46,14 +46,14 @@ export default class FindAndUpdateRbacLocalStorageService {
         return await navigator.locks.request(
           lockKey,
           { mode: "shared" },
-          async () => new RbacsCollection(await this.rbacLocalStorage.get()),
+          async () => new RbacsCollection(await this.rbacLocalStorage.getData()),
         );
       }
 
       // Lock is granted, retrieve the current user's Rbac and update the local storage.
       const rbacsCollection = await this.findRbacService.findMe();
 
-      await this.rbacLocalStorage.set(rbacsCollection);
+      await this.rbacLocalStorage.setData(rbacsCollection);
       return rbacsCollection;
     });
   }

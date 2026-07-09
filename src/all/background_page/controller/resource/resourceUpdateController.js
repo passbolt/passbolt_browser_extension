@@ -43,11 +43,12 @@ class ResourceUpdateController {
    * Controller executor.
    * @param {object} resourceDto The resource data
    * @param {string|object} plaintextDto The secret to encrypt
+   * @param {Array<object>} [permissionChanges] Optional permission changes applied after the update.
    * @returns {Promise<void>}
    */
-  async _exec(resourceDto, plaintextDto) {
+  async _exec(resourceDto, plaintextDto, permissionChanges) {
     try {
-      const resource = await this.exec(resourceDto, plaintextDto);
+      const resource = await this.exec(resourceDto, plaintextDto, permissionChanges);
       this.worker.port.emit(this.requestId, "SUCCESS", resource);
     } catch (error) {
       console.error(error);
@@ -60,15 +61,21 @@ class ResourceUpdateController {
    *
    * @param {object} resourceDto The resource data
    * @param {null|string|object} plaintextDto The secret to encrypt
+   * @param {Array<object>} [permissionChanges] Optional permission changes applied after the update.
    * @returns {Promise<Object>} updated resource
    */
-  async exec(resourceDto, plaintextDto) {
+  async exec(resourceDto, plaintextDto, permissionChanges) {
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
     this.progressService.start(1, i18n.t("Updating resource"));
 
     try {
-      const resourceUpdated = await this.resourceUpdateService.exec(resourceDto, plaintextDto, passphrase);
+      const resourceUpdated = await this.resourceUpdateService.exec(
+        resourceDto,
+        plaintextDto,
+        passphrase,
+        permissionChanges,
+      );
       await this.progressService.finishStep(i18n.t("Done!"), true);
       return resourceUpdated;
     } finally {

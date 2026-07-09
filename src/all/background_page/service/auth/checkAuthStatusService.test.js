@@ -13,9 +13,11 @@
  */
 
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
-import AuthenticationStatusService from "../authenticationStatusService";
-import AuthStatusLocalStorage from "../local_storage/authStatusLocalStorage";
 import CheckAuthStatusService from "./checkAuthStatusService";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
+import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -24,102 +26,118 @@ beforeEach(() => {
 describe("CheckAuthStatusService", () => {
   it("expects the user not to be authenticated", async () => {
     expect.assertions(3);
-    jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
-    jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => false);
 
-    const service = new CheckAuthStatusService();
+    const account = new AccountEntity(defaultAccountDto());
+    const service = new CheckAuthStatusService(account, defaultApiClientOptions());
+    jest.spyOn(service.activeSessionLocalStorage, "get").mockImplementation(() => undefined);
+    jest.spyOn(service.activeSessionLocalStorage, "flush");
+    jest.spyOn(service.authenticationStatusService, "isAuthenticated").mockImplementation(() => false);
     const authStatus = await service.checkAuthStatus();
 
-    expect(AuthStatusLocalStorage.get).toHaveBeenCalledTimes(1);
-    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
-    expect(authStatus).toStrictEqual({
-      isAuthenticated: false,
-      isMfaRequired: false,
-    });
+    expect(service.activeSessionLocalStorage.get).toHaveBeenCalledTimes(1);
+    expect(service.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
+    expect(authStatus).toStrictEqual(
+      new OnlineSessionEntity({
+        is_authenticated: false,
+        is_mfa_authenticated: true,
+      }),
+    );
   });
 
   it("expects the user to be fully authenticated", async () => {
     expect.assertions(3);
-    jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
-    jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
 
-    const service = new CheckAuthStatusService();
+    const account = new AccountEntity(defaultAccountDto());
+    const service = new CheckAuthStatusService(account, defaultApiClientOptions());
+    jest.spyOn(service.activeSessionLocalStorage, "get").mockImplementation(() => undefined);
+    jest.spyOn(service.activeSessionLocalStorage, "flush");
+    jest.spyOn(service.authenticationStatusService, "isAuthenticated").mockImplementation(() => true);
     const authStatus = await service.checkAuthStatus();
 
-    expect(AuthStatusLocalStorage.get).toHaveBeenCalledTimes(1);
-    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
-    expect(authStatus).toStrictEqual({
-      isAuthenticated: true,
-      isMfaRequired: false,
-    });
+    expect(service.activeSessionLocalStorage.get).toHaveBeenCalledTimes(1);
+    expect(service.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
+    expect(authStatus).toStrictEqual(
+      new OnlineSessionEntity({
+        is_authenticated: true,
+        is_mfa_authenticated: true,
+      }),
+    );
   });
 
   it("expects the user to require MFA authentication", async () => {
     expect.assertions(3);
-    jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
-    jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => {
+
+    const account = new AccountEntity(defaultAccountDto());
+    const service = new CheckAuthStatusService(account, defaultApiClientOptions());
+    jest.spyOn(service.activeSessionLocalStorage, "get").mockImplementation(() => undefined);
+    jest.spyOn(service.activeSessionLocalStorage, "flush");
+    jest.spyOn(service.authenticationStatusService, "isAuthenticated").mockImplementation(() => {
       throw new MfaAuthenticationRequiredError();
     });
-
-    const service = new CheckAuthStatusService();
     const authStatus = await service.checkAuthStatus();
 
-    expect(AuthStatusLocalStorage.get).toHaveBeenCalledTimes(1);
-    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
-    expect(authStatus).toStrictEqual({
-      isAuthenticated: true,
-      isMfaRequired: true,
-    });
+    expect(service.activeSessionLocalStorage.get).toHaveBeenCalledTimes(1);
+    expect(service.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
+    expect(authStatus).toStrictEqual(
+      new OnlineSessionEntity({
+        is_authenticated: true,
+        is_mfa_authenticated: false,
+      }),
+    );
   });
 
   it("should ask for an API call to find the authentication status", async () => {
-    expect.assertions(3);
-    jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
-    jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
+    expect.assertions(4);
 
-    const service = new CheckAuthStatusService();
+    const account = new AccountEntity(defaultAccountDto());
+    const service = new CheckAuthStatusService(account, defaultApiClientOptions());
+    jest.spyOn(service.activeSessionLocalStorage, "get").mockImplementation(() => undefined);
+    jest.spyOn(service.activeSessionLocalStorage, "set");
+    jest.spyOn(service.activeSessionLocalStorage, "flush");
+    jest.spyOn(service.authenticationStatusService, "isAuthenticated").mockImplementation(() => true);
     const authStatus = await service.checkAuthStatus(true);
 
-    expect(AuthStatusLocalStorage.get).not.toHaveBeenCalled();
-    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
-    expect(authStatus).toStrictEqual({
-      isAuthenticated: true,
-      isMfaRequired: false,
-    });
+    expect(service.activeSessionLocalStorage.get).toHaveBeenCalled();
+    expect(service.activeSessionLocalStorage.set).toHaveBeenCalled();
+    expect(service.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
+    expect(authStatus).toStrictEqual(
+      new OnlineSessionEntity({
+        is_authenticated: true,
+        is_mfa_authenticated: true,
+      }),
+    );
   });
 
   it("should return the authentication status from the cache", async () => {
     expect.assertions(3);
-    const localStorageData = {
-      isAuthenticated: false,
-      isMfaRequired: false,
-    };
-    jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => localStorageData);
-    jest.spyOn(AuthStatusLocalStorage, "flush");
+    const localStorageData = new OnlineSessionEntity({
+      is_authenticated: false,
+      is_mfa_authenticated: true,
+    });
 
-    const service = new CheckAuthStatusService();
+    const account = new AccountEntity(defaultAccountDto());
+    const service = new CheckAuthStatusService(account, defaultApiClientOptions());
+    jest.spyOn(service.activeSessionLocalStorage, "get").mockImplementation(() => localStorageData);
+    jest.spyOn(service.activeSessionLocalStorage, "flush");
     const authStatus = await service.checkAuthStatus(false);
 
-    expect(AuthStatusLocalStorage.get).toHaveBeenCalledTimes(1);
-    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
+    expect(service.activeSessionLocalStorage.get).toHaveBeenCalledTimes(1);
+    expect(service.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual(localStorageData);
   });
 
   it("should return the authentication status from the API if the cache is empty", async () => {
     expect.assertions(3);
-    jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => null);
-    jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => false);
 
-    const service = new CheckAuthStatusService();
+    const account = new AccountEntity(defaultAccountDto());
+    const service = new CheckAuthStatusService(account, defaultApiClientOptions());
+    jest.spyOn(service.activeSessionLocalStorage, "get").mockImplementation(() => null);
+    jest.spyOn(service.activeSessionLocalStorage, "flush");
+    jest.spyOn(service.authenticationStatusService, "isAuthenticated").mockImplementation(() => false);
     const authStatus = await service.checkAuthStatus(false);
 
-    expect(AuthStatusLocalStorage.get).toHaveBeenCalledTimes(1);
-    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
-    expect(authStatus).toStrictEqual({ isAuthenticated: false, isMfaRequired: false });
+    expect(service.activeSessionLocalStorage.get).toHaveBeenCalledTimes(1);
+    expect(service.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
+    expect(authStatus).toStrictEqual(new OnlineSessionEntity({ is_authenticated: false, is_mfa_authenticated: true }));
   });
 });

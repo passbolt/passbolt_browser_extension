@@ -68,6 +68,7 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import GetOrFindMetadataSettingsService from "../../service/metadata/getOrFindMetadataSettingsService";
+import GetOrFindResourceTypesService from "../../service/resourceType/getOrFindResourceTypesService";
 
 beforeEach(async () => {
   await MockExtension.withConfiguredAccount();
@@ -808,7 +809,7 @@ describe("ImportResourcesFileController", () => {
       expect.assertions(1);
 
       jest.spyOn(controller.progressService, "close");
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => {
+      jest.spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll").mockImplementationOnce(() => {
         throw new Error("API error");
       });
       const file = btoa(BinaryConvert.toBinary(defaultCsvData));

@@ -15,6 +15,5 @@ if [ "$ERRORS" -gt 0 ]; then
   echo "WARNING: $ERRORS mount(s) missing. Claude Code may not work correctly."
 fi
 
-echo "==> Updating Claude Code..."
-curl -fsSL https://claude.ai/install.sh | bash -s stable
+echo "==> Claude Code version:"
 claude --version

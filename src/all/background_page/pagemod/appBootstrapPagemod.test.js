@@ -21,6 +21,9 @@ import { PortEvents } from "../event/portEvents";
 import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import { userLoggedInAuthStatus, userLoggedOutAuthStatus } from "../controller/auth/authCheckStatus.test.data";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
+import AccountEntity from "../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../model/entity/account/accountEntity.test.data";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -62,10 +65,10 @@ describe("AppBootstrap", () => {
     it("Should be able to attach app bootstrap pagemod to browser frame", async () => {
       expect.assertions(1);
       // mock functions
-      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       jest
         .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
-        .mockImplementation(async () => userLoggedInAuthStatus());
+        .mockImplementation(async () => new OnlineSessionEntity(userLoggedInAuthStatus()));
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       const result = await AppBootstrap.canBeAttachedTo({
         frameId: Pagemod.TOP_FRAME_ID,

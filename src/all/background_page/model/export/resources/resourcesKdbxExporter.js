@@ -14,6 +14,7 @@ import ExternalFolderEntity from "../../entity/folder/external/externalFolderEnt
 import * as kdbxweb from "kdbxweb";
 import { FORMAT_KDBX, FORMAT_KDBX_OTHERS } from "../../entity/export/exportResourcesFileEntity";
 import { ICON_TYPE_KEEPASS_ICON_SET } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/IconEntity";
+import { KDBX_SUPPORTED_FIELDS } from "../../import/resources/resourcesKdbxImportParser";
 
 class ResourcesKdbxExporter {
   /**
@@ -22,11 +23,12 @@ class ResourcesKdbxExporter {
    */
   constructor(exportEntity) {
     this.exportEntity = exportEntity;
+    this.customFieldsConflicts = [];
   }
 
   /**
    * Export
-   * @returns {Promise<void>}
+   * @returns {Promise<Array<{resourceName: string, originalKey: string, newKey: string}>>} The custom fields renamed to avoid conflicting with reserved KeePass field names
    */
   async export() {
     const kdbxDb = await this.createKdbxDb();
@@ -39,6 +41,7 @@ class ResourcesKdbxExporter {
       this.createKdbxEntry(kdbxDb, childExportResource, kdbxDb.getDefaultGroup()),
     );
     this.exportEntity.file = await kdbxDb.save();
+    return this.customFieldsConflicts;
   }
 
   /**
@@ -120,7 +123,9 @@ class ResourcesKdbxExporter {
   }
 
   /**
-   * Set the custom fields according to the kdbx format
+   * Set the custom fields according to the kdbx format.
+   * A custom field whose key collides with a reserved KeePass field (e.g. "Password") or an already set field
+   * is renamed with a post-fix numeration ("Password (1)") to avoid overwriting the reserved field value.
    * @param {kdbxweb.KdbxEntry} kdbxEntry
    * @param {ExternalResourceEntity} externalResourceEntity
    * @returns {void}
@@ -128,9 +133,41 @@ class ResourcesKdbxExporter {
   setCustomFields(kdbxEntry, externalResourceEntity) {
     if (externalResourceEntity.customFields) {
       externalResourceEntity.customFields.items.forEach((customField) => {
-        kdbxEntry.fields.set(customField.key, kdbxweb.ProtectedValue.fromString(customField.value));
+        const key = this.getNonConflictingFieldName(kdbxEntry, customField.key);
+        if (key !== customField.key) {
+          this.customFieldsConflicts.push({
+            resourceName: externalResourceEntity.name,
+            originalKey: customField.key,
+            newKey: key,
+          });
+        }
+        kdbxEntry.fields.set(key, kdbxweb.ProtectedValue.fromString(customField.value));
       });
     }
+  }
+
+  /**
+   * Resolve a custom field key to a name that does not conflict with a reserved KeePass field or an already set field.
+   * A name conflicts when it is a reserved field or already present on the entry. The static reserved list is required
+   * because some reserved fields (e.g. "Notes") are set after the custom fields, while already set fields (including
+   * the multi-uri KP2A_URL fields, written before the custom fields) are caught by the entry lookup.
+   * @param {kdbxweb.KdbxEntry} kdbxEntry
+   * @param {string} key The custom field key
+   * @returns {string} The original key, or a numbered variant ("key (1)", "key (2)", ...) when it conflicts
+   */
+  getNonConflictingFieldName(kdbxEntry, key) {
+    const isConflicting = (name) => KDBX_SUPPORTED_FIELDS.includes(name) || kdbxEntry.fields.has(name);
+
+    if (!isConflicting(key)) {
+      return key;
+    }
+    let index = 1;
+    let candidate = `${key} (${index})`;
+    while (isConflicting(candidate)) {
+      index++;
+      candidate = `${key} (${index})`;
+    }
+    return candidate;
   }
 
   /**

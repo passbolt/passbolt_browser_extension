@@ -52,7 +52,7 @@ class ExportResourcesFileController {
 
   /**
    * Main execution function.
-   * @return {Promise<ExportResourcesFileEntity>}
+   * @return {Promise<{customFieldsConflicts: Array}>} The custom fields renamed to avoid conflicting with reserved field names
    */
   async exec(exportResourcesFileDto) {
     //Assert the param through the entity
@@ -61,7 +61,10 @@ class ExportResourcesFileController {
     try {
       const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       await this.exportResourcesService.prepareExportContent(exportResourcesFileEntity, passphrase);
-      await this.exportResourcesService.exportToFile(exportResourcesFileEntity, passphrase);
+      const customFieldsConflicts = await this.exportResourcesService.exportToFile(
+        exportResourcesFileEntity,
+        passphrase,
+      );
       const date = new Date().toISOString().slice(0, 10);
       const filename = `passbolt-export-${date}.${exportResourcesFileEntity.fileType}`;
       const mimeType =
@@ -69,7 +72,7 @@ class ExportResourcesFileController {
       const blobFile = exportResourcesFileEntity.toBlob(mimeType);
       await FileService.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
       this.progressService.finishStep(i18n.t("Done"), true);
-      return exportResourcesFileEntity;
+      return { customFieldsConflicts: customFieldsConflicts || [] };
     } finally {
       this.progressService.close();
     }

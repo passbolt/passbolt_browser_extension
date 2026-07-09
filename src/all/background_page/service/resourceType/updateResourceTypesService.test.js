@@ -17,23 +17,26 @@ import UpdateResourceTypesService from "./updateResourceTypesService";
 import { v4 as uuidV4 } from "uuid";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 describe("UpdateResourceTypesService", () => {
-  let apiClientOptions;
+  let account, apiClientOptions;
 
   beforeEach(async () => {
     apiClientOptions = defaultApiClientOptions();
+    account = new AccountEntity(defaultAccountDto());
   });
 
   describe("::delete", () => {
     it("should assert its parameters", async () => {
       expect.assertions(1);
 
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
       expect(() => service.delete("test")).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
@@ -41,7 +44,7 @@ describe("UpdateResourceTypesService", () => {
       expect.assertions(2);
 
       const expectedId = uuidV4();
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
       jest.spyOn(service.resourceTypeService, "delete").mockImplementation(() => {});
 
       await service.delete(expectedId);
@@ -55,7 +58,7 @@ describe("UpdateResourceTypesService", () => {
     it("should assert its parameters", async () => {
       expect.assertions(1);
 
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
       expect(() => service.undelete("test")).rejects.toThrow("The given parameter is not a valid UUID");
     });
 
@@ -63,7 +66,7 @@ describe("UpdateResourceTypesService", () => {
       expect.assertions(2);
 
       const expectedId = uuidV4();
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
       jest.spyOn(service.resourceTypeService, "undelete").mockImplementation(() => {});
 
       await service.undelete(expectedId);
@@ -77,7 +80,7 @@ describe("UpdateResourceTypesService", () => {
     it("should assert its parameters", async () => {
       expect.assertions(1);
 
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
       expect(() => service.deleteAll("test")).rejects.toThrow(
         "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
       );
@@ -89,7 +92,7 @@ describe("UpdateResourceTypesService", () => {
       expect.assertions(1 + resourceTypesDto.length);
 
       const resourcesTypesCollection = new ResourceTypesCollection(resourceTypesDto);
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
 
       jest.spyOn(service.resourceTypeService, "delete").mockImplementation(() => {});
 
@@ -106,7 +109,7 @@ describe("UpdateResourceTypesService", () => {
     it("should assert its parameters", async () => {
       expect.assertions(1);
 
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
       expect(() => service.undeleteAll("test")).rejects.toThrow(
         "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
       );
@@ -118,7 +121,7 @@ describe("UpdateResourceTypesService", () => {
       expect.assertions(1 + resourceTypesDto.length);
 
       const resourcesTypesCollection = new ResourceTypesCollection(resourceTypesDto);
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
 
       jest.spyOn(service.resourceTypeService, "undelete").mockImplementation(() => {});
 
@@ -135,14 +138,14 @@ describe("UpdateResourceTypesService", () => {
     it("should assert its parameters", async () => {
       expect.assertions(1);
 
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
       expect(() => service.updateAllDeletedStatus("test")).rejects.toThrow(
         "The resourceTypesCollection parameter should be a valid ResourceTypesCollection",
       );
     });
 
     it("should call for the right service with the right arguments.", async () => {
-      expect.assertions(14);
+      expect.assertions(15);
       const resourceTypesDto = resourceTypesCollectionDto();
       for (let i = 0; i < resourceTypesDto.length; i += 2) {
         resourceTypesDto[i].deleted = "2025-02-24T09:00:00+00:00";
@@ -150,10 +153,11 @@ describe("UpdateResourceTypesService", () => {
 
       const resourcesTypesCollection = new ResourceTypesCollection(resourceTypesDto);
 
-      const service = new UpdateResourceTypesService(apiClientOptions);
+      const service = new UpdateResourceTypesService(account, apiClientOptions);
       jest.spyOn(service.resourceTypeService, "delete").mockImplementation(() => {});
       jest.spyOn(service.resourceTypeService, "undelete").mockImplementation(() => {});
-      jest.spyOn(service.resourceTypeModel, "updateLocalStorage").mockImplementation(() => {});
+      jest.spyOn(service.resourceTypeService, "findAll").mockImplementation(() => {});
+      jest.spyOn(service.resourceTypeLocalStorage, "setData").mockImplementation(() => {});
 
       await service.updateAllDeletedStatus(resourcesTypesCollection);
 
@@ -172,7 +176,8 @@ describe("UpdateResourceTypesService", () => {
       expect(service.resourceTypeService.undelete).toHaveBeenCalledWith(resourceTypesDto[9].id);
       expect(service.resourceTypeService.delete).toHaveBeenCalledWith(resourceTypesDto[10].id);
 
-      expect(service.resourceTypeModel.updateLocalStorage).toHaveBeenCalledTimes(1);
+      expect(service.resourceTypeService.findAll).toHaveBeenCalledTimes(1);
+      expect(service.resourceTypeLocalStorage.setData).toHaveBeenCalledTimes(1);
     });
   });
 });

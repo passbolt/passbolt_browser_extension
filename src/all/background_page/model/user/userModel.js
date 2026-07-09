@@ -17,7 +17,6 @@ import UserEntity from "../entity/user/userEntity";
 import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 import Validator from "validator";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
 import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
 
 /**
@@ -49,13 +48,13 @@ class UserModel {
       profile: true,
       gpgkey: false,
       groups_users: false,
-      last_logged_in: true,
       pending_account_recovery_request: true,
       account_recovery_user_setting: true,
     };
-    // Add is_mfa_enabled contain if the user account role name is admin
+    // last_logged_in and is_mfa_enabled contains are only available for admin.
 
     if (this.account && this.account.roleName === RoleEntity.ROLE_ADMIN) {
+      contains.last_logged_in = true;
       contains.is_mfa_enabled = true;
       const organizationSettings = await this.organisationSettingsModel.getOrFind();
       if (organizationSettings.isPluginEnabled("metadata")) {
@@ -76,27 +75,6 @@ class UserModel {
    */
   async resendInvite(username) {
     return this.userApiService.resendInvite(username);
-  }
-
-  /**
-   * Get or find the signed-in user information.
-   * @param {boolean} refreshCache (Optional) Should request the API and refresh the cache. Default false.
-   * @returns {Promise<UserEntity>}
-   */
-  async getOrFindMe(refreshCache = false) {
-    let user = await UserMeSessionStorageService.get(this.account);
-    if (!user || refreshCache) {
-      const contains = { profile: true, role: true, account_recovery_user_setting: true };
-      const organizationSettings = await this.organisationSettingsModel.getOrFind();
-      if (organizationSettings.isPluginEnabled("metadata")) {
-        contains.missing_metadata_key_ids = true;
-      }
-      user = await this.findOne(this.account.userId, contains, true);
-
-      await UserMeSessionStorageService.set(this.account, user);
-    }
-
-    return user;
   }
 
   /**

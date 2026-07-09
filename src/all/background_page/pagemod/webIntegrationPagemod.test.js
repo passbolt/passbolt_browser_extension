@@ -19,9 +19,12 @@ import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
 import Pagemod from "./pagemod";
 import { ConfigEvents } from "../event/configEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { WebIntegrationEvents } from "../event/webIntegrationEvents";
 import { PortEvents } from "../event/portEvents";
+import GetActiveAccountService from "../service/account/getActiveAccountService";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import { v4 as uuid } from "uuid";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -29,7 +32,7 @@ jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn())
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(WebIntegrationEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(SiteSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("WebIntegration", () => {
@@ -54,12 +57,7 @@ describe("WebIntegration", () => {
         "contentScripts/js/dist/browser-integration/vendors.js",
         "contentScripts/js/dist/browser-integration/browser-integration.js",
       ]);
-      expect(WebIntegration.events).toStrictEqual([
-        ConfigEvents,
-        WebIntegrationEvents,
-        OrganizationSettingsEvents,
-        PortEvents,
-      ]);
+      expect(WebIntegration.events).toStrictEqual([ConfigEvents, WebIntegrationEvents, SiteSettingsEvents, PortEvents]);
       expect(WebIntegration.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(WebIntegration.appName).toBe("WebIntegration");
     });
@@ -114,29 +112,22 @@ describe("WebIntegration", () => {
           },
         },
       };
+      // mock functions
+      const mockedAccount = { user_id: uuid(), domain: "https://test.passbolt.local" };
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
       // process
       await WebIntegration.attachEvents(port);
       // expectations
-      expect(ConfigEvents.listen).toHaveBeenCalledWith({
+      const expectedWorker = {
         port: port,
         tab: port._port.sender.tab,
         name: WebIntegration.appName,
-      });
-      expect(WebIntegrationEvents.listen).toHaveBeenCalledWith({
-        port: port,
-        tab: port._port.sender.tab,
-        name: WebIntegration.appName,
-      });
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({
-        port: port,
-        tab: port._port.sender.tab,
-        name: WebIntegration.appName,
-      });
-      expect(PortEvents.listen).toHaveBeenCalledWith({
-        port: port,
-        tab: port._port.sender.tab,
-        name: WebIntegration.appName,
-      });
+      };
+      expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedWorker, apiClientOptions, mockedAccount);
+      expect(WebIntegrationEvents.listen).toHaveBeenCalledWith(expectedWorker, apiClientOptions, mockedAccount);
+      expect(SiteSettingsEvents.listen).toHaveBeenCalledWith(expectedWorker, apiClientOptions, mockedAccount);
+      expect(PortEvents.listen).toHaveBeenCalledWith(expectedWorker, apiClientOptions, mockedAccount);
     });
   });
 });

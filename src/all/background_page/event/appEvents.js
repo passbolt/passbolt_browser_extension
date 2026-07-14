@@ -137,7 +137,12 @@ const listen = function (worker, apiClientOptions, account) {
 
   worker.port.on("passbolt.account-recovery.generate-organization-key", async (requestId, generateGpgKeyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoveryGenerateOrganizationKeyController(worker, requestId, apiClientOptions);
+    const controller = new AccountRecoveryGenerateOrganizationKeyController(
+      worker,
+      requestId,
+      apiClientOptions,
+      account,
+    );
     await controller._exec(generateGpgKeyDto);
   });
 

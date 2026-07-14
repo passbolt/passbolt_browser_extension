@@ -14,7 +14,7 @@
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import FindMetadataSettingsService from "./findMetadataSettingsService";
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSettingsLocalStorage";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 
@@ -35,7 +35,7 @@ export default class FindAndUpdateMetadataSettingsLocalStorageService {
     this.findMetadataSettingsService = new FindMetadataSettingsService(apiClientOptions);
     this.metadataTypesSettingsLocalStorage = new MetadataTypesSettingsLocalStorage(account);
     this.metadataKeysSettingsLocalStorage = new MetadataKeysSettingsLocalStorage(account);
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
   }
 
   /**
@@ -59,8 +59,8 @@ export default class FindAndUpdateMetadataSettingsLocalStorageService {
 
       // Lock is granted, retrieve the metadata types settings and update the local storage.
       let metadataTypesSettings;
-      const organizationSettings = await this.organisationSettingsModel.getOrFind();
-      if (organizationSettings.isPluginEnabled("metadata")) {
+      const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+      if (siteSettings.isPluginEnabled("metadata")) {
         metadataTypesSettings = await this.findMetadataSettingsService.findTypesSettings();
       } else {
         // If the metadata plugin is not yet present, provide with the default v4 metadata types settings.

@@ -21,7 +21,7 @@ import FindAndUpdateUsersLocalStorageService from "./findAndUpdateUsersLocalStor
 import FindUsersService from "./findUsersService";
 import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 import UserLocalStorage from "../local_storage/userLocalStorage";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 
 describe("FindAndUpdateUsersLocalStorageService", () => {
   let service, account;
@@ -82,7 +82,7 @@ describe("FindAndUpdateUsersLocalStorageService", () => {
         .spyOn(FindUsersService.prototype, "findAll")
         .mockImplementation(() => new UsersCollection([]));
       jest
-        .spyOn(OrganizationSettingsModel.prototype, "getOrFind")
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
         .mockImplementation(() => ({ isPluginEnabled: (plugin) => plugin === "metadata" }));
 
       await adminService.findAndUpdateAll();
@@ -100,7 +100,7 @@ describe("FindAndUpdateUsersLocalStorageService", () => {
         .spyOn(FindUsersService.prototype, "findAll")
         .mockImplementation(() => new UsersCollection([]));
       jest
-        .spyOn(OrganizationSettingsModel.prototype, "getOrFind")
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
         .mockImplementation(() => ({ isPluginEnabled: () => false }));
 
       await adminService.findAndUpdateAll();

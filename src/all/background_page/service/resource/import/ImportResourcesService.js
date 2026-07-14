@@ -35,7 +35,7 @@ import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
 import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import PasswordExpirySettingsGetOrFindService from "../../passwordExpirySettings/passwordExpirySettingsGetOrFindService";
-import OrganizationSettingsModel from "../../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../../siteSettings/getOrFindSiteSettingsService";
 import UpdateResourceTagsService from "../../tag/updateResourceTagsService";
 import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 
@@ -62,7 +62,7 @@ class ImportResourcesService {
     this.getOrFindMetadataSettingsService = new GetOrFindMetadataSettingsService(account, apiClientOptions);
     this.encryptMetadataService = new EncryptMetadataService(apiClientOptions, account);
     this.decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
     this.passwordExpirySettingsGetOrFindService = new PasswordExpirySettingsGetOrFindService(account, apiClientOptions);
     this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
     this.account = account;
@@ -76,7 +76,7 @@ class ImportResourcesService {
    */
   async importFile(importResourcesFile, passphrase) {
     const userId = User.getInstance().get().id;
-    const organizationSettings = await this.organisationSettingsModel.getOrFind();
+    const organizationSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
     await this.encryptSecrets(importResourcesFile, userId, privateKey);
     importResourcesFile.mustImportFolders && (await this.bulkImportFolders(importResourcesFile));

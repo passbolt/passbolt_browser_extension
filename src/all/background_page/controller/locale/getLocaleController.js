@@ -23,10 +23,11 @@ class GetLocaleController {
    * GetLocaleController constructor.
    * @param {Worker} worker
    * @param {ApiClientOptions} apiClientOptions The api client options.
+   * @param {AccountEntity} [account] The account, used to read the organization locale from the site settings.
    */
-  constructor(worker, apiClientOptions) {
+  constructor(worker, apiClientOptions, account) {
     this.worker = worker;
-    this.localeModel = new LocaleModel(apiClientOptions);
+    this.localeModel = new LocaleModel(apiClientOptions, account);
   }
 
   /**

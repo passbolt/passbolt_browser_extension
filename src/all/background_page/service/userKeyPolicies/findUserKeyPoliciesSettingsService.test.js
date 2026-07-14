@@ -24,6 +24,7 @@ import {
   defaultCeSiteSettings,
 } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -41,7 +42,7 @@ describe("FindUserKeyPoliciesSettingsService", () => {
       const service = new FindUserKeyPoliciesSettingsService(apiClientOptions, account);
 
       jest
-        .spyOn(service.organizationSettingsModel, "getOrFind")
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
         .mockImplementation(() => new SiteSettingsEntity(defaultCeSiteSettings()));
       jest
         .spyOn(service.userKeyPoliciesSettingsApiService, "findSettingsAsGuest")
@@ -69,7 +70,7 @@ describe("FindUserKeyPoliciesSettingsService", () => {
       delete orgSettings.passbolt.plugins?.userKeyPolicies;
 
       jest
-        .spyOn(service.organizationSettingsModel, "getOrFind")
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
         .mockImplementation(() => new SiteSettingsEntity(orgSettings));
       jest.spyOn(service.userKeyPoliciesSettingsApiService, "findSettingsAsGuest").mockImplementation(() => {
         throw new Error("Something went wrong!");
@@ -94,7 +95,7 @@ describe("FindUserKeyPoliciesSettingsService", () => {
       const service = new FindUserKeyPoliciesSettingsService(apiClientOptions, account);
 
       jest
-        .spyOn(service.organizationSettingsModel, "getOrFind")
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
         .mockImplementation(() => new SiteSettingsEntity(defaultCeSiteSettings()));
       jest.spyOn(service.userKeyPoliciesSettingsApiService, "findSettingsAsGuest").mockImplementation(() => {
         throw new Error("Something went wrong!");

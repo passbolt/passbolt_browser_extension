@@ -36,7 +36,6 @@ class GenerateSetupKeyPairController {
     this.apiClientOptions = apiClientOptions;
     // The temporary account stored in the session storage
     this.temporaryAccount = null;
-    this.findUserKeyPoliciesSettingsService = new FindUserKeyPoliciesSettingsService(apiClientOptions);
   }
 
   /**
@@ -86,7 +85,11 @@ class GenerateSetupKeyPairController {
   async _buildGenerateKeyPairOptionsEntity(passphrase) {
     const userId = this.temporaryAccount.account.userId;
     const authenticationToken = this.temporaryAccount.account.authenticationTokenToken;
-    const userKeyPoliciesSettings = await this.findUserKeyPoliciesSettingsService.findSettingsAsGuest(
+    const findUserKeyPoliciesSettingsService = new FindUserKeyPoliciesSettingsService(
+      this.apiClientOptions,
+      this.temporaryAccount.account,
+    );
+    const userKeyPoliciesSettings = await findUserKeyPoliciesSettingsService.findSettingsAsGuest(
       userId,
       authenticationToken,
     );
@@ -95,7 +98,7 @@ class GenerateSetupKeyPairController {
       name: `${this.temporaryAccount.account.firstName} ${this.temporaryAccount.account.lastName}`,
       email: this.temporaryAccount.account.username,
       passphrase: passphrase,
-      date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
+      date: await GetGpgKeyCreationDateService.getDate(this.temporaryAccount.account, this.apiClientOptions),
     };
 
     return GenerateGpgKeyPairOptionsEntity.createForUserKeyGeneration(

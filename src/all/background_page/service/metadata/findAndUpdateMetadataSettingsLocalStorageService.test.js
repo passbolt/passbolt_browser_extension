@@ -24,6 +24,8 @@ import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/ent
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -56,8 +58,8 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
         )
         .mockImplementation(() => metadataTypesSettingsDto);
       jest
-        .spyOn(findAndUpdateMetadataSettingsService.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const entity = await findAndUpdateMetadataSettingsService.findAndUpdateTypesSettings();
 
@@ -77,8 +79,8 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
         )
         .mockImplementation(() => metadataTypesSettingsDto);
       jest
-        .spyOn(findAndUpdateMetadataSettingsService.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const entity = await findAndUpdateMetadataSettingsService.findAndUpdateTypesSettings();
 
@@ -98,8 +100,8 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
         "findSettings",
       );
       jest
-        .spyOn(findAndUpdateMetadataSettingsService.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const entity = await findAndUpdateMetadataSettingsService.findAndUpdateTypesSettings();
 
@@ -124,8 +126,8 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
         )
         .mockImplementation(() => metadataTypesSettingsDto);
       jest
-        .spyOn(findAndUpdateMetadataSettingsService.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
       await findAndUpdateMetadataSettingsService.metadataTypesSettingsLocalStorage.set(
         new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
       );
@@ -150,8 +152,8 @@ describe("FindAndUpdateMetadataSettingsLocalStorageService", () => {
         )
         .mockImplementation(() => promise);
       jest
-        .spyOn(findAndUpdateMetadataSettingsService.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
       await findAndUpdateMetadataSettingsService.metadataTypesSettingsLocalStorage.set(
         new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto()),
       );

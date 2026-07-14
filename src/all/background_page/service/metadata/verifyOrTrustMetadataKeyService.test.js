@@ -26,6 +26,8 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 import VerifyOrTrustMetadataKeyService from "./verifyOrTrustMetadataKeyService";
 import UntrustedMetadataKeyError from "../../error/UntrustedMetadataKeyError";
 import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 describe("VerifyOrTrustMetadataKeyService", () => {
   let account, apiClientOptions, service;
@@ -40,8 +42,8 @@ describe("VerifyOrTrustMetadataKeyService", () => {
     // Mock the site settings
     const siteSettingsDto = defaultCeSiteSettings();
     jest
-      .spyOn(service.organisationSettingsModel.organizationSettingsService, "find")
-      .mockImplementation(() => siteSettingsDto);
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
   });
 
   describe("::verifyTrustedOrTrustNewMetadataKey", () => {
@@ -51,8 +53,8 @@ describe("VerifyOrTrustMetadataKeyService", () => {
       const siteSettingsDto = defaultCeSiteSettings();
       delete siteSettingsDto.passbolt.plugins.metadata;
       jest
-        .spyOn(service.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
       await expect(service.verifyTrustedOrTrustNewMetadataKey(pgpKeys.ada.passphrase)).resolves.not.toThrow();
     });
 

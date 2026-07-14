@@ -40,7 +40,7 @@ class RecoverAccountController {
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
     this.accountModel = new AccountModel(apiClientOptions);
-    this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
+    this.apiClientOptions = apiClientOptions;
     // The temporary account stored in the session storage
     this.temporaryAccount = null;
   }
@@ -210,7 +210,11 @@ class RecoverAccountController {
      * The server part is kept as the user needs to be logged in to request a DELETE on the API.
      */
     await SsoDataStorage.flush();
-    await this.updateSsoCredentialsService.updateSsoKitIfNeeded(passphrase);
+    const updateSsoCredentialsService = new UpdateSsoCredentialsService(
+      this.apiClientOptions,
+      this.temporaryAccount.account,
+    );
+    await updateSsoCredentialsService.updateSsoKitIfNeeded(passphrase);
   }
 }
 

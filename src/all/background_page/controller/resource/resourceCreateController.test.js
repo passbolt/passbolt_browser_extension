@@ -27,12 +27,18 @@ import { v4 as uuidv4 } from "uuid";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 jest.mock("../../service/progress/progressService");
 
 beforeEach(() => {
   enableFetchMocks();
+  jest
+    .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+    .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
 });
 
 describe("ResourceCreateController", () => {

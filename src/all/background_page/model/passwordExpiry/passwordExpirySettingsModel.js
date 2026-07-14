@@ -15,7 +15,7 @@
 import PasswordExpirySettingsService from "../../service/api/passwordExpiry/passwordExpirySettingsService";
 import { assertType, assertUuid } from "../../utils/assertions";
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
-import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
 import PasswordExpirySettingsLocalStorage from "../../service/local_storage/passwordExpirySettingsLocalStorage";
 
@@ -30,7 +30,7 @@ class PasswordExpirySettingsModel {
   constructor(account, apiClientOptions) {
     this.passwordExpirySettingsLocalStorage = new PasswordExpirySettingsLocalStorage(account);
     this.passwordExpirySettingsService = new PasswordExpirySettingsService(apiClientOptions);
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
   }
 
   /**
@@ -68,8 +68,8 @@ class PasswordExpirySettingsModel {
    * @returns {Promise<PasswordExpirySettingsEntity>}
    */
   async save(passwordExpirySettingsEntity) {
-    const organizationSettings = await this.organisationSettingsModel.getOrFind();
-    const isAdvancedSettingsEnable = organizationSettings.isPluginEnabled("passwordExpiryPolicies");
+    const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+    const isAdvancedSettingsEnable = siteSettings.isPluginEnabled("passwordExpiryPolicies");
     if (!isAdvancedSettingsEnable) {
       assertType(
         passwordExpirySettingsEntity,
@@ -106,8 +106,8 @@ class PasswordExpirySettingsModel {
    * @returns {Promise<PasswordExpirySettingsEntity|PasswordExpiryProSettingsEntity>}
    */
   async createFromDefault(passwordExpirySettingsDto = {}) {
-    const organizationSettings = await this.organisationSettingsModel.getOrFind();
-    const isAdvancedSettingsEnabled = organizationSettings.isPluginEnabled("passwordExpiryPolicies");
+    const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+    const isAdvancedSettingsEnabled = siteSettings.isPluginEnabled("passwordExpiryPolicies");
     if (!isAdvancedSettingsEnabled) {
       return PasswordExpirySettingsEntity.createFromDefault(passwordExpirySettingsDto);
     }

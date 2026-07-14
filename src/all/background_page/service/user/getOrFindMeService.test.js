@@ -19,6 +19,9 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import UserMeLocalStorage from "../local_storage/userMeLocalStorage";
 import GetOrFindMeService from "./getOrFindMeService";
 import UserEntity from "../../model/entity/user/userEntity";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 
 describe("GetOrFindMeService", () => {
   let service, account, storage;
@@ -29,6 +32,9 @@ describe("GetOrFindMeService", () => {
     service = new GetOrFindMeService(account, defaultApiClientOptions());
     storage = new UserMeLocalStorage(account);
     await storage.flush();
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(defaultCeSiteSettings()));
   });
 
   describe("::getOrFindMe", () => {

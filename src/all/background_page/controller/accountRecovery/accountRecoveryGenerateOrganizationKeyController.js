@@ -24,11 +24,13 @@ class AccountRecoveryGenerateOrganizationKeyController {
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions The api client options.
+   * @param {AccountEntity} account The user account.
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.apiClientOptions = apiClientOptions;
+    this.account = account;
   }
 
   /**
@@ -54,7 +56,7 @@ class AccountRecoveryGenerateOrganizationKeyController {
   async exec(generateGpgKeyPairOptionsDto = {}) {
     generateGpgKeyPairOptionsDto = {
       ...generateGpgKeyPairOptionsDto,
-      date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
+      date: await GetGpgKeyCreationDateService.getDate(this.account, this.apiClientOptions),
     };
     const generateKeyPairOptions =
       GenerateGpgKeyPairOptionsEntity.createForOrkKeyGeneration(generateGpgKeyPairOptionsDto);

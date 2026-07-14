@@ -22,6 +22,8 @@ import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
@@ -33,6 +35,9 @@ import KeepSessionAliveService from "../../service/session_storage/keepSessionAl
 
 beforeEach(() => {
   enableFetchMocks();
+  jest
+    .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+    .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
 });
 
 describe("SignInSetupController", () => {
@@ -99,9 +104,9 @@ describe("SignInSetupController", () => {
       organizationSettings.passbolt.plugins.sso = {
         enabled: true,
       };
-      fetch.doMockOnceIf(new RegExp("/settings.json"), () =>
-        mockApiResponse(organizationSettings, { servertime: Date.now() / 1000 }),
-      );
+      jest
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
       fetch.doMockOnceIf(new RegExp("/sso/settings/current.json"), () => mockApiResponse(withAzureSsoSettings()));
       jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({ value: "csrf-token" }));
       jest.spyOn(PassphraseStorageService, "set").mockImplementation(async () => {});

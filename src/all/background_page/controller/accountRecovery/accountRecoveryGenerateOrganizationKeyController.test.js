@@ -16,12 +16,29 @@ import AccountRecoveryGenerateOrganizationKeyController from "./accountRecoveryG
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import * as openpgp from "openpgp";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 describe("AccountRecoveryGenerateOrganizationKeyController", () => {
+  beforeEach(() => {
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
+  });
+
   describe("AccountRecoveryGenerateOrganizationKeyController::exec", () => {
     it("Should assert provided generate key pair dto is valid.", async () => {
       await MockExtension.withConfiguredAccount();
-      const controller = new AccountRecoveryGenerateOrganizationKeyController(null, null, defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new AccountRecoveryGenerateOrganizationKeyController(
+        null,
+        null,
+        defaultApiClientOptions(),
+        account,
+      );
       const promise = controller.exec();
 
       expect.assertions(1);
@@ -30,7 +47,13 @@ describe("AccountRecoveryGenerateOrganizationKeyController", () => {
 
     it("Should generate an account recovery organization key pair.", async () => {
       await MockExtension.withConfiguredAccount();
-      const controller = new AccountRecoveryGenerateOrganizationKeyController(null, null, defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new AccountRecoveryGenerateOrganizationKeyController(
+        null,
+        null,
+        defaultApiClientOptions(),
+        account,
+      );
       const generateKeyPairDto = {
         name: "key name",
         email: "key@email.com",

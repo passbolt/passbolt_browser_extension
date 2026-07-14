@@ -32,10 +32,18 @@ import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import FindSignatureService from "../../service/crypto/findSignatureService";
 import MetadataPrivateKeyApiService from "../../service/api/metadata/metadataPrivateKeyApiService";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 
 describe("ShareMetadataKeyPrivateController", () => {
+  beforeEach(() => {
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
+  });
   describe("::exec", () => {
     let controller, account, apiClientOptions, keyring;
 

@@ -25,6 +25,7 @@ import EncryptMetadataKeysService from "../../metadata/encryptMetadataService";
 import PermissionChangesCollection from "../../../model/entity/permission/change/permissionChangesCollection";
 import ShareResourceService, { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../../share/shareResourceService";
 import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 
 class ResourceCreateService {
   /**
@@ -76,11 +77,12 @@ class ResourceCreateService {
       // The styleguide can't know the resource id at confirm time so the deltas arrive with
       // aco_foreign_key unset (or null). Stamp the real id before handing them to the share API.
       const stampedChanges = permissionChanges.map((change) => ({ ...change, aco_foreign_key: createdResource.id }));
-      await this.shareResourceService.shareAll(
-        [createdResource.id],
-        new PermissionChangesCollection(stampedChanges),
-        passphrase,
+      const originalPermissionSet = new PermissionsCollection([createdResource.permission]);
+      const permissionChangesToApply = PermissionChangesCollection.calculateChanges(
+        originalPermissionSet,
+        new PermissionsCollection(stampedChanges),
       );
+      await this.shareResourceService.shareAll([createdResource.id], permissionChangesToApply, passphrase);
     }
     return createdResource;
   }

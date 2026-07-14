@@ -16,30 +16,19 @@ import Keyring from "../../model/keyring";
 import { Uuid } from "../../utils/uuid";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import User from "../../model/user";
-import BuildApiClientOptionsService from "./buildApiClientOptionsService";
-import UserModel from "../../model/user/userModel";
 
 class GetLegacyAccountService {
   /**
    * Get the account associated with this extension.
-   * @param {Object} option The option to add more data in the account
-   * @return {Promise<AccountEntity>}
+   * @return {AccountEntity}
    * @throw {Error} if no account yet associated with this extension.
    */
-  static async get(option = {}) {
+  static get() {
     const keyring = new Keyring();
     const user = User.getInstance().get();
     const serverPublicKeyInfo = keyring.findPublic(Uuid.get(user.settings.domain));
     const userPublicKeyInfo = keyring.findPublic(user.id);
     const userPrivateKeyInfo = keyring.findPrivate();
-
-    // Add in the account the role name if the option object have role (only for authenticated user)
-    let userEntity;
-    if (option?.role) {
-      // Load the application settings, necessary to validate the account username.
-      const apiClientOptions = BuildApiClientOptionsService.buildFromDomain(user.settings.domain);
-      userEntity = await new UserModel(apiClientOptions).findOne(user.id, { role: true });
-    }
 
     const accountDto = {
       domain: user.settings.domain,
@@ -52,7 +41,7 @@ class GetLegacyAccountService {
       user_public_armored_key: userPublicKeyInfo.armoredKey,
       user_private_armored_key: userPrivateKeyInfo.armoredKey,
       security_token: user.settings.securityToken,
-      role_name: userEntity?.role?.name || null,
+      role_name: null, // This property should be updated later as the user should be authenticated to get his role
     };
 
     /*

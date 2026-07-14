@@ -43,6 +43,8 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
 import { AppSignOutEvents } from "../event/appSignOutEvents";
+import UserApiService from "passbolt-styleguide/src/shared/services/api/user/userApiService";
+import UserEntity from "../model/entity/user/userEntity";
 
 class App extends Pagemod {
   /**
@@ -97,7 +99,7 @@ class App extends Pagemod {
   async attachEvents(port) {
     try {
       const tab = port._port.sender.tab;
-      let account = await GetActiveAccountService.get();
+      const account = await GetActiveAccountService.get();
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
       const checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
       const authStatus = await checkAuthStatusService.checkAuthStatus(true);
@@ -113,7 +115,30 @@ class App extends Pagemod {
       const appInitController = new AppInitController();
       await appInitController.main();
 
-      account = await GetActiveAccountService.get({ role: true });
+      /*
+       * Get the user from the API to add the role name into the account
+       * This is used in some classes to add contain for API request or to throw an Error
+       * - UserModel.updateLocalStorage
+       * - FindAndUpdateUsersLocalStorageService.findAndUpdateAll
+       * - ShareMetadataKeyPrivateService.shareOneMissing
+       * - ShareMetadataKeyPrivateService.shareAllMissing
+       *
+       * If an issue happen the role name will not be updated and the App will start anyway with fewer permissions
+       */
+      try {
+        // Load the application settings, necessary to validate the account username.
+        const userApiService = new UserApiService(apiClientOptions);
+        const userDto = await userApiService.get(account.userId, {
+          role: true,
+        });
+        const userEntity = new UserEntity(userDto);
+        // Add in the account the role name if the option object have role (only for authenticated user)
+        account.set("role_name", userEntity.role?.name);
+      } catch (error) {
+        console.error("appPagemod::add role name to the account cannot be retrieved, some features could be missing.");
+        console.error(error);
+      }
+
       for (const event of this.events) {
         event.listen({ port, tab }, apiClientOptions, account);
       }

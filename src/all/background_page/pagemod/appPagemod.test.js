@@ -35,7 +35,6 @@ import { ThemeEvents } from "../event/themeEvents";
 import { MobileEvents } from "../event/mobileEvents";
 import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
 import { MfaEvents } from "../event/mfaEvents";
-import { v4 as uuid } from "uuid";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { RememberMeEvents } from "../event/rememberMeEvents";
@@ -46,6 +45,10 @@ import { PermissionEvents } from "../event/permissionEvents";
 import { AccountEvents } from "../event/accountEvents";
 import { AppSignOutEvents } from "../event/appSignOutEvents";
 import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
+import UserApiService from "passbolt-styleguide/src/shared/services/api/user/userApiService";
+import { defaultAdminUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
+import AccountEntity from "../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../model/entity/account/accountEntity.test.data";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -85,7 +88,7 @@ describe("App", () => {
 
   describe("App::attachEvents", () => {
     it("Should attach app events", async () => {
-      expect.assertions(30);
+      expect.assertions(31);
       // data mocked
       const port = {
         _port: {
@@ -101,14 +104,18 @@ describe("App", () => {
       jest
         .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
         .mockImplementation(async () => new OnlineSessionEntity(userLoggedInAuthStatus()));
-      const mockedAccount = { user_id: uuid(), domain: "https://test-domain.passbolt.com" };
+      const mockedAccount = new AccountEntity(defaultAccountDto());
       const mockApiClient = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
+      // resource name added when UserApiService is created.
+      mockApiClient.setResourceName("users");
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
+      jest.spyOn(UserApiService.prototype, "get").mockImplementation(() => defaultAdminUserDto());
       // process
       await App.attachEvents(port);
       // expectations
       const expectedPortAndTab = { port: port, tab: port._port.sender.tab };
-      expect(GetActiveAccountService.get).toHaveBeenCalledWith({ role: true });
+      expect(GetActiveAccountService.get).toHaveBeenCalledTimes(1);
+      expect(UserApiService.prototype.get).toHaveBeenCalledWith(mockedAccount.userId, { role: true });
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AppEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);

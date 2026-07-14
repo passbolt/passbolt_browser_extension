@@ -18,8 +18,8 @@ import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyServ
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import { defaultDto } from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity.test.data";
 import { customEmailValidationProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import SiteSettingsRuntimeCache from "../siteSettings/siteSettingsRuntimeCache";
 
 describe("GenerateGpgKeyPair service", () => {
   it(
@@ -125,7 +125,7 @@ describe("GenerateGpgKeyPair service", () => {
     "should generate a key pair with a non standard email if the application settings customize the email validation.",
     async () => {
       const organizationSettings = customEmailValidationProSiteSettings();
-      OrganizationSettingsModel.set(new SiteSettingsEntity(organizationSettings));
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity(organizationSettings));
 
       const generateGpgKeyPairOptionsDto = defaultDto({ email: "admin@passbolt.c" });
       const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(generateGpgKeyPairOptionsDto);

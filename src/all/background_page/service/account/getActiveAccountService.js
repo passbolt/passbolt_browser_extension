@@ -20,11 +20,10 @@ const ACTIVE_ACCOUNT_KEY = "active-account";
 class GetActiveAccountService {
   /**
    * Get the active account associated with this extension.
-   * @param {Object} options The option to add more data in the account
    * @return {Promise<AccountEntity>}
    * @throw {Error} if no account yet associated with this extension.
    */
-  get(options = {}) {
+  get() {
     return navigator.locks.request(ACTIVE_ACCOUNT_KEY, async () => {
       // Check if the storage have some data
       if (Object.keys(storage._data).length === 0) {
@@ -33,7 +32,7 @@ class GetActiveAccountService {
         // Initialization of the config to get the user information
         Config.init();
       }
-      return await GetLegacyAccountService.get(options);
+      return GetLegacyAccountService.get();
     });
   }
 }

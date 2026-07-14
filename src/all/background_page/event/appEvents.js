@@ -320,7 +320,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.desktop.export-account", async (requestId) => {
-    const account = await GetLegacyAccountService.get();
+    const account = GetLegacyAccountService.get();
     const controller = new ExportDesktopAccountController(worker, requestId, account);
     await controller._exec();
   });

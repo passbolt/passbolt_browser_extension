@@ -51,7 +51,7 @@ export default class FindAndUpdateSiteSettingsLocalStorageService {
       // Another caller is already refreshing: wait on a shared lock and return what they wrote.
       if (!lock) {
         return await navigator.locks.request(lockKey, { mode: "shared" }, async () => {
-          const dto = SiteSettingsRuntimeCache.get(this.account.id);
+          const dto = SiteSettingsRuntimeCache.get();
           return dto ? new SiteSettingsEntity(dto) : null;
         });
       }
@@ -64,8 +64,12 @@ export default class FindAndUpdateSiteSettingsLocalStorageService {
       if (activeSession.isAuthenticated) {
         await this.siteSettingsLocalStorage.set(siteSettings);
       }
-
-      SiteSettingsRuntimeCache.set(this.account.id, siteSettings);
+      /*
+       * PB-53134:
+       * Set a cache of site setting without account id as a key to get the cache in AppEmailValidatorService
+       * This is very sensitive as the AppEmailValidatorService valid the username of account entity.
+       */
+      SiteSettingsRuntimeCache.set(siteSettings);
 
       return siteSettings;
     });

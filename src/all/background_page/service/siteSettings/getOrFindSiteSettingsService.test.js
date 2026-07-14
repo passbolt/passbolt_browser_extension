@@ -46,7 +46,7 @@ describe("GetOrFindSiteSettingsService", () => {
     it("always hits the API even when the runtime cache is populated", async () => {
       expect.assertions(3);
       const stale = new SiteSettingsEntity({ ...defaultProSiteSettings(), serverTimeDiff: 999 });
-      SiteSettingsRuntimeCache.set(account.id, stale);
+      SiteSettingsRuntimeCache.set(stale);
 
       const fresh = new SiteSettingsEntity(defaultProSiteSettings());
       const apiSpy = jest
@@ -57,7 +57,7 @@ describe("GetOrFindSiteSettingsService", () => {
 
       expect(apiSpy).toHaveBeenCalledTimes(1);
       expect(result.toDto()).toEqual(fresh.toDto());
-      expect(SiteSettingsRuntimeCache.get(account.id)).toEqual(fresh.toDto());
+      expect(SiteSettingsRuntimeCache.get()).toEqual(fresh.toDto());
     });
 
     it("never reads local storage on this path", async () => {
@@ -100,10 +100,7 @@ describe("GetOrFindSiteSettingsService", () => {
       expect.assertions(2);
       // Populate the runtime cache but leave LS empty: an authenticated read must not use
       // the runtime cache, so it falls through to the API.
-      SiteSettingsRuntimeCache.set(
-        account.id,
-        new SiteSettingsEntity({ ...defaultProSiteSettings(), serverTimeDiff: 999 }),
-      );
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity({ ...defaultProSiteSettings(), serverTimeDiff: 999 }));
       const dto = defaultProSiteSettings();
       const apiSpy = jest
         .spyOn(service.findAndUpdateSiteSettingsLocalStorageService.findSiteSettingsService, "findSiteSettings")
@@ -120,7 +117,7 @@ describe("GetOrFindSiteSettingsService", () => {
     it("returns from the runtime cache when populated; no LS read; no API call", async () => {
       expect.assertions(3);
       const dto = defaultProSiteSettings();
-      SiteSettingsRuntimeCache.set(account.id, new SiteSettingsEntity(dto));
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity(dto));
       const lsSpy = jest.spyOn(service.siteSettingsLocalStorage, "get");
       const apiSpy = jest.spyOn(
         service.findAndUpdateSiteSettingsLocalStorageService.findSiteSettingsService,

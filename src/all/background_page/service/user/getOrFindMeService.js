@@ -20,7 +20,7 @@ import OrganizationSettingsModel from "../../model/organizationSettings/organiza
  * The service aims to get user me from the local storage if it is set, or retrieve them from the API and
  * set the local storage.
  */
-class GetOrFindUsersService {
+class GetOrFindMeService {
   /**
    * Constructor.
    * @param {AccountEntity} account The user account.
@@ -61,4 +61,4 @@ class GetOrFindUsersService {
   }
 }
 
-export default GetOrFindUsersService;
+export default GetOrFindMeService;

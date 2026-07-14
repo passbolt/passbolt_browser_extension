@@ -63,7 +63,7 @@ class LocalStorageService {
       return;
     }
 
-    const account = await GetLegacyAccountService.get();
+    const account = GetLegacyAccountService.get();
     new ActiveSessionLocalStorage(account).flush();
     new RbacsLocalStorage(account).flush();
     new ResourceTypeLocalStorage(account).flush();

@@ -18,6 +18,9 @@ import BuildApiClientOptionsService from "../service/account/buildApiClientOptio
 import BuildAccountSetupService from "../service/setup/buildAccountSetupService";
 import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
 import { enableFetchMocks } from "jest-fetch-mock";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../service/siteSettings/getOrFindSiteSettingsService";
 
 jest.spyOn(BuildAccountSetupService, "buildFromSetupUrl");
 jest.spyOn(BuildApiClientOptionsService, "buildFromAccount");
@@ -30,6 +33,9 @@ describe("Setup", () => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
   });
 
   describe("Setup::attachEvents", () => {

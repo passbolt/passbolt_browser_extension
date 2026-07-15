@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.1.1
  */
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 import { assertUuid } from "../../utils/assertions";
 import UserKeyPoliciesSettingsApiService from "../api/userKeyPolicies/userKeyPoliciesSettingsApiService";
 import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
@@ -28,7 +28,7 @@ export default class FindUserKeyPoliciesSettingsService {
    */
   constructor(apiClientOptions, account = null) {
     this.account = account;
-    this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.apiClientOptions = apiClientOptions;
     this.userKeyPoliciesSettingsApiService = new UserKeyPoliciesSettingsApiService(apiClientOptions);
   }
 
@@ -42,8 +42,9 @@ export default class FindUserKeyPoliciesSettingsService {
     assertUuid(userId, "The userId must be a valid UUID");
     assertUuid(authenticationToken, "The authenticationToken must be a valid UUID");
 
-    const organizationSettings = await this.organizationSettingsModel.getOrFind();
-    const isUserKeyPoliciesPluginEnabled = organizationSettings.isPluginEnabled("userKeyPolicies");
+    const getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(this.account, this.apiClientOptions);
+    const siteSettings = await getOrFindSiteSettingsService.getOrFind(false);
+    const isUserKeyPoliciesPluginEnabled = siteSettings.isPluginEnabled("userKeyPolicies");
 
     if (isUserKeyPoliciesPluginEnabled) {
       try {

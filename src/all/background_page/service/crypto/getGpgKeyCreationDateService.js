@@ -11,28 +11,29 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.3
  */
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 
 class GetGpgKeyCreationDateService {
   /**
    * Returns a date that could be used to generate a gpg key
    * while being compatible with both the client and the server.
    *
+   * @param {AccountEntity} account The account.
    * @param {ApiClientOptions} apiClientOptions The api client options.
    * @return {Promise<integer>}
    */
-  static async getDate(apiClientOptions) {
-    const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+  static async getDate(account, apiClientOptions) {
+    const getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
 
-    let organizationSettings;
+    let siteSettings;
     try {
-      organizationSettings = await organizationSettingsModel.getOrFind();
+      siteSettings = await getOrFindSiteSettingsService.getOrFind(false);
     } catch (e) {
       console.error(e);
       return new Date().getTime();
     }
 
-    return organizationSettings.isServerInPast() ? organizationSettings.serverTime : new Date().getTime();
+    return siteSettings.isServerInPast() ? siteSettings.serverTime : new Date().getTime();
   }
 }
 

@@ -20,7 +20,8 @@ import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEn
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { adminAccountDto, defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
-import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -30,7 +31,9 @@ describe("UpdateUserLocalStorageController", () => {
   beforeEach(() => {
     const siteSettingsDto = defaultCeSiteSettings();
 
-    jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => siteSettingsDto);
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
   });
   describe("UpdateUserLocalStorageController::exec", () => {
     it("Should update the user local storage for a user having a role user.", async () => {

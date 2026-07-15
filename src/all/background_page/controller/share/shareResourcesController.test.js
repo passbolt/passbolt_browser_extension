@@ -27,10 +27,18 @@ import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import { defaultResourceV4Dto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import { plaintextSecretPasswordAndDescriptionDto } from "passbolt-styleguide/src/shared/models/entity/plaintextSecret/plaintextSecretEntity.test.data";
 import { simulateShareSecretsChangesDto } from "../../service/share/shareResourceService.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 const { pgpKeys } = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 
 describe("ShareResourcesController", () => {
+  beforeEach(() => {
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
+  });
   describe("::exec", () => {
     let account, controller;
     beforeEach(async () => {

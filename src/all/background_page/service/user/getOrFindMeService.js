@@ -14,7 +14,7 @@
 import UserApiService from "passbolt-styleguide/src/shared/services/api/user/userApiService";
 import UserMeLocalStorage from "../local_storage/userMeLocalStorage";
 import UserEntity from "../../model/entity/user/userEntity";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 
 /**
  * The service aims to get user me from the local storage if it is set, or retrieve them from the API and
@@ -29,7 +29,7 @@ class GetOrFindMeService {
   constructor(account, apiClientOptions) {
     this.account = account;
     this.userApiService = new UserApiService(apiClientOptions);
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
     this.userMeLocalStorageService = new UserMeLocalStorage(account);
   }
 
@@ -47,8 +47,8 @@ class GetOrFindMeService {
     }
 
     const contains = { profile: true, role: true, account_recovery_user_setting: true };
-    const organizationSettings = await this.organisationSettingsModel.getOrFind();
-    if (organizationSettings.isPluginEnabled("metadata")) {
+    const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+    if (siteSettings.isPluginEnabled("metadata")) {
       contains.missing_metadata_key_ids = true;
     }
 

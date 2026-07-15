@@ -18,10 +18,14 @@ import GetAndInitializeAccountLocaleController from "./getAndInitializeAccountLo
 import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
-import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 beforeEach(() => {
   enableFetchMocks();
+  jest
+    .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+    .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
 });
 
 describe("GetAndInitializeAccountLocaleController", () => {
@@ -35,10 +39,6 @@ describe("GetAndInitializeAccountLocaleController", () => {
         defaultApiClientOptions(),
         storedAccount,
       );
-
-      // Mock API fetch organization settings
-      const mockApiResult = anonymousSiteSettings();
-      fetch.doMockOnce(() => mockApiResponse(mockApiResult));
 
       expect.assertions(1);
       const locale = await controller.exec();
@@ -56,10 +56,6 @@ describe("GetAndInitializeAccountLocaleController", () => {
         storedAccount,
       );
 
-      // Mock API fetch organization settings
-      const mockApiResult = anonymousSiteSettings();
-      fetch.doMockOnce(() => mockApiResponse(mockApiResult));
-
       expect.assertions(1);
       const locale = await controller.exec();
       const expectedLocaleDto = { locale: "en-UK", label: "English" };
@@ -75,10 +71,6 @@ describe("GetAndInitializeAccountLocaleController", () => {
         defaultApiClientOptions(),
         storedAccount,
       );
-
-      // Mock API fetch organization settings
-      const mockApiResult = anonymousSiteSettings({ app: { locale: null } });
-      fetch.doMockOnce(() => mockApiResponse(mockApiResult));
 
       expect.assertions(1);
       const locale = await controller.exec();

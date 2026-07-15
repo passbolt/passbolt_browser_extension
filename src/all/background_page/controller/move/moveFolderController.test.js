@@ -19,8 +19,16 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import { v4 as uuidv4 } from "uuid";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 describe("MoveFolderController", () => {
+  beforeEach(() => {
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
+  });
   describe("::exec", () => {
     let worker, account, controller;
 

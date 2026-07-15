@@ -24,9 +24,17 @@ import ShareOneFolderController from "./shareOneFolderController";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import { defaultFolderDto } from "passbolt-styleguide/src/shared/models/entity/folder/folderEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 const { pgpKeys } = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 
 describe("ShareOneFolderController", () => {
+  beforeEach(() => {
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
+  });
   describe("::exec", () => {
     let account, controller;
     beforeEach(async () => {

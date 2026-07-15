@@ -17,7 +17,7 @@ import UserEntity from "../entity/user/userEntity";
 import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
 import Validator from "validator";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
-import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 /**
  * @deprecated
@@ -32,7 +32,7 @@ class UserModel {
    */
   constructor(apiClientOptions, account = null) {
     this.userApiService = new UserApiService(apiClientOptions);
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.apiClientOptions = apiClientOptions;
     this.account = account;
   }
 
@@ -56,8 +56,9 @@ class UserModel {
     if (this.account && this.account.roleName === RoleEntity.ROLE_ADMIN) {
       contains.last_logged_in = true;
       contains.is_mfa_enabled = true;
-      const organizationSettings = await this.organisationSettingsModel.getOrFind();
-      if (organizationSettings.isPluginEnabled("metadata")) {
+      const getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(this.account, this.apiClientOptions);
+      const siteSettings = await getOrFindSiteSettingsService.getOrFind(false);
+      if (siteSettings.isPluginEnabled("metadata")) {
         contains.missing_metadata_key_ids = true;
       }
     }

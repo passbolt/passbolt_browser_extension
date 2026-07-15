@@ -61,7 +61,7 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
       email: temporaryAccount.account?.username,
       passphrase: generateGpgKeyPairDto?.passphrase,
       keySize: ACCOUNT_RECOVERY_REQUEST_KEY_SIZE,
-      date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
+      date: await GetGpgKeyCreationDateService.getDate(temporaryAccount.account, this.apiClientOptions),
     };
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(dto);
     const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);

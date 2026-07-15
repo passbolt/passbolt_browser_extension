@@ -28,6 +28,8 @@ import CollectionValidationError from "passbolt-styleguide/src/shared/models/ent
 import { adminAccountDto, defaultAccountDto } from "../entity/account/accountEntity.test.data";
 import AccountEntity from "../entity/account/accountEntity";
 import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeAll(() => {
   enableFetchMocks();
@@ -150,8 +152,8 @@ describe("UserModel", () => {
       siteSettingsDto.passbolt.plugins.metadata = { enabled: false };
 
       jest
-        .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       jest.spyOn(model, "findAll");
 
@@ -197,8 +199,8 @@ describe("UserModel", () => {
       const siteSettingsDto = defaultCeSiteSettings();
 
       jest
-        .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       jest.spyOn(model, "findAll");
 

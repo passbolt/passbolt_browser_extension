@@ -13,7 +13,7 @@
  */
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
 import PasswordExpirySettingsModel from "../../model/passwordExpiry/passwordExpirySettingsModel";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
 
 class SavePasswordExpirySettingsController {
@@ -28,7 +28,7 @@ class SavePasswordExpirySettingsController {
     this.worker = worker;
     this.requestId = requestId;
     this.passwordExpirySettingsModel = new PasswordExpirySettingsModel(account, apiClientOptions);
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
   }
 
   /**
@@ -52,8 +52,8 @@ class SavePasswordExpirySettingsController {
    * @returns {Promise<PasswordExpirySettingsEntity>}
    */
   async exec(passwordExpirySettingsDto) {
-    const organizationSettings = await this.organisationSettingsModel.getOrFind();
-    const isAdvancedSettingsEnabled = organizationSettings.isPluginEnabled("passwordExpiryPolicies");
+    const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+    const isAdvancedSettingsEnabled = siteSettings.isPluginEnabled("passwordExpiryPolicies");
     const entity = isAdvancedSettingsEnabled
       ? new PasswordExpiryProSettingsEntity(passwordExpirySettingsDto)
       : new PasswordExpirySettingsEntity(passwordExpirySettingsDto);

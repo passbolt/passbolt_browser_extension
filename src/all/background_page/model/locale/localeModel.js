@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import AccountSettingsService from "../../service/api/accountSettings/accountSettingsService";
 import { Config } from "../config";
 import i18n from "../../sdk/i18n";
@@ -42,11 +42,14 @@ class LocaleModel {
    * Constructor
    *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} [account] The account. Required for the organization-locale finders that
+   *   read the site settings; not needed by `updateUserLocale`.
    * @public
    */
-  constructor(apiClientOptions) {
+  constructor(apiClientOptions, account) {
     this.accountSettingsService = new AccountSettingsService(apiClientOptions);
-    this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.apiClientOptions = apiClientOptions;
+    this.account = account;
   }
 
   /**
@@ -71,8 +74,9 @@ class LocaleModel {
    * @returns {Promise<LocaleEntity>}
    */
   async getOrganizationLocale() {
-    const organizationSettings = await this.organizationSettingsModel.getOrFind();
-    return this.getSupportedLocale(organizationSettings.locale);
+    const getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(this.account, this.apiClientOptions);
+    const siteSettings = await getOrFindSiteSettingsService.getOrFind(false);
+    return this.getSupportedLocale(siteSettings.locale);
   }
 
   /**
@@ -80,11 +84,12 @@ class LocaleModel {
    * @returns {Promise<LocalesCollection>}
    */
   async getSupportedOrganizationLocales() {
-    const organizationSettings = await this.organizationSettingsModel.getOrFind();
-    const localePluginEnabled = organizationSettings.isPluginEnabled("locale");
+    const getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(this.account, this.apiClientOptions);
+    const siteSettings = await getOrFindSiteSettingsService.getOrFind(false);
+    const localePluginEnabled = siteSettings.isPluginEnabled("locale");
 
     if (localePluginEnabled) {
-      const localePluginSettings = organizationSettings.getPluginSettings("locale");
+      const localePluginSettings = siteSettings.getPluginSettings("locale");
       return new LocalesCollection(localePluginSettings.options || []);
     }
 

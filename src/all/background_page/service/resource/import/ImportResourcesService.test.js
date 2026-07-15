@@ -72,10 +72,12 @@ import DecryptMetadataService from "../../metadata/decryptMetadataService";
 import { defaultPasswordExpirySettingsDtoFromApi } from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpirySettingsService from "../../api/passwordExpiry/passwordExpirySettingsService";
 import {
+  anonymousSiteSettings,
   defaultCeSiteSettings,
   defaultProSiteSettings,
 } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
-import OrganizationSettingsService from "../../api/organizationSettings/organizationSettingsService";
+import GetOrFindSiteSettingsService from "../../siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
@@ -121,6 +123,9 @@ describe("ImportResourcesService", () => {
     };
     decryptMetadataService = new DecryptMetadataService(apiClientOptions, account);
     importResourcesService = new ImportResourcesService(account, apiClientOptions, new ProgressService(worker, ""));
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
     collection = resourceTypesCollectionDto();
     jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => collection);
     importResourceFileCSV = new ImportResourcesFileEntity(defaultImportResourceFileCSVDto());
@@ -714,7 +719,9 @@ describe("ImportResourcesService", () => {
         it("Should set expiry date when password expiry feature is enabled with default period", async () => {
           expect.assertions(3);
 
-          jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => defaultProSiteSettings());
+          jest
+            .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+            .mockImplementation(() => new SiteSettingsEntity(defaultProSiteSettings()));
 
           jest.spyOn(PasswordExpirySettingsService.prototype, "find").mockImplementation(() =>
             defaultPasswordExpirySettingsDtoFromApi({
@@ -742,7 +749,9 @@ describe("ImportResourcesService", () => {
             const organizationSettings = defaultProSiteSettings();
             organizationSettings.passbolt.plugins.passwordExpiry.enabled = false;
 
-            jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
+            jest
+              .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+              .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
 
             jest.spyOn(PasswordExpirySettingsService.prototype, "find").mockImplementation(() =>
               defaultPasswordExpirySettingsDtoFromApi({
@@ -769,7 +778,9 @@ describe("ImportResourcesService", () => {
             const organizationSettings = defaultProSiteSettings();
             organizationSettings.passbolt.plugins.passwordExpiryPolicies.enabled = false;
 
-            jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
+            jest
+              .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+              .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
 
             jest.spyOn(PasswordExpirySettingsService.prototype, "find").mockImplementation(() =>
               defaultPasswordExpirySettingsDtoFromApi({
@@ -794,8 +805,8 @@ describe("ImportResourcesService", () => {
             expect.assertions(3);
 
             jest
-              .spyOn(OrganizationSettingsService.prototype, "find")
-              .mockImplementation(() => defaultProSiteSettings());
+              .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+              .mockImplementation(() => new SiteSettingsEntity(defaultProSiteSettings()));
 
             jest
               .spyOn(PasswordExpirySettingsService.prototype, "find")
@@ -832,7 +843,9 @@ describe("ImportResourcesService", () => {
             enabled: true,
           };
 
-          jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
+          jest
+            .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+            .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
 
           jest
             .spyOn(PasswordExpirySettingsService.prototype, "find")

@@ -17,7 +17,7 @@ import BuildApiClientOptionsService from "../service/account/buildApiClientOptio
 import { SetupEvents } from "../event/setupEvents";
 import BuildAccountSetupService from "../service/setup/buildAccountSetupService";
 import { PownedPasswordEvents } from "../event/pownedPasswordEvents";
-import OrganizationSettingsModel from "../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../service/siteSettings/getOrFindSiteSettingsService";
 
 class Setup extends Pagemod {
   /**
@@ -43,7 +43,7 @@ class Setup extends Pagemod {
       const tab = port._port.sender.tab;
       const account = BuildAccountSetupService.buildFromSetupUrl(tab.url);
       const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-      await new OrganizationSettingsModel(apiClientOptions).getOrFind(true);
+      await new GetOrFindSiteSettingsService(account, apiClientOptions).getOrFind(true);
       for (const event of this.events) {
         event.listen({ port, tab }, apiClientOptions, account);
       }

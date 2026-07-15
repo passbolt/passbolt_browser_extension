@@ -24,6 +24,8 @@ import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/ent
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -54,12 +56,8 @@ describe("GetOrFindMetadataSettingsService", () => {
         )
         .mockImplementation(() => metadataTypesSettingsDto);
       jest
-        .spyOn(
-          getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel
-            .organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       // Control initial storage value.
       const initialStorageValue = await getOrFindMetadataSettingsService.metadataTypesSettingsLocalStorage.get();

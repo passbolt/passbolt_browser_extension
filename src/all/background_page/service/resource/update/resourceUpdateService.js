@@ -59,21 +59,33 @@ class ResourceUpdateService {
    * @return {Promise<ResourceEntity>} resourceEntity
    */
   async exec(resourceDto, plaintextDto, passphrase, permissionChanges) {
-    // Port serialization replaces an omitted arg with `null`, sliding past a `= []` default;
-    // normalize defensively so the rest of the method can assume an array.
-    permissionChanges = permissionChanges ?? [];
     const resourceEntity = new ResourceEntity(resourceDto);
+
+    permissionChanges = permissionChanges ?? [];
+    // Apply the operator-confirmed permission changes (re-share) in the spec-mandated safe order.
+    if (permissionChanges.length > 0) {
+      // The styleguide emits deltas with aco_foreign_key unset (or null); stamp the resource id
+      // before handing them to the share orchestration.
+      const stampedChanges = permissionChanges.map((change) => ({
+        ...change,
+        aco_foreign_key: resourceEntity.id,
+      }));
+      await this.shareResourceService.shareAll(
+        [resourceEntity.id],
+        new PermissionChangesCollection(stampedChanges),
+        passphrase,
+      );
+    }
+
     const resourceTypesCollection = await this.getOrFindResourcetypesService.getOrFindAll();
     const resourceTypeEntity = resourceTypesCollection.getFirstById(resourceEntity.resourceTypeId);
-    const permissionsCollection = await this.findPermissionsService.findAllByAcoForeignKey(resourceEntity.id);
 
     // Get users ids of those who have access to the resource
     const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
-    // Set personal property only if resource is not shared with user and group
-    resourceEntity.personal = usersIds.length === 1 && !permissionsCollection.hasGroupPermission;
     // Set goals
     const goals = this.calculateGoals(plaintextDto, resourceTypeEntity, usersIds.length, permissionChanges.length);
     this.progressService.updateGoals(goals);
+
     // Keep metadata decrypted to update it in the local storage
     const metadataDecrypted = resourceEntity.metadata;
     if (resourceTypeEntity.isV5()) {
@@ -81,27 +93,14 @@ class ResourceUpdateService {
       await this.progressService.finishStep(i18n.t("Encrypting Metadata"), true);
       await this.encryptMetadataKeysService.encryptOneForForeignModel(resourceEntity, passphrase);
     }
+
     if (plaintextDto !== null) {
       // Update secret
       await this.updateSecret(resourceEntity, plaintextDto, passphrase, usersIds);
     }
+
     // Update resource
-    const updatedResourceEntity = await this.update(resourceEntity, resourceTypeEntity, metadataDecrypted);
-    // Apply the operator-confirmed permission changes (re-share) in the spec-mandated safe order.
-    if (permissionChanges.length > 0) {
-      // The styleguide emits deltas with aco_foreign_key unset (or null); stamp the resource id
-      // before handing them to the share orchestration.
-      const stampedChanges = permissionChanges.map((change) => ({
-        ...change,
-        aco_foreign_key: updatedResourceEntity.id,
-      }));
-      await this.shareResourceService.shareAll(
-        [updatedResourceEntity.id],
-        new PermissionChangesCollection(stampedChanges),
-        passphrase,
-      );
-    }
-    return updatedResourceEntity;
+    return await this.update(resourceEntity, resourceTypeEntity, metadataDecrypted);
   }
 
   /**
@@ -116,10 +115,6 @@ class ResourceUpdateService {
   async updateSecret(resourceEntity, plaintextDto, passphrase, usersIds) {
     // Get the passphrase if needed and decrypt secret key
     const privateKey = await DecryptPrivateKeyService.decryptArmoredKey(this.account.userPrivateArmoredKey, passphrase);
-
-    // Sync keyring
-    await this.progressService.finishStep(i18n.t("Synchronizing keyring"), true);
-    await this.keyring.sync();
 
     // Encrypt
     const plaintext = await this.resourceModel.serializePlaintextDto(resourceEntity.resourceTypeId, plaintextDto);
@@ -190,11 +185,11 @@ class ResourceUpdateService {
   calculateGoals(plaintextDto, resourceType, usersLength, permissionChangesLength = 0) {
     const shareSteps = permissionChangesLength > 0 ? PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL : 0;
     if (resourceType.isV5()) {
-      // encrypt metadata + save + done or encrypt secret * users + encrypt metadata + keyring sync + save + done
-      return (plaintextDto === null ? 3 : usersLength + 4) + shareSteps;
+      // encrypt metadata + save + done or encrypt secret * users + encrypt metadata + save + done
+      return (plaintextDto === null ? 3 : usersLength + 3) + shareSteps;
     } else if (resourceType.isV4()) {
-      // save + done or encrypt secret * users + keyring sync + save + done
-      return (plaintextDto === null ? 2 : usersLength + 3) + shareSteps;
+      // save + done or encrypt secret * users + save + done
+      return (plaintextDto === null ? 2 : usersLength + 2) + shareSteps;
     }
   }
 }

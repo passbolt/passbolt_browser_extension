@@ -58,7 +58,7 @@ describe("GetOrFindSiteSettingsController", () => {
       const result = await controller.exec();
 
       expect(result.toDto()).toEqual(dto);
-      expect(SiteSettingsRuntimeCache.get(account.id)).toEqual(dto);
+      expect(SiteSettingsRuntimeCache.get()).toEqual(dto);
       expect(await ls.get()).toEqual(dto);
     });
 
@@ -82,7 +82,7 @@ describe("GetOrFindSiteSettingsController", () => {
       const result = await controller.exec();
 
       expect(result.toDto()).toEqual(dto);
-      expect(SiteSettingsRuntimeCache.get(account.id)).toEqual(dto);
+      expect(SiteSettingsRuntimeCache.get()).toEqual(dto);
       expect(await ls.get()).toBeUndefined();
     });
   });
@@ -92,7 +92,7 @@ describe("GetOrFindSiteSettingsController", () => {
       expect.assertions(2);
       const dto = defaultProSiteSettings();
       const controller = new GetOrFindSiteSettingsController(worker, "req-1", apiClientOptions, account);
-      SiteSettingsRuntimeCache.set(account.id, new SiteSettingsEntity(dto));
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity(dto));
       const apiSpy = jest.spyOn(
         controller.getOrFindSiteSettingsService.findAndUpdateSiteSettingsLocalStorageService.findSiteSettingsService,
         "findSiteSettings",
@@ -129,7 +129,7 @@ describe("GetOrFindSiteSettingsController", () => {
       expect.assertions(1);
       const dto = defaultProSiteSettings();
       const controller = new GetOrFindSiteSettingsController(worker, "req-1", apiClientOptions, account);
-      SiteSettingsRuntimeCache.set(account.id, new SiteSettingsEntity(dto));
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity(dto));
       const execSpy = jest.spyOn(controller, "exec");
 
       await controller._exec(false);

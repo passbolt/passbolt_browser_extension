@@ -13,7 +13,7 @@
  */
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import UsersCollection from "passbolt-styleguide/src/shared/models/entity/user/usersCollection";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 import UserLocalStorage from "../local_storage/userLocalStorage";
 import FindUsersService from "./findUsersService";
 
@@ -31,7 +31,7 @@ class FindAndUpdateUsersLocalStorageService {
   constructor(account, apiClientOptions) {
     this.account = account;
     this.findUsersService = new FindUsersService(account, apiClientOptions);
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
     this.lockKey = `${USERS_UPDATE_ALL_LS_LOCK_PREFIX}-${this.account.id}`;
   }
 
@@ -64,8 +64,8 @@ class FindAndUpdateUsersLocalStorageService {
       };
       if (this.account?.roleName === RoleEntity.ROLE_ADMIN) {
         contains.is_mfa_enabled = true;
-        const organizationSettings = await this.organisationSettingsModel.getOrFind();
-        if (organizationSettings.isPluginEnabled("metadata")) {
+        const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+        if (siteSettings.isPluginEnabled("metadata")) {
           contains.missing_metadata_key_ids = true;
         }
       }

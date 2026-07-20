@@ -13,12 +13,12 @@
  */
 import BextUserEntity from "./userEntity";
 import AppEmailValidatorService from "../../../service/validator/appEmailValidatorService";
-import OrganizationSettingsModel from "../../organizationSettings/organizationSettingsModel";
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import { customEmailValidationProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { defaultUserDto } from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import GroupsUsersCollection from "passbolt-styleguide/src/shared/models/entity/groupUser/groupsUsersCollection";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import SiteSettingsRuntimeCache from "../../../service/siteSettings/siteSettingsRuntimeCache";
 
 describe("BextUserEntity", () => {
   describe("BextUserEntity::getSchema", () => {
@@ -37,7 +37,7 @@ describe("BextUserEntity", () => {
     it("validates username with custom validation rule", () => {
       expect.assertions(2);
       const organizationSettings = customEmailValidationProSiteSettings();
-      OrganizationSettingsModel.set(new SiteSettingsEntity(organizationSettings));
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity(organizationSettings));
       const dto = defaultUserDto({ username: "ada@passbolt.c" });
       const entity = new BextUserEntity(dto);
       expect(entity.username).toEqual("ada@passbolt.c");
@@ -45,7 +45,7 @@ describe("BextUserEntity", () => {
        * Ensure that the custom formula used to validate the format of the email is dynamic, and can be changed even if the
        * entity schema is cached. This formula might loaded after the schema was cached and could lead to user not valid.
        */
-      OrganizationSettingsModel.flushCache();
+      SiteSettingsRuntimeCache.flushAll();
       expect(() => new BextUserEntity(dto)).toThrowEntityValidationError("username", "custom");
     });
   });

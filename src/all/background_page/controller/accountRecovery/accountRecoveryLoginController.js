@@ -38,7 +38,7 @@ class AccountRecoveryLoginController {
     this.worker = worker;
     this.requestId = requestId;
     this.authVerifyLoginChallengeService = new AuthVerifyLoginChallengeService(apiClientOptions);
-    this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
+    this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions, account);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
     this.userRememberMeLatestChoiceLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
   }

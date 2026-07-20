@@ -388,15 +388,24 @@ describe("ResourceCreateService", () => {
       const folderId = uuidv4();
       const createdResourceId = uuidv4();
       const resourceDto = defaultResourceDto({ id: createdResourceId, folder_parent_id: folderId });
-      const aroForeignKey = uuidv4();
+      const operatorId = resourceDto.permission.aro_foreign_key;
+      const otherUserId = uuidv4();
       const permissionChanges = [
         {
           is_new: true,
           aro: "User",
-          aro_foreign_key: aroForeignKey,
+          aro_foreign_key: operatorId,
           aco: "Resource",
           aco_foreign_key: createdResourceId,
           type: 1,
+        },
+        {
+          is_new: true,
+          aro: "User",
+          aro_foreign_key: otherUserId,
+          aco: "Resource",
+          aco_foreign_key: createdResourceId,
+          type: 15,
         },
       ];
       jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => [resourceDto]);
@@ -419,10 +428,17 @@ describe("ResourceCreateService", () => {
       expect(changesCollection.toDto()).toEqual([
         expect.objectContaining({
           aro: "User",
-          aro_foreign_key: aroForeignKey,
+          aro_foreign_key: operatorId,
           aco: "Resource",
           aco_foreign_key: createdResourceId,
           type: 1,
+        }),
+        expect.objectContaining({
+          aro: "User",
+          aro_foreign_key: otherUserId,
+          aco: "Resource",
+          aco_foreign_key: createdResourceId,
+          type: 15,
         }),
       ]);
     });

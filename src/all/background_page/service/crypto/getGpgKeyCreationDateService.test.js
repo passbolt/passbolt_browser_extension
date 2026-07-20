@@ -17,11 +17,14 @@ import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
-let currentTime;
+let currentTime, account;
 beforeEach(() => {
   enableFetchMocks();
   MockExtension.withMissingPrivateKeyAccount();
+  account = new AccountEntity(defaultAccountDto());
 
   jest.useFakeTimers();
   currentTime = new Date();
@@ -36,7 +39,7 @@ describe("GetGpgCompatibleDate service", () => {
 
     fetch.doMock(() => mockApiResponse(anonymousSiteSettings(), { servertime: serverTime.getTime() / 1000 }));
 
-    const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
+    const gpgDate = await GetGpgKeyCreationDateService.getDate(account, defaultApiClientOptions());
     expect(gpgDate).toEqual(serverTime.getTime());
   });
 
@@ -46,7 +49,7 @@ describe("GetGpgCompatibleDate service", () => {
 
     fetch.doMock(() => mockApiResponse(anonymousSiteSettings(), { servertime: serverTime.getTime() / 1000 }));
 
-    const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
+    const gpgDate = await GetGpgKeyCreationDateService.getDate(account, defaultApiClientOptions());
     expect(gpgDate).toEqual(currentTime.getTime());
   });
 
@@ -55,7 +58,7 @@ describe("GetGpgCompatibleDate service", () => {
       throw new Error("Something wrong happened");
     });
 
-    const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
+    const gpgDate = await GetGpgKeyCreationDateService.getDate(account, defaultApiClientOptions());
     expect(gpgDate).toEqual(currentTime.getTime());
   });
 });

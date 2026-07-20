@@ -20,7 +20,7 @@ import TrustMetadataKeyService from "./trustMetadataKeyService";
 import UntrustedMetadataKeyError from "../../error/UntrustedMetadataKeyError";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import i18n from "../../sdk/i18n";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 
 class VerifyOrTrustMetadataKeyService {
   /**
@@ -29,7 +29,7 @@ class VerifyOrTrustMetadataKeyService {
    * @param {ApiClientOptions} apiClientOptions the api client options
    */
   constructor(worker, account, apiClientOptions) {
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
     this.getOrFindMetadataKeysService = new GetOrFindMetadataKeysService(account, apiClientOptions);
     this.metadataKeysSessionStorage = new MetadataKeysSessionStorage(account);
     this.getMetadataTrustedKeyService = new GetMetadataTrustedKeyService(account);
@@ -45,8 +45,8 @@ class VerifyOrTrustMetadataKeyService {
    * @throws {UntrustedMetadataKeyError} If user has not confirmed the new metadata key.
    */
   async verifyTrustedOrTrustNewMetadataKey(passphrase) {
-    const organizationSettings = await this.organisationSettingsModel.getOrFind();
-    const metadataIsEnabled = organizationSettings.isPluginEnabled("metadata");
+    const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+    const metadataIsEnabled = siteSettings.isPluginEnabled("metadata");
     if (!metadataIsEnabled) {
       return;
     }

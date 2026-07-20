@@ -25,8 +25,18 @@ import { v4 as uuidv4 } from "uuid";
 import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
 import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
 import { defaultUserKeyPoliciesSettingsDto } from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
+import FindUserKeyPoliciesSettingsService from "../../service/userKeyPolicies/findUserKeyPoliciesSettingsService";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 describe("GenerateSetupKeyPairController", () => {
+  beforeEach(() => {
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
+  });
+
   describe("GenerateSetupKeyPairController::exec", () => {
     it("Should throw an exception if the passed DTO is not valid.", async () => {
       await MockExtension.withConfiguredAccount();
@@ -127,7 +137,7 @@ describe("GenerateSetupKeyPairController", () => {
         defaultApiClientOptions(),
       );
       jest
-        .spyOn(controller.findUserKeyPoliciesSettingsService, "findSettingsAsGuest")
+        .spyOn(FindUserKeyPoliciesSettingsService.prototype, "findSettingsAsGuest")
         .mockImplementation(() => new UserKeyPoliciesSettingsEntity(defaultUserKeyPoliciesSettingsDto()));
 
       await controller.exec(generateKeyPairDto);

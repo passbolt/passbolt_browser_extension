@@ -137,7 +137,12 @@ const listen = function (worker, apiClientOptions, account) {
 
   worker.port.on("passbolt.account-recovery.generate-organization-key", async (requestId, generateGpgKeyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoveryGenerateOrganizationKeyController(worker, requestId, apiClientOptions);
+    const controller = new AccountRecoveryGenerateOrganizationKeyController(
+      worker,
+      requestId,
+      apiClientOptions,
+      account,
+    );
     await controller._exec(generateGpgKeyDto);
   });
 
@@ -320,7 +325,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.desktop.export-account", async (requestId) => {
-    const account = await GetLegacyAccountService.get();
+    const account = GetLegacyAccountService.get();
     const controller = new ExportDesktopAccountController(worker, requestId, account);
     await controller._exec();
   });

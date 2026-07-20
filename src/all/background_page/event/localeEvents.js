@@ -19,8 +19,9 @@ import LocaleEntity from "../model/entity/locale/localeEntity";
  * Listens to the locale events
  * @param {Worker} worker
  * @param {ApiClientOptions} apiClientOptions the api client options
+ * @param {AccountEntity} [account] the user account
  */
-const listen = function (worker, apiClientOptions) {
+const listen = function (worker, apiClientOptions, account) {
   /*
    * Get locale language
    *
@@ -28,7 +29,7 @@ const listen = function (worker, apiClientOptions) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.locale.get", async (requestId) => {
-    const getLocaleController = new GetLocaleController(worker, apiClientOptions);
+    const getLocaleController = new GetLocaleController(worker, apiClientOptions, account);
 
     try {
       const localeEntity = await getLocaleController.getLocale();
@@ -46,7 +47,7 @@ const listen = function (worker, apiClientOptions) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.locale.update-user-locale", async (requestId, localeDto) => {
-    const localeModel = new LocaleModel(apiClientOptions);
+    const localeModel = new LocaleModel(apiClientOptions, account);
     try {
       const localeToUpdateEntity = new LocaleEntity(localeDto);
       await localeModel.updateUserLocale(localeToUpdateEntity);

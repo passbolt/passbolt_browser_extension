@@ -154,7 +154,7 @@ class ShareResourceService {
    * @private
    */
   async simulateShare(permissionChanges) {
-    this.progressService.finishStep(i18n.t("Calculating secrets"), true);
+    await this.progressService.finishStep(i18n.t("Calculating secrets"), true);
     const concurrentlyExecutionService = new ExecuteConcurrentlyService();
     const neededSecretsDto = [];
     const resourceIds = [...new Set(permissionChanges.extract("aco_foreign_key"))];

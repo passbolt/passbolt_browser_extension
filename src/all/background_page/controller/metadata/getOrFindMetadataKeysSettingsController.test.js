@@ -20,6 +20,8 @@ import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/m
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -52,12 +54,8 @@ describe("GetOrFindMetadataKeysSettingsController", () => {
         )
         .mockImplementationOnce(() => new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
       jest
-        .spyOn(
-          controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService
-            .organisationSettingsModel.organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const metadataKeysSettings = await controller.exec();
 
@@ -83,12 +81,8 @@ describe("GetOrFindMetadataKeysSettingsController", () => {
         )
         .mockImplementationOnce(() => new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
       jest
-        .spyOn(
-          controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService
-            .organisationSettingsModel.organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const metadataKeysSettings = await controller.exec();
 
@@ -105,12 +99,8 @@ describe("GetOrFindMetadataKeysSettingsController", () => {
       // disable the plugin metadata.
       delete siteSettingsDto.passbolt.plugins.metadata;
       jest
-        .spyOn(
-          controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService
-            .organisationSettingsModel.organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
       jest
         .spyOn(
           controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService

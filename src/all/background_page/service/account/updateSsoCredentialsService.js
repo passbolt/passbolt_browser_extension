@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../sso/generateSsoKitService";
@@ -19,8 +19,12 @@ import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 class UpdateSsoCredentialsService {
-  constructor(apiClientOption) {
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOption);
+  /**
+   * @param {ApiClientOptions} apiClientOption the api client options
+   * @param {AccountEntity} account the user account
+   */
+  constructor(apiClientOption, account) {
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOption);
     this.ssoSettingsModel = new SsoSettingsModel(apiClientOption);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOption);
   }
@@ -44,8 +48,8 @@ class UpdateSsoCredentialsService {
    */
   async updateSsoKitIfNeeded(passphrase) {
     const localSsoKit = await SsoDataStorage.get();
-    const organizationSettings = await this.organisationSettingsModel.getOrFind();
-    if (!organizationSettings.isPluginEnabled("sso")) {
+    const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+    if (!siteSettings.isPluginEnabled("sso")) {
       /*
        * If the plugin is disabled there is no reason to keep an SSO kit
        * Plus, if we have an SSO kit locally, the login page will continue display the SSO login

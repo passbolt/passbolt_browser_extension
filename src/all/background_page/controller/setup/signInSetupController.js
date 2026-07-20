@@ -31,8 +31,8 @@ class SignInSetupController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.apiClientOptions = apiClientOptions;
     this.authVerifyLoginChallengeService = new AuthVerifyLoginChallengeService(apiClientOptions);
-    this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
   }
 
@@ -68,7 +68,11 @@ class SignInSetupController {
     }
 
     await this.checkPassphraseService.checkPassphrase(temporaryAccount.passphrase);
-    await this.updateSsoCredentialsService.forceUpdateSsoKit(temporaryAccount.passphrase);
+    const updateSsoCredentialsService = new UpdateSsoCredentialsService(
+      this.apiClientOptions,
+      temporaryAccount.account,
+    );
+    await updateSsoCredentialsService.forceUpdateSsoKit(temporaryAccount.passphrase);
 
     await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(
       temporaryAccount.account.userKeyFingerprint,

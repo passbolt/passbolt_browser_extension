@@ -33,33 +33,30 @@ let _cache = {};
 class SiteSettingsRuntimeCache {
   /**
    * Read the cached entry for the given account.
-   * @param {string} accountId
    * @returns {object|null} the cached DTO, or null when absent.
    */
-  static get(accountId) {
-    return _cache[accountId] || null;
+  static get() {
+    return _cache.siteSettings || null;
   }
 
   /**
    * Write the cached entry for the given account.
-   * @param {string} accountId
    * @param {SiteSettingsEntity} settings
    * @throws {TypeError} If settings is not a SiteSettingsEntity.
    */
-  static set(accountId, settings) {
+  static set(settings) {
     if (!(settings instanceof SiteSettingsEntity)) {
       throw new TypeError("Parameter `settings` should be of type SiteSettingsEntity.");
     }
-    _cache[accountId] = settings.toDto();
+    _cache.siteSettings = settings.toDto();
   }
 
   /**
    * Drop the cached entry for an account. Intended for session lifecycle hooks
    * (logout / account switch).
-   * @param {string} accountId
    */
-  static flush(accountId) {
-    delete _cache[accountId];
+  static flush() {
+    delete _cache.siteSettings;
   }
 
   /**

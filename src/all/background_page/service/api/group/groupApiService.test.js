@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe("GroupApiService", () => {
   describe("::findAll", () => {
-    it("should return a PassboltResponseEntity containing all groups when no has-id filter is given", async () => {
+    it("should return a PassboltResponseEntity containing all groups", async () => {
       expect.assertions(3);
       const groupsDto = [defaultGroupDto(), defaultGroupDto()];
       fetch.doMockOnceIf(/groups\.json/, () => mockApiResponse(groupsDto));
@@ -36,49 +36,6 @@ describe("GroupApiService", () => {
       expect(response).toBeInstanceOf(PassboltResponseEntity);
       expect(response.body).toHaveLength(2);
       expect(response.body).toStrictEqual(groupsDto);
-    });
-
-    it("should post-filter results to only return groups matching the has-id filter", async () => {
-      expect.assertions(3);
-      const group1 = defaultGroupDto();
-      const group2 = defaultGroupDto();
-      const group3 = defaultGroupDto();
-      fetch.doMockOnceIf(/groups\.json/, () => mockApiResponse([group1, group2, group3]));
-
-      const service = new GroupApiService(defaultApiClientOptions());
-      const response = await service.findAll(null, { "has-id": [group1.id, group3.id] });
-
-      expect(response).toBeInstanceOf(PassboltResponseEntity);
-      expect(response.body).toHaveLength(2);
-      expect(response.body).toStrictEqual([group1, group3]);
-    });
-
-    it("should support a single string value for the has-id filter", async () => {
-      expect.assertions(3);
-      const group1 = defaultGroupDto();
-      const group2 = defaultGroupDto();
-      fetch.doMockOnceIf(/groups\.json/, () => mockApiResponse([group1, group2]));
-
-      const service = new GroupApiService(defaultApiClientOptions());
-      const response = await service.findAll(null, { "has-id": group2.id });
-
-      expect(response).toBeInstanceOf(PassboltResponseEntity);
-      expect(response.body).toHaveLength(1);
-      expect(response.body).toStrictEqual([group2]);
-    });
-
-    it("should return an empty body when no groups match the has-id filter", async () => {
-      expect.assertions(2);
-      const group1 = defaultGroupDto();
-      const group2 = defaultGroupDto();
-      fetch.doMockOnceIf(/groups\.json/, () => mockApiResponse([group1, group2]));
-
-      const unrelatedId = defaultGroupDto().id;
-      const service = new GroupApiService(defaultApiClientOptions());
-      const response = await service.findAll(null, { "has-id": [unrelatedId] });
-
-      expect(response).toBeInstanceOf(PassboltResponseEntity);
-      expect(response.body).toHaveLength(0);
     });
   });
 });

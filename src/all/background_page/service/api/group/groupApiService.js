@@ -66,21 +66,23 @@ class GroupApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedFiltersOptions() {
-    return ["has-users", "has-managers", "has-id"];
+    return ["has-users", "has-managers"];
   }
 
   /**
    * Get a group for a given id
    *
    * @param {string} id group uuid
+   * @param {Object} [contains] optional example: { ["groups_users.user.profile"]: true }
    * @throws {Error} if API call fails, service unreachable, etc.
    * @throws {TypeError} if group id is not a valid uuid
-   * @returns {Object} groupDto
+   * @returns {Promise<PassboltResponseEntity>} groupDto
    */
-  async get(id) {
+  async get(id, contains) {
     this.assertValidId(id);
-    const response = await this.apiClient.get(id);
-    return response.body;
+    const options = contains ? this.formatContainOptions(contains, GroupApiService.getSupportedContainOptions()) : null;
+    const response = await this.apiClient.get(id, options);
+    return new PassboltResponseEntity(response);
   }
 
   /**

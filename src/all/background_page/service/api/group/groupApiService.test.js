@@ -12,7 +12,8 @@
  * @since         2.13.0
  */
 import { enableFetchMocks } from "jest-fetch-mock";
-import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
+import { v4 as uuidv4 } from "uuid";
+import { mockApiResponse, mockApiResponseError } from "../../../../../../test/mocks/mockApiResponse";
 import GroupApiService from "./groupApiService";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import { defaultGroupDto } from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
@@ -36,6 +37,81 @@ describe("GroupApiService", () => {
       expect(response).toBeInstanceOf(PassboltResponseEntity);
       expect(response.body).toHaveLength(2);
       expect(response.body).toStrictEqual(groupsDto);
+    });
+  });
+
+  describe("::get", () => {
+    it("should return a PassboltResponseEntity containing the group for the given id", async () => {
+      expect.assertions(3);
+      const groupDto = defaultGroupDto();
+      let request;
+      fetch.doMockOnceIf(new RegExp(`/groups/${groupDto.id}.json`), (req) => {
+        request = req;
+        return mockApiResponse(groupDto);
+      });
+
+      const service = new GroupApiService(defaultApiClientOptions());
+      const response = await service.get(groupDto.id);
+
+      expect(response).toBeInstanceOf(PassboltResponseEntity);
+      expect(response.body).toStrictEqual(groupDto);
+      // No contain params should be sent when no contains is given.
+      const containParams = [...new URL(request.url).searchParams.keys()].filter((key) => key.startsWith("contain"));
+      expect(containParams).toStrictEqual([]);
+    });
+
+    it("should request the given contain options", async () => {
+      expect.assertions(3);
+      const groupDto = defaultGroupDto();
+      const contains = { groups_users: true, my_group_user: true, modifier: false };
+      let request;
+      fetch.doMockOnceIf(new RegExp(`/groups/${groupDto.id}.json`), (req) => {
+        request = req;
+        return mockApiResponse(groupDto);
+      });
+
+      const service = new GroupApiService(defaultApiClientOptions());
+      await service.get(groupDto.id, contains);
+
+      const url = new URL(request.url);
+      expect(url.searchParams.get("contain[groups_users]")).toStrictEqual("1");
+      expect(url.searchParams.get("contain[my_group_user]")).toStrictEqual("1");
+      expect(url.searchParams.get("contain[modifier]")).toStrictEqual("0");
+    });
+
+    it("should ignore unsupported contain options", async () => {
+      expect.assertions(2);
+      const groupDto = defaultGroupDto();
+      const contains = { groups_users: true, unsupported_option: true };
+      let request;
+      fetch.doMockOnceIf(new RegExp(`/groups/${groupDto.id}.json`), (req) => {
+        request = req;
+        return mockApiResponse(groupDto);
+      });
+
+      const service = new GroupApiService(defaultApiClientOptions());
+      await service.get(groupDto.id, contains);
+
+      const url = new URL(request.url);
+      expect(url.searchParams.get("contain[groups_users]")).toStrictEqual("1");
+      expect(url.searchParams.has("contain[unsupported_option]")).toStrictEqual(false);
+    });
+
+    it("should throw an error if the API returns a 404", async () => {
+      expect.assertions(1);
+      const groupId = uuidv4();
+      fetch.doMockOnceIf(new RegExp(`/groups/${groupId}.json`), () => mockApiResponseError(404, "Group not found"));
+
+      const service = new GroupApiService(defaultApiClientOptions());
+
+      await expect(service.get(groupId)).rejects.toThrow("Group not found");
+    });
+
+    it("should throw a TypeError if the id is not a valid uuid", async () => {
+      expect.assertions(1);
+      const service = new GroupApiService(defaultApiClientOptions());
+
+      await expect(service.get("not-a-uuid")).rejects.toThrow(TypeError);
     });
   });
 });

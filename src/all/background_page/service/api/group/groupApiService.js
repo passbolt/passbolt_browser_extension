@@ -93,23 +93,14 @@ class GroupApiService extends AbstractService {
    * @public
    */
   async findAll(contains, filters) {
-    const hasIdFilter = filters?.["has-id"];
     const legacyContain = GroupApiService.remapLegacyContain(contains); // crassette
     contains = legacyContain
       ? this.formatContainOptions(legacyContain, GroupApiService.getSupportedContainOptions())
       : null;
     filters = filters ? this.formatFilterOptions(filters, GroupApiService.getSupportedFiltersOptions()) : null;
     const options = { ...contains, ...filters };
-    const rawResponse = await this.apiClient.findAll(options);
-    /*
-     * Ensure backward compatibility with servers that do not yet support the has-id filter:
-     * post-filter the results in memory so the caller always receives only the requested groups.
-     */
-    if (hasIdFilter && rawResponse.body) {
-      const idsMap = new Set(Array.isArray(hasIdFilter) ? hasIdFilter : [hasIdFilter]);
-      rawResponse.body = rawResponse.body.filter((group) => idsMap.has(group.id));
-    }
-    return new PassboltResponseEntity(rawResponse);
+    const response = await this.apiClient.findAll(options);
+    return new PassboltResponseEntity(response);
   }
 
   /**

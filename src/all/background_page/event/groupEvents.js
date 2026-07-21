@@ -63,18 +63,6 @@ const listen = function (worker, apiClientOptions, account) {
   });
 
   /*
-   * Find the members of a group given its id.
-   *
-   * @listens passbolt.groups_users.get-by-group-id
-   * @param {uuid} requestId The request identifier
-   * @param {uuid} groupId The id of the group whose members are requested
-   */
-  worker.port.on("passbolt.groups_users.get-by-group-id", async (requestId, groupId) => {
-    const controller = new GetOrFindGroupsUsersController(worker, requestId, apiClientOptions, account);
-    controller._exec(groupId);
-  });
-
-  /*
    * ==================================================================================
    *  CRUD
    * ==================================================================================

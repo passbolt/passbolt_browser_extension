@@ -82,7 +82,7 @@ describe("GetOrFindSiteSettingsService", () => {
     });
 
     it("returns from local storage when populated; no API call", async () => {
-      expect.assertions(2);
+      expect.assertions(3);
       const dto = defaultProSiteSettings();
       await service.siteSettingsLocalStorage.set(new SiteSettingsEntity(dto));
       const apiSpy = jest.spyOn(
@@ -93,6 +93,33 @@ describe("GetOrFindSiteSettingsService", () => {
       const result = await service.getOrFind(false);
 
       expect(result.toDto()).toEqual(dto);
+      expect(apiSpy).not.toHaveBeenCalled();
+      // The local storage read must also seed the runtime cache (see next test for why).
+      expect(SiteSettingsRuntimeCache.get()).toEqual(dto);
+    });
+
+    it("seeds the runtime cache from local storage so the synchronous username validator stays consistent", async () => {
+      /*
+       * Regression: SiteSettingsRuntimeCache is the ONLY store AppEmailValidatorService reads
+       * (synchronously, while constructing a user entity). It is flushed on login and lost on
+       * service-worker restart, whereas SiteSettingsLocalStorage survives both. An authenticated
+       * read that hits local storage must therefore repopulate the runtime cache, otherwise a
+       * custom email validation regex would be dropped and valid usernames rejected.
+       */
+      expect.assertions(3);
+      const dto = defaultProSiteSettings();
+      await service.siteSettingsLocalStorage.set(new SiteSettingsEntity(dto));
+      // Emulate a flushed / post-restart runtime cache while local storage still holds the settings.
+      SiteSettingsRuntimeCache.flushAll();
+      expect(SiteSettingsRuntimeCache.get()).toBeNull();
+      const apiSpy = jest.spyOn(
+        service.findAndUpdateSiteSettingsLocalStorageService.findSiteSettingsService,
+        "findSiteSettings",
+      );
+
+      await service.getOrFind(false);
+
+      expect(SiteSettingsRuntimeCache.get()).toEqual(dto);
       expect(apiSpy).not.toHaveBeenCalled();
     });
 

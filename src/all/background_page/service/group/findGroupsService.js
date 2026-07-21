@@ -95,19 +95,13 @@ export default class FindGroupsService {
     const callbacks = groupIds.map((groupId) => {
       return async () => {
         const response = await this.groupApiService.get(groupId, contains);
-        return new GroupsCollection(response.body);
+        return response.body;
       };
     });
 
     // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
     const executeConcurrentlyService = new ExecuteConcurrentlyService();
-    const arrayOfCollection = await executeConcurrentlyService.execute(callbacks, 5);
-    const groupsCollection = new GroupsCollection();
-
-    arrayOfCollection.forEach((collection) => {
-      groupsCollection.pushMany(collection.items, { validate: false, ignoreInvalidEntity: true });
-    });
-
-    return groupsCollection;
+    const groupsCollectionDto = await executeConcurrentlyService.execute(callbacks, 5);
+    return new GroupsCollection(groupsCollectionDto, { ignoreInvalidEntity: true });
   }
 }

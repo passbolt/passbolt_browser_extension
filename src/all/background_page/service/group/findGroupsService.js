@@ -13,9 +13,10 @@
  */
 
 import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
-import { assertBoolean, assertType } from "../../utils/assertions";
+import { assertArrayUUID, assertBoolean, assertType } from "../../utils/assertions";
 import GroupApiService from "../api/group/groupApiService";
 import User from "../../model/user";
+import ExecuteConcurrentlyService from "../execute/executeConcurrentlyService";
 
 export default class FindGroupsService {
   /**
@@ -69,5 +70,44 @@ export default class FindGroupsService {
   async findAllForLocalStorage() {
     const contains = { groups_users: true, my_group_user: true, modifier: false };
     return await this.findAll(contains, null, true);
+  }
+
+  /**
+   * Find all groups given their ids with the data tailored for the "Share" process.
+   * @param {Array<string>} groupIds
+   */
+  async findAllByIdsForShare(groupIds) {
+    assertArrayUUID(groupIds);
+
+    const contains = { groups_users: true, my_group_user: false, modifier: false };
+    return await this.findAllByIds(groupIds, contains);
+  }
+
+  /**
+   * Find all groups given their ids.
+   * @param {Array<string>} groupIds
+   * @param {Object|null} [contains] optional
+   */
+  async findAllByIds(groupIds, contains) {
+    assertArrayUUID(groupIds);
+
+    // @todo: update to check for server capability for supporting `has-id` filter and use it instead.
+    const callbacks = groupIds.map((groupId) => {
+      return async () => {
+        const response = await this.groupApiService.get(groupId, contains);
+        return new GroupsCollection(response.body);
+      };
+    });
+
+    // @todo Later (tm). The Collection should provide this capability, ensuring that validation build rules are executed and performance is guaranteed.
+    const executeConcurrentlyService = new ExecuteConcurrentlyService();
+    const arrayOfCollection = await executeConcurrentlyService.execute(callbacks, 5);
+    const groupsCollection = new GroupsCollection();
+
+    arrayOfCollection.forEach((collection) => {
+      groupsCollection.pushMany(collection.items, { validate: false, ignoreInvalidEntity: true });
+    });
+
+    return groupsCollection;
   }
 }

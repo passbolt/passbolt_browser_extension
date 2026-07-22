@@ -66,21 +66,23 @@ class GroupApiService extends AbstractService {
    * @returns {Array<string>} list of supported option
    */
   static getSupportedFiltersOptions() {
-    return ["has-users", "has-managers", "has-id"];
+    return ["has-users", "has-managers"];
   }
 
   /**
    * Get a group for a given id
    *
    * @param {string} id group uuid
+   * @param {Object} [contains] optional example: { ["groups_users.user.profile"]: true }
    * @throws {Error} if API call fails, service unreachable, etc.
    * @throws {TypeError} if group id is not a valid uuid
-   * @returns {Object} groupDto
+   * @returns {Promise<PassboltResponseEntity>} groupDto
    */
-  async get(id) {
+  async get(id, contains) {
     this.assertValidId(id);
-    const response = await this.apiClient.get(id);
-    return response.body;
+    const options = contains ? this.formatContainOptions(contains, GroupApiService.getSupportedContainOptions()) : null;
+    const response = await this.apiClient.get(id, options);
+    return new PassboltResponseEntity(response);
   }
 
   /**
@@ -93,23 +95,14 @@ class GroupApiService extends AbstractService {
    * @public
    */
   async findAll(contains, filters) {
-    const hasIdFilter = filters?.["has-id"];
     const legacyContain = GroupApiService.remapLegacyContain(contains); // crassette
     contains = legacyContain
       ? this.formatContainOptions(legacyContain, GroupApiService.getSupportedContainOptions())
       : null;
     filters = filters ? this.formatFilterOptions(filters, GroupApiService.getSupportedFiltersOptions()) : null;
     const options = { ...contains, ...filters };
-    const rawResponse = await this.apiClient.findAll(options);
-    /*
-     * Ensure backward compatibility with servers that do not yet support the has-id filter:
-     * post-filter the results in memory so the caller always receives only the requested groups.
-     */
-    if (hasIdFilter && rawResponse.body) {
-      const idsMap = new Set(Array.isArray(hasIdFilter) ? hasIdFilter : [hasIdFilter]);
-      rawResponse.body = rawResponse.body.filter((group) => idsMap.has(group.id));
-    }
-    return new PassboltResponseEntity(rawResponse);
+    const response = await this.apiClient.findAll(options);
+    return new PassboltResponseEntity(response);
   }
 
   /**

@@ -15,8 +15,8 @@ import FindGroupsService from "../../service/group/findGroupsService";
 import { assertArrayUUID } from "../../utils/assertions";
 
 /**
- * Controller for the `passbolt.groups.find-by-ids` event.
- * Returns the groups matching the given ids  fetched from the API.
+ * Controller for the `passbolt.groups.find-by-ids-for-share` event.
+ * Returns the groups matching the given ids fetched from the API.
  */
 class FindGroupsByIdsForShareController {
   /**
@@ -24,7 +24,6 @@ class FindGroupsByIdsForShareController {
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
-   * @param {AccountEntity} account The user account.
    */
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;

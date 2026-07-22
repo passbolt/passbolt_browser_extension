@@ -52,7 +52,7 @@ const listen = function (worker, apiClientOptions, account) {
   /*
    * Find groups by their ids.
    *
-   * @listens passbolt.groups.get-by-ids
+   * @listens passbolt.groups.find-by-ids-for-share
    * @param {uuid} requestId The request identifier
    * @param {Array<uuid>} groupIds The ids of the groups to retrieve
    */

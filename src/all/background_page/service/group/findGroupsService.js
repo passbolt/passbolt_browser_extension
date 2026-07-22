@@ -92,6 +92,12 @@ export default class FindGroupsService {
   async findAllByIds(groupIds, contains) {
     assertArrayUUID(groupIds);
 
+    // Short-circuit an empty id list: it produces no callbacks, and ExecuteConcurrentlyService
+    // never resolves when given none (its resolve() only fires from within the per-callback loop).
+    if (groupIds.length === 0) {
+      return new GroupsCollection([]);
+    }
+
     // @todo: update to check for server capability for supporting `has-id` filter and use it instead.
     const callbacks = groupIds.map((groupId) => {
       return async () => {

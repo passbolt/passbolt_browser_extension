@@ -175,6 +175,17 @@ describe("FindGroupsService", () => {
       expect(result.items.map((group) => group.id).sort()).toEqual([...groupIds].sort());
     });
 
+    it("should return an empty collection without calling the API when the given group ids are empty", async () => {
+      expect.assertions(3);
+      const spy = jest.spyOn(findGroupsService.groupApiService, "get");
+
+      const result = await findGroupsService.findAllByIds([]);
+
+      expect(result).toBeInstanceOf(GroupsCollection);
+      expect(result).toHaveLength(0);
+      expect(spy).not.toHaveBeenCalled();
+    });
+
     it("should reject if the API returns an invalid group", async () => {
       const validGroupDto = defaultGroupDto();
       const invalidGroupDto = defaultGroupDto({ name: 42 });

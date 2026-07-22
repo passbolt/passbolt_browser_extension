@@ -131,7 +131,7 @@ describe("FindGroupsService", () => {
   describe("::findAllByIdsForShare", () => {
     it("should delegate to findAllByIds with the contains tailored for the share process", async () => {
       const groupIds = [uuidv4(), uuidv4()];
-      const expectedContains = { groups_users: true, my_group_user: false, modifier: false };
+      const expectedContains = { "groups_users.user.profile": true };
       const expectedCollection = new GroupsCollection();
       jest.spyOn(findGroupsService, "findAllByIds").mockResolvedValue(expectedCollection);
 

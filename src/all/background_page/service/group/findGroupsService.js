@@ -74,12 +74,13 @@ export default class FindGroupsService {
 
   /**
    * Find all groups given their ids with the data tailored for the "Share" process.
+   * Each group embeds its members (groups_users with their associated user and user profile).
    * @param {Array<string>} groupIds
    */
   async findAllByIdsForShare(groupIds) {
     assertArrayUUID(groupIds);
 
-    const contains = { groups_users: true, my_group_user: false, modifier: false };
+    const contains = { "groups_users.user.profile": true };
     return await this.findAllByIds(groupIds, contains);
   }
 

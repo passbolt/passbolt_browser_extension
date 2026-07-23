@@ -59,7 +59,17 @@ export default class GetOrFindSiteSettingsService {
       if (activeSession.isAuthenticated) {
         const lsDto = await this.siteSettingsLocalStorage.get();
         if (lsDto) {
-          return new SiteSettingsEntity(lsDto);
+          const siteSettings = new SiteSettingsEntity(lsDto);
+          /*
+           * Mirror the persisted settings into the in-memory runtime cache. The cache is
+           * service-worker-lifetime and is flushed on login (postLoginService) and lost on
+           * service-worker restart, whereas SiteSettingsLocalStorage survives both. Seeding it
+           * here keeps AppEmailValidatorService.validate - which reads SiteSettingsRuntimeCache
+           * synchronously to validate account usernames - in sync with the persisted settings,
+           * so a custom email validation regex is honored even after the cache has been dropped.
+           */
+          SiteSettingsRuntimeCache.set(siteSettings);
+          return siteSettings;
         }
       } else {
         const cachedDto = SiteSettingsRuntimeCache.get(this.account.id);

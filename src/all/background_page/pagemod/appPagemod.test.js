@@ -88,7 +88,7 @@ describe("App", () => {
 
   describe("App::attachEvents", () => {
     it("Should attach app events", async () => {
-      expect.assertions(31);
+      expect.assertions(32);
       // data mocked
       const port = {
         _port: {
@@ -108,14 +108,17 @@ describe("App", () => {
       const mockApiClient = BuildApiClientOptionsService.buildFromAccount(mockedAccount);
       // resource name added when UserApiService is created.
       mockApiClient.setResourceName("users");
+      const adminUserDto = defaultAdminUserDto();
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => mockedAccount);
-      jest.spyOn(UserApiService.prototype, "get").mockImplementation(() => defaultAdminUserDto());
+      jest.spyOn(UserApiService.prototype, "get").mockImplementation(() => adminUserDto);
+      jest.spyOn(mockedAccount, "set");
       // process
       await App.attachEvents(port);
       // expectations
       const expectedPortAndTab = { port: port, tab: port._port.sender.tab };
       expect(GetActiveAccountService.get).toHaveBeenCalledTimes(1);
       expect(UserApiService.prototype.get).toHaveBeenCalledWith(mockedAccount.userId, { role: true });
+      expect(mockedAccount.set).toHaveBeenCalledWith("role_name", adminUserDto.role.name);
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AppEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);

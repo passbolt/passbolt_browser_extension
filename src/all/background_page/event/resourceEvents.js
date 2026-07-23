@@ -13,7 +13,6 @@ import SetResourcesExpiryDateController from "../controller/resource/setResource
 import FindResourceDetailsController from "../controller/resource/findResourceDetailsController";
 import ResourceUpdateLocalStorageController from "../controller/resourceLocalStorage/resourceUpdateLocalStorageController";
 import FindAllIdsByIsSharedWithGroupController from "../controller/resource/findAllIdsByIsSharedWithGroupController";
-import FindAllByIdsForDisplayPermissionsController from "../controller/resource/findAllByIdsForDisplayPermissionsController";
 import MoveResourcesController from "../controller/move/moveResourcesController";
 import ResetResourceGridUserSettingController from "../controller/resourceGridSetting/resetResourceGridUserSettingController";
 import UpdateResourceLocalStorageByFolderParentIdController from "../controller/resource/updateResourceLocalStorageByFolderParentIdController";
@@ -144,16 +143,6 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.resources.set-expiration-date", async (requestId, passwordExpiryResourcesCollectionDto) => {
     const controller = new SetResourcesExpiryDateController(worker, requestId, apiClientOptions);
     await controller._exec(passwordExpiryResourcesCollectionDto);
-  });
-
-  /*
-   * Retrieve all resources by ids with their permissions.
-   * @listens passbolt.resources.find-all-by-ids-with-permissions
-   * @param {array} resourcesIds The ids of the resources to retrieve.
-   */
-  worker.port.on("passbolt.resources.find-all-by-ids-for-display-permissions", async (requestId, resourcesIds) => {
-    const controller = new FindAllByIdsForDisplayPermissionsController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourcesIds);
   });
 
   /*

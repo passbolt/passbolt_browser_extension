@@ -1,7 +1,6 @@
-# v5.14.1
+# v5.14.2
 
 ### Fixed
-- PB-53277: adapt findAllByIdsForShare to fetch the user profiles
-
-### Maintenance
-- PB-53277: update groupApiService to support 'contains' on 'get' method
+- PB-53322: throttle permissions confirmation dialog requests
+- PB-53211: fix an error when creating an account
+- PB-53316: fix edition name translation

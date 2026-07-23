@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import ProfileEntity from "passbolt-styleguide/src/shared/models/entity/profile/profileEntity";
 import UserEntity from "../user/userEntity";
 import SecurityTokenEntity from "../securityToken/securityTokenEntity";
@@ -24,7 +24,7 @@ const FINGERPRINT_MAX_LENGTH = 40;
 
 const UUID_PASSBOLT_NAMESPACE = "d5447ca1-950f-459d-8b20-86ddfdd0f922";
 
-class AbstractAccountEntity extends Entity {
+class AbstractAccountEntity extends EntityV2 {
   /**
    * @inheritDoc
    */

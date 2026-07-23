@@ -12,7 +12,6 @@
  */
 
 import AbstractAccountEntity from "./abstractAccountEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 
 const ENTITY_NAME = "Account";
@@ -26,28 +25,22 @@ class AccountEntity extends AbstractAccountEntity {
    * @param {boolean} [options.validateUsername=true] Validate the username
    */
   constructor(accountDto, options = {}) {
-    AccountEntity.marshal(accountDto);
-
     // Should the username be validated.
     const isUsernameValidated = options?.validateUsername !== false;
+    if (!isUsernameValidated) {
+      options.schema = AccountEntity.getSchema(isUsernameValidated);
+    }
 
-    super(
-      EntitySchema.validate(AccountEntity.ENTITY_NAME, accountDto, AccountEntity.getSchema(isUsernameValidated)),
-      options,
-    );
+    super(accountDto, options);
 
     this.isUsernameValidated = isUsernameValidated;
   }
 
   /**
-   * Marshal the dto
-   * @param {Object} accountDto account DTO
-   * @return {Object}
+   * @inheritDoc
    */
-  static marshal(accountDto) {
-    Object.assign(accountDto, {
-      type: AccountEntity.TYPE_ACCOUNT,
-    });
+  marshall() {
+    this._props.type = AccountEntity.TYPE_ACCOUNT;
   }
 
   /**

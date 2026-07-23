@@ -174,6 +174,24 @@ export default class FindResourcesService {
   }
 
   /**
+   * Retrieve resources by ids with their permissions (embedding each permission's user profile or
+   * group), tailored for the share process. The metadata is intentionally not requested nor
+   * decrypted, so no passphrase prompt is triggered.
+   * @param {Array<string>} resourcesIds The resource ids to retrieve.
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllPermissionsByIdsForShare(resourcesIds) {
+    assertArrayUUID(resourcesIds);
+
+    const contains = {
+      "permissions.user.profile": true,
+      "permissions.group": true,
+    };
+
+    return this.findAllByIds(resourcesIds, contains);
+  }
+
+  /**
    * Retrieve all resources by ids with permissions.
    * @param {Array<string>} resourcesIds The resource ids to retrieve.
    * @returns {Promise<ResourcesCollection>}

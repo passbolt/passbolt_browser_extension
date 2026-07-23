@@ -38,6 +38,7 @@ import { defaultDecryptedSharedMetadataKeysDtos } from "passbolt-styleguide/src/
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
+import DecryptMetadataService from "../metadata/decryptMetadataService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -538,6 +539,56 @@ describe("FindResourcesService", () => {
       const result = await service.findAllByIdsForDisplayPermissions(collectionIds);
 
       expect(result.toDto()).toEqual(collectionDto);
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("::findAllPermissionsByIdsForShare", () => {
+    let service, expectedContains;
+
+    beforeEach(() => {
+      service = new FindResourcesService(account, apiClientOptions);
+      expectedContains = {
+        "permissions.user.profile": true,
+        "permissions.group": true,
+      };
+    });
+
+    it("should request the permissions without the metadata and without decrypting it", async () => {
+      expect.assertions(4);
+
+      const collectionDto = Array.from({ length: 80 }, () => defaultResourceDto());
+      const collectionIds = collectionDto.map((collection) => collection.id);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation(() => mockPassboltResponse(collectionDto));
+      jest.spyOn(DecryptMetadataService.prototype, "decryptAllFromForeignModels");
+
+      const result = await service.findAllPermissionsByIdsForShare(collectionIds);
+
+      expect(result).toEqual(new ResourcesCollection(collectionDto));
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledWith(expectedContains, {
+        "has-id": collectionIds,
+      });
+      expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(1);
+      // No metadata is requested, so the operator is never prompted for a passphrase to decrypt it.
+      expect(DecryptMetadataService.prototype.decryptAllFromForeignModels).not.toHaveBeenCalled();
+    });
+
+    it("should chunk the ids by 80 to avoid a too long url", async () => {
+      expect.assertions(3);
+
+      const collectionDto = Array.from({ length: 82 }, () => defaultResourceDto());
+      const resultCollectionDto = [...collectionDto];
+      const collectionIds = collectionDto.map((collection) => collection.id);
+
+      jest.spyOn(ResourceService.prototype, "findAll").mockImplementation((contains, filters) => {
+        expect(contains).toEqual(expectedContains);
+        const splicedCollection = resultCollectionDto.splice(0, filters["has-id"].length);
+        return mockPassboltResponse(splicedCollection);
+      });
+
+      await service.findAllPermissionsByIdsForShare(collectionIds);
+
       expect(ResourceService.prototype.findAll).toHaveBeenCalledTimes(2);
     });
   });

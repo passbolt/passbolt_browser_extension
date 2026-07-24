@@ -26,6 +26,7 @@ import PermissionChangesCollection from "../../../model/entity/permission/change
 import ShareResourceService, { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../../share/shareResourceService";
 import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
+import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 
 class ResourceCreateService {
   /**
@@ -73,7 +74,13 @@ class ResourceCreateService {
       createdResource.metadata = resourceMetadata;
     }
     await ResourceLocalStorage.addResource(createdResource);
-    if (permissionChanges.length > 0) {
+
+    const isAnOperatorPersonalResource =
+      permissionChanges.length === 1 &&
+      permissionChanges[0].aro === PermissionEntity.ARO_USER &&
+      permissionChanges[0].aro_foreign_key === this.account.userId;
+
+    if (!isAnOperatorPersonalResource && permissionChanges.length > 0) {
       // The styleguide can't know the resource id at confirm time so the deltas arrive with
       // aco_foreign_key unset (or null). Stamp the real id before handing them to the share API.
       const stampedChanges = permissionChanges.map((change) => ({ ...change, aco_foreign_key: createdResource.id }));

@@ -4,6 +4,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.14.2] - 2026-07-27
+### Fixed
+- PB-53322: throttle permissions confirmation dialog requests
+- PB-53211: fix an error when creating an account
+- PB-53316: fix edition name translation
+
+## [5.14.1] - 2026-07-23
+### Fixed
+- PB-53277: adapt findAllByIdsForShare to fetch the user profiles
+
+### Maintenance
+- PB-53277: update groupApiService to support 'contains' on 'get' method
+
+
 ## [5.14.0] - 2026-07-09
 ### Added
 - PB-45405 - Sort suggested resources by relevance instead of URI lengths
@@ -2911,7 +2925,9 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.2...HEAD
+[5.14.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.1...v5.14.2
+[5.14.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.0...v5.14.1
 [5.14.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.13.4...v5.14.0
 [5.13.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.13.3...v5.13.4
 [5.13.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.13.2...v5.13.3

@@ -9,46 +9,48 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         5.13.0
+ * @since         5.14.0
  */
 
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import GetOrFindGroupsController from "./getOrFindGroupsController";
-import GroupsCollection from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection";
-import { defaultGroupsDtos } from "passbolt-styleguide/src/shared/models/entity/group/groupsCollection.test.data";
+import FindPermissionsByIdsForShareController from "./findPermissionsByIdsForShareController";
+import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
+import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("GetOrFindGroupsController", () => {
+describe("FindPermissionsByIdsForShareController", () => {
   describe("::exec", () => {
-    it("Should retrieve the groups matching the given ids.", async () => {
+    it("Should retrieve the permissions of the resources matching the given ids.", async () => {
       expect.assertions(3);
 
       const account = new AccountEntity(defaultAccountDto());
-      const groupsDto = defaultGroupsDtos();
-      const groupsCollection = new GroupsCollection(groupsDto);
-      const requestedIds = [groupsDto[1].id, groupsDto[3].id];
-      const controller = new GetOrFindGroupsController(null, null, defaultApiClientOptions(), account);
-      jest.spyOn(controller.getOrFindGroupsService, "getOrFindByIds").mockImplementation(() => groupsCollection);
+      const resourcesDto = [defaultResourceDto(), defaultResourceDto()];
+      const resourcesCollection = new ResourcesCollection(resourcesDto);
+      const requestedIds = resourcesDto.map((resource) => resource.id);
+      const controller = new FindPermissionsByIdsForShareController(null, null, defaultApiClientOptions(), account);
+      jest
+        .spyOn(controller.findResourcesService, "findAllPermissionsByIdsForShare")
+        .mockImplementation(() => resourcesCollection);
 
       const result = await controller.exec(requestedIds);
 
-      expect(result).toBeInstanceOf(GroupsCollection);
-      expect(result).toStrictEqual(groupsCollection);
-      expect(controller.getOrFindGroupsService.getOrFindByIds).toHaveBeenCalledWith(requestedIds);
+      expect(result).toBeInstanceOf(ResourcesCollection);
+      expect(result).toStrictEqual(resourcesCollection);
+      expect(controller.findResourcesService.findAllPermissionsByIdsForShare).toHaveBeenCalledWith(requestedIds);
     });
 
     it("Should let error been thrown from the service if any.", async () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
-      const controller = new GetOrFindGroupsController(null, null, defaultApiClientOptions(), account);
-      const requestedIds = [defaultGroupsDtos()[0].id];
-      jest.spyOn(controller.getOrFindGroupsService, "getOrFindByIds").mockImplementation(() => {
+      const controller = new FindPermissionsByIdsForShareController(null, null, defaultApiClientOptions(), account);
+      const requestedIds = [defaultResourceDto().id];
+      jest.spyOn(controller.findResourcesService, "findAllPermissionsByIdsForShare").mockImplementation(() => {
         throw new Error("Something went wrong!");
       });
 
@@ -59,7 +61,7 @@ describe("GetOrFindGroupsController", () => {
       expect.assertions(1);
 
       const account = new AccountEntity(defaultAccountDto());
-      const controller = new GetOrFindGroupsController(null, null, defaultApiClientOptions(), account);
+      const controller = new FindPermissionsByIdsForShareController(null, null, defaultApiClientOptions(), account);
 
       await expect(() => controller.exec(["not-a-uuid"])).rejects.toThrow(
         "The given parameter is not a valid array of uuid",

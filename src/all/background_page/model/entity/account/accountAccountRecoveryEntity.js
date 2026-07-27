@@ -26,19 +26,13 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
    * @param {boolean} [options.validateUsername=true] Validate the username
    */
   constructor(accountAccountRecoveryDto, options = {}) {
-    AccountAccountRecoveryEntity.marshal(accountAccountRecoveryDto);
-
     // Should the username be validated.
     const isUsernameValidated = options?.validateUsername !== false;
+    if (!isUsernameValidated) {
+      options.schema = AccountAccountRecoveryEntity.getSchema(isUsernameValidated);
+    }
 
-    super(
-      EntitySchema.validate(
-        AccountAccountRecoveryEntity.ENTITY_NAME,
-        accountAccountRecoveryDto,
-        AccountAccountRecoveryEntity.getSchema(isUsernameValidated),
-      ),
-      options,
-    );
+    super(accountAccountRecoveryDto, options);
 
     this.isUsernameValidated = isUsernameValidated;
 
@@ -52,14 +46,10 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
   }
 
   /**
-   * Marshal the dto
-   * @param {Object} accountAccountRecoveryDto account account recovery DTO
-   * @return {Object}
+   * @inheritDoc
    */
-  static marshal(accountAccountRecoveryDto) {
-    Object.assign(accountAccountRecoveryDto, {
-      type: AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY,
-    });
+  marshall() {
+    this._props.type = AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY;
   }
 
   /**

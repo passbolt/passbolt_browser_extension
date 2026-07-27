@@ -9,27 +9,26 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         5.13.0
+ * @since         5.14.0
  */
-import GetOrFindGroupsService from "../../service/group/getOrFindGroupsService";
+import FindGroupsService from "../../service/group/findGroupsService";
 import { assertArrayUUID } from "../../utils/assertions";
 
 /**
- * Controller for the `passbolt.groups.get-by-ids` event. Returns the groups matching the given ids,
- * served from the local storage cache when available and otherwise fetched from the API.
+ * Controller for the `passbolt.groups.find-by-ids-for-share` event.
+ * Returns the groups matching the given ids fetched from the API.
  */
-class GetOrFindGroupsController {
+class FindGroupsByIdsForShareController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
-   * @param {AccountEntity} account The user account.
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.getOrFindGroupsService = new GetOrFindGroupsService(account, apiClientOptions);
+    this.findGroupsService = new FindGroupsService(apiClientOptions);
   }
 
   /**
@@ -54,8 +53,8 @@ class GetOrFindGroupsController {
    */
   async exec(groupIds) {
     assertArrayUUID(groupIds);
-    return this.getOrFindGroupsService.getOrFindByIds(groupIds);
+    return this.findGroupsService.findAllByIdsForShare(groupIds);
   }
 }
 
-export default GetOrFindGroupsController;
+export default FindGroupsByIdsForShareController;

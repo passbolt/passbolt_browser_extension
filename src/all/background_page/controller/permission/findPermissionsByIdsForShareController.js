@@ -9,17 +9,17 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         5.13.0
+ * @since         5.14.0
  */
-import GetOrFindGroupsUsersService from "../../service/group/getOrFindGroupsUsersService";
-import { assertUuid } from "../../utils/assertions";
+import FindResourcesService from "../../service/resource/findResourcesService";
+import { assertArrayUUID } from "../../utils/assertions";
 
 /**
- * Controller for the `passbolt.groups_users.get-by-group-id` event. Returns the members of the group
- * matching the given id, served from the local storage cache when available and otherwise fetched
- * from the API.
+ * Controller for the `passbolt.permissions.find-by-ids-for-share` event.
+ * Returns the given resources with the permissions data tailored for the share process, fetched
+ * from the API in a single batched query (no metadata decryption, no passphrase prompt).
  */
-class GetOrFindGroupsUsersController {
+class FindPermissionsByIdsForShareController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
@@ -30,17 +30,17 @@ class GetOrFindGroupsUsersController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.getOrFindGroupsUsersService = new GetOrFindGroupsUsersService(account, apiClientOptions);
+    this.findResourcesService = new FindResourcesService(account, apiClientOptions);
   }
 
   /**
    * Controller executor.
-   * @param {string} groupId The id of the group whose members are requested.
+   * @param {Array<string>} resourcesIds The ids of the resources to retrieve.
    * @returns {Promise<void>}
    */
-  async _exec(groupId) {
+  async _exec(resourcesIds) {
     try {
-      const result = await this.exec(groupId);
+      const result = await this.exec(resourcesIds);
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
@@ -49,14 +49,14 @@ class GetOrFindGroupsUsersController {
   }
 
   /**
-   * Find all the members of the group matching the given id.
-   * @param {string} groupId The id of the group whose members are requested.
-   * @returns {Promise<GroupsUsersCollection>}
+   * Find the permissions of the given resources for the share process.
+   * @param {Array<string>} resourcesIds The ids of the resources to retrieve.
+   * @returns {Promise<ResourcesCollection>}
    */
-  async exec(groupId) {
-    assertUuid(groupId);
-    return this.getOrFindGroupsUsersService.getOrFindByGroupId(groupId);
+  async exec(resourcesIds) {
+    assertArrayUUID(resourcesIds);
+    return this.findResourcesService.findAllPermissionsByIdsForShare(resourcesIds);
   }
 }
 
-export default GetOrFindGroupsUsersController;
+export default FindPermissionsByIdsForShareController;

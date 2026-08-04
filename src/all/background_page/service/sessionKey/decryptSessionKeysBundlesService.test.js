@@ -90,7 +90,10 @@ describe("DecryptSessionKeysBundlesService", () => {
       //bypassing entity checks for the unit test
       sessionKeysBundleEntity._props.data = "Test";
 
-      const expectedCauseError = new Error("The message should be a valid openpgp message.");
+      const expectedCauseError = new Error("The message should be a valid openpgp message.", {
+        cause: new Error("Misformed armored text"),
+      });
+
       const expectedError = new Error(
         `Unable to decrypt the metadata session key bundle (${sessionKeysBundleEntity.id}) using the user key.`,
         { cause: expectedCauseError },

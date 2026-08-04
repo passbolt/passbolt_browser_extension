@@ -49,8 +49,40 @@ export default class ResponseAddUsersToGroupOffscreenService {
     if (type === ADD_USERS_TO_GROUP_OFFSCREEN_RESPONSE_TYPE_SUCCESS) {
       callbacks.resolve(data);
     } else {
-      callbacks.reject(new Error(data.message));
+      callbacks.reject(ResponseAddUsersToGroupOffscreenService.rebuildError(data));
     }
+  }
+
+  /**
+   * Rebuild the error thrown in the offscreen document from its serialized form.
+   * The contextual message (carrying the resource/user ids) is always restored; the original name and
+   * the underlying cause (e.g. the openpgp reason) are restored when the serialized error is present.
+   * @param {{name: string, message: string, error: string}} data The error response data.
+   * @returns {Error}
+   * @private
+   */
+  static rebuildError(data) {
+    const error = new Error(data.message);
+    if (data.name) {
+      error.name = data.name;
+    }
+
+    if (data.error) {
+      try {
+        const serialized = JSON.parse(data.error);
+        if (serialized?.cause) {
+          error.cause = new Error(serialized.cause.message);
+          if (serialized.cause.name) {
+            error.cause.name = serialized.cause.name;
+          }
+          error.cause.stack = serialized.cause.stack;
+        }
+      } catch {
+        // Ignore a malformed serialized error and keep the message-only error.
+      }
+    }
+
+    return error;
   }
 
   /**

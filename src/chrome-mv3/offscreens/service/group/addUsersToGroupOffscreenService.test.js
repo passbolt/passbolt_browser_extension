@@ -103,6 +103,44 @@ describe("AddUsersToGroupOffscreenService", () => {
 
       expect(result).toStrictEqual(expectedResult);
     });
+
+    it("should carry the contextual message and the serialized cause when a secret cannot be decrypted", async () => {
+      expect.assertions(4);
+
+      const account = new AccountEntity(defaultAccountDto());
+
+      const existingEntityDto = defaultGroupDto({}, { withGroupsUsers: 1 });
+      const updateGroupEntity = new GroupEntity({ ...existingEntityDto });
+
+      const newUser = new GroupUserEntity(createGroupUser({ group_id: existingEntityDto.id }));
+      updateGroupEntity._groups_users._items = [...updateGroupEntity._groups_users.items, newUser];
+
+      const secrets = defaultResourcesSecretsDtos(1);
+      // A secret that keeps the armor delimiters but has a corrupted body: fails inside the decrypt loop.
+      secrets[0].data = "-----BEGIN PGP MESSAGE-----\n\nnot!valid!base64!!!\n-----END PGP MESSAGE-----";
+      const needed_secrets = [{ user_id: newUser._props.user_id, resource_id: secrets[0].resource_id }];
+      const groupUpdateDryRunEntity = new GroupUpdateDryRunResultEntity({ needed_secrets, secrets });
+
+      const result = await AddUsersToGroupOffscreenService.handleRequest({
+        requestId: "11111111-1111-4111-8111-111111111111",
+        addUsersToGroupContent: {
+          privateKey: {
+            armoredKey: account.userPrivateArmoredKey,
+            passphrase: "ada@passbolt.com",
+          },
+          secrets: groupUpdateDryRunEntity.secrets.toDto(),
+          neededSecrets: groupUpdateDryRunEntity.neededSecrets.toDto(),
+          usersPublicKeys: { [newUser._props.user_id]: pgpKeys.betty.public },
+        },
+      });
+
+      expect(result.type).toEqual(ADD_USERS_TO_GROUP_OFFSCREEN_RESPONSE_TYPE_ERROR);
+      expect(result.data.message).toEqual(`Unable to decrypt the secret of the resource (${secrets[0].resource_id}).`);
+      // The serialized error preserves the underlying openpgp reason as its cause.
+      const serialized = JSON.parse(result.data.error);
+      expect(serialized.message).toEqual(`Unable to decrypt the secret of the resource (${secrets[0].resource_id}).`);
+      expect(serialized.cause).toBeDefined();
+    });
   });
 
   describe("::handleProgressResponse", () => {

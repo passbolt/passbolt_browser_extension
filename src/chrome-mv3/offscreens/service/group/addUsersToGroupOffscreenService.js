@@ -104,10 +104,19 @@ export default class AddUsersToGroupOffscreenService {
    */
   static handleErrorResponse(error) {
     console.error(error);
+    // Serialize the full error (including its cause chain) so the underlying openpgp reason is not
+    // lost when crossing the offscreen boundary. getOwnPropertyNames captures message/stack/cause.
+    let serializedError;
+    try {
+      serializedError = JSON.stringify(error, Object.getOwnPropertyNames(error));
+    } catch {
+      serializedError = undefined;
+    }
     return {
       data: {
         name: error?.name,
         message: error?.message || "AddUsersToGroupOffscreenService: an unexpected error occurred",
+        error: serializedError,
       },
       type: ADD_USERS_TO_GROUP_OFFSCREEN_RESPONSE_TYPE_ERROR,
       target: SEND_MESSAGE_TARGET_ADD_USERS_TO_GROUP_OFFSCREEN_RESPONSE_HANDLER,

@@ -41,6 +41,43 @@ describe("GroupUpdateSecretsCryptoService", () => {
       expect(onProgress).toHaveBeenCalledTimes(1);
       expect(onProgress).toHaveBeenCalledWith("Decrypting 1/1");
     });
+
+    it("should throw an error identifying the resource when a secret cannot be decrypted", async () => {
+      expect.assertions(2);
+
+      const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const secretsDtos = defaultResourcesSecretsDtos(1);
+      secretsDtos[0].data = await EncryptMessageService.encrypt(
+        JSON.stringify(plaintextSecretPasswordAndDescriptionDto()),
+        adaPublicKey,
+      );
+      const secrets = new GroupUpdateSecretsCollection(secretsDtos, { validate: false });
+      // Decrypt with a private key the secret was not encrypted for.
+      const wrongPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+
+      const promise = GroupUpdateSecretsCryptoService.decryptSecrets(wrongPrivateKey, secrets);
+
+      await expect(promise).rejects.toThrow(
+        `Unable to decrypt the secret of the resource (${secretsDtos[0].resource_id}).`,
+      );
+      await expect(promise).rejects.toHaveProperty("cause");
+    });
+
+    it("should throw an error identifying the resource when a secret is not a valid openpgp message", async () => {
+      expect.assertions(2);
+
+      const secretsDtos = defaultResourcesSecretsDtos(1);
+      secretsDtos[0].data = "-----BEGIN PGP MESSAGE-----\n\nnot!valid!base64!!!\n-----END PGP MESSAGE-----";
+      const secrets = new GroupUpdateSecretsCollection(secretsDtos, { validate: false });
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+
+      const promise = GroupUpdateSecretsCryptoService.decryptSecrets(privateKey, secrets);
+
+      await expect(promise).rejects.toThrow(
+        `Unable to decrypt the secret of the resource (${secretsDtos[0].resource_id}).`,
+      );
+      await expect(promise).rejects.toHaveProperty("cause");
+    });
   });
 
   describe("::encryptSecrets", () => {
@@ -97,6 +134,69 @@ describe("GroupUpdateSecretsCryptoService", () => {
       );
 
       expect(result.items).toHaveLength(1);
+    });
+
+    it("should throw an error identifying the resource and user when no decrypted secret is available", async () => {
+      expect.assertions(1);
+
+      const userId = uuidv4();
+      const resourceId = uuidv4();
+      const decryptedSecrets = {}; // Missing the decrypted secret for the needed resource.
+      const neededSecrets = new NeededSecretsCollection([{ user_id: userId, resource_id: resourceId }], {
+        validate: false,
+      });
+      const usersPublicKeys = { [userId]: pgpKeys.betty.public };
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+
+      await expect(
+        GroupUpdateSecretsCryptoService.encryptSecrets(privateKey, usersPublicKeys, neededSecrets, decryptedSecrets),
+      ).rejects.toThrow(
+        `Unable to encrypt the secret of the resource (${resourceId}) for the user (${userId}): no decrypted secret is available for this resource.`,
+      );
+    });
+
+    it("should throw an error identifying the resource and user when no public key is available", async () => {
+      expect.assertions(1);
+
+      const userId = uuidv4();
+      const resourceId = uuidv4();
+      const decryptedSecrets = { [resourceId]: JSON.stringify(plaintextSecretPasswordAndDescriptionDto()) };
+      const neededSecrets = new NeededSecretsCollection([{ user_id: userId, resource_id: resourceId }], {
+        validate: false,
+      });
+      const usersPublicKeys = {}; // Missing the public key for the needed user.
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+
+      await expect(
+        GroupUpdateSecretsCryptoService.encryptSecrets(privateKey, usersPublicKeys, neededSecrets, decryptedSecrets),
+      ).rejects.toThrow(
+        `Unable to encrypt the secret of the resource (${resourceId}) for the user (${userId}): no public key is available for this user.`,
+      );
+    });
+
+    it("should throw an error identifying the resource and user when the recipient key is expired", async () => {
+      expect.assertions(2);
+
+      const userId = uuidv4();
+      const resourceId = uuidv4();
+      const decryptedSecrets = { [resourceId]: JSON.stringify(plaintextSecretPasswordAndDescriptionDto()) };
+      const neededSecrets = new NeededSecretsCollection([{ user_id: userId, resource_id: resourceId }], {
+        validate: false,
+      });
+      const usersPublicKeys = { [userId]: pgpKeys.expired.public };
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
+
+      const promise = GroupUpdateSecretsCryptoService.encryptSecrets(
+        privateKey,
+        usersPublicKeys,
+        neededSecrets,
+        decryptedSecrets,
+      );
+
+      await expect(promise).rejects.toThrow(
+        `Unable to encrypt the secret of the resource (${resourceId}) for the user (${userId}).`,
+      );
+      await expect(promise).rejects.toHaveProperty("cause");
     });
   });
 });

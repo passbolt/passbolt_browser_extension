@@ -531,4 +531,43 @@ describe("GroupUpdateService", () => {
       "The given parameter is not a valid string",
     );
   });
+
+  it("should throw an error identifying the user when their public key is missing from the keyring", async () => {
+    expect.assertions(1);
+
+    chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 2 }));
+
+    const apiClientOptions = defaultApiClientOptions();
+    const account = new AccountEntity(defaultAccountDto());
+    const progressService = defaultProgressService({ goals: 10 });
+
+    const existingEntityDto = defaultGroupDto({}, { withGroupsUsers: 1 });
+    const updateGroupEntity = new GroupEntity({ ...existingEntityDto });
+
+    const newUser = new GroupUserEntity(createGroupUser({ group_id: existingEntityDto.id }));
+    updateGroupEntity._groups_users._items = [...updateGroupEntity._groups_users.items, newUser];
+
+    const secrets = defaultResourcesSecretsDtos(1);
+    const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+    secrets[0].data = await EncryptMessageService.encrypt(
+      JSON.stringify(plaintextSecretPasswordAndDescriptionDto()),
+      adaPublicKey,
+    );
+    const needed_secrets = [{ user_id: newUser._props.user_id, resource_id: secrets[0].resource_id }];
+    const groupUpdateDryRunResultDto = { needed_secrets, secrets };
+
+    const service = new GroupUpdateService(apiClientOptions, account, progressService);
+
+    jest.spyOn(service.groupModel, "getById").mockImplementation(async () => new GroupEntity(existingEntityDto));
+    jest
+      .spyOn(service.groupModel, "updateDryRun")
+      .mockImplementation(async () => new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto));
+    jest.spyOn(Keyring.prototype, "sync").mockImplementation(async () => {});
+    // The user's public key is absent from the local keyring.
+    jest.spyOn(Keyring.prototype, "findPublic").mockImplementation(() => undefined);
+
+    await expect(service.exec(updateGroupEntity, "ada@passbolt.com")).rejects.toThrow(
+      `The public key of the user (${newUser._props.user_id}) could not be found in the local keyring.`,
+    );
+  });
 });

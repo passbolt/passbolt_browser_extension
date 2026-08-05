@@ -18,6 +18,7 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
+import PassboltBadResponseError from "../../error/passboltBadResponseError";
 
 jest.useFakeTimers();
 
@@ -90,5 +91,32 @@ describe("StartLoopAuthSessionCheckService", () => {
 
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
     expect(spyOnPostLogout).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not send logout event if the authentication status cannot be determined, and retry on the next alarm", async () => {
+    expect.assertions(4);
+
+    const spyIsAuthenticated = jest
+      .spyOn(CheckAuthStatusService.prototype, "checkAuthStatus")
+      .mockRejectedValue(new PassboltBadResponseError());
+    const spyOnPostLogout = jest.spyOn(PostLogoutService, "exec").mockImplementation(async () => {});
+
+    browser.alarms.onAlarm.addListener(
+      async (alarm) => await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm(alarm),
+    );
+
+    await StartLoopAuthSessionCheckService.exec();
+
+    await jest.advanceTimersByTime(60000);
+    await Promise.resolve();
+
+    expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
+    expect(spyOnPostLogout).not.toHaveBeenCalled();
+
+    await jest.advanceTimersByTime(60000);
+    await Promise.resolve();
+
+    expect(spyIsAuthenticated).toHaveBeenCalledTimes(2);
+    expect(spyOnPostLogout).not.toHaveBeenCalled();
   });
 });

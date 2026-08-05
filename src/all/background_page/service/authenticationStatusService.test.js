@@ -17,6 +17,7 @@ import { mockApiResponse, mockApiResponseError, mockApiRedirectResponse } from "
 import NotFoundError from "../error/notFoundError";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MfaAuthenticationRequiredError from "../error/mfaAuthenticationRequiredError";
+import PassboltBadResponseError from "../error/passboltBadResponseError";
 
 beforeAll(() => {
   enableFetchMocks();
@@ -57,5 +58,14 @@ describe("AuthenticationStatusService::isAuthenticated", () => {
     mockIsAuthenticated(() => mockApiRedirectResponse("/mfa/verify/error.json"));
     const authenticationStatusService = new AuthenticationStatusService(defaultApiClientOptions());
     await expect(authenticationStatusService.isAuthenticated()).rejects.toThrow(MfaAuthenticationRequiredError);
+  });
+
+  it("should throw a PassboltBadResponseError if the response can't be parsed (e.g HTML error page, ...)", async () => {
+    expect.assertions(1);
+
+    mockIsAuthenticated(async () => "<html><body>502 Bad Gateway</body></html>");
+    const authenticationStatusService = new AuthenticationStatusService(defaultApiClientOptions());
+
+    await expect(authenticationStatusService.isAuthenticated()).rejects.toThrow(PassboltBadResponseError);
   });
 });

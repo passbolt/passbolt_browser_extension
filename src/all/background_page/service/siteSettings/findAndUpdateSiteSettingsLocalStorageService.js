@@ -60,10 +60,16 @@ export default class FindAndUpdateSiteSettingsLocalStorageService {
 
       // Authenticated sessions persist to SiteSettingsLocalStorage (the offline-mode store);
       // Anonymous sessions only get the in-memory runtime cache below.
-      const activeSession = await this.checkAuthStatusService.checkAuthStatus();
-      if (activeSession.isAuthenticated) {
-        await this.siteSettingsLocalStorage.set(siteSettings);
+      try {
+        const activeSession = await this.checkAuthStatusService.checkAuthStatus();
+        if (activeSession.isAuthenticated) {
+          await this.siteSettingsLocalStorage.set(siteSettings);
+        }
+      } catch (error) {
+        // An error occured while checking the auth status
+        console.error(error);
       }
+
       /*
        * PB-53134:
        * Set a cache of site setting without account id as a key to get the cache in AppEmailValidatorService

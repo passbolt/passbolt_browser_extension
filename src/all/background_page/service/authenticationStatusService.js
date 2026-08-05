@@ -31,6 +31,9 @@ class AuthenticationStatusService extends AbstractService {
   /**
    * Check if the current user is authenticated.
    * @returns {Promise<boolean>}
+   * @throws {PassboltBadResponseError} If the response can't be parsed
+   * @throws {MfaAuthenticationRequiredError} If there was an error during the MFA
+   * @throws {NotFoundError} If the server answered with 404
    */
   async isAuthenticated() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl.toString()}/is-authenticated`, null);

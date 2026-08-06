@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.14.4] - 2026-08-10
+### Fixed
+- PB-53681: Safari applies URLs redirection on created resource too early
+
 ## [5.14.3] - 2026-08-03
 ### Fixed
 - PB-53406: PCD: do not display when editing a shared resource metadata only
@@ -2934,7 +2938,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.4...HEAD
+[5.14.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.3...v5.14.4
 [5.14.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.2...v5.14.3
 [5.14.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.1...v5.14.2
 [5.14.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.0...v5.14.1

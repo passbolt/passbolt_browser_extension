@@ -20,6 +20,7 @@ import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage"
 import SiteSettingsRuntimeCache from "./siteSettingsRuntimeCache";
 import FindAndUpdateSiteSettingsLocalStorageService from "./findAndUpdateSiteSettingsLocalStorageService";
 import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
+import PassboltBadResponseError from "../../error/passboltBadResponseError";
 
 const readBrowserStorage = async (storageKey) => {
   const data = await browser.storage.local.get([storageKey]);
@@ -84,6 +85,23 @@ describe("FindAndUpdateSiteSettingsLocalStorageService", () => {
 
       await service.findAndUpdateAll();
 
+      expect(await readBrowserStorage(service.siteSettingsLocalStorage.storageKey)).toBeUndefined();
+      expect(SiteSettingsLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
+    });
+
+    it("should handle API errors as if the user is not authenticated", async () => {
+      expect.assertions(4);
+
+      const dto = defaultProSiteSettings();
+
+      // An API error occured
+      jest.spyOn(service.checkAuthStatusService, "checkAuthStatus").mockRejectedValue(new PassboltBadResponseError());
+      jest.spyOn(service.findSiteSettingsService, "findSiteSettings").mockResolvedValue(new SiteSettingsEntity(dto));
+
+      const result = await service.findAndUpdateAll();
+
+      expect(result.toDto()).toEqual(dto);
+      expect(SiteSettingsRuntimeCache.get()).toEqual(dto);
       expect(await readBrowserStorage(service.siteSettingsLocalStorage.storageKey)).toBeUndefined();
       expect(SiteSettingsLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
     });

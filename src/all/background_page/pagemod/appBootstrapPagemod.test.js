@@ -24,6 +24,7 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
 import AccountEntity from "../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../model/entity/account/accountEntity.test.data";
+import PassboltBadResponseError from "../error/passboltBadResponseError";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -112,6 +113,22 @@ describe("AppBootstrap", () => {
       const constraint = await AppBootstrap.canBeAttachedTo({ frameId: 0 });
       // expectations
       expect(constraint).toBeFalsy();
+    });
+
+    it("Should not be able to attach a pagemod if the authentication status threw an error", async () => {
+      expect.assertions(1);
+
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
+      // An API error occured
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockRejectedValue(new PassboltBadResponseError());
+      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+
+      const result = await AppBootstrap.canBeAttachedTo({
+        frameId: Pagemod.TOP_FRAME_ID,
+        url: "https://passbolt.dev/app",
+      });
+
+      expect(result).toEqual(false);
     });
   });
 

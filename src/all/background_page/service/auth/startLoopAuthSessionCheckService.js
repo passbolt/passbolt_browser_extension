@@ -55,8 +55,19 @@ class StartLoopAuthSessionCheckService {
     const account = await GetActiveAccountService.get();
     const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     const checkAuthService = new CheckAuthStatusService(account, apiClientOptions);
-    const authStatus = await checkAuthService.checkAuthStatus(true);
-    if (!authStatus.isAuthenticated) {
+
+    let isAuthenticated = false;
+
+    try {
+      const authStatus = await checkAuthService.checkAuthStatus(true);
+      isAuthenticated = authStatus.isAuthenticated;
+    } catch (error) {
+      // An error occured while checking the auth status
+      console.error(error);
+      return;
+    }
+
+    if (!isAuthenticated) {
       PostLogoutService.exec();
     }
   }

@@ -118,7 +118,7 @@ class GroupUpdateService {
    * Encrypt a collection of needed secrets.
    * @param {openpgp.PrivateKey} privateKey The logged in user private key
    * @param {NeededSecretsCollection} neededSecretsCollection A collection of needed secret
-   * @param {Array} decryptedSecrets A collection of decrypted secret [{resourceId: secretDecrypted}, ...]
+   * @param {object} decryptedSecrets The decrypted secrets organized as {[resourceId]: secretDecrypted, ...}
    * @returns {Promise<GroupUpdateSecretsCollection>}
    * @private
    */
@@ -139,7 +139,7 @@ class GroupUpdateService {
    * Decrypt a collection of secrets
    * @param {openpgp.PrivateKey} privateKey The logged in user private key
    * @param {GroupUpdateSecretsCollection} secretsCollection The collection of secrets to decrypt
-   * @returns {Promise<[]>} [{resourceId: secretDecrypted}, ...]
+   * @returns {Promise<object>} The decrypted secrets organized as {[resourceId]: secretDecrypted, ...}
    * @private
    */
   async decryptSecrets(privateKey, secretsCollection) {
@@ -190,8 +190,12 @@ class GroupUpdateService {
     await keyring.sync();
 
     for (const userId of userIds) {
+      const publicKey = keyring.findPublic(userId);
+      if (!publicKey) {
+        throw new Error(`The public key of the user (${userId}) could not be found in the local keyring.`);
+      }
       // Keep armored key to send it through a message for offscreen
-      userOpenpgpPublicKeys[userId] = keyring.findPublic(userId).armoredKey;
+      userOpenpgpPublicKeys[userId] = publicKey.armoredKey;
     }
 
     return userOpenpgpPublicKeys;

@@ -4,6 +4,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.14.4] - 2026-08-10
+### Fixed
+- PB-53681: Safari applies URLs redirection on created resource too early
+
+## [5.14.3] - 2026-08-03
+### Fixed
+- PB-53406: PCD: do not display when editing a shared resource metadata only
+- PB-53471: PCD: creation of a shared resource in a non owned folder should display the PCD in read-only
+- PB-53546: Fix in form menu integration disablement behaviour
+
+### Maintenance
+- PB-53384: Add logs for errors on the process "add user to group"
+
 ## [5.14.2] - 2026-07-27
 ### Fixed
 - PB-53322: throttle permissions confirmation dialog requests
@@ -2925,7 +2938,9 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.4...HEAD
+[5.14.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.3...v5.14.4
+[5.14.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.2...v5.14.3
 [5.14.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.1...v5.14.2
 [5.14.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.14.0...v5.14.1
 [5.14.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.13.4...v5.14.0

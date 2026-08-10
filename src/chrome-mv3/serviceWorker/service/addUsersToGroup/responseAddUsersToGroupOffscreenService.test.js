@@ -47,6 +47,53 @@ describe("ResponseAddUsersToGroupOffscreenService", () => {
       expect(callbacks.reject).toHaveBeenCalledTimes(1);
     });
 
+    it("should rebuild the error preserving the contextual message, the name and the underlying cause", () => {
+      expect.assertions(4);
+
+      const id = crypto.randomUUID();
+      const callbacks = defaultCallbacks();
+
+      const cause = new Error("Error decrypting message: No decryption key packets found");
+      const original = new Error("Unable to decrypt the secret of the resource (resource-id).", { cause });
+      original.name = "GroupUpdateError";
+      const message = errorAddUsersToGroupResponseMessage({
+        id,
+        data: {
+          name: original.name,
+          message: original.message,
+          error: JSON.stringify(original, Object.getOwnPropertyNames(original)),
+        },
+      });
+
+      ResponseAddUsersToGroupOffscreenService.handleAddUsersToGroupResponse(message, callbacks);
+
+      const rebuiltError = callbacks.reject.mock.calls[0][0];
+      expect(rebuiltError.message).toEqual("Unable to decrypt the secret of the resource (resource-id).");
+      expect(rebuiltError.name).toEqual("GroupUpdateError");
+      expect(rebuiltError.cause).toBeInstanceOf(Error);
+      expect(rebuiltError.cause.message).toEqual("Error decrypting message: No decryption key packets found");
+    });
+
+    it("should rebuild a message-only error when no serialized error is provided", () => {
+      expect.assertions(2);
+
+      const id = crypto.randomUUID();
+      const callbacks = defaultCallbacks();
+
+      const message = errorAddUsersToGroupResponseMessage({
+        id,
+        data: { message: "Unable to encrypt the secret of the resource (resource-id) for the user (user-id)." },
+      });
+
+      ResponseAddUsersToGroupOffscreenService.handleAddUsersToGroupResponse(message, callbacks);
+
+      const rebuiltError = callbacks.reject.mock.calls[0][0];
+      expect(rebuiltError.message).toEqual(
+        "Unable to encrypt the secret of the resource (resource-id) for the user (user-id).",
+      );
+      expect(rebuiltError.cause).toBeUndefined();
+    });
+
     it("should clear the request progress service once the response is handled", () => {
       expect.assertions(1);
 

@@ -31,7 +31,7 @@ class InformCallToActionController {
   constructor(worker, apiClientOptions, account) {
     this.worker = worker;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
-    this.checkAuthStatusService = new CheckAuthStatusService();
+    this.checkAuthStatusService = new CheckAuthStatusService(account, apiClientOptions);
     this.getOrFindResourcesService = new GetOrFindResourcesService(account, apiClientOptions);
     this.openTrustedDomainTabService = new OpenTrustedDomainTabService();
   }
@@ -65,7 +65,7 @@ class InformCallToActionController {
         const queryParameters = [{ name: "feature", value: "login" }];
         await QuickAccessService.open(queryParameters);
         this.worker.port.emit(requestId, "SUCCESS");
-      } else if (status.isMfaRequired) {
+      } else if (!status.isMfaAuthenticated) {
         await this.openTrustedDomainTabService.openTab();
         this.worker.port.emit(requestId, "SUCCESS");
       } else {

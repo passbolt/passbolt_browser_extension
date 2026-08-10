@@ -24,7 +24,11 @@ import FileService from "../../service/file/fileService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { mockApiResponse, mockApiResponseError } from "../../../../../test/mocks/mockApiResponse";
 import { enableFetchMocks } from "jest-fetch-mock";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
@@ -42,14 +46,15 @@ beforeEach(() => {
 });
 
 describe("UpdatePrivateKeyController", () => {
+  const account = new AccountEntity(defaultAccountDto());
   const mockOrganisationSettingCall = (ssoEnabled = false) => {
-    const organizationSettings = anonymousOrganizationSettings();
+    const organizationSettings = anonymousSiteSettings();
     if (ssoEnabled) {
       organizationSettings.passbolt.plugins.sso = { enabled: true };
     }
-    fetch.doMockOnceIf(new RegExp("/settings.json"), () =>
-      mockApiResponse(organizationSettings, { servertime: Date.now() / 1000 }),
-    );
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
   };
 
   describe("UpdatePrivateKeyController::exec", () => {
@@ -76,7 +81,7 @@ describe("UpdatePrivateKeyController", () => {
         },
       };
 
-      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
+      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions(), account);
       const oldPassphrase = pgpKeys.ada.passphrase;
       const newPassphrase = "newPassphrase";
       await controller.exec(oldPassphrase, newPassphrase);
@@ -85,7 +90,7 @@ describe("UpdatePrivateKeyController", () => {
     it("Should throw an error if no passphrase is provided.", async () => {
       expect.assertions(2);
       await MockExtension.withConfiguredAccount();
-      const controller = new UpdatePrivateKeyController(null, null, defaultApiClientOptions());
+      const controller = new UpdatePrivateKeyController(null, null, defaultApiClientOptions(), account);
 
       const nullPassphrase = null;
       const stringPassphrase = "stringPassphrase";
@@ -106,7 +111,7 @@ describe("UpdatePrivateKeyController", () => {
     it("Should throw an error if passphrases are not strings.", async () => {
       expect.assertions(2);
       await MockExtension.withConfiguredAccount();
-      const controller = new UpdatePrivateKeyController(null, null, defaultApiClientOptions());
+      const controller = new UpdatePrivateKeyController(null, null, defaultApiClientOptions(), account);
 
       const notStringPassphrase = {};
       const stringPassphrase = "stringPassphrase";
@@ -164,7 +169,7 @@ describe("UpdatePrivateKeyController", () => {
 
       mockedSaveFile.mockImplementation(async () => {});
 
-      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
+      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions(), account);
       const oldPassphrase = pgpKeys.ada.passphrase;
       await controller.exec(oldPassphrase, newPassphrase);
     });
@@ -195,7 +200,7 @@ describe("UpdatePrivateKeyController", () => {
 
       mockedSaveFile.mockImplementation(() => {});
 
-      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
+      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions(), account);
       await controller.exec(pgpKeys.ada.passphrase, "newPassphrase");
 
       expect(GenerateSsoKitService.generateSsoKits).not.toHaveBeenCalled();
@@ -235,7 +240,7 @@ describe("UpdatePrivateKeyController", () => {
 
       mockedSaveFile.mockImplementation(async () => {});
 
-      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
+      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions(), account);
       const oldPassphrase = pgpKeys.ada.passphrase;
       try {
         await controller.exec(oldPassphrase, newPassphrase);
@@ -281,7 +286,7 @@ describe("UpdatePrivateKeyController", () => {
 
       mockedSaveFile.mockImplementation(async () => {});
 
-      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
+      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions(), account);
       const oldPassphrase = pgpKeys.ada.passphrase;
       await controller.exec(oldPassphrase, newPassphrase);
     });
@@ -320,7 +325,7 @@ describe("UpdatePrivateKeyController", () => {
 
       mockedSaveFile.mockImplementation(async () => {});
 
-      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions());
+      const controller = new UpdatePrivateKeyController(worker, null, defaultApiClientOptions(), account);
       try {
         await controller.exec("wrong passphrase", newPassphrase);
       } catch (e) {

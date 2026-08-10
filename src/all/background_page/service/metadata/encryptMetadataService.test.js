@@ -317,7 +317,7 @@ describe("EncryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(PassphraseStorageService, "get").mockImplementation(() => pgpKeys.ada.passphrase);
@@ -356,7 +356,7 @@ describe("EncryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(PassphraseStorageService, "get");
@@ -392,7 +392,7 @@ describe("EncryptMetadataService", () => {
       const keyring = new Keyring();
       await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(async () => privateKeyDecrypted);
@@ -436,7 +436,7 @@ describe("EncryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest
@@ -469,7 +469,7 @@ describe("EncryptMetadataService", () => {
       const collection = new ResourcesCollection([personalResourceEntity, sharedResourceEntity]);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll");
       jest.spyOn(PassphraseStorageService, "get");
       jest.spyOn(
@@ -520,7 +520,7 @@ describe("EncryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(GetDecryptedUserPrivateKeyService, "getKey").mockImplementationOnce(async () => privateKeyDecrypted);
@@ -555,7 +555,7 @@ describe("EncryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest.spyOn(decryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest
@@ -603,7 +603,7 @@ describe("EncryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest.spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll").mockImplementation(() => metadataKeys);
       jest
         .spyOn(
@@ -639,7 +639,7 @@ describe("EncryptMetadataService", () => {
       const collection = new ResourcesCollection([resourceEntity]);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest
         .spyOn(
           encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService
@@ -669,7 +669,7 @@ describe("EncryptMetadataService", () => {
       const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest
         .spyOn(encryptService.getOrFindMetadataKeysService, "getOrFindAll")
         .mockImplementationOnce(() => metadataKeys);
@@ -702,7 +702,7 @@ describe("EncryptMetadataService", () => {
       expect.assertions(1);
       const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
 
-      jest.spyOn(encryptService.resourceTypesModel, "getOrFindAll").mockImplementation(() => resourceTypes);
+      jest.spyOn(encryptService.getOrFindResourceTypesService, "getOrFindAll").mockImplementation(() => resourceTypes);
       jest
         .spyOn(
           encryptService.getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService

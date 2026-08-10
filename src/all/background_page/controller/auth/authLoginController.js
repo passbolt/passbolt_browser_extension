@@ -35,7 +35,7 @@ class AuthLoginController {
     this.requestId = requestId;
     this.account = account;
     this.authVerifyLoginChallengeService = new AuthVerifyLoginChallengeService(apiClientOptions);
-    this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
+    this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions, account);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
     this.userRememberMeLatestChoiceLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
   }

@@ -15,9 +15,8 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import OrganizationSettingsModel from "../../../organizationSettings/organizationSettingsModel";
-import OrganizationSettingsEntity from "../../organizationSettings/organizationSettingsEntity";
-import { customEmailValidationProOrganizationSettings } from "../../organizationSettings/organizationSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import { customEmailValidationProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import GenerateGpgKeyPairOptionsEntity from "./generateGpgKeyPairOptionsEntity";
 import { defaultDto, minimalDto } from "./generateGpgKeyPairOptionsEntity.test.data";
 import {
@@ -25,6 +24,7 @@ import {
   rsaUserKeyPoliciesSettingsDto,
 } from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity.test.data";
 import UserKeyPoliciesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/userKeyPolicies/UserKeyPoliciesSettingsEntity";
+import SiteSettingsRuntimeCache from "../../../../service/siteSettings/siteSettingsRuntimeCache";
 
 beforeEach(() => {
   jest.useFakeTimers(); //avoid slight nano seconds shift in test when comparing dates that makes test failing while they shouldn't
@@ -147,8 +147,8 @@ describe("GenerateGpgKeyPairOptionsEntity", () => {
 
     it("allows non-standard email if custom validation is configured", () => {
       expect.assertions(1);
-      const organizationSettings = customEmailValidationProOrganizationSettings();
-      OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
+      const organizationSettings = customEmailValidationProSiteSettings();
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity(organizationSettings));
       const dto = defaultDto({ email: "ada@passbolt.c" });
       const entity = new GenerateGpgKeyPairOptionsEntity(dto);
       expect(entity.email).toEqual("ada@passbolt.c");

@@ -32,10 +32,18 @@ import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import FindSignatureService from "../../service/crypto/findSignatureService";
 import MetadataPrivateKeyApiService from "../../service/api/metadata/metadataPrivateKeyApiService";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 
 describe("ShareMetadataKeyPrivateController", () => {
+  beforeEach(() => {
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
+  });
   describe("::exec", () => {
     let controller, account, apiClientOptions, keyring;
 
@@ -73,7 +81,9 @@ describe("ShareMetadataKeyPrivateController", () => {
 
       jest.spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey");
       jest.spyOn(controller.getPassphraseService, "getPassphrase");
-      jest.spyOn(controller.shareMetadataKeyPrivateService.userModel, "getOrFindAll").mockImplementation(() => users);
+      jest
+        .spyOn(controller.shareMetadataKeyPrivateService.getOrFindUsersService, "getOrFindAll")
+        .mockImplementation(() => users);
       jest.spyOn(GetOrFindMetadataKeysService.prototype, "getOrFindAll").mockImplementation(() => metadataKeys);
 
       await controller.exec(pgpKeys.betty.userId);
@@ -97,7 +107,9 @@ describe("ShareMetadataKeyPrivateController", () => {
 
       jest.spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey");
       jest.spyOn(controller.getPassphraseService, "getPassphrase");
-      jest.spyOn(controller.shareMetadataKeyPrivateService.userModel, "getOrFindAll").mockImplementation(() => users);
+      jest
+        .spyOn(controller.shareMetadataKeyPrivateService.getOrFindUsersService, "getOrFindAll")
+        .mockImplementation(() => users);
       jest
         .spyOn(controller.shareMetadataKeyPrivateService.getOrFindMetadataKeysService, "getOrFindAll")
         .mockImplementation(() => metadataKeys);

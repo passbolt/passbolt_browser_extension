@@ -20,10 +20,12 @@ import {
   defaultMetadataTypesSettingsV4Dto,
   defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
-import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -45,7 +47,7 @@ describe("GetOrFindMetadataSettingsService", () => {
     it("with empty storage, retrieves the metadata types settings from the API and store them into the local storage.", async () => {
       expect.assertions(3);
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       jest
         .spyOn(
           getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService
@@ -54,12 +56,8 @@ describe("GetOrFindMetadataSettingsService", () => {
         )
         .mockImplementation(() => metadataTypesSettingsDto);
       jest
-        .spyOn(
-          getOrFindMetadataSettingsService.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel
-            .organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       // Control initial storage value.
       const initialStorageValue = await getOrFindMetadataSettingsService.metadataTypesSettingsLocalStorage.get();

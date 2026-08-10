@@ -89,7 +89,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.locale.get", async (requestId) => {
-    const getLocaleController = new GetLocaleController(worker, apiClientOptions);
+    const getLocaleController = new GetLocaleController(worker, apiClientOptions, account);
 
     try {
       const localeEntity = await getLocaleController.getLocale();

@@ -15,14 +15,18 @@
 import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GetAndInitSetupLocaleController from "./getAndInitSetupLocaleController";
-import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import { initialAccountSetupDto } from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
 // Reset the modules before each test.
 beforeEach(() => {
   enableFetchMocks();
+  jest
+    .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+    .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
 });
 
 describe("GetAndInitSetupLocaleController", () => {
@@ -30,10 +34,6 @@ describe("GetAndInitSetupLocaleController", () => {
     it("Should get the locale defined on the account if one defined.", async () => {
       const account = new AccountSetupEntity(initialAccountSetupDto({ locale: "fr-FR" }));
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
-
-      // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings();
-      fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
 
       expect.assertions(1);
       const locale = await controller.exec();
@@ -44,9 +44,6 @@ describe("GetAndInitSetupLocaleController", () => {
       const account = new AccountSetupEntity(initialAccountSetupDto());
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
-      // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings();
-      fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
       const languageGetterMock = jest.spyOn(self.navigator, "language", "get");
       languageGetterMock.mockReturnValue("de-AT");
@@ -60,9 +57,6 @@ describe("GetAndInitSetupLocaleController", () => {
       const account = new AccountSetupEntity(initialAccountSetupDto());
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
-      // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings();
-      fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
       const languageGetterMock = jest.spyOn(self.navigator, "language", "get");
       languageGetterMock.mockReturnValue("de-DE");
@@ -76,9 +70,10 @@ describe("GetAndInitSetupLocaleController", () => {
       const account = new AccountSetupEntity(initialAccountSetupDto());
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
-      // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings({ app: { locale: "ja-JP" } });
-      fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
+      // Mock the organization settings.
+      jest
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings({ app: { locale: "ja-JP" } })));
       // Mock the navigator locale
       const languageGetterMock = jest.spyOn(self.navigator, "language", "get");
       languageGetterMock.mockReturnValue("ma-MA");
@@ -92,9 +87,10 @@ describe("GetAndInitSetupLocaleController", () => {
       const account = new AccountSetupEntity(initialAccountSetupDto());
       const controller = new GetAndInitSetupLocaleController(null, null, defaultApiClientOptions(), account);
 
-      // Mock API fetch organization settings
-      const mockOrganizationSettings = anonymousOrganizationSettings({ app: { locale: null } });
-      fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
+      // Mock the organization settings.
+      jest
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings({ app: { locale: null } })));
       // Mock the navigator locale
       const languageGetterMock = jest.spyOn(self.navigator, "language", "get");
       languageGetterMock.mockReturnValue("ma-MA");

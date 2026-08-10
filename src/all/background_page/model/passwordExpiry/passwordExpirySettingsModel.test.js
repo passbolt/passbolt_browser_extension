@@ -26,6 +26,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
 import PasswordExpirySettingsModel from "./passwordExpirySettingsModel";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import { v4 as uuid } from "uuid";
 import PassboltBadResponseError from "passbolt-styleguide/src/shared/lib/Error/PassboltBadResponseError";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
@@ -40,7 +41,7 @@ describe("PasswordExpiry model", () => {
     const account = new AccountEntity(defaultAccountDto());
     apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     model = new PasswordExpirySettingsModel(account, apiClientOptions);
-    jest.spyOn(model.organisationSettingsModel, "getOrFind").mockImplementation(() =>
+    jest.spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind").mockImplementation(() =>
       Promise.resolve({
         isPluginEnabled: () => false,
       }),
@@ -216,7 +217,7 @@ describe("PasswordExpiry model", () => {
     it("should return an PasswordExpiryProSettingsEntity when passwordExpiryPolicies is enabled ", async () => {
       expect.assertions(1);
 
-      jest.spyOn(model.organisationSettingsModel, "getOrFind").mockImplementation(() =>
+      jest.spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind").mockImplementation(() =>
         Promise.resolve({
           isPluginEnabled: () => true,
         }),

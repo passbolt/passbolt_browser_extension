@@ -25,6 +25,8 @@ import FindAndDecryptSecretRevisionsService from "./findAndDecryptSecretRevision
 import { v4 as uuidv4 } from "uuid";
 import DecryptMessageService from "../crypto/decryptMessageService";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 describe("FindAndDecryptSecretRevisionsService", () => {
   describe("::findAllByResourceIdAndDecryptForDisplay", () => {
@@ -32,6 +34,7 @@ describe("FindAndDecryptSecretRevisionsService", () => {
       expect.assertions(8);
 
       await MockExtension.withConfiguredAccount(pgpKeys.ada);
+      const account = new AccountEntity(defaultAccountDto());
 
       const encryptedSecretDto = minimalDto().data;
       const pgpMessage = await OpenpgpAssertion.readMessageOrFail(encryptedSecretDto);
@@ -57,8 +60,8 @@ describe("FindAndDecryptSecretRevisionsService", () => {
       const resourceSecretRevisions = new ResourceSecretRevisionsCollection(
         defaultResourceSecretRevisionsDtos({ resource_id }, { count: 4, withSecrets: true, withCreator: true }),
       );
-      const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
-      jest.spyOn(service.resourceTypeModel, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      const service = new FindAndDecryptSecretRevisionsService(account, defaultApiClientOptions());
+      jest.spyOn(service.getOrFindResourceTypesService, "getOrFindAll").mockReturnValue(resourceTypesCollection);
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(OpenpgpAssertion, "readMessageOrFail").mockReturnValue(pgpMessage);
 
@@ -83,14 +86,15 @@ describe("FindAndDecryptSecretRevisionsService", () => {
       expect.assertions(2);
 
       await MockExtension.withConfiguredAccount(pgpKeys.ada);
+      const account = new AccountEntity(defaultAccountDto());
 
       const resource_id = uuidv4();
       const encryptedSecretDto = minimalDto().data;
       const resourceSecretRevisions = new ResourceSecretRevisionsCollection([]);
 
-      const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
+      const service = new FindAndDecryptSecretRevisionsService(account, defaultApiClientOptions());
       jest
-        .spyOn(service.resourceTypeModel, "getOrFindAll")
+        .spyOn(service.getOrFindResourceTypesService, "getOrFindAll")
         .mockReturnValue(new ResourceTypesCollection(resourceTypesCollectionDto()));
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => encryptedSecretDto);
@@ -107,6 +111,7 @@ describe("FindAndDecryptSecretRevisionsService", () => {
       expect.assertions(2);
 
       await MockExtension.withConfiguredAccount(pgpKeys.ada);
+      const account = new AccountEntity(defaultAccountDto());
 
       const resource_id = uuidv4();
       const encryptedSecretDto = minimalDto().data;
@@ -114,9 +119,9 @@ describe("FindAndDecryptSecretRevisionsService", () => {
         defaultResourceSecretRevisionsDtos({ resource_id }, { count: 4, withSecrets: true, withCreator: true }),
       );
 
-      const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
+      const service = new FindAndDecryptSecretRevisionsService(account, defaultApiClientOptions());
       jest
-        .spyOn(service.resourceTypeModel, "getOrFindAll")
+        .spyOn(service.getOrFindResourceTypesService, "getOrFindAll")
         .mockReturnValue(new ResourceTypesCollection(resourceTypesCollectionDto()));
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => encryptedSecretDto);
@@ -133,6 +138,7 @@ describe("FindAndDecryptSecretRevisionsService", () => {
       expect.assertions(1);
 
       await MockExtension.withConfiguredAccount(pgpKeys.ada);
+      const account = new AccountEntity(defaultAccountDto());
       const passphrase = pgpKeys.admin.passphrase;
 
       const resource_id = uuidv4();
@@ -141,9 +147,9 @@ describe("FindAndDecryptSecretRevisionsService", () => {
         defaultResourceSecretRevisionsDtos({ resource_id }, { count: 4, withSecrets: true, withCreator: true }),
       );
 
-      const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
+      const service = new FindAndDecryptSecretRevisionsService(account, defaultApiClientOptions());
       jest
-        .spyOn(service.resourceTypeModel, "getOrFindAll")
+        .spyOn(service.getOrFindResourceTypesService, "getOrFindAll")
         .mockReturnValue(new ResourceTypesCollection(resourceTypesCollectionDto()));
       jest.spyOn(service.findSecretRevisionsService, "findAllByResourceId").mockReturnValue(resourceSecretRevisions);
       jest.spyOn(DecryptMessageService, "decrypt").mockImplementation(() => encryptedSecretDto);
@@ -154,7 +160,8 @@ describe("FindAndDecryptSecretRevisionsService", () => {
     it("should assert its parameters", async () => {
       expect.assertions(4);
 
-      const service = new FindAndDecryptSecretRevisionsService(defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const service = new FindAndDecryptSecretRevisionsService(account, defaultApiClientOptions());
 
       await expect(() => service.findAllByResourceIdAndDecryptForDisplay(42, "passphrase")).rejects.toThrow();
       await expect(() => service.findAllByResourceIdAndDecryptForDisplay(null, "passphrase")).rejects.toThrow();

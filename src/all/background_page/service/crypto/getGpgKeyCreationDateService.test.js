@@ -12,16 +12,19 @@
  * @since         3.6.0
  */
 import GetGpgKeyCreationDateService from "./getGpgKeyCreationDateService";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
-let currentTime;
+let currentTime, account;
 beforeEach(() => {
   enableFetchMocks();
   MockExtension.withMissingPrivateKeyAccount();
+  account = new AccountEntity(defaultAccountDto());
 
   jest.useFakeTimers();
   currentTime = new Date();
@@ -34,9 +37,9 @@ describe("GetGpgCompatibleDate service", () => {
     const serverTimestamp = currentTime.getTime() - 3600000; //current time minus one hour
     const serverTime = new Date(serverTimestamp);
 
-    fetch.doMock(() => mockApiResponse(anonymousOrganizationSettings(), { servertime: serverTime.getTime() / 1000 }));
+    fetch.doMock(() => mockApiResponse(anonymousSiteSettings(), { servertime: serverTime.getTime() / 1000 }));
 
-    const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
+    const gpgDate = await GetGpgKeyCreationDateService.getDate(account, defaultApiClientOptions());
     expect(gpgDate).toEqual(serverTime.getTime());
   });
 
@@ -44,9 +47,9 @@ describe("GetGpgCompatibleDate service", () => {
     const serverTimestamp = currentTime.getTime() + 3600000; //current time plus one hour
     const serverTime = new Date(serverTimestamp);
 
-    fetch.doMock(() => mockApiResponse(anonymousOrganizationSettings(), { servertime: serverTime.getTime() / 1000 }));
+    fetch.doMock(() => mockApiResponse(anonymousSiteSettings(), { servertime: serverTime.getTime() / 1000 }));
 
-    const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
+    const gpgDate = await GetGpgKeyCreationDateService.getDate(account, defaultApiClientOptions());
     expect(gpgDate).toEqual(currentTime.getTime());
   });
 
@@ -55,7 +58,7 @@ describe("GetGpgCompatibleDate service", () => {
       throw new Error("Something wrong happened");
     });
 
-    const gpgDate = await GetGpgKeyCreationDateService.getDate(defaultApiClientOptions());
+    const gpgDate = await GetGpgKeyCreationDateService.getDate(account, defaultApiClientOptions());
     expect(gpgDate).toEqual(currentTime.getTime());
   });
 });

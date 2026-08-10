@@ -17,6 +17,13 @@ import ExtQuickAccess from "passbolt-styleguide/src/react-quickaccess/ExtQuickAc
 import Port from "../lib/port";
 
 async function main() {
+  // The QuickAccess is only ever rendered as a top-level extension surface (toolbar popup or detached window).
+  // If it is running inside a frame, a remote page has embedded it; refuse to initialise to prevent
+  // clickjacking / UI redress of the QuickAccess UI.
+  if (window.top !== window.self) {
+    return;
+  }
+
   const query = new URLSearchParams(window.location.search);
   const portname = query.get("passbolt");
   const port = new Port(portname);

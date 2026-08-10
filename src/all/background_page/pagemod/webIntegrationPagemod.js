@@ -14,10 +14,11 @@
 import Pagemod from "./pagemod";
 import { ConfigEvents } from "../event/configEvents";
 import { WebIntegrationEvents } from "../event/webIntegrationEvents";
-import { OrganizationSettingsEvents } from "../event/organizationSettingsEvents";
+import { SiteSettingsEvents } from "../event/siteSettingsEvents";
 import { PortEvents } from "../event/portEvents";
 import ParseWebIntegrationUrlService from "../service/webIntegration/parseWebIntegrationUrlService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
 class WebIntegration extends Pagemod {
   /**
@@ -49,7 +50,25 @@ class WebIntegration extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents, PortEvents];
+    return [ConfigEvents, WebIntegrationEvents, SiteSettingsEvents, PortEvents];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async attachEvents(port) {
+    try {
+      const tab = port._port.sender.tab;
+      const account = await GetActiveAccountService.get();
+      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+      const name = this.appName;
+      for (const event of this.events) {
+        event.listen({ port, tab, name }, apiClientOptions, account);
+      }
+    } catch (error) {
+      // Unexpected error.
+      console.error(error);
+    }
   }
 
   /**

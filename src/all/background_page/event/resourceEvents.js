@@ -13,7 +13,6 @@ import SetResourcesExpiryDateController from "../controller/resource/setResource
 import FindResourceDetailsController from "../controller/resource/findResourceDetailsController";
 import ResourceUpdateLocalStorageController from "../controller/resourceLocalStorage/resourceUpdateLocalStorageController";
 import FindAllIdsByIsSharedWithGroupController from "../controller/resource/findAllIdsByIsSharedWithGroupController";
-import FindAllByIdsForDisplayPermissionsController from "../controller/resource/findAllByIdsForDisplayPermissionsController";
 import MoveResourcesController from "../controller/move/moveResourcesController";
 import ResetResourceGridUserSettingController from "../controller/resourceGridSetting/resetResourceGridUserSettingController";
 import UpdateResourceLocalStorageByFolderParentIdController from "../controller/resource/updateResourceLocalStorageByFolderParentIdController";
@@ -63,10 +62,11 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param resourceDto {object} The resource meta data
    * @param plaintextDto {string|object} The plaintext data to encrypt
+   * @param permissionChanges {Array<object>} Optional permission changes applied after create
    */
-  worker.port.on("passbolt.resources.create", async (requestId, resourceDto, plaintextDto) => {
+  worker.port.on("passbolt.resources.create", async (requestId, resourceDto, plaintextDto, permissionChanges) => {
     const controller = new ResourceCreateController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourceDto, plaintextDto);
+    await controller._exec(resourceDto, plaintextDto, permissionChanges);
   });
 
   /*
@@ -88,10 +88,11 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @param resource {array} The resource
    * @param plaintextDto {} The resource secret
+   * @param permissionChanges {Array<object>} Optional permission changes applied after the update
    */
-  worker.port.on("passbolt.resources.update", async (requestId, resourceDto, plaintextDto) => {
+  worker.port.on("passbolt.resources.update", async (requestId, resourceDto, plaintextDto, permissionChanges) => {
     const controller = new ResourceUpdateController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourceDto, plaintextDto);
+    await controller._exec(resourceDto, plaintextDto, permissionChanges);
   });
 
   /*
@@ -142,16 +143,6 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.resources.set-expiration-date", async (requestId, passwordExpiryResourcesCollectionDto) => {
     const controller = new SetResourcesExpiryDateController(worker, requestId, apiClientOptions);
     await controller._exec(passwordExpiryResourcesCollectionDto);
-  });
-
-  /*
-   * Retrieve all resources by ids with their permissions.
-   * @listens passbolt.resources.find-all-by-ids-with-permissions
-   * @param {array} resourcesIds The ids of the resources to retrieve.
-   */
-  worker.port.on("passbolt.resources.find-all-by-ids-for-display-permissions", async (requestId, resourcesIds) => {
-    const controller = new FindAllByIdsForDisplayPermissionsController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourcesIds);
   });
 
   /*

@@ -14,38 +14,51 @@
 
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
 import AuthenticationStatusService from "../authenticationStatusService";
-import AuthStatusLocalStorage from "../local_storage/authStatusLocalStorage";
+import ActiveSessionLocalStorage from "../local_storage/activeSessionLocalStorage";
+import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
 
 class CheckAuthStatusService {
+  /**
+   * Constructor
+   *
+   * @param {AccountEntity} account the user account
+   * @param {ApiClientOptions} apiClientOptions
+   * @public
+   */
+  constructor(account, apiClientOptions) {
+    this.account = account;
+    this.authenticationStatusService = new AuthenticationStatusService(apiClientOptions);
+    this.activeSessionLocalStorage = new ActiveSessionLocalStorage(account);
+  }
+
   /**
    * Returns the authentication status of the current user.
    * It first interrogates the local storage and if necessary the API afterward.
    * @param {boolean} [flushCache] should the cache be flushed before or not.
-   * @return {Promise<{isAuthenticated: {boolean}, isMfaRequired: {boolean}}>}
+   * @return {Promise<OnlineSessionEntity>}
    * @throws {Error} if something wrong happened on the API
    */
   async checkAuthStatus(flushCache = false) {
-    if (!flushCache) {
-      const storedStatus = await AuthStatusLocalStorage.get();
-      if (storedStatus) {
-        return storedStatus;
-      }
+    const storedSession = await this.activeSessionLocalStorage.get();
+    if (!flushCache && storedSession) {
+      return new OnlineSessionEntity(storedSession);
     }
 
-    let isAuthenticated, isMfaRequired;
+    const session = { ...storedSession };
     try {
-      isAuthenticated = await AuthenticationStatusService.isAuthenticated();
-      isMfaRequired = false;
+      session.is_authenticated = await this.authenticationStatusService.isAuthenticated();
+      session.is_mfa_authenticated = true;
     } catch (error) {
       if (!(error instanceof MfaAuthenticationRequiredError)) {
         throw error;
       }
-      isAuthenticated = true;
-      isMfaRequired = true;
+      session.is_authenticated = true;
+      session.is_mfa_authenticated = false;
     }
 
-    await AuthStatusLocalStorage.set(isAuthenticated, isMfaRequired);
-    return { isAuthenticated, isMfaRequired };
+    const onlineSessionEntity = new OnlineSessionEntity(session);
+    await this.activeSessionLocalStorage.set(onlineSessionEntity);
+    return onlineSessionEntity;
   }
 }
 

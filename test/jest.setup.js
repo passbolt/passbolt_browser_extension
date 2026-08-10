@@ -20,7 +20,8 @@ import "./mocks/mockCryptoKey";
 import "./matchers/extendExpect";
 import MockNavigatorLocks from "./mocks/mockNavigatorLocks";
 import MockNavigatorClipboard from "./mocks/mockNavigatorClipboard";
-import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
+import SiteSettingsRuntimeCache from "../src/all/background_page/service/siteSettings/siteSettingsRuntimeCache";
+import SiteSettingsLocalStorage from "../src/all/background_page/service/local_storage/siteSettingsLocalStorage";
 import { Config } from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
 import ResourceLocalStorage from "../src/all/background_page/service/local_storage/resourceLocalStorage";
@@ -71,7 +72,8 @@ beforeEach(async () => {
   // Flush the session storage
   await browser.storage.session.clear();
   // Flush caches
-  OrganizationSettingsModel.flushCache();
+  SiteSettingsRuntimeCache.flushAll();
+  SiteSettingsLocalStorage._runtimeCachedData = {};
   ResourceLocalStorage.flush();
   FolderLocalStorage.flush();
   GroupLocalStorage._runtimeCachedData = {};

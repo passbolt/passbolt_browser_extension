@@ -17,6 +17,8 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import GetResourceTypesController from "./getResourceTypesController";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -30,9 +32,10 @@ describe("GetResourceTypesController", () => {
       expect.assertions(2);
 
       const resourceTypesDto = resourceTypesCollectionDto();
-      const controller = new GetResourceTypesController(null, null, defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new GetResourceTypesController(null, null, defaultApiClientOptions(), account);
       jest
-        .spyOn(controller.resourceTypeModel, "getOrFindAll")
+        .spyOn(controller.getOrFindResourceTypesService, "getOrFindAll")
         .mockImplementationOnce(() => new ResourceTypesCollection(resourceTypesDto));
 
       const resourceTypesCollection = await controller.exec();

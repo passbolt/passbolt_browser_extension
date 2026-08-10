@@ -22,7 +22,9 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
 import { enableFetchMocks } from "jest-fetch-mock";
-import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -46,7 +48,7 @@ describe("FindMetadataTypesSettingsController", () => {
       expect.assertions(3);
 
       const metadataTypesSettingsDto = defaultMetadataTypesSettingsV50FreshDto();
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       jest
         .spyOn(
           controller.findAndUpdateMetadataSettingsLocalStorageService.findMetadataSettingsService,
@@ -54,12 +56,8 @@ describe("FindMetadataTypesSettingsController", () => {
         )
         .mockImplementationOnce(() => new MetadataTypesSettingsEntity(metadataTypesSettingsDto));
       jest
-        .spyOn(
-          controller.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel
-            .organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const metadataTypesSettings = await controller.exec();
 
@@ -73,16 +71,12 @@ describe("FindMetadataTypesSettingsController", () => {
     it("get or find metadata types settings for a v4.", async () => {
       expect.assertions(3);
 
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       // disable the plugin metadata.
       delete siteSettingsDto.passbolt.plugins.metadata;
       jest
-        .spyOn(
-          controller.findAndUpdateMetadataSettingsLocalStorageService.organisationSettingsModel
-            .organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const metadataTypesSettings = await controller.exec();
 

@@ -20,7 +20,9 @@ import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import AccountRecoveryLoginController from "./accountRecoveryLoginController";
 import { enableFetchMocks } from "jest-fetch-mock";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import { defaultEmptySettings, withAzureSsoSettings } from "../sso/getCurrentSsoSettingsController.test.data";
 import { clientSsoKit } from "../../model/entity/sso/ssoKitClientPart.test.data";
@@ -38,19 +40,22 @@ beforeEach(async () => {
   enableFetchMocks();
   jest.clearAllMocks();
   await MockExtension.withConfiguredAccount();
+  jest
+    .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+    .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
 });
 
 describe("AccountRecoveryLoginController", () => {
   describe("AccountRecoveryLoginController::exec", () => {
     const passphrase = "ada@passbolt.com";
     const mockOrganisationSettings = (withSsoEnabled = true) => {
-      const organizationSettings = anonymousOrganizationSettings();
+      const organizationSettings = anonymousSiteSettings();
       organizationSettings.passbolt.plugins.sso = {
         enabled: withSsoEnabled,
       };
-      fetch.doMockOnceIf(new RegExp("/settings.json"), () =>
-        mockApiResponse(organizationSettings, { servertime: Date.now() / 1000 }),
-      );
+      jest
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
     };
 
     const mockOrganisationSettingsSsoSettings = (ssoSettings) => {

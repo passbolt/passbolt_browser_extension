@@ -68,10 +68,17 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_TOTP_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import GetOrFindMetadataSettingsService from "../../service/metadata/getOrFindMetadataSettingsService";
+import GetOrFindResourceTypesService from "../../service/resourceType/getOrFindResourceTypesService";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 
 beforeEach(async () => {
   await MockExtension.withConfiguredAccount();
   jest.clearAllMocks();
+  jest
+    .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+    .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
 });
 
 describe("ImportResourcesFileController", () => {
@@ -808,7 +815,7 @@ describe("ImportResourcesFileController", () => {
       expect.assertions(1);
 
       jest.spyOn(controller.progressService, "close");
-      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => {
+      jest.spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll").mockImplementationOnce(() => {
         throw new Error("API error");
       });
       const file = btoa(BinaryConvert.toBinary(defaultCsvData));

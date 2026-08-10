@@ -14,7 +14,8 @@
 import AccountModel from "../../model/account/accountModel";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import FileService from "../../service/file/fileService";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
@@ -29,12 +30,13 @@ class UpdatePrivateKeyController {
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the user account
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.accountModel = new AccountModel();
-    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
   }
 
@@ -64,8 +66,8 @@ class UpdatePrivateKeyController {
     if (typeof oldPassphrase !== "string" || typeof newPassphrase !== "string") {
       throw new Error("The old and new passphrase have to be string");
     }
-    const organizationSettings = await this.organisationSettingsModel.getOrFind();
-    const ssoIsEnabled = organizationSettings.isPluginEnabled("sso");
+    const siteSettings = await this.getOrFindSiteSettingsService.getOrFind(false);
+    const ssoIsEnabled = siteSettings.isPluginEnabled("sso");
 
     const userPrivateArmoredKey = await this.accountModel.rotatePrivateKeyPassphrase(oldPassphrase, newPassphrase);
     if (ssoIsEnabled) {

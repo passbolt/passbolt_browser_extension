@@ -13,7 +13,6 @@
  */
 
 import AbstractAccountEntity from "./abstractAccountEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountAccountRecoveryEntity from "./accountAccountRecoveryEntity";
 import AccountSetupEntity from "./accountSetupEntity";
 import AccountRecoverEntity from "./accountRecoverEntity";
@@ -26,10 +25,8 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
   /**
    * @inheritDoc
    */
-  constructor(AccountEntityDto) {
-    super(
-      EntitySchema.validate(AccountTemporaryEntity.ENTITY_NAME, AccountEntityDto, AccountTemporaryEntity.getSchema()),
-    );
+  constructor(accountEntityDto, options = {}) {
+    super(accountEntityDto, options);
 
     // Associations
     if (this._props.account) {

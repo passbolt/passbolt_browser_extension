@@ -19,7 +19,9 @@ import GetOrFindMetadataKeysController from "./getOrFindMetadataKeysSettingsCont
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import MetadataKeysSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity";
 import { enableFetchMocks } from "jest-fetch-mock";
-import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -43,7 +45,7 @@ describe("GetOrFindMetadataKeysSettingsController", () => {
       expect.assertions(3);
 
       const metadataKeysSettingsDto = defaultMetadataKeysSettingsDto();
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       jest
         .spyOn(
           controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService
@@ -52,12 +54,8 @@ describe("GetOrFindMetadataKeysSettingsController", () => {
         )
         .mockImplementationOnce(() => new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
       jest
-        .spyOn(
-          controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService
-            .organisationSettingsModel.organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const metadataKeysSettings = await controller.exec();
 
@@ -74,7 +72,7 @@ describe("GetOrFindMetadataKeysSettingsController", () => {
         allow_usage_of_personal_keys: false,
         zero_knowledge_key_share: true,
       });
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       jest
         .spyOn(
           controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService
@@ -83,12 +81,8 @@ describe("GetOrFindMetadataKeysSettingsController", () => {
         )
         .mockImplementationOnce(() => new MetadataKeysSettingsEntity(metadataKeysSettingsDto));
       jest
-        .spyOn(
-          controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService
-            .organisationSettingsModel.organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       const metadataKeysSettings = await controller.exec();
 
@@ -101,16 +95,12 @@ describe("GetOrFindMetadataKeysSettingsController", () => {
     it("get or find metadata keys settings for a v4 should have the default.", async () => {
       expect.assertions(3);
 
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       // disable the plugin metadata.
       delete siteSettingsDto.passbolt.plugins.metadata;
       jest
-        .spyOn(
-          controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService
-            .organisationSettingsModel.organizationSettingsService,
-          "find",
-        )
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
       jest
         .spyOn(
           controller.getOrFindMetadaSettingsService.findAndUpdateMetadataSettingsLocalStorageService

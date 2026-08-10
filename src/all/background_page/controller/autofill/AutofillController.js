@@ -13,7 +13,6 @@
  */
 
 import ResourceModel from "../../model/resource/resourceModel";
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import WorkerService from "../../service/worker/workerService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
@@ -21,6 +20,7 @@ import DecryptAndParseResourceSecretService from "../../service/secret/decryptAn
 import InformMenuPagemod from "../../pagemod/informMenuPagemod";
 import QuickAccessPagemod from "../../pagemod/quickAccessPagemod";
 import FindSecretService from "../../service/secret/findSecretService";
+import GetSecretSchemaResourceTypeService from "../../service/resourceType/getSecretSchemaResourceTypeService";
 
 class AutofillController {
   /**
@@ -35,7 +35,7 @@ class AutofillController {
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.findSecretService = new FindSecretService(account, apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getSecretSchemaResourceTypeService = new GetSecretSchemaResourceTypeService(account, apiClientOptions);
     this.getPassphraseService = new GetPassphraseService(account);
   }
 
@@ -71,7 +71,7 @@ class AutofillController {
       // Get the resource, decrypt the resources password and requests to fill the credentials
       const resource = await this.resourceModel.getById(resourceId);
       const secret = await this.findSecretService.findByResourceId(resourceId);
-      const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);
+      const secretSchema = await this.getSecretSchemaResourceTypeService.getByResourceTypeId(resource.resourceTypeId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
       const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(
         secret,

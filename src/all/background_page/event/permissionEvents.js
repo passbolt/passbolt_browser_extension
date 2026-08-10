@@ -13,6 +13,7 @@
  */
 
 import FindAcoPermissionsForDisplayController from "../controller/permission/FindAcoPermissionsForDisplayController";
+import FindPermissionsByIdsForShareController from "../controller/permission/findPermissionsByIdsForShareController";
 
 /**
  * Listens the permission events
@@ -31,6 +32,18 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.permissions.find-aco-permissions-for-display", async (requestId, acoId, acoType) => {
     const controller = new FindAcoPermissionsForDisplayController(worker, requestId, apiClientOptions, account);
     await controller._exec(acoId, acoType);
+  });
+
+  /*
+   * Find the permissions of the given resources, tailored for the share process.
+   *
+   * @listens passbolt.permissions.find-by-ids-for-share
+   * @param requestId {uuid} The request identifier
+   * @param resourcesIds {Array<uuid>} The ids of the resources to retrieve
+   */
+  worker.port.on("passbolt.permissions.find-by-ids-for-share", async (requestId, resourcesIds) => {
+    const controller = new FindPermissionsByIdsForShareController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourcesIds);
   });
 };
 

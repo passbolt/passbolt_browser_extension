@@ -26,7 +26,7 @@ class SetSetupLocaleController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.localeModel = new LocaleModel(apiClientOptions);
+    this.localeModel = new LocaleModel(apiClientOptions, account);
     this.account = account;
   }
 

@@ -27,8 +27,9 @@ import {
   defaultPasswordExpirySettingsDtoFromApi,
 } from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
-import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 describe("SavePasswordExpirySettingsController", () => {
   let account, apiClientOptions;
@@ -47,9 +48,11 @@ describe("SavePasswordExpirySettingsController", () => {
     const dtoToSave = defaultPasswordExpirySettingsDto();
     const expectedDto = defaultPasswordExpirySettingsDtoFromApi(dtoToSave);
     const expectedEntity = new PasswordExpirySettingsEntity(expectedDto);
-    const organizationSettings = defaultCeOrganizationSettings();
+    const organizationSettings = defaultCeSiteSettings();
 
-    jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
+    jest
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
     fetch.doMockOnceIf(/password-expiry\/settings\.json/, async (request) => {
       const body = JSON.parse(await request.text());
       expect(body).toStrictEqual(dtoToSave);
@@ -75,12 +78,7 @@ describe("SavePasswordExpirySettingsController", () => {
     });
 
     const controller = new SavePasswordExpirySettingsController(null, null, account, apiClientOptions);
-    jest.spyOn(controller.organisationSettingsModel, "getOrFind").mockImplementation(() =>
-      Promise.resolve({
-        isPluginEnabled: () => true,
-      }),
-    );
-    jest.spyOn(controller.passwordExpirySettingsModel.organisationSettingsModel, "getOrFind").mockImplementation(() =>
+    jest.spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind").mockImplementation(() =>
       Promise.resolve({
         isPluginEnabled: () => true,
       }),

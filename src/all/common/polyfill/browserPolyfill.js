@@ -11,21 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-const browser = require("webextension-polyfill");
+const browserPolyfill = require("webextension-polyfill");
 const ScriptingPolyfill = require("./scriptingPolyfill");
 const SessionStoragePolyfill = require("./sessionStoragePolyfill");
 
 // mv3 scripting API for mv2
-if (!browser.scripting) {
-  browser.scripting = new ScriptingPolyfill(browser);
+if (!browserPolyfill.scripting) {
+  browserPolyfill.scripting = new ScriptingPolyfill(browserPolyfill);
 }
 // mv3 session storage API polyfill
-if (!browser.storage.session) {
-  browser.storage.session = new SessionStoragePolyfill();
+if (!browserPolyfill.storage.session) {
+  browserPolyfill.storage.session = new SessionStoragePolyfill();
 }
 // mv3 action API polyfill for mv2
-if (!browser.action) {
-  browser.action = browser.browserAction;
+if (!browserPolyfill.action) {
+  browserPolyfill.action = browserPolyfill.browserAction;
 }
 
-module.exports = browser;
+module.exports = browserPolyfill;

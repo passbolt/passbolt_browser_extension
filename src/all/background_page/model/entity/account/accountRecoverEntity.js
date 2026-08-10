@@ -14,7 +14,6 @@
 import UserEntity from "../user/userEntity";
 import AbstractAccountEntity from "./abstractAccountEntity";
 import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 
 const ENTITY_NAME = "AccountRecover";
@@ -25,12 +24,7 @@ class AccountRecoverEntity extends AbstractAccountEntity {
    * @inheritDoc
    */
   constructor(accountRecoverDto, options = {}) {
-    AccountRecoverEntity.marshal(accountRecoverDto);
-
-    super(
-      EntitySchema.validate(AccountRecoverEntity.ENTITY_NAME, accountRecoverDto, AccountRecoverEntity.getSchema()),
-      options,
-    );
+    super(accountRecoverDto, options);
 
     // Recover account associations.
     if (this._props.account_recovery_user_setting) {
@@ -47,14 +41,10 @@ class AccountRecoverEntity extends AbstractAccountEntity {
   }
 
   /**
-   * Marshal the dto
-   * @param {Object} accountRecoverDto account recover DTO
-   * @return {Object}
+   * @inheritDoc
    */
-  static marshal(accountRecoverDto) {
-    Object.assign(accountRecoverDto, {
-      type: AccountRecoverEntity.TYPE_ACCOUNT_RECOVER,
-    });
+  marshall() {
+    this._props.type = AccountRecoverEntity.TYPE_ACCOUNT_RECOVER;
   }
 
   /**

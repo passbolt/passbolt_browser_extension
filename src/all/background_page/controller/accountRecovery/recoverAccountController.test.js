@@ -30,12 +30,17 @@ import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import { anonymousOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
   enableFetchMocks();
   jest.clearAllMocks();
+  jest
+    .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+    .mockImplementation(() => new SiteSettingsEntity(anonymousSiteSettings()));
 });
 
 describe("RecoverAccountController", () => {
@@ -48,11 +53,13 @@ describe("RecoverAccountController", () => {
     const passphrase = pgpKeys.account_recovery_request.passphrase;
 
     const mockOrganisationSettings = (isSsoEnabled) => {
-      const organizationSettings = anonymousOrganizationSettings();
+      const organizationSettings = anonymousSiteSettings();
       if (isSsoEnabled) {
         organizationSettings.passbolt.plugins.sso = { enabled: true };
       }
-      fetch.doMockOnce(() => mockApiResponse(organizationSettings, { servertime: Date.now() / 1000 }));
+      jest
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
     };
 
     it("Should perform the account recovery.", async () => {
@@ -198,7 +205,7 @@ describe("RecoverAccountController", () => {
 
       expect.assertions(3);
       const expetedProvider = "azure";
-      const organizationSettings = anonymousOrganizationSettings();
+      const organizationSettings = anonymousSiteSettings();
       organizationSettings.passbolt.plugins.sso = { enabled: true };
 
       // Mock API fetch account recovery request get response.

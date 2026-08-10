@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.12.0
  */
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
-import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import IsRegexValidator from "passbolt-styleguide/src/shared/lib/Validator/IsRegexValidator";
 import IsEmailValidator from "passbolt-styleguide/src/shared/lib/Validator/IsEmailValidator";
+import SiteSettingsRuntimeCache from "../siteSettings/siteSettingsRuntimeCache";
 
 /**
  * This service provides email validation and allow API administrator to customize email validation regex as per
@@ -45,10 +45,15 @@ export default class AppEmailValidatorService {
    * @returns {IsRegexValidator|IsEmailValidator}
    */
   static getValidator() {
-    const appSettings = OrganizationSettingsModel.get();
-
-    if (appSettings && appSettings instanceof OrganizationSettingsEntity && appSettings.emailValidateRegex) {
-      return new IsRegexValidator(appSettings.emailValidateRegex);
+    const appSettings = SiteSettingsRuntimeCache.get();
+    if (appSettings) {
+      // Get the site settings from a cache, so it should have been validated
+      const siteSettingsEntity = new SiteSettingsEntity(appSettings, {
+        validate: false,
+      });
+      if (siteSettingsEntity.emailValidateRegex) {
+        return new IsRegexValidator(siteSettingsEntity.emailValidateRegex);
+      }
     }
 
     return IsEmailValidator;

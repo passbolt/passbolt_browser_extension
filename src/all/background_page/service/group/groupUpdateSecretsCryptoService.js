@@ -34,13 +34,17 @@ class GroupUpdateSecretsCryptoService {
    * @returns {Promise<object>} Decrypted secrets organized as {[resourceId]: secretDecrypted, ...}
    */
   static async decryptSecrets(privateKey, secretsCollection, onProgress) {
-    const result = [];
+    const result = {};
     const collectionLength = secretsCollection.length;
 
     for (let i = 0; i < collectionLength; i++) {
       const secret = secretsCollection.items[i];
-      const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
-      result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
+      try {
+        const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
+        result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
+      } catch (error) {
+        throw new Error(`Unable to decrypt the secret of the resource (${secret.resourceId}).`, { cause: error });
+      }
 
       await onProgress?.(i18n.t("Decrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }));
     }
@@ -66,8 +70,26 @@ class GroupUpdateSecretsCryptoService {
       const user_id = neededSecret.userId;
       const resource_id = neededSecret.resourceId;
 
-      const encryptionKey = await OpenpgpAssertion.readKeyOrFail(usersPublicKeys[user_id]);
-      const data = await EncryptMessageService.encrypt(decryptedSecrets[resource_id], encryptionKey, [privateKey]);
+      if (typeof decryptedSecrets[resource_id] === "undefined") {
+        throw new Error(
+          `Unable to encrypt the secret of the resource (${resource_id}) for the user (${user_id}): no decrypted secret is available for this resource.`,
+        );
+      }
+      if (typeof usersPublicKeys[user_id] === "undefined") {
+        throw new Error(
+          `Unable to encrypt the secret of the resource (${resource_id}) for the user (${user_id}): no public key is available for this user.`,
+        );
+      }
+
+      let data;
+      try {
+        const encryptionKey = await OpenpgpAssertion.readKeyOrFail(usersPublicKeys[user_id]);
+        data = await EncryptMessageService.encrypt(decryptedSecrets[resource_id], encryptionKey, [privateKey]);
+      } catch (error) {
+        throw new Error(`Unable to encrypt the secret of the resource (${resource_id}) for the user (${user_id}).`, {
+          cause: error,
+        });
+      }
 
       const secret = new SecretEntity({ resource_id, user_id, data });
       groupUpdateSecrets.push(secret);

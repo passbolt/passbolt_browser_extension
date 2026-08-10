@@ -25,7 +25,9 @@ import { v4 as uuidv4 } from "uuid";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import VerifyOrTrustMetadataKeyService from "./verifyOrTrustMetadataKeyService";
 import UntrustedMetadataKeyError from "../../error/UntrustedMetadataKeyError";
-import { defaultCeOrganizationSettings } from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 describe("VerifyOrTrustMetadataKeyService", () => {
   let account, apiClientOptions, service;
@@ -38,21 +40,21 @@ describe("VerifyOrTrustMetadataKeyService", () => {
     // Flush the storages.
     await service.metadataKeysSessionStorage.flush();
     // Mock the site settings
-    const siteSettingsDto = defaultCeOrganizationSettings();
+    const siteSettingsDto = defaultCeSiteSettings();
     jest
-      .spyOn(service.organisationSettingsModel.organizationSettingsService, "find")
-      .mockImplementation(() => siteSettingsDto);
+      .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+      .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
   });
 
   describe("::verifyTrustedOrTrustNewMetadataKey", () => {
     it("does nothing if the plugin metadata is disabled", async () => {
       expect.assertions(1);
 
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
       delete siteSettingsDto.passbolt.plugins.metadata;
       jest
-        .spyOn(service.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
       await expect(service.verifyTrustedOrTrustNewMetadataKey(pgpKeys.ada.passphrase)).resolves.not.toThrow();
     });
 

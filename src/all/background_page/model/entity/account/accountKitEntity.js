@@ -12,7 +12,6 @@
  */
 
 import AbstractAccountEntity from "./abstractAccountEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = "AccountKit";
 const PGP_KEY_MAX_LENGTH = 50000;
@@ -23,7 +22,7 @@ class AccountKitEntity extends AbstractAccountEntity {
    * @inheritDoc
    */
   constructor(accountDto, options = {}) {
-    super(EntitySchema.validate(AccountKitEntity.ENTITY_NAME, accountDto, AccountKitEntity.getSchema()), options);
+    super(accountDto, options);
   }
 
   /**

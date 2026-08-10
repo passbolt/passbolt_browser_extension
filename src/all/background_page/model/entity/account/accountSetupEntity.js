@@ -15,7 +15,6 @@
 import UserEntity from "../user/userEntity";
 import AbstractAccountEntity from "./abstractAccountEntity";
 import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
-import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 
 const ENTITY_NAME = "AccountSetup";
@@ -26,12 +25,7 @@ class AccountSetupEntity extends AbstractAccountEntity {
    * @inheritDoc
    */
   constructor(accountSetupDto, options = {}) {
-    AccountSetupEntity.marshal(accountSetupDto);
-
-    super(
-      EntitySchema.validate(AccountSetupEntity.ENTITY_NAME, accountSetupDto, AccountSetupEntity.getSchema()),
-      options,
-    );
+    super(accountSetupDto, options);
 
     // Setup account associations.
     if (this._props.account_recovery_user_setting) {
@@ -48,14 +42,10 @@ class AccountSetupEntity extends AbstractAccountEntity {
   }
 
   /**
-   * Marshal the dto
-   * @param {Object} accountSetupDto account setup DTO
-   * @return {Object}
+   * @inheritDoc
    */
-  static marshal(accountSetupDto) {
-    Object.assign(accountSetupDto, {
-      type: AccountSetupEntity.TYPE_ACCOUNT_SETUP,
-    });
+  marshall() {
+    this._props.type = AccountSetupEntity.TYPE_ACCOUNT_SETUP;
   }
 
   /**

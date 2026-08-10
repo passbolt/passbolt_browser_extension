@@ -21,10 +21,11 @@ import GetOrFindPasswordExpirySettingsController from "./getOrFindPasswordExpiry
 import { defaultPasswordExpirySettingsDtoFromApi } from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
 import {
-  defaultCeOrganizationSettings,
-  defaultProOrganizationSettings,
-} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
+  defaultCeSiteSettings,
+  defaultProSiteSettings,
+} from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
 
 describe("GetOrFindPasswordExpirySettingsController", () => {
@@ -40,8 +41,10 @@ describe("GetOrFindPasswordExpirySettingsController", () => {
 
   describe("CE version", () => {
     beforeEach(() => {
-      const organizationSettings = defaultCeOrganizationSettings();
-      jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
+      const organizationSettings = defaultCeSiteSettings();
+      jest
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
     });
     it("Should return the value from the API", async () => {
       expect.assertions(1);
@@ -122,8 +125,10 @@ describe("GetOrFindPasswordExpirySettingsController", () => {
 
   describe("PRO version", () => {
     beforeEach(() => {
-      const organizationSettings = defaultProOrganizationSettings();
-      jest.spyOn(OrganizationSettingsService.prototype, "find").mockImplementation(() => organizationSettings);
+      const organizationSettings = defaultProSiteSettings();
+      jest
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(organizationSettings));
     });
     it("Should return the value from the API", async () => {
       expect.assertions(1);

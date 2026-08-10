@@ -20,7 +20,7 @@ import GetOrFindLoggedInUserController from "./getOrFindLoggedInUserController";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import UserEntity from "../../model/entity/user/userEntity";
-import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";
+import UserMeLocalStorage from "../../service/local_storage/userMeLocalStorage";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -32,61 +32,65 @@ describe("GetOrFindLoggedInUserController", () => {
     it("Should find the information and set the cache if cache is empty.", async () => {
       expect.assertions(5);
       const account = new AccountEntity(defaultAccountDto());
-
+      const storage = new UserMeLocalStorage(account);
       const mockApiResult = defaultUserDto();
       fetch.doMock(() => mockApiResponse(mockApiResult));
 
-      expect(await UserMeSessionStorageService.get(account)).toBeNull();
+      expect(await storage.getData()).toBeUndefined();
 
       const controller = new GetOrFindLoggedInUserController(null, null, defaultApiClientOptions(), account);
       const userMe = await controller.exec();
 
       expect(userMe).toBeInstanceOf(UserEntity);
-      const cachedUsedMe = await UserMeSessionStorageService.get(account);
+      const cachedUsedMe = await storage.getData();
       expect(cachedUsedMe).not.toBeNull();
       expect(cachedUsedMe.id).toEqual(mockApiResult.id);
       expect(fetch).toHaveBeenCalled();
+
+      await storage.flush();
     });
 
     it("Should return cached data if any.", async () => {
       expect.assertions(3);
       const account = new AccountEntity(defaultAccountDto());
-
+      const storage = new UserMeLocalStorage(account);
       // Populate the cache
-      await UserMeSessionStorageService.set(account, new UserEntity(defaultUserDto()));
-      expect(await UserMeSessionStorageService.get(account)).not.toBeNull();
+      await storage.setData(new UserEntity(defaultUserDto()));
+      expect(await storage.getData()).not.toBeNull();
 
       const controller = new GetOrFindLoggedInUserController(null, null, defaultApiClientOptions(), account);
       const userMe = await controller.exec();
 
       expect(userMe).toBeInstanceOf(UserEntity);
       expect(fetch).not.toHaveBeenCalled();
+
+      await storage.flush();
     });
 
     it("Should refresh the cache if enforced.", async () => {
       expect.assertions(7);
       const account = new AccountEntity(defaultAccountDto());
-
+      const storage = new UserMeLocalStorage(account);
       // Populate the cache
-      await UserMeSessionStorageService.set(account, new UserEntity(defaultUserDto()));
-      expect(await UserMeSessionStorageService.get(account)).not.toBeNull();
-      // Spy on the cache set function
-      jest.spyOn(UserMeSessionStorageService, "set");
+      await storage.setData(new UserEntity(defaultUserDto()));
+      expect(await storage.getData()).not.toBeNull();
       // Mock the API response
       const mockApiResult = defaultUserDto();
       fetch.doMock(() => mockApiResponse(mockApiResult));
 
-      expect(await UserMeSessionStorageService.get(account)).not.toBeNull();
+      expect(await storage.getData()).not.toBeNull();
 
       const controller = new GetOrFindLoggedInUserController(null, null, defaultApiClientOptions(), account);
+      // Spy on the cache set function
+      jest.spyOn(controller.getOrFindMeService.userMeLocalStorageService, "setData");
       const userMe = await controller.exec(true);
 
       expect(userMe).toBeInstanceOf(UserEntity);
-      const cachedUsedMe = await UserMeSessionStorageService.get(account);
+      const cachedUsedMe = await storage.getData();
       expect(cachedUsedMe).not.toBeNull();
       expect(cachedUsedMe.id).toEqual(mockApiResult.id);
       expect(fetch).toHaveBeenCalled();
-      expect(UserMeSessionStorageService.set).toHaveBeenCalled();
+      expect(controller.getOrFindMeService.userMeLocalStorageService.setData).toHaveBeenCalled();
     });
   });
 });

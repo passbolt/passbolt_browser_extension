@@ -12,20 +12,21 @@
  * @since         5.7.0
  */
 
-import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import { assertString, assertUuid } from "../../utils/assertions";
 import GetDecryptedUserPrivateKeyService from "../account/getDecryptedUserPrivateKeyService";
 import DecryptSecretsService from "../crypto/decryptSecretsService";
 import FindSecretRevisionsService from "./findSecretRevisionsService";
+import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceTypesService";
 
 export default class FindAndDecryptSecretRevisionsService {
   /**
    * @constructor
+   * @param {AccountEntity} account
    * @param {ApiClientOptions} apiClientOptions
    */
-  constructor(apiClientOptions) {
+  constructor(account, apiClientOptions) {
     this.findSecretRevisionsService = new FindSecretRevisionsService(apiClientOptions);
-    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.getOrFindResourceTypesService = new GetOrFindResourceTypesService(account, apiClientOptions);
   }
 
   /**
@@ -42,7 +43,7 @@ export default class FindAndDecryptSecretRevisionsService {
     assertString(passphrase);
 
     const decryptedKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    const resourceTypesCollection = await this.getOrFindResourceTypesService.getOrFindAll();
     const contains = {
       secret: true,
       creator: true,

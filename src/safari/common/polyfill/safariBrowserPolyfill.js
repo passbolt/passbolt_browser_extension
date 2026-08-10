@@ -11,27 +11,27 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.5.0
  */
-const browser = require("webextension-polyfill");
+const browserPolyfill = require("webextension-polyfill");
 const ScriptingPolyfill = require("./../../../all/common/polyfill/scriptingPolyfill");
 const SessionStoragePolyfill = require("./../../../all/common/polyfill/sessionStoragePolyfill");
 const OnInstalledReasonPolyfill = require("./onInstalledReasonPolyfill");
 
 // mv3 scripting API for mv2
-if (!browser.scripting) {
-  browser.scripting = new ScriptingPolyfill(browser);
+if (!browserPolyfill.scripting) {
+  browserPolyfill.scripting = new ScriptingPolyfill(browserPolyfill);
 }
 // mv3 session storage API polyfill
-if (!browser.storage.session) {
-  browser.storage.session = new SessionStoragePolyfill();
+if (!browserPolyfill.storage.session) {
+  browserPolyfill.storage.session = new SessionStoragePolyfill();
 }
 // mv3 action API polyfill for mv2
-if (!browser.action) {
-  browser.action = browser.browserAction;
+if (!browserPolyfill.action) {
+  browserPolyfill.action = browserPolyfill.browserAction;
 }
 
 // OnInstaledReason polyfill for Safari
-if (!browser.runtime.OnInstalledReason) {
-  OnInstalledReasonPolyfill(browser.runtime);
+if (!browserPolyfill.runtime.OnInstalledReason) {
+  OnInstalledReasonPolyfill(browserPolyfill.runtime);
 }
 
-module.exports = browser;
+module.exports = browserPolyfill;

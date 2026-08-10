@@ -25,10 +25,11 @@ import UserModel from "./userModel";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import UserEntity from "../entity/user/userEntity";
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
-import { adminAccountDto } from "../entity/account/accountEntity.test.data";
+import { adminAccountDto, defaultAccountDto } from "../entity/account/accountEntity.test.data";
 import AccountEntity from "../entity/account/accountEntity";
-import { defaultCeOrganizationSettings } from "../entity/organizationSettings/organizationSettingsEntity.test.data";
-import MockExtension from "../../../../../test/mocks/mockExtension";
+import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
 beforeAll(() => {
   enableFetchMocks();
@@ -147,12 +148,12 @@ describe("UserModel", () => {
 
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
-      const siteSettingsDto = defaultCeOrganizationSettings();
-      siteSettingsDto.passbolt.plugins.metadata = false;
+      const siteSettingsDto = defaultCeSiteSettings();
+      siteSettingsDto.passbolt.plugins.metadata = { enabled: false };
 
       jest
-        .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       jest.spyOn(model, "findAll");
 
@@ -195,11 +196,11 @@ describe("UserModel", () => {
 
       const apiClientOption = defaultApiClientOptions();
       const model = new UserModel(apiClientOption, account);
-      const siteSettingsDto = defaultCeOrganizationSettings();
+      const siteSettingsDto = defaultCeSiteSettings();
 
       jest
-        .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
+        .spyOn(GetOrFindSiteSettingsService.prototype, "getOrFind")
+        .mockImplementation(() => new SiteSettingsEntity(siteSettingsDto));
 
       jest.spyOn(model, "findAll");
 
@@ -213,6 +214,46 @@ describe("UserModel", () => {
           groups_users: false,
           is_mfa_enabled: true,
           missing_metadata_key_ids: true,
+          pending_account_recovery_request: true,
+          profile: true,
+        },
+        null,
+        true,
+      );
+    });
+
+    it("should not add contains last_logged_in and is_mfa_enabled if user is not an administrator", async () => {
+      expect.assertions(1);
+      const account = new AccountEntity(
+        defaultAccountDto({
+          role_name: RoleEntity.ROLE_USER,
+        }),
+      );
+
+      const dtoOptions = {
+        withRole: true,
+        withGroupsUsers: true,
+        withGpgkey: true,
+        withAccountRecoveryUserSetting: true,
+        withPendingAccountRecoveryUserRequest: true,
+      };
+      const dto1 = defaultUserDto({ username: "ada@passbolt.com" }, dtoOptions);
+      const dtos = [dto1];
+
+      fetch.doMockOnceIf(/users\.json/, async () => mockApiResponse(dtos));
+
+      const apiClientOption = defaultApiClientOptions();
+      const model = new UserModel(apiClientOption, account);
+
+      jest.spyOn(model, "findAll");
+
+      await model.updateLocalStorage();
+
+      expect(model.findAll).toHaveBeenCalledWith(
+        {
+          account_recovery_user_setting: true,
+          gpgkey: false,
+          groups_users: false,
           pending_account_recovery_request: true,
           profile: true,
         },
@@ -280,95 +321,6 @@ describe("UserModel", () => {
       expect.assertions(2);
       expect(entity._groups_users).toBeInstanceOf(GroupsUsersCollection);
       expect(entity._groups_users).toHaveLength(0);
-    });
-  });
-
-  describe("UserModel::getOrFindMe", () => {
-    it("should, with the option profile, role, account_recovery_user_setting without missing_metadata_key_ids if plugin is disabled", async () => {
-      expect.assertions(2);
-
-      const account = new AccountEntity(adminAccountDto());
-
-      const dtoOptions = {
-        withGpgkey: true,
-        withAccountRecoveryUserSetting: true,
-        withPendingAccountRecoveryUserRequest: true,
-      };
-      const dto = defaultUserDto(
-        {
-          id: "f642271d-bbb1-401e-bbd1-7ec370f8e19b",
-          username: "betty@passbolt.com",
-          groups_users: [],
-          missing_metadata_key_ids: [],
-        },
-        dtoOptions,
-      );
-
-      //Mock the API call and check if the call is the one expected
-      fetch.doMockOnceIf(/users\/.*\.json/, async () => mockApiResponse(dto));
-      await MockExtension.withConfiguredAccount();
-      const apiClientOption = defaultApiClientOptions();
-      const model = new UserModel(apiClientOption, account);
-      const siteSettingsDto = defaultCeOrganizationSettings();
-      siteSettingsDto.passbolt.plugins.metadata = false;
-
-      jest
-        .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
-
-      jest.spyOn(model, "findOne");
-
-      const entity = await model.getOrFindMe(true);
-
-      expect(model.findOne).toHaveBeenCalledWith(
-        "f642271d-bbb1-401e-bbd1-7ec370f8e19b",
-        { account_recovery_user_setting: true, profile: true, role: true },
-        true,
-      );
-      expect(entity).toEqual(new UserEntity(dto));
-    });
-    it("should, with the option profile, role, account_recovery_user_setting and missing_metadata_key_ids if plugin is enabled", async () => {
-      expect.assertions(2);
-
-      const account = new AccountEntity(adminAccountDto());
-
-      const dtoOptions = {
-        withGpgkey: true,
-        withAccountRecoveryUserSetting: true,
-        withPendingAccountRecoveryUserRequest: true,
-      };
-      const dto = defaultUserDto(
-        {
-          id: "f642271d-bbb1-401e-bbd1-7ec370f8e19b",
-          username: "betty@passbolt.com",
-          groups_users: [],
-          missing_metadata_key_ids: [],
-        },
-        dtoOptions,
-      );
-
-      //Mock the API call and check if the call is the one expected
-      fetch.doMockOnceIf(/users\/.*\.json/, async () => mockApiResponse(dto));
-      await MockExtension.withConfiguredAccount();
-      const apiClientOption = defaultApiClientOptions();
-      const model = new UserModel(apiClientOption, account);
-      const siteSettingsDto = defaultCeOrganizationSettings();
-      siteSettingsDto.passbolt.plugins.metadata = true;
-
-      jest
-        .spyOn(model.organisationSettingsModel.organizationSettingsService, "find")
-        .mockImplementation(() => siteSettingsDto);
-
-      jest.spyOn(model, "findOne");
-
-      const entity = await model.getOrFindMe(true);
-
-      expect(model.findOne).toHaveBeenCalledWith(
-        "f642271d-bbb1-401e-bbd1-7ec370f8e19b",
-        { account_recovery_user_setting: true, missing_metadata_key_ids: true, profile: true, role: true },
-        true,
-      );
-      expect(entity).toEqual(new UserEntity(dto));
     });
   });
   describe("UserModel::findAll", () => {

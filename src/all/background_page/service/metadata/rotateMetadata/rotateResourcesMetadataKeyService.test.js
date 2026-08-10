@@ -30,10 +30,10 @@ import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/Pass
 import { defaultProgressService } from "../../progress/progressService.test.data";
 import { defaultMetadataKeysSettingsDto } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataKeysSettingsEntity.test.data";
 import { enableFetchMocks } from "jest-fetch-mock";
-import ResourceTypeModel from "../../../model/resourceType/resourceTypeModel";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import { TEST_RESOURCE_TYPE_V5_DEFAULT } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceTypesService";
 
 describe("RotateResourcesMetadataKeyService", () => {
   let account, metadataKeysDtos;
@@ -91,7 +91,7 @@ describe("RotateResourcesMetadataKeyService", () => {
           : new PassboltResponseEntity(passboltReponseWithCollectionDto(nextBatchToRotate)),
       ); //first rotate call, there is another page of resources to rotate
       jest.spyOn(service.metadataRotateKeysResourcesApiService, "findAll").mockReturnValue(rotationDetails);
-      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
       jest
         .spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings")
         .mockReturnValue(defaultMetadataKeysSettingsDto());
@@ -154,7 +154,7 @@ describe("RotateResourcesMetadataKeyService", () => {
 
       // Spy initialization
       jest.spyOn(service.metadataRotateKeysResourcesApiService, "findAll").mockReturnValue(rotationDetails);
-      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
       jest.spyOn(service, "_rotateResources");
       jest
         .spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings")
@@ -200,7 +200,7 @@ describe("RotateResourcesMetadataKeyService", () => {
         .spyOn(service.encryptMetadataService.getOrFindMetadataSettingsService, "getOrFindKeysSettings")
         .mockReturnValue(defaultMetadataKeysSettingsDto());
       jest.spyOn(service, "_rotateResources");
-      jest.spyOn(ResourceTypeModel.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
+      jest.spyOn(GetOrFindResourceTypesService.prototype, "getOrFindAll").mockReturnValue(resourceTypesCollection);
 
       // running process
       const replayOptions = { count: 0 };

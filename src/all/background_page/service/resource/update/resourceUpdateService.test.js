@@ -116,7 +116,7 @@ describe("ResourceUpdateService", () => {
 
   describe("ResourceUpdateService::exec", () => {
     it("Should call progress service during the different steps of creation", async () => {
-      expect.assertions(8);
+      expect.assertions(7);
 
       const resourceDto = defaultResourceDto();
       const entity = new ResourceEntity(resourceDto);
@@ -140,15 +140,75 @@ describe("ResourceUpdateService", () => {
       );
 
       expect(resourceUpdateService.progressService.updateGoals).toHaveBeenCalledTimes(1);
-      expect(resourceUpdateService.progressService.updateGoals).toHaveBeenCalledWith(6);
-      expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledTimes(5);
-      expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledWith("Synchronizing keyring", true);
+      expect(resourceUpdateService.progressService.updateGoals).toHaveBeenCalledWith(5);
+      expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledTimes(4);
       expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledWith("Encrypting Secret", true);
       expect(resourceUpdateService.progressService.finishStep).toHaveBeenCalledWith("Saving resource", true);
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledTimes(1);
       expect(ResourceLocalStorage.updateResource).toHaveBeenCalledWith(
         new ResourceEntity(resourceLocalStorageExpected),
       );
+    });
+
+    it("Should apply the permission changes via shareAll after the update, stamping the resource id", async () => {
+      expect.assertions(3);
+
+      const resourceDto = defaultResourceDto();
+      await ResourceLocalStorage.addResource(new ResourceEntity(resourceDto));
+      jest
+        .spyOn(resourceUpdateService.resourceService, "update")
+        .mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
+          const resourceEntity = new ResourceEntity(resourceDto);
+          resourceEntity.secrets = new ResourceSecretsCollection([resourceDtoToUpdate.secrets[0]]);
+          return resourceEntity.toV4Dto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        });
+      const shareAllSpy = jest
+        .spyOn(resourceUpdateService.shareResourceService, "shareAll")
+        .mockImplementation(jest.fn);
+
+      const permissionChanges = [
+        {
+          aco: "Resource",
+          aro: "User",
+          aro_foreign_key: pgpKeys.betty.userId,
+          aco_foreign_key: null,
+          type: 1,
+          is_new: true,
+        },
+      ];
+      await resourceUpdateService.exec(
+        resourceDto,
+        plaintextSecretPasswordAndDescriptionDto(),
+        pgpKeys.ada.passphrase,
+        permissionChanges,
+      );
+
+      expect(shareAllSpy).toHaveBeenCalledTimes(1);
+      const [resourcesIds, changesCollection] = shareAllSpy.mock.calls[0];
+      expect(resourcesIds).toEqual([resourceDto.id]);
+      // The delta's aco_foreign_key must be stamped with the resource id before sharing.
+      expect(changesCollection.toDto()[0].aco_foreign_key).toEqual(resourceDto.id);
+    });
+
+    it("Should not call shareAll when no permission changes are provided", async () => {
+      expect.assertions(1);
+
+      const resourceDto = defaultResourceDto();
+      await ResourceLocalStorage.addResource(new ResourceEntity(resourceDto));
+      jest
+        .spyOn(resourceUpdateService.resourceService, "update")
+        .mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
+          const resourceEntity = new ResourceEntity(resourceDto);
+          resourceEntity.secrets = new ResourceSecretsCollection([resourceDtoToUpdate.secrets[0]]);
+          return resourceEntity.toV4Dto(ResourceLocalStorage.DEFAULT_CONTAIN);
+        });
+      const shareAllSpy = jest
+        .spyOn(resourceUpdateService.shareResourceService, "shareAll")
+        .mockImplementation(jest.fn);
+
+      await resourceUpdateService.exec(resourceDto, plaintextSecretPasswordAndDescriptionDto(), pgpKeys.ada.passphrase);
+
+      expect(shareAllSpy).not.toHaveBeenCalled();
     });
 
     it("Should Update the resource with encrypted secrets (password and description) and dto", async () => {
@@ -903,33 +963,6 @@ describe("ResourceUpdateService", () => {
       } catch (error) {
         expect(error.message).toEqual("Error encrypting message: Primary key is expired");
       }
-    });
-
-    it("Should set personal to true when resource has only 1 user and no groups", async () => {
-      expect.assertions(2);
-
-      const resourceDto = defaultResourceDto();
-      const entity = new ResourceEntity(resourceDto);
-      await ResourceLocalStorage.addResource(entity);
-
-      jest
-        .spyOn(resourceUpdateService.userModel, "findAllIdsForResourceUpdate")
-        .mockImplementationOnce(() => [pgpKeys.ada.userId]);
-      jest.spyOn(PermissionService.prototype, "findAllByAcoForeignKey").mockImplementationOnce(() => []);
-
-      let resourceUpdated;
-      jest
-        .spyOn(resourceUpdateService.resourceService, "update")
-        .mockImplementation((resourceIdToUpdate, resourceDtoToUpdate) => {
-          resourceUpdated = resourceDtoToUpdate;
-          const resourceEntity = new ResourceEntity(resourceDto);
-          return resourceEntity.toV4Dto(ResourceLocalStorage.DEFAULT_CONTAIN);
-        });
-
-      await resourceUpdateService.exec(resourceDto, null, pgpKeys.ada.passphrase);
-
-      expect(resourceUpdated.personal).toBe(true);
-      expect(resourceUpdateService.resourceService.update).toHaveBeenCalledTimes(1);
     });
 
     it("Should set personal to false when resource has 1 user but is shared with groups", async () => {

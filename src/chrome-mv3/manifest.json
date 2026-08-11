@@ -5,7 +5,7 @@
   "version": "5.14.4",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
-  "minimum_chrome_version": "116",
+  "minimum_chrome_version": "120",
   "externally_connectable": {
     "ids": []
   },
@@ -42,6 +42,8 @@
     "storage",
     "tabs",
     "scripting",
+    "webRequest",
+    "webRequestAuthProvider",
     "alarms",
     "downloads",
     "cookies",

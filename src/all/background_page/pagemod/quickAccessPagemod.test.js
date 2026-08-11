@@ -16,6 +16,7 @@ import { ConfigEvents } from "../event/configEvents";
 import { AuthEvents } from "../event/authEvents";
 import { KeyringEvents } from "../event/keyringEvents";
 import { QuickAccessEvents } from "../event/quickAccessEvents";
+import { AutofillSettingsEvents } from "../event/autofillSettingsEvents";
 import { GroupEvents } from "../event/groupEvents";
 import { ResourceEvents } from "../event/resourceEvents";
 import { SecretEvents } from "../event/secretEvents";
@@ -35,6 +36,7 @@ jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(QuickAccessEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(AutofillSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(GroupEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ResourceEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
@@ -55,7 +57,7 @@ describe("QuickAccess", () => {
 
   describe("QuickAccess::attachEvents", () => {
     it("Should attach events", async () => {
-      expect.assertions(17);
+      expect.assertions(18);
       // data mocked
       const port = {
         _port: {
@@ -75,6 +77,7 @@ describe("QuickAccess", () => {
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(QuickAccessEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(AutofillSettingsEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(GroupEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ResourceEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(SecretEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
@@ -90,6 +93,7 @@ describe("QuickAccess", () => {
         ConfigEvents,
         KeyringEvents,
         QuickAccessEvents,
+        AutofillSettingsEvents,
         GroupEvents,
         ResourceEvents,
         SecretEvents,

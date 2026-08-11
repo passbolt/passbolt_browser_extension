@@ -10,6 +10,8 @@ import FindRbacMeController from "../controller/rbac/findRbacMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import AutofillController from "../controller/autofill/AutofillController";
+import LaunchResourceController from "../controller/autofill/launchResourceController";
+import OpenResourceUriInOpenerTabController from "../controller/tab/openResourceUriInOpenerTabController";
 import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 import CopyToClipboardController from "../controller/clipboard/copyToClipboardController";
@@ -49,6 +51,46 @@ const listen = function (worker, apiClientOptions, account) {
     }
     const autofillController = new AutofillController(worker, requestId, apiClientOptions, account);
     await autofillController._exec(resourceId, tab.id);
+  });
+
+  /*
+   * Launch a resource: navigate to its URI then autofill the login form once the page has loaded.
+   * Only dispatched by the popup when the autofillOnLaunch setting is enabled.
+   *
+   * @listens passbolt.quickaccess.launch-resource
+   * @param requestId {uuid} The request identifier
+   * @param resourceId {uuid} The resource identifier
+   * @param openerTabId {number} The id of the tab that was active when the popup opened
+   */
+  worker.port.on("passbolt.quickaccess.launch-resource", async (requestId, resourceId, openerTabId) => {
+    try {
+      const controller = new LaunchResourceController(worker, requestId, apiClientOptions, account);
+      await controller._exec(resourceId, openerTabId);
+    } catch (error) {
+      // _exec handles its own outcome; this guards controller construction so a failure there
+      // cannot become an unhandled rejection.
+      console.error(error);
+      worker.port.emit(requestId, "ERROR", new Error("Unable to launch and autofill the resource."));
+    }
+  });
+
+  /*
+   * Open a resource URI in a tab WITHOUT autofilling (autofill-on-launch disabled). Reuses the
+   * opener tab when it is blank (e.g. an incognito new-tab page) for parity with the autofill path.
+   *
+   * @listens passbolt.quickaccess.open-resource-uri
+   * @param requestId {uuid} The request identifier
+   * @param uri {string} The resource URI to open
+   * @param openerTabId {number} The id of the tab that was active when the popup opened
+   */
+  worker.port.on("passbolt.quickaccess.open-resource-uri", async (requestId, uri, openerTabId) => {
+    try {
+      const controller = new OpenResourceUriInOpenerTabController(worker, requestId);
+      await controller._exec(uri, openerTabId);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, "ERROR", new Error("Unable to open the resource URL."));
+    }
   });
 
   /*

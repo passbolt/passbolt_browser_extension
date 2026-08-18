@@ -54,9 +54,17 @@ export default class GetOrFindSiteSettingsService {
    */
   async getOrFind(refreshCache = true) {
     if (!refreshCache) {
-      const activeSession = await this.checkAuthStatusService.checkAuthStatus();
+      let isAuthenticated = false;
 
-      if (activeSession.isAuthenticated) {
+      try {
+        const activeSession = await this.checkAuthStatusService.checkAuthStatus();
+        isAuthenticated = activeSession.isAuthenticated;
+      } catch (error) {
+        // An error occured while checking the auth status
+        console.error(error);
+      }
+
+      if (isAuthenticated) {
         const lsDto = await this.siteSettingsLocalStorage.get();
         if (lsDto) {
           const siteSettings = new SiteSettingsEntity(lsDto);

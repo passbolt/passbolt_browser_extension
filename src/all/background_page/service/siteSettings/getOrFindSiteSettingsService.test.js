@@ -21,6 +21,7 @@ import SiteSettingsRuntimeCache from "./siteSettingsRuntimeCache";
 import GetOrFindSiteSettingsService from "./getOrFindSiteSettingsService";
 import OnlineSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/onlineSessionEntity";
 import CheckAuthStatusService from "../auth/checkAuthStatusService";
+import PassboltBadResponseError from "../../error/passboltBadResponseError";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -169,6 +170,47 @@ describe("GetOrFindSiteSettingsService", () => {
       const result = await service.getOrFind(false);
 
       expect(lsSpy).not.toHaveBeenCalled();
+      expect(result.toDto()).toEqual(dto);
+    });
+  });
+
+  describe("::getOrFind (refreshCache=false) — authentication status unavailable", () => {
+    beforeEach(() => {
+      // An API error occured
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockRejectedValue(new PassboltBadResponseError());
+    });
+
+    it("should return the runtime cache when populated when there is an API error", async () => {
+      expect.assertions(3);
+
+      const dto = defaultProSiteSettings();
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity(dto));
+
+      const localStorageSpy = jest.spyOn(service.siteSettingsLocalStorage, "get");
+      const apiSpy = jest.spyOn(
+        service.findAndUpdateSiteSettingsLocalStorageService.findSiteSettingsService,
+        "findSiteSettings",
+      );
+
+      const result = await service.getOrFind(false);
+
+      expect(result.toDto()).toEqual(dto);
+      expect(localStorageSpy).not.toHaveBeenCalled();
+      expect(apiSpy).not.toHaveBeenCalled();
+    });
+
+    it("should  call the API when cache is empty when there is an API error", async () => {
+      expect.assertions(2);
+
+      const dto = defaultProSiteSettings();
+
+      const apiSpy = jest
+        .spyOn(service.findAndUpdateSiteSettingsLocalStorageService.findSiteSettingsService, "findSiteSettings")
+        .mockResolvedValue(new SiteSettingsEntity(dto));
+
+      const result = await service.getOrFind(false);
+
+      expect(apiSpy).toHaveBeenCalledTimes(1);
       expect(result.toDto()).toEqual(dto);
     });
   });

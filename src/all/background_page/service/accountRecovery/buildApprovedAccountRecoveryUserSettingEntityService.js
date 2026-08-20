@@ -15,7 +15,7 @@
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
-import secrets from "secrets-passbolt";
+import CryptoRandomValuesService from "../crypto/cryptoRandomValuesService";
 import AccountRecoveryPrivateKeyPasswordEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
@@ -39,7 +39,7 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
       throw new Error("The provided organizationPolicy must be a valid AccountRecoveryOrganizationPolicyEntity.");
     }
 
-    const symmetricSecret = secrets.random(SYMMETRIC_SECRET_BITS);
+    const symmetricSecret = CryptoRandomValuesService.randomHex(SYMMETRIC_SECRET_BITS);
     const accountRecoveryPrivateKeyDto = await this._encryptPrivateKey(symmetricSecret, decryptedPrivateKey);
     const accountRecoveryPrivateKeyPasswordForOrganizationDto =
       await this._encryptPrivateKeyPasswordsForOrganizationKey(

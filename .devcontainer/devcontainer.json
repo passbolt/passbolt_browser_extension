@@ -5,7 +5,7 @@
   "service": "devcontainer",
   "workspaceFolder": "/workspaces/passbolt-browser-extension",
   "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
+    "ghcr.io/devcontainers/features/git:1@sha256:fd75977de13a9979000e0e78baf949adb0ca71d2398995fa22e0a36d7e7e7fe2": {}
   },
   "customizations": {
     "vscode": {

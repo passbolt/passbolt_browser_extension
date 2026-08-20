@@ -4,6 +4,71 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.15.0] - 2026-08-20
+### Added
+PB-53103 - AUTOFILL EPIC - Autofill improvements
+PB-53105 - Add ShadowDomDictionary and InFormFieldDictionary
+PB-53107 - Create ShadowRootResolverService
+PB-53108 - Add ShadowRootCollectorService
+PB-53109 - Add ShadowRootCacheService
+PB-53110 - Add ShadowMutationObserverService
+PB-53120 - Add ShadowDomQueryService
+PB-53121 - Add ShadowDomFocusHealerService
+PB-53122 - Add InFormFieldGeometryService
+PB-53123 - Update InFormCallToActionField to use ShadowRootCacheService, ShadowDomQueryService and InFormFieldGeometryService
+PB-53124 - Find username element through shadow doms if needed
+PB-53125 - Switch from DomUtils to InFormFieldGeometryService in InformMenuField
+PB-53126 - Listen for focus event on the whole page to detect missed inputs
+PB-53127 - Refactor InFormManager to use previously created services
+PB-53128 - Refactor DomUtils
+PB-53574 - Shadow dom should solve duck-types as a shadow root
+PB-53619 - Shadow dom piercing is missing on the autofill resolver
+PB-53394 - Global new design of share dialog
+
+### Fixed
+PB-48042 - Sign-in with SSO secondary CTA alignment on sign-in with passphrase page
+PB-52353 - Clicking on several items is not possible when filtering the grid by expired
+PB-52539 - Left side bar alignment adjustments
+PB-53329 - Discrepancy in data (group or member) display when we remove and add them again
+PB-53819 - Fix height for share dialog badges and dropdowns
+PB-53820 - Fix revert button disappearing at certain widths
+PB-53921 - Fix application crash after creating a resource in a shared folder while transferring ownership
+PB-53497 - Fix crash when is-authenticated endpoint response is not JSON
+
+### Security
+PB-53357 - Fix js-yaml GCVE-0-2026-59869 - HIGH CVSS3.1
+PB-53358 - Fix brace-expansion GHSA-3jxr-9vmj-r5cp - HIGH CVSS4.0
+PB-53386 - Potential Cross Site Scripting (XSS) via window.location.href (Low)
+PB-53391 - Fix svgo GHSA-2p49-hgcm-8545 - HIGH CVSS3.1
+PB-53392 - Fix fast-uri GHSA-4c8g-83qw-93j6 - HIGH CVSS3.1
+PB-53401 - Fix shell-quote GHSA-395f-4hp3-45gv - HIGH CVSS4.0
+PB-53402 - Fix websocket-driver GHSA-xv26-6w52-cph6 - CRITICAL CVSS4.0
+PB-53403 - Fix postcss GHSA-r28c-9q8g-f849 - HIGH CVSS3.1
+PB-53404 - Fix webpack-dev-server GHSA-m28w-2pqf-7qgj - MEDIUM CVSS3.1
+PB-53405 - Fix body-parser GHSA-v422-hmwv-36x6 - LOW CVSS3.1
+PB-53550 - Small upgrade for js-yaml (Low)
+PB-53552 - Fix fast-uri GHSA-7p8r-x3mc-p8w7 - HIGH CVSS3.1
+PB-53559 - Fix brace-expansion GHSA-mh99-v99m-4gvg - HIGH CVSS3.1
+PB-53942 - Fix image-size GHSA-5p2g-fcmc-qvqq - HIGH CVSS4.0
+PB-53357 - Fix js-yaml GCVE-0-2026-59869 - HIGH CVSS3.1
+PB-53358 - Fix brace-expansion GHSA-3jxr-9vmj-r5cp - HIGH CVSS4.0
+PB-53385 - Fix adm-zip GHSA-xcpc-8h2w-3j85 - HIGH CVSS3.1
+PB-53391 - Fix svgo GHSA-2p49-hgcm-8545 - HIGH CVSS3.1
+PB-53392 - Fix fast-uri GHSA-4c8g-83qw-93j6 - HIGH CVSS3.1
+PB-53401 - Fix shell-quote GHSA-395f-4hp3-45gv - HIGH CVSS4.0
+PB-53550 - Small upgrade for js-yaml (Low)
+PB-53552 - Fix fast-uri GHSA-7p8r-x3mc-p8w7 - HIGH CVSS3.1
+PB-53553 - Fix undici GHSA-4cwx-7wf7-3272 - HIGH CVSS3.1
+PB-53559 - Fix brace-expansion GHSA-mh99-v99m-4gvg - HIGH CVSS3.1
+PB-53940 - Small upgrade for @xmldom/xmldom (High)
+
+### Maintenance
+PB-53204 - Reverse passboltEnvPlugin logic
+PB-53671 - Replace the forked secrets.js library with a native randomHex 
+PB-53764 - Update Storybook libraries in passbolt-styleguide to remove vulnerable dependencies while keeping the Storybook scripts functional
+PB-53934 - Use correct version for github-pages-deploy-action
+PB-53972 - Clean comment in ShareDialog
+
 ## [5.14.4] - 2026-08-10
 ### Fixed
 - PB-53681: Safari applies URLs redirection on created resource too early

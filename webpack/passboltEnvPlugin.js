@@ -14,27 +14,26 @@
 const path = require("path");
 const webpack = require("webpack");
 
-const PASSBOLT_ENV_KEYS = ["PASSBOLT_DEBUG", "PASSBOLT_LOG_LEVEL", "PASSBOLT_LOG_CONSOLE"];
-
-// Defaults applied when the corresponding process.env entry is unset. They mirror
-// the legacy config.json.debug values so `NODE_ENV=development` builds get the
-// dev-friendly configuration without any host configuration.
+// Defaults applied when the corresponding process.env entry is unset.
+// We use 'no debug' values by default and only enable them when we are in development mode.
 const DEBUG_DEFAULTS = {
-  PASSBOLT_DEBUG: "true",
-  PASSBOLT_LOG_LEVEL: "4",
-  PASSBOLT_LOG_CONSOLE: "true",
+  PASSBOLT_DEBUG: "false",
+  PASSBOLT_LOG_LEVEL: "0",
+  PASSBOLT_LOG_CONSOLE: "false",
 };
+
+const PASSBOLT_ENV_KEYS = Object.keys(DEBUG_DEFAULTS);
 
 module.exports = function buildPassboltEnvPlugin() {
   const isDevelopment = process.env.NODE_ENV === "development";
 
   if (isDevelopment) {
+    require("dotenv").config({ path: path.resolve(__dirname, "..", ".env") });
+  } else {
     // Strip any inherited shell value so EnvironmentPlugin falls back to defaults.
     for (const key of PASSBOLT_ENV_KEYS) {
       delete process.env[key];
     }
-  } else {
-    require("dotenv").config({ path: path.resolve(__dirname, "..", ".env") });
   }
 
   return new webpack.EnvironmentPlugin(DEBUG_DEFAULTS);

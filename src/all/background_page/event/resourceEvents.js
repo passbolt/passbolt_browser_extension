@@ -150,13 +150,17 @@ const listen = function (worker, apiClientOptions, account) {
    *
    * @listens passbolt.resources.move-by-ids
    * @param {uuid} requestId The request identifier
-   * @param {string} destinationFolderId The destination folder id
    * @param {string} resourcesIds The resources ids to move
+   * @param {string} destinationFolderId The destination folder id
+   * @param {Object<string, Array<object>>|null} permissionsDto The permissions the operator confirmed, keyed by resource id. Null to keep the permissions as they are.
    */
-  worker.port.on("passbolt.resources.move-by-ids", async (requestId, resourcesIds, destinationFolderId) => {
-    const controller = new MoveResourcesController(worker, requestId, apiClientOptions, account);
-    await controller._exec(resourcesIds, destinationFolderId);
-  });
+  worker.port.on(
+    "passbolt.resources.move-by-ids",
+    async (requestId, resourcesIds, destinationFolderId, permissionsDto) => {
+      const controller = new MoveResourcesController(worker, requestId, apiClientOptions, account);
+      await controller._exec(resourcesIds, destinationFolderId, permissionsDto);
+    },
+  );
 
   /*
    * Update the local storage for resources in the specified parent folder.

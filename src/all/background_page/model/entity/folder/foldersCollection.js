@@ -153,20 +153,49 @@ class FoldersCollection extends EntityV2Collection {
    * @returns {FoldersCollection} outputCollection final
    */
   static getAllChildren(parentId, inputCollection, outputCollection) {
-    const children = inputCollection.folders.filter((item) => item.folderParentId === parentId);
-    if (children.length) {
-      try {
-        outputCollection.pushMany(children);
-      } catch (error) {
-        console.error(error);
-        /*
-         * children are already in collection
-         * skip...
-         */
-      }
-      const childrenIds = children.map((child) => child.id);
-      childrenIds.forEach((id) => FoldersCollection.getAllChildren(id, inputCollection, outputCollection));
+    return FoldersCollection._collectDescendants(parentId, inputCollection, outputCollection, () => true);
+  }
+
+  /**
+   * Find the folders nested under the given one that the operator owns.
+   * Each branch stops at the first folder the operator does not own.
+   * That folder is left out, and so is everything below it, owned or not: the operator cannot change
+   * its permissions, so it cannot change the permissions of anything it holds either.
+   *
+   * @param {string} parentId
+   * @returns {FoldersCollection}
+   */
+  getOwnedDescendantsStoppingAtNotOwned(parentId) {
+    return FoldersCollection._collectDescendants(parentId, this, new FoldersCollection([]), (folder) =>
+      folder.isOwner(),
+    );
+  }
+
+  /**
+   * Collect the folders nested under the given one, keeping only the children the predicate accepts.
+   * A rejected child is left out and is not descended into, so its branch stops there.
+   *
+   * @param {string} parentId
+   * @param {FoldersCollection} inputCollection
+   * @param {FoldersCollection} outputCollection carried forward
+   * @param {function(FolderEntity): boolean} shouldVisit
+   * @returns {FoldersCollection} outputCollection final
+   * @private
+   */
+  static _collectDescendants(parentId, inputCollection, outputCollection, shouldVisit) {
+    const children = inputCollection.folders.filter((item) => item.folderParentId === parentId && shouldVisit(item));
+    try {
+      outputCollection.pushMany(children);
+    } catch (error) {
+      console.error(error);
+      /*
+       * children are already in collection
+       * skip...
+       */
     }
+    children.forEach((child) =>
+      FoldersCollection._collectDescendants(child.id, inputCollection, outputCollection, shouldVisit),
+    );
     return outputCollection;
   }
 

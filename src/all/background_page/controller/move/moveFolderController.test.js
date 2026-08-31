@@ -22,6 +22,7 @@ import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort
 import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
+import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 
 describe("MoveFolderController", () => {
   beforeEach(() => {
@@ -52,9 +53,38 @@ describe("MoveFolderController", () => {
       expect(controller.moveOneFolderService.moveOne).toHaveBeenCalledWith(
         expectedFolderId,
         expectedDestinationFolderId,
-        controller.confirmMoveStrategyService,
+        new Map(),
         pgpKeys.ada.passphrase,
       );
+    });
+
+    it("converts the per-item permissions DTO map into a Map of PermissionsCollection passed to the service", async () => {
+      expect.assertions(4);
+      const folderId = uuidv4();
+      const destinationFolderId = uuidv4();
+      // Sent as an object keyed by item id, here the moved folder and the permissions it ends up with.
+      const permissionsDto = {
+        [folderId]: [{ aro: "User", aro_foreign_key: uuidv4(), aco: "Folder", aco_foreign_key: folderId, type: 15 }],
+      };
+
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockReturnValue(pgpKeys.ada.passphrase);
+      jest
+        .spyOn(controller.verifyOrTrustMetadataKeyService, "verifyTrustedOrTrustNewMetadataKey")
+        .mockImplementation(jest.fn);
+      jest.spyOn(controller.moveOneFolderService, "moveOne").mockImplementation(jest.fn);
+
+      await controller.exec(folderId, destinationFolderId, permissionsDto);
+
+      expect(controller.moveOneFolderService.moveOne).toHaveBeenCalledWith(
+        folderId,
+        destinationFolderId,
+        expect.any(Map),
+        pgpKeys.ada.passphrase,
+      );
+      const confirmedPermissions = controller.moveOneFolderService.moveOne.mock.calls[0][2];
+      expect(confirmedPermissions.get(folderId)).toBeInstanceOf(PermissionsCollection);
+      expect(confirmedPermissions.get(folderId).items).toHaveLength(1);
+      expect(confirmedPermissions.get(folderId).items[0].type).toBe(15);
     });
 
     it("throws if the parameters are invalid", async () => {

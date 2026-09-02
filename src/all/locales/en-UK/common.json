@@ -124,8 +124,6 @@
   "The verificationResult keyID should be a valid keyID Object.": "The verificationResult keyID should be a valid keyID Object.",
   "The verificationResult signature should be a valid verified Promise<openpgp.Signature>.": "The verificationResult signature should be a valid verified Promise<openpgp.Signature>.",
   "The verificationResult verified should be a valid verified Promise<boolean>.": "The verificationResult verified should be a valid verified Promise<boolean>.",
-  "This change would leave {{name}} without any permission.": "This change would leave {{name}} without any permission.",
-  "This change would leave {{name}} without owner.": "This change would leave {{name}} without owner.",
   "This is not a valid passphrase": "This is not a valid passphrase",
   "This key does not match any account.": "This key does not match any account.",
   "This key is already used by another user.": "This key is already used by another user.",

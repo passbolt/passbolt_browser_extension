@@ -60,6 +60,7 @@ class CalculatePermissionsChangesService {
    *
    * Only what the operator actually changed is copied down, never the folder's whole access list.
    * A permission the folder merely kept, unedited, must not reach an item that never had it.
+   * An item the copy would leave unmanageable is left alone, see _calculateCascaded.
    *
    * Used by the move flow and by the share flow alike.
    *
@@ -92,13 +93,13 @@ class CalculatePermissionsChangesService {
   /**
    * Shared by forFolderWithCascadedChange and forResourceWithCascadedChange.
    * Builds the access list the item ends up with, checks it, then derives the changes.
-   * An item left with no permission at all, or with nobody as owner, is refused.
-   * Everything is computed before anything is applied, so one refusal blocks the whole operation.
+   * An item left with no permission at all, or with nobody as owner, keeps what it has and gets no
+   * change at all. The rest of the cascade still goes through.
    *
    * @param {FolderEntity|ResourceEntity} entity The item the change is copied onto.
    * @param {PermissionChangesCollection} folderPermissionChanges The change made on the folder.
    * @param {string} aco One of `PermissionEntity.ACO_FOLDER` or `PermissionEntity.ACO_RESOURCE`.
-   * @returns {PermissionChangesCollection}
+   * @returns {PermissionChangesCollection} Empty when the item is left alone.
    * @private
    */
   static _calculateCascaded(entity, folderPermissionChanges, aco) {
@@ -139,17 +140,18 @@ class CalculatePermissionsChangesService {
         );
       }
     }
-    // assertAtLeastOneOwner passes on an empty collection, so check for empty separately.
-    // Without it, an item left with nobody on it would have all its permissions deleted.
-    // The message reaches the dialog, so it names the item and is translated.
-    const name = CalculatePermissionsChangesService._entityName(entity, aco);
-    if (!resultingPermissions.length) {
-      throw new Error(i18n.t("This change would leave {{name}} without any permission.", { name }));
-    }
-    try {
-      resultingPermissions.assertAtLeastOneOwner();
-    } catch {
-      throw new Error(i18n.t("This change would leave {{name}} without owner.", { name }));
+    /*
+     * An item the alignment would leave unmanageable, with nothing on it or with nobody as owner,
+     * is left alone instead of blocking the whole operation. The empty case is tested separately
+     * because assertAtLeastOneOwner passes on an empty collection.
+     *
+     * @todo Interim behaviour, to be reworked. The operator is told nothing: the operation reports
+     * success while that item silently kept its former access list. Telling them means computing
+     * the cascade before the dialog is confirmed, so the dialog can list the items a row was not
+     * applied to, the way it already does for the items the operator does not own.
+     */
+    if (!resultingPermissions.length || !resultingPermissions.items.some((permission) => permission.isOwner())) {
+      return new PermissionChangesCollection([]);
     }
     return PermissionChangesCollection.calculateChanges(entity.permissions, resultingPermissions);
   }

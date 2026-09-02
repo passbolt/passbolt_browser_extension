@@ -323,10 +323,11 @@ describe("ShareResourceService", () => {
       expect(subFolderChange.type).toEqual(1);
     });
 
-    it("refuses the whole share when the cascade would strip a sub folder's last owner", async () => {
-      expect.assertions(2);
+    it("leaves a sub folder the cascade would strip of its last owner untouched, and aligns the rest of the branch", async () => {
+      expect.assertions(4);
       const folderIdToShare = uuidv4();
-      const subFolderId = uuidv4();
+      const subFolderIdSkipped = uuidv4();
+      const subFolderIdAligned = uuidv4();
       const groupId = uuidv4();
 
       // The group is downgraded to READ on the shared folder.
@@ -352,47 +353,74 @@ describe("ShareResourceService", () => {
           aro_foreign_key: pgpKeys.admin.userId,
         }),
       });
-      // The operator owns the sub folder through the group, and that group is its only owner.
-      // Lowering the group there too would leave the sub folder with nobody as owner.
-      const subFolderDto = defaultFolderDto({
-        id: subFolderId,
+      /*
+       * The operator owns the first sub folder through the group, and that group is its only owner.
+       * Lowering the group there too would leave it with nobody as owner, so it keeps what it has.
+       * The branch does not stop there: the folder below it still gets the change, because somebody
+       * else remains owner.
+       */
+      const subFolderSkippedDto = defaultFolderDto({
+        id: subFolderIdSkipped,
         folder_parent_id: folderIdToShare,
         permission: ownerFolderPermissionDto({
-          aco_foreign_key: subFolderId,
+          aco_foreign_key: subFolderIdSkipped,
           aro_foreign_key: pgpKeys.admin.userId,
         }),
       });
-      const groupSubFolderPermission = ownerFolderPermissionDto({
-        aco_foreign_key: subFolderId,
+      const groupSubFolderSkippedPermission = ownerFolderPermissionDto({
+        aco_foreign_key: subFolderIdSkipped,
+        aro: "Group",
+        aro_foreign_key: groupId,
+      });
+      const subFolderAlignedDto = defaultFolderDto({
+        id: subFolderIdAligned,
+        folder_parent_id: subFolderIdSkipped,
+        permission: ownerFolderPermissionDto({
+          aco_foreign_key: subFolderIdAligned,
+          aro_foreign_key: pgpKeys.admin.userId,
+        }),
+      });
+      const groupSubFolderAlignedPermission = ownerFolderPermissionDto({
+        aco_foreign_key: subFolderIdAligned,
         aro: "Group",
         aro_foreign_key: groupId,
       });
       jest
         .spyOn(service.getOrFindFoldersService, "getOrFindAll")
-        .mockImplementation(() => new FoldersCollection([folderDto, subFolderDto]));
+        .mockImplementation(() => new FoldersCollection([folderDto, subFolderSkippedDto, subFolderAlignedDto]));
       jest
         .spyOn(service.getOrFindResourcesService, "getOrFindAll")
         .mockImplementation(() => new ResourcesCollection([]));
-      jest
-        .spyOn(service.findFoldersService, "findAllByIdsWithPermissions")
-        .mockImplementation(
-          () =>
-            new FoldersCollection([
-              defaultFolderDto({ ...folderDto, permissions: [folderDto.permission, groupFolderPermission] }),
-              defaultFolderDto({ ...subFolderDto, permissions: [groupSubFolderPermission] }),
-            ]),
-        );
+      jest.spyOn(service.findFoldersService, "findAllByIdsWithPermissions").mockImplementation(
+        () =>
+          new FoldersCollection([
+            defaultFolderDto({ ...folderDto, permissions: [folderDto.permission, groupFolderPermission] }),
+            defaultFolderDto({ ...subFolderSkippedDto, permissions: [groupSubFolderSkippedPermission] }),
+            defaultFolderDto({
+              ...subFolderAlignedDto,
+              permissions: [subFolderAlignedDto.permission, groupSubFolderAlignedPermission],
+            }),
+          ]),
+      );
       jest
         .spyOn(service.findResourcesService, "findAllByIdsWithPermissions")
         .mockImplementation(() => new ResourcesCollection([]));
-      jest.spyOn(service.shareApiService, "shareFolder").mockImplementation(() => ({}));
+
+      const shareRequests = new Map();
+      jest.spyOn(service.shareApiService, "shareFolder").mockImplementation((folderId, data) => {
+        shareRequests.set(folderId, data);
+        return {};
+      });
       jest.spyOn(service.findAndUpdateFoldersLocalStorageService, "findAndUpdateAll").mockImplementation(jest.fn);
 
-      await expect(
-        service.shareOneWithContent(folderDto.id, permissionChanges, pgpKeys.admin.passphrase),
-      ).rejects.toThrow();
-      // The refusal happens while computing the changes, so nothing was sent to the API.
-      expect(service.shareApiService.shareFolder).not.toHaveBeenCalled();
+      await service.shareOneWithContent(folderDto.id, permissionChanges, pgpKeys.admin.passphrase);
+
+      expect([...shareRequests.keys()]).toEqual([folderIdToShare, subFolderIdAligned]);
+      const alignedPermissions = shareRequests.get(subFolderIdAligned).permissions;
+      expect(alignedPermissions).toHaveLength(1);
+      const alignedChange = alignedPermissions[0].toDto();
+      expect(alignedChange.aro_foreign_key).toEqual(groupId);
+      expect(alignedChange.type).toEqual(1);
     });
 
     it("stops the cascade at a sub folder the operator does not own", async () => {

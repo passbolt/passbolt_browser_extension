@@ -136,14 +136,12 @@ class ShareFoldersService {
   /**
    * Calculate the folder permission changes.
    * Each folder below receives the change the operator made on the shared folder.
-   * A folder left with no permission at all, or with nobody as owner, throws. Nothing is sent to the
-   * API, and the whole share is refused.
+   * A folder the change would leave with no permission at all, or with nobody as owner, keeps what
+   * it has. Only that one is left out, the rest of the cascade is applied.
    * @param {string} folderTargetId The folder originally target of the share.
    * @param {PermissionChangesCollection} permissionsChanges The permission changes
    * @param {FoldersCollection} foldersToShare The folders to share, with their permissions.
    * @return {PermissionChangesCollection}
-   * @throws {Error} If the cascade would leave a descendant folder without any permission.
-   * @throws {CollectionValidationError} If the cascade would leave a descendant folder without owner.
    * @private
    */
   calculateFoldersPermissionChanges(folderTargetId, permissionsChanges, foldersToShare) {
@@ -170,13 +168,11 @@ class ShareFoldersService {
   /**
    * Calculate the resource permission changes.
    * Each resource below receives the change the operator made on the shared folder.
-   * A resource left with no permission at all, or with nobody as owner, throws. Nothing is sent to
-   * the API, and the whole share is refused.
+   * A resource the change would leave with no permission at all, or with nobody as owner, keeps what
+   * it has. Only that one is left out, the rest of the cascade is applied.
    * @param {PermissionChangesCollection} permissionsChanges The permission changes
    * @param {ResourcesCollection} resourcesToShare The resources to share, with their permissions.
    * @return {PermissionChangesCollection}
-   * @throws {Error} If the cascade would leave a descendant resource without any permission.
-   * @throws {CollectionValidationError} If the cascade would leave a descendant resource without owner.
    */
   calculateResourcesPermissionChanges(permissionsChanges, resourcesToShare) {
     this.progressService.finishStep(i18n.t("Calculating resources permissions changes"), true);

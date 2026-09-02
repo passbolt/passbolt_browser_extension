@@ -261,7 +261,8 @@ class MoveOneFolderService {
   /**
    * Calculate the folder permission changes to apply.
    * The caller already computed the moved folder's own change. Each owned folder below receives the
-   * same change, and keeps everything else it holds.
+   * same change, and keeps everything else it holds. A folder the change would leave with no
+   * permission at all, or with nobody as owner, keeps what it has. Only that one is left out.
    * The moved folder is not handled here, the caller merges its own change in.
    *
    * @param {Array<FolderEntity>} foldersToShare The owned folders below, with their permissions.
@@ -285,6 +286,8 @@ class MoveOneFolderService {
   /**
    * Calculate the resource permission changes to apply.
    * Each owned resource below receives the moved folder's change, and keeps everything else it holds.
+   * A resource the change would leave with no permission at all, or with nobody as owner, keeps what
+   * it has. Only that one is left out.
    *
    * @param {ResourcesCollection} resourcesToShare The resources that could be shared.
    * @param {PermissionChangesCollection} movedFolderPermissionChanges The change made on the moved folder.

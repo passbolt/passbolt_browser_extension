@@ -21,6 +21,7 @@ import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 import {
   ownerFolderPermissionDto,
+  ownerGroupPermissionDto,
   ownerPermissionDto,
   readFolderPermissionDto,
   readPermissionDto,
@@ -533,6 +534,70 @@ describe("MoveOneFolderService", () => {
       expect(service.findFoldersService.findAllByIdsWithPermissions).not.toHaveBeenCalled();
       // R is left out entirely, no share call is made for it.
       expect(service.shareResourceService.shareAll).not.toHaveBeenCalled();
+    });
+
+    it("leaves a descendant the cascade would strip of its last owner untouched, and still moves the folder", async () => {
+      expect.assertions(5);
+
+      const groupId = uuidv4();
+      const destinationFolderId = uuidv4();
+
+      // Folder F moves from the root. The operator and G1 own it, and the operator drops G1.
+      const folderToMoveId = uuidv4();
+      const folderToMoveDto = defaultFolderDto({
+        id: folderToMoveId,
+        folder_parent_id: null,
+        permission: ownerFolderPermissionDto({ aco_foreign_key: folderToMoveId, aro_foreign_key: account.id }),
+        permissions: [
+          ownerFolderPermissionDto({ aco_foreign_key: folderToMoveId, aro_foreign_key: account.id }),
+          ownerGroupPermissionDto({ aco: "Folder", aco_foreign_key: folderToMoveId, aro_foreign_key: groupId }),
+        ],
+      });
+      // Resource R1 in F, owned by G1 alone, which is also where the operator's access comes from.
+      // Dropping G1 there would leave nobody on it, so it keeps what it has.
+      const skippedResourceId = uuidv4();
+      const skippedResourceDto = defaultResourceDto({
+        id: skippedResourceId,
+        folder_parent_id: folderToMoveId,
+        permission: ownerPermissionDto({ aco_foreign_key: skippedResourceId, aro_foreign_key: account.id }),
+        permissions: [ownerGroupPermissionDto({ aco_foreign_key: skippedResourceId, aro_foreign_key: groupId })],
+      });
+      // Resource R2 in F, owned by the operator directly too, so dropping G1 leaves it manageable.
+      const alignedResourceId = uuidv4();
+      const alignedResourceDto = defaultResourceDto({
+        id: alignedResourceId,
+        folder_parent_id: folderToMoveId,
+        permission: ownerPermissionDto({ aco_foreign_key: alignedResourceId, aro_foreign_key: account.id }),
+        permissions: [
+          ownerPermissionDto({ aco_foreign_key: alignedResourceId, aro_foreign_key: account.id }),
+          ownerGroupPermissionDto({ aco_foreign_key: alignedResourceId, aro_foreign_key: groupId }),
+        ],
+      });
+      const destinationFolderDto = defaultFolderDto({ id: destinationFolderId });
+      await mockServiceDependencies(
+        service,
+        [folderToMoveDto, destinationFolderDto],
+        [skippedResourceDto, alignedResourceDto],
+      );
+
+      // What the operator confirmed for F drops G1 and keeps only themselves.
+      const folderTargetPermissions = new PermissionsCollection(
+        [ownerFolderPermissionDto({ aco_foreign_key: folderToMoveId, aro_foreign_key: account.id })],
+        { assertAtLeastOneOwner: false },
+      );
+      const confirmedPermissions = new Map([[folderToMoveId, folderTargetPermissions]]);
+
+      await service.moveOne(folderToMoveId, destinationFolderId, confirmedPermissions, pgpKeys.admin.passphrase);
+
+      // The move is not refused, and everything the cascade can align still is.
+      expect(service.moveApiService.moveFolder).toHaveBeenCalled();
+      const [sharedResourceIds, resourceChanges] = service.shareResourceService.shareAll.mock.calls[0];
+      expect(sharedResourceIds).toEqual([alignedResourceId]);
+      const alignedChange = resourceChanges.items.find((change) => change.acoForeignKey === alignedResourceId);
+      expect(alignedChange?.aroForeignKey).toEqual(groupId);
+      expect(alignedChange?.scenario).toBe("delete");
+      // R1 is left alone, no change at all is computed for it.
+      expect(resourceChanges.items.find((change) => change.acoForeignKey === skippedResourceId)).toBeUndefined();
     });
 
     it("moves the folder before re-permissioning, so a failed move leaves no descendant re-permissioned", async () => {

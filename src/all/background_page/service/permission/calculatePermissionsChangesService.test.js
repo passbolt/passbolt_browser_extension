@@ -221,7 +221,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.length).toBe(0);
     });
 
-    it("throws when the cascade would leave a descendant with no permission at all", () => {
+    it("leaves a descendant the cascade would empty untouched", () => {
       expect.assertions(1);
       const group = uuidv4();
       const resource = buildResource([ownerPermissionDto({ aro_foreign_key: group })]);
@@ -234,12 +234,12 @@ describe("CalculatePermissionsChangesService", () => {
         }),
       ]);
 
-      expect(() => CalculatePermissionsChangesService.forResourceWithCascadedChange(resource, folderChanges)).toThrow(
-        "without any permission.",
-      );
+      const changes = CalculatePermissionsChangesService.forResourceWithCascadedChange(resource, folderChanges);
+
+      expect(changes.length).toBe(0);
     });
 
-    it("throws when the cascade would leave a descendant without an owner", () => {
+    it("leaves a descendant the cascade would strip of its last owner untouched", () => {
       expect.assertions(1);
       const group = uuidv4();
       const resource = buildResource([ownerPermissionDto({ aro_foreign_key: group })]);
@@ -252,7 +252,9 @@ describe("CalculatePermissionsChangesService", () => {
         }),
       ]);
 
-      expect(() => CalculatePermissionsChangesService.forResourceWithCascadedChange(resource, folderChanges)).toThrow();
+      const changes = CalculatePermissionsChangesService.forResourceWithCascadedChange(resource, folderChanges);
+
+      expect(changes.length).toBe(0);
     });
   });
 

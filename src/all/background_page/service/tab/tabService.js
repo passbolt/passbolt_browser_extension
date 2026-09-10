@@ -48,8 +48,9 @@ class TabService {
     if (!(tab?.url?.startsWith("http://") || tab?.url?.startsWith("https://"))) {
       return;
     }
-
-    await TabService.handleNavigation(tabId, tab.url);
+    await navigator.locks.request(tab.url, async () => {
+      await TabService.handleNavigation(tabId, tab.url);
+    });
   }
 
   /**

@@ -16,6 +16,7 @@ import Port from "../../../webAccessibleResources/js/lib/port";
 import MessageService from "../service/messageService";
 import MessageEventHandler from "../message/messageEventHandler";
 import ConnectPortController from "../controller/connectPortController";
+import { WebauthnSetupCeremonyEvents } from "../event/webauthnSetupCeremonyEvents";
 import { createRoot } from "react-dom/client";
 
 async function main() {
@@ -23,6 +24,7 @@ async function main() {
   const port = new Port(self.portname);
   // Emit a success if the port is still connected
   port.on("passbolt.port.check", (requestId) => port.emit(requestId, "SUCCESS"));
+  WebauthnSetupCeremonyEvents.listen(port);
   await port.connect();
   // Message listener
   const messageService = new MessageService();

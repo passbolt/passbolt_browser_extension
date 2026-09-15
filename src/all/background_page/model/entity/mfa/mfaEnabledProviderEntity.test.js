@@ -31,6 +31,19 @@ describe("MfaEnabledProvider entity", () => {
     expect(entity.duo).toEqual(dto.duo);
   });
 
+  it("constructor keeps the webauthn flag when provided", () => {
+    const dto = createMfaCombinedEnabledProviders({ webauthn: true });
+    const entity = new MfaEnabledProviderEntity(dto);
+
+    expect(entity.webauthn).toBe(true);
+  });
+
+  it("constructor works without the webauthn flag", () => {
+    const entity = new MfaEnabledProviderEntity(createMfaCombinedEnabledProviders());
+
+    expect(entity.webauthn).toBeUndefined();
+  });
+
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
       new MfaEnabledProviderEntity({});

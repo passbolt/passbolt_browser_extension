@@ -33,6 +33,26 @@ export default class WebauthnApiService extends AbstractService {
   }
 
   /**
+   * Find all the credentials of the current user.
+   * @returns {Promise<Array<object>>}
+   */
+  async findAll() {
+    const response = await this.apiClient.findAll();
+    return response.body;
+  }
+
+  /**
+   * Delete a credential of the current user.
+   * @param {string} id the credential id
+   * @returns {Promise<void>}
+   * @throws {TypeError} if the id is not a uuid
+   */
+  async delete(id) {
+    this.assertValidId(id);
+    await this.apiClient.delete(id);
+  }
+
+  /**
    * Begin the attestation ceremony.
    * @returns {Promise<{handle: string, credentialCreationOptions: object}>}
    */
@@ -45,7 +65,7 @@ export default class WebauthnApiService extends AbstractService {
   /**
    * Finish the attestation ceremony.
    * @param {{handle: string, credential: object, name: string}} dto
-   * @returns {Promise<{verified: string}>} verified is the enrolment date-time
+   * @returns {Promise<{verified: string}>} verified is the registration date-time
    */
   async finish(dto) {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/finish`);

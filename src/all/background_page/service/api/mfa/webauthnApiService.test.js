@@ -18,6 +18,7 @@ import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/Pass
 import WebauthnApiService from "./webauthnApiService";
 import { defaultWebauthnCredentialCreationOptionsDto } from "../../../model/entity/mfa/webauthnCredentialCreationOptionsEntity.test.data";
 import { defaultWebauthnRegistrationResponseDto } from "../../../model/entity/mfa/webauthnRegistrationResponseEntity.test.data";
+import { defaultMfaWebauthnCredentialsDtos } from "../../../model/entity/mfa/mfaWebauthnCredentialsCollection.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -34,6 +35,52 @@ describe("WebauthnApiService", () => {
   it("has the correct resource name", () => {
     expect.assertions(1);
     expect(WebauthnApiService.RESOURCE_NAME).toEqual("/mfa/setup/webauthn");
+  });
+
+  describe("WebauthnApiService::findAll", () => {
+    it("gets the credentials and returns the body", async () => {
+      expect.assertions(2);
+      const dtos = defaultMfaWebauthnCredentialsDtos(2);
+      fetch.doMockOnceIf(/mfa\/setup\/webauthn\.json/, async (req) => {
+        expect(req.method).toEqual("GET");
+        return mockApiResponse(dtos);
+      });
+      expect(await service.findAll()).toEqual(dtos);
+    });
+
+    it("throws on API error", async () => {
+      expect.assertions(1);
+      fetch.doMockOnceIf(/mfa\/setup\/webauthn\.json/, () =>
+        mockApiResponseError(403, "MFA authentication is required."),
+      );
+      await expect(service.findAll()).rejects.toThrow(PassboltApiFetchError);
+    });
+  });
+
+  describe("WebauthnApiService::delete", () => {
+    const id = "8e3874ae-4b40-590b-968a-418f704b9d9a";
+
+    it("deletes the credential by id", async () => {
+      expect.assertions(2);
+      fetch.doMockOnceIf(new RegExp(`mfa/setup/webauthn/${id}\\.json`), async (req) => {
+        expect(req.method).toEqual("DELETE");
+        return mockApiResponse();
+      });
+      await expect(service.delete(id)).resolves.toBeUndefined();
+    });
+
+    it("throws if the id is not a uuid", async () => {
+      expect.assertions(1);
+      await expect(service.delete("not-a-uuid")).rejects.toThrow(TypeError);
+    });
+
+    it("throws on API error", async () => {
+      expect.assertions(1);
+      fetch.doMockOnceIf(new RegExp(`mfa/setup/webauthn/${id}\\.json`), () =>
+        mockApiResponseError(400, "The credential does not exist."),
+      );
+      await expect(service.delete(id)).rejects.toThrow(PassboltApiFetchError);
+    });
   });
 
   describe("WebauthnApiService::begin", () => {

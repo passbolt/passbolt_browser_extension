@@ -14,6 +14,8 @@
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 
 const CEREMONY_TTL_MS = 5 * 60 * 1000;
+// dashed hex of the 16 authenticator bytes; not an RFC 4122 uuid for some authenticators
+export const AAGUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 /**
  * The pending WebAuthn setup ceremony kept in session storage between begin, result and finish.
@@ -49,8 +51,7 @@ class WebauthnSetupCeremonyEntity extends EntityV2 {
         },
         aaguid: {
           type: "string",
-          // dashed hex of the 16 authenticator bytes; not an RFC 4122 uuid for most authenticators
-          pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+          pattern: AAGUID_PATTERN,
           nullable: true,
         },
       },

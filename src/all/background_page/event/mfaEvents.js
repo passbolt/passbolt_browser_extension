@@ -25,6 +25,9 @@ import GetStartedWithDuoController from "../controller/mfaSetup/GetStartedWithDu
 import MfaSetupBeginWebauthnCeremonyController from "../controller/mfaSetup/MfaSetupBeginWebauthnCeremonyController";
 import MfaSetupFinishWebauthnCeremonyController from "../controller/mfaSetup/MfaSetupFinishWebauthnCeremonyController";
 import MfaSetupAbortWebauthnCeremonyController from "../controller/mfaSetup/MfaSetupAbortWebauthnCeremonyController";
+import MfaSetupGetWebauthnCredentialsController from "../controller/mfaSetup/MfaSetupGetWebauthnCredentialsController";
+import MfaSetupDeleteWebauthnCredentialController from "../controller/mfaSetup/MfaSetupDeleteWebauthnCredentialController";
+import MfaSetupGetWebauthnSettingsController from "../controller/mfaSetup/MfaSetupGetWebauthnSettingsController";
 
 /**
  * Listens to the MFA events
@@ -95,6 +98,21 @@ const listen = function (worker, apiClientOptions, account) {
 
   worker.port.on("passbolt.mfa-setup.abort-webauthn-ceremony", async (requestId) => {
     const controller = new MfaSetupAbortWebauthnCeremonyController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  worker.port.on("passbolt.mfa-setup.get-webauthn-credentials", async (requestId) => {
+    const controller = new MfaSetupGetWebauthnCredentialsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on("passbolt.mfa-setup.delete-webauthn-credential", async (requestId, id) => {
+    const controller = new MfaSetupDeleteWebauthnCredentialController(worker, requestId, apiClientOptions);
+    await controller._exec(id);
+  });
+
+  worker.port.on("passbolt.mfa-setup.get-webauthn-settings", async (requestId) => {
+    const controller = new MfaSetupGetWebauthnSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 };

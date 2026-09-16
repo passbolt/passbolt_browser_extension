@@ -15,7 +15,7 @@ import EdgeBackgroundPageClipboardService from "../../../../chrome/polyfill/clip
 import BrowserService from "../browser/browserService";
 
 /**
- * The service retrieves the appropriate clipboard provider for the current environment: Edge, Chrome, or Firefox.
+ * The service retrieves the appropriate clipboard provider for the current environment: Edge, Chrome, Safari or Firefox.
  */
 export default class ClipboardProviderService {
   /**
@@ -23,7 +23,7 @@ export default class ClipboardProviderService {
    * @returns {Clipboard}
    */
   static getClipboard() {
-    //is Chrome with MV3?
+    //is a clipboard implementation injected at build time? (Chrome MV3 offscreen, Safari native app)
     if (typeof customNavigatorClipboard !== "undefined") {
       // eslint-disable-next-line no-undef
       return customNavigatorClipboard;

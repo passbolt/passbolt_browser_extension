@@ -41,7 +41,8 @@ struct SafariWebExtensionHandlerTests {
         #expect(routes["save-file"] == SaveFileController.self)
         #expect(routes["fetch"] == FetchController.self)
         #expect(routes["open-safari-settings"] == OpenSafariSettingsController.self)
-        #expect(routes.count == 3)
+        #expect(routes["write-clipboard"] == WriteClipboardController.self)
+        #expect(routes.count == 4)
     }
 
     @Test("routes returns nil for unknown action")

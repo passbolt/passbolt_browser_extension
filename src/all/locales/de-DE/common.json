@@ -33,6 +33,8 @@
   "Encrypting secret": "Geheimnis wird verschlüsselt",
   "Encrypting Secret": "Geheimnis wird verschlüsselt",
   "Encrypting secrets": "Geheimnisse werden verschlüsselt",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Ablauf des Metadatenschlüssels",
   "Expiry date will be updated on {{count}} resource._one": "Das Ablaufdatum wird auf {{count}} Ressource aktualisiert.",
   "Expiry date will be updated on {{count}} resource._other": "Das Ablaufdatum wird auf {{count}} Ressourcen aktualisiert.",

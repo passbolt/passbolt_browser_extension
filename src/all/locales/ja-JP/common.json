@@ -33,6 +33,8 @@
   "Encrypting secret": "秘密の暗号化",
   "Encrypting Secret": "シークレットを暗号化中",
   "Encrypting secrets": "シークレットを暗号化中",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "メタデータ鍵を失効しています",
   "Expiry date will be updated on {{count}} resource._one": "有効期限は{{count}}件のリソースで更新されます。",
   "Expiry date will be updated on {{count}} resource._other": "有効期限は{{count}}件のリソースで更新されます。",

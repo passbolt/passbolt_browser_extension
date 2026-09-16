@@ -33,6 +33,8 @@
   "Encrypting secret": "Se criptează secretul",
   "Encrypting Secret": "Se criptează secretul",
   "Encrypting secrets": "Se criptează secretele",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Cheia de metadate expiră",
   "Expiry date will be updated on {{count}} resource._one": "Data de expirare va fi actualizată la {{count}} resursă.",
   "Expiry date will be updated on {{count}} resource._other": "Data de expirare va fi actualizată la {{count}} resurse.",

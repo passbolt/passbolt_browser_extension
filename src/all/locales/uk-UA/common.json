@@ -33,6 +33,8 @@
   "Encrypting secret": "Шифрування секрету",
   "Encrypting Secret": "Шифрування секрету",
   "Encrypting secrets": "Шифрування секретів",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Завершення строку дії ключа метаданих",
   "Expiry date will be updated on {{count}} resource._one": "Термін дії буде оновлено на {{count}} ресурсі.",
   "Expiry date will be updated on {{count}} resource._other": "Термін дії буде оновлено на {{count}} ресурсах.",

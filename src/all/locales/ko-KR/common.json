@@ -33,6 +33,8 @@
   "Encrypting secret": "비밀 암호화 중",
   "Encrypting Secret": "비밀 암호화 중",
   "Encrypting secrets": "비밀 암호화 중",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "만료되는 메타데이터 키",
   "Expiry date will be updated on {{count}} resource._one": "만료일이 {{count}} 개의 리소스에 업데이트됩니다.",
   "Expiry date will be updated on {{count}} resource._other": "만료일이 {{count}} 개의 리소스에 업데이트됩니다.",

@@ -33,6 +33,8 @@
   "Encrypting secret": "Krypterar hemlighet",
   "Encrypting Secret": "Krypterar hemlighet",
   "Encrypting secrets": "Krypterar hemligheter",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Metadata-nyckel löper ut",
   "Expiry date will be updated on {{count}} resource._one": "Utgångsdatumet kommer att uppdateras på {{count}} resurs.",
   "Expiry date will be updated on {{count}} resource._other": "Utgångsdatumet kommer att uppdateras på {{count}} resurser.",

@@ -33,6 +33,8 @@
   "Encrypting secret": "Užšifruoti paslaptį",
   "Encrypting Secret": "Šifruojama paslaptis",
   "Encrypting secrets": "Užšifruojamos paslaptys",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Baigiamas metaduomenų rakto galiojimas",
   "Expiry date will be updated on {{count}} resource._one": "Baigimosi data bus atnaujinta {{count}} ištekliui.",
   "Expiry date will be updated on {{count}} resource._other": "Baigimosi data bus atnaujinta {{count}} ištekliams.",

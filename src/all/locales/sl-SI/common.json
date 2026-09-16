@@ -33,6 +33,8 @@
   "Encrypting secret": "Šifriranje gesla",
   "Encrypting Secret": "Šifriranje gesla",
   "Encrypting secrets": "Šifriranje gesla",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Potek ključa metapodatkov",
   "Expiry date will be updated on {{count}} resource._one": "Datum poteka bo posodobljen za {{count}} vir.",
   "Expiry date will be updated on {{count}} resource._other": "Datum poteka bo posodobljen za {{count}} virov.",

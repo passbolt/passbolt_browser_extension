@@ -13,7 +13,6 @@
  */
 
 import PostLogoutService from "../../service/auth/postLogoutService";
-import SessionCookieFlushService from "../../service/auth/sessionCookieFlushService";
 import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
 import OfflineSessionExpiryAlarmService from "../../service/auth/offlineSessionExpiryAlarmService";
 
@@ -32,7 +31,6 @@ class AuthOfflineLogoutController {
       account,
       apiClientOptions,
     );
-    this.sessionCookieFlushSrvice = new SessionCookieFlushService(account);
   }
 
   /**

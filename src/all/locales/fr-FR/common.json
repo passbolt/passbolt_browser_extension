@@ -33,6 +33,8 @@
   "Encrypting secret": "Chiffrement du secret",
   "Encrypting Secret": "Chiffrement du secret",
   "Encrypting secrets": "Chiffrement des secrets",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Expiration de la clé de métadonnées",
   "Expiry date will be updated on {{count}} resource._one": "La date d'expiration sera mise à jour sur {{count}} ressource.",
   "Expiry date will be updated on {{count}} resource._other": "La date d'expiration sera mise à jour sur {{count}} ressources.",

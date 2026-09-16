@@ -33,6 +33,8 @@
   "Encrypting secret": "Šifrování tajemství",
   "Encrypting Secret": "Šifrování tajného klíče",
   "Encrypting secrets": "Šifrování tajných klíčů",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Vypršení platnosti klíče metadat",
   "Expiry date will be updated on {{count}} resource._one": "Datum vypršení platnosti bude aktualizováno u {{count}} zdroje.",
   "Expiry date will be updated on {{count}} resource._other": "Datum vypršení platnosti bude aktualizováno na {{count}} zdrojích.",

@@ -33,6 +33,8 @@
   "Encrypting secret": "Versleutelen van het geheim",
   "Encrypting Secret": "Versleutelen van het geheim",
   "Encrypting secrets": "Geheimen versleutelen",
+  "Encrypting secrets {{count}}/{{total}}_one": "Encrypting one secret",
+  "Encrypting secrets {{count}}/{{total}}_other": "Encrypting secrets {{count}}/{{total}}",
   "Expiring metadata key": "Metadata-sleutel laten verlopen",
   "Expiry date will be updated on {{count}} resource._one": "De vervaldatum zal worden bijgewerkt voor {{count}} middel.",
   "Expiry date will be updated on {{count}} resource._other": "De vervaldatum zal worden bijgewerkt voor {{count}} middelen.",

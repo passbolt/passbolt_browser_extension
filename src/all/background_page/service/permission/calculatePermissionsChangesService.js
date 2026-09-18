@@ -15,7 +15,6 @@ import PermissionChangesCollection from "../../model/entity/permission/change/pe
 import PermissionChangeEntity from "../../model/entity/permission/change/permissionChangeEntity";
 import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
 import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
-import i18n from "../../sdk/i18n";
 
 /**
  * Calculates the permission changes a move or a share applies.
@@ -156,30 +155,15 @@ class CalculatePermissionsChangesService {
     }
     const expectedPermissions = targetPermissions.cloneForAco(aco, entity.id, false);
     // assertAtLeastOneOwner passes on an empty set, which would delete every permission.
-    const name = CalculatePermissionsChangesService._entityName(entity, aco);
     if (!expectedPermissions.length) {
-      throw new Error(i18n.t("The confirmed permissions would leave {{name}} without any permission.", { name }));
+      throw new Error(`The confirmed permissions would leave ${entity.id} without any permission.`);
     }
     try {
       expectedPermissions.assertAtLeastOneOwner();
     } catch {
-      throw new Error(i18n.t("The confirmed permissions would leave {{name}} without owner.", { name }));
+      throw new Error(`The confirmed permissions would leave ${entity.id} without owner.`);
     }
     return PermissionChangesCollection.calculateChanges(entity.permissions, expectedPermissions);
-  }
-
-  /**
-   * The name of the item a refusal message points at.
-   * @param {FolderEntity|ResourceEntity} entity
-   * @param {string} aco One of `PermissionEntity.ACO_FOLDER` or `PermissionEntity.ACO_RESOURCE`.
-   * @returns {string}
-   * @private
-   */
-  static _entityName(entity, aco) {
-    if (aco === PermissionEntity.ACO_FOLDER) {
-      return entity.name;
-    }
-    return entity.metadata?.name ?? entity.id;
   }
 }
 

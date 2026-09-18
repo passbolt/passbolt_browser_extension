@@ -774,7 +774,7 @@ describe("MoveOneFolderService", () => {
 
       await expect(
         service.moveOne(folderToMoveId, destinationFolderId, confirmedPermissions, pgpKeys.admin.passphrase),
-      ).rejects.toThrow(`Folder ${folderToMoveDto.name} must be owned to apply the confirmed permissions.`);
+      ).rejects.toThrow(`Folder ${folderToMoveId} must be owned to apply the confirmed permissions.`);
 
       expect(service.moveApiService.moveFolder).not.toHaveBeenCalled();
     });

@@ -114,9 +114,7 @@ class MoveOneFolderService {
       if (!folder.isOwner()) {
         // The dialog only confirms permissions for a folder the operator owns, so the two disagree if we reach this point.
         // Refuse rather than apply half of what was confirmed.
-        throw new Error(
-          i18n.t("Folder {{name}} must be owned to apply the confirmed permissions.", { name: folder.name }),
-        );
+        throw new Error(`Folder ${folder.id} must be owned to apply the confirmed permissions.`);
       }
       const movedFolderWithPermissions = await this.findFoldersService.findByIdWithPermissions(folderId);
       movedFolderPermissionChanges = CalculatePermissionsChangesService.forFolderWithTargetPermissions(

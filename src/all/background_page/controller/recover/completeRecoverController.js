@@ -17,6 +17,7 @@ import SetupModel from "../../model/setup/setupModel";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
+import ToolbarService from "../../service/toolbar/toolbarService";
 
 class CompleteRecoverController {
   /**
@@ -59,6 +60,9 @@ class CompleteRecoverController {
     );
     await this.setupModel.completeRecover(temporaryAccount.account);
     await this.accountModel.add(accountRecovered);
+
+    // For Edge to avoid a double click on the QA icon when the account is set
+    ToolbarService.setQuickaccessPopup();
   }
 }
 

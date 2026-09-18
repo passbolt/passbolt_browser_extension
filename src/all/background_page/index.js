@@ -12,12 +12,22 @@ import OnExtensionUpdateAvailableService from "./service/extension/onExtensionUp
 import GlobalAlarmService from "./service/alarm/globalAlarmService";
 import OnStartUpService from "./service/extension/onStartUpService";
 import ToolbarService from "./service/toolbar/toolbarService";
+import User from "./model/user";
 
 const main = async () => {
   /**
    * Load all system requirement
    */
   await SystemRequirementService.get();
+
+  const user = User.getInstance();
+  if (user.isValid()) {
+    /*
+     * Use for Edge mainly as 'openPopup' does not work (see ToolbarService.handleIconToolbarClicked).
+     * When browser started, it avoids users to click twice on the QA icon to show it.
+     */
+    ToolbarService.setQuickaccessPopup();
+  }
 };
 
 main();

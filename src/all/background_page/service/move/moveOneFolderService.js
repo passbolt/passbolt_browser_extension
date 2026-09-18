@@ -35,6 +35,10 @@ const STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE =
   1 + // Calculate resources permissions
   STEPS_TO_COMPLETE_SHARE;
 
+const STEPS_SKIPPED_WITHOUT_PERMISSIONS_CHANGE =
+  1 + // Retrieve resources permissions
+  STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE;
+
 export const PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE =
   1 + // Retrieve folders permissions
   1 + // Retrieve resources permissions
@@ -99,21 +103,15 @@ class MoveOneFolderService {
       ? await this.findFoldersService.findByIdWithPermissions(destinationFolderId)
       : null;
 
-    // Checked before looking any permission up, so a refused move fetches nothing.
     this.assertFolderCanBeMoved(folder, destinationFolder, parentFolder);
 
-    // Only the moved folder has confirmed permissions. Its content is handled further down.
-    // Null means there are none, so the folder simply moves.
     const folderTargetPermissions = confirmedPermissions.get(folderId) ?? null;
 
-    // The folder's own change first, so an impossible one throws before anything has moved, and a
-    // folder that does not actually change copies nothing onto its content.
     this.progressService.finishStep(i18n.t("Retrieving folders permissions"), true);
     let movedFolderPermissionChanges = null;
     if (folderTargetPermissions) {
       if (!folder.isOwner()) {
-        // The dialog only confirms permissions for a folder the operator owns, so the two disagree if we reach this point.
-        // Refuse rather than apply half of what was confirmed.
+        // The dialog only confirms permissions for an owned folder, so reaching this means the two disagree.
         throw new Error(`Folder ${folder.id} must be owned to apply the confirmed permissions.`);
       }
       const movedFolderWithPermissions = await this.findFoldersService.findByIdWithPermissions(folderId);
@@ -123,13 +121,9 @@ class MoveOneFolderService {
       );
     }
 
-    // Move first and change the permissions after, like the resource path: a failed move then
-    // leaves no re-encrypted secret behind.
     let foldersPermissionsChanges = null;
     let resourcesPermissionsChanges = null;
     if (movedFolderPermissionChanges?.length) {
-      // What the change reaches: the owned folders below, each branch stopping at the first one the
-      // operator does not own, then their resources.
       const allFolders = await this.getOrFindFoldersService.getOrFindAll();
       const ownedDescendantFolders = allFolders.getOwnedDescendantsStoppingAtNotOwned(folderId);
       const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(ownedDescendantFolders);
@@ -137,11 +131,9 @@ class MoveOneFolderService {
         folderId,
         ownedDescendantFolders,
       );
-      // The moved folder is merged in first because the changes are saved in that order: a failure
-      // part way through never leaves the content ahead of the folder itself.
       foldersPermissionsChanges = new PermissionChangesCollection([]);
+      // Merged first: the changes are saved in order, so a failure never leaves the content ahead of the folder.
       foldersPermissionsChanges.merge(movedFolderPermissionChanges);
-      // Only the folder's change is copied down, never its whole access list.
       foldersPermissionsChanges.merge(
         this.calculateFoldersPermissionChanges(foldersToShareWithPermissions.items, movedFolderPermissionChanges),
       );
@@ -150,10 +142,10 @@ class MoveOneFolderService {
         movedFolderPermissionChanges,
       );
     } else {
-      // Account for the skipped "Retrieving resources permissions" step and the override steps.
-      this.progressService.finishSteps(1 + STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE);
+      this.progressService.finishSteps(STEPS_SKIPPED_WITHOUT_PERMISSIONS_CHANGE);
     }
 
+    // Move before applying the permissions: a failed move then leaves no re-encrypted secret behind.
     await this.move(folder, destinationFolderId);
 
     try {
@@ -162,8 +154,7 @@ class MoveOneFolderService {
         await this.shareFolders(foldersPermissionsChanges);
       }
     } catch (error) {
-      // The folder has already moved on the server, so refresh local storage even though the
-      // permissions failed. A failed refresh is only logged: it must not hide the original error.
+      // The folder already moved, so refresh the local storage; a failed refresh must not hide the original error.
       try {
         await this.findAndUpdateFoldersLocalStorage.findAndUpdateAll();
       } catch (flushError) {

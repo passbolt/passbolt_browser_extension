@@ -247,8 +247,7 @@ class MoveResourcesService {
         movedResourceIds.push(resource.id);
       }
     } catch (error) {
-      // The batch failed part way through, so refresh the resources that did move, or they keep
-      // showing in the folder they left. A failed refresh is only logged: it must not hide the error.
+      // Part of the batch already moved, so refresh it; a failed refresh must not hide the original error.
       if (movedResourceIds.length) {
         try {
           await this.resourceUpdateLocalStorageService.updateFolderParentId(movedResourceIds, destinationFolderId);

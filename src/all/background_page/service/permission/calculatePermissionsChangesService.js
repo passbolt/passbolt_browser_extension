@@ -153,17 +153,19 @@ class CalculatePermissionsChangesService {
     if (!entity.permissions) {
       throw new TypeError("CalculatePermissionsChangesService requires permissions to be set.");
     }
-    const expectedPermissions = targetPermissions.cloneForAco(aco, entity.id, false);
     // assertAtLeastOneOwner passes on an empty set, which would delete every permission.
-    if (!expectedPermissions.length) {
+    if (!targetPermissions.length) {
       throw new Error(`The confirmed permissions would leave ${entity.id} without any permission.`);
     }
     try {
-      expectedPermissions.assertAtLeastOneOwner();
+      targetPermissions.assertAtLeastOneOwner();
     } catch {
       throw new Error(`The confirmed permissions would leave ${entity.id} without owner.`);
     }
-    return PermissionChangesCollection.calculateChanges(entity.permissions, expectedPermissions);
+    return PermissionChangesCollection.calculateChanges(
+      entity.permissions,
+      targetPermissions.cloneForAco(aco, entity.id, false),
+    );
   }
 }
 

@@ -50,8 +50,7 @@ class MoveResourcesService {
 
   /**
    * Move the given resources into the given destination folder, applying the permissions the
-   * operator confirmed to the ones they own.
-   * A resource without an entry just moves and keeps the permissions it has.
+   * operator confirmed to the ones they own. A resource without an entry keeps its permissions.
    *
    * @param {array<string>} resourcesIds
    * @param {string|null} destinationFolderId
@@ -171,10 +170,8 @@ class MoveResourcesService {
   }
 
   /**
-   * Filter out the resources that already sit in the destination folder. Moving an item into the
-   * folder it is already in does nothing, so it is skipped without error (a debug log only) and,
-   * because it does not move, its permissions are left untouched: the filtering happens before the
-   * changes are calculated so no confirmed target is ever applied to it.
+   * Filter out the resources that already sit in the destination folder. They are skipped without
+   * error, and filtered out before the changes are calculated so their permissions stay untouched.
    * @param {ResourcesCollection} resources
    * @param {string|null} destinationFolderId
    * @returns {void}
@@ -191,10 +188,8 @@ class MoveResourcesService {
   }
 
   /**
-   * Build the permission changes to apply from what the operator confirmed.
-   * Only the resources the operator owns can change, the others just move.
-   * Each owned resource is set to exactly what was confirmed for it, so lowering or removing a
-   * permission takes effect.
+   * The permission changes to apply from what the operator confirmed. Only the owned resources can
+   * change, each set to exactly what was confirmed for it, lowerings and removals included.
    * @param {ResourcesCollection} resources
    * @param {Map<string, PermissionsCollection>} confirmedPermissions The permissions the operator confirmed, keyed by resource id. May be empty.
    * @returns {PermissionChangesCollection}
@@ -229,8 +224,8 @@ class MoveResourcesService {
   }
 
   /**
-   * Move the resources into the target destination foler. The resources that will not move have
-   * already been filtered out by the caller, so `resources` and the calculated changes stay aligned.
+   * Move the resources into the target destination folder. The caller has already filtered out the
+   * ones that will not move, so `resources` and the calculated changes stay aligned.
    * @param {ResourcesCollection} resources The resources to move
    * @param {string} destinationFolderId The target destination folder id
    * @returns {Promise<void>}
@@ -252,9 +247,8 @@ class MoveResourcesService {
         movedResourceIds.push(resource.id);
       }
     } catch (error) {
-      // The batch failed part way through, so refresh the resources that did move. Without this they
-      // would keep showing in the folder they left.
-      // A failure to refresh must not hide the original error, so it is only logged.
+      // The batch failed part way through, so refresh the resources that did move, or they keep
+      // showing in the folder they left. A failed refresh is only logged: it must not hide the error.
       if (movedResourceIds.length) {
         try {
           await this.resourceUpdateLocalStorageService.updateFolderParentId(movedResourceIds, destinationFolderId);

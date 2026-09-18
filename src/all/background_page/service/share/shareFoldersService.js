@@ -67,8 +67,7 @@ class ShareFoldersService {
     assertString(passphrase, 'The parameter "passphrase" should be a string');
 
     const folders = await this.getOrFindFoldersService.getOrFindAll();
-    // Each branch stops at the first folder the operator does not own. The permissions of what it
-    // holds cannot be changed either.
+    // Each branch stops at the first folder the operator does not own, including what it holds.
     const foldersDescendant = folders.getOwnedDescendantsStoppingAtNotOwned(folderId);
     const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(folderId, foldersDescendant);
     const resourcesToShareWithPermissions = await this.findResourcesToShareWithPermissions(folderId, foldersDescendant);
@@ -134,10 +133,8 @@ class ShareFoldersService {
   }
 
   /**
-   * Calculate the folder permission changes.
-   * Each folder below receives the change the operator made on the shared folder.
-   * A folder the change would leave with no permission at all, or with nobody as owner, keeps what
-   * it has. Only that one is left out, the rest of the cascade is applied.
+   * The changes to apply to the folders below: each receives the change made on the shared folder.
+   * One left with no permission or no owner is skipped, the rest of the cascade still applies.
    * @param {string} folderTargetId The folder originally target of the share.
    * @param {PermissionChangesCollection} permissionsChanges The permission changes
    * @param {FoldersCollection} foldersToShare The folders to share, with their permissions.
@@ -166,10 +163,8 @@ class ShareFoldersService {
   }
 
   /**
-   * Calculate the resource permission changes.
-   * Each resource below receives the change the operator made on the shared folder.
-   * A resource the change would leave with no permission at all, or with nobody as owner, keeps what
-   * it has. Only that one is left out, the rest of the cascade is applied.
+   * The changes to apply to the resources below: each receives the change made on the shared
+   * folder. One left with no permission or no owner is skipped, the rest of the cascade applies.
    * @param {PermissionChangesCollection} permissionsChanges The permission changes
    * @param {ResourcesCollection} resourcesToShare The resources to share, with their permissions.
    * @return {PermissionChangesCollection}

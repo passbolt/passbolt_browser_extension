@@ -157,11 +157,8 @@ class FoldersCollection extends EntityV2Collection {
   }
 
   /**
-   * Find the folders nested under the given one that the operator owns.
-   * Each branch stops at the first folder the operator does not own.
-   * That folder is left out, and so is everything below it, owned or not: the operator cannot change
-   * its permissions, so it cannot change the permissions of anything it holds either.
-   *
+   * The folders nested under the given one that the operator owns, each branch stopping at the
+   * first folder they do not own. That folder is left out, and so is everything below it.
    * @param {string} parentId
    * @returns {FoldersCollection}
    */
@@ -172,9 +169,8 @@ class FoldersCollection extends EntityV2Collection {
   }
 
   /**
-   * Collect the folders nested under the given one, keeping only the children the predicate accepts.
-   * A rejected child is left out and is not descended into, so its branch stops there.
-   *
+   * Collect the folders nested under the given one, keeping only the children the predicate
+   * accepts. A rejected child is left out and not descended into, so its branch stops there.
    * @param {string} parentId
    * @param {FoldersCollection} inputCollection
    * @param {FoldersCollection} outputCollection carried forward

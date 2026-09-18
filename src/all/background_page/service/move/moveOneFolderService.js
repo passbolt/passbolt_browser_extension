@@ -64,8 +64,7 @@ class MoveOneFolderService {
 
   /**
    * Move one folder and apply the permissions the operator confirmed, to the folder and to what it
-   * contains. Without an entry for the folder, it just moves and keeps the permissions it has.
-   * The styleguide move flow decides what those permissions are.
+   * contains. Without an entry for the folder, it moves and keeps the permissions it has.
    * @param {string} folderId The folder id to move.
    * @param {string|null} destinationFolderId The destination folder or null for the root folder.
    * @param {Map<string, PermissionsCollection>} confirmedPermissions The permissions the operator confirmed, keyed by item id. May be empty.
@@ -103,20 +102,18 @@ class MoveOneFolderService {
     // Checked before looking any permission up, so a refused move fetches nothing.
     this.assertFolderCanBeMoved(folder, destinationFolder, parentFolder);
 
-    // The operator only reviews the moved folder itself. What they confirm there becomes the folder's
-    // new access list, and the change it represents is what gets copied onto the content.
+    // Only the moved folder has confirmed permissions. Its content is handled further down.
+    // Null means there are none, so the folder simply moves.
     const folderTargetPermissions = confirmedPermissions.get(folderId) ?? null;
 
-    // Work out the folder's own change first, against the permissions it has right now.
-    // An impossible result, an access list with nobody as owner for instance, then throws before
-    // anything has moved. And if the folder's own permissions do not actually change, nothing is
-    // copied onto the content either.
+    // The folder's own change first, so an impossible one throws before anything has moved, and a
+    // folder that does not actually change copies nothing onto its content.
     this.progressService.finishStep(i18n.t("Retrieving folders permissions"), true);
     let movedFolderPermissionChanges = null;
     if (folderTargetPermissions) {
       if (!folder.isOwner()) {
-        // The dialog only offers permissions for a folder the operator owns, so reaching this point
-        // means the two disagree. Refuse rather than apply half of what was confirmed.
+        // The dialog only confirms permissions for a folder the operator owns, so the two disagree if we reach this point.
+        // Refuse rather than apply half of what was confirmed.
         throw new Error(
           i18n.t("Folder {{name}} must be owned to apply the confirmed permissions.", { name: folder.name }),
         );
@@ -128,13 +125,13 @@ class MoveOneFolderService {
       );
     }
 
-    // Move first, change the permissions after, like the resource path does.
-    // A failed move then leaves nothing behind: no re-encrypted secrets, no folder stuck at its source.
+    // Move first and change the permissions after, like the resource path: a failed move then
+    // leaves no re-encrypted secret behind.
     let foldersPermissionsChanges = null;
     let resourcesPermissionsChanges = null;
     if (movedFolderPermissionChanges?.length) {
-      // What the change reaches, resolved only now that there is a change to copy. The owned folders
-      // below, each branch stopping at the first one the operator does not own, then their resources.
+      // What the change reaches: the owned folders below, each branch stopping at the first one the
+      // operator does not own, then their resources.
       const allFolders = await this.getOrFindFoldersService.getOrFindAll();
       const ownedDescendantFolders = allFolders.getOwnedDescendantsStoppingAtNotOwned(folderId);
       const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(ownedDescendantFolders);
@@ -142,15 +139,11 @@ class MoveOneFolderService {
         folderId,
         ownedDescendantFolders,
       );
-      /*
-       * The moved folder takes what the operator confirmed, as it is. It is merged in first because
-       * the changes are saved folder by folder, in this order. A failure part way through then never
-       * leaves the content carrying a change the folder itself never got.
-       */
+      // The moved folder is merged in first because the changes are saved in that order: a failure
+      // part way through never leaves the content ahead of the folder itself.
       foldersPermissionsChanges = new PermissionChangesCollection([]);
       foldersPermissionsChanges.merge(movedFolderPermissionChanges);
-      // Only the folder's change is copied down, never its whole access list. A permission the folder
-      // merely kept, unedited, must not reach an item below that never had it.
+      // Only the folder's change is copied down, never its whole access list.
       foldersPermissionsChanges.merge(
         this.calculateFoldersPermissionChanges(foldersToShareWithPermissions.items, movedFolderPermissionChanges),
       );
@@ -171,11 +164,8 @@ class MoveOneFolderService {
         await this.shareFolders(foldersPermissionsChanges);
       }
     } catch (error) {
-      /*
-       * The folder has already moved on the server, so refresh local storage for the UI to show it,
-       * even though the permissions failed to apply. A failure to refresh must not hide the original
-       * error, so it is only logged.
-       */
+      // The folder has already moved on the server, so refresh local storage even though the
+      // permissions failed. A failed refresh is only logged: it must not hide the original error.
       try {
         await this.findAndUpdateFoldersLocalStorage.findAndUpdateAll();
       } catch (flushError) {
@@ -190,8 +180,8 @@ class MoveOneFolderService {
   }
 
   /**
-   * Retrieve, with their permissions, the owned folders nested under the moved one.
-   * The moved folder is not part of them, the caller fetches its permissions itself.
+   * Retrieve, with their permissions, the owned folders nested under the moved one, which is not
+   * included.
    * @param {FoldersCollection} ownedDescendantFolders The owned folders below, each branch stopping
    *   at the first folder the operator does not own.
    * @returns {Promise<FoldersCollection>}
@@ -206,10 +196,8 @@ class MoveOneFolderService {
   }
 
   /**
-   * Retrieve the resources to share with their permissions.
-   * A resource is concerned when the operator owns it and it sits in the moved folder or in one of
-   * the owned folders below. A resource under a folder the operator does not own is left alone, even
-   * when the operator owns the resource itself: the branch already stopped there.
+   * Retrieve the resources to share with their permissions: the owned ones sitting in the moved
+   * folder or in an owned folder below, the branches stopping at the first not-owned folder.
    * @param {string} folderId The folder id to share
    * @param {FoldersCollection} ownedDescendantFolders The owned folders below, each branch stopping
    *   at the first folder the operator does not own.
@@ -259,12 +247,8 @@ class MoveOneFolderService {
   }
 
   /**
-   * Calculate the folder permission changes to apply.
-   * The caller already computed the moved folder's own change. Each owned folder below receives the
-   * same change, and keeps everything else it holds. A folder the change would leave with no
-   * permission at all, or with nobody as owner, keeps what it has. Only that one is left out.
-   * The moved folder is not handled here, the caller merges its own change in.
-   *
+   * The changes to apply to the folders below: each receives the moved folder's change and keeps
+   * everything else it holds. One left with no permission or no owner is skipped.
    * @param {Array<FolderEntity>} foldersToShare The owned folders below, with their permissions.
    * @param {PermissionChangesCollection} movedFolderPermissionChanges The change made on the moved folder.
    * @return {PermissionChangesCollection}
@@ -284,11 +268,8 @@ class MoveOneFolderService {
   }
 
   /**
-   * Calculate the resource permission changes to apply.
-   * Each owned resource below receives the moved folder's change, and keeps everything else it holds.
-   * A resource the change would leave with no permission at all, or with nobody as owner, keeps what
-   * it has. Only that one is left out.
-   *
+   * The changes to apply to the resources below: each receives the moved folder's change and keeps
+   * everything else it holds. One left with no permission or no owner is skipped.
    * @param {ResourcesCollection} resourcesToShare The resources that could be shared.
    * @param {PermissionChangesCollection} movedFolderPermissionChanges The change made on the moved folder.
    * @returns {PermissionChangesCollection}

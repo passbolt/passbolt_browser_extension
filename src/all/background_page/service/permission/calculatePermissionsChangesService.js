@@ -17,12 +17,15 @@ import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permi
 import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/permission/permissionsCollection";
 import i18n from "../../sdk/i18n";
 
+/**
+ * Calculates the permission changes a move or a share applies.
+ * Two families of methods: the `WithTargetPermissions` ones set an item to exactly the permissions
+ * the operator confirmed, the `WithCascadedChange` ones copy a folder's own change onto its content.
+ */
 class CalculatePermissionsChangesService {
   /**
-   * Calculate the changes that give the resource exactly the permissions the operator confirmed.
-   * Lowering or removing a permission takes effect as shown.
-   * The styleguide move flow already built that set, so there is nothing left to merge here.
-   *
+   * The changes giving the resource exactly the permissions the operator confirmed, lowerings and
+   * removals included.
    * @param {ResourceEntity} resource The resource being moved.
    * @param {PermissionsCollection} targetPermissions The permissions the operator confirmed.
    * @returns {PermissionChangesCollection}
@@ -36,11 +39,8 @@ class CalculatePermissionsChangesService {
   }
 
   /**
-   * Calculate the changes that give the folder exactly the permissions the operator confirmed.
-   * Lowering or removing a permission takes effect as shown.
-   * Only the folder itself is handled here. What it contains is handled by MoveOneFolderService,
-   * through forFolderWithCascadedChange below.
-   *
+   * The changes giving the folder exactly the permissions the operator confirmed, lowerings and
+   * removals included. Only the folder itself; its content goes through forFolderWithCascadedChange.
    * @param {FolderEntity} folder The folder being moved.
    * @param {PermissionsCollection} targetPermissions The permissions the operator confirmed.
    * @returns {PermissionChangesCollection}
@@ -54,16 +54,8 @@ class CalculatePermissionsChangesService {
   }
 
   /**
-   * Copy the change made on a folder onto one item the folder contains.
-   * Someone the change added, raised, lowered or removed on the folder gets the same treatment here.
-   * Everybody else keeps what the item already gives them.
-   *
-   * Only what the operator actually changed is copied down, never the folder's whole access list.
-   * A permission the folder merely kept, unedited, must not reach an item that never had it.
-   * An item the copy would leave unmanageable is left alone, see _calculateCascaded.
-   *
-   * Used by the move flow and by the share flow alike.
-   *
+   * Copy the change made on a folder onto one item it contains: whoever it added, raised, lowered or
+   * removed gets the same treatment, everybody else keeps what the item already gives them.
    * @param {FolderEntity} folderEntity
    * @param {PermissionChangesCollection} folderPermissionChanges The change made on the folder.
    * @returns {PermissionChangesCollection}
@@ -91,11 +83,8 @@ class CalculatePermissionsChangesService {
   }
 
   /**
-   * Shared by forFolderWithCascadedChange and forResourceWithCascadedChange.
-   * Builds the access list the item ends up with, checks it, then derives the changes.
-   * An item left with no permission at all, or with nobody as owner, keeps what it has and gets no
-   * change at all. The rest of the cascade still goes through.
-   *
+   * Build the access list the item ends up with, then derive the changes. An item the copy would
+   * leave with no permission or no owner keeps what it has, and the rest of the cascade goes on.
    * @param {FolderEntity|ResourceEntity} entity The item the change is copied onto.
    * @param {PermissionChangesCollection} folderPermissionChanges The change made on the folder.
    * @param {string} aco One of `PermissionEntity.ACO_FOLDER` or `PermissionEntity.ACO_RESOURCE`.
@@ -115,8 +104,8 @@ class CalculatePermissionsChangesService {
         // Untouched on the folder, so left as it is here.
         resultingPermissions.push(permission);
       } else if (change.scenario !== PermissionChangeEntity.PERMISSION_CHANGE_DELETE) {
-        // Touched on the folder, so set to the level the folder now gives them.
-        // A removal skips both branches, which leaves the permission out of the resulting list.
+        // Touched on the folder: set to the level it now gives. A removal skips both branches,
+        // which drops the permission from the resulting list.
         const alignedPermission = new PermissionEntity(permission.toDto());
         alignedPermission.type = change.type;
         resultingPermissions.push(alignedPermission);
@@ -124,7 +113,6 @@ class CalculatePermissionsChangesService {
     }
     for (const change of folderPermissionChanges) {
       // Only a brand new grant reaches someone the item did not have.
-      // A level change only moves the people already on it.
       if (
         change.scenario === PermissionChangeEntity.PERMISSION_CHANGE_CREATE &&
         !entity.permissions.getByAro(change.aro, change.aroForeignKey)
@@ -141,14 +129,11 @@ class CalculatePermissionsChangesService {
       }
     }
     /*
-     * An item the alignment would leave unmanageable, with nothing on it or with nobody as owner,
-     * is left alone instead of blocking the whole operation. The empty case is tested separately
-     * because assertAtLeastOneOwner passes on an empty collection.
+     * An item left unmanageable, with nothing on it or with nobody as owner, is left alone rather
+     * than blocking the operation. Empty is checked separately, assertAtLeastOneOwner passes on it.
      *
-     * @todo Interim behaviour, to be reworked. The operator is told nothing: the operation reports
-     * success while that item silently kept its former access list. Telling them means computing
-     * the cascade before the dialog is confirmed, so the dialog can list the items a row was not
-     * applied to, the way it already does for the items the operator does not own.
+     * @todo Interim behaviour: the operation reports success while that item silently kept its
+     * former access list. Telling the operator means computing the cascade before the confirmation.
      */
     if (!resultingPermissions.length || !resultingPermissions.items.some((permission) => permission.isOwner())) {
       return new PermissionChangesCollection([]);
@@ -157,13 +142,8 @@ class CalculatePermissionsChangesService {
   }
 
   /**
-   * Shared by forResourceWithTargetPermissions and forFolderWithTargetPermissions.
-   * The confirmed set is the complete access list the item must end up with.
-   * Nothing is dropped as inherited and nothing is kept because it was higher, so a lowering or a
-   * removal the operator asked for goes through.
-   * The set must still leave somebody as owner. That is checked first, so a malformed one coming
-   * over the wire can never strip the last owner.
-   *
+   * The confirmed set is the complete access list the item must end up with, so a lowering or a
+   * removal goes through. It must leave somebody as owner, checked before any change is derived.
    * @param {FolderEntity|ResourceEntity} entity The folder or resource being moved.
    * @param {PermissionsCollection} targetPermissions The permissions the operator confirmed.
    * @param {string} aco One of `PermissionEntity.ACO_FOLDER` or `PermissionEntity.ACO_RESOURCE`.
@@ -175,8 +155,7 @@ class CalculatePermissionsChangesService {
       throw new TypeError("CalculatePermissionsChangesService requires permissions to be set.");
     }
     const expectedPermissions = targetPermissions.cloneForAco(aco, entity.id, false);
-    // assertAtLeastOneOwner passes on an empty collection, so check for empty separately.
-    // Without it, an empty set would delete every permission, the operator's own included.
+    // assertAtLeastOneOwner passes on an empty set, which would delete every permission.
     const name = CalculatePermissionsChangesService._entityName(entity, aco);
     if (!expectedPermissions.length) {
       throw new Error(i18n.t("The confirmed permissions would leave {{name}} without any permission.", { name }));

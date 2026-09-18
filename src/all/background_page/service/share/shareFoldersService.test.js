@@ -353,12 +353,8 @@ describe("ShareResourceService", () => {
           aro_foreign_key: pgpKeys.admin.userId,
         }),
       });
-      /*
-       * The operator owns the first sub folder through the group, and that group is its only owner.
-       * Lowering the group there too would leave it with nobody as owner, so it keeps what it has.
-       * The branch does not stop there: the folder below it still gets the change, because somebody
-       * else remains owner.
-       */
+      // The group is the only owner of the first sub folder, so lowering it there would leave nobody
+      // as owner and it keeps what it has. The branch goes on: the folder below still gets the change.
       const subFolderSkippedDto = defaultFolderDto({
         id: subFolderIdSkipped,
         folder_parent_id: folderIdToShare,

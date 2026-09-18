@@ -40,9 +40,8 @@ describe("CalculatePermissionsChangesService", () => {
   const extra = uuidv4();
 
   /*
-   * Copying a folder's change onto what it contains.
-   * Only the change is copied, never the folder's whole access list. A permission the folder merely
-   * kept, unedited, must not reach an item that never had it.
+   * Copying a folder's change onto what it contains: only the change, never its whole access list,
+   * so a permission the folder merely kept does not reach an item that never had it.
    */
   describe("::forFolderWithCascadedChange / ::forResourceWithCascadedChange", () => {
     const folderId = uuidv4();
@@ -259,9 +258,8 @@ describe("CalculatePermissionsChangesService", () => {
   });
 
   /*
-   * Applying what the operator confirmed.
-   * It is the complete access list the item must end up with, so lowering or removing a permission
-   * takes effect. Nothing is kept back because it was higher.
+   * Applying what the operator confirmed: the complete access list the item must end up with, so
+   * lowering or removing a permission takes effect.
    */
   describe("::forResourceWithTargetPermissions / ::forFolderWithTargetPermissions", () => {
     const operator = uuidv4();
@@ -369,13 +367,4 @@ describe("CalculatePermissionsChangesService", () => {
       expect(adaChange.aco).toBe(PermissionEntity.ACO_FOLDER);
     });
   });
-
-  /*
-   * The moved item and what it contains are calculated separately, on purpose.
-   * The item's own set comes from PermissionsCollection.calculateMovedPermissions, which never lets
-   * the destination lower a permission granted on the item itself. The preview the operator saw and
-   * what the service worker applies therefore agree.
-   * What it contains works the other way: each item is set to the level the folder now gives.
-   * Both are covered above.
-   */
 });

@@ -44,9 +44,8 @@ beforeEach(() => {
 });
 
 /**
- * Wire the services `moveOne` depends on.
- * The folder tree comes from local storage, so the real ownership resolution runs.
- * The share, move and storage calls are mocked.
+ * Wire the services `moveOne` depends on: the folder tree comes from local storage, so the real
+ * ownership resolution runs, while the share, move and storage calls are mocked.
  * @param {MoveOneFolderService} service
  * @param {Array<object>} foldersDto The folders to seed local storage and answer the find services with.
  * @param {Array<object>} resourcesDto The resources to seed local storage and answer the find services with.
@@ -713,9 +712,8 @@ describe("MoveOneFolderService", () => {
       await service.moveOne(folderToMoveDto.id, destinationFolderId, confirmedPermissions, pgpKeys.admin.passphrase);
 
       const folderChanges = service.shareFolderService.saveFoldersPermissionsChanges.mock.calls[0][0];
-      // Both the moved folder and the folder below gain the extra reader, the moved folder first.
-      // The changes are saved in this order, so a failure part way through never leaves the folder
-      // below carrying a change its own folder never got.
+      // Both the moved folder and the one below gain the extra reader, the moved folder first: a
+      // failure part way through never leaves the folder below ahead of its parent.
       expect(folderChanges.items).toHaveLength(2);
       expect(folderChanges.items[0].acoForeignKey).toStrictEqual(folderToMoveDto.id);
       expect(folderChanges.items[1].acoForeignKey).toStrictEqual(subFolderDto.id);

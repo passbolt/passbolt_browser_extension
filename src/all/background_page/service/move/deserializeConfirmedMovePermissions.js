@@ -15,11 +15,10 @@ import PermissionsCollection from "passbolt-styleguide/src/shared/models/entity/
 
 /**
  * Turn the permissions the operator confirmed into a Map of item id to PermissionsCollection.
- * They stay grouped per item, so somebody granted on one moved item does not spread to the others.
  * An empty Map means nothing was confirmed, and the items move with the permissions they have.
  * @param {Object<string, Array<object>>|null|undefined} permissionsDtoByItemId Permission DTOs, keyed by item id.
- * @param {Array<string>} allowedItemIds The ids of the items actually being moved. An entry keyed by
- *   anything else is rejected, so a malformed or tampered payload cannot reach an item outside the move.
+ * @param {Array<string>} allowedItemIds The ids of the items actually being moved, so a tampered
+ *   payload cannot reach an item outside the move.
  * @returns {Map<string, PermissionsCollection>}
  * @throws {Error} If an entry references an item id absent from `allowedItemIds`.
  */

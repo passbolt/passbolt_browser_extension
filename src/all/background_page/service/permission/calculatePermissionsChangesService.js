@@ -95,20 +95,18 @@ class CalculatePermissionsChangesService {
     if (!entity.permissions) {
       throw new TypeError("CalculatePermissionsChangesService requires permissions to be set.");
     }
-    const resultingPermissions = new PermissionsCollection([], { assertAtLeastOneOwner: false });
+    const resultingPermissionDtos = [];
     for (const permission of entity.permissions) {
       const change = folderPermissionChanges.items.find(
         (item) => item.aro === permission.aro && item.aroForeignKey === permission.aroForeignKey,
       );
       if (!change) {
         // Untouched on the folder, so left as it is here.
-        resultingPermissions.push(permission);
+        resultingPermissionDtos.push(permission.toDto());
       } else if (change.scenario !== PermissionChangeEntity.PERMISSION_CHANGE_DELETE) {
         // Touched on the folder: set to the level it now gives. A removal skips both branches,
         // which drops the permission from the resulting list.
-        const alignedPermission = new PermissionEntity(permission.toDto());
-        alignedPermission.type = change.type;
-        resultingPermissions.push(alignedPermission);
+        resultingPermissionDtos.push({ ...permission.toDto(), type: change.type });
       }
     }
     for (const change of folderPermissionChanges) {
@@ -117,28 +115,30 @@ class CalculatePermissionsChangesService {
         change.scenario === PermissionChangeEntity.PERMISSION_CHANGE_CREATE &&
         !entity.permissions.getByAro(change.aro, change.aroForeignKey)
       ) {
-        resultingPermissions.push(
-          new PermissionEntity({
-            aco: aco,
-            aco_foreign_key: entity.id,
-            aro: change.aro,
-            aro_foreign_key: change.aroForeignKey,
-            type: change.type,
-          }),
-        );
+        resultingPermissionDtos.push({
+          aco: aco,
+          aco_foreign_key: entity.id,
+          aro: change.aro,
+          aro_foreign_key: change.aroForeignKey,
+          type: change.type,
+        });
       }
     }
     /*
      * An item left unmanageable, with nothing on it or with nobody as owner, is left alone rather
-     * than blocking the operation. Empty is checked separately, assertAtLeastOneOwner passes on it.
+     * than blocking the operation.
      *
      * @todo Interim behaviour: the operation reports success while that item silently kept its
      * former access list. Telling the operator means computing the cascade before the confirmation.
      */
-    if (!resultingPermissions.length || !resultingPermissions.items.some((permission) => permission.isOwner())) {
+    if (!resultingPermissionDtos.some((dto) => dto.type === PermissionEntity.PERMISSION_OWNER)) {
       return new PermissionChangesCollection([]);
     }
-    return PermissionChangesCollection.calculateChanges(entity.permissions, resultingPermissions);
+    // The collection is built once complete, so it is validated as a whole, one owner included.
+    return PermissionChangesCollection.calculateChanges(
+      entity.permissions,
+      new PermissionsCollection(resultingPermissionDtos),
+    );
   }
 
   /**

@@ -46,7 +46,7 @@ describe("CalculatePermissionsChangesService", () => {
   describe("::forFolderWithCascadedChange / ::forResourceWithCascadedChange", () => {
     const folderId = uuidv4();
 
-    it("grants the recipient on a descendant that never held them when the ancestor's edit added them", () => {
+    it("adds to the item a user who was added on the folder", () => {
       expect.assertions(3);
       const resource = buildResource([ownerPermissionDto({ aro_foreign_key: owner })]);
       const folderChanges = new PermissionChangesCollection([
@@ -65,7 +65,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.items[0].acoForeignKey).toBe(resource.id);
     });
 
-    it("keeps a descendant's own grant when the ancestor's edit doesn't touch that recipient", () => {
+    it("changes nothing on the item when nothing changed on the folder", () => {
       expect.assertions(1);
       const folder = buildFolder([
         ownerFolderPermissionDto({ aro_foreign_key: owner }),
@@ -78,7 +78,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.length).toBe(0);
     });
 
-    it("releases a descendant's matching grant when the ancestor's edit removed it", () => {
+    it("removes from the item a user who was removed from the folder", () => {
       expect.assertions(3);
       const folder = buildFolder([
         ownerFolderPermissionDto({ aro_foreign_key: owner }),
@@ -101,7 +101,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.length).toBe(1);
     });
 
-    it("produces nothing for a released recipient the descendant never held", () => {
+    it("ignores the removal of a user the item never had", () => {
       expect.assertions(1);
       const folder = buildFolder([ownerFolderPermissionDto({ aro_foreign_key: owner })]);
       const folderChanges = new PermissionChangesCollection([
@@ -118,7 +118,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.length).toBe(0);
     });
 
-    it("releases a descendant's grant above the level the ancestor's edit removed", () => {
+    it("removes the user from the item even when the item gave them more than the folder did", () => {
       expect.assertions(2);
       const folder = buildFolder([
         ownerFolderPermissionDto({ aro_foreign_key: owner }),
@@ -139,7 +139,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.items.find((change) => change.aroForeignKey === extra)?.scenario).toBe("delete");
     });
 
-    it("raises a descendant's grant below the level the ancestor's edit added", () => {
+    it("raises a user the item already had to the higher level the folder now gives them", () => {
       expect.assertions(2);
       const folder = buildFolder([
         ownerFolderPermissionDto({ aro_foreign_key: owner }),
@@ -160,7 +160,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.items[0].type).toBe(PermissionEntity.PERMISSION_UPDATE);
     });
 
-    it("lowers a descendant's grant above the level the ancestor's edit modified", () => {
+    it("lowers a user the item already had to the lower level the folder now gives them", () => {
       expect.assertions(3);
       const folder = buildFolder([
         ownerFolderPermissionDto({ aro_foreign_key: owner }),
@@ -183,7 +183,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.items[0].id).toBe(folder.permissions.items[1].id);
     });
 
-    it("emits nothing when the aligned level equals what the descendant already holds", () => {
+    it("changes nothing when the item already gives the user the level the folder now gives them", () => {
       expect.assertions(1);
       const folder = buildFolder([
         ownerFolderPermissionDto({ aro_foreign_key: owner }),
@@ -203,7 +203,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.length).toBe(0);
     });
 
-    it("leaves a descendant without the recipient untouched when the ancestor's edit only changed their level", () => {
+    it("does not add a user to the item when the folder only changed their level", () => {
       expect.assertions(1);
       const folder = buildFolder([ownerFolderPermissionDto({ aro_foreign_key: owner })]);
       const folderChanges = new PermissionChangesCollection([
@@ -220,7 +220,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.length).toBe(0);
     });
 
-    it("leaves a descendant the cascade would empty untouched", () => {
+    it("leaves the item alone rather than removing its last permission", () => {
       expect.assertions(1);
       const group = uuidv4();
       const resource = buildResource([ownerPermissionDto({ aro_foreign_key: group })]);
@@ -238,7 +238,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.length).toBe(0);
     });
 
-    it("leaves a descendant the cascade would strip of its last owner untouched", () => {
+    it("leaves the item alone rather than leaving it without an owner", () => {
       expect.assertions(1);
       const group = uuidv4();
       const resource = buildResource([ownerPermissionDto({ aro_foreign_key: group })]);
@@ -265,7 +265,7 @@ describe("CalculatePermissionsChangesService", () => {
     const operator = uuidv4();
     const ada = uuidv4();
 
-    it("emits an UPDATE change when the target downgrades a recipient", () => {
+    it("emits an update change when the confirmed permissions lower a user", () => {
       expect.assertions(2);
       const resource = buildResource([
         ownerPermissionDto({ aro_foreign_key: operator }),
@@ -283,7 +283,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(adaChange.type).toBe(PermissionEntity.PERMISSION_UPDATE);
     });
 
-    it("emits a DELETE change when a recipient is removed from the target", () => {
+    it("emits a delete change when the confirmed permissions drop a user", () => {
       expect.assertions(2);
       const resource = buildResource([
         ownerPermissionDto({ aro_foreign_key: operator }),
@@ -297,7 +297,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.items.find((change) => change.aroForeignKey === ada).scenario).toBe("delete");
     });
 
-    it("emits an UPDATE change when the target upgrades a recipient", () => {
+    it("emits an update change when the confirmed permissions raise a user", () => {
       expect.assertions(2);
       const resource = buildResource([
         ownerPermissionDto({ aro_foreign_key: operator }),
@@ -315,7 +315,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(adaChange.type).toBe(PermissionEntity.PERMISSION_OWNER);
     });
 
-    it("emits no change when the target matches the resource", () => {
+    it("emits no change when the confirmed permissions match what the resource already has", () => {
       expect.assertions(1);
       const resource = buildResource([
         ownerPermissionDto({ aro_foreign_key: operator }),
@@ -331,7 +331,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(changes.length).toBe(0);
     });
 
-    it("throws when the target has no owner", () => {
+    it("throws when the confirmed permissions leave nobody as owner", () => {
       expect.assertions(1);
       const resource = buildResource([ownerPermissionDto({ aro_foreign_key: operator })]);
       const target = new PermissionsCollection([readPermissionDto({ aro_foreign_key: ada })], {
@@ -341,7 +341,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(() => CalculatePermissionsChangesService.forResourceWithTargetPermissions(resource, target)).toThrow();
     });
 
-    it("throws when the target is empty (would otherwise delete every permission)", () => {
+    it("throws when the confirmed permissions are empty, which would delete every permission", () => {
       expect.assertions(1);
       const resource = buildResource([ownerPermissionDto({ aro_foreign_key: operator })]);
       const target = new PermissionsCollection([], { assertAtLeastOneOwner: false });
@@ -349,7 +349,7 @@ describe("CalculatePermissionsChangesService", () => {
       expect(() => CalculatePermissionsChangesService.forResourceWithTargetPermissions(resource, target)).toThrow();
     });
 
-    it("applies the confirmed permissions to a folder (a lowering emits an ACO_FOLDER UPDATE)", () => {
+    it("applies the confirmed permissions to a folder, lowerings included", () => {
       expect.assertions(2);
       const folder = buildFolder([
         ownerFolderPermissionDto({ aro_foreign_key: operator }),

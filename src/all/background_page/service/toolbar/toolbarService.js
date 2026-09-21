@@ -124,7 +124,6 @@ class ToolbarService {
   /**
    * Handles click on the icon in the toolbar.
    * The event is called by the browser only if no quickaccess popup URL is set (neither from the manifest nor in script).
-   * The popup URL is set only when an account is detected and configured, otherwise this handler opens a tab on the "Getting started page".
    */
   async handleIconToolbarClicked() {
     const user = User.getInstance();
@@ -137,14 +136,13 @@ class ToolbarService {
     // picking the right API between browser.browserAction (MV2 only) and browser.action (MV3 only)
     const browserAction = browser.browserAction ?? browser.action;
 
-    // if the user account is set, sets the popup to the expected URL and open it. The browser wiil not use that callback again until it is restarted.
+    // if the user account is set, sets the QA popup to the expected URL and open it.
     this.setQuickaccessPopup();
     browserAction?.openPopup(); // 'openPopup' is not available in Edge
   }
 
   /**
    * Sets the Quickaccess popup with the default popup URL to open to.
-   * The URL use to be set in the manifest.json but to allo
    */
   setQuickaccessPopup() {
     // picking the right API between browser.browserAction (MV2 only) and browser.action (MV3 only)

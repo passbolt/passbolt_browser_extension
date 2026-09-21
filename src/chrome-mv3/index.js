@@ -88,5 +88,6 @@ browser.windows.onFocusChanged.addListener(ToolbarService.handleSuggestedResourc
 
 /**
  * Handle click on the toolbar icon
+ * This handler is called only when the popup URL of the QA is not defined.
  */
 chrome.action.onClicked.addListener(ToolbarService.handleIconToolbarClicked);

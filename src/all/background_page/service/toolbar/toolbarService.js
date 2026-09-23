@@ -23,6 +23,9 @@ import GetOrFindOfflineResourcesService from "../resource/getOrFindOfflineResour
 
 export const QUICKACCESS_POPUP_URL = "webAccessibleResources/quickaccess.html?passbolt=quickaccess";
 
+// picking the right API between browser.browserAction (MV2 only) and browser.action (MV3 only)
+const browserAction = browser.browserAction ?? browser.action;
+
 class ToolbarService {
   constructor() {
     this.bindCallbacks();
@@ -124,8 +127,6 @@ class ToolbarService {
   /**
    * Handles click on the icon in the toolbar.
    * The event is called by the browser only if no quickaccess popup URL is set (neither from the manifest nor in script).
-   * The popup is set when clicking the first and if an account is configured, otherwise this handler always triggers a tab open.
-   * note: Only used for Safari right now
    */
   async handleIconToolbarClicked() {
     const user = User.getInstance();
@@ -135,9 +136,16 @@ class ToolbarService {
       return;
     }
 
-    // if the user account is set, sets the popup to the expected URL and open it. The browser wiil not use that callback until it is restarted.
-    browser.browserAction.setPopup({ popup: QUICKACCESS_POPUP_URL });
-    browser.browserAction.openPopup();
+    // if the user account is set, sets the QA popup to the expected URL and open it.
+    this.setQuickaccessPopup();
+    browserAction?.openPopup(); // 'openPopup' is not available in Edge
+  }
+
+  /**
+   * Sets the Quickaccess popup with the default popup URL to open to.
+   */
+  setQuickaccessPopup() {
+    browserAction.setPopup({ popup: QUICKACCESS_POPUP_URL });
   }
 
   /**

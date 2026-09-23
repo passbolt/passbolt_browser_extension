@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [5.16.1] - 2026-08-17
+### Fixed
+- PB-53792 - Copy/pasting issues on Safari
 
 ## [5.16.0] - 2026-08-15
 ### Added

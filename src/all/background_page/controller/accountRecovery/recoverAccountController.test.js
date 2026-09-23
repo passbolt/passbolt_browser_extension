@@ -34,6 +34,7 @@ import { anonymousSiteSettings } from "passbolt-styleguide/src/shared/models/ent
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import ToolbarService from "../../service/toolbar/toolbarService";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -74,11 +75,12 @@ describe("RecoverAccountController", () => {
         .spyOn(AccountTemporarySessionStorageService, "get")
         .mockImplementationOnce(() => ({ account: accountRecovery }));
       jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
+      jest.spyOn(ToolbarService, "setQuickaccessPopup").mockImplementation(() => {});
 
       const controller = new RecoverAccountController({ port: { _port: { name: "test" } } }, null, apiClientOptions);
       await controller.exec(passphrase);
 
-      expect.assertions(9);
+      expect.assertions(10);
 
       // The user account should have been configured (legacy).
       const user = User.getInstance().get();
@@ -99,6 +101,8 @@ describe("RecoverAccountController", () => {
       expect(keyringPrivateKeyFingerprint).toStrictEqual(pgpKeys.ada.fingerprint);
       expect(userPublicKeyFingerprint).toStrictEqual(pgpKeys.ada.fingerprint);
       expect(userPublicKeyFingerprint).toStrictEqual(keyringPrivateKeyFingerprint);
+
+      expect(ToolbarService.setQuickaccessPopup).toHaveBeenCalledTimes(1);
     });
 
     describe.each([

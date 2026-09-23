@@ -17,6 +17,7 @@ import SetupModel from "../../model/setup/setupModel";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
+import ToolbarService from "../../service/toolbar/toolbarService";
 
 class CompleteSetupController {
   /**
@@ -57,6 +58,9 @@ class CompleteSetupController {
     const accountSetup = new AccountEntity(temporaryAccount.account.toDto(AccountSetupEntity.ALL_CONTAIN_OPTIONS));
     await this.setupModel.completeSetup(temporaryAccount.account);
     await this.accountModel.add(accountSetup);
+
+    // For Edge to avoid a double click on the QA icon when the account is set
+    ToolbarService.setQuickaccessPopup();
   }
 }
 

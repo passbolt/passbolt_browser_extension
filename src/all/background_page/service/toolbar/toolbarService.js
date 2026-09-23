@@ -23,6 +23,9 @@ import GetOrFindOfflineResourcesService from "../resource/getOrFindOfflineResour
 
 export const QUICKACCESS_POPUP_URL = "webAccessibleResources/quickaccess.html?passbolt=quickaccess";
 
+// picking the right API between browser.browserAction (MV2 only) and browser.action (MV3 only)
+const browserAction = browser.browserAction ?? browser.action;
+
 class ToolbarService {
   constructor() {
     this.bindCallbacks();
@@ -133,9 +136,6 @@ class ToolbarService {
       return;
     }
 
-    // picking the right API between browser.browserAction (MV2 only) and browser.action (MV3 only)
-    const browserAction = browser.browserAction ?? browser.action;
-
     // if the user account is set, sets the QA popup to the expected URL and open it.
     this.setQuickaccessPopup();
     browserAction?.openPopup(); // 'openPopup' is not available in Edge
@@ -145,8 +145,6 @@ class ToolbarService {
    * Sets the Quickaccess popup with the default popup URL to open to.
    */
   setQuickaccessPopup() {
-    // picking the right API between browser.browserAction (MV2 only) and browser.action (MV3 only)
-    const browserAction = browser.browserAction ?? browser.action;
     browserAction.setPopup({ popup: QUICKACCESS_POPUP_URL });
   }
 

@@ -35,16 +35,56 @@ class WebauthnCredentialCreationOptionsEntity extends EntityV2 {
       properties: {
         rp: {
           type: "object",
+          properties: {
+            id: {
+              type: "string",
+              minLength: 1,
+            },
+            name: {
+              type: "string",
+              minLength: 1,
+            },
+          },
         },
         user: {
           type: "object",
+          properties: {
+            id: {
+              type: "string",
+              minLength: 1,
+              // format: "x-base64", // "x-" prefixed format are non JSON Schema standards
+            },
+            name: {
+              type: "string",
+              minLength: 1,
+            },
+            displayName: {
+              type: "string",
+              minLength: 1,
+            },
+          },
         },
         challenge: {
           type: "string",
           minLength: 1,
+          // format: "x-base64",
         },
         pubKeyCredParams: {
           type: "array",
+          minItems: 1,
+          items: {
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                enum: ["public-key"],
+              },
+              alg: {
+                type: "number",
+                enum: ALLOWED_ALGORITHMS,
+              },
+            },
+          },
         },
         timeout: {
           type: "integer",

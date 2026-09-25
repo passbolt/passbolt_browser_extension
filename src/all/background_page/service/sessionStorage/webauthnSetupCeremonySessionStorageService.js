@@ -12,6 +12,7 @@
  * @since         5.17.0
  */
 import WebauthnSetupCeremonyEntity from "../../model/entity/mfa/webauthnSetupCeremonyEntity";
+import { assertType } from "../../utils/assertions";
 
 const WEBAUTHN_SETUP_CEREMONY_KEY = "webauthn-setup-ceremony";
 
@@ -36,9 +37,12 @@ class WebauthnSetupCeremonySessionStorageService {
    * @returns {Promise<void>}
    */
   static async set(ceremony) {
-    if (!(ceremony instanceof WebauthnSetupCeremonyEntity)) {
-      throw new Error("The ceremony is not a WebauthnSetupCeremonyEntity, storage has not been set");
-    }
+    assertType(
+      ceremony,
+      WebauthnSetupCeremonyEntity,
+      "The ceremony is not a WebauthnSetupCeremonyEntity, storage has not been set",
+    );
+
     await navigator.locks.request(WEBAUTHN_SETUP_CEREMONY_KEY, async () => {
       await browser.storage.session.set({ [WEBAUTHN_SETUP_CEREMONY_KEY]: ceremony.toDto() });
     });

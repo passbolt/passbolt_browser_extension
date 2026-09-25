@@ -213,9 +213,8 @@ class ToolbarService {
       this.tabUrl = tabUrl;
 
       if (!this.isUrlPassboltDomain(this.tabUrl, account) && !this.isUrlPassboltExtension(this.tabUrl)) {
-        // Get the suggested resources for the current tab
-        // As we don't know if the page is using OTP or password, we need to check both
-        const resourcesCollection = await this.getOrFindResourcesService.getOrFindSuggested(this.tabUrl);
+        // Count the resources the quick access "Suggested" section would display for the current tab.
+        const resourcesCollection = await this.getOrFindResourcesService.getOrFindSuggestedForQuickAccess(this.tabUrl);
         suggestedResourcesCount = resourcesCollection.length;
       }
 

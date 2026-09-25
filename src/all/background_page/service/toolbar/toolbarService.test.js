@@ -24,8 +24,16 @@ import ResourceTypeLocalStorage from "../local_storage/resourceTypeLocalStorage"
 import User from "../../../../all/background_page/model/user";
 import OpenWebsiteGettingStartedPageService from "../ui/openWebsiteGettingStartedPageService";
 import UserActiveSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
-import { defaultUserActiveSessionDto } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
+import {
+  defaultUserActiveSessionDto,
+  offlineUserActiveSessionDto,
+} from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
 import GetOrFindActiveSessionService from "../activeSession/getOrFindActiveSessionService";
+import {
+  resourceStandaloneCustomFieldsDto,
+  resourceStandaloneNoteDto,
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 
 jest.useFakeTimers();
 
@@ -91,6 +99,40 @@ describe("ToolbarService", () => {
       expect(browserExtensionIconServiceActivateMock).toHaveBeenCalled();
       expect(browserExtensionIconServiceSetCountMock).toHaveBeenCalledWith(4);
     });
+
+    it.each([
+      { session: "online", sessionDto: defaultUserActiveSessionDto() },
+      { session: "offline", sessionDto: offlineUserActiveSessionDto() },
+    ])(
+      "Given the user is $session on a tab matching a note and a custom fields resource, it should count them in the suggested resources.",
+      async ({ sessionDto }) => {
+        expect.assertions(1);
+        const account = new AccountEntity(defaultAccountDto());
+        const matchingNote = resourceStandaloneNoteDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingCustomFields = resourceStandaloneCustomFieldsDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+
+        jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
+        jest.spyOn(browser.tabs, "query").mockImplementation(() => [{ url: "https://www.passbolt.com" }]);
+        jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
+        jest
+          .spyOn(ResourceLocalStorage, "get")
+          .mockImplementation(() => [...defaultResourceDtosCollection(), matchingNote, matchingCustomFields]);
+        jest
+          .spyOn(ResourceTypeLocalStorage.prototype, "getData")
+          .mockImplementation(() => resourceTypesCollectionDto());
+        jest
+          .spyOn(GetOrFindActiveSessionService.prototype, "getOrFind")
+          .mockImplementation(() => new UserActiveSessionEntity(sessionDto));
+
+        await toolbarService.handleUserLoggedIn();
+
+        expect(browserExtensionIconServiceSetCountMock).toHaveBeenCalledWith(6);
+      },
+    );
   });
 
   describe("handleUserLoggedOut", () => {

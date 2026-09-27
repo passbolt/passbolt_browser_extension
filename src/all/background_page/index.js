@@ -12,6 +12,8 @@ import OnExtensionUpdateAvailableService from "./service/extension/onExtensionUp
 import GlobalAlarmService from "./service/alarm/globalAlarmService";
 import OnStartUpService from "./service/extension/onStartUpService";
 import ToolbarService from "./service/toolbar/toolbarService";
+import BasicAuthService from "./service/auth/basicAuthService";
+import BrowserService from "./service/browser/browserService";
 
 const main = async () => {
   /**
@@ -76,3 +78,13 @@ browser.tabs.onActivated.addListener(ToolbarService.handleSuggestedResourcesOnAc
  * Handle suggested resources on toolbar icon
  */
 browser.windows.onFocusChanged.addListener(ToolbarService.handleSuggestedResourcesOnFocusedWindow);
+
+if (BrowserService.isFirefox()) {
+  browser.webRequest.onAuthRequired.addListener(
+    (details) => BasicAuthService.handle(details),
+    { urls: ["<all_urls>"] },
+    ["blocking"],
+  );
+  browser.webRequest.onCompleted.addListener((details) => BasicAuthService.clear(details), { urls: ["<all_urls>"] });
+  browser.webRequest.onErrorOccurred.addListener((details) => BasicAuthService.clear(details), { urls: ["<all_urls>"] });
+}

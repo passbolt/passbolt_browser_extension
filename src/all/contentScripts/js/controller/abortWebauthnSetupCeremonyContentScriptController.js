@@ -12,7 +12,7 @@
  * @since         5.17.0
  */
 import { assertUuid } from "passbolt-styleguide/src/shared/utils/assertions";
-import WebauthnSetupCeremonyService from "../service/webauthnSetupCeremonyService";
+import WebauthnSetupCeremonyContentScriptService from "../service/webauthnSetupCeremonyContentScriptService";
 
 const RESULT_EVENT = "passbolt.app-bootstrap.webauthn-ceremony-result";
 
@@ -53,7 +53,7 @@ class AbortWebauthnSetupCeremonyContentScriptController {
 
     assertUuid(id);
 
-    WebauthnSetupCeremonyService.abort(id);
+    WebauthnSetupCeremonyContentScriptService.abort(id);
   }
 }
 

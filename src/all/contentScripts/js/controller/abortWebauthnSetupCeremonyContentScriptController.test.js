@@ -12,13 +12,13 @@
  * @since         5.17.0
  */
 import AbortWebauthnSetupCeremonyContentScriptController from "./abortWebauthnSetupCeremonyContentScriptController";
-import WebauthnSetupCeremonyService from "../service/webauthnSetupCeremonyService";
+import WebauthnSetupCeremonyContentScriptService from "../service/webauthnSetupCeremonyContentScriptService";
 
 const CEREMONY_ID = "8e3874ae-4b40-590b-968a-418f704b9d9a";
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.spyOn(WebauthnSetupCeremonyService, "abort").mockImplementation(() => {});
+  jest.spyOn(WebauthnSetupCeremonyContentScriptService, "abort").mockImplementation(() => {});
 });
 
 describe("AbortWebauthnSetupCeremonyContentScriptController", () => {
@@ -29,8 +29,8 @@ describe("AbortWebauthnSetupCeremonyContentScriptController", () => {
 
       await controller.exec({ id: CEREMONY_ID });
 
-      expect(WebauthnSetupCeremonyService.abort).toHaveBeenCalledTimes(1);
-      expect(WebauthnSetupCeremonyService.abort).toHaveBeenCalledWith(CEREMONY_ID);
+      expect(WebauthnSetupCeremonyContentScriptService.abort).toHaveBeenCalledTimes(1);
+      expect(WebauthnSetupCeremonyContentScriptService.abort).toHaveBeenCalledWith(CEREMONY_ID);
     });
 
     it("Should throw an error if the given id is not a valid uuid.", async () => {
@@ -38,7 +38,7 @@ describe("AbortWebauthnSetupCeremonyContentScriptController", () => {
       const controller = new AbortWebauthnSetupCeremonyContentScriptController();
 
       await expect(() => controller.exec({ id: "test" })).rejects.toThrow();
-      expect(WebauthnSetupCeremonyService.abort).not.toHaveBeenCalled();
+      expect(WebauthnSetupCeremonyContentScriptService.abort).not.toHaveBeenCalled();
     });
   });
 });

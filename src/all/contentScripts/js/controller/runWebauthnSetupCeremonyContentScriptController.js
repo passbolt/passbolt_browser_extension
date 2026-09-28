@@ -13,7 +13,7 @@
  */
 import { assertUuid } from "passbolt-styleguide/src/shared/utils/assertions";
 import { assertType } from "../../../background_page/utils/assertions";
-import WebauthnSetupCeremonyService from "../service/webauthnSetupCeremonyService";
+import WebauthnSetupCeremonyContentScriptService from "../service/webauthnSetupCeremonyContentScriptService";
 import WebauthnCredentialCreationOptionsEntity from "../../../background_page/model/entity/mfa/webauthnCredentialCreationOptionsEntity";
 
 const RESULT_EVENT = "passbolt.app-bootstrap.webauthn-ceremony-result";
@@ -58,6 +58,6 @@ export default class RunWebauthnSetupCeremonyContentScriptController {
     assertType(options, Object);
 
     const webauthnCredentialCreationOptionsEntity = new WebauthnCredentialCreationOptionsEntity(options);
-    return await WebauthnSetupCeremonyService.run(id, webauthnCredentialCreationOptionsEntity);
+    return await WebauthnSetupCeremonyContentScriptService.run(id, webauthnCredentialCreationOptionsEntity);
   }
 }

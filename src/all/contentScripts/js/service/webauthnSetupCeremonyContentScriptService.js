@@ -22,7 +22,7 @@ const AAGUID_LENGTH = 16;
 /**
  * Handles navigator.credentials.create() on the relying party origin on behalf of the background page.
  */
-class WebauthnSetupCeremonyService {
+class WebauthnSetupCeremonyContentScriptService {
   /**
    * @constructor
    */
@@ -132,4 +132,4 @@ class WebauthnSetupCeremonyService {
   }
 }
 
-export default new WebauthnSetupCeremonyService();
+export default new WebauthnSetupCeremonyContentScriptService();

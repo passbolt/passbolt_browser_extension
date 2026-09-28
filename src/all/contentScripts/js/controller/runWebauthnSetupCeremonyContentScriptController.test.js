@@ -12,7 +12,7 @@
  * @since         5.17.0
  */
 import RunWebauthnSetupCeremonyContentScriptController from "./runWebauthnSetupCeremonyContentScriptController";
-import WebauthnSetupCeremonyService from "../service/webauthnSetupCeremonyService";
+import WebauthnSetupCeremonyContentScriptService from "../service/webauthnSetupCeremonyContentScriptService";
 import WebauthnCredentialCreationOptionsEntity from "../../../background_page/model/entity/mfa/webauthnCredentialCreationOptionsEntity";
 import { defaultWebauthnCredentialCreationOptionsDto } from "../../../background_page/model/entity/mfa/webauthnCredentialCreationOptionsEntity.test.data";
 
@@ -20,7 +20,7 @@ const CEREMONY_ID = "8e3874ae-4b40-590b-968a-418f704b9d9a";
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.spyOn(WebauthnSetupCeremonyService, "run").mockImplementation(async (id) => ({ id }));
+  jest.spyOn(WebauthnSetupCeremonyContentScriptService, "run").mockImplementation(async (id) => ({ id }));
 });
 
 describe("RunWebauthnSetupCeremonyContentScriptController", () => {
@@ -32,12 +32,12 @@ describe("RunWebauthnSetupCeremonyContentScriptController", () => {
 
       const result = await controller.exec({ id: CEREMONY_ID, options });
 
-      expect(WebauthnSetupCeremonyService.run).toHaveBeenCalledTimes(1);
-      expect(WebauthnSetupCeremonyService.run).toHaveBeenCalledWith(
+      expect(WebauthnSetupCeremonyContentScriptService.run).toHaveBeenCalledTimes(1);
+      expect(WebauthnSetupCeremonyContentScriptService.run).toHaveBeenCalledWith(
         CEREMONY_ID,
         expect.any(WebauthnCredentialCreationOptionsEntity),
       );
-      expect(WebauthnSetupCeremonyService.run.mock.calls[0][1].toDto()).toEqual(options);
+      expect(WebauthnSetupCeremonyContentScriptService.run.mock.calls[0][1].toDto()).toEqual(options);
       expect(result).toEqual({ id: CEREMONY_ID });
     });
 
@@ -48,7 +48,7 @@ describe("RunWebauthnSetupCeremonyContentScriptController", () => {
       await expect(() =>
         controller.exec({ id: "test", options: defaultWebauthnCredentialCreationOptionsDto() }),
       ).rejects.toThrow();
-      expect(WebauthnSetupCeremonyService.run).not.toHaveBeenCalled();
+      expect(WebauthnSetupCeremonyContentScriptService.run).not.toHaveBeenCalled();
     });
 
     it("Should throw an error if the given options is not an object.", async () => {
@@ -56,7 +56,7 @@ describe("RunWebauthnSetupCeremonyContentScriptController", () => {
       const controller = new RunWebauthnSetupCeremonyContentScriptController();
 
       await expect(() => controller.exec({ id: CEREMONY_ID, options: "test" })).rejects.toThrow(TypeError);
-      expect(WebauthnSetupCeremonyService.run).not.toHaveBeenCalled();
+      expect(WebauthnSetupCeremonyContentScriptService.run).not.toHaveBeenCalled();
     });
 
     it("Should throw an error if the given options are not valid creation options.", async () => {
@@ -64,7 +64,7 @@ describe("RunWebauthnSetupCeremonyContentScriptController", () => {
       const controller = new RunWebauthnSetupCeremonyContentScriptController();
 
       await expect(() => controller.exec({ id: CEREMONY_ID, options: {} })).rejects.toThrow();
-      expect(WebauthnSetupCeremonyService.run).not.toHaveBeenCalled();
+      expect(WebauthnSetupCeremonyContentScriptService.run).not.toHaveBeenCalled();
     });
   });
 });

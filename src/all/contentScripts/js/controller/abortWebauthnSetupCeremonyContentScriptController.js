@@ -35,10 +35,10 @@ class AbortWebauthnSetupCeremonyContentScriptController {
   async _exec(contentScriptControllerArguments) {
     try {
       await this.exec(contentScriptControllerArguments);
-      this.port.emit(RESULT_EVENT, { success: true });
+      this.worker.port.emit(RESULT_EVENT, { success: true });
     } catch (error) {
       console.error(error);
-      this.port.emit(RESULT_EVENT, { success: false, result: error });
+      this.worker.port.emit(RESULT_EVENT, { success: false, result: error });
     }
   }
 

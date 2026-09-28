@@ -11,21 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.17.0
  */
-import WebauthnSetupCeremonyController from "../controller/webauthnSetupCeremonyController";
+import RunWebauthnSetupCeremonyContentScriptController from "../controller/runWebauthnSetupCeremonyContentScriptController";
+import AbortWebauthnSetupCeremonyContentScriptController from "../controller/abortWebauthnSetupCeremonyContentScriptController";
 
 /**
  * Listens the WebAuthn setup ceremony events sent by the background page
  * @param {Port} port
  */
 const listen = function (port) {
-  const controller = new WebauthnSetupCeremonyController(port);
-
   port.on("passbolt.app-bootstrap.run-webauthn-ceremony", async (dto) => {
-    await controller.run(dto);
+    const controller = new RunWebauthnSetupCeremonyContentScriptController({ port });
+    await controller._exec(dto);
   });
 
-  port.on("passbolt.app-bootstrap.abort-webauthn-ceremony", (dto) => {
-    controller.abort(dto);
+  port.on("passbolt.app-bootstrap.abort-webauthn-ceremony", async (dto) => {
+    const controller = new AbortWebauthnSetupCeremonyContentScriptController({ port });
+    await controller._exec(dto);
   });
 };
 

@@ -11,55 +11,60 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.17.0
  */
-import WebauthnCeremonyCancelledError from "../../../background_page/error/webauthnCeremonyCancelledError";
 import WebauthnAuthenticatorAlreadyRegisteredError from "../../../background_page/error/webauthnAuthenticatorAlreadyRegisteredError";
+import WebauthnCeremonyCancelledError from "../../../background_page/error/webauthnCeremonyCancelledError";
 import WebauthnCeremonyError from "../../../background_page/error/webauthnCeremonyError";
 
-const RESULT_EVENT = "passbolt.app-bootstrap.webauthn-ceremony-result";
 // Authenticator data: rpIdHash (32) + flags (1) + signCount (4) + aaguid (16), https://www.w3.org/TR/webauthn-3/#sctn-attested-credential-data
 const AAGUID_OFFSET = 37;
 const AAGUID_LENGTH = 16;
 
 /**
- * Runs navigator.credentials.create() on the relying party origin on behalf of the background page.
+ * Handles navigator.credentials.create() on the relying party origin on behalf of the background page.
  */
-class WebauthnSetupCeremonyController {
+class WebauthnSetupCeremonyService {
   /**
-   * @param {Port} port
+   * @constructor
    */
-  constructor(port) {
-    this.port = port;
+  constructor() {
     this.pendingId = null;
     this.abortController = null;
   }
 
   /**
    * Run a ceremony and emit its result. A ceremony still pending is aborted first.
-   * @param {{id: string, options: object}} dto creation options in PublicKeyCredentialCreationOptionsJSON form
-   * @returns {Promise<void>}
+   * @param {string} id creation options in PublicKeyCredentialCreationOptionsJSON form
+   * @param {WebauthnCredentialCreationOptionsEntity} options creation options in PublicKeyCredentialCreationOptionsJSON form
+   * @returns {Promise<object>}
+   * @throws {WebauthnCeremonyError} if the relying party id does not match the current page origin
+   * @throws {Error} if something goes wrong and that the abort did already drop the ceremony
    */
-  async run({ id, options }) {
+  async run(id, options) {
     this.abortController?.abort();
+
     const abortController = new AbortController();
-    this.pendingId = id;
     this.abortController = abortController;
+
+    this.pendingId = id;
+
     try {
       if (location.hostname !== options?.rp?.id) {
         throw new WebauthnCeremonyError(`The relying party id "${options?.rp?.id}" does not match the page origin.`);
       }
-      const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(options);
+
+      const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(options.toDto());
       const credential = await navigator.credentials.create({ publicKey, signal: abortController.signal });
-      this.port.emit(RESULT_EVENT, {
+
+      return {
         id,
-        status: "success",
         credential: credential.toJSON(),
         aaguid: this.getAaguid(credential),
-      });
+      };
     } catch (error) {
-      if (abortController.signal.aborted) {
-        return; // the background requested the abort and has already dropped the ceremony
+      // the background requested the abort and has not already dropped the ceremony
+      if (!abortController.signal.aborted) {
+        throw this.qualifyWebauthnCeremonyError(id, error);
       }
-      this.port.emit(RESULT_EVENT, { id, status: "error", error: this.mapErrorToDto(error) });
     } finally {
       if (this.abortController === abortController) {
         this.pendingId = null;
@@ -70,9 +75,9 @@ class WebauthnSetupCeremonyController {
 
   /**
    * Abort the pending ceremony if it is the one requested.
-   * @param {{id: string}} dto
+   * @param {string} id the webauthn ceremony id to abort
    */
-  abort({ id }) {
+  abort(id) {
     if (this.pendingId === id) {
       this.abortController?.abort();
     }
@@ -82,6 +87,7 @@ class WebauthnSetupCeremonyController {
    * Read the authenticator aaguid from the attestation, null when the authenticator data is truncated.
    * @param {PublicKeyCredential} credential
    * @returns {string|null} dashed hex, uuid-like
+   * @private
    */
   getAaguid(credential) {
     const data = new Uint8Array(credential.response.getAuthenticatorData());
@@ -97,11 +103,14 @@ class WebauthnSetupCeremonyController {
   /**
    * Map a ceremony exception to a typed error dto that crosses the port.
    * Exception names per https://www.w3.org/TR/webauthn-3/#sctn-createCredential
+   * @param {string} ceremonyId
    * @param {Error} error
-   * @returns {{name: string, message: string}}
+   * @returns {Error}
+   * @private
    */
-  mapErrorToDto(error) {
+  qualifyWebauthnCeremonyError(ceremonyId, error) {
     let typedError;
+
     switch (error.name) {
       case "NotAllowedError":
         typedError = new WebauthnCeremonyCancelledError();
@@ -115,8 +124,12 @@ class WebauthnSetupCeremonyController {
       default:
         typedError = new WebauthnCeremonyError(`${error.name}: ${error.message}`);
     }
-    return { name: typedError.name, message: typedError.message };
+
+    typedError.ceremonyId = ceremonyId;
+    typedError.cause = error;
+
+    return typedError;
   }
 }
 
-export default WebauthnSetupCeremonyController;
+export default new WebauthnSetupCeremonyService();

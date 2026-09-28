@@ -45,7 +45,8 @@ describe("WebauthnApiService", () => {
         expect(req.method).toEqual("GET");
         return mockApiResponse(dtos);
       });
-      expect(await service.findAll()).toEqual(dtos);
+      const result = await service.findAll();
+      expect(result.body).toEqual(dtos);
     });
 
     it("throws on API error", async () => {
@@ -91,7 +92,8 @@ describe("WebauthnApiService", () => {
         expect(req.method).toEqual("POST");
         return mockApiResponse(body);
       });
-      expect(await service.begin()).toEqual(body);
+      const response = await service.begin();
+      expect(response.body).toEqual(body);
     });
 
     it("throws on API error", async () => {
@@ -110,7 +112,8 @@ describe("WebauthnApiService", () => {
         expect(await req.json()).toEqual(dto);
         return mockApiResponse({ verified: true });
       });
-      expect(await service.finish(dto)).toEqual({ verified: true });
+      const response = await service.finish(dto);
+      expect(response.body).toEqual({ verified: true });
     });
   });
 });

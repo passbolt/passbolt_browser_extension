@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.17.0
  */
+import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import AbstractService from "passbolt-styleguide/src/shared/services/api/abstract/abstractService";
 
 const WEBAUTHN_MFA_RESOURCE_NAME = "/mfa/setup/webauthn";
@@ -34,11 +35,11 @@ export default class WebauthnApiService extends AbstractService {
 
   /**
    * Find all the credentials of the current user.
-   * @returns {Promise<Array<object>>}
+   * @returns {Promise<PassboltResponseEntity>}
    */
   async findAll() {
     const response = await this.apiClient.findAll();
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 
   /**
@@ -54,22 +55,22 @@ export default class WebauthnApiService extends AbstractService {
 
   /**
    * Begin the attestation ceremony.
-   * @returns {Promise<{handle: string, credentialCreationOptions: object}>}
+   * @returns {Promise<PassboltResponseEntity>}
    */
   async begin() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/begin`);
     const response = await this.apiClient.fetchAndHandleResponse("POST", url, "{}");
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 
   /**
    * Finish the attestation ceremony.
    * @param {{handle: string, credential: object, name: string}} dto
-   * @returns {Promise<{verified: string}>} verified is the registration date-time
+   * @returns {Promise<PassboltResponseEntity>} verified is the registration date-time
    */
   async finish(dto) {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/finish`);
     const response = await this.apiClient.fetchAndHandleResponse("POST", url, JSON.stringify(dto));
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 }

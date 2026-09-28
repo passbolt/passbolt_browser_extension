@@ -54,7 +54,8 @@ class WebauthnSetupCeremonyService {
    * @returns {Promise<void>}
    */
   async begin(tabId) {
-    const { handle, credentialCreationOptions } = await this.webauthnApiService.begin();
+    const response = await this.webauthnApiService.begin();
+    const { handle, credentialCreationOptions } = response.body;
     const options = new WebauthnCredentialCreationOptionsEntity(credentialCreationOptions);
     ValidateWebauthnCreationOptionsService.validate(options, this.account);
     const worker = await WorkerService.get(APP_BOOTSTRAP_WORKER, tabId);
@@ -132,9 +133,9 @@ class WebauthnSetupCeremonyService {
     if (ceremony.tabId !== tabId || !ceremony.hasCredential) {
       throw new WebauthnCeremonyNotFoundError();
     }
-    let body;
+    let response;
     try {
-      body = await this.webauthnApiService.finish({
+      response = await this.webauthnApiService.finish({
         handle: ceremony.handle,
         credential: ceremony.credential,
         name: name,
@@ -150,7 +151,7 @@ class WebauthnSetupCeremonyService {
       throw error;
     }
     await WebauthnSetupCeremonySessionStorageService.flush();
-    return body;
+    return response.body;
   }
 
   /**

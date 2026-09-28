@@ -45,7 +45,8 @@ class MfaSetupGetWebauthnCredentialsController {
    * @returns {Promise<Array<object>>}
    */
   async exec() {
-    const collection = new MfaWebauthnCredentialsCollection(await this.webauthnApiService.findAll());
+    const response = await this.webauthnApiService.findAll();
+    const collection = new MfaWebauthnCredentialsCollection(response.body);
     return collection.toDto();
   }
 }

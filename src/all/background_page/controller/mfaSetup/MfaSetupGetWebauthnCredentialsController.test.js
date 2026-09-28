@@ -15,6 +15,7 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 import MfaSetupGetWebauthnCredentialsController from "./MfaSetupGetWebauthnCredentialsController";
 import { defaultMfaWebauthnCredentialsDtos } from "../../model/entity/mfa/mfaWebauthnCredentialsCollection.test.data";
+import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
 
 describe("MfaSetupGetWebauthnCredentialsController", () => {
   let controller, worker;
@@ -29,7 +30,7 @@ describe("MfaSetupGetWebauthnCredentialsController", () => {
     it("emits SUCCESS with the credentials dtos", async () => {
       expect.assertions(1);
       const dtos = defaultMfaWebauthnCredentialsDtos(2);
-      jest.spyOn(controller.webauthnApiService, "findAll").mockResolvedValue(dtos);
+      jest.spyOn(controller.webauthnApiService, "findAll").mockResolvedValue(await mockPassboltResponse(dtos));
 
       await controller._exec();
 
@@ -50,7 +51,10 @@ describe("MfaSetupGetWebauthnCredentialsController", () => {
   describe("MfaSetupGetWebauthnCredentialsController::exec", () => {
     it("throws if the API returns an invalid credential", async () => {
       expect.assertions(1);
-      jest.spyOn(controller.webauthnApiService, "findAll").mockResolvedValue([{ id: "not-a-uuid" }]);
+      const response = await mockPassboltResponse([{ id: "not-a-uuid" }]);
+      response.header._props.status = 400;
+
+      jest.spyOn(controller.webauthnApiService, "findAll").mockResolvedValue(response);
 
       await expect(controller.exec()).rejects.toThrow(CollectionValidationError);
     });

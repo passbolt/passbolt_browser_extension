@@ -85,7 +85,10 @@ class WebauthnSetupCeremonyService {
    * Handle the ceremony result sent by the content script and forward the outcome to the App worker.
    * A result for an expired ceremony is reported to the App worker as an error.
    * @param {number} tabId the tab the result came from
-   * @param {{id: string, status: string, credential?: object, aaguid?: string|null, error?: {name: string, message: string}}} resultDto
+   * @param {object} resultDto
+   * @param {boolean} resultDto.success true if the webauthn ceremony succeeded, false otherwise
+   * @param {{id: string, credential: object, aaguid: string|null}} [resultDto.result] the ceremony result details when it succeeded
+   * @param {{name: string, message: string}} [result.error] the error when the ceremony failed
    * @throws {WebauthnCeremonyNotFoundError} if no ceremony is pending or the result does not match it (id or tab)
    * @returns {Promise<void>}
    */
@@ -94,29 +97,48 @@ class WebauthnSetupCeremonyService {
     if (!ceremony) {
       throw new WebauthnCeremonyNotFoundError();
     }
-    if (ceremony.id !== resultDto?.id || ceremony.tabId !== tabId) {
+
+    const { success, result: webauthnCeremonyResult, result: webauthnCeremonyError } = resultDto;
+    if (ceremony.tabId !== tabId || (success && ceremony.id !== webauthnCeremonyResult.id)) {
       throw new WebauthnCeremonyNotFoundError("The result does not match the pending passkey ceremony.");
     }
-    let done;
+
     if (ceremony.isExpired) {
-      await WebauthnSetupCeremonySessionStorageService.flush();
       const error = new WebauthnCeremonyNotFoundError("The pending passkey ceremony has expired.");
-      done = { status: "error", error: { name: error.name, message: error.message } };
-    } else if (resultDto.status === "success") {
-      const credential = new WebauthnRegistrationResponseEntity(resultDto.credential);
-      const completed = new WebauthnSetupCeremonyEntity({
-        ...ceremony.toDto(),
-        credential: credential.toDto(),
-        aaguid: resultDto.aaguid ?? null,
-      });
-      await WebauthnSetupCeremonySessionStorageService.set(completed);
-      done = { status: "success", aaguid: completed.aaguid };
-    } else {
-      await WebauthnSetupCeremonySessionStorageService.flush();
-      done = { status: "error", error: { name: resultDto.error?.name, message: resultDto.error?.message } };
+      await this._emitCeremonyDoneReponse(tabId, error);
+      return;
     }
+
+    if (!success) {
+      await this._emitCeremonyDoneReponse(tabId, webauthnCeremonyError);
+      return;
+    }
+
+    const credential = new WebauthnRegistrationResponseEntity(webauthnCeremonyResult.credential);
+    const completed = new WebauthnSetupCeremonyEntity({
+      ...ceremony.toDto(),
+      credential: credential.toDto(),
+      aaguid: webauthnCeremonyResult.aaguid ?? null,
+    });
+    await WebauthnSetupCeremonySessionStorageService.set(completed);
+    await this._emitCeremonyDoneReponse(tabId, { aaguid: completed.aaguid }, true);
+  }
+
+  /**
+   * Sends a `webauthn ceremony done` response back to the content script
+   * @param {number} tabId the tab id where to find the worker to answer to
+   * @param {object|error} result the data to send to the worker
+   * @param {boolean} success should the content script treat the response as a success or not
+   * @returns {Promise<void>}
+   */
+  async _emitCeremonyDoneReponse(tabId, result, success = false) {
+    if (!success) {
+      await WebauthnSetupCeremonySessionStorageService.flush();
+    }
+
     const appWorker = await WorkerService.get(APP_WORKER, tabId);
-    appWorker.port.emit(CEREMONY_DONE_EVENT, done);
+    const responseDto = { success, result };
+    await appWorker.port.emit(CEREMONY_DONE_EVENT, responseDto);
   }
 
   /**

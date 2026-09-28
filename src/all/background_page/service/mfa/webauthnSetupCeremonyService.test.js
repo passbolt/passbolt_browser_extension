@@ -214,11 +214,14 @@ describe("WebauthnSetupCeremonyService", () => {
 
   describe("WebauthnSetupCeremonyService::handleResult", () => {
     const successResult = (ceremony, data = {}) => ({
-      id: ceremony.id,
-      status: "success",
-      credential: defaultWebauthnRegistrationResponseDto(),
-      aaguid: "fbfc3007-154e-4ecc-8c0b-6e020557d7bd",
-      ...data,
+      success: true,
+      result: {
+        id: ceremony.id,
+        status: "success",
+        credential: defaultWebauthnRegistrationResponseDto(),
+        aaguid: "fbfc3007-154e-4ecc-8c0b-6e020557d7bd",
+        ...data,
+      },
     });
 
     it("stores the credential and notifies the app worker on success", async () => {
@@ -232,8 +235,10 @@ describe("WebauthnSetupCeremonyService", () => {
       expect(ceremony.aaguid).toEqual("fbfc3007-154e-4ecc-8c0b-6e020557d7bd");
       expect(WorkerService.get).toHaveBeenCalledWith("App", TAB_ID);
       expect(appWorker.port.emit).toHaveBeenCalledWith(DONE_EVENT, {
-        status: "success",
-        aaguid: "fbfc3007-154e-4ecc-8c0b-6e020557d7bd",
+        success: true,
+        result: {
+          aaguid: "fbfc3007-154e-4ecc-8c0b-6e020557d7bd",
+        },
       });
     });
 
@@ -244,7 +249,12 @@ describe("WebauthnSetupCeremonyService", () => {
       await service.handleResult(TAB_ID, successResult(pending, { aaguid: null }));
 
       expect((await WebauthnSetupCeremonySessionStorageService.get()).aaguid).toBeNull();
-      expect(appWorker.port.emit).toHaveBeenCalledWith(DONE_EVENT, { status: "success", aaguid: null });
+      expect(appWorker.port.emit).toHaveBeenCalledWith(DONE_EVENT, {
+        success: true,
+        result: {
+          aaguid: null,
+        },
+      });
     });
 
     it("removes the ceremony and notifies the app worker on error", async () => {
@@ -255,10 +265,10 @@ describe("WebauthnSetupCeremonyService", () => {
         message: "The passkey prompt was cancelled or timed out.",
       };
 
-      await service.handleResult(TAB_ID, { id: pending.id, status: "error", error });
+      await service.handleResult(TAB_ID, { id: pending.id, success: false, result: error });
 
       expect(await WebauthnSetupCeremonySessionStorageService.get()).toBeNull();
-      expect(appWorker.port.emit).toHaveBeenCalledWith(DONE_EVENT, { status: "error", error });
+      expect(appWorker.port.emit).toHaveBeenCalledWith(DONE_EVENT, { success: false, result: error });
     });
 
     it("rejects a result whose id does not match the pending ceremony", async () => {
@@ -301,8 +311,8 @@ describe("WebauthnSetupCeremonyService", () => {
 
       expect(await WebauthnSetupCeremonySessionStorageService.get()).toBeNull();
       expect(appWorker.port.emit).toHaveBeenCalledWith(DONE_EVENT, {
-        status: "error",
-        error: { name: "WebauthnCeremonyNotFoundError", message: "The pending passkey ceremony has expired." },
+        success: false,
+        result: new WebauthnCeremonyNotFoundError("The pending passkey ceremony has expired."),
       });
     });
 

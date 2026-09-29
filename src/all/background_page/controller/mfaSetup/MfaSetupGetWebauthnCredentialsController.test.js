@@ -52,7 +52,6 @@ describe("MfaSetupGetWebauthnCredentialsController", () => {
     it("throws if the API returns an invalid credential", async () => {
       expect.assertions(1);
       const response = await mockPassboltResponse([{ id: "not-a-uuid" }]);
-      response.header._props.status = 400;
 
       jest.spyOn(controller.webauthnApiService, "findAll").mockResolvedValue(response);
 

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.17.0
  */
+import PassboltResponseEntity from "passbolt-styleguide/src/shared/models/entity/apiService/PassboltResponseEntity";
 import AbstractService from "passbolt-styleguide/src/shared/services/api/abstract/abstractService";
 
 const WEBAUTHN_SETTINGS_RESOURCE_NAME = "/mfa/settings/webauthn";
@@ -38,6 +39,6 @@ export default class WebauthnSettingsApiService extends AbstractService {
    */
   async find() {
     const response = await this.apiClient.findAll();
-    return response.body;
+    return new PassboltResponseEntity(response);
   }
 }

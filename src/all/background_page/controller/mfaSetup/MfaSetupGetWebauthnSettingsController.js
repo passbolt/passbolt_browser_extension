@@ -42,11 +42,11 @@ class MfaSetupGetWebauthnSettingsController {
 
   /**
    * Get the organisation WebAuthn settings.
-   * @returns {Promise<object>}
+   * @returns {Promise<MfaWebauthnSettingsEntity>}
    */
   async exec() {
-    const entity = new MfaWebauthnSettingsEntity(await this.webauthnSettingsApiService.find());
-    return entity.toDto();
+    const response = await this.webauthnSettingsApiService.find();
+    return new MfaWebauthnSettingsEntity(response.body);
   }
 }
 

@@ -43,7 +43,8 @@ describe("WebauthnSettingsApiService", () => {
         expect(req.method).toEqual("GET");
         return mockApiResponse(dto);
       });
-      expect(await service.find()).toEqual(dto);
+      const passboltResponseEntity = await service.find();
+      expect(passboltResponseEntity.body).toEqual(dto);
     });
 
     it("throws on API error", async () => {

@@ -87,8 +87,7 @@ class WebauthnSetupCeremonyService {
    * @param {number} tabId the tab the result came from
    * @param {object} resultDto
    * @param {boolean} resultDto.success true if the webauthn ceremony succeeded, false otherwise
-   * @param {{id: string, credential: object, aaguid: string|null}} [resultDto.result] the ceremony result details when it succeeded
-   * @param {{name: string, message: string}} [result.error] the error when the ceremony failed
+   * @param {{id: string, credential: object, aaguid: string|null}|{name: string, message: string}} [resultDto.result] the ceremony result details
    * @throws {WebauthnCeremonyNotFoundError} if no ceremony is pending or the result does not match it (id or tab)
    * @returns {Promise<void>}
    */
@@ -105,12 +104,12 @@ class WebauthnSetupCeremonyService {
 
     if (ceremony.isExpired) {
       const error = new WebauthnCeremonyNotFoundError("The pending passkey ceremony has expired.");
-      await this._emitCeremonyDoneReponse(tabId, error);
+      await this._emitCeremonyDoneResponse(tabId, error);
       return;
     }
 
     if (!success) {
-      await this._emitCeremonyDoneReponse(tabId, webauthnCeremonyError);
+      await this._emitCeremonyDoneResponse(tabId, webauthnCeremonyError);
       return;
     }
 
@@ -121,7 +120,7 @@ class WebauthnSetupCeremonyService {
       aaguid: webauthnCeremonyResult.aaguid ?? null,
     });
     await WebauthnSetupCeremonySessionStorageService.set(completed);
-    await this._emitCeremonyDoneReponse(tabId, { aaguid: completed.aaguid }, true);
+    await this._emitCeremonyDoneResponse(tabId, { aaguid: completed.aaguid }, true);
   }
 
   /**
@@ -131,7 +130,7 @@ class WebauthnSetupCeremonyService {
    * @param {boolean} success should the content script treat the response as a success or not
    * @returns {Promise<void>}
    */
-  async _emitCeremonyDoneReponse(tabId, result, success = false) {
+  async _emitCeremonyDoneResponse(tabId, result, success = false) {
     if (!success) {
       await WebauthnSetupCeremonySessionStorageService.flush();
     }

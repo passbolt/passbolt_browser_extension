@@ -15,6 +15,7 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import MfaSetupGetWebauthnSettingsController from "./MfaSetupGetWebauthnSettingsController";
 import { defaultMfaWebauthnSettingsDto } from "../../model/entity/mfa/mfaWebauthnSettingsEntity.test.data";
+import { mockPassboltResponse } from "passbolt-styleguide/test/mocks/mockApiResponse";
 
 describe("MfaSetupGetWebauthnSettingsController", () => {
   let controller, worker;
@@ -25,32 +26,30 @@ describe("MfaSetupGetWebauthnSettingsController", () => {
     controller = new MfaSetupGetWebauthnSettingsController(worker, requestId, defaultApiClientOptions());
   });
 
-  describe("MfaSetupGetWebauthnSettingsController::_exec", () => {
-    it("emits SUCCESS with the settings dto", async () => {
+  describe("MfaSetupGetWebauthnSettingsController::exec", () => {
+    it("returns a valid MfaWebauthnSettingsEntity", async () => {
       expect.assertions(1);
       const dto = defaultMfaWebauthnSettingsDto();
-      jest.spyOn(controller.webauthnSettingsApiService, "find").mockResolvedValue(dto);
+      jest.spyOn(controller.webauthnSettingsApiService, "find").mockImplementation(() => mockPassboltResponse(dto));
 
-      await controller._exec();
+      const entity = await controller.exec();
 
-      expect(worker.port.emit).toHaveBeenCalledWith(requestId, "SUCCESS", dto);
+      expect(entity.toDto()).toStrictEqual(dto);
     });
 
-    it("emits ERROR with the service error", async () => {
+    it("let the error be thrown from the service and bubble up", async () => {
       expect.assertions(1);
       const error = new Error("service failed");
       jest.spyOn(controller.webauthnSettingsApiService, "find").mockRejectedValue(error);
 
-      await controller._exec();
-
-      expect(worker.port.emit).toHaveBeenCalledWith(requestId, "ERROR", error);
+      await expect(() => controller.exec()).rejects.toThrow(error);
     });
-  });
 
-  describe("MfaSetupGetWebauthnSettingsController::exec", () => {
     it("throws if the API returns invalid settings", async () => {
       expect.assertions(1);
-      jest.spyOn(controller.webauthnSettingsApiService, "find").mockResolvedValue({ max_credentials_per_user: 0 });
+      jest
+        .spyOn(controller.webauthnSettingsApiService, "find")
+        .mockImplementation(() => mockPassboltResponse({ max_credentials_per_user: 0 }));
 
       await expect(controller.exec()).rejects.toThrow(EntityValidationError);
     });

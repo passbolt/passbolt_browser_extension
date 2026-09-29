@@ -100,7 +100,7 @@ describe("GroupUpdateService", () => {
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);
-    expect(progressService.start).toHaveBeenCalledWith(6, "Initialize");
+    expect(progressService.start).toHaveBeenCalledWith(5, "Initialize");
     expect(progressService.updateGoals).not.toHaveBeenCalled();
 
     expect(progressService.finishStep).toHaveBeenCalledTimes(3);
@@ -359,7 +359,7 @@ describe("GroupUpdateService", () => {
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);
-    expect(progressService.start).toHaveBeenCalledWith(6, "Initialize");
+    expect(progressService.start).toHaveBeenCalledWith(5, "Initialize");
     expect(progressService.updateGoals).not.toHaveBeenCalled();
 
     expect(progressService.finishStep).toHaveBeenCalledTimes(5);
@@ -494,7 +494,7 @@ describe("GroupUpdateService", () => {
 
     //Exepctation for the progressSerivce when there is no crypto involved
     expect(progressService.start).toHaveBeenCalledTimes(1);
-    expect(progressService.start).toHaveBeenCalledWith(6, "Initialize");
+    expect(progressService.start).toHaveBeenCalledWith(5, "Initialize");
     expect(progressService.updateGoals).not.toHaveBeenCalled();
 
     expect(progressService.finishStep).toHaveBeenCalledTimes(5);

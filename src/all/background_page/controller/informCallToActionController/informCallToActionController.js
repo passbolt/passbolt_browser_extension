@@ -70,8 +70,10 @@ class InformCallToActionController {
   /**
    * Whenever the user executes the inform call-to-action
    * @param requestId The identifier of the request
+   * @param applicationId {uuid} The identifier of the call-to-action that was clicked, so the web
+   *   integration can tell which field the menu belongs to without inferring it from focus or hover.
    */
-  async execute(requestId) {
+  async execute(requestId, applicationId) {
     try {
       const status = await this.getOrFindActiveSessionService.getOrFind();
       if (!status.isAuthenticated) {
@@ -91,7 +93,7 @@ class InformCallToActionController {
         this.worker.port.emit(requestId, "SUCCESS");
       } else {
         const webIntegrationWorker = await WorkerService.get("WebIntegration", this.worker.tab.id);
-        webIntegrationWorker.port.emit("passbolt.in-form-menu.open");
+        webIntegrationWorker.port.emit("passbolt.in-form-menu.open", applicationId);
       }
     } catch (error) {
       console.error(error);

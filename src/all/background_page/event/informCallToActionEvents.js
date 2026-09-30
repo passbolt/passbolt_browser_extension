@@ -48,10 +48,11 @@ const listen = function (worker, apiClientOptions, account) {
    * Whenever the in-form call-to-action is executed
    * @listens passbolt.in-form-cta.execute
    * @param requestId {uuid} The request identifier
+   * @param applicationId {uuid} The identifier of the call-to-action that was clicked
    */
-  worker.port.on("passbolt.in-form-cta.execute", async (requestId) => {
+  worker.port.on("passbolt.in-form-cta.execute", async (requestId, applicationId) => {
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
-    await informCallToActionController.execute(requestId);
+    await informCallToActionController.execute(requestId, applicationId);
   });
 
   /*

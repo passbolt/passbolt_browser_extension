@@ -31,6 +31,7 @@ import {
 } from "../../model/entity/mfa/webauthnSetupCeremonyEntity.test.data";
 import WebauthnCeremonyNotFoundError from "../../error/webauthnCeremonyNotFoundError";
 import WebauthnCeremonyError from "../../error/webauthnCeremonyError";
+import WebauthnCeremonyAbortedError from "../../error/webauthnCeremonyAbortedError";
 
 const TAB_ID = 1;
 const OTHER_TAB_ID = 2;
@@ -123,11 +124,8 @@ describe("WebauthnSetupCeremonyService", () => {
       expect(appBootstrapWorker.port.emit).toHaveBeenCalledWith(ABORT_EVENT, { id: pending.id });
       expect(WorkerService.get).toHaveBeenCalledWith("App", OTHER_TAB_ID);
       expect(appWorker.port.emit).toHaveBeenCalledWith(DONE_EVENT, {
-        status: "error",
-        error: {
-          name: "WebauthnCeremonyAbortedError",
-          message: "The passkey ceremony was superseded by a new one.",
-        },
+        success: false,
+        result: new WebauthnCeremonyAbortedError("The passkey ceremony was superseded by a new one."),
       });
     });
 

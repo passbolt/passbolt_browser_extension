@@ -220,10 +220,9 @@ class WebauthnSetupCeremonyService {
    */
   async emitSuperseded(ceremony) {
     const error = new WebauthnCeremonyAbortedError("The passkey ceremony was superseded by a new one.");
-    const done = { status: "error", error: { name: error.name, message: error.message } };
     try {
       const appWorker = await WorkerService.get(APP_WORKER, ceremony.tabId);
-      appWorker.port.emit(CEREMONY_DONE_EVENT, done);
+      appWorker.port.emit(CEREMONY_DONE_EVENT, { success: false, result: error });
     } catch (error) {
       console.warn("WebauthnSetupCeremonyService: could not reach the app worker of the superseded ceremony.", error);
     }

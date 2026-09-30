@@ -13,7 +13,7 @@
  */
 import EntityV2 from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2";
 import GroupEntity from "passbolt-styleguide/src/shared/models/entity/group/groupEntity";
-import UserEntity from "../user/userEntity";
+import UserEntity from "passbolt-styleguide/src/shared/models/entity/user/userEntity";
 
 const ENTITY_NAME = "UserAndGroupSearchResult";
 

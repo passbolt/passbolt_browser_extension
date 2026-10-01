@@ -19,6 +19,7 @@ import WebauthnCeremonyError from "../../../background_page/error/webauthnCeremo
 import WebauthnCeremonyCancelledError from "../../../background_page/error/webauthnCeremonyCancelledError";
 import WebauthnAuthenticatorAlreadyRegisteredError from "../../../background_page/error/webauthnAuthenticatorAlreadyRegisteredError";
 import WebauthnTLSCertificateError from "../../../background_page/error/webauthnTLSCertificateError";
+import WebauthnAlreadyRunningCeremonyError from "../../../background_page/error/webauthnAlreadyRunningCeremonyError";
 
 const CEREMONY_ID = "8e3874ae-4b40-590b-968a-418f704b9d9a";
 const OTHER_CEREMONY_ID = "1cbfca6f-ab36-4e13-a5b8-7c0a1b2c3d4e";
@@ -187,6 +188,7 @@ describe("WebauthnSetupCeremonyContentScriptService", () => {
       ["NotAllowedError", WebauthnCeremonyCancelledError],
       ["InvalidStateError", WebauthnAuthenticatorAlreadyRegisteredError],
       ["SecurityError", WebauthnTLSCertificateError],
+      ["ConstraintError", WebauthnAlreadyRunningCeremonyError],
     ])("maps a %s exception to %p.", (domName, expectedErrorClass) => {
       expect.assertions(3);
       const error = domException(domName);

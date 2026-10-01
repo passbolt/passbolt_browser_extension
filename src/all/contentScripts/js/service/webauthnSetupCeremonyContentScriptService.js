@@ -15,6 +15,7 @@ import WebauthnAuthenticatorAlreadyRegisteredError from "../../../background_pag
 import WebauthnCeremonyCancelledError from "../../../background_page/error/webauthnCeremonyCancelledError";
 import WebauthnCeremonyError from "../../../background_page/error/webauthnCeremonyError";
 import WebauthnTLSCertificateError from "../../../background_page/error/webauthnTLSCertificateError";
+import WebauthnAlreadyRunningCeremonyError from "../../../background_page/error/webauthnAlreadyRunningCeremonyError";
 
 // Authenticator data: rpIdHash (32) + flags (1) + signCount (4) + aaguid (16), https://www.w3.org/TR/webauthn-3/#sctn-attested-credential-data
 const AAGUID_OFFSET = 37;
@@ -124,6 +125,9 @@ class WebauthnSetupCeremonyContentScriptService {
         break;
       case "SecurityError":
         typedError = new WebauthnTLSCertificateError();
+        break;
+      case "ConstraintError":
+        typedError = new WebauthnAlreadyRunningCeremonyError();
         break;
       default:
         typedError = new WebauthnCeremonyError(`${error.name}: ${error.message}`);

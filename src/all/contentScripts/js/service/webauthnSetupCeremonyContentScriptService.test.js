@@ -18,6 +18,7 @@ import { defaultWebauthnRegistrationResponseDto } from "../../../background_page
 import WebauthnCeremonyError from "../../../background_page/error/webauthnCeremonyError";
 import WebauthnCeremonyCancelledError from "../../../background_page/error/webauthnCeremonyCancelledError";
 import WebauthnAuthenticatorAlreadyRegisteredError from "../../../background_page/error/webauthnAuthenticatorAlreadyRegisteredError";
+import WebauthnTLSCertificateError from "../../../background_page/error/webauthnTLSCertificateError";
 
 const CEREMONY_ID = "8e3874ae-4b40-590b-968a-418f704b9d9a";
 const OTHER_CEREMONY_ID = "1cbfca6f-ab36-4e13-a5b8-7c0a1b2c3d4e";
@@ -185,6 +186,7 @@ describe("WebauthnSetupCeremonyContentScriptService", () => {
     it.each([
       ["NotAllowedError", WebauthnCeremonyCancelledError],
       ["InvalidStateError", WebauthnAuthenticatorAlreadyRegisteredError],
+      ["SecurityError", WebauthnTLSCertificateError],
     ])("maps a %s exception to %p.", (domName, expectedErrorClass) => {
       expect.assertions(3);
       const error = domException(domName);
@@ -208,12 +210,12 @@ describe("WebauthnSetupCeremonyContentScriptService", () => {
 
     it("maps any other exception to a WebauthnCeremonyError carrying the original name and message.", () => {
       expect.assertions(4);
-      const error = domException("SecurityError");
+      const error = domException("Error");
 
       const result = WebauthnSetupCeremonyContentScriptService.qualifyWebauthnCeremonyError(CEREMONY_ID, error);
 
       expect(result).toBeInstanceOf(WebauthnCeremonyError);
-      expect(result.message).toEqual("SecurityError: SecurityError message");
+      expect(result.message).toEqual("Error: Error message");
       expect(result.ceremonyId).toEqual(CEREMONY_ID);
       expect(result.cause).toBe(error);
     });

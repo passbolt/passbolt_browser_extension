@@ -168,13 +168,17 @@ private class SecureSessionDelegate: NSObject, URLSessionTaskDelegate {
         newRequest request: URLRequest,
         completionHandler: @escaping (URLRequest?) -> Void
     ) {
-        guard let originalHost = task.originalRequest?.url?.host,
-              let newHost = request.url?.host else {
-            completionHandler(nil)  // Block if hosts can't be determined
-            return
+        guard let originalUrl = task.originalRequest?.url,
+            let newUrl = request.url,
+            let originalHost = originalUrl.host?.lowercased(),
+            let newHost = newUrl.host?.lowercased()else {
+            completionHandler(nil)
+            return;
         }
 
-        if originalHost.lowercased() == newHost.lowercased() {
+        if originalHost == newHost
+            && originalUrl.port == newUrl.port
+            && originalUrl.scheme == newUrl.scheme {
             completionHandler(request)  // Allow same-host redirect
         } else {
             // SECURITY: Block cross-domain redirects

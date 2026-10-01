@@ -13,6 +13,7 @@
  */
 
 import { assertNonEmptyString, assertString } from "../../../../all/background_page/utils/assertions";
+import { urlProtocols } from "passbolt-styleguide/src/react-extension/lib/Sanitize/sanitizeUrl";
 
 const CSRF_TOKEN_COOKIE_NAME = "csrfToken";
 const DEFAULT_COOKIE_VALUES = {
@@ -43,11 +44,12 @@ export class CookiesService {
    */
   async getSerialisedCookies() {
     const query = {
-      domain: this.domain,
       storeId: this.storeId,
+      url: this.url,
     };
     const cookies = await chrome.cookies.getAll(query);
-    return this.serializeCookies(cookies);
+    const isSecureProtocol = new URL(this.url).protocol === urlProtocols.HTTPS;
+    return this.serializeCookies(cookies, isSecureProtocol);
   }
 
   /**
@@ -84,10 +86,14 @@ export class CookiesService {
   /**
    * Serialises all the cookies for the current domain to be a string comptaible for HTTP header value.
    * @param {Array<Cookie>} cookies
+   * @param {boolean} withSecureCookie should the secure cookies be included or not
    * @returns {string}
    * @private
    */
-  serializeCookies(cookies) {
+  serializeCookies(cookies, withSecureCookie) {
+    if (!withSecureCookie) {
+      cookies = cookies.filter((cookie) => !cookie.secure);
+    }
     return cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join(";");
   }
 

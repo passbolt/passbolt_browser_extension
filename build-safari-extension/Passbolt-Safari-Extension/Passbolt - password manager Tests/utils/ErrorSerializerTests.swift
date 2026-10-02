@@ -26,13 +26,13 @@ import Testing
 
 @Suite("ErrorSerializer")
 struct ErrorSerializerTests {
-
+    
     // MARK: - Test Helpers
-
+    
     enum MockLocalizedError: LocalizedError {
         case withAllFields
         case withMessageOnly
-
+        
         var errorDescription: String? {
             switch self {
             case .withAllFields: return "Full error description"
@@ -52,13 +52,13 @@ struct ErrorSerializerTests {
             }
         }
     }
-
+    
     enum MockPlainError: Error {
         case generic
     }
-
+    
     // MARK: - Tests
-
+    
     @Test("serialize includes message, type, domain, and code for a plain Error")
     func serializePlainError() {
         let dict = ErrorSerializer.serialize(MockPlainError.generic)
@@ -67,18 +67,18 @@ struct ErrorSerializerTests {
         #expect(dict["domain"] is String)
         #expect(dict["code"] is Int)
     }
-
+    
     @Test("serialize includes reason and suggestion when present, omits them when nil")
     func serializeLocalizedError() {
         let full = ErrorSerializer.serialize(MockLocalizedError.withAllFields)
         #expect(full["reason"] as? String == "Something went wrong")
         #expect(full["suggestion"] as? String == "Try again")
-
+        
         let partial = ErrorSerializer.serialize(MockLocalizedError.withMessageOnly)
         #expect(partial["reason"] == nil)
         #expect(partial["suggestion"] == nil)
     }
-
+    
     @Test("serialize extracts file, line, and function from a LocatedError")
     func serializeLocatedError() {
         let located = locatedError(MockLocalizedError.withAllFields, file: "Module/MyFile.swift", line: 42, function: "doStuff()")
@@ -89,7 +89,7 @@ struct ErrorSerializerTests {
         #expect(dict["message"] as? String == "Full error description")
         #expect(dict["type"] as? String == "MockLocalizedError")
     }
-
+    
     @Test("LocatedError location takes precedence over NSError userInfo location")
     func locatedErrorLocationTakesPrecedence() {
         let innerNSError = NSError(domain: "Inner", code: 1, userInfo: [
@@ -104,7 +104,7 @@ struct ErrorSerializerTests {
         #expect(dict["line"] as? Int == 1)
         #expect(dict["function"] as? String == "locatedFunc()")
     }
-
+    
     @Test("serialize recursively serializes the cause chain")
     func serializeCauseChain() {
         let rootCause = NSError(domain: "RootCause", code: 1, userInfo: [
@@ -114,22 +114,22 @@ struct ErrorSerializerTests {
             NSLocalizedDescriptionKey: "top message",
             NSUnderlyingErrorKey: rootCause
         ])
-
+        
         let dict = ErrorSerializer.serialize(topError)
         #expect(dict["message"] as? String == "top message")
-
+        
         let cause = dict["cause"] as? [String: Any]
         #expect(cause?["message"] as? String == "root cause message")
         #expect(cause?["domain"] as? String == "RootCause")
     }
-
+    
     @Test("serialize has no cause key when there is no underlying error")
     func serializeNoCause() {
         let dict = ErrorSerializer.serialize(MockPlainError.generic)
         #expect(dict["cause"] == nil)
     }
-
-    #if DEBUG
+    
+#if DEBUG
     @Test("serialize includes filtered userInfo in DEBUG builds")
     func serializeUserInfoInDebug() {
         let nsError = NSError(domain: "Test", code: 1, userInfo: [
@@ -151,5 +151,5 @@ struct ErrorSerializerTests {
         #expect(userInfo?["nullKey"] is NSNull)
         #expect(userInfo?["arrayKey"] is [Any])
     }
-    #endif
+#endif
 }

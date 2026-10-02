@@ -26,7 +26,7 @@ import Foundation
 @available(macOSApplicationExtension 12.0, *)
 class FetchController: AbstractController {
     required init() {}
-
+    
     func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) throws -> Void {
         guard let urlString = payload["resource"] as? String else {
             return self.respondAsError(context, locatedNSError(
@@ -35,7 +35,7 @@ class FetchController: AbstractController {
                 description: "Missing required 'resource' parameter"
             ))
         }
-
+        
         guard let url = URL(string: urlString) else {
             return self.respondAsError(context, locatedNSError(
                 domain: "FetchController",
@@ -44,7 +44,7 @@ class FetchController: AbstractController {
             ))
         }
         let options = payload["options"] as? [String: Any] ?? [:]
-
+        
         Task {
             do {
                 let httpResponse = try await FetchService.fetch(url: url, options: options, profileUUID: profileUUID)

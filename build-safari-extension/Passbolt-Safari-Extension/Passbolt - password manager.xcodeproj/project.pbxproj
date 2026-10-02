@@ -428,7 +428,6 @@
 		82EE777D2F3C9D57000B30B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -443,14 +442,13 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Passbolt - password manager";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/[DEBUG] Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/[DEBUG] Passbolt - password manager";
 			};
 			name = Debug;
 		};
 		82EE777E2F3C9D57000B30B5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -464,7 +462,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Passbolt - password manager";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/[DEBUG] Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/[DEBUG] Passbolt - password manager";
 			};
 			name = Release;
 		};

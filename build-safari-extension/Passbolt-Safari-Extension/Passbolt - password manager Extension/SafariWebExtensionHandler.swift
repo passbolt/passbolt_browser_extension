@@ -41,7 +41,7 @@ let routes: [String: AbstractController.Type] = [
 // It is mainly used to handle request from the extension
 final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
     private let errorController = ErrorController()
-
+    
     // Handles request coming form the extension using `chrome.runtime.sendNativeMessage`
     func beginRequest(with context: NSExtensionContext) {
         guard
@@ -56,7 +56,7 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             errorController.run(context, ["error": ErrorSerializer.serialize(error)], profileUUID: "unknown")
             return
         }
-
+        
         // SECURITY: Extract profile UUID for session isolation
         // SFExtensionProfileKey provides the Safari profile identifier (macOS 14+)
         let profileUUID: String
@@ -67,7 +67,7 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         } else {
             profileUUID = "default"
         }
-
+        
         guard let action = payload["action"] as? String else {
             let error = locatedNSError(
                 domain: "SafariExtension",
@@ -77,7 +77,7 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             errorController.run(context, ["error": ErrorSerializer.serialize(error)], profileUUID: profileUUID)
             return
         }
-
+        
         if let controllerType = routes[action] {
             do {
                 let controller = controllerType.init()
@@ -87,7 +87,7 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             }
             return
         }
-
+        
         let error = locatedNSError(
             domain: "SafariExtension",
             code: SafariExtensionError.unsupportedAction.rawValue,

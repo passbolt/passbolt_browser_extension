@@ -26,7 +26,7 @@ import Testing
 
 @Suite("WriteClipboardController")
 struct WriteClipboardControllerTests {
-
+    
     @Test("WriteClipboardController conforms to AbstractController")
     func conformance() {
         let _: any AbstractController = WriteClipboardController()

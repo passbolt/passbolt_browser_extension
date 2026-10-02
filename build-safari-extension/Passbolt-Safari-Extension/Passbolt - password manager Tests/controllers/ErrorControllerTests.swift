@@ -26,7 +26,7 @@ import Testing
 
 @Suite("ErrorController")
 struct ErrorControllerTests {
-
+    
     @Test("ErrorController conforms to AbstractController")
     func conformance() {
         let _: any AbstractController = ErrorController()

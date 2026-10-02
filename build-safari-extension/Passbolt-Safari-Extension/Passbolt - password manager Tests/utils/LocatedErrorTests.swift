@@ -26,23 +26,23 @@ import Testing
 
 @Suite("LocatedError")
 struct LocatedErrorTests {
-
+    
     // MARK: - Test Helpers
-
+    
     enum MockLocalizedError: LocalizedError {
         case sample
-
+        
         var errorDescription: String? { "Mock error description" }
         var failureReason: String? { "Mock failure reason" }
         var recoverySuggestion: String? { "Mock recovery suggestion" }
     }
-
+    
     enum MockPlainError: Error {
         case sample
     }
-
+    
     // MARK: - Tests
-
+    
     @Test("LocatedError delegates errorDescription, failureReason, and recoverySuggestion to underlying LocalizedError")
     func delegatesLocalizedErrorProperties() {
         let located = LocatedError(underlyingError: MockLocalizedError.sample, file: "F.swift", line: 1, function: "f()")
@@ -50,7 +50,7 @@ struct LocatedErrorTests {
         #expect(located.failureReason == "Mock failure reason")
         #expect(located.recoverySuggestion == "Mock recovery suggestion")
     }
-
+    
     @Test("LocatedError returns nil for failureReason and recoverySuggestion when underlying error is not LocalizedError")
     func returnsNilForPlainError() {
         let located = LocatedError(underlyingError: MockPlainError.sample, file: "F.swift", line: 1, function: "f()")
@@ -58,7 +58,7 @@ struct LocatedErrorTests {
         #expect(located.failureReason == nil)
         #expect(located.recoverySuggestion == nil)
     }
-
+    
     @Test("LocatedError preserves file, line, and function")
     func preservesLocationFields() {
         let located = LocatedError(underlyingError: MockPlainError.sample, file: "SomeFile.swift", line: 99, function: "someFunc()")
@@ -66,19 +66,19 @@ struct LocatedErrorTests {
         #expect(located.line == 99)
         #expect(located.function == "someFunc()")
     }
-
+    
     @Test("locatedError() extracts filename from fileID paths")
     func extractsFilenameFromFileID() {
         let withSlash = locatedError(MockPlainError.sample, file: "MyModule/SomeFile.swift", line: 10, function: "f()")
         #expect(withSlash.file == "SomeFile.swift")
-
+        
         let withoutSlash = locatedError(MockPlainError.sample, file: "JustAFile.swift", line: 1, function: "g()")
         #expect(withoutSlash.file == "JustAFile.swift")
-
+        
         let deepPath = locatedError(MockPlainError.sample, file: "A/B/C/Deep.swift", line: 5, function: "h()")
         #expect(deepPath.file == "Deep.swift")
     }
-
+    
     @Test("locatedNSError() creates an NSError with domain, code, description, and location in userInfo")
     func locatedNSErrorCreation() {
         let nsError = locatedNSError(domain: "TestDomain", code: 42, description: "Test desc", file: "Module/MyFile.swift", line: 20, function: "doThing()")

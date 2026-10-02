@@ -26,7 +26,7 @@ import SafariServices
 
 class OpenSafariSettingsController: AbstractController {
     required init() {}
-
+    
     func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) throws -> Void {
         SFSafariApplication.showPreferencesForExtension(withIdentifier: "com.passbolt.safari.Extension") { error in
             if let error = error {

@@ -30,29 +30,29 @@ final class SecureProfileSessionManager {
     // Thread-safe storage for profile sessions
     private static var sessionCache: [String: CachedSession] = [:]
     private static let lock = NSLock()
-
+    
     // Session TTL: 30 minutes of inactivity before cleanup
     private static let sessionTTL: TimeInterval = 30 * 60
-
+    
     /// Wrapper to track session last access time for TTL-based cleanup
     private struct CachedSession {
         let session: URLSession
         var lastAccess: Date
-
+        
         init(session: URLSession) {
             self.session = session
             self.lastAccess = Date()
         }
-
+        
         mutating func touch() {
             self.lastAccess = Date()
         }
-
+        
         func isExpired(ttl: TimeInterval) -> Bool {
             return Date().timeIntervalSince(lastAccess) > ttl
         }
     }
-
+    
     /// Creates or returns a completely isolated URLSession for a specific profile.
     /// Each profile gets its own HTTPCookieStorage instance that is NOT
     /// connected to HTTPCookieStorage.shared.
@@ -62,20 +62,20 @@ final class SecureProfileSessionManager {
     static func session(forProfile profileUUID: String) -> URLSession {
         lock.lock()
         defer { lock.unlock() }
-
+        
         // Cleanup expired sessions periodically
         cleanupExpiredSessionsLocked()
-
+        
         // Return cached session if exists and update last access time
         if var cached = sessionCache[profileUUID] {
             cached.touch()
             sessionCache[profileUUID] = cached
             return cached.session
         }
-
+        
         // Create profile-specific configuration
         let config = URLSessionConfiguration.default
-
+        
         // CRITICAL: Disable URLSession's automatic cookie handling completely.
         // The extension manages cookies via chrome.cookies API which is profile-isolated.
         // We inject cookies manually via the Cookie header in the request.
@@ -83,32 +83,32 @@ final class SecureProfileSessionManager {
         config.httpCookieStorage = nil
         config.httpShouldSetCookies = false
         config.httpCookieAcceptPolicy = .never
-
+        
         // SECURITY: Disable credential storage completely
         // Prevents auth tokens from persisting across sessions
         config.urlCredentialStorage = nil
-
+        
         // SECURITY: No memory cache, no disk persistence
         config.urlCache = URLCache(
             memoryCapacity: 0,  // No memory cache
             diskCapacity: 0,              // NO disk cache
             diskPath: nil
         )
-
+        
         // SECURITY: Prevent cached responses
         config.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-
+        
         // Create session with security delegate
         let session = URLSession(
             configuration: config,
             delegate: SecureSessionDelegate(profileUUID: profileUUID),
             delegateQueue: nil  // Use URLSession's internal queue
         )
-
+        
         sessionCache[profileUUID] = CachedSession(session: session)
         return session
     }
-
+    
     /// Cleans up sessions that have exceeded their TTL.
     /// Must be called while holding the lock.
     private static func cleanupExpiredSessionsLocked() {
@@ -119,7 +119,7 @@ final class SecureProfileSessionManager {
             }
         }
     }
-
+    
     /// Invalidates and removes a profile's session completely.
     /// Call this when a user logs out to ensure complete cleanup.
     /// Note: Cookie cleanup is handled by the extension via chrome.cookies API,
@@ -129,18 +129,18 @@ final class SecureProfileSessionManager {
     static func invalidateSession(forProfile profileUUID: String) {
         lock.lock()
         defer { lock.unlock() }
-
+        
         if let cached = sessionCache.removeValue(forKey: profileUUID) {
             cached.session.invalidateAndCancel()
         }
     }
-
+    
     /// Invalidates all cached sessions.
     /// Useful for complete cleanup on extension unload.
     static func invalidateAllSessions() {
         lock.lock()
         defer { lock.unlock() }
-
+        
         for (_, cached) in sessionCache {
             cached.session.invalidateAndCancel()
         }
@@ -153,12 +153,12 @@ final class SecureProfileSessionManager {
 /// URLSession delegate that enforces security policies for profile-isolated sessions.
 private class SecureSessionDelegate: NSObject, URLSessionTaskDelegate {
     let profileUUID: String
-
+    
     init(profileUUID: String) {
         self.profileUUID = profileUUID
         super.init()
     }
-
+    
     /// SECURITY: Block cross-domain redirects to prevent cookie leakage.
     /// Only allows redirects within the same host.
     func urlSession(
@@ -169,13 +169,13 @@ private class SecureSessionDelegate: NSObject, URLSessionTaskDelegate {
         completionHandler: @escaping (URLRequest?) -> Void
     ) {
         guard let originalUrl = task.originalRequest?.url,
-            let newUrl = request.url,
-            let originalHost = originalUrl.host?.lowercased(),
-            let newHost = newUrl.host?.lowercased()else {
+              let newUrl = request.url,
+              let originalHost = originalUrl.host?.lowercased(),
+              let newHost = newUrl.host?.lowercased() else {
             completionHandler(nil)
-            return;
+            return
         }
-
+        
         if originalHost == newHost
             && originalUrl.port == newUrl.port
             && originalUrl.scheme == newUrl.scheme {
@@ -186,14 +186,14 @@ private class SecureSessionDelegate: NSObject, URLSessionTaskDelegate {
             completionHandler(nil)
         }
     }
-
+    
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
            let serverTrust = challenge.protectionSpace.serverTrust {
-                completionHandler(.useCredential, URLCredential(trust: serverTrust))
+            completionHandler(.useCredential, URLCredential(trust: serverTrust))
         } else {
             completionHandler(.performDefaultHandling, nil)
         }
     }
-
+    
 }

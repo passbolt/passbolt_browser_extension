@@ -113,6 +113,36 @@ class WorkersSessionStorage {
   }
 
   /**
+   * Add a worker, atomically evicting any previous worker of the same name/tab/frame first. A re-injection
+   * into a frame supersedes its previous worker; doing the evict + add in a single locked transaction keeps
+   * concurrent (re-)injections from each leaving a worker behind (which would let a stale one be picked).
+   * @param {WorkerEntity} workerEntity
+   * @return {Promise<void>}
+   */
+  async addWorkerAndEvictSameFrame(workerEntity) {
+    await lock.acquire();
+    try {
+      this.assertEntityBeforeSave(workerEntity);
+      let workers = await this.getWorkers();
+      workers = workers.filter(
+        (worker) =>
+          !(
+            worker.name === workerEntity.name &&
+            worker.tabId === workerEntity.tabId &&
+            worker.frameId === workerEntity.frameId
+          ),
+      );
+      if (this.IsExceedNumberWorkersByTabId(workers, workerEntity.tabId)) {
+        throw new Error(`The extension port limit is exceeded on tab ${workerEntity.tabId}`);
+      }
+      workers.push(workerEntity.toDto());
+      await browser.storage.session.set({ workers });
+    } finally {
+      lock.release();
+    }
+  }
+
+  /**
    *
    * @param {Object<array>} workers The workers
    * @param {number} tabId The tab id

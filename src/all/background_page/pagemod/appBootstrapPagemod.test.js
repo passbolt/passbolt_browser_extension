@@ -31,7 +31,7 @@ import PassboltBadResponseError from "../error/passboltBadResponseError";
 import AuthenticationStatusService from "../service/authenticationStatusService";
 import ServerStatusApiService from "../service/api/status/serverStatusApiService";
 
-const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
+const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorkerAndEvictSameFrame");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());

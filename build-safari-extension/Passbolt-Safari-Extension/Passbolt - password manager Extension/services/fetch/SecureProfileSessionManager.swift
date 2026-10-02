@@ -178,7 +178,9 @@ private class SecureSessionDelegate: NSObject, URLSessionTaskDelegate {
         
         if originalHost == newHost
             && originalUrl.port == newUrl.port
-            && originalUrl.scheme == newUrl.scheme {
+            && originalUrl.scheme == newUrl.scheme
+            && originalUrl.user() == newUrl.user()
+            && originalUrl.password() == newUrl.password() {
             completionHandler(request)  // Allow same-host redirect
         } else {
             // SECURITY: Block cross-domain redirects

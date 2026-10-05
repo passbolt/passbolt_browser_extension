@@ -45,7 +45,7 @@ describe("PostLogoutService", () => {
       const appPortWrapper = new Port(appPort);
 
       // function mocked
-      jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(jest.fn());
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(async () => {});
       jest.spyOn(PortManager, "getPortById").mockImplementationOnce(() => appPortWrapper);
       jest.spyOn(appPortWrapper, "emit");
       jest.spyOn(LocalStorageService, "flush");

@@ -20,6 +20,7 @@ import WebauthnCeremonyCancelledError from "../../../background_page/error/webau
 import WebauthnAuthenticatorAlreadyRegisteredError from "../../../background_page/error/webauthnAuthenticatorAlreadyRegisteredError";
 import WebauthnTLSCertificateError from "../../../background_page/error/webauthnTLSCertificateError";
 import WebauthnAlreadyRunningCeremonyError from "../../../background_page/error/webauthnAlreadyRunningCeremonyError";
+import WebauthnRelyingPartyIpAddressError from "passbolt-styleguide/src/shared/lib/Error/WebauthnRelyingPartyIpAddressError";
 
 const CEREMONY_ID = "8e3874ae-4b40-590b-968a-418f704b9d9a";
 const OTHER_CEREMONY_ID = "1cbfca6f-ab36-4e13-a5b8-7c0a1b2c3d4e";
@@ -98,6 +99,20 @@ describe("WebauthnSetupCeremonyContentScriptService", () => {
       }
       expect(create).not.toHaveBeenCalled();
     });
+
+    it.each(["192.168.1.10", "[::1]"])(
+      "throws a WebauthnRelyingPartyIpAddressError if the page is reached through the IP address %s.",
+      async (hostname) => {
+        expect.assertions(3);
+        defineGlobal("location", { hostname });
+
+        const promise = WebauthnSetupCeremonyContentScriptService.run(CEREMONY_ID, options);
+
+        await expect(promise).rejects.toThrow(WebauthnRelyingPartyIpAddressError);
+        await expect(promise).rejects.toHaveProperty("ceremonyId", CEREMONY_ID);
+        expect(create).not.toHaveBeenCalled();
+      },
+    );
 
     it("throws the qualified error if the credential creation fails.", async () => {
       expect.assertions(3);
@@ -203,6 +218,16 @@ describe("WebauthnSetupCeremonyContentScriptService", () => {
     it("keeps a WebauthnCeremonyError as is.", () => {
       expect.assertions(2);
       const error = new WebauthnCeremonyError("Something went wrong.");
+
+      const result = WebauthnSetupCeremonyContentScriptService.qualifyWebauthnCeremonyError(CEREMONY_ID, error);
+
+      expect(result).toBe(error);
+      expect(result.ceremonyId).toEqual(CEREMONY_ID);
+    });
+
+    it("keeps a WebauthnRelyingPartyIpAddressError as is.", () => {
+      expect.assertions(2);
+      const error = new WebauthnRelyingPartyIpAddressError();
 
       const result = WebauthnSetupCeremonyContentScriptService.qualifyWebauthnCeremonyError(CEREMONY_ID, error);
 

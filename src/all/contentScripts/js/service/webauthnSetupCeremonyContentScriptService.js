@@ -16,6 +16,7 @@ import WebauthnCeremonyCancelledError from "../../../background_page/error/webau
 import WebauthnCeremonyError from "../../../background_page/error/webauthnCeremonyError";
 import WebauthnTLSCertificateError from "../../../background_page/error/webauthnTLSCertificateError";
 import WebauthnAlreadyRunningCeremonyError from "../../../background_page/error/webauthnAlreadyRunningCeremonyError";
+import { assertWebauthnRelyingPartyIsNotIpAddress } from "passbolt-styleguide/src/shared/utils/assertions";
 
 // Authenticator data: rpIdHash (32) + flags (1) + signCount (4) + aaguid (16), https://www.w3.org/TR/webauthn-3/#sctn-attested-credential-data
 const AAGUID_OFFSET = 37;
@@ -38,6 +39,7 @@ class WebauthnSetupCeremonyContentScriptService {
    * @param {string} id creation options in PublicKeyCredentialCreationOptionsJSON form
    * @param {WebauthnCredentialCreationOptionsEntity} options creation options in PublicKeyCredentialCreationOptionsJSON form
    * @returns {Promise<object>}
+   * @throws {WebauthnRelyingPartyIpAddressError} if the page is reached through an IP address
    * @throws {WebauthnCeremonyError} if the relying party id does not match the current page origin
    * @throws {Error} if something goes wrong and that the abort did already drop the ceremony
    */
@@ -50,6 +52,7 @@ class WebauthnSetupCeremonyContentScriptService {
     this.pendingId = id;
 
     try {
+      assertWebauthnRelyingPartyIsNotIpAddress(location.hostname);
       if (location.hostname !== options?.rp?.id) {
         throw new WebauthnCeremonyError(`The relying party id "${options?.rp?.id}" does not match the page origin.`);
       }
@@ -121,6 +124,7 @@ class WebauthnSetupCeremonyContentScriptService {
         typedError = new WebauthnAuthenticatorAlreadyRegisteredError();
         break;
       case "WebauthnCeremonyError":
+      case "WebauthnRelyingPartyIpAddressError":
         typedError = error;
         break;
       case "SecurityError":

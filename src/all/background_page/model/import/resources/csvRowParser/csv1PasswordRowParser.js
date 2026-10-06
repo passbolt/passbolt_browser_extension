@@ -14,6 +14,7 @@ import ImportError from "../../../../error/importError";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import ResourcesTypeImportParser from "../resourcesTypeImportParser";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
+import ExternalTotpEntity from "../../../entity/totp/externalTotpEntity";
 
 class Csv1PasswordRowParser extends AbstractCsvRowParser {
   /**
@@ -28,6 +29,7 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
       secret_clear: "Password",
       description: "Notes",
       folder_parent_path: "Type",
+      totp: "OTPAuth",
     };
   }
 
@@ -45,6 +47,8 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
     for (const propertyName in this.mapping) {
       if (propertyName === "uris") {
         externalResourceDto[propertyName] = [data[this.mapping[propertyName]]];
+      } else if (propertyName === "totp" && data[this.mapping[propertyName]]) {
+        externalResourceDto[propertyName] = this.parseTotp(data[this.mapping[propertyName]]);
       } else if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }
@@ -85,6 +89,17 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
     externalResourceDto.resource_type_id = resourceType.id;
 
     return new ExternalResourceEntity(externalResourceDto);
+  }
+
+  /**
+   * Parse the TOTP.
+   * @param {string} totpUrl
+   * @return {{secret_key: *, period: *, digits: *, algorithm: *}}
+   */
+  static parseTotp(totpUrl) {
+    const totpUrlDecoded = new URL(decodeURIComponent(totpUrl));
+    const totp = ExternalTotpEntity.createTotpFromUrl(totpUrlDecoded);
+    return totp.toDto();
   }
 }
 

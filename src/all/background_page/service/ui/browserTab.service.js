@@ -12,7 +12,8 @@
  * @since         3.4.0
  */
 
-import { assertNumber, assertString } from "../../utils/assertions";
+import { assertNumber } from "passbolt-styleguide/src/shared/utils/assertions";
+import { assertString } from "../../utils/assertions";
 import Validator from "validator";
 
 class BrowserTabService {
@@ -29,8 +30,8 @@ class BrowserTabService {
    * @param id
    */
   static async getById(id) {
-    const tabs = await browser.tabs.query({});
-    return tabs.find((tab) => tab.id === parseInt(id));
+    assertNumber(id);
+    return await browser.tabs.get(id);
   }
 
   /**

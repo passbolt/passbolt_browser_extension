@@ -36,16 +36,16 @@ describe("BrowserTabService", () => {
 
   describe("BrowserTabService::getById", () => {
     it("Should get tab by id", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       // mock data
-      const tab1 = { id: 1 };
-      const tab2 = { id: 2 };
+      const tabId = 1;
       // mock functions
-      jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [tab1, tab2]);
+      jest.spyOn(browser.tabs, "get");
       // process
-      const tab = await BrowserTabService.getById(1);
+      await BrowserTabService.getById(tabId);
       // expectations
-      expect(tab).toBe(tab1);
+      expect(browser.tabs.get).toHaveBeenCalledTimes(1);
+      expect(browser.tabs.get).toHaveBeenCalledWith(tabId);
     });
   });
 

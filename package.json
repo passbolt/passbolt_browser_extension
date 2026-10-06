@@ -79,7 +79,7 @@
     "uuid": "^14.0.0",
     "shell-quote": "1.10.0",
     "js-yaml": "^4.3.2",
-    "adm-zip": "0.6.0",
+    "adm-zip": "0.6.1",
     "qrcode": {
       "yargs": "^18.1.0"
     }

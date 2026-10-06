@@ -216,23 +216,25 @@ describe("WebauthnSetupCeremonyContentScriptService", () => {
     });
 
     it("keeps a WebauthnCeremonyError as is.", () => {
-      expect.assertions(2);
+      expect.assertions(3);
       const error = new WebauthnCeremonyError("Something went wrong.");
 
       const result = WebauthnSetupCeremonyContentScriptService.qualifyWebauthnCeremonyError(CEREMONY_ID, error);
 
       expect(result).toBe(error);
       expect(result.ceremonyId).toEqual(CEREMONY_ID);
+      expect(result.cause).toBeUndefined();
     });
 
     it("keeps a WebauthnRelyingPartyIpAddressError as is.", () => {
-      expect.assertions(2);
+      expect.assertions(3);
       const error = new WebauthnRelyingPartyIpAddressError();
 
       const result = WebauthnSetupCeremonyContentScriptService.qualifyWebauthnCeremonyError(CEREMONY_ID, error);
 
       expect(result).toBe(error);
       expect(result.ceremonyId).toEqual(CEREMONY_ID);
+      expect(result.cause).toBeUndefined();
     });
 
     it("maps any other exception to a WebauthnCeremonyError carrying the original name and message.", () => {

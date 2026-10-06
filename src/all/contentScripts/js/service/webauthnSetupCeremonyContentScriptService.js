@@ -138,7 +138,10 @@ class WebauthnSetupCeremonyContentScriptService {
     }
 
     typedError.ceremonyId = ceremonyId;
-    typedError.cause = error;
+    // A passed-through error must not reference itself: the port serializes it with JSON.stringify.
+    if (typedError !== error) {
+      typedError.cause = error;
+    }
 
     return typedError;
   }

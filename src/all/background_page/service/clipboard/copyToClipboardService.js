@@ -17,11 +17,7 @@ import ClipboardProviderService from "./clipboardProviderService";
 
 const CLIPBOARD_TEMPORARY_CONTENT_FLUSH_DELAY_IN_SECOND = 30;
 const CLIPBOARD_TEMPORARY_CONTENT_FLUSH_ALARM = "ClipboardTemporaryContentFlush";
-/**
- * The service aims to use the clipboard capability on Edge MV2 where:
- * - navigator.clipboard.writeText cannot be used in Edge MV2 background page due to a focus issue.
- * - offscreen clipboard cannot be used due to offscreen API available only with MV3.
- */
+
 export default class CopyToClipboardService {
   /**
    * @constructor

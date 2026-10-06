@@ -15,10 +15,9 @@ function send_to_chrome() {
   local id="$1"
   curl \
     -H "Authorization: Bearer $token"  \
-    -H "x-goog-api-version: 2" \
-    -X PUT \
+    -X POST \
     -T "dist/chromium-mv3/passbolt-${CI_COMMIT_TAG#v}.zip" \
-    https://www.googleapis.com/upload/chromewebstore/v1.1/items/"$id"
+    https://chromewebstore.googleapis.com/upload/v2/publishers/${CHROME_PUBLISHER_ID}/items/"$id:upload"
 }
 
 if is_release_candidate "$CI_COMMIT_TAG"; then

@@ -26,10 +26,11 @@ class PostLogoutService {
    * Sends a passbolt.auth.after-logout event on workers
    */
   static async exec() {
-    await PostLogoutService.sendLogoutEventForWorkers();
+    // Flush the user data first, so it never depends on the workers' ability to answer.
     await LocalStorageService.flush();
     await new CopyToClipboardService().flushTemporaryContentIfAny();
     await StartLoopAuthSessionCheckService.clearAlarm();
+    await PostLogoutService.sendLogoutEventForWorkers();
     toolbarService.handleUserLoggedOut();
     resourceInProgressCacheService.reset();
     OnExtensionUpdateAvailableService.handleUserLoggedOut();

@@ -45,7 +45,7 @@ describe("PostLogoutService", () => {
       const appPortWrapper = new Port(appPort);
 
       // function mocked
-      jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(jest.fn());
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(async () => {});
       jest.spyOn(PortManager, "getPortById").mockImplementationOnce(() => appPortWrapper);
       jest.spyOn(appPortWrapper, "emit");
       jest.spyOn(LocalStorageService, "flush");
@@ -82,6 +82,29 @@ describe("PostLogoutService", () => {
       expect(BrowserTabService.sendMessage).toHaveBeenCalledTimes(0);
       expect(PortManager.isPortExist).toHaveBeenCalledTimes(0);
       expect(LocalStorageService.flush).toHaveBeenCalled();
+    });
+
+    it("Should flush the user data even if a worker never answers", async () => {
+      expect.assertions(3);
+      jest.useFakeTimers();
+      const worker = readWorker({ name: AppPagemod.appName });
+      await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
+
+      jest.spyOn(PortManager, "isPortExist").mockImplementation(() => false);
+      // Simulate the Edge sleeping tab behavior: the message promise never settles.
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(() => new Promise(() => {}));
+      jest.spyOn(LocalStorageService, "flush");
+      jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
+      jest.spyOn(toolbarService, "handleUserLoggedOut");
+
+      const promise = PostLogoutService.exec();
+      await jest.advanceTimersByTimeAsync(1000);
+      await promise;
+
+      expect(LocalStorageService.flush).toHaveBeenCalledTimes(1);
+      expect(StartLoopAuthSessionCheckService.clearAlarm).toHaveBeenCalledTimes(1);
+      expect(toolbarService.handleUserLoggedOut).toHaveBeenCalledTimes(1);
+      jest.useRealTimers();
     });
 
     it("Should call all services that needs to run processes on logout", async () => {

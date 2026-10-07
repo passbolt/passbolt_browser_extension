@@ -55,7 +55,7 @@ describe("PostLoginService", () => {
       const informCtaPortWrapper = new Port(informCtaPort);
 
       // function mocked
-      jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(jest.fn());
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(async () => {});
       jest.spyOn(PortManager, "getPortById").mockImplementationOnce(() => informCtaPortWrapper);
       jest.spyOn(informCtaPortWrapper, "emit");
       jest.spyOn(toolbarService, "handleUserLoggedIn").mockImplementation(async () => {});

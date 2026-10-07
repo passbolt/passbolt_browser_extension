@@ -38,9 +38,10 @@ export default class GetOrFindRbacService {
    */
   async getOrFindMe() {
     const activeSession = await this.getOrFindActiveSessionService.getOrFind();
-    // Only an online session refreshes stale data; an offline session cannot reach the API.
+    // Only an online session with a server reachable refreshes stale data; an offline session cannot reach the API.
     const isStale =
       activeSession.isSessionOnline &&
+      activeSession.isServerReachable &&
       (await this.rbacsLocalStorage.isStaleSinceLastLoggedIn(activeSession.lastLoggedIn));
     if (!isStale) {
       const collectionDto = await this.rbacsLocalStorage.getData();

@@ -11,12 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.17.0
  */
+import Validator from "validator";
 import WebauthnAuthenticatorAlreadyRegisteredError from "../../../background_page/error/webauthnAuthenticatorAlreadyRegisteredError";
 import WebauthnCeremonyCancelledError from "../../../background_page/error/webauthnCeremonyCancelledError";
 import WebauthnCeremonyError from "../../../background_page/error/webauthnCeremonyError";
 import WebauthnTLSCertificateError from "../../../background_page/error/webauthnTLSCertificateError";
 import WebauthnAlreadyRunningCeremonyError from "../../../background_page/error/webauthnAlreadyRunningCeremonyError";
-import { assertWebauthnRelyingPartyIsNotIpAddress } from "passbolt-styleguide/src/shared/utils/assertions";
+import WebauthnRelyingPartyIpAddressError from "passbolt-styleguide/src/shared/lib/Error/WebauthnRelyingPartyIpAddressError";
 
 // Authenticator data: rpIdHash (32) + flags (1) + signCount (4) + aaguid (16), https://www.w3.org/TR/webauthn-3/#sctn-attested-credential-data
 const AAGUID_OFFSET = 37;
@@ -52,7 +53,10 @@ class WebauthnSetupCeremonyContentScriptService {
     this.pendingId = id;
 
     try {
-      assertWebauthnRelyingPartyIsNotIpAddress(location.hostname);
+      if (Validator.isIP(location.hostname.replace(/^\[(.*)\]$/, "$1"))) {
+        throw new WebauthnRelyingPartyIpAddressError();
+      }
+
       if (location.hostname !== options?.rp?.id) {
         throw new WebauthnCeremonyError(`The relying party id "${options?.rp?.id}" does not match the page origin.`);
       }

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.17.0
  */
-import { assertUuid } from "passbolt-styleguide/src/shared/utils/assertions";
+import Validator from "validator";
 import WebauthnSetupCeremonyContentScriptService from "../service/webauthnSetupCeremonyContentScriptService";
 
 const RESULT_EVENT = "passbolt.app-bootstrap.webauthn-ceremony-result";
@@ -51,7 +51,9 @@ class AbortWebauthnSetupCeremonyContentScriptController {
   async exec(contentScriptControllerArguments) {
     const { id } = contentScriptControllerArguments;
 
-    assertUuid(id);
+    if (!Validator.isUUID(id)) {
+      throw new Error("The given parameter is not a valid UUID");
+    }
 
     WebauthnSetupCeremonyContentScriptService.abort(id);
   }

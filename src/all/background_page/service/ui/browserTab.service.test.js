@@ -47,6 +47,19 @@ describe("BrowserTabService", () => {
       expect(browser.tabs.get).toHaveBeenCalledTimes(1);
       expect(browser.tabs.get).toHaveBeenCalledWith(tabId);
     });
+
+    it("Should get tab by id given as a string", async () => {
+      expect.assertions(2);
+      jest.spyOn(browser.tabs, "get");
+      await BrowserTabService.getById("1");
+      expect(browser.tabs.get).toHaveBeenCalledTimes(1);
+      expect(browser.tabs.get).toHaveBeenCalledWith(1);
+    });
+
+    it("Should throw if the id is not a valid number", async () => {
+      expect.assertions(1);
+      await expect(() => BrowserTabService.getById({})).rejects.toThrow(TypeError);
+    });
   });
 
   describe("BrowserTabService::sendMessage", () => {

@@ -11,8 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import Port from "./port";
+import Port, { EMIT_MAX_ATTEMPTS, PORT_READY_TIMEOUT } from "./port";
 import { v4 as uuidv4 } from "uuid";
+
+/**
+ * Trigger the disconnection listeners registered on a runtime port.
+ * @param {object} runtimePort The mocked runtime port
+ */
+const triggerDisconnect = (runtimePort) =>
+  runtimePort.onDisconnect.addListener.mock.calls.forEach(([listener]) => listener());
 
 describe("Port", () => {
   describe("Port::connect", () => {
@@ -170,6 +177,172 @@ describe("Port", () => {
       port._onMessage(JSON.stringify([requestId, "SUCCESS", dataReceived]));
       expect(Object.keys(port._listeners).length).toBe(0);
       expect(await promise).toStrictEqual(dataReceived);
+    });
+  });
+
+  describe("Port::connect failures", () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("should reject and release the port when it is disconnected before being ready", async () => {
+      expect.assertions(3);
+
+      const port = new Port(uuidv4());
+      const promise = port.connect();
+      const runtimePort = port._port;
+      // The addon code denied the connection.
+      triggerDisconnect(runtimePort);
+
+      await expect(promise).rejects.toThrow("disconnected before being acknowledged");
+      expect(port._connected).toStrictEqual(false);
+      expect(runtimePort.disconnect).toHaveBeenCalled();
+    });
+
+    it("should reject when a reconnection is not acknowledged in time", async () => {
+      expect.assertions(2);
+      jest.useFakeTimers();
+
+      const port = new Port(uuidv4());
+      port.connect();
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+      port._connected = false;
+      const promise = port.connect();
+      jest.advanceTimersByTime(PORT_READY_TIMEOUT);
+
+      await expect(promise).rejects.toThrow("not been acknowledged by the addon code in time");
+      expect(port._connected).toStrictEqual(false);
+    });
+
+    it("should wait without maximum delay for the first connection to be acknowledged", async () => {
+      expect.assertions(2);
+      jest.useFakeTimers();
+
+      const port = new Port(uuidv4());
+      const promise = port.connect();
+      // The addon code can take long to attach the application (i.e. API calls).
+      jest.advanceTimersByTime(PORT_READY_TIMEOUT * 2);
+      expect(port._connected).toStrictEqual(true);
+
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+      await expect(promise).resolves.toBeUndefined();
+    });
+
+    it("should release the lock and reject the request when the connection is denied", async () => {
+      expect.assertions(3);
+
+      const port = new Port(uuidv4());
+      const promise = port.request("request_message");
+      // Wait for the connection to be attempted, whatever the number of ticks the transpiled async chain takes.
+      for (let tick = 0; tick < 20 && !port._port; tick++) {
+        await Promise.resolve();
+      }
+      triggerDisconnect(port._port);
+
+      await expect(promise).rejects.toThrow("disconnected before being acknowledged");
+      expect(port.lock._locked).toBeFalsy();
+      // Only the request listener had been added, it is removed with the failure.
+      expect(Object.keys(port._listeners).length).toBe(0);
+    });
+  });
+
+  describe("Port::disconnection", () => {
+    it("should ignore the late disconnection of a previous port", async () => {
+      expect.assertions(2);
+
+      const port = new Port(uuidv4());
+      port.connect();
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+      const previousRuntimePort = port._port;
+      // The application reconnects (i.e. after a service worker restart) before the previous disconnection is received.
+      port._connected = false;
+      port.connect();
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+      expect(port._port).not.toBe(previousRuntimePort);
+
+      triggerDisconnect(previousRuntimePort);
+
+      expect(port._connected).toStrictEqual(true);
+    });
+
+    it("should flag the port as disconnected when the current port is disconnected", async () => {
+      expect.assertions(1);
+
+      const port = new Port(uuidv4());
+      port.connect();
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+
+      triggerDisconnect(port._port);
+
+      expect(port._connected).toStrictEqual(false);
+    });
+  });
+
+  describe("Port::emit on a dead port", () => {
+    it("should reconnect and send the message again when the port is dead without its disconnection received", async () => {
+      expect.assertions(3);
+
+      const port = new Port(uuidv4());
+      port.connect();
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+      const deadRuntimePort = port._port;
+      const connectionsCount = browser.runtime.connect.mock.calls.length;
+      deadRuntimePort.postMessage.mockImplementation(() => {
+        throw new Error("Attempting to use a disconnected port object");
+      });
+
+      const emitting = port.emit("message");
+      // Wait for the reconnection to be attempted, then acknowledge it.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+      await emitting;
+
+      expect(browser.runtime.connect).toHaveBeenCalledTimes(connectionsCount + 1);
+      expect(port._port).not.toBe(deadRuntimePort);
+      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify(["message"]));
+    });
+  });
+
+  describe("Port::emit retries", () => {
+    it("should stop retrying and reject once the maximum number of attempts is reached", async () => {
+      expect.assertions(2);
+
+      const port = new Port(uuidv4());
+      port.connect();
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+      const error = new Error("Attempting to use a disconnected port object");
+      port._port.postMessage.mockImplementation(() => {
+        throw error;
+      });
+      // Every reconnection succeeds but the port stays dead.
+      jest.spyOn(port, "connectIfDisconnected").mockImplementation(async () => {
+        port._connected = true;
+      });
+
+      await expect(port.emit("message")).rejects.toBe(error);
+      expect(port._port.postMessage).toHaveBeenCalledTimes(EMIT_MAX_ATTEMPTS);
+    });
+  });
+
+  describe("Port::request delivery", () => {
+    it("should post a request only once", async () => {
+      expect.assertions(2);
+
+      const port = new Port(uuidv4());
+      port.connect();
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+
+      const promise = port.request("request_message");
+      const requestId = Object.keys(port._listeners)[0];
+      // Wait for the message to be posted.
+      for (let tick = 0; tick < 20 && port._port.postMessage.mock.calls.length === 0; tick++) {
+        await Promise.resolve();
+      }
+      port._onMessage(JSON.stringify([requestId, "SUCCESS"]));
+      await promise;
+
+      expect(port._port.postMessage).toHaveBeenCalledTimes(1);
+      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify(["request_message", requestId]));
     });
   });
 });

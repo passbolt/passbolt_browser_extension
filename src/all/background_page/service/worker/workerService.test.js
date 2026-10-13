@@ -209,12 +209,15 @@ describe("WorkerService", () => {
       PortManager.registerPort(portWrapper);
 
       jest.spyOn(WorkersSessionStorage, "getWorkersByNames").mockImplementationOnce(() => [worker, worker2]);
-      jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => PortManager.registerPort(portWrapper2));
+      jest
+        .spyOn(BrowserTabService, "sendMessage")
+        .mockImplementationOnce(async () => PortManager.registerPort(portWrapper2));
       jest.spyOn(portWrapper, "emit");
       jest.spyOn(portWrapper2, "emit");
 
       await WorkerService.destroyWorkersByName([worker.name, worker2.name]);
-      await Promise.resolve();
+      // Waiting all promises has been finished
+      await jest.advanceTimersByTimeAsync(0);
 
       // expectation
       expect(portWrapper.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
@@ -243,6 +246,8 @@ describe("WorkerService", () => {
       jest.spyOn(portWrapper2, "emit");
 
       await WorkerService.destroyWorkersByName([worker.name, worker2.name]);
+      // Waiting all promises has been finished
+      await jest.advanceTimersByTimeAsync(0);
 
       // expectation
       expect(portWrapper.emit).toHaveBeenCalledTimes(0);
@@ -250,6 +255,69 @@ describe("WorkerService", () => {
       expect(portWrapper2.emit).toHaveBeenCalledTimes(1);
       expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker, "passbolt.port.connect", worker.id);
       expect(BrowserTabService.sendMessage).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("WorkerService::emitOnWorkersWithName", () => {
+    it("Should reconnect the port of an awake tab and emit the event", async () => {
+      expect.assertions(3);
+      const worker = readWorker();
+      const portWrapper = new Port(mockPort({ name: worker.id, tabId: worker.tabId, frameId: worker.frameId }));
+
+      jest.spyOn(WorkersSessionStorage, "getWorkersByNames").mockImplementationOnce(() => [worker]);
+      jest.spyOn(browser.tabs, "get").mockImplementationOnce(async () => ({ frozen: false, discarded: false }));
+      jest
+        .spyOn(BrowserTabService, "sendMessage")
+        .mockImplementationOnce(async () => PortManager.registerPort(portWrapper));
+      jest.spyOn(portWrapper, "emit");
+
+      await WorkerService.emitOnWorkersWithName("passbolt.event", [worker.name]);
+
+      expect(browser.tabs.get).toHaveBeenCalledWith(worker.tabId);
+      expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker, "passbolt.port.connect", worker.id);
+      expect(portWrapper.emit).toHaveBeenCalledWith("passbolt.event");
+    });
+
+    it.each([
+      ["frozen", { frozen: true, discarded: false }],
+      ["discarded", { frozen: false, discarded: true }],
+    ])("Should not try to reconnect the port of a %s tab", async (_, tab) => {
+      expect.assertions(2);
+      const worker = readWorker();
+      const worker2 = readWorker();
+      const portWrapper2 = new Port(mockPort({ name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId }));
+      PortManager.registerPort(portWrapper2);
+
+      jest.spyOn(WorkersSessionStorage, "getWorkersByNames").mockImplementationOnce(() => [worker, worker2]);
+      jest.spyOn(browser.tabs, "get").mockImplementationOnce(async () => tab);
+      jest.spyOn(BrowserTabService, "sendMessage");
+      jest.spyOn(portWrapper2, "emit");
+
+      await WorkerService.emitOnWorkersWithName("passbolt.event", [worker.name, worker2.name]);
+
+      expect(BrowserTabService.sendMessage).not.toHaveBeenCalled();
+      expect(portWrapper2.emit).toHaveBeenCalledWith("passbolt.event");
+    });
+
+    it("Should not wait indefinitely for a tab that never answers", async () => {
+      expect.assertions(3);
+      const worker = readWorker();
+      const worker2 = readWorker();
+      const portWrapper2 = new Port(mockPort({ name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId }));
+      PortManager.registerPort(portWrapper2);
+
+      jest.spyOn(WorkersSessionStorage, "getWorkersByNames").mockImplementationOnce(() => [worker, worker2]);
+      jest.spyOn(browser.tabs, "get").mockImplementationOnce(async () => ({ frozen: false, discarded: false }));
+      // Simulate the Edge sleeping tab behavior: the message promise never settles.
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => new Promise(() => {}));
+      jest.spyOn(portWrapper2, "emit");
+
+      const promise = WorkerService.emitOnWorkersWithName("passbolt.event", [worker.name, worker2.name]);
+      await jest.advanceTimersByTimeAsync(1000);
+
+      await expect(promise).resolves.toBeUndefined();
+      expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker, "passbolt.port.connect", worker.id);
+      expect(portWrapper2.emit).toHaveBeenCalledWith("passbolt.event");
     });
   });
 });

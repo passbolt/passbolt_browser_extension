@@ -57,12 +57,14 @@ class PortManager {
         console.debug(
           `A known port has been denied connection or reconnection with name=${port.name}, tabUrl=${port.sender.tab.url}, tabId=${port.sender.tab.id}, frameId=${port.sender.frameId}`,
         );
+        port.disconnect();
       }
     } else {
       // If there is no worker associate to this port
       console.debug(
         `An unknown port has been denied connection with name=${port.name}, tabUrl=${port.sender.tab.url}, tabId=${port.sender.tab.id}, frameId=${port.sender.frameId}`,
       );
+      port.disconnect();
     }
   }
 
@@ -106,6 +108,10 @@ class PortManager {
     const portWrapper = new Port(port);
     this.registerPort(portWrapper);
     await PagemodManager.attachEventToPort(portWrapper, name);
+    if (this._ports[port.name] !== portWrapper) {
+      console.debug(`The port ${port.name} has been disconnected before being ready.`);
+      return;
+    }
     portWrapper.emit("passbolt.port.ready");
   }
 
@@ -124,7 +130,13 @@ class PortManager {
    * @param port
    */
   registerPort(port) {
-    this._ports[port._port.name] = port;
+    const id = port._port.name;
+    this._ports[id] = port;
+    port._port.onDisconnect.addListener(() => {
+      if (this._ports[id] === port) {
+        delete this._ports[id];
+      }
+    });
   }
 
   /**

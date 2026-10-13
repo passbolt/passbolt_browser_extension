@@ -111,6 +111,104 @@ describe("PortManager", () => {
     });
   });
 
+  describe("PortManager::port lifecycle", () => {
+    /**
+     * Trigger the disconnection listeners registered on a runtime port.
+     * @param {object} runtimePort The mocked runtime port
+     */
+    const triggerDisconnect = (runtimePort) =>
+      runtimePort.onDisconnect.addListener.mock.calls.forEach(([listener]) => listener());
+
+    it("should disconnect a port denied because its sender is not the expected one", async () => {
+      expect.assertions(2);
+      const workerDto = readWorker();
+      await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto));
+      const port = mockPort({ name: workerDto.id, tabId: 2, frameId: workerDto.frameId });
+
+      await PortManager.onPortConnect(port);
+
+      expect(port.disconnect).toHaveBeenCalled();
+      expect(port.postMessage).not.toHaveBeenCalled();
+    });
+
+    it("should disconnect an unknown port", async () => {
+      expect.assertions(2);
+      const workerDto = readWorker();
+      const port = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
+
+      await PortManager.onPortConnect(port);
+
+      expect(port.disconnect).toHaveBeenCalled();
+      expect(PortManager._ports[workerDto.id]).toBeUndefined();
+    });
+
+    it("should disconnect a port reusing the name of a port still connected", async () => {
+      expect.assertions(3);
+      const workerDto = readWorker();
+      await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto));
+      const firstPort = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
+      const secondPort = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
+      jest.spyOn(PagemodManager, "attachEventToPort").mockImplementation(jest.fn());
+
+      await PortManager.onPortConnect(firstPort);
+      await PortManager.onPortConnect(secondPort);
+
+      expect(PortManager._ports[workerDto.id]._port).toBe(firstPort);
+      expect(secondPort.disconnect).toHaveBeenCalled();
+      expect(firstPort.disconnect).not.toHaveBeenCalled();
+    });
+
+    it("should forget a disconnected port so the application can reconnect with the same name", async () => {
+      expect.assertions(3);
+      const workerDto = readWorker();
+      await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto));
+      const firstPort = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
+      jest.spyOn(PagemodManager, "attachEventToPort").mockImplementation(jest.fn());
+      await PortManager.onPortConnect(firstPort);
+
+      // The page was frozen, closed or navigated away.
+      triggerDisconnect(firstPort);
+      expect(PortManager._ports[workerDto.id]).toBeUndefined();
+
+      const secondPort = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
+      await PortManager.onPortConnect(secondPort);
+
+      expect(PortManager._ports[workerDto.id]._port).toBe(secondPort);
+      expect(secondPort.postMessage).toHaveBeenCalledWith(JSON.stringify(["passbolt.port.ready"]));
+    });
+
+    it("should not emit ready on a port disconnected while its events were attached", async () => {
+      expect.assertions(2);
+      const workerDto = readWorker();
+      await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto));
+      const port = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
+      // The application gives up waiting while the events are being attached.
+      jest.spyOn(PagemodManager, "attachEventToPort").mockImplementation(async () => triggerDisconnect(port));
+
+      await PortManager.onPortConnect(port);
+
+      expect(PortManager._ports[workerDto.id]).toBeUndefined();
+      expect(port.postMessage).not.toHaveBeenCalled();
+    });
+
+    it("should not forget a newer port when a previous port with the same name is disconnected late", async () => {
+      expect.assertions(1);
+      const workerDto = readWorker();
+      await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto));
+      const firstPort = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
+      const secondPort = mockPort({ name: workerDto.id, tabId: workerDto.tabId, frameId: workerDto.frameId });
+      jest.spyOn(PagemodManager, "attachEventToPort").mockImplementation(jest.fn());
+      await PortManager.onPortConnect(firstPort);
+      // The first port is replaced, i.e. the service worker restarted and its memory was flushed.
+      PortManager._ports = {};
+      await PortManager.onPortConnect(secondPort);
+
+      triggerDisconnect(firstPort);
+
+      expect(PortManager._ports[workerDto.id]._port).toBe(secondPort);
+    });
+  });
+
   describe("PortManager::onTabRemoved", () => {
     it("Should remove the workers and runtime memory ports for a specific tab id", async () => {
       expect.assertions(6);

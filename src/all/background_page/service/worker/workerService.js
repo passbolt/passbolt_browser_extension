@@ -16,9 +16,11 @@ import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import BrowserTabService from "../ui/browserTab.service";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import WebNavigationService from "../webNavigation/webNavigationService";
+import PromiseTimeoutService from "../../utils/promise/promiseTimeoutService";
 
 const WORKER_EXIST_TIME_CHECKING = 100;
 const WORKER_CHECK_STATUS_TIME_CHECKING = 50;
+const WORKER_RECONNECT_PORT_TIMEOUT = 1000;
 
 class WorkerService {
   static timeoutByWorkerID = {};
@@ -145,19 +147,48 @@ class WorkerService {
    */
   static async emitOnWorkersWithName(eventName, workersName) {
     const workers = await WorkersSessionStorage.getWorkersByNames(workersName);
-    for (const worker of workers) {
-      if (!PortManager.isPortExist(worker.id)) {
-        try {
-          await BrowserTabService.sendMessage(worker, "passbolt.port.connect", worker.id);
-        } catch (error) {
-          console.debug("Unable to reconnect the port prior to emitting event");
-          console.error(error);
-          continue;
-        }
+    // Emit in parallel so that a worker slow to answer does not delay the others.
+    await Promise.allSettled(workers.map((worker) => this.emitOnWorker(eventName, worker)));
+  }
+
+  /**
+   * Emit an event on a worker, reconnecting its port first if needed.
+   * @param {string} eventName
+   * @param {object} worker
+   * @return {Promise<void>}
+   * @private
+   */
+  static async emitOnWorker(eventName, worker) {
+    if (!PortManager.isPortExist(worker.id)) {
+      try {
+        await this.reconnectPort(worker);
+      } catch (error) {
+        console.debug("Unable to reconnect the port prior to emitting event");
+        console.error(error);
+        return;
       }
-      const port = PortManager.getPortById(worker.id);
-      port.emit(eventName);
     }
+    const port = PortManager.getPortById(worker.id);
+    port.emit(eventName);
+  }
+
+  /**
+   * Request the content script of a worker to reconnect its port.
+   * On Edge, messages sent to a sleeping (frozen) tab never resolve until the tab wakes up, so sleeping tabs are
+   * skipped and the request is bounded by a timeout.
+   * @see https://github.com/microsoft/MicrosoftEdge-Extensions/issues/134
+   * @param {object} worker
+   * @return {Promise<void>}
+   * @throws {Error} If the tab is asleep or the content script does not answer in time.
+   * @private
+   */
+  static async reconnectPort(worker) {
+    const tab = await browser.tabs.get(worker.tabId);
+    if (tab?.frozen || tab?.discarded) {
+      throw new Error(`The tab ${worker.tabId} is asleep, its worker port cannot be reconnected.`);
+    }
+    const sendMessagePromise = BrowserTabService.sendMessage(worker, "passbolt.port.connect", worker.id);
+    await PromiseTimeoutService.exec(sendMessagePromise, WORKER_RECONNECT_PORT_TIMEOUT);
   }
 }
 

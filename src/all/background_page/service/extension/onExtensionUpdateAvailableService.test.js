@@ -112,7 +112,7 @@ describe("OnExtensionUpdateAvailableService", () => {
       jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(() => true);
       jest
         .spyOn(BrowserTabService, "sendMessage")
-        .mockImplementation(() => PortManager.registerPort(webIntegrationPortWrapper));
+        .mockImplementation(async () => PortManager.registerPort(webIntegrationPortWrapper));
       jest.spyOn(browser.runtime, "reload");
       jest.spyOn(webIntegrationPortWrapper, "emit");
       jest.spyOn(webIntegrationPortWrapper2, "emit");
@@ -123,11 +123,7 @@ describe("OnExtensionUpdateAvailableService", () => {
       expect(browser.runtime.reload).not.toHaveBeenCalled();
       await PostLogoutService.exec();
       // Waiting all promises has been finished
-      await Promise.resolve();
-      await Promise.resolve();
-      await Promise.resolve();
-      await Promise.resolve();
-      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 0));
       // expectation
       expect(webIntegrationPortWrapper.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
       expect(webIntegrationPortWrapper.emit).toHaveBeenCalledTimes(1);

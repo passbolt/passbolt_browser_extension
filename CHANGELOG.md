@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [5.16.2] - 2026-09-10
+### Added
+- PB-55198 - EDGE - WP1.1 - Create emitOnWorker in workerService
+- PB-55199 - EDGE - WP1.2 - Improve postLogoutService
+- PB-55200 - EDGE - WP1.3 - Update postLoginService
+- PB-55201 - EDGE - WP1.4 - Update ResourceCreatePage to handle Edge new tab page
+
 ## [5.16.1] - 2026-08-17
 ### Fixed
 - PB-53792 - Copy/pasting issues on Safari

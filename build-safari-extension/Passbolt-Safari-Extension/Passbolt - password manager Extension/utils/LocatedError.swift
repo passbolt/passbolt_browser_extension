@@ -29,15 +29,15 @@ struct LocatedError: LocalizedError {
     let file: String
     let line: Int
     let function: String
-
+    
     var errorDescription: String? {
         (underlyingError as? LocalizedError)?.errorDescription ?? underlyingError.localizedDescription
     }
-
+    
     var failureReason: String? {
         (underlyingError as? LocalizedError)?.failureReason
     }
-
+    
     var recoverySuggestion: String? {
         (underlyingError as? LocalizedError)?.recoverySuggestion
     }

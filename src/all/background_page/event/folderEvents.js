@@ -93,16 +93,17 @@ const listen = function (worker, apiClientOptions, account) {
   });
 
   /*
-   * Open the folder move confirmation dialog.
+   * Move a folder, and apply the permissions the operator confirmed when there are any.
    *
-   * @listens passbolt.folders.move-one-folder
+   * @listens passbolt.folders.move-by-id
    * @param {uuid} requestId The request identifier
    * @param {string} folderId The folder id to move
    * @param {string} destinationFolderId The destination folder id
+   * @param {Object<string, Array<object>>|null} permissionsDto The permissions the operator confirmed, keyed by item id. Null to keep the permissions as they are.
    */
-  worker.port.on("passbolt.folders.move-by-id", async (requestId, folderId, destinationFolderId) => {
+  worker.port.on("passbolt.folders.move-by-id", async (requestId, folderId, destinationFolderId, permissionsDto) => {
     const controller = new MoveFolderController(worker, requestId, apiClientOptions, account);
-    await controller.exec(folderId, destinationFolderId);
+    await controller._exec(folderId, destinationFolderId, permissionsDto);
   });
 };
 

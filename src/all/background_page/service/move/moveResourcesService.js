@@ -15,13 +15,13 @@ import PermissionChangesCollection from "../../model/entity/permission/change/pe
 import i18n from "../../sdk/i18n";
 import FindResourcesService from "../../service/resource/findResourcesService";
 import ShareResourceService, { PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL } from "../share/shareResourceService";
-import { assertNonEmptyArray, assertString } from "../../utils/assertions";
+import { assertNonEmptyArray, assertString, assertType } from "../../utils/assertions";
 import { assertArrayUUID, assertUuid } from "passbolt-styleguide/src/shared/utils/assertions";
 import FindFoldersService from "../folder/findFoldersService";
 import MoveService from "../api/move/moveService";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import ResourceUpdateLocalStorageService from "../resource/update/resourceUpdateLocalStorageService";
-import CalculatePermissionsChangesForMoveService from "./calculatePermissionsChangesForMoveService";
+import CalculatePermissionsChangesService from "../permission/calculatePermissionsChangesService";
 
 export const PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL =
   1 + // Retrieving destination folder permissions
@@ -49,18 +49,22 @@ class MoveResourcesService {
   }
 
   /**
-   * Moves resources given their ids to a destination folder (given its id).
+   * Move the given resources into the given destination folder, applying the permissions the
+   * operator confirmed to the ones they own. A resource without an entry keeps its permissions.
    *
    * @param {array<string>} resourcesIds
    * @param {string|null} destinationFolderId
+   * @param {Map<string, PermissionsCollection>} confirmedPermissions The permissions the operator confirmed, keyed by resource id. May be empty.
    * @param {string} passphrase
+   * @returns {Promise<{skippedResourceIds: Array<string>}>} The ids of the resources that could not be moved.
    */
-  async moveAll(resourcesIds, destinationFolderId, passphrase) {
+  async moveAll(resourcesIds, destinationFolderId, confirmedPermissions, passphrase) {
     assertNonEmptyArray(resourcesIds, "Could not move, expecting at least a resource to be provided.");
     assertArrayUUID(resourcesIds, "Could not move, expecting resourcesIds to be an array of UUIDs.");
     if (destinationFolderId) {
       assertUuid(destinationFolderId, "Could not move, expecting destinationFolderId to be a valid UUID.");
     }
+    assertType(confirmedPermissions, Map, 'The parameter "confirmedPermissions" should be a Map keyed by resource id.');
     if (passphrase) {
       assertString(passphrase);
     }
@@ -68,12 +72,19 @@ class MoveResourcesService {
     const destinationFolder = await this.findDestinationFolderWithPermissions(destinationFolderId);
     const resources = await this.findAllResourcesWithPermissions(resourcesIds);
     const resourcesParentFolders = await this.findAllFoldersWithPermissions([...new Set(resources.folderParentIds)]);
-    this.filterOutResourcesThatWontMove(resources, resourcesParentFolders, destinationFolder);
+    const skippedResourceIds = this.filterOutResourcesThatWontMove(
+      resources,
+      resourcesParentFolders,
+      destinationFolder,
+    );
+    this.filterOutResourcesAlreadyInDestination(resources, destinationFolderId);
 
-    const changes = await this.calculateChanges(resources, resourcesParentFolders, destinationFolder);
+    const changes = this.calculateChanges(resources, confirmedPermissions);
 
     await this.move(resources, destinationFolderId);
     await this.share(resources, changes, passphrase);
+
+    return { skippedResourceIds };
   }
 
   /**
@@ -135,34 +146,56 @@ class MoveResourcesService {
   }
 
   /**
-   * Filter out resources that will not move.
+   * Filter out resources that will not move, returning their ids so the caller can report them.
    * @param {ResourcesCollection} resources
    * @param {FoldersCollection} resourcesParentFolders
    * @param {FolderEntity} destinationFolder
+   * @returns {Array<string>} The ids of the resources removed because they cannot be moved.
    * @private
    */
   filterOutResourcesThatWontMove(resources, resourcesParentFolders, destinationFolder) {
+    const skippedResourceIds = [];
     resources.filterByCallback((resource) => {
       const parentFolder = resource.folderParentId ? resourcesParentFolders.getById(resource.folderParentId) : null;
 
       const canMove = resource.canMove(parentFolder, destinationFolder);
       if (!canMove) {
         console.warn(`Resource "${resource.id}" cannot be moved, skipping.`);
+        skippedResourceIds.push(resource.id);
       }
 
       return canMove;
     });
+    return skippedResourceIds;
   }
 
   /**
-   * Build changes to be used for share.
+   * Filter out the resources that already sit in the destination folder. They are skipped without
+   * error, and filtered out before the changes are calculated so their permissions stay untouched.
    * @param {ResourcesCollection} resources
-   * @param {FoldersCollection} resourcesParentFolders
-   * @param {FolderEntity} destinationFolder
-   * @returns {Promise<PermissionChangesCollection>}
+   * @param {string|null} destinationFolderId
+   * @returns {void}
    * @private
    */
-  async calculateChanges(resources, resourcesParentFolders, destinationFolder) {
+  filterOutResourcesAlreadyInDestination(resources, destinationFolderId) {
+    resources.filterByCallback((resource) => {
+      const isMoving = resource.folderParentId !== destinationFolderId;
+      if (!isMoving) {
+        console.debug(`Resource "${resource.id}" is already in the destination folder, skipping.`);
+      }
+      return isMoving;
+    });
+  }
+
+  /**
+   * The permission changes to apply from what the operator confirmed. Only the owned resources can
+   * change, each set to exactly what was confirmed for it, lowerings and removals included.
+   * @param {ResourcesCollection} resources
+   * @param {Map<string, PermissionsCollection>} confirmedPermissions The permissions the operator confirmed, keyed by resource id. May be empty.
+   * @returns {PermissionChangesCollection}
+   * @private
+   */
+  calculateChanges(resources, confirmedPermissions) {
     this.progressService.finishStep(i18n.t("Calculating resources permissions changes"), true);
 
     const resultingChanges = new PermissionChangesCollection([]);
@@ -178,23 +211,12 @@ class MoveResourcesService {
         continue;
       }
 
-      /*
-       * When a shared folder is moved, we do not change permissions when:
-       * - move is from the root to a personal folder
-       * - move is from a personal folder to a personal folder;
-       * - move is from a personal folder to the root.
-       */
-      if (
-        resource.isShared() &&
-        (destinationFolder === null || destinationFolder.isPersonal()) &&
-        (resource.folderParentId === null || resource.isPersonal())
-      ) {
+      const targetPermissions = confirmedPermissions.get(resource.id);
+      if (!targetPermissions) {
         continue;
       }
 
-      const parentFolder = resource.folderParentId ? resourcesParentFolders.getById(resource.folderParentId) : null;
-
-      const changes = CalculatePermissionsChangesForMoveService.forResource(resource, parentFolder, destinationFolder);
+      const changes = CalculatePermissionsChangesService.forResourceWithTargetPermissions(resource, targetPermissions);
       resultingChanges.merge(changes);
     }
 
@@ -202,21 +224,14 @@ class MoveResourcesService {
   }
 
   /**
-   * Move the resources into the target destination foler.
+   * Move the resources into the target destination folder. The caller has already filtered out the
+   * ones that will not move, so `resources` and the calculated changes stay aligned.
    * @param {ResourcesCollection} resources The resources to move
    * @param {string} destinationFolderId The target destination folder id
    * @returns {Promise<void>}
    * @private
    */
   async move(resources, destinationFolderId) {
-    resources.filterByCallback((resource) => {
-      const isMoving = resource.folderParentId !== destinationFolderId;
-      if (!isMoving) {
-        console.debug(`Resource "${resource.id}" is already in the destination folder, skipping.`);
-      }
-      return isMoving;
-    });
-
     if (resources.length === 0) {
       this.progressService.finishSteps(1);
       return;
@@ -224,12 +239,25 @@ class MoveResourcesService {
 
     this.progressService.finishStep(i18n.t("Moving resources"), true);
 
-    for (const resource of resources) {
-      this.progressService.updateStepMessage(i18n.t("Moving {{name}}", { name: resource.metadata.name }));
-      await this.moveApiService.moveResource(resource.id, destinationFolderId);
+    const movedResourceIds = [];
+    try {
+      for (const resource of resources) {
+        this.progressService.updateStepMessage(i18n.t("Moving {{name}}", { name: resource.metadata.name }));
+        await this.moveApiService.moveResource(resource.id, destinationFolderId);
+        movedResourceIds.push(resource.id);
+      }
+    } catch (error) {
+      // Part of the batch already moved, so refresh it; a failed refresh must not hide the original error.
+      if (movedResourceIds.length) {
+        try {
+          await this.resourceUpdateLocalStorageService.updateFolderParentId(movedResourceIds, destinationFolderId);
+        } catch (flushError) {
+          console.error(flushError);
+        }
+      }
+      throw error;
     }
-    // Update the collection with the resources updated
-    await this.resourceUpdateLocalStorageService.updateFolderParentId(resources.ids, destinationFolderId);
+    await this.resourceUpdateLocalStorageService.updateFolderParentId(movedResourceIds, destinationFolderId);
   }
 
   /**

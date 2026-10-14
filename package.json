@@ -1,6 +1,6 @@
 {
   "name": "passbolt-browser-extension",
-  "version": "5.16.2",
+  "version": "5.17.0-rc.0",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2025 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -15,13 +15,13 @@
     "downloadjs": "^1.4.7",
     "eckey-utils": "^0.7.14",
     "i18next": "^26.3.4",
-    "i18next-http-backend": "^3.0.5",
+    "i18next-http-backend": "^4.0.2",
     "ip-regex": "^5.0.0",
     "jssha": "~3.3.1",
     "kdbxweb": "2.1.1",
     "openpgp": "^6.1.1",
     "papaparse": "^5.5.2",
-    "passbolt-styleguide": "^5.16.2",
+    "passbolt-styleguide": "^5.17.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "uuid": "^14.0.0",
@@ -66,20 +66,23 @@
     "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^16.0.0",
     "jest-webextension-mock": "^4.1.1",
-    "lockfile-lint": "^4.14.1",
+    "lockfile-lint": "^5.0.1",
     "prettier": "3.6.2",
     "terser-webpack-plugin": "^5.4.0",
     "text-encoding-utf-8": "^1.0.2",
-    "web-ext": "^10.4.0",
+    "web-ext": "^10.7.0",
     "webpack": "^5.107.2",
     "webpack-cli": "^7.0.2"
   },
   "overrides": {
     "@xmldom/xmldom": "0.8.15",
     "uuid": "^14.0.0",
-    "shell-quote": "1.10.0",
+    "shell-quote": "1.12.0",
     "js-yaml": "^4.3.2",
-    "adm-zip": "0.6.0"
+    "adm-zip": "0.6.1",
+    "qrcode": {
+      "yargs": "^18.1.0"
+    }
   },
   "scripts": {
     "build": "webpack",

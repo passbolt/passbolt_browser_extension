@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "__MSG_appName__",
   "short_name": "passbolt",
-  "version": "5.16.2",
+  "version": "5.17.0.0",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
   "browser_specific_settings": {
@@ -29,8 +29,7 @@
         "dark": "webAccessibleResources/img/icons/icon-32.png",
         "size": 32
     }],
-    "default_title": "Passbolt Quickaccess",
-    "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
+    "default_title": "Passbolt Quickaccess"
   },
   "commands": {
     "_execute_browser_action": {},

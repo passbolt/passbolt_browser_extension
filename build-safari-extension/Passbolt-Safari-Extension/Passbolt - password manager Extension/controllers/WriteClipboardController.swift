@@ -35,7 +35,7 @@ extension NSPasteboard.PasteboardType {
 // background page never has when it processes a port request, hence the delegation to the app.
 class WriteClipboardController: AbstractController {
     required init() {}
-
+    
     func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) -> Void {
         guard let data = payload["data"] as? String else {
             self.respondAsError(context, locatedNSError(
@@ -45,11 +45,11 @@ class WriteClipboardController: AbstractController {
             ))
             return
         }
-
+        
         let pasteboard = NSPasteboard.general
         // Host only keeps the secret out of the Universal Clipboard, it must not reach the other devices.
         pasteboard.prepareForNewContents(with: .currentHostOnly)
-
+        
         if pasteboard.setString(data, forType: .string) {
             // Best effort hint, a refusal must not fail the copy itself.
             pasteboard.setString(data, forType: .concealed)

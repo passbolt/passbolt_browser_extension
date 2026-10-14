@@ -18,6 +18,7 @@ import WorkerEntity from "../model/entity/worker/workerEntity";
 import ScriptExecution from "../sdk/scriptExecution";
 import Pagemod from "./pagemod";
 import { PortEvents } from "../event/portEvents";
+import { AppBootstrapEvents } from "../event/appBootstrapEvents";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import UserActiveSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
 import AccountEntity from "../model/entity/account/accountEntity";
@@ -31,11 +32,12 @@ import PassboltBadResponseError from "../error/passboltBadResponseError";
 import AuthenticationStatusService from "../service/authenticationStatusService";
 import ServerStatusApiService from "../service/api/status/serverStatusApiService";
 
-const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
+const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorkerAndEvictSameFrame");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
 jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(AppBootstrapEvents, "listen").mockImplementation(jest.fn());
 
 describe("AppBootstrap", () => {
   beforeEach(async () => {
@@ -61,7 +63,7 @@ describe("AppBootstrap", () => {
         "contentScripts/js/dist/vendors.js",
         "contentScripts/js/dist/app.js",
       ]);
-      expect(AppBootstrap.events).toStrictEqual([PortEvents]);
+      expect(AppBootstrap.events).toStrictEqual([PortEvents, AppBootstrapEvents]);
       expect(AppBootstrap.mustReloadOnExtensionUpdate).toBeTruthy();
       expect(AppBootstrap.appName).toBe("AppBootstrap");
     });
@@ -160,7 +162,7 @@ describe("AppBootstrap", () => {
 
   describe("AppBootstrap::attachEvents", () => {
     it("Should attach events", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       // data mocked
       const port = {
         on: () => jest.fn(),
@@ -175,11 +177,9 @@ describe("AppBootstrap", () => {
       // process
       await AppBootstrap.attachEvents(port);
       // expectations
-      expect(PortEvents.listen).toHaveBeenCalledWith({
-        port: port,
-        tab: port._port.sender.tab,
-        name: AppBootstrap.appName,
-      });
+      const worker = { port: port, tab: port._port.sender.tab, name: AppBootstrap.appName };
+      expect(PortEvents.listen).toHaveBeenCalledWith(worker);
+      expect(AppBootstrapEvents.listen).toHaveBeenCalledWith(worker);
     });
   });
 });

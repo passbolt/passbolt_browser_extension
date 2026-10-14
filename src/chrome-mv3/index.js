@@ -85,3 +85,9 @@ browser.tabs.onActivated.addListener(ToolbarService.handleSuggestedResourcesOnAc
  * Handle suggested resources on toolbar icon
  */
 browser.windows.onFocusChanged.addListener(ToolbarService.handleSuggestedResourcesOnFocusedWindow);
+
+/**
+ * Handle click on the toolbar icon
+ * This handler is called only when the popup URL of the QA is not defined.
+ */
+chrome.action.onClicked.addListener(ToolbarService.handleIconToolbarClicked);

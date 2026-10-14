@@ -64,9 +64,36 @@ describe("CookieService", () => {
       expect(result).toStrictEqual(`session=abcdef;test=other`);
       expect(chrome.cookies.getAll).toHaveBeenCalledTimes(1);
       expect(chrome.cookies.getAll).toHaveBeenCalledWith({
-        domain: "www.passbolt.com",
+        url: "https://www.passbolt.com/",
         storeId: TEST_STORE_ID,
       });
+    });
+
+    it("should not get the 'secure' cookie on HTTP (unsecure) hosts", async () => {
+      expect.assertions(1);
+      const cookie1 = {
+        name: "expected-cookie",
+        value: "abcdef",
+        url: "http://www.passbolt.com",
+        domain: "www.passbolt.com",
+      };
+
+      const cookie2 = {
+        name: "unexpected-cookie",
+        value: "other",
+        url: "http://www.passbolt.com",
+        domain: "www.passbolt.com",
+        secure: true,
+        httpOnly: true,
+      };
+
+      const cookies = [cookie1, cookie2];
+      jest.spyOn(chrome.cookies, "getAll").mockReturnValue(cookies);
+
+      const service = new CookiesService("http://www.passbolt.com", TEST_STORE_ID);
+      const result = await service.getSerialisedCookies();
+
+      expect(result).toStrictEqual(`expected-cookie=abcdef`);
     });
   });
 

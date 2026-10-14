@@ -15,9 +15,9 @@ import GetPassphraseService from "../../service/passphrase/getPassphraseService"
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
 import MoveOneFolderService, { PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE } from "../../service/move/moveOneFolderService";
-import ConfirmMoveStrategyService from "../../service/move/confirmMoveStrategyService";
 import { assertUuid } from "passbolt-styleguide/src/shared/utils/assertions";
 import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
+import deserializeConfirmedMovePermissions from "../../service/move/deserializeConfirmedMovePermissions";
 
 class MoveFolderController {
   /**
@@ -34,18 +34,20 @@ class MoveFolderController {
     this.progressService = new ProgressService(this.worker);
     this.getPassphraseService = new GetPassphraseService(account);
     this.moveOneFolderService = new MoveOneFolderService(apiClientOptions, account, this.progressService);
-    this.confirmMoveStrategyService = new ConfirmMoveStrategyService(worker);
     this.verifyOrTrustMetadataKeyService = new VerifyOrTrustMetadataKeyService(worker, account, apiClientOptions);
   }
 
   /**
    * Wrapper of exec function to run it with worker.
    *
+   * @param {string} folderId The folder id to move
+   * @param {string|null} destinationFolderId The destination folder id or null for the root folder
+   * @param {Object<string, Array<object>>|null} permissionsDto The permissions the operator confirmed, keyed by item id, or null.
    * @return {Promise<void>}
    */
-  async _exec(folderId, destinationFolderId) {
+  async _exec(folderId, destinationFolderId, permissionsDto) {
     try {
-      await this.exec(folderId, destinationFolderId);
+      await this.exec(folderId, destinationFolderId, permissionsDto);
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
@@ -58,12 +60,13 @@ class MoveFolderController {
    *
    * @param {string} folderId The folder id to move
    * @param {string|null} [destinationFolderId] The destination folder id or null for the root folder
+   * @param {Object<string, Array<object>>|null} [permissionsDto] The permissions the operator confirmed, keyed by item id. Null to keep the permissions as they are.
    * @return {Promise<void>}
    * @throws {TypeError} If the folderId is not a UUID
    * @throws {TypeError} If the destinationFolderId is not a UUID
    * @throws {Error} If the folderId is equal to destinationFolderId
    */
-  async exec(folderId, destinationFolderId = null) {
+  async exec(folderId, destinationFolderId = null, permissionsDto = null) {
     assertUuid(folderId, 'The parameter "folderId" should be a UUID');
     if (destinationFolderId !== null) {
       assertUuid(destinationFolderId, 'The parameter "destinationFolderId" should be a UUID');
@@ -71,19 +74,16 @@ class MoveFolderController {
     if (folderId === destinationFolderId) {
       throw new Error(i18n.t("The folder cannot be moved inside itself."));
     }
+    const confirmedPermissions = deserializeConfirmedMovePermissions(permissionsDto, [folderId]);
 
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
-    this.progressService.start(PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE, i18n.t("Initialize"));
+    // One extra step for the closing "Done!" message.
+    this.progressService.start(PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE + 1, i18n.t("Initialize"));
 
     try {
-      await this.moveOneFolderService.moveOne(
-        folderId,
-        destinationFolderId,
-        this.confirmMoveStrategyService,
-        passphrase,
-      );
+      await this.moveOneFolderService.moveOne(folderId, destinationFolderId, confirmedPermissions, passphrase);
       this.progressService.finishStep(i18n.t("Done!"), true);
     } finally {
       this.progressService.close();

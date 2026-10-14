@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Passbolt - password manager",
   "short_name": "passbolt",
-  "version": "5.16.2",
+  "version": "5.17.0.0",
   "description": "Passbolt extension for the open source password manager.",
   "default_locale": "en",
   "icons": {
@@ -15,8 +15,7 @@
   },
   "browser_action": {
     "default_icon": "webAccessibleResources/img/icons/icon-32.png",
-    "default_title": "Passbolt Quickaccess",
-    "default_popup": ""
+    "default_title": "Passbolt Quickaccess"
   },
   "commands": {
     "passbolt-open": {

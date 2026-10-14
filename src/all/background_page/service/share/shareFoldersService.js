@@ -23,8 +23,8 @@ import ShareResourceService from "./shareResourceService";
 import FindAndUpdateFoldersLocalStorageService from "../folder/findAndUpdateFoldersLocalStorageService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import GetOrFindFoldersService from "../folder/getOrFindFoldersService";
-import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
+import CalculatePermissionsChangesService from "../permission/calculatePermissionsChangesService";
 
 export const PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE = 1;
 
@@ -52,8 +52,6 @@ class ShareFoldersService {
 
   /**
    * Share a folder and its descendant.
-   * Note: When implementing shareAll, note that some parts of the algorithm require access to the original permissions
-   * of the folder that was target of the share.
    * @param {string} folderId The folder id to share
    * @param {PermissionChangesCollection} permissionsChanges The permission changes
    * @param {string} passphrase The user's private key passphrase
@@ -68,17 +66,18 @@ class ShareFoldersService {
     );
     assertString(passphrase, 'The parameter "passphrase" should be a string');
 
-    const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(folderId);
-    const resourcesToShareWithPermissions = await this.findResourcesToShareWithPermissions(folderId);
+    const folders = await this.getOrFindFoldersService.getOrFindAll();
+    // Each branch stops at the first folder the operator does not own, including what it holds.
+    const foldersDescendant = folders.getOwnedDescendantsStoppingAtNotOwned(folderId);
+    const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(folderId, foldersDescendant);
+    const resourcesToShareWithPermissions = await this.findResourcesToShareWithPermissions(folderId, foldersDescendant);
     const folderPermissionsChanges = this.calculateFoldersPermissionChanges(
       folderId,
       permissionsChanges,
       foldersToShareWithPermissions,
     );
     const resourcesPermissionChanges = this.calculateResourcesPermissionChanges(
-      folderId,
       permissionsChanges,
-      foldersToShareWithPermissions,
       resourcesToShareWithPermissions,
     );
     await this.saveFoldersPermissionsChanges(folderPermissionsChanges);
@@ -98,15 +97,14 @@ class ShareFoldersService {
    * A folder is impacted by the share if it is the folder that is shared or a folder descendant for which the user
    * has ownership.
    * @param {string} folderId The folder id to share
+   * @param {FoldersCollection} foldersDescendant The owned folders below, each branch stopping at the
+   *   first folder the operator does not own.
    * @returns {Promise<FoldersCollection>}
    * @private
    */
-  async findFoldersToShareWithPermissions(folderId) {
+  async findFoldersToShareWithPermissions(folderId, foldersDescendant) {
     this.progressService.finishStep(i18n.t("Retrieving folders permissions"), true);
-    const folders = await this.getOrFindFoldersService.getOrFindAll();
-    const foldersDescendant = FoldersCollection.getAllChildren(folderId, folders, new FoldersCollection([]));
-    const foldersDescendantWithOwnership = foldersDescendant.filterByIsOwner();
-    const foldersIdsToRetrievePermissions = [folderId, ...foldersDescendantWithOwnership.ids];
+    const foldersIdsToRetrievePermissions = [folderId, ...foldersDescendant.ids];
 
     return this.findFoldersService.findAllByIdsWithPermissions(foldersIdsToRetrievePermissions);
   }
@@ -115,13 +113,13 @@ class ShareFoldersService {
    * Retrieve the resources to share with their permissions.
    * A resource is impacted by the share if it is a folder descendant for which the user has ownership.
    * @param {string} folderId The folder id to share
+   * @param {FoldersCollection} foldersDescendant The owned folders below, each branch stopping at the
+   *   first folder the operator does not own.
    * @returns {Promise<ResourcesCollection>}
    * @private
    */
-  async findResourcesToShareWithPermissions(folderId) {
+  async findResourcesToShareWithPermissions(folderId, foldersDescendant) {
     this.progressService.finishStep(i18n.t("Retrieving resources permissions"), true);
-    const folders = await this.getOrFindFoldersService.getOrFindAll();
-    const foldersDescendant = FoldersCollection.getAllChildren(folderId, folders, new FoldersCollection([]));
     const resourcesDescendant = await this.getOrFindResourcesService.getOrFindAll();
     resourcesDescendant.filterByPropertyValueIn("folder_parent_id", [folderId, ...foldersDescendant.ids]);
     const resourcesDescendantWithOwnership = resourcesDescendant.filterByIsOwner();
@@ -135,7 +133,8 @@ class ShareFoldersService {
   }
 
   /**
-   * Calculate folders permissions changes.
+   * The changes to apply to the folders below: each receives the change made on the shared folder.
+   * One left with no permission or no owner is skipped, the rest of the cascade still applies.
    * @param {string} folderTargetId The folder originally target of the share.
    * @param {PermissionChangesCollection} permissionsChanges The permission changes
    * @param {FoldersCollection} foldersToShare The folders to share, with their permissions.
@@ -146,7 +145,6 @@ class ShareFoldersService {
     this.progressService.finishStep(i18n.t("Calculating folders permissions changes"), true);
 
     const foldersPermissionChanges = new PermissionChangesCollection([]);
-    const folderTargetOriginalPermissions = foldersToShare.getById(folderTargetId).permissions;
 
     // Add the user requested changes to the collection of permissions changes to apply to the folders.
     foldersPermissionChanges.merge(permissionsChanges);
@@ -157,13 +155,7 @@ class ShareFoldersService {
         continue;
       }
       foldersPermissionChanges.merge(
-        PermissionChangesCollection.reuseChanges(
-          folderToShare.permission.aco,
-          folderToShare.id,
-          folderToShare.permissions,
-          permissionsChanges,
-          folderTargetOriginalPermissions,
-        ),
+        CalculatePermissionsChangesService.forFolderWithCascadedChange(folderToShare, permissionsChanges),
       );
     }
 
@@ -171,28 +163,20 @@ class ShareFoldersService {
   }
 
   /**
-   * Calculate resource permissions changes.
-   * @param {string} folderTargetId The folder originally target of the share.
+   * The changes to apply to the resources below: each receives the change made on the shared
+   * folder. One left with no permission or no owner is skipped, the rest of the cascade applies.
    * @param {PermissionChangesCollection} permissionsChanges The permission changes
-   * @param {FoldersCollection} foldersToShare The folders to share, with their permissions.
    * @param {ResourcesCollection} resourcesToShare The resources to share, with their permissions.
    * @return {PermissionChangesCollection}
    */
-  calculateResourcesPermissionChanges(folderTargetId, permissionsChanges, foldersToShare, resourcesToShare) {
+  calculateResourcesPermissionChanges(permissionsChanges, resourcesToShare) {
     this.progressService.finishStep(i18n.t("Calculating resources permissions changes"), true);
 
     const resourcesPermissionsChanges = new PermissionChangesCollection([]);
-    const folderTargetOriginalPermissions = foldersToShare.getById(folderTargetId).permissions;
 
     for (const resourceToShare of resourcesToShare.items) {
       resourcesPermissionsChanges.merge(
-        PermissionChangesCollection.reuseChanges(
-          resourceToShare.permission.aco,
-          resourceToShare.id,
-          resourceToShare.permissions,
-          permissionsChanges,
-          folderTargetOriginalPermissions,
-        ),
+        CalculatePermissionsChangesService.forResourceWithCascadedChange(resourceToShare, permissionsChanges),
       );
     }
 

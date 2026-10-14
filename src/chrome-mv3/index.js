@@ -19,6 +19,8 @@ import OnExtensionUpdateAvailableService from "../all/background_page/service/ex
 import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarmService";
 import OnStartUpService from "../all/background_page/service/extension/onStartUpService";
 import ToolbarService from "../all/background_page/service/toolbar/toolbarService";
+// Registers the keyboard-shortcut command listener (e.g. passbolt-lock) on import.
+import "../all/background_page/service/toolbar/keyboardShortcutsService";
 import HandleOffscreenResponseService from "./serviceWorker/service/offscreen/handleOffscreenResponseService";
 
 /**

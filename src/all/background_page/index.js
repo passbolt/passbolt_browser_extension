@@ -12,6 +12,8 @@ import OnExtensionUpdateAvailableService from "./service/extension/onExtensionUp
 import GlobalAlarmService from "./service/alarm/globalAlarmService";
 import OnStartUpService from "./service/extension/onStartUpService";
 import ToolbarService from "./service/toolbar/toolbarService";
+// Registers the keyboard-shortcut command listener (e.g. passbolt-lock) on import.
+import "./service/toolbar/keyboardShortcutsService";
 
 const main = async () => {
   /**

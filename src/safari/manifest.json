@@ -25,7 +25,14 @@
         "mac": "Alt+Shift+P"
       },
       "description": "Open passbolt in a new tab!"
+    },
+    "passbolt-lock": {
+      "description": "Lock passbolt (clear the cached passphrase)"
     }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
   },
   "permissions": [
     "activeTab",

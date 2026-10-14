@@ -27,11 +27,12 @@ class BrowserTabService {
 
   /**
    * Get by Id
-   * @param id
+   * @param {number|string} id The tab id. A string is accepted as the tab id can come from a url query parameter (i.e. detached quickaccess).
    */
   static async getById(id) {
-    assertNumber(id);
-    return await browser.tabs.get(id);
+    const tabId = typeof id === "string" ? parseInt(id, 10) : id;
+    assertNumber(tabId);
+    return await browser.tabs.get(tabId);
   }
 
   /**

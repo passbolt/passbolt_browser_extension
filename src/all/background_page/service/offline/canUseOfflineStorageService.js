@@ -24,6 +24,7 @@ import UserMeLocalStorage from "../local_storage/userMeLocalStorage";
 import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
 import UserEntity from "../../model/entity/user/userEntity";
 import CanUse from "passbolt-styleguide/src/shared/services/rbacs/canUseService";
+import SiteSettingsRuntimeCache from "../siteSettings/siteSettingsRuntimeCache";
 
 /**
  * Returns whether the current user can use offline storage for resources.
@@ -114,8 +115,22 @@ export default class CanUseOfflineStorageService {
    */
   static async canUseOfflineStorageFromLocalStorage(account) {
     const siteSettingsDto = await new SiteSettingsLocalStorage(account).get();
-    if (!siteSettingsDto || !new SiteSettingsEntity(siteSettingsDto).isPluginEnabled("offlineMode")) {
+    if (!siteSettingsDto) {
       return false;
+    } else {
+      const siteSettings = new SiteSettingsEntity(siteSettingsDto);
+      if (!siteSettings?.isPluginEnabled("offlineMode")) {
+        return false;
+      }
+      /*
+       * Mirror the persisted settings into the in-memory runtime cache. The cache is
+       * service-worker-lifetime and is flushed on login (postLoginService) and lost on
+       * service-worker restart, whereas SiteSettingsLocalStorage survives both. Seeding it
+       * here keeps AppEmailValidatorService.validate - which reads SiteSettingsRuntimeCache
+       * synchronously to validate account usernames - in sync with the persisted settings,
+       * so a custom email validation regex is honored even after the cache has been dropped.
+       */
+      SiteSettingsRuntimeCache.set(siteSettings);
     }
 
     const offlineSettingsDto = await new OfflineSettingsLocalStorage(account).getData();

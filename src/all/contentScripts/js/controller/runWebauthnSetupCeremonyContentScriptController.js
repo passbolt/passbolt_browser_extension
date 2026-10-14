@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.17.0
  */
-import { assertUuid } from "passbolt-styleguide/src/shared/utils/assertions";
+import Validator from "validator";
 import { assertType } from "../../../background_page/utils/assertions";
 import WebauthnSetupCeremonyContentScriptService from "../service/webauthnSetupCeremonyContentScriptService";
 import WebauthnCredentialCreationOptionsEntity from "../../../background_page/model/entity/mfa/webauthnCredentialCreationOptionsEntity";
@@ -54,7 +54,9 @@ export default class RunWebauthnSetupCeremonyContentScriptController {
   async exec(contentScriptControllerArguments) {
     const { id, options } = contentScriptControllerArguments;
 
-    assertUuid(id);
+    if (!Validator.isUUID(id)) {
+      throw new Error("The given parameter is not a valid UUID");
+    }
     assertType(options, Object);
 
     const webauthnCredentialCreationOptionsEntity = new WebauthnCredentialCreationOptionsEntity(options);

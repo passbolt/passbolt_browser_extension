@@ -39,6 +39,7 @@ import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage"
 import UserMeLocalStorage from "../local_storage/userMeLocalStorage";
 import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
 import CanUseOfflineStorageService from "./canUseOfflineStorageService";
+import SiteSettingsRuntimeCache from "../siteSettings/siteSettingsRuntimeCache";
 
 const allowOfflineAccessRbac = (data = {}) =>
   defaultRbacWithActionData({ action: defaultActionData({ name: actions.OFFLINE_ITEMS_VIEW }), ...data });
@@ -155,6 +156,7 @@ describe("CanUseOfflineStorageService", () => {
       jest.spyOn(OfflineSettingsLocalStorage.prototype, "getData").mockResolvedValue(offlineSettings);
       jest.spyOn(UserMeLocalStorage.prototype, "getData").mockResolvedValue(user);
       jest.spyOn(RbacsLocalStorage.prototype, "getData").mockResolvedValue(rbacs);
+      jest.spyOn(SiteSettingsRuntimeCache, "set");
     };
 
     it("returns false when the site settings storage is empty, without reading the other storages.", async () => {
@@ -186,30 +188,33 @@ describe("CanUseOfflineStorageService", () => {
     });
 
     it("returns false when the offline settings storage is empty, without reading the other storages.", async () => {
-      expect.assertions(3);
+      expect.assertions(4);
       mockStorages({ offlineSettings: undefined, user: defaultAdminUserDto(), rbacs: [] });
 
       expect(await CanUseOfflineStorageService.canUseOfflineStorageFromLocalStorage(account)).toBe(false);
       expect(UserMeLocalStorage.prototype.getData).not.toHaveBeenCalled();
       expect(RbacsLocalStorage.prototype.getData).not.toHaveBeenCalled();
+      expect(SiteSettingsRuntimeCache.set).toHaveBeenCalled();
     });
 
     it("returns false when the user me storage is empty.", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       mockStorages({ offlineSettings: defaultOfflineSettingsDto(), user: undefined, rbacs: [] });
 
       expect(await CanUseOfflineStorageService.canUseOfflineStorageFromLocalStorage(account)).toBe(false);
+      expect(SiteSettingsRuntimeCache.set).toHaveBeenCalled();
     });
 
     it("returns true for an administrator even when the rbacs storage is empty.", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       mockStorages({ offlineSettings: defaultOfflineSettingsDto(), user: defaultAdminUserDto(), rbacs: undefined });
 
       expect(await CanUseOfflineStorageService.canUseOfflineStorageFromLocalStorage(account)).toBe(true);
+      expect(SiteSettingsRuntimeCache.set).toHaveBeenCalled();
     });
 
     it("returns false for a user when the rbacs storage is empty.", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       mockStorages({
         offlineSettings: defaultOfflineSettingsDto(),
         user: defaultUserDto({}, { withRole: true }),
@@ -217,10 +222,11 @@ describe("CanUseOfflineStorageService", () => {
       });
 
       expect(await CanUseOfflineStorageService.canUseOfflineStorageFromLocalStorage(account)).toBe(false);
+      expect(SiteSettingsRuntimeCache.set).toHaveBeenCalled();
     });
 
     it("returns true when the user role is allowed.", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       const userDto = defaultUserDto({}, { withRole: true });
       mockStorages({
         offlineSettings: defaultOfflineSettingsDto(),
@@ -229,10 +235,11 @@ describe("CanUseOfflineStorageService", () => {
       });
 
       expect(await CanUseOfflineStorageService.canUseOfflineStorageFromLocalStorage(account)).toBe(true);
+      expect(SiteSettingsRuntimeCache.set).toHaveBeenCalled();
     });
 
     it("returns false when the user role is denied.", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       const userDto = defaultUserDto({}, { withRole: true });
       mockStorages({
         offlineSettings: defaultOfflineSettingsDto(),
@@ -241,6 +248,7 @@ describe("CanUseOfflineStorageService", () => {
       });
 
       expect(await CanUseOfflineStorageService.canUseOfflineStorageFromLocalStorage(account)).toBe(false);
+      expect(SiteSettingsRuntimeCache.set).toHaveBeenCalled();
     });
 
     it("throws when a stored dto does not validate, return false to not block the process.", async () => {

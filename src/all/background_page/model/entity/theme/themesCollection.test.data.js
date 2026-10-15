@@ -12,11 +12,20 @@
  * @since         5.7.0
  */
 
-import { defaultThemeDto, midgarThemeDto, solarisedDarkThemeDto, solarisedThemeDto } from "./themeEntity.test.data";
+import {
+  defaultThemeDto,
+  midgarThemeDto,
+  solarisedDarkThemeDto,
+  solarisedThemeDto,
+  sakuraThemeDto,
+  layetteThemeDto,
+} from "./themeEntity.test.data";
 
 export const defaultThemeCollectionDtos = () => [
   defaultThemeDto(),
   midgarThemeDto(),
   solarisedThemeDto(),
   solarisedDarkThemeDto(),
+  sakuraThemeDto(),
+  layetteThemeDto(),
 ];

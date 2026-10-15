@@ -36,3 +36,15 @@ export const solarisedDarkThemeDto = (data = {}) => ({
   name: "solarised_dark",
   ...data,
 });
+
+export const sakuraThemeDto = (data = {}) => ({
+  id: uuidv4(),
+  name: "sakura",
+  ...data,
+});
+
+export const layetteThemeDto = (data = {}) => ({
+  id: uuidv4(),
+  name: "layette",
+  ...data,
+});

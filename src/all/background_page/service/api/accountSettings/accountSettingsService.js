@@ -36,19 +36,6 @@ class AccountSettingsService extends AbstractService {
   }
 
   /**
-   * Find all themes
-   *
-   * @returns {Promise<*>} response body
-   * @throws {Error} if options are invalid or API error
-   * @public
-   */
-  async findAllThemes() {
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/themes`);
-    const response = await this.apiClient.fetchAndHandleResponse("GET", url);
-    return response.body;
-  }
-
-  /**
    * Update the current user theme
    *
    * @param {string} name The theme name to switch on

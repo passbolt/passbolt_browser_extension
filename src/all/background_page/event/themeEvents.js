@@ -12,6 +12,7 @@
  */
 import ThemeModel from "../model/theme/themeModel";
 import ChangeThemeEntity from "../model/entity/theme/change/ChangeThemeEntity";
+import FindThemesController from "../controller/theme/findThemesController";
 
 /**
  * Listens the theme events
@@ -19,21 +20,15 @@ import ChangeThemeEntity from "../model/entity/theme/change/ChangeThemeEntity";
  * @param {ApiClientOptions} apiClientOptions the api client options
  */
 const listen = function (worker, apiClientOptions) {
-  /*
+  /**
    * Find all themes
    *
    * @listens passbolt.themes.find-all
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.themes.find-all", async (requestId) => {
-    try {
-      const themeModel = new ThemeModel(apiClientOptions);
-      const themes = await themeModel.findAll();
-      worker.port.emit(requestId, "SUCCESS", themes);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, "ERROR", error);
-    }
+    const controller = new FindThemesController(worker, requestId, apiClientOptions);
+    await controller._exec();
   });
 
   /*

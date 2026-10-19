@@ -20,7 +20,7 @@ import ThemesCollection from "../../model/entity/theme/themesCollection";
 export default class FindThemesService {
   /**
    * @constructor
-   * @param {ApiClientOptions} apiClientOptions The api client options
+   * @param {ApiClientOptions} apiClientOptions The api client options.
    */
   constructor(apiClientOptions) {
     this.themesApiService = new ThemesApiService(apiClientOptions);
@@ -29,7 +29,7 @@ export default class FindThemesService {
   /**
    * Finds all the themes.
    * @returns {Promise<ThemesCollection>}
-   * @throws {CollectionValidationError} if the API returns invalid themes
+   * @throws {CollectionValidationError} If the API returns invalid themes.
    */
   async findAll() {
     const dtos = await this.themesApiService.findAll();

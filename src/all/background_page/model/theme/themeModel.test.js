@@ -15,9 +15,7 @@
 import { enableFetchMocks } from "jest-fetch-mock";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import ThemeModel from "./themeModel";
-import { defaultThemeCollectionDtos } from "../../model/entity/theme/themesCollection.test.data";
 import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
-import ThemesCollection from "../entity/theme/themesCollection";
 import { Config } from "../config";
 import { midgarThemeDto } from "../entity/theme/themeEntity.test.data";
 
@@ -35,19 +33,6 @@ describe("themeModel", () => {
     it("should create themeModel object", () => {
       expect.assertions(1);
       expect(themeModelObj).toBeInstanceOf(ThemeModel);
-    });
-  });
-
-  describe("::findAll", () => {
-    it("should return a ThemesCollection Object", async () => {
-      expect.assertions(2);
-
-      const themesCollectionDto = defaultThemeCollectionDtos();
-      fetch.doMockOnceIf(new RegExp("/settings/themes"), async () => await mockApiResponse(themesCollectionDto));
-      const received = await themeModelObj.findAll();
-
-      expect(received).toBeInstanceOf(ThemesCollection);
-      expect(received.toDto()).toStrictEqual(themesCollectionDto);
     });
   });
 

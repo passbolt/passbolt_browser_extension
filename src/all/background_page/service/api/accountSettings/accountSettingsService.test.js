@@ -18,7 +18,6 @@ import { enableFetchMocks } from "jest-fetch-mock";
 import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
 import {
   accountSettingsService_midgarThemeDto,
-  accountSettingsService_themesDto,
   accountSettingsService_localeDto,
 } from "./accountSettingsService.test.data";
 
@@ -43,18 +42,6 @@ describe("accountSettingsService", () => {
       const receivedUpdateThemeName = await service.updateTheme(expectedUpdateThemeName);
 
       expect(receivedUpdateThemeName.value).toBe(expectedUpdateThemeName);
-    });
-  });
-
-  describe("::findAllThemes", () => {
-    it("should return all available themes", async () => {
-      expect.assertions(1);
-
-      const expectedThemes = accountSettingsService_themesDto();
-      fetch.doMockOnceIf(new RegExp("/settings/themes"), async () => await mockApiResponse(expectedThemes));
-      const result = await service.findAllThemes();
-
-      expect(result).toEqual(expectedThemes);
     });
   });
 

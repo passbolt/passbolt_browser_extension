@@ -12,7 +12,6 @@
  */
 import AccountSettingsService from "../../service/api/accountSettings/accountSettingsService";
 import { Config } from "../config";
-import ThemesCollection from "../entity/theme/themesCollection";
 
 class ThemeModel {
   /**
@@ -23,24 +22,6 @@ class ThemeModel {
    */
   constructor(apiClientOptions) {
     this.accountSettingsService = new AccountSettingsService(apiClientOptions);
-  }
-
-  /*
-   * ==============================================================
-   *  Finders / remote calls
-   * ==============================================================
-   */
-
-  /**
-   * Find all themes
-   *
-   * @returns {Promise<ThemesCollection>} The collection of available themes
-   * @throws {Error} if options are invalid or API error
-   * @public
-   */
-  async findAll() {
-    const themesDto = await this.accountSettingsService.findAllThemes();
-    return new ThemesCollection(themesDto);
   }
 
   /*

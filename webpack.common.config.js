@@ -97,6 +97,8 @@ const buildSharedExtraPlugins = () => [
       { from: themeCss, context: styleguidePath('build/css/themes/midgar'), to: warBuildPath('css/themes/midgar') },
       { from: themeCss, context: styleguidePath('build/css/themes/solarized_light'), to: warBuildPath('css/themes/solarized_light') },
       { from: themeCss, context: styleguidePath('build/css/themes/solarized_dark'), to: warBuildPath('css/themes/solarized_dark') },
+      { from: themeCss, context: styleguidePath('build/css/themes/sakura'), to: warBuildPath('css/themes/sakura') },
+      { from: themeCss, context: styleguidePath('build/css/themes/layette'), to: warBuildPath('css/themes/layette') },
       {
         from: '{opensans-variable-font.ttf,opensans-italic-variable-font.ttf,obfuscation-regular.otf,inconsolata-regular.ttf}',
         context: styleguidePath('src/fonts'),

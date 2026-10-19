@@ -36,22 +36,6 @@ class AccountSettingsService extends AbstractService {
   }
 
   /**
-   * Update the current user theme
-   *
-   * @param {string} name The theme name to switch on
-   * @returns {Promise<*>} response body
-   * @throws {Error} if options are invalid or API error
-   * @public
-   */
-  async updateTheme(name) {
-    const data = { value: name };
-    const bodyString = this.apiClient.buildBody(data);
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/themes`);
-    const response = await this.apiClient.fetchAndHandleResponse("POST", url, bodyString);
-    return response.body;
-  }
-
-  /**
    * Update the current user locale language
    *
    * @param {string} locale The locale language to switch on

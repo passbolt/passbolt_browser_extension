@@ -16,10 +16,7 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import AccountSettingsService from "./accountSettingsService";
 import { enableFetchMocks } from "jest-fetch-mock";
 import { mockApiResponse } from "../../../../../../test/mocks/mockApiResponse";
-import {
-  accountSettingsService_midgarThemeDto,
-  accountSettingsService_localeDto,
-} from "./accountSettingsService.test.data";
+import { accountSettingsService_localeDto } from "./accountSettingsService.test.data";
 
 describe("accountSettingsService", () => {
   let service;
@@ -28,21 +25,6 @@ describe("accountSettingsService", () => {
     jest.clearAllMocks();
     const apiClientOptions = defaultApiClientOptions();
     service = new AccountSettingsService(apiClientOptions);
-  });
-
-  describe("::updateTheme", () => {
-    it("should update the theme value to $expectedUpdateThemeName", async () => {
-      expect.assertions(1);
-
-      const expectedUpdateThemeName = "midgar";
-      fetch.doMockOnceIf(
-        new RegExp("/settings/themes"),
-        async () => await mockApiResponse(accountSettingsService_midgarThemeDto()),
-      );
-      const receivedUpdateThemeName = await service.updateTheme(expectedUpdateThemeName);
-
-      expect(receivedUpdateThemeName.value).toBe(expectedUpdateThemeName);
-    });
   });
 
   describe("::updateLocale", () => {

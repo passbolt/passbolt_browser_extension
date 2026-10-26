@@ -22,10 +22,11 @@ import CsvSafariRowComposer from "./csvRowComposer/csvSafariRowComposer";
 import CsvDashlaneRowComposer from "./csvRowComposer/csvDashlaneRowComposer";
 import CsvNordpassRowComposer from "./csvRowComposer/csvNordpassRowComposer";
 import CsvLogMeOnceRowComposer from "./csvRowComposer/csvLogMeOnceRowComposer";
+import CsvNetwrixRowComposer from "./csvRowComposer/csvNetwrixRowComposer";
 
 describe("ResourcesCsvExporter", () => {
   it("should be aware of the supported row parsers", () => {
-    expect(ResourcesCsvExporter.register).toHaveLength(10);
+    expect(ResourcesCsvExporter.register).toHaveLength(11);
     const supportedRowComposers = [
       Csv1PasswordRowComposer,
       CsvKdbxRowComposer,
@@ -37,6 +38,7 @@ describe("ResourcesCsvExporter", () => {
       CsvDashlaneRowComposer,
       CsvNordpassRowComposer,
       CsvLogMeOnceRowComposer,
+      CsvNetwrixRowComposer,
     ];
     expect(ResourcesCsvExporter.register).toEqual(expect.arrayContaining(supportedRowComposers));
   });

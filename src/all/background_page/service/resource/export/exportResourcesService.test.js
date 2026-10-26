@@ -34,6 +34,7 @@ import ExportResourcesFileEntity, {
   FORMAT_CSV_KDBX,
   FORMAT_CSV_LASTPASS,
   FORMAT_CSV_LOGMEONCE,
+  FORMAT_CSV_NETWRIX,
   FORMAT_CSV_MOZILLA,
   FORMAT_CSV_NORDPASS,
   FORMAT_CSV_SAFARI,
@@ -61,6 +62,7 @@ import {
   lastpassCsvFile,
   logMeOnceCsvFile,
   mozillaCsvFile,
+  netwrixCsvFile,
   nordPassCsvFile,
   onePasswordCsvFile,
   safariCsvFile,
@@ -142,6 +144,7 @@ describe("ExportResourcesService", () => {
         { format: FORMAT_CSV_DASHLANE, expected: dashlaneCsvFile },
         { format: FORMAT_CSV_NORDPASS, expected: nordPassCsvFile },
         { format: FORMAT_CSV_LOGMEONCE, expected: logMeOnceCsvFile },
+        { format: FORMAT_CSV_NETWRIX, expected: netwrixCsvFile },
       ])("Should export the csv file with password and description.", (test) => {
         describe.each([
           { version: "v4", resourceType: RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG },

@@ -27,6 +27,7 @@ export const FORMAT_CSV_SAFARI = "csv-safari";
 export const FORMAT_CSV_DASHLANE = "csv-dashlane";
 export const FORMAT_CSV_NORDPASS = "csv-nordpass";
 export const FORMAT_CSV_LOGMEONCE = "csv-logmeonce";
+export const FORMAT_CSV_NETWRIX = "csv-netwrix";
 
 const SUPPORTED_FORMAT = [
   FORMAT_KDBX,
@@ -41,6 +42,7 @@ const SUPPORTED_FORMAT = [
   FORMAT_CSV_DASHLANE,
   FORMAT_CSV_NORDPASS,
   FORMAT_CSV_LOGMEONCE,
+  FORMAT_CSV_NETWRIX,
 ];
 
 class ExportResourcesFileEntity extends EntityV2 {

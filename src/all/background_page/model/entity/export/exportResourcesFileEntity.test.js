@@ -47,6 +47,7 @@ describe("ExportResourcesFileEntity", () => {
         "csv-dashlane",
         "csv-nordpass",
         "csv-logmeonce",
+        "csv-netwrix",
       ];
       const unexpectedValues = ["1", "false", "test"];
       assertEntityProperty.enumeration(ExportResourcesFileEntity, "format", expectedValues, unexpectedValues);

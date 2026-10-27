@@ -20,6 +20,7 @@ import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarm
 import OnStartUpService from "../all/background_page/service/extension/onStartUpService";
 import ToolbarService from "../all/background_page/service/toolbar/toolbarService";
 import HandleOffscreenResponseService from "./serviceWorker/service/offscreen/handleOffscreenResponseService";
+import BasicAuthService from "../all/background_page/service/auth/basicAuthService";
 
 /**
  * Load all system requirement
@@ -85,3 +86,11 @@ browser.tabs.onActivated.addListener(ToolbarService.handleSuggestedResourcesOnAc
  * Handle suggested resources on toolbar icon
  */
 browser.windows.onFocusChanged.addListener(ToolbarService.handleSuggestedResourcesOnFocusedWindow);
+
+browser.webRequest.onAuthRequired.addListener(
+  (details, callback) => BasicAuthService.handle(details).then(callback),
+  { urls: ["<all_urls>"] },
+  ["asyncBlocking"],
+);
+browser.webRequest.onCompleted.addListener((details) => BasicAuthService.clear(details), { urls: ["<all_urls>"] });
+browser.webRequest.onErrorOccurred.addListener((details) => BasicAuthService.clear(details), { urls: ["<all_urls>"] });

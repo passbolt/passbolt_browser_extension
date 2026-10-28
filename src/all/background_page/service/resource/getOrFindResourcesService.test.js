@@ -26,6 +26,8 @@ import { multipleResourceDtos } from "./getOrFindResourcesService.test.data";
 import { resourceAllTypesDtosCollection } from "passbolt-styleguide/src/shared/models/entity/resource/resourcesCollection.test.data";
 import {
   defaultResourceDto,
+  resourceStandaloneCustomFieldsDto,
+  resourceStandaloneNoteDto,
   resourceStandaloneTotpDto,
   resourceWithTotpDto,
 } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
@@ -159,7 +161,7 @@ describe("GetOrFindResourcesService", () => {
       expect(resources).toHaveLength(0);
     });
 
-    it("should filter the collection by default supported resource types and filter by suggested url", async () => {
+    it("should filter the collection by password resource types and filter by suggested url", async () => {
       expect.assertions(4);
 
       const suggestedResource1 = defaultResourceDto({
@@ -184,7 +186,7 @@ describe("GetOrFindResourcesService", () => {
         .mockImplementation(() => mockPassboltResponse(resourcesCollectionDto));
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
 
-      const resources = await service.getOrFindSuggested("https://www.passbolt.com");
+      const resources = await service.getOrFindSuggested("https://www.passbolt.com", "password");
 
       expect(resources).toBeInstanceOf(ResourcesCollection);
       expect(resources).toHaveLength(2);
@@ -264,7 +266,80 @@ describe("GetOrFindResourcesService", () => {
       expect(resources.getFirstById(suggestedResource2.id)).toBeTruthy();
     });
 
-    it("should filter the collection by password and otp resource types when fieldType is null and filter by suggested url", async () => {
+    it.each([
+      { fieldType: "username", expectedSuggested: "password" },
+      { fieldType: "password", expectedSuggested: "password" },
+      { fieldType: "otp", expectedSuggested: "totp" },
+    ])(
+      "should never return the note and custom fields resources matching the url when fieldType is $fieldType",
+      async ({ fieldType, expectedSuggested }) => {
+        expect.assertions(4);
+
+        const matchingResources = {
+          password: defaultResourceDto({ metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }) }),
+          totp: resourceStandaloneTotpDto({ metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }) }),
+        };
+        const matchingNote = resourceStandaloneNoteDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingCustomFields = resourceStandaloneCustomFieldsDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+
+        const resourcesCollectionDto = [
+          matchingResources.password,
+          matchingResources.totp,
+          matchingNote,
+          matchingCustomFields,
+        ];
+        jest
+          .spyOn(ResourceService.prototype, "findAll")
+          .mockImplementation(() => mockPassboltResponse(resourcesCollectionDto));
+        jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+
+        const resources = await service.getOrFindSuggested("https://www.passbolt.com", fieldType);
+
+        expect(resources).toHaveLength(1);
+        expect(resources.getFirstById(matchingResources[expectedSuggested].id)).toBeTruthy();
+        expect(resources.getFirstById(matchingNote.id)).toBeUndefined();
+        expect(resources.getFirstById(matchingCustomFields.id)).toBeUndefined();
+      },
+    );
+
+    it("should not return any resources if no suggestions are found.", async () => {
+      expect.assertions(2);
+
+      const resourcesCollectionDto = resourceAllTypesDtosCollection();
+
+      jest
+        .spyOn(ResourceService.prototype, "findAll")
+        .mockImplementation(() => mockPassboltResponse(resourcesCollectionDto));
+      jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
+
+      const resources = await service.getOrFindSuggested("https://www.not-passbolt.com", "password");
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(resources).toHaveLength(0);
+    });
+  });
+
+  describe("::getOrFindSuggestedForQuickAccess", () => {
+    let service;
+
+    beforeEach(() => {
+      service = new GetOrFindResourcesService(account, apiClientOptions);
+    });
+
+    it("should return an empty resource collection without URL", async () => {
+      expect.assertions(2);
+
+      const resources = await service.getOrFindSuggestedForQuickAccess();
+
+      expect(resources).toBeInstanceOf(ResourcesCollection);
+      expect(resources).toHaveLength(0);
+    });
+
+    it("should filter the collection by quick access resource types and filter by suggested url", async () => {
       expect.assertions(4);
 
       const suggestedResource1 = resourceStandaloneTotpDto({
@@ -290,7 +365,7 @@ describe("GetOrFindResourcesService", () => {
         .mockImplementation(() => mockPassboltResponse(resourcesCollectionDto));
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
 
-      const resources = await service.getOrFindSuggested("https://www.passbolt.com");
+      const resources = await service.getOrFindSuggestedForQuickAccess("https://www.passbolt.com");
 
       expect(resources).toBeInstanceOf(ResourcesCollection);
       expect(resources).toHaveLength(2);
@@ -298,20 +373,35 @@ describe("GetOrFindResourcesService", () => {
       expect(resources.getFirstById(suggestedResource2.id)).toBeTruthy();
     });
 
-    it("should not return any resources if no suggestions are found.", async () => {
-      expect.assertions(2);
+    it("should return the note and custom fields resources matching the url", async () => {
+      expect.assertions(5);
 
-      const resourcesCollectionDto = resourceAllTypesDtosCollection();
+      const suggestedPassword = defaultResourceDto({
+        metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+      });
+      const suggestedNote = resourceStandaloneNoteDto({
+        metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+      });
+      const suggestedCustomFields = resourceStandaloneCustomFieldsDto({
+        metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+      });
+      const notSuggestedNote = resourceStandaloneNoteDto({
+        metadata: defaultResourceMetadataDto({ uris: ["not-passbolt.com"] }),
+      });
 
+      const resourcesCollectionDto = [suggestedPassword, suggestedNote, suggestedCustomFields, notSuggestedNote];
       jest
         .spyOn(ResourceService.prototype, "findAll")
         .mockImplementation(() => mockPassboltResponse(resourcesCollectionDto));
       jest.spyOn(ResourceTypeService.prototype, "findAll").mockImplementation(() => resourceTypesCollectionDto());
 
-      const resources = await service.getOrFindSuggested("https://www.not-passbolt.com");
+      const resources = await service.getOrFindSuggestedForQuickAccess("https://www.passbolt.com");
 
       expect(resources).toBeInstanceOf(ResourcesCollection);
-      expect(resources).toHaveLength(0);
+      expect(resources).toHaveLength(3);
+      expect(resources.getFirstById(suggestedPassword.id)).toBeTruthy();
+      expect(resources.getFirstById(suggestedNote.id)).toBeTruthy();
+      expect(resources.getFirstById(suggestedCustomFields.id)).toBeTruthy();
     });
   });
 

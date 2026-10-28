@@ -31,6 +31,17 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 import GetOrFindOfflineResourcesService from "../../service/resource/getOrFindOfflineResourcesService";
+import GetOrFindActiveSessionService from "../../service/activeSession/getOrFindActiveSessionService";
+import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
+import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {
+  defaultResourceDto,
+  resourceStandaloneCustomFieldsDto,
+  resourceStandaloneNoteDto,
+  resourceStandaloneTotpDto,
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 
 describe("InformCallToActionController", () => {
   let requestId, worker, port, controller, suggestedResources;
@@ -96,6 +107,41 @@ describe("InformCallToActionController", () => {
       expect(GetOrFindResourcesService.prototype.getOrFindSuggested).not.toHaveBeenCalled();
       expect(port.emit).toHaveBeenCalledWith(requestId, "SUCCESS", suggestedResources.length);
     });
+
+    it.each(["username", "password", "otp"])(
+      "Should count only the password or TOTP resource, never a matching note or custom fields resource, for a %s field",
+      async (fieldType) => {
+        expect.assertions(1);
+        // Let the real service run against the local storage to check the resource type filtering.
+        GetOrFindResourcesService.prototype.getOrFindSuggested.mockRestore();
+
+        const matchingPassword = defaultResourceDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingTotp = resourceStandaloneTotpDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingNote = resourceStandaloneNoteDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingCustomFields = resourceStandaloneCustomFieldsDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+
+        jest
+          .spyOn(GetOrFindActiveSessionService.prototype, "getOrFind")
+          .mockResolvedValue(new UserActiveSessionEntity(defaultUserActiveSessionDto()));
+        jest
+          .spyOn(ResourceLocalStorage, "get")
+          .mockResolvedValue([matchingPassword, matchingTotp, matchingNote, matchingCustomFields]);
+        jest.spyOn(ResourceTypeLocalStorage.prototype, "isStaleSinceLastLoggedIn").mockResolvedValue(false);
+        jest.spyOn(ResourceTypeLocalStorage.prototype, "getData").mockResolvedValue(resourceTypesCollectionDto());
+
+        await controller.getSuggestedResourcesCount(requestId, fieldType);
+
+        expect(port.emit).toHaveBeenCalledWith(requestId, "SUCCESS", 1);
+      },
+    );
 
     it("Should catch and emit ERROR when getOrFindSuggested throws an error", async () => {
       expect.assertions(1);

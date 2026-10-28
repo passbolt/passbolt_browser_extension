@@ -22,7 +22,7 @@ class ParseSetupUrlService {
    */
   static parse(url) {
     const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
-    const regex = new RegExp(`^(https?:\/\/[^#]*)\/setup\/(install|start)\/(${uuidRegex})\/(${uuidRegex})`);
+    const regex = new RegExp(`^(https?:\/\/[^#?]*)\/setup\/(install|start)\/(${uuidRegex})\/(${uuidRegex})`);
 
     if (!regex.test(url)) {
       throw new Error("Cannot parse setup url. The url does not match the pattern.");

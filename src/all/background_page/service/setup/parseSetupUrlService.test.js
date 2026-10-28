@@ -19,10 +19,17 @@ const TOKEN = "5ea0fc9c-b180-4873-8e00-9457862e43e0";
 const HOSTS = ["test.com", "cloud.test.com", "passbolt", "127.0.0.1", "[0:0:0:0:0:0:0:1]"];
 const PORTS = ["", ":4443"];
 const SUBFOLDERS = ["", "/", "/subfolder", "/subfolder/"];
-const FRAGMENTS = ["", "#fragment", `#/setup/install/${USER_ID}/${TOKEN}`];
+const SUFFIXES = [
+  "",
+  "#fragment",
+  `#/setup/install/${USER_ID}/${TOKEN}`,
+  "?first-install=1",
+  `?redirect=/setup/install/${USER_ID}/${TOKEN}`,
+  "?first-install=1#fragment",
+];
 
 /**
- * Build setup url variations (host, port, subfolder, fragment) for the given schemes and setup paths.
+ * Build setup url variations (host, port, subfolder, query string and fragment suffix) for the given schemes and setup paths.
  * @param {Array<string>} schemes The url schemes, i.e. ["http", "https"]. An empty scheme produces a url without scheme.
  * @param {Array<string>} setupPaths The paths following "/setup/", i.e. ["install/<user_id>/<token>"]
  * @returns {Array<{scenario: string, url: string, domain: string}>}
@@ -34,12 +41,12 @@ function setupUrlVariations(schemes, setupPaths) {
       for (const port of PORTS) {
         for (const subfolder of SUBFOLDERS) {
           for (const setupPath of setupPaths) {
-            for (const fragment of FRAGMENTS) {
+            for (const suffix of SUFFIXES) {
               const prefix = scheme ? `${scheme}://` : "";
               const base = `${prefix}${host}${port}${subfolder}`;
               variations.push({
-                scenario: `${base}/setup/${setupPath}${fragment}`,
-                url: `${base}/setup/${setupPath}${fragment}`,
+                scenario: `${base}/setup/${setupPath}${suffix}`,
+                url: `${base}/setup/${setupPath}${suffix}`,
                 domain: base.replace(/\/*$/, ""),
               });
             }
@@ -76,6 +83,30 @@ describe("ParseSetupUrlService", () => {
         [`install/${USER_ID}/${TOKEN}`, `start/${USER_ID}/${TOKEN}`],
       ),
     ])("should not parse", (_props) => {
+      it(`should not parse: ${_props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => ParseSetupUrlService.parse(_props.url)).toThrow(
+          "Cannot parse setup url. The url does not match the pattern.",
+        );
+      });
+    });
+
+    describe.each([
+      { scenario: "Setup path in query string", url: `https://test.com/?next=/setup/install/${USER_ID}/${TOKEN}` },
+      {
+        scenario: "Setup url in query string",
+        url: `https://test.com/page?redirect=https://other.com/setup/install/${USER_ID}/${TOKEN}`,
+      },
+      {
+        scenario: "Setup url in query string with subfolder",
+        url: `https://test.com/subfolder?redirect=https://other.com/setup/install/${USER_ID}/${TOKEN}`,
+      },
+      { scenario: "Setup path in fragment", url: `https://test.com/#/setup/install/${USER_ID}/${TOKEN}` },
+      {
+        scenario: "Setup url in fragment",
+        url: `https://test.com/page#https://other.com/setup/install/${USER_ID}/${TOKEN}`,
+      },
+    ])("should not parse setup path outside of the url path", (_props) => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);
         expect(() => ParseSetupUrlService.parse(_props.url)).toThrow(

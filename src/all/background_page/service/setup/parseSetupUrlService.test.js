@@ -14,82 +14,67 @@
 
 import ParseSetupUrlService from "./parseSetupUrlService";
 
+const USER_ID = "571bec7e-6cce-451d-b53a-f8c93e147228";
+const TOKEN = "5ea0fc9c-b180-4873-8e00-9457862e43e0";
+const HOSTS = ["test.com", "cloud.test.com", "passbolt", "127.0.0.1", "[0:0:0:0:0:0:0:1]"];
+const PORTS = ["", ":4443"];
+const SUBFOLDERS = ["", "/", "/subfolder", "/subfolder/"];
+const FRAGMENTS = ["", "#fragment", `#/setup/install/${USER_ID}/${TOKEN}`];
+
+/**
+ * Build setup url variations (host, port, subfolder, fragment) for the given schemes and setup paths.
+ * @param {Array<string>} schemes The url schemes, i.e. ["http", "https"]. An empty scheme produces a url without scheme.
+ * @param {Array<string>} setupPaths The paths following "/setup/", i.e. ["install/<user_id>/<token>"]
+ * @returns {Array<{scenario: string, url: string, domain: string}>}
+ */
+function setupUrlVariations(schemes, setupPaths) {
+  const variations = [];
+  for (const scheme of schemes) {
+    for (const host of HOSTS) {
+      for (const port of PORTS) {
+        for (const subfolder of SUBFOLDERS) {
+          for (const setupPath of setupPaths) {
+            for (const fragment of FRAGMENTS) {
+              const prefix = scheme ? `${scheme}://` : "";
+              const base = `${prefix}${host}${port}${subfolder}`;
+              variations.push({
+                scenario: `${base}/setup/${setupPath}${fragment}`,
+                url: `${base}/setup/${setupPath}${fragment}`,
+                domain: base.replace(/\/*$/, ""),
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+  return variations;
+}
+
 describe("ParseSetupUrlService", () => {
   describe("ParseSetupUrlService:parse", () => {
-    describe.each([
-      {
-        scenario: "Legacy url",
-        url: "https://passbolt.dev/setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://passbolt.dev",
-      },
-      {
-        scenario: "TLD",
-        url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://passbolt.dev",
-      },
-      {
-        scenario: "TLD with Port",
-        url: "https://passbolt.dev:4443/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://passbolt.dev:4443",
-      },
-      {
-        scenario: "Non tld",
-        url: "https://passbolt/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://passbolt",
-      },
-      {
-        scenario: "IP v4",
-        url: "https://127.0.0.1/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://127.0.0.1",
-      },
-      {
-        scenario: "IP v4 with port",
-        url: "https://127.0.0.1:4443/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://127.0.0.1:4443",
-      },
-      {
-        scenario: "IP v6",
-        url: "https://[0:0:0:0:0:0:0:1]/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://[0:0:0:0:0:0:0:1]",
-      },
-      {
-        scenario: "IP v6 with port",
-        url: "https://[0:0:0:0:0:0:0:1]:4443/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://[0:0:0:0:0:0:0:1]:4443",
-      },
-      {
-        scenario: "Subdomain",
-        url: "https://clould.passbolt.dev/acme/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://clould.passbolt.dev/acme",
-      },
-      {
-        scenario: "Trailing /",
-        url: "https://clould.passbolt.dev/acme//setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://clould.passbolt.dev/acme",
-      },
-    ])("should parse", (_props) => {
-      it(`should parse: ${_props.scenario}`, () => {
-        const parseResult = ParseSetupUrlService.parse(_props.url);
+    describe.each(setupUrlVariations(["http", "https"], [`install/${USER_ID}/${TOKEN}`, `start/${USER_ID}/${TOKEN}`]))(
+      "should parse",
+      (_props) => {
+        it(`should parse: ${_props.scenario}`, () => {
+          const parseResult = ParseSetupUrlService.parse(_props.url);
 
-        expect.assertions(3);
-        expect(parseResult.domain).toBe(_props.domain);
-        expect(parseResult.user_id).toBe("571bec7e-6cce-451d-b53a-f8c93e147228");
-        expect(parseResult.authentication_token_token).toBe("5ea0fc9c-b180-4873-8e00-9457862e43e0");
-      });
-    });
+          expect.assertions(3);
+          expect(parseResult.domain).toBe(_props.domain);
+          expect(parseResult.user_id).toBe(USER_ID);
+          expect(parseResult.authentication_token_token).toBe(TOKEN);
+        });
+      },
+    );
 
     describe.each([
-      {
-        scenario: "No domain",
-        url: "setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-      },
-      { scenario: "No token", url: "https://passbolt.dev/setup/install/571bec7e-6cce-451d-b53a-f8c93e147228" },
-      { scenario: "No user id", url: "https://passbolt.dev/setup/install" },
-      {
-        scenario: "Not targeting setup start",
-        url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
-        domain: "https://passbolt.dev",
-      },
+      // Wrong path, missing token, missing user id
+      ...setupUrlVariations(["http", "https"], [`test/${USER_ID}/${TOKEN}`, `install/${USER_ID}`, "install"]),
+      // No scheme or invalid scheme
+      ...setupUrlVariations(
+        ["", "ftp", "ftps", "ssh", "file", "javascript"],
+        [`install/${USER_ID}/${TOKEN}`, `start/${USER_ID}/${TOKEN}`],
+      ),
     ])("should not parse", (_props) => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);
@@ -99,8 +84,46 @@ describe("ParseSetupUrlService", () => {
       });
     });
 
+    describe.each([
+      { scenario: "Plain script", url: "javascript:alert(1)" },
+      { scenario: "Script with setup path", url: `javascript:alert(1)//setup/install/${USER_ID}/${TOKEN}` },
+      { scenario: "Script with setup fragment", url: `javascript:alert(1)#/setup/install/${USER_ID}/${TOKEN}` },
+      {
+        scenario: "Script with encoded new line",
+        url: `javascript://test.com/%0aalert(1)/setup/install/${USER_ID}/${TOKEN}`,
+      },
+      {
+        scenario: "Script followed by setup url in comment",
+        url: `javascript:alert(1)//https://test.com/setup/install/${USER_ID}/${TOKEN}`,
+      },
+      {
+        scenario: "Script with setup url in block comment",
+        url: `javascript:/*https://test.com/setup/install/${USER_ID}/${TOKEN}*/alert(1)`,
+      },
+      {
+        scenario: "Script fetching the setup url",
+        url: `javascript:fetch("https://test.com/setup/install/${USER_ID}/${TOKEN}")`,
+      },
+      {
+        scenario: "Script redirecting to the setup url",
+        url: `javascript:window.location="https://test.com/setup/install/${USER_ID}/${TOKEN}"`,
+      },
+      {
+        scenario: "Script with setup url in fragment",
+        url: `javascript:void(0)#https://test.com/setup/install/${USER_ID}/${TOKEN}`,
+      },
+      { scenario: "Mixed case scheme", url: `JaVaScRiPt:alert(1)//https://test.com/setup/install/${USER_ID}/${TOKEN}` },
+    ])("should not parse javascript scheme", (_props) => {
+      it(`should not parse: ${_props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => ParseSetupUrlService.parse(_props.url)).toThrow(
+          "Cannot parse setup url. The url does not match the pattern.",
+        );
+      });
+    });
+
     it("should not parse if the domain does not validate", async () => {
-      const url = "http://setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0";
+      const url = `http:///setup/start/${USER_ID}/${TOKEN}`;
 
       expect.assertions(1);
       await expect(() => ParseSetupUrlService.parse(url)).toThrow("Cannot parse setup url. The domain is not valid.");

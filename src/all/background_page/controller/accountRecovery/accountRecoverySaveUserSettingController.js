@@ -17,7 +17,6 @@ import Keyring from "../../model/keyring";
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import User from "../../model/user";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import BuildApprovedAccountRecoveryUserSettingEntityService from "../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService";
 
@@ -77,7 +76,7 @@ class AccountRecoverySaveUserSettingsController {
     if (isApproved) {
       accountRecoveryUserSettingEntity = await this.buildApprovedUserSetting(organizationPolicy);
     } else {
-      const userId = User.getInstance().get().id;
+      const userId = this.account.userId;
       const userSettingDto = { user_id: userId, status: AccountRecoveryUserSettingEntity.STATUS_REJECTED };
       accountRecoveryUserSettingEntity = new AccountRecoveryUserSettingEntity(userSettingDto);
     }

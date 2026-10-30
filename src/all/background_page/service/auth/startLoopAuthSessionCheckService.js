@@ -15,6 +15,7 @@ import PostLogoutService from "./postLogoutService";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import UpdateSessionTimestampsService from "../sessionTimestamps/updateSessionTimestampsService";
 
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
 const AUTH_SESSION_CHECK_ALARM = "AuthSessionCheck";
@@ -61,8 +62,10 @@ class StartLoopAuthSessionCheckService {
     const activeSessionEntity = await findAndUpdateActiveSessionLocalStorageService.findAndUpdateAuthenticationStatus();
     if (!activeSessionEntity.isAuthenticated) {
       PostLogoutService.exec();
+    } else if (activeSessionEntity.isServerReachable) {
+      // Only an authenticated session with a reachable server counts as seen online.
+      await new UpdateSessionTimestampsService(account).updateLastSeenOnline(new Date());
     }
-    await findAndUpdateActiveSessionLocalStorageService.updateLastSeenOnline(new Date());
   }
 
   /**

@@ -15,6 +15,7 @@ import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/r
 import RbacsLocalStorage from "../../service/local_storage/rbacLocalStorage";
 import FindAndUpdateRbacLocalStorageService from "./findAndUpdateRbacsLocalStorageService";
 import GetOrFindActiveSessionService from "../activeSession/getOrFindActiveSessionService";
+import GetSessionTimestampsService from "../sessionTimestamps/getSessionTimestampsService";
 
 /**
  * Model related to the role based access control
@@ -29,6 +30,7 @@ export default class GetOrFindRbacService {
     this.rbacsLocalStorage = new RbacsLocalStorage(account);
     this.findAndUpdateRbacLocalStorageService = new FindAndUpdateRbacLocalStorageService(account, apiClientOptions);
     this.getOrFindActiveSessionService = new GetOrFindActiveSessionService(account, apiClientOptions);
+    this.getSessionTimestampsService = new GetSessionTimestampsService(account);
   }
 
   /**
@@ -38,11 +40,12 @@ export default class GetOrFindRbacService {
    */
   async getOrFindMe() {
     const activeSession = await this.getOrFindActiveSessionService.getOrFind();
+    const lastLoggedIn = (await this.getSessionTimestampsService.get())?.lastLoggedIn;
     // Only an online session with a server reachable refreshes stale data; an offline session cannot reach the API.
     const isStale =
       activeSession.isSessionOnline &&
       activeSession.isServerReachable &&
-      (await this.rbacsLocalStorage.isStaleSinceLastLoggedIn(activeSession.lastLoggedIn));
+      (await this.rbacsLocalStorage.isStaleSinceLastLoggedIn(lastLoggedIn));
     if (!isStale) {
       const collectionDto = await this.rbacsLocalStorage.getData();
       if (typeof collectionDto !== "undefined") {

@@ -21,6 +21,8 @@ import UserActiveSessionEntity, {
   USER_ACTIVE_SESSION_ONLINE,
 } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
+import SessionTimestampsEntity from "passbolt-styleguide/src/shared/models/entity/sessionTimestamps/sessionTimestampsEntity";
+import { defaultSessionTimestampsDto } from "passbolt-styleguide/src/shared/models/entity/sessionTimestamps/sessionTimestampsEntity.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -38,7 +40,29 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
     );
     // flush account related storage before each.
     await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.flush();
+    await findAndUpdateActiveSessionLocalStorageService.updateSessionTimestampsService.sessionTimestampsLocalStorage.flush();
   });
+
+  /**
+   * Get the stored session timestamps.
+   * @returns {Promise<object|undefined>}
+   */
+  const getStoredSessionTimestamps = () =>
+    findAndUpdateActiveSessionLocalStorageService.updateSessionTimestampsService.sessionTimestampsLocalStorage.getData();
+
+  /**
+   * Store session timestamps of a previous session.
+   * @returns {Promise<void>}
+   */
+  const setPreviousSessionTimestamps = () =>
+    findAndUpdateActiveSessionLocalStorageService.updateSessionTimestampsService.sessionTimestampsLocalStorage.setData(
+      new SessionTimestampsEntity(
+        defaultSessionTimestampsDto({
+          last_seen_online: "2025-08-06T10:05:46+00:00",
+          last_logged_in: "2025-08-06T09:00:00+00:00",
+        }),
+      ),
+    );
 
   describe("::findAndUpdateAuthenticationStatus", () => {
     it("If no active session create a new one and store it into the local storage.", async () => {
@@ -331,15 +355,14 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
   });
 
   describe("::resetAuthentication", () => {
-    it("resets authentication in place, preserving durable fields", async () => {
-      expect.assertions(5);
+    it("resets authentication in place, without touching the session timestamps", async () => {
+      expect.assertions(4);
+      await setPreviousSessionTimestamps();
       const existing = {
         is_authenticated: true,
         is_mfa_required: true,
         is_server_reachable: false,
         type: USER_ACTIVE_SESSION_OFFLINE,
-        last_seen_online: "2025-08-06T10:05:46+00:00",
-        last_logged_in: "2025-08-06T09:00:00+00:00",
       };
       jest
         .spyOn(findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
@@ -350,9 +373,11 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
       const storageValue = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
       expect(storageValue.is_authenticated).toBe(false);
       expect(storageValue.is_mfa_required).toBe(false);
-      expect(storageValue.last_seen_online).toBe("2025-08-06T10:05:46+00:00");
-      expect(storageValue.last_logged_in).toBe("2025-08-06T09:00:00+00:00");
       expect(storageValue.type).toBe(USER_ACTIVE_SESSION_OFFLINE);
+      expect(await getStoredSessionTimestamps()).toStrictEqual({
+        last_seen_online: "2025-08-06T10:05:46+00:00",
+        last_logged_in: "2025-08-06T09:00:00+00:00",
+      });
     });
 
     it("does nothing when there is no active session", async () => {
@@ -394,20 +419,20 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
       const storageValue = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
       expect(storageValue.is_authenticated).toBe(true);
       expect(storageValue.type).toBe(USER_ACTIVE_SESSION_ONLINE);
-      expect(typeof storageValue.last_logged_in).toBe("string");
-      expect(typeof storageValue.last_seen_online).toBe("string");
+      const sessionTimestamps = await getStoredSessionTimestamps();
+      expect(typeof sessionTimestamps.last_logged_in).toBe("string");
+      expect(sessionTimestamps.last_seen_online).toBe(sessionTimestamps.last_logged_in);
       expect(findAndUpdateActiveSessionLocalStorageService.findServerStatusService.find).not.toHaveBeenCalled();
     });
 
-    it("asserts online authenticated and refreshes the login date while preserving other durable fields", async () => {
+    it("asserts online authenticated and refreshes the login and last seen online dates", async () => {
       expect.assertions(7);
+      await setPreviousSessionTimestamps();
       const existing = {
         is_authenticated: false,
         is_mfa_required: false,
         is_server_reachable: false,
         type: USER_ACTIVE_SESSION_OFFLINE,
-        last_seen_online: "2025-08-06T10:05:46+00:00",
-        last_logged_in: "2025-08-06T09:00:00+00:00",
       };
       jest
         .spyOn(findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
@@ -420,10 +445,11 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
       expect(storageValue.is_authenticated).toBe(true);
       expect(storageValue.type).toBe(USER_ACTIVE_SESSION_ONLINE);
       // The login date and last seen online date are refreshed to the current date, not kept from the previous session.
-      expect(storageValue.last_logged_in).not.toBe("2025-08-06T09:00:00+00:00");
-      expect(typeof storageValue.last_logged_in).toBe("string");
-      expect(storageValue.last_seen_online).not.toBe("2025-08-06T09:00:00+00:00");
-      expect(typeof storageValue.last_seen_online).toBe("string");
+      const sessionTimestamps = await getStoredSessionTimestamps();
+      expect(sessionTimestamps.last_logged_in).not.toBe("2025-08-06T09:00:00+00:00");
+      expect(typeof sessionTimestamps.last_logged_in).toBe("string");
+      expect(sessionTimestamps.last_seen_online).not.toBe("2025-08-06T10:05:46+00:00");
+      expect(typeof sessionTimestamps.last_seen_online).toBe("string");
       expect(
         findAndUpdateActiveSessionLocalStorageService.authenticationStatusService.isAuthenticated,
       ).not.toHaveBeenCalled();
@@ -445,12 +471,12 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
       const storageValue = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
       expect(storageValue.is_authenticated).toBe(true);
       expect(storageValue.type).toBe(USER_ACTIVE_SESSION_ONLINE);
-      expect(typeof storageValue.last_logged_in).toBe("string");
+      expect(typeof (await getStoredSessionTimestamps()).last_logged_in).toBe("string");
     });
   });
 
   describe("::authenticateOffline", () => {
-    it("creates an offline authenticated session stamped with the login date when none exists", async () => {
+    it("creates an offline authenticated session without creating session timestamps when none exists", async () => {
       expect.assertions(4);
       jest.spyOn(findAndUpdateActiveSessionLocalStorageService.findServerStatusService, "find");
       jest.spyOn(findAndUpdateActiveSessionLocalStorageService.authenticationStatusService, "isAuthenticated");
@@ -460,19 +486,19 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
       const storageValue = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
       expect(storageValue.is_authenticated).toBe(true);
       expect(storageValue.type).toBe(USER_ACTIVE_SESSION_OFFLINE);
-      expect(typeof storageValue.last_logged_in).toBe("string");
+      // Session timestamps are only created at an online sign-in.
+      expect(await getStoredSessionTimestamps()).toBeUndefined();
       expect(findAndUpdateActiveSessionLocalStorageService.findServerStatusService.find).not.toHaveBeenCalled();
     });
 
-    it("asserts offline authenticated and refreshes the login date while preserving other durable fields", async () => {
+    it("asserts offline authenticated and refreshes the login date while preserving the last seen online date", async () => {
       expect.assertions(7);
+      await setPreviousSessionTimestamps();
       const existing = {
         is_authenticated: false,
         is_mfa_required: false,
         is_server_reachable: false,
         type: USER_ACTIVE_SESSION_ONLINE,
-        last_seen_online: "2025-08-06T10:05:46+00:00",
-        last_logged_in: "2025-08-06T09:00:00+00:00",
       };
       jest
         .spyOn(findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
@@ -484,10 +510,11 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
       const storageValue = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
       expect(storageValue.is_authenticated).toBe(true);
       expect(storageValue.type).toBe(USER_ACTIVE_SESSION_OFFLINE);
-      expect(storageValue.last_seen_online).toBe("2025-08-06T10:05:46+00:00");
       expect(storageValue.is_server_reachable).toBe(false);
-      expect(storageValue.last_logged_in).not.toBe("2025-08-06T09:00:00+00:00");
-      expect(typeof storageValue.last_logged_in).toBe("string");
+      const sessionTimestamps = await getStoredSessionTimestamps();
+      expect(sessionTimestamps.last_seen_online).toBe("2025-08-06T10:05:46+00:00");
+      expect(sessionTimestamps.last_logged_in).not.toBe("2025-08-06T09:00:00+00:00");
+      expect(typeof sessionTimestamps.last_logged_in).toBe("string");
       expect(
         findAndUpdateActiveSessionLocalStorageService.authenticationStatusService.isAuthenticated,
       ).not.toHaveBeenCalled();
@@ -495,6 +522,7 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
 
     it("fails safe to a minimal authenticated offline session when the write errors, so the user stays signed in offline", async () => {
       expect.assertions(3);
+      await setPreviousSessionTimestamps();
       const corrupt = {
         is_authenticated: false,
         type: USER_ACTIVE_SESSION_ONLINE,
@@ -512,7 +540,7 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
       const storageValue = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
       expect(storageValue.is_authenticated).toBe(true);
       expect(storageValue.type).toBe(USER_ACTIVE_SESSION_OFFLINE);
-      expect(typeof storageValue.last_logged_in).toBe("string");
+      expect(typeof (await getStoredSessionTimestamps()).last_logged_in).toBe("string");
     });
   });
 
@@ -688,89 +716,5 @@ describe("FindAndUpdateActiveSessionLocalStorageService", () => {
     expect(findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.set).toHaveBeenCalledWith(
       expectedEntity,
     );
-  });
-
-  describe("::updateLastSeenOnline", () => {
-    it("Update the last seen online property when no user active session is stored in local storage", async () => {
-      expect.assertions(5);
-      jest
-        .spyOn(findAndUpdateActiveSessionLocalStorageService.findServerStatusService, "find")
-        .mockImplementationOnce(() => true);
-      jest.spyOn(findAndUpdateActiveSessionLocalStorageService.authenticationStatusService, "isAuthenticated");
-
-      const date = new Date();
-      await findAndUpdateActiveSessionLocalStorageService.updateLastSeenOnline(date);
-
-      const userActiveSessionDto = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
-      expect(userActiveSessionDto.is_authenticated).toBeFalsy();
-      expect(userActiveSessionDto.type).toBe(USER_ACTIVE_SESSION_ONLINE);
-      expect(userActiveSessionDto.last_seen_online).toBe(date.toISOString());
-      expect(findAndUpdateActiveSessionLocalStorageService.findServerStatusService.find).toHaveBeenCalledTimes(1);
-      expect(
-        findAndUpdateActiveSessionLocalStorageService.authenticationStatusService.isAuthenticated,
-      ).not.toHaveBeenCalled();
-    });
-
-    it("Update the last seen online property when user active session is stored in local storage", async () => {
-      expect.assertions(5);
-      const userActiveSession = {
-        is_authenticated: true,
-        is_server_reachable: true,
-        is_mfa_required: false,
-        type: USER_ACTIVE_SESSION_ONLINE,
-      };
-      jest
-        .spyOn(findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
-        .mockImplementationOnce(() => userActiveSession);
-      jest.spyOn(findAndUpdateActiveSessionLocalStorageService.findServerStatusService, "find");
-      jest.spyOn(findAndUpdateActiveSessionLocalStorageService.authenticationStatusService, "isAuthenticated");
-
-      const date = new Date();
-      await findAndUpdateActiveSessionLocalStorageService.updateLastSeenOnline(date);
-
-      const userActiveSessionDto = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
-      expect(userActiveSessionDto.is_authenticated).toBeTruthy();
-      expect(userActiveSessionDto.type).toBe(USER_ACTIVE_SESSION_ONLINE);
-      expect(userActiveSessionDto.last_seen_online).toBe(date.toISOString());
-      expect(findAndUpdateActiveSessionLocalStorageService.findServerStatusService.find).not.toHaveBeenCalled();
-      expect(
-        findAndUpdateActiveSessionLocalStorageService.authenticationStatusService.isAuthenticated,
-      ).not.toHaveBeenCalled();
-    });
-
-    it("assert parameter last seen online property is a date", async () => {
-      expect.assertions(1);
-      expect(findAndUpdateActiveSessionLocalStorageService.updateLastSeenOnline({})).rejects.toThrow(
-        "The given data is not of the expected type",
-      );
-    });
-
-    it("fails safe to a minimal user active session and update last seen online property", async () => {
-      expect.assertions(5);
-      const corrupt = {
-        is_authenticated: false,
-        type: USER_ACTIVE_SESSION_ONLINE,
-        is_server_reachable: "not-a-boolean",
-      };
-      jest
-        .spyOn(findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
-        .mockImplementationOnce(() => corrupt);
-      jest
-        .spyOn(findAndUpdateActiveSessionLocalStorageService.findServerStatusService, "find")
-        .mockImplementation(() => true);
-      jest.spyOn(findAndUpdateActiveSessionLocalStorageService.authenticationStatusService, "isAuthenticated");
-
-      const date = new Date();
-      await findAndUpdateActiveSessionLocalStorageService.updateLastSeenOnline(date);
-
-      const userActiveSessionDto = await findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get();
-      expect(userActiveSessionDto.is_authenticated).toBeFalsy();
-      expect(userActiveSessionDto.type).toBe(USER_ACTIVE_SESSION_ONLINE);
-      expect(userActiveSessionDto.last_seen_online).toBe(date.toISOString());
-      expect(findAndUpdateActiveSessionLocalStorageService.findServerStatusService.find).toHaveBeenCalledTimes(1);
-      expect(
-        findAndUpdateActiveSessionLocalStorageService.authenticationStatusService.isAuthenticated,
-      ).not.toHaveBeenCalled();
-    });
   });
 });

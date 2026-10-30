@@ -40,6 +40,7 @@ import ActiveSessionLocalStorage, {
 import SiteSettingsLocalStorage, { SITE_SETTINGS } from "../local_storage/siteSettingsLocalStorage";
 import CanUseOfflineStorageService from "../offline/canUseOfflineStorageService";
 import OfflineRetentionDataFlushService from "../offline/offlineRetentionDataFlushService";
+import { SESSION_TIMESTAMPS_LOCAL_STORAGE_KEY } from "../local_storage/sessionTimestampsLocalStorage";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -96,7 +97,7 @@ describe("LocalStorageService", () => {
 
   describe("LocalStorageService::flushAccountBasedStorages", () => {
     it("Should retain the offline-related storages when the user can use offline storage while flushing others", async () => {
-      expect.assertions(17);
+      expect.assertions(18);
       // mock data
       await MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -146,12 +147,15 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).not.toHaveBeenCalledWith(
         `${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`,
       );
+      expect(browser.storage.local.remove).not.toHaveBeenCalledWith(
+        `${SESSION_TIMESTAMPS_LOCAL_STORAGE_KEY}-${account.id}`,
+      );
       expect(browser.storage.local.remove).not.toHaveBeenCalledWith(`${SITE_SETTINGS}-${account.id}`);
       expect(OfflineRetentionDataFlushService.prototype.flushIfExceeded).toHaveBeenCalledWith();
     });
 
     it("Should flush the offline-related storages when the user cannot use offline storage", async () => {
-      expect.assertions(9);
+      expect.assertions(10);
       // mock data
       await MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -173,13 +177,16 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).toHaveBeenCalledWith(
         `${RESOURCE_TYPES_LOCAL_STORAGE_KEY}-metadata-${account.id}`,
       );
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(
+        `${SESSION_TIMESTAMPS_LOCAL_STORAGE_KEY}-${account.id}`,
+      );
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RESOURCE_TYPES_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${USER_ME_STORAGE_KEY_PREFIX}-metadata-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${USER_ME_STORAGE_KEY_PREFIX}-${account.id}`);
     });
 
     it("Should flush the offline-related storages when the offline capability cannot be resolved", async () => {
-      expect.assertions(6);
+      expect.assertions(7);
       // mock data
       await MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -198,6 +205,9 @@ describe("LocalStorageService", () => {
         "LocalStorageService: could not resolve the offline capability, flushing all storages.",
         error,
       );
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(
+        `${SESSION_TIMESTAMPS_LOCAL_STORAGE_KEY}-${account.id}`,
+      );
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${SITE_SETTINGS}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-${account.id}`);
@@ -206,7 +216,7 @@ describe("LocalStorageService", () => {
     });
 
     it("Should log a failing storage flush and carry on with the other ones", async () => {
-      expect.assertions(4);
+      expect.assertions(5);
       // mock data
       await MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -224,6 +234,9 @@ describe("LocalStorageService", () => {
       expect(console.error).toHaveBeenCalledTimes(1);
       expect(console.error).toHaveBeenCalledWith("LocalStorageService: a storage flush failed and was ignored.", error);
       // The storages flushed alongside the failing one are not impacted.
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(
+        `${SESSION_TIMESTAMPS_LOCAL_STORAGE_KEY}-${account.id}`,
+      );
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`);
     });
   });

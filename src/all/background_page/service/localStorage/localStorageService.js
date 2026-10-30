@@ -40,6 +40,7 @@ import OfflineSettingsLocalStorage from "../local_storage/offlineSettingsLocalSt
 import CanUseOfflineStorageService from "../offline/canUseOfflineStorageService";
 import OfflineRetentionDataFlushService from "../offline/offlineRetentionDataFlushService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
+import SessionTimestampsLocalStorage from "../local_storage/sessionTimestampsLocalStorage";
 
 /**
  * Flush storage data when:
@@ -119,6 +120,7 @@ class LocalStorageService {
     if (!canUseOfflineStorage) {
       flushes.push(
         new ActiveSessionLocalStorage(account).flush(),
+        new SessionTimestampsLocalStorage(account).flush(),
         new RbacsLocalStorage(account).flush(),
         new ResourceTypeLocalStorage(account).flush(),
         new UserMeLocalStorage(account).flush(),

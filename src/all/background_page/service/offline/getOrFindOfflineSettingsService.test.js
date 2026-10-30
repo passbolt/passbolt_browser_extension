@@ -26,11 +26,20 @@ import UserActiveSessionEntity, {
 import { defaultUserActiveSessionDto } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
 import LocalStorageMetadataEntity from "../../model/entity/localStorage/localStorageMetadataEntity";
 import GetOrFindActiveSessionService from "../activeSession/getOrFindActiveSessionService";
+import GetSessionTimestampsService from "../sessionTimestamps/getSessionTimestampsService";
+import SessionTimestampsEntity from "passbolt-styleguide/src/shared/models/entity/sessionTimestamps/sessionTimestampsEntity";
+import { defaultSessionTimestampsDto } from "passbolt-styleguide/src/shared/models/entity/sessionTimestamps/sessionTimestampsEntity.test.data";
 
-const mockActiveSession = (data) =>
+const mockActiveSession = ({ last_logged_in, ...data } = {}) => {
   jest
     .spyOn(GetOrFindActiveSessionService.prototype, "getOrFind")
     .mockResolvedValue(new UserActiveSessionEntity(defaultUserActiveSessionDto(data)));
+  jest
+    .spyOn(GetSessionTimestampsService.prototype, "get")
+    .mockResolvedValue(
+      last_logged_in ? new SessionTimestampsEntity(defaultSessionTimestampsDto({ last_logged_in })) : null,
+    );
+};
 
 beforeEach(() => {
   jest.clearAllMocks();

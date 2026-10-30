@@ -15,14 +15,9 @@
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import UserActiveSessionEntity, {
-  USER_ACTIVE_SESSION_OFFLINE,
-} from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
+import SessionTimestampsEntity from "passbolt-styleguide/src/shared/models/entity/sessionTimestamps/sessionTimestampsEntity";
 import OfflineSettingsEntity from "passbolt-styleguide/src/shared/models/entity/offline/offlineSettingsEntity";
-import {
-  minimalUserActiveSessionDto,
-  defaultUserActiveSessionDto,
-} from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
+import { defaultSessionTimestampsDto } from "passbolt-styleguide/src/shared/models/entity/sessionTimestamps/sessionTimestampsEntity.test.data";
 import { defaultOfflineSettingsDto } from "passbolt-styleguide/src/shared/models/entity/offline/offlineSettingsEntity.test.data";
 import OfflineRetentionDataFlushService from "./offlineRetentionDataFlushService";
 
@@ -36,10 +31,10 @@ describe("OfflineRetentionDataFlushService", () => {
     offlineRetentionDataFlushService = new OfflineRetentionDataFlushService(account, apiClientOptions);
   });
 
-  const mockActiveSession = (activeSessionDto) => {
+  const mockSessionTimestamps = (sessionTimestampsDto) => {
     jest
-      .spyOn(offlineRetentionDataFlushService.getOrFindActiveSessionService, "getOrFind")
-      .mockResolvedValue(new UserActiveSessionEntity(activeSessionDto));
+      .spyOn(offlineRetentionDataFlushService.getSessionTimestampsService, "get")
+      .mockResolvedValue(sessionTimestampsDto ? new SessionTimestampsEntity(sessionTimestampsDto) : null);
   };
 
   const mockOfflineSettings = (offlineSettingsDto) => {
@@ -49,9 +44,9 @@ describe("OfflineRetentionDataFlushService", () => {
   };
 
   describe("::flushIfExceeded", () => {
-    it("Do nothing if last seen online property is not defined.", async () => {
+    it("Should flush data if no session timestamps are stored.", async () => {
       expect.assertions(3);
-      mockActiveSession(minimalUserActiveSessionDto());
+      mockSessionTimestamps(null);
       mockOfflineSettings(defaultOfflineSettingsDto());
 
       jest.spyOn(offlineRetentionDataFlushService.metadataKeyOPFSStorage, "flush");
@@ -60,14 +55,32 @@ describe("OfflineRetentionDataFlushService", () => {
 
       await offlineRetentionDataFlushService.flushIfExceeded();
 
-      expect(offlineRetentionDataFlushService.metadataKeyOPFSStorage.flush).not.toHaveBeenCalled();
-      expect(offlineRetentionDataFlushService.offlineResourcesOPFSStorage.flush).not.toHaveBeenCalled();
-      expect(offlineRetentionDataFlushService.offlineSecretsOPFSStorage.flush).not.toHaveBeenCalled();
+      expect(offlineRetentionDataFlushService.metadataKeyOPFSStorage.flush).toHaveBeenCalledTimes(1);
+      expect(offlineRetentionDataFlushService.offlineResourcesOPFSStorage.flush).toHaveBeenCalledTimes(1);
+      expect(offlineRetentionDataFlushService.offlineSecretsOPFSStorage.flush).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should flush data if the stored session timestamps are not valid.", async () => {
+      expect.assertions(3);
+      jest
+        .spyOn(offlineRetentionDataFlushService.getSessionTimestampsService.sessionTimestampsLocalStorage, "getData")
+        .mockResolvedValue({ last_logged_in: "not a date" });
+      mockOfflineSettings(defaultOfflineSettingsDto());
+
+      jest.spyOn(offlineRetentionDataFlushService.metadataKeyOPFSStorage, "flush");
+      jest.spyOn(offlineRetentionDataFlushService.offlineResourcesOPFSStorage, "flush");
+      jest.spyOn(offlineRetentionDataFlushService.offlineSecretsOPFSStorage, "flush");
+
+      await offlineRetentionDataFlushService.flushIfExceeded();
+
+      expect(offlineRetentionDataFlushService.metadataKeyOPFSStorage.flush).toHaveBeenCalledTimes(1);
+      expect(offlineRetentionDataFlushService.offlineResourcesOPFSStorage.flush).toHaveBeenCalledTimes(1);
+      expect(offlineRetentionDataFlushService.offlineSecretsOPFSStorage.flush).toHaveBeenCalledTimes(1);
     });
 
     it("Do nothing if offline settings is not in local storage.", async () => {
       expect.assertions(3);
-      mockActiveSession(minimalUserActiveSessionDto({ type: USER_ACTIVE_SESSION_OFFLINE }));
+      mockSessionTimestamps(defaultSessionTimestampsDto());
       jest
         .spyOn(offlineRetentionDataFlushService.getOrFindOfflineSettingsService, "getOrFind")
         .mockImplementationOnce(() => null);
@@ -86,7 +99,7 @@ describe("OfflineRetentionDataFlushService", () => {
     it("Do nothing if time is not exceeded.", async () => {
       expect.assertions(3);
       const last_seen_online = new Date().toISOString();
-      mockActiveSession(defaultUserActiveSessionDto({ last_seen_online }));
+      mockSessionTimestamps(defaultSessionTimestampsDto({ last_seen_online }));
       mockOfflineSettings(defaultOfflineSettingsDto());
 
       jest.spyOn(offlineRetentionDataFlushService.metadataKeyOPFSStorage, "flush");
@@ -102,7 +115,7 @@ describe("OfflineRetentionDataFlushService", () => {
 
     it("Should flush data if time is exceeded.", async () => {
       expect.assertions(3);
-      mockActiveSession(defaultUserActiveSessionDto());
+      mockSessionTimestamps(defaultSessionTimestampsDto());
       mockOfflineSettings(defaultOfflineSettingsDto());
 
       jest.spyOn(offlineRetentionDataFlushService.metadataKeyOPFSStorage, "flush");
@@ -118,7 +131,7 @@ describe("OfflineRetentionDataFlushService", () => {
 
     it("Should log error if data has not been flushed.", async () => {
       expect.assertions(4);
-      mockActiveSession(defaultUserActiveSessionDto());
+      mockSessionTimestamps(defaultSessionTimestampsDto());
       mockOfflineSettings(defaultOfflineSettingsDto());
 
       jest
@@ -141,11 +154,9 @@ describe("OfflineRetentionDataFlushService", () => {
 
     it("Should log error if any service throw an error.", async () => {
       expect.assertions(4);
-      jest
-        .spyOn(offlineRetentionDataFlushService.getOrFindActiveSessionService, "getOrFind")
-        .mockImplementationOnce(() => {
-          throw new Error("Error");
-        });
+      jest.spyOn(offlineRetentionDataFlushService.getSessionTimestampsService, "get").mockImplementationOnce(() => {
+        throw new Error("Error");
+      });
       jest.spyOn(offlineRetentionDataFlushService.metadataKeyOPFSStorage, "flush");
       jest.spyOn(offlineRetentionDataFlushService.offlineResourcesOPFSStorage, "flush");
       jest.spyOn(offlineRetentionDataFlushService.offlineSecretsOPFSStorage, "flush");

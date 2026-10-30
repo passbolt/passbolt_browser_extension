@@ -15,6 +15,7 @@ import OfflineSettingsEntity from "passbolt-styleguide/src/shared/models/entity/
 import OfflineSettingsLocalStorage from "../local_storage/offlineSettingsLocalStorage";
 import FindAndUpdateOfflineSettingsLocalStorageService from "./findAndUpdateOfflineSettingsLocalStorageService";
 import GetOrFindActiveSessionService from "../activeSession/getOrFindActiveSessionService";
+import GetSessionTimestampsService from "../sessionTimestamps/getSessionTimestampsService";
 
 /**
  * The service aims to get offline settings from the local storage if it is set, or retrieve them from the API and
@@ -33,6 +34,7 @@ export default class GetOrFindOfflineSettingsService {
       apiClientOptions,
     );
     this.getOrFindActiveSessionService = new GetOrFindActiveSessionService(account, apiClientOptions);
+    this.getSessionTimestampsService = new GetSessionTimestampsService(account);
   }
 
   /**
@@ -41,11 +43,12 @@ export default class GetOrFindOfflineSettingsService {
    */
   async getOrFind() {
     const activeSession = await this.getOrFindActiveSessionService.getOrFind();
+    const lastLoggedIn = (await this.getSessionTimestampsService.get())?.lastLoggedIn;
     // Only an online session with a server reachable refreshes stale data; an offline session cannot reach the API.
     const isStale =
       activeSession.isSessionOnline &&
       activeSession.isServerReachable &&
-      (await this.offlineSettingsLocalStorage.isStaleSinceLastLoggedIn(activeSession.lastLoggedIn));
+      (await this.offlineSettingsLocalStorage.isStaleSinceLastLoggedIn(lastLoggedIn));
     if (!isStale) {
       const offlineSettingsDto = await this.offlineSettingsLocalStorage.getData();
       if (offlineSettingsDto) {

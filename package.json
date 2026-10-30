@@ -74,16 +74,6 @@
     "webpack": "^5.107.2",
     "webpack-cli": "^7.0.2"
   },
-  "overrides": {
-    "@xmldom/xmldom": "0.8.15",
-    "uuid": "^14.0.0",
-    "shell-quote": "1.12.0",
-    "js-yaml": "^4.3.2",
-    "adm-zip": "0.6.1",
-    "qrcode": {
-      "yargs": "^18.1.0"
-    }
-  },
   "scripts": {
     "build": "webpack",
     "build:firefox": "webpack --config webpack.firefox.config.js",

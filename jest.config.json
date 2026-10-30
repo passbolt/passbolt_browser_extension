@@ -8,7 +8,7 @@
   "setupFilesAfterEnv": ["<rootDir>/test/jest.setup.js"],
   "transform": {
     "^.+\\.js$": ["babel-jest", {
-      "presets": [["@babel/env", {"targets": {"node": "current"}}], "@babel/react"]
+      "presets": [["@babel/env", {"targets": {"node": "current"}}], ["@babel/react", {"runtime": "classic"}]]
     }]
   },
   "transformIgnorePatterns": ["/node_modules/(.!passbolt-styleguide)"],

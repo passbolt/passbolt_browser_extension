@@ -7,7 +7,7 @@
   "homepage": "https://www.passbolt.com",
   "repository": "https://github.com/passbolt/passbolt_browser_extension",
   "engines": {
-    "node": ">=22.14.0",
+    "node": "^22.18.0 || >=24.11.0",
     "npm": ">=10.9.2"
   },
   "dependencies": {
@@ -30,15 +30,13 @@
     "xregexp": "~5.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.7",
-    "@babel/preset-env": "^7.29.5",
-    "@babel/preset-react": "^7.28.5",
-    "@babel/runtime": "^7.27.0",
-    "@babel/runtime-corejs3": "^7.26.10",
+    "@babel/core": "^8.0.9",
+    "@babel/preset-env": "^8.0.7",
+    "@babel/preset-react": "^8.0.1",
     "@eslint/js": "^9.39.4",
     "@svgr/webpack": "^8.1.0",
-    "babel-jest": "^30.3.0",
-    "babel-loader": "^8.2.3",
+    "babel-jest": "^30.5.2",
+    "babel-loader": "^10.1.1",
     "buffer": "^6.0.3",
     "copy-webpack-plugin": "^14.0.0",
     "dotenv": "^16.4.5",
@@ -55,7 +53,6 @@
     "eslint-plugin-regexp": "^3.1.0",
     "eslint-plugin-security": "^4.0.0",
     "filereader": "^0.10.3",
-    "formdata-node": "^6.0.3",
     "globals": "^16.4.0",
     "i18next-cli": "^1.58.0",
     "jest": "^30.3.0",

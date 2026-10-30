@@ -13,22 +13,10 @@
  */
 
 import VerifyGpgKeyService from "../../src/all/background_page/service/crypto/verifyGpgKeyService";
-import {OpenpgpAssertion} from "../../src/all/background_page/utils/openpgp/openpgpAssertions";
+import { OpenpgpAssertion } from "../../src/all/background_page/utils/openpgp/openpgpAssertions";
 
-exports.toBeOpenpgpKeySignedBy = async function(armoredKey, armoredVerifyingKeys) {
-  const {printExpected, matcherHint} = this.utils;
-
-  const passMessage =
-    `${matcherHint('.not.toBeOpenpgpKeySignedBy')
-    }\n\n` +
-    `Expected validation not to verify signature(s):\n` +
-    `  ${printExpected(verifyingKeys)}\n`;
-
-  const failMessage =
-    `${matcherHint('.toBeOpenpgpKeySignedBy')
-    }\n\n` +
-    `Expected validation to verify signature(s):\n` +
-    `  ${printExpected(verifyingKeys)}\n`;
+exports.toBeOpenpgpKeySignedBy = async function (armoredKey, armoredVerifyingKeys) {
+  const { printExpected, matcherHint } = this.utils;
 
   const key = await OpenpgpAssertion.readKeyOrFail(armoredKey);
 
@@ -36,7 +24,18 @@ exports.toBeOpenpgpKeySignedBy = async function(armoredKey, armoredVerifyingKeys
     armoredVerifyingKeys = [armoredVerifyingKeys];
   }
   const verifyingKeys = await OpenpgpAssertion.readAllKeysOrFail(armoredVerifyingKeys);
+
+  const passMessage =
+    `${matcherHint(".not.toBeOpenpgpKeySignedBy")}\n\n` +
+    `Expected validation not to verify signature(s):\n` +
+    `  ${printExpected(verifyingKeys)}\n`;
+
+  const failMessage =
+    `${matcherHint(".toBeOpenpgpKeySignedBy")}\n\n` +
+    `Expected validation to verify signature(s):\n` +
+    `  ${printExpected(verifyingKeys)}\n`;
+
   const pass = await VerifyGpgKeyService.verify(key, verifyingKeys);
 
-  return {pass: pass, message: () => (pass ? passMessage : failMessage)};
+  return { pass: pass, message: () => (pass ? passMessage : failMessage) };
 };

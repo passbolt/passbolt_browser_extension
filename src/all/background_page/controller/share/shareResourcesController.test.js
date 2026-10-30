@@ -105,7 +105,7 @@ describe("ShareResourcesController", () => {
         JSON.stringify(secretDto),
         await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public),
       );
-      const resourceForShareDto = new defaultResourceV4Dto({
+      const resourceForShareDto = defaultResourceV4Dto({
         ...resourceDto,
         secrets: [plaintextSecretPasswordAndDescriptionDto({ resource_id: resourceId, data: resourceSecretData })],
       });

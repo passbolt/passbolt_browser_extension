@@ -31,10 +31,17 @@ class GetSessionTimestampsService {
    */
   async get() {
     const sessionTimestampsDto = await this.sessionTimestampsLocalStorage.getData();
-    if (sessionTimestampsDto) {
-      return new SessionTimestampsEntity(sessionTimestampsDto);
+    if (!sessionTimestampsDto) {
+      return null;
     }
-    return null;
+
+    try {
+      return new SessionTimestampsEntity(sessionTimestampsDto);
+    } catch (error) {
+      // Catch invalid timestamps and treat as missing; next online sign in overrides them
+      console.error(error);
+      return null;
+    }
   }
 }
 

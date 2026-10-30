@@ -50,13 +50,17 @@ describe("GetSessionTimestampsService", () => {
       expect(result).toBeNull();
     });
 
-    it("should throw if the stored session timestamps are not valid.", async () => {
-      expect.assertions(1);
+    it("should return null and log the error if the stored session timestamps are not valid.", async () => {
+      expect.assertions(2);
       jest
         .spyOn(getSessionTimestampsService.sessionTimestampsLocalStorage, "getData")
         .mockResolvedValue({ last_logged_in: "not a date" });
+      jest.spyOn(console, "error").mockImplementation(() => {});
 
-      await expect(() => getSessionTimestampsService.get()).rejects.toThrow();
+      const result = await getSessionTimestampsService.get();
+
+      expect(result).toBeNull();
+      expect(console.error).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 });

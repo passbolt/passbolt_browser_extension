@@ -22,6 +22,7 @@ import AuthLocalLogoutController from "../controller/auth/authLocalLogoutControl
 import AuthLoginOfflineController from "../controller/auth/authLoginOfflineController";
 import FindAndUpdateResourcesLocalStorageFromOPFSController from "../controller/resourceLocalStorage/findAndUpdateResourcesLocalStorageFromOPFSController";
 import FindSecretByResourceIdFromOPFSController from "../controller/secret/findSecretByResourceIdFromOPFSController";
+import GetSessionTimestampsController from "../controller/sessionTimestamps/getSessionTimestampsController";
 
 /**
  * Listens to the quickaccess application events
@@ -209,6 +210,17 @@ const listen = function (worker, apiClientOptions, account) {
    */
   worker.port.on("passbolt.offline.get-or-find-settings", async (requestId) => {
     const controller = new GetOrFindOfflineSettingsController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /*
+   * Get the session timestamps (last_logged_in, last_seen_online).
+   *
+   * @listens passbolt.session-timestamps.get
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on("passbolt.session-timestamps.get", async (requestId) => {
+    const controller = new GetSessionTimestampsController(worker, requestId, account);
     await controller._exec();
   });
 

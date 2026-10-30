@@ -12,7 +12,6 @@
  */
 
 import GetOrganizationPolicyController from "../controller/accountRecovery/getOrganizationPolicyController";
-import User from "../model/user";
 import AccountRecoverySaveOrganizationPolicyController from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
 import AccountRecoveryValidatePublicKeyController from "../controller/accountRecovery/accountRecoveryValidatePublicKeyController";
 import AccountRecoveryValidateOrganizationPrivateKeyController from "../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController";
@@ -35,7 +34,6 @@ import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/
 import SavePasswordPoliciesController from "../controller/passwordPolicies/savePasswordPoliciesController";
 import FindPasswordPoliciesController from "../controller/passwordPolicies/findPasswordPoliciesController";
 import ExportDesktopAccountController from "../controller/exportAccount/exportDesktopAccountController";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import FindUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/findUserPassphrasePoliciesController";
 import SaveUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/saveUserPassphrasePoliciesController";
 import SavePasswordExpirySettingsController from "../controller/passwordExpiry/savePasswordExpirySettingsController";
@@ -113,7 +111,6 @@ const listen = function (worker, apiClientOptions, account) {
    */
 
   worker.port.on("passbolt.account-recovery.get-organization-policy", async (requestId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrganizationPolicyController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
@@ -121,7 +118,6 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on(
     "passbolt.account-recovery.save-organization-policy",
     async (requestId, accountRecoveryOrganizationPolicyDto, privateGpgKeyDto) => {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const controller = new AccountRecoverySaveOrganizationPolicyController(
         worker,
         requestId,
@@ -135,14 +131,12 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on(
     "passbolt.account-recovery.validate-organization-key",
     async (requestId, newAccountRecoveryOrganizationPublicKey) => {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const controller = new AccountRecoveryValidatePublicKeyController(worker, requestId, apiClientOptions);
       await controller._exec(newAccountRecoveryOrganizationPublicKey);
     },
   );
 
   worker.port.on("passbolt.account-recovery.generate-organization-key", async (requestId, generateGpgKeyDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoveryGenerateOrganizationKeyController(
       worker,
       requestId,
@@ -160,7 +154,6 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on(
     "passbolt.account-recovery.validate-organization-private-key",
     async (requestId, accountRecoveryOrganizationPrivateKeyDto) => {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(
         worker,
         requestId,
@@ -171,19 +164,16 @@ const listen = function (worker, apiClientOptions, account) {
   );
 
   worker.port.on("passbolt.account-recovery.get-user-requests", async (requestId, userId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoveryGetUserRequestsController(worker, requestId, apiClientOptions);
     await controller._exec(userId);
   });
 
   worker.port.on("passbolt.account-recovery.get-request", async (requestId, accountRecoveryRequestId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoveryGetRequestController(worker, requestId, apiClientOptions);
     await controller._exec(accountRecoveryRequestId);
   });
 
   worker.port.on("passbolt.account-recovery.save-user-settings", async (requestId, accountRecoveryUserSettingDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoverySaveUserSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec(accountRecoveryUserSettingDto);
   });
@@ -191,7 +181,6 @@ const listen = function (worker, apiClientOptions, account) {
   worker.port.on(
     "passbolt.account-recovery.review-request",
     async (requestId, accountRecoveryRequestId, responseStatus, privateKeyDto) => {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ReviewRequestController(worker, requestId, apiClientOptions, account);
       await controller._exec(accountRecoveryRequestId, responseStatus, privateKeyDto);
     },
@@ -208,37 +197,31 @@ const listen = function (worker, apiClientOptions, account) {
   });
 
   worker.port.on("passbolt.sso.get-current", async (requestId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetCurrentSsoSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on("passbolt.sso.save-draft", async (requestId, draftSsoSettings) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new SaveSsoSettingsAsDraftController(worker, requestId, apiClientOptions);
     await controller._exec(draftSsoSettings);
   });
 
   worker.port.on("passbolt.sso.dry-run", async (requestId, draftId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new TestSsoAuthenticationController(worker, requestId, apiClientOptions, account);
     await controller._exec(draftId);
   });
 
   worker.port.on("passbolt.sso.activate-settings", async (requestId, draftId, ssoToken) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new ActivateSsoSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(draftId, ssoToken);
   });
 
   worker.port.on("passbolt.sso.delete-settings", async (requestId, settingsId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new DeleteSsoSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(settingsId);
   });
 
   worker.port.on("passbolt.sso.generate-sso-kit", async (requestId, provider) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GenerateSsoKitController(worker, requestId, apiClientOptions, account);
     await controller._exec(provider);
   });
@@ -250,7 +233,6 @@ const listen = function (worker, apiClientOptions, account) {
    */
 
   worker.port.on("passbolt.rbacs.find-me", async (requestId, name) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindRbacMeController(worker, requestId, apiClientOptions, account);
     await controller._exec(name);
   });
@@ -262,19 +244,16 @@ const listen = function (worker, apiClientOptions, account) {
    */
 
   worker.port.on("passbolt.password-policies.get", async (requestId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on("passbolt.password-policies.save", async (requestId, passwordSettingsDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new SavePasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec(passwordSettingsDto);
   });
 
   worker.port.on("passbolt.password-policies.get-admin-settings", async (requestId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
@@ -286,13 +265,11 @@ const listen = function (worker, apiClientOptions, account) {
    */
 
   worker.port.on("passbolt.user-passphrase-policies.find", async (requestId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindUserPassphrasePoliciesController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on("passbolt.user-passphrase-policies.save", async (requestId, userPassphrasePoliciesDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new SaveUserPassphrasePoliciesController(worker, requestId, apiClientOptions);
     await controller._exec(userPassphrasePoliciesDto);
   });
@@ -331,7 +308,6 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.desktop.export-account", async (requestId) => {
-    const account = GetLegacyAccountService.get();
     const controller = new ExportDesktopAccountController(worker, requestId, account);
     await controller._exec();
   });
@@ -349,7 +325,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.metadata.find-all-non-deleted-metadata-keys", async (requestId) => {
-    const controller = new FindAllNonDeletedMetadataKeysController(worker, requestId, apiClientOptions, account);
+    const controller = new FindAllNonDeletedMetadataKeysController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
@@ -454,7 +430,6 @@ const listen = function (worker, apiClientOptions, account) {
    * Get the CSRF token from
    */
   worker.port.on("passbolt.auth.get-csrf-token", async (requestId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetCsrfTokenController(worker, requestId, apiClientOptions);
     await controller._exec();
   });

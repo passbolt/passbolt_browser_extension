@@ -48,7 +48,7 @@ describe("SessionKeysBundlesApiService", () => {
       const service = new SessionKeysBundlesApiService(apiClientOptions);
       const resultDto = await service.findAll();
 
-      expect(resultDto).toBeInstanceOf(Array);
+      expect(Array.isArray(resultDto)).toBe(true);
       expect(resultDto).toHaveLength(apiSessionKeysBundlesCollection.length);
     });
 

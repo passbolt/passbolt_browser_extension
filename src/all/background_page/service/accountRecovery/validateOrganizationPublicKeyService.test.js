@@ -19,7 +19,7 @@ import { mockApiResponse } from "../../../../../test/mocks/mockApiResponse";
 import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import { dummyData } from "./validateOrganizationPublicKeyService.test.data";
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

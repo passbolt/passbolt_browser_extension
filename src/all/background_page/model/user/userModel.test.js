@@ -31,7 +31,7 @@ import { defaultCeSiteSettings } from "passbolt-styleguide/src/shared/models/ent
 import GetOrFindSiteSettingsService from "../../service/siteSettings/getOrFindSiteSettingsService";
 import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

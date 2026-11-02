@@ -144,7 +144,7 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).not.toHaveBeenCalledWith(
         `${RESOURCE_TYPES_LOCAL_STORAGE_KEY}-${account.id}`,
       );
-      expect(browser.storage.local.remove).not.toHaveBeenCalledWith(
+      expect(browser.storage.session.remove).not.toHaveBeenCalledWith(
         `${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`,
       );
       expect(browser.storage.local.remove).not.toHaveBeenCalledWith(
@@ -161,6 +161,7 @@ describe("LocalStorageService", () => {
       const account = new AccountEntity(defaultAccountDto());
       // spy on
       jest.spyOn(browser.storage.local, "remove");
+      jest.spyOn(browser.storage.session, "remove");
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       // The user is not eligible for offline access: the org did not configure it, or its role is denied.
       jest
@@ -170,7 +171,7 @@ describe("LocalStorageService", () => {
       await LocalStorageService.flushAccountBasedStorages();
       // expectations: the offline-related storages are fully flushed.
       expect(CanUseOfflineStorageService.canUseOfflineStorageFromLocalStorage).toHaveBeenCalledWith(account);
-      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.session.remove).toHaveBeenCalledWith(`${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${SITE_SETTINGS}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-metadata-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-${account.id}`);
@@ -193,6 +194,7 @@ describe("LocalStorageService", () => {
       const error = new Error("Could not resolve the offline capability.");
       // spy on
       jest.spyOn(browser.storage.local, "remove");
+      jest.spyOn(browser.storage.session, "remove");
       jest.spyOn(console, "error").mockImplementation(() => {});
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest
@@ -208,7 +210,7 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).toHaveBeenCalledWith(
         `${SESSION_TIMESTAMPS_LOCAL_STORAGE_KEY}-${account.id}`,
       );
-      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.session.remove).toHaveBeenCalledWith(`${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${SITE_SETTINGS}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RESOURCE_TYPES_LOCAL_STORAGE_KEY}-${account.id}`);
@@ -223,6 +225,7 @@ describe("LocalStorageService", () => {
       const error = new Error("Could not flush the groups.");
       // spy on
       jest.spyOn(browser.storage.local, "remove");
+      jest.spyOn(browser.storage.session, "remove");
       jest.spyOn(console, "error").mockImplementation(() => {});
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest
@@ -237,7 +240,7 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).toHaveBeenCalledWith(
         `${SESSION_TIMESTAMPS_LOCAL_STORAGE_KEY}-${account.id}`,
       );
-      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.session.remove).toHaveBeenCalledWith(`${ACTIVE_SESSION_LOCAL_STORAGE_KEY}-${account.id}`);
     });
   });
 

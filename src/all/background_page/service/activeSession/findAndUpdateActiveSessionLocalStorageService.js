@@ -204,15 +204,12 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
    */
   async authenticateOnline() {
     await navigator.locks.request(this._lockKey, async () => {
-      const nowDate = new Date().toISOString();
       try {
         const storedSession = await this.activeSessionLocalStorage.get();
         const userActiveSessionEntity = new UserActiveSessionEntity({
           ...storedSession,
           is_authenticated: true,
           type: USER_ACTIVE_SESSION_ONLINE,
-          last_logged_in: nowDate,
-          last_seen_online: nowDate,
         });
         await this.activeSessionLocalStorage.set(userActiveSessionEntity);
       } catch (error) {
@@ -221,7 +218,6 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
         const userActiveSessionEntity = new UserActiveSessionEntity({
           is_authenticated: true,
           type: USER_ACTIVE_SESSION_ONLINE,
-          last_logged_in: nowDate,
         });
         await this.activeSessionLocalStorage.set(userActiveSessionEntity);
       }
@@ -236,14 +232,12 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
    */
   async authenticateOffline() {
     await navigator.locks.request(this._lockKey, async () => {
-      const lastLoggedIn = new Date().toISOString();
       try {
         const storedSession = await this.activeSessionLocalStorage.get();
         const userActiveSessionEntity = new UserActiveSessionEntity({
           ...storedSession,
           is_authenticated: true,
           type: USER_ACTIVE_SESSION_OFFLINE,
-          last_logged_in: lastLoggedIn,
         });
         await this.activeSessionLocalStorage.set(userActiveSessionEntity);
       } catch (error) {
@@ -252,7 +246,6 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
         const userActiveSessionEntity = new UserActiveSessionEntity({
           is_authenticated: true,
           type: USER_ACTIVE_SESSION_OFFLINE,
-          last_logged_in: lastLoggedIn,
         });
         await this.activeSessionLocalStorage.set(userActiveSessionEntity);
       }

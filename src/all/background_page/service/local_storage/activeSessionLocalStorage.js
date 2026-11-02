@@ -57,22 +57,22 @@ class ActiveSessionLocalStorage {
   }
 
   /**
-   * Flush the active session from local storage and runtime cached data.
+   * Flush the active session from the session storage and runtime cached data.
    * @return {Promise<void>}
    */
   async flush() {
-    await browser.storage.local.remove(this.storageKey);
+    await browser.storage.session.remove(this.storageKey);
     delete ActiveSessionLocalStorage._runtimeCachedData[this.account.id];
     Log.write({ level: "debug", message: `ActiveSessionLocalStorage flushed for (${this.account.id})` });
   }
 
   /**
-   * Get the active session from the local storage.
+   * Get the active session from the session storage.
    * @return {Promise<object|undefined>}
    */
   async get() {
     if (!ActiveSessionLocalStorage._runtimeCachedData[this.account.id]) {
-      const data = await browser.storage.local.get([this.storageKey]);
+      const data = await browser.storage.session.get(this.storageKey);
       if (!data[this.storageKey]) {
         return;
       }
@@ -83,8 +83,8 @@ class ActiveSessionLocalStorage {
   }
 
   /**
-   * Set the active session in the local storage.
-   * @param {UserActiveSessionEntity} activeSession The active session to insert in the local storage.
+   * Set the active session in the session storage.
+   * @param {UserActiveSessionEntity} activeSession The active session to insert in the session storage.
    * @return {Promise<void>}
    * @throws {TypeError} If parameter settings is not of type UserActiveSessionEntity.
    */
@@ -105,12 +105,12 @@ class ActiveSessionLocalStorage {
    * Set the browser storage.
    * @todo Tool to test the semaphore. A dedicated local storage service could be implemented later on top
    * of the browser provided one to ease the testing.
-   * @param {object} data The data to store in the local storage.
+   * @param {object} data The data to store in the session storage.
    * @returns {Promise<void>}
    * @private
    */
   async _setBrowserStorage(data) {
-    await browser.storage.local.set(data);
+    await browser.storage.session.set(data);
   }
 }
 

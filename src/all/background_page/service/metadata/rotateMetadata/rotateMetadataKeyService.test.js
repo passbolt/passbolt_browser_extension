@@ -28,10 +28,10 @@ import { defaultMetadataKeyDto } from "passbolt-styleguide/src/shared/models/ent
 describe("RotateMetadataKeyService", () => {
   let account;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
 
-    MockExtension.withConfiguredAccount();
+    await MockExtension.withConfiguredAccount();
     account = new AccountEntity(defaultAccountDto());
   });
 

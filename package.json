@@ -59,7 +59,7 @@
     "jest-environment-node": "^30.5.2",
     "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^16.0.0",
-    "jest-webextension-mock": "^4.1.1",
+    "jest-webextension-mock": "^4.2.0",
     "lockfile-lint": "^5.0.1",
     "prettier": "3.6.2",
     "terser-webpack-plugin": "^5.4.0",

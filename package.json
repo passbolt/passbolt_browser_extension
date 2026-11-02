@@ -33,27 +33,26 @@
     "@babel/core": "^8.0.9",
     "@babel/preset-env": "^8.0.7",
     "@babel/preset-react": "^8.0.1",
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^10.0.1",
     "@svgr/webpack": "^8.1.0",
     "babel-jest": "^30.5.2",
     "babel-loader": "^10.1.1",
     "buffer": "^6.0.3",
     "copy-webpack-plugin": "^14.0.0",
     "dotenv": "^16.4.5",
-    "eslint": "^9.39.4",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jest": "^29.15.1",
-    "eslint-plugin-n": "^17.24.0",
+    "eslint-plugin-import-x": "^4.17.1",
+    "eslint-plugin-jest": "^29.17.0",
+    "eslint-plugin-n": "^18.5.0",
     "eslint-plugin-no-unsanitized": "^4.1.5",
-    "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-prettier": "^5.5.7",
+    "eslint-plugin-promise": "^7.3.0",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-regexp": "^3.1.0",
-    "eslint-plugin-security": "^4.0.0",
+    "eslint-plugin-regexp": "^3.3.2",
+    "eslint-plugin-security": "^4.2.1",
     "filereader": "^0.10.3",
-    "globals": "^16.4.0",
+    "globals": "^17.13.0",
     "i18next-cli": "^1.58.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
@@ -92,5 +91,10 @@
     "test:unit": "jest --no-cache ./src/all/ ./src/chrome-mv3/ ./src/chrome/ ./src/safari/",
     "test:coverage": "jest --no-cache ./src/all/ ./src/chrome-mv3/ ./src/safari/ --coverage",
     "test:ci:coverage": "npm run test:coverage -- --runInBand"
+  },
+  "overrides": {
+    "eslint-plugin-react": {
+      "eslint": "$eslint"
+    }
   }
 }

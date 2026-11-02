@@ -37,7 +37,7 @@ class ParseRecoverUrlService {
       new URL(domain);
     } catch (error) {
       console.error(error);
-      throw new Error("The domain is not valid.");
+      throw new Error("The domain is not valid.", { cause: error });
     }
 
     return { domain, user_id, authentication_token_token };

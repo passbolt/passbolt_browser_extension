@@ -32,6 +32,7 @@ describe("Locales", () => {
           console.error(error);
           throw new Error(
             `Extension name for locale "${locale}" should not be greater than ${extensionNameLength} characters`,
+            { cause: error },
           );
         }
 
@@ -41,6 +42,7 @@ describe("Locales", () => {
           console.error(error);
           throw new Error(
             `Extension description for locale "${locale}" should not be greater than ${extensionDescriptionLength} characters`,
+            { cause: error },
           );
         }
       }

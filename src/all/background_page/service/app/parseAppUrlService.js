@@ -43,7 +43,7 @@ class ParseAppUrlService {
       new URL(url);
     } catch (error) {
       console.error(error);
-      throw new Error("Cannot parse application url. The domain is not valid.");
+      throw new Error("Cannot parse application url. The domain is not valid.", { cause: error });
     }
   }
 

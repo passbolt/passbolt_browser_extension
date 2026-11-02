@@ -7,7 +7,7 @@ import js from "@eslint/js";
 import noUnsanitizedPlugin from "eslint-plugin-no-unsanitized";
 import jestPlugin from "eslint-plugin-jest";
 import reactPlugin from "eslint-plugin-react";
-import importPlugin from "eslint-plugin-import";
+import { flatConfigs as importFlatConfigs, createNodeResolver } from "eslint-plugin-import-x";
 import pluginSecurity from "eslint-plugin-security";
 import nodePlugin from "eslint-plugin-n";
 import * as regexpPlugin from "eslint-plugin-regexp";
@@ -21,7 +21,7 @@ export default [
   js.configs.recommended, // core JavaScript rules
   reactPlugin.configs.flat.recommended, // React best practices
   reactPlugin.configs.flat["jsx-runtime"], // JSX transform rules
-  importPlugin.flatConfigs.recommended, // import/export validations
+  importFlatConfigs.recommended, // import/export validations
   pluginSecurity.configs.recommended,
   nodePlugin.configs["flat/recommended-script"],
   regexpPlugin.configs["flat/recommended"],
@@ -58,23 +58,19 @@ export default [
 
     settings: {
       react: {
-        version: "detect",
+        version: "18.3",
       },
       regexp: {
         // Allow PGP armor header character ranges (RFC 4880)
         // !-9 and ;-~ match all printable ASCII except colon
         allowedCharacterRanges: ["alphanumeric", "!-9", ";-~"],
       },
-      "import/resolver": {
-        node: {
-          paths: [__dirname], // Add project root to resolution paths
+      "import-x/resolver-next": [
+        createNodeResolver({
           extensions: [".js", ".jsx", ".mjs", ".cjs"],
-        },
-        alias: {
-          map: [["passbolt-styleguide", path.resolve(__dirname)]],
-          extensions: [".js", ".jsx", ".ts", ".tsx"],
-        },
-      },
+          fallback: { "passbolt-styleguide": [path.resolve(__dirname)] },
+        }),
+      ],
     },
 
     rules: {
@@ -98,15 +94,16 @@ export default [
       "react/prop-types": "off", // Skip PropTypes (future TypeScript)
       "react/jsx-uses-react": "error", // Marks React as used when JSX is present
       "no-useless-escape": "off", // Too many false positives
+      "no-useless-assignment": "off", // Keep defensive variable initialisation
       "func-names": ["error", "never"],
-      "import/no-named-as-default": "off",
+      "import-x/no-named-as-default": "off",
       "security/detect-object-injection": "off",
       "security/detect-non-literal-regexp": "off",
       "security/detect-unsafe-regex": "off",
       "prefer-regex-literals": "off",
 
       // Phantom dependency detection (CRITICAL)
-      "import/no-extraneous-dependencies": [
+      "import-x/no-extraneous-dependencies": [
         "error",
         {
           devDependencies: [
@@ -162,7 +159,7 @@ export default [
 
       // Test-specific overrides
       "no-console": "off", // Allow console in tests
-      "import/no-extraneous-dependencies": "off", // Dev deps OK in tests
+      "import-x/no-extraneous-dependencies": "off", // Dev deps OK in tests
       "n/no-unpublished-import": "off", // Dev deps OK in tests
       "n/no-unpublished-require": "off",
       "n/no-extraneous-import": "off",
@@ -216,6 +213,7 @@ export default [
     files: ["*.config.{js,mjs,cjs}", "scripts/**/*.js", "webpack.config.js"],
 
     languageOptions: {
+      ecmaVersion: "latest", // Plugins imported by configs may use newer syntax (e.g. import attributes)
       globals: {
         ...globals.node,
       },
@@ -223,7 +221,7 @@ export default [
 
     rules: {
       "no-console": "off", // Allow console in scripts
-      "import/no-extraneous-dependencies": "off", // Dev deps OK in configs
+      "import-x/no-extraneous-dependencies": "off", // Dev deps OK in configs
       "n/no-unpublished-import": "off",
     },
   },

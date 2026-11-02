@@ -73,7 +73,7 @@ export class RequestFetchOffscreenService {
     } catch (error) {
       // Let the fetch happen even if offline in case it requests a local url or a cache, however do not fallback on offscreen strategy in that case.
       if (!navigator.onLine) {
-        throw new Error("RequestFetchOffscreenService::fetchNative: offline error.");
+        throw new Error("RequestFetchOffscreenService::fetchNative: offline error.", { cause: error });
       }
       console.error(
         "RequestFetchOffscreenService::fetchNative: An error occurred while using the native fetch API, fallback on offscreen strategy until browser restart.",

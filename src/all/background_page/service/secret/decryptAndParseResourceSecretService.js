@@ -51,7 +51,7 @@ class DecryptAndParseResourceSecretService {
       secretDto = JSON.parse(decryptedSecretMessage);
     } catch (error) {
       console.error(error);
-      throw new Error("Unable to parse the secret.");
+      throw new Error("Unable to parse the secret.", { cause: error });
     }
 
     return new PlaintextEntity(secretDto, { schema });

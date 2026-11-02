@@ -22,6 +22,7 @@ import User from "../../model/user";
 import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import ToolbarService from "../../service/toolbar/toolbarService";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -38,11 +39,12 @@ describe("CompleteRecoverController", () => {
         null,
         defaultApiClientOptions(),
       );
+      jest.spyOn(ToolbarService, "setQuickaccessPopup").mockImplementation(() => {});
 
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
 
-      expect.assertions(9);
+      expect.assertions(10);
       await controller.exec();
       const user = User.getInstance().get();
       expect(user.id).toStrictEqual(account.userId);
@@ -64,6 +66,8 @@ describe("CompleteRecoverController", () => {
       expect(keyringPrivateFingerprint).toStrictEqual(accountPrivateFingerprint);
       expect(keyringPublicFingerprint).toStrictEqual(accountPublicFingerprint);
       expect(keyringPublicFingerprint).toStrictEqual(keyringPrivateFingerprint);
+
+      expect(ToolbarService.setQuickaccessPopup).toHaveBeenCalledTimes(1);
     });
 
     it("Should not add the account to the local storage if the complete API request fails.", async () => {

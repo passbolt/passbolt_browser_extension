@@ -46,6 +46,9 @@ class MfaEnabledProviderEntity extends Entity {
         duo: {
           type: "boolean",
         },
+        webauthn: {
+          type: "boolean",
+        },
       },
     };
   }
@@ -78,6 +81,14 @@ class MfaEnabledProviderEntity extends Entity {
    */
   get duo() {
     return this._props.duo;
+  }
+
+  /**
+   * get the webauthn prop
+   * @returns {boolean|undefined}
+   */
+  get webauthn() {
+    return this._props.webauthn;
   }
 
   /*

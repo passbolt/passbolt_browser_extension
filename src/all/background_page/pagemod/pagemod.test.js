@@ -16,7 +16,7 @@ import WorkersSessionStorage from "../service/sessionStorage/workersSessionStora
 import ScriptExecution from "../sdk/scriptExecution";
 import WorkerEntity from "../model/entity/worker/workerEntity";
 
-const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
+const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorkerAndEvictSameFrame");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());

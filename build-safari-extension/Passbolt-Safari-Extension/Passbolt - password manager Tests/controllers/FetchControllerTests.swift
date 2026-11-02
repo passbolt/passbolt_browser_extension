@@ -26,7 +26,7 @@ import Testing
 
 @Suite("FetchController")
 struct FetchControllerTests {
-
+    
     @Test("FetchController conforms to AbstractController")
     func conformance() {
         let _: any AbstractController = FetchController()

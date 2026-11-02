@@ -100,7 +100,9 @@ class Pagemod {
       frameId: frameId,
       status: WorkerEntity.STATUS_WAITING_CONNECTION,
     };
-    await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
+    // A re-injection supersedes the previous worker of this app on the frame: evict + add atomically so a
+    // stale worker can't be left behind and later picked (e.g. by WorkerService.get → dead-port hang).
+    await WorkersSessionStorage.addWorkerAndEvictSameFrame(new WorkerEntity(worker));
     // a helper to handle insertion of scripts, variables and css in target page
     const scriptExecution = new ScriptExecution(tabId, frameId);
     // Inject port name

@@ -87,12 +87,10 @@ jest.mock("webextension-polyfill", () => {
         removeListener: jest.fn(),
       },
     },
-    browserAction: {
-      setPopup: jest.fn(),
-      openPopup: jest.fn(),
-    },
     action: {
       setIcon: jest.fn(),
+      setPopup: jest.fn(),
+      openPopup: jest.fn(),
     }
   };
 });

@@ -26,7 +26,7 @@ import Testing
 
 @Suite("FetchService")
 struct FetchServiceTests {
-
+    
     @Test("fetch throws when the server is unreachable")
     func fetchThrowsForUnreachableServer() async {
         let url = URL(string: "https://localhost:1")!

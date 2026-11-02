@@ -158,11 +158,13 @@ describe("InformCallToActionController", () => {
       );
       jest.spyOn(WorkerService, "get").mockResolvedValue({ port });
 
-      await controller.execute(requestId);
+      const applicationId = "a2bd0dcd-0e2a-4bbb-bd6a-4f6c5a4d1e2f";
+      await controller.execute(requestId, applicationId);
 
       expect(controller.getOrFindActiveSessionService.getOrFind).toHaveBeenCalledTimes(1);
       expect(WorkerService.get).toHaveBeenCalledWith("WebIntegration", worker.tab.id);
-      expect(port.emit).toHaveBeenCalledWith("passbolt.in-form-menu.open");
+      // The clicked call-to-action must be named, so the web integration serves the right field.
+      expect(port.emit).toHaveBeenCalledWith("passbolt.in-form-menu.open", applicationId);
     });
 
     it("Should catch and emit ERROR when an error occurs in getOrFindActiveSessionService", async () => {

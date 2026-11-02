@@ -26,16 +26,18 @@ import FindResourcesService from "../resource/findResourcesService";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import FindAndUpdateFoldersLocalStorageService from "../folder/findAndUpdateFoldersLocalStorageService";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
-import ConfirmMoveStrategyService from "./confirmMoveStrategyService";
-import CalculatePermissionsChangesForMoveService from "./calculatePermissionsChangesForMoveService";
+import CalculatePermissionsChangesService from "../permission/calculatePermissionsChangesService";
 
 const STEPS_TO_COMPLETE_SHARE = PROGRESS_STEPS_SHARE_FOLDERS_SHARE_ONE + PROGRESS_STEPS_SHARE_RESOURCES_SHARE_ALL;
 
 const STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE =
   1 + // Calculate folders permissions
   1 + // Calculate resources permissions
-  1 + // Confirm share operation
   STEPS_TO_COMPLETE_SHARE;
+
+const STEPS_SKIPPED_WITHOUT_PERMISSIONS_CHANGE =
+  1 + // Retrieve resources permissions
+  STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE;
 
 export const PROGRESS_STEPS_MOVE_FOLDER_MOVE_ONE =
   1 + // Retrieve folders permissions
@@ -65,21 +67,22 @@ class MoveOneFolderService {
   }
 
   /**
-   * Move on folder.
+   * Move one folder and apply the permissions the operator confirmed, to the folder and to what it
+   * contains. Without an entry for the folder, it moves and keeps the permissions it has.
    * @param {string} folderId The folder id to move.
    * @param {string|null} destinationFolderId The destination folder or null for the root folder.
-   * @param {ConfirmMoveStrategyService} moveStrategyService The move strategy confirmation service.
+   * @param {Map<string, PermissionsCollection>} confirmedPermissions The permissions the operator confirmed, keyed by item id. May be empty.
    * @param {string} passphrase The user passphrase.
    * @returns {Promise<void>}
    * @throws {TypeError} If the folderId is not a UUID
    * @throws {TypeError} If the destinationFolderId is not a UUID
    * @throws {Error} If the folderId is equal to destinationFolderId
-   * @throws {TypeError} If the moveStrategyService is not of type MoveStrategyService
+   * @throws {TypeError} If confirmedPermissions is defined and is not a Map
    * @throws {TypeError} If the passphrase is defined and is not a string
    * @throw {Error} If the destination folder is the root and the folder is already the root folder
    * @throw {Error} If the destination folder is already the parent folder
    */
-  async moveOne(folderId, destinationFolderId, moveStrategyService, passphrase) {
+  async moveOne(folderId, destinationFolderId, confirmedPermissions, passphrase) {
     assertUuid(folderId, 'The parameter "folderId" should be a UUID');
     if (destinationFolderId !== null) {
       assertUuid(destinationFolderId, 'The parameter "destinationFolderId" should be a UUID');
@@ -87,58 +90,78 @@ class MoveOneFolderService {
     if (folderId === destinationFolderId) {
       throw new Error(i18n.t("The folder cannot be moved inside itself."));
     }
-    assertType(
-      moveStrategyService,
-      ConfirmMoveStrategyService,
-      'The parameter "moveStrategyService" should be MoveStrategy service instance.',
-    );
+    assertType(confirmedPermissions, Map, 'The parameter "confirmedPermissions" should be a Map keyed by item id.');
     if (passphrase) {
       assertString(passphrase, 'The parameter "passphrase" should be a string');
     }
 
     const folder = await this.getOrFindFoldersService.getOrFindById(folderId);
-    const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(folder);
     const parentFolder = folder.folderParentId
       ? await this.findFoldersService.findByIdWithPermissions(folder.folderParentId)
       : null;
     const destinationFolder = destinationFolderId
       ? await this.findFoldersService.findByIdWithPermissions(destinationFolderId)
       : null;
-    const resourcesToShareWithPermissions = await this.findResourcesToShareWithPermissions(folderId);
 
     this.assertFolderCanBeMoved(folder, destinationFolder, parentFolder);
 
-    const couldOverridePermissions = this.checkCouldOverridePermissions(folder, destinationFolder, parentFolder);
-    if (couldOverridePermissions) {
-      const foldersPermissionsChanges = this.calculateFoldersPermissionChanges(
-        folder,
-        foldersToShareWithPermissions,
-        destinationFolder,
-        parentFolder,
-      );
-      const resourcesPermissionsChanges = this.calculateResourcesPermissionsChanges(
-        resourcesToShareWithPermissions,
-        destinationFolder,
-        parentFolder,
-      );
-      const isShareConfirmed = await this.confirmShareOperation(
-        folder,
-        destinationFolder,
-        moveStrategyService,
-        foldersPermissionsChanges,
-        resourcesPermissionsChanges,
-      );
-      if (isShareConfirmed) {
-        await this.shareResources(resourcesPermissionsChanges, passphrase);
-        await this.shareFolders(foldersPermissionsChanges);
-      } else {
-        this.progressService.finishSteps(STEPS_TO_COMPLETE_SHARE);
+    const folderTargetPermissions = confirmedPermissions.get(folderId) ?? null;
+
+    this.progressService.finishStep(i18n.t("Retrieving folders permissions"), true);
+    let movedFolderPermissionChanges = null;
+    if (folderTargetPermissions) {
+      if (!folder.isOwner()) {
+        // The dialog only confirms permissions for an owned folder, so reaching this means the two disagree.
+        throw new Error(`Folder ${folder.id} must be owned to apply the confirmed permissions.`);
       }
-    } else {
-      this.progressService.finishSteps(STEPS_TO_COMPLETE_PERMISSIONS_OVERRIDE);
+      const movedFolderWithPermissions = await this.findFoldersService.findByIdWithPermissions(folderId);
+      movedFolderPermissionChanges = CalculatePermissionsChangesService.forFolderWithTargetPermissions(
+        movedFolderWithPermissions,
+        folderTargetPermissions,
+      );
     }
 
+    let foldersPermissionsChanges = null;
+    let resourcesPermissionsChanges = null;
+    if (movedFolderPermissionChanges?.length) {
+      const allFolders = await this.getOrFindFoldersService.getOrFindAll();
+      const ownedDescendantFolders = allFolders.getOwnedDescendantsStoppingAtNotOwned(folderId);
+      const foldersToShareWithPermissions = await this.findFoldersToShareWithPermissions(ownedDescendantFolders);
+      const resourcesToShareWithPermissions = await this.findResourcesToShareWithPermissions(
+        folderId,
+        ownedDescendantFolders,
+      );
+      foldersPermissionsChanges = new PermissionChangesCollection([]);
+      // Merged first: the changes are saved in order, so a failure never leaves the content ahead of the folder.
+      foldersPermissionsChanges.merge(movedFolderPermissionChanges);
+      foldersPermissionsChanges.merge(
+        this.calculateFoldersPermissionChanges(foldersToShareWithPermissions.items, movedFolderPermissionChanges),
+      );
+      resourcesPermissionsChanges = this.calculateResourcesPermissionsChanges(
+        resourcesToShareWithPermissions,
+        movedFolderPermissionChanges,
+      );
+    } else {
+      this.progressService.finishSteps(STEPS_SKIPPED_WITHOUT_PERMISSIONS_CHANGE);
+    }
+
+    // Move before applying the permissions: a failed move then leaves no re-encrypted secret behind.
     await this.move(folder, destinationFolderId);
+
+    try {
+      if (movedFolderPermissionChanges?.length) {
+        await this.shareResources(resourcesPermissionsChanges, passphrase);
+        await this.shareFolders(foldersPermissionsChanges);
+      }
+    } catch (error) {
+      // The folder already moved, so refresh the local storage; a failed refresh must not hide the original error.
+      try {
+        await this.findAndUpdateFoldersLocalStorage.findAndUpdateAll();
+      } catch (flushError) {
+        console.error(flushError);
+      }
+      throw error;
+    }
 
     // Update folders local storage, it shouldn't be done by the ShareOneFolderService function called to save the permissions.
     this.progressService.finishStep(i18n.t("Updating folders local storage"), true);
@@ -146,42 +169,34 @@ class MoveOneFolderService {
   }
 
   /**
-   * Retrieve the folders to share with their permissions.
-   * A folder is impacted by the share if it is the folder that is shared or a folder descendant for which the user
-   * has ownership.
-   * @param {FolderEntity} folder The folder to share
+   * Retrieve, with their permissions, the owned folders nested under the moved one, which is not
+   * included.
+   * @param {FoldersCollection} ownedDescendantFolders The owned folders below, each branch stopping
+   *   at the first folder the operator does not own.
    * @returns {Promise<FoldersCollection>}
    * @private
    */
-  async findFoldersToShareWithPermissions(folder) {
-    this.progressService.finishStep(i18n.t("Retrieving folders permissions"), true);
-    const folders = await this.getOrFindFoldersService.getOrFindAll();
-    const foldersDescendant = FoldersCollection.getAllChildren(folder.id, folders, new FoldersCollection([]));
-    const foldersDescendantWithOwnership = foldersDescendant.filterByIsOwner();
-    const foldersIdsToRetrievePermissions = foldersDescendantWithOwnership.ids;
-    if (folder.isOwner()) {
-      foldersIdsToRetrievePermissions.unshift(folder.id);
-    }
-    if (!foldersIdsToRetrievePermissions.length) {
+  async findFoldersToShareWithPermissions(ownedDescendantFolders) {
+    if (!ownedDescendantFolders.ids.length) {
       return new FoldersCollection();
     }
 
-    return this.findFoldersService.findAllByIdsWithPermissions(foldersIdsToRetrievePermissions);
+    return this.findFoldersService.findAllByIdsWithPermissions(ownedDescendantFolders.ids);
   }
 
   /**
-   * Retrieve the resources to share with their permissions.
-   * A resource is impacted by the share if it is a folder descendant for which the user has ownership.
+   * Retrieve the resources to share with their permissions: the owned ones sitting in the moved
+   * folder or in an owned folder below, the branches stopping at the first not-owned folder.
    * @param {string} folderId The folder id to share
+   * @param {FoldersCollection} ownedDescendantFolders The owned folders below, each branch stopping
+   *   at the first folder the operator does not own.
    * @returns {Promise<ResourcesCollection>}
    * @private
    */
-  async findResourcesToShareWithPermissions(folderId) {
+  async findResourcesToShareWithPermissions(folderId, ownedDescendantFolders) {
     this.progressService.finishStep(i18n.t("Retrieving resources permissions"), true);
-    const folders = await this.getOrFindFoldersService.getOrFindAll();
-    const foldersDescendant = FoldersCollection.getAllChildren(folderId, folders, new FoldersCollection([]));
     const resourcesDescendant = await this.getOrFindResourcesService.getOrFindAll();
-    resourcesDescendant.filterByPropertyValueIn("folder_parent_id", [folderId, ...foldersDescendant.ids]);
+    resourcesDescendant.filterByPropertyValueIn("folder_parent_id", [folderId, ...ownedDescendantFolders.ids]);
     const resourcesDescendantWithOwnership = resourcesDescendant.filterByIsOwner();
     const resourcesIdsToRetrievePermissions = [...resourcesDescendantWithOwnership.ids];
 
@@ -221,109 +236,47 @@ class MoveOneFolderService {
   }
 
   /**
-   * Check if the permissions could be overridden.
-   *
-   * There is no permission override if, the folder is moved:
-   * - from the root to a personal folder;
-   * - from a personal folder to a personal folder;
-   * - from a personal folder to the root.
-   *
-   * @param {FolderEntity} folder The folder to move
-   * @param {FolderEntity|null} destinationFolder The destination folder
-   * @param {FolderEntity|null} parentFolder The parent folder
-   * @returns {boolean}
-   */
-  checkCouldOverridePermissions(folder, destinationFolder, parentFolder) {
-    const isDestinationFolderPersonalOrRoot = destinationFolder === null || destinationFolder.isPersonal();
-    const isParentFolderPersonalOrRoot = parentFolder === null || parentFolder.isPersonal();
-
-    if (folder.isShared() && isDestinationFolderPersonalOrRoot && isParentFolderPersonalOrRoot) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Calculate folders permissions changes.
-   *
-   * @param {FolderEntity} folder The folder originally target by the move.
-   * @param {FoldersCollection} foldersToShare The folders to share, with their permissions.
-   * @param {FolderEntity} destinationFolder The destination folder.
-   * @param {FolderEntity} parentFolder The parent folder.
+   * The changes to apply to the folders below: each receives the moved folder's change and keeps
+   * everything else it holds. One left with no permission or no owner is skipped.
+   * @param {Array<FolderEntity>} foldersToShare The owned folders below, with their permissions.
+   * @param {PermissionChangesCollection} movedFolderPermissionChanges The change made on the moved folder.
    * @return {PermissionChangesCollection}
    * @private
    */
-  calculateFoldersPermissionChanges(folder, foldersToShare, destinationFolder, parentFolder) {
+  calculateFoldersPermissionChanges(foldersToShare, movedFolderPermissionChanges) {
     this.progressService.finishStep(i18n.t("Calculating folders permissions changes"), true);
-
-    const isDestinationFolderPersonalOrRoot = destinationFolder === null || destinationFolder.isPersonal();
-    const isParentFolderPersonalOrRoot = parentFolder === null || parentFolder.isPersonal();
-    if (folder.isShared() && isDestinationFolderPersonalOrRoot && isParentFolderPersonalOrRoot) {
-      return new PermissionChangesCollection([]);
-    }
 
     const permissionChanges = new PermissionChangesCollection([]);
     for (const folderToShare of foldersToShare) {
-      const childrenFolderPermissionChange = CalculatePermissionsChangesForMoveService.forFolder(
-        folderToShare,
-        parentFolder,
-        destinationFolder,
+      permissionChanges.merge(
+        CalculatePermissionsChangesService.forFolderWithCascadedChange(folderToShare, movedFolderPermissionChanges),
       );
-      permissionChanges.merge(childrenFolderPermissionChange);
     }
 
     return permissionChanges;
   }
 
   /**
-   * Calculate the resources permissions changes.
-   *
+   * The changes to apply to the resources below: each receives the moved folder's change and keeps
+   * everything else it holds. One left with no permission or no owner is skipped.
    * @param {ResourcesCollection} resourcesToShare The resources that could be shared.
-   * @param {FolderEntity} destinationFolder The destination folder.
-   * @param {FolderEntity} parentFolder The parent folder.
+   * @param {PermissionChangesCollection} movedFolderPermissionChanges The change made on the moved folder.
    * @returns {PermissionChangesCollection}
+   * @private
    */
-  calculateResourcesPermissionsChanges(resourcesToShare, destinationFolder, parentFolder) {
+  calculateResourcesPermissionsChanges(resourcesToShare, movedFolderPermissionChanges) {
     this.progressService.finishStep(i18n.t("Calculating resources permissions changes"), true);
 
     const resourcePermissionChanges = new PermissionChangesCollection([]);
     for (const resourceToShare of resourcesToShare) {
-      const resourcePermissionChange = CalculatePermissionsChangesForMoveService.forResource(
+      const resourcePermissionChange = CalculatePermissionsChangesService.forResourceWithCascadedChange(
         resourceToShare,
-        parentFolder,
-        destinationFolder,
+        movedFolderPermissionChanges,
       );
       resourcePermissionChanges.merge(resourcePermissionChange);
     }
 
     return resourcePermissionChanges;
-  }
-
-  /**
-   * Confirm the share operation with the user.
-   *
-   * @param {FolderEntity} folder The folder to move
-   * @param {FolderEntity|null} destinationFolder The destination folder
-   * @param {ConfirmMoveStrategyService} moveStrategyService
-   * @param {PermissionChangesCollection} foldersPermissionsChanges The folders permission changes
-   * @param {PermissionChangesCollection} resourcesPermissionsChanges The resources permission changes
-   * @returns {Promise<boolean>}
-   */
-  async confirmShareOperation(
-    folder,
-    destinationFolder,
-    moveStrategyService,
-    foldersPermissionsChanges,
-    resourcesPermissionsChanges,
-  ) {
-    this.progressService.finishStep(i18n.t("Confirming share operation"), true);
-
-    if (foldersPermissionsChanges.length || resourcesPermissionsChanges.length) {
-      return await moveStrategyService.confirm(destinationFolder?.id, folder.id);
-    }
-
-    return false;
   }
 
   /**

@@ -12,7 +12,8 @@
  * @since         3.4.0
  */
 
-import { assertNumber, assertString } from "../../utils/assertions";
+import { assertNumber } from "passbolt-styleguide/src/shared/utils/assertions";
+import { assertString } from "../../utils/assertions";
 import Validator from "validator";
 
 class BrowserTabService {
@@ -26,11 +27,12 @@ class BrowserTabService {
 
   /**
    * Get by Id
-   * @param id
+   * @param {number|string} id The tab id. A string is accepted as the tab id can come from a url query parameter (i.e. detached quickaccess).
    */
   static async getById(id) {
-    const tabs = await browser.tabs.query({});
-    return tabs.find((tab) => tab.id === parseInt(id));
+    const tabId = typeof id === "string" ? parseInt(id, 10) : id;
+    assertNumber(tabId);
+    return await browser.tabs.get(tabId);
   }
 
   /**

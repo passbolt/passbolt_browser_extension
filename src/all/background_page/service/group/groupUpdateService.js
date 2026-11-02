@@ -34,7 +34,7 @@ import { RequestAddUsersToGroupOffscreenService } from "../../../../chrome-mv3/s
  * - Updating group
  * - Done
  */
-const PROGRESS_GOAL = 6;
+const PROGRESS_GOAL = 5;
 
 class GroupUpdateService {
   /**

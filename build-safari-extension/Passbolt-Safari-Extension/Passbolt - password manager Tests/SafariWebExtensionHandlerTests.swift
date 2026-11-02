@@ -26,7 +26,7 @@ import Testing
 
 @Suite("SafariWebExtensionHandler")
 struct SafariWebExtensionHandlerTests {
-
+    
     @Test("SafariExtensionError raw values are stable")
     func errorRawValues() {
         #expect(SafariExtensionError.missingMessage.rawValue == 1)
@@ -35,7 +35,7 @@ struct SafariWebExtensionHandlerTests {
         #expect(SafariExtensionError.controllerExecutionFailed.rawValue == 4)
         #expect(SafariExtensionError.unknownError.rawValue == 999)
     }
-
+    
     @Test("routes map each action to the correct controller")
     func routesMappings() {
         #expect(routes["save-file"] == SaveFileController.self)
@@ -44,7 +44,7 @@ struct SafariWebExtensionHandlerTests {
         #expect(routes["write-clipboard"] == WriteClipboardController.self)
         #expect(routes.count == 4)
     }
-
+    
     @Test("routes returns nil for unknown action")
     func routesUnknownAction() {
         #expect(routes["nonexistent-action"] == nil)

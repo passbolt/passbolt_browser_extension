@@ -64,6 +64,61 @@ describe("WorkersSessionStorage", () => {
     });
   });
 
+  describe("WorkersSessionStorage::addWorkerAndEvictSameFrame", () => {
+    it("Should evict a previous worker of the same name/tab/frame before adding the new one", async () => {
+      expect.assertions(2);
+      // data mocked
+      const previousWorker = new WorkerEntity(readWorker());
+      const newWorker = new WorkerEntity(
+        readWorker({ name: previousWorker.name, tabId: previousWorker.tabId, frameId: previousWorker.frameId }),
+      );
+      // process
+      await WorkersSessionStorage.addWorker(previousWorker);
+      await WorkersSessionStorage.addWorkerAndEvictSameFrame(newWorker);
+      // expectations: only the new worker remains on the frame.
+      expect(await WorkersSessionStorage.getWorkersByTabId(newWorker.tabId)).toEqual([newWorker.toDto()]);
+      expect(await WorkersSessionStorage.getWorkerById(previousWorker.id)).toBeUndefined();
+    });
+
+    it("Should keep workers of a different name/tab/frame untouched", async () => {
+      expect.assertions(1);
+      // data mocked
+      const otherFrame = new WorkerEntity(readWorker({ name: "worker", frameId: 2 }));
+      const otherName = new WorkerEntity(readWorker({ name: "worker2", frameId: 0 }));
+      const otherTab = new WorkerEntity(readWorker({ name: "worker", tabId: 2, frameId: 0 }));
+      const newWorker = new WorkerEntity(readWorker({ name: "worker", tabId: 1, frameId: 0 }));
+      // process
+      await WorkersSessionStorage.addWorker(otherFrame);
+      await WorkersSessionStorage.addWorker(otherName);
+      await WorkersSessionStorage.addWorker(otherTab);
+      await WorkersSessionStorage.addWorkerAndEvictSameFrame(newWorker);
+      // expectations: none of the non-matching workers were evicted.
+      expect(await WorkersSessionStorage.getWorkers()).toEqual([
+        otherFrame.toDto(),
+        otherName.toDto(),
+        otherTab.toDto(),
+        newWorker.toDto(),
+      ]);
+    });
+
+    it("Should throw and not add the worker when the tab limit is exceeded", async () => {
+      expect.assertions(2);
+      // data mocked: fill the tab to the limit with same-frame workers so the evict frees exactly one slot.
+      for (let i = 0; i < 100; i++) {
+        await WorkersSessionStorage.addWorker(new WorkerEntity(readWorker({ name: `worker${i}`, frameId: i })));
+      }
+      const newWorker = new WorkerEntity(readWorker({ name: "workerNew", frameId: 500 }));
+      // process
+      try {
+        await WorkersSessionStorage.addWorkerAndEvictSameFrame(newWorker);
+      } catch (error) {
+        // expectations
+        expect(error.message).toStrictEqual("The extension port limit is exceeded on tab 1");
+        expect(await WorkersSessionStorage.getWorkerById(newWorker.id)).toBeUndefined();
+      }
+    });
+  });
+
   describe("WorkersSessionStorage::updateWorker", () => {
     it("Should update a worker if present", async () => {
       expect.assertions(2);

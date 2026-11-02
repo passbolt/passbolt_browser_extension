@@ -26,12 +26,12 @@ import Testing
 
 @Suite("AbstractController")
 struct AbstractControllerTests {
-
+    
     struct StubController: AbstractController {
         init() {}
         func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) throws {}
     }
-
+    
     @Test("a concrete type can conform to AbstractController and be instantiated")
     func conformanceAndInstantiation() {
         let _: any AbstractController = StubController()

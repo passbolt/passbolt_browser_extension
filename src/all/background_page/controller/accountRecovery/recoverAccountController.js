@@ -26,6 +26,7 @@ import UpdateSsoCredentialsService from "../../service/account/updateSsoCredenti
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
+import ToolbarService from "../../service/toolbar/toolbarService";
 
 class RecoverAccountController {
   /**
@@ -179,6 +180,9 @@ class RecoverAccountController {
   async _addRecoveredAccountToStorage(accountAccountRecovery) {
     const account = new AccountEntity(accountAccountRecovery.toDto(AccountAccountRecoveryEntity.ALL_CONTAIN_OPTIONS));
     await this.accountModel.add(account);
+
+    // For Edge to avoid a double click on the QA icon when the account is set
+    ToolbarService.setQuickaccessPopup();
     return account;
   }
 

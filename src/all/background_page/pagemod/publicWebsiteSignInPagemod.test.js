@@ -20,7 +20,7 @@ import PublicWebsiteSignIn from "./publicWebsiteSignInPagemod";
 import { v4 as uuid } from "uuid";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 
-const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
+const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorkerAndEvictSameFrame");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());

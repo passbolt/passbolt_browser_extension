@@ -22,13 +22,20 @@ import MfaSetupRemoveProviderController from "../controller/mfaSetup/MfaSetupRem
 import MfaSetupVerifyYubikeyCodeController from "../controller/mfaSetup/MfaSetupVerifyYubikeyCodeController";
 import MfaSetupGetTotpCodeController from "../controller/mfaSetup/MfaSetupGetTotpCodeController";
 import GetStartedWithDuoController from "../controller/mfaSetup/GetStartedWithDuoController";
+import MfaSetupBeginWebauthnCeremonyController from "../controller/mfaSetup/MfaSetupBeginWebauthnCeremonyController";
+import MfaSetupFinishWebauthnCeremonyController from "../controller/mfaSetup/MfaSetupFinishWebauthnCeremonyController";
+import MfaSetupAbortWebauthnCeremonyController from "../controller/mfaSetup/MfaSetupAbortWebauthnCeremonyController";
+import MfaSetupGetWebauthnCredentialsController from "../controller/mfaSetup/MfaSetupGetWebauthnCredentialsController";
+import MfaSetupDeleteWebauthnCredentialController from "../controller/mfaSetup/MfaSetupDeleteWebauthnCredentialController";
+import MfaSetupGetWebauthnSettingsController from "../controller/mfaSetup/MfaSetupGetWebauthnSettingsController";
 
 /**
  * Listens to the MFA events
  * @param {Worker} worker The worker
  * @param {ApiClientOptions} apiClientOptions The api client options
+ * @param {AccountEntity} account The account
  */
-const listen = function (worker, apiClientOptions) {
+const listen = function (worker, apiClientOptions, account) {
   worker.port.on("passbolt.mfa-policy.has-user-postponed-user-setting-invitation", async (requestId) => {
     const controller = new HasUserPostponedUserSettingInvitationMFAPolicyController(worker, requestId);
     await controller._exec();
@@ -76,6 +83,36 @@ const listen = function (worker, apiClientOptions) {
 
   worker.port.on("passbolt.mfa-setup.start-with-duo", async (requestId) => {
     const controller = new GetStartedWithDuoController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on("passbolt.mfa-setup.begin-webauthn-ceremony", async (requestId) => {
+    const controller = new MfaSetupBeginWebauthnCeremonyController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  worker.port.on("passbolt.mfa-setup.finish-webauthn-ceremony", async (requestId, name) => {
+    const controller = new MfaSetupFinishWebauthnCeremonyController(worker, requestId, apiClientOptions, account);
+    await controller._exec(name);
+  });
+
+  worker.port.on("passbolt.mfa-setup.abort-webauthn-ceremony", async (requestId) => {
+    const controller = new MfaSetupAbortWebauthnCeremonyController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  worker.port.on("passbolt.mfa-setup.get-webauthn-credentials", async (requestId) => {
+    const controller = new MfaSetupGetWebauthnCredentialsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on("passbolt.mfa-setup.delete-webauthn-credential", async (requestId, id) => {
+    const controller = new MfaSetupDeleteWebauthnCredentialController(worker, requestId, apiClientOptions);
+    await controller._exec(id);
+  });
+
+  worker.port.on("passbolt.mfa-setup.get-webauthn-settings", async (requestId) => {
+    const controller = new MfaSetupGetWebauthnSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 };

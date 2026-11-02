@@ -18,6 +18,7 @@ import { assertArrayUUID, assertUuid } from "passbolt-styleguide/src/shared/util
 import GetOrFindFoldersService from "../../service/folder/getOrFindFoldersService";
 import i18n from "../../sdk/i18n";
 import VerifyOrTrustMetadataKeyService from "../../service/metadata/verifyOrTrustMetadataKeyService";
+import deserializeConfirmedMovePermissions from "../../service/move/deserializeConfirmedMovePermissions";
 
 class MoveResourcesController {
   /**
@@ -43,10 +44,11 @@ class MoveResourcesController {
    *
    * @param {Array<string>} resourcesIds
    * @param {string|null} destinationFolderId
+   * @param {Object<string, Array<object>>|null} permissionsDto The permissions the operator confirmed, keyed by resource id, or null.
    */
-  async _exec(resourcesIds, destinationFolderId) {
+  async _exec(resourcesIds, destinationFolderId, permissionsDto) {
     try {
-      const result = await this.exec(resourcesIds, destinationFolderId);
+      const result = await this.exec(resourcesIds, destinationFolderId, permissionsDto);
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
@@ -57,19 +59,30 @@ class MoveResourcesController {
   /**
    * @param {Array<string>} resourcesIds The resources ids to move
    * @param {string} [destinationFolderId=null] The target destination folder, or null if root.
+   * @param {Object<string, Array<object>>|null} [permissionsDto=null] The permissions the operator confirmed, keyed by resource id. Null to keep the permissions as they are.
+   * @returns {Promise<{skippedResourceIds: Array<string>}>} The ids of the resources that could not be moved.
    */
-  async exec(resourcesIds, destinationFolderId = null) {
+  async exec(resourcesIds, destinationFolderId = null, permissionsDto = null) {
     assertArrayUUID(resourcesIds, "The resourceIds should be a valid array of UUID");
     if (destinationFolderId !== null) {
       assertUuid(destinationFolderId, "The destinationFolderId should be a valid UUID");
     }
+    const confirmedPermissions = deserializeConfirmedMovePermissions(permissionsDto, resourcesIds);
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     await this.verifyOrTrustMetadataKeyService.verifyTrustedOrTrustNewMetadataKey(passphrase);
 
     this.progressService.title = i18n.t("Moving {{count}} resources", { count: resourcesIds.length });
-    this.progressService.start(PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL, i18n.t("Initializing ..."));
+    // One extra step for the closing "Done!" message.
+    this.progressService.start(PROGRESS_STEPS_MOVE_RESOURCES_MOVE_ALL + 1, i18n.t("Initializing ..."));
     try {
-      await this.moveResourcesService.moveAll(resourcesIds, destinationFolderId, passphrase);
+      const result = await this.moveResourcesService.moveAll(
+        resourcesIds,
+        destinationFolderId,
+        confirmedPermissions,
+        passphrase,
+      );
+      this.progressService.finishStep(i18n.t("Done!"), true);
+      return result;
     } finally {
       this.progressService.close();
     }

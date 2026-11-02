@@ -25,38 +25,38 @@ import Foundation
 
 /// Serializes Swift errors into dictionaries for JSON transmission to the JavaScript extension
 struct ErrorSerializer {
-
+    
     /// Converts an Error to a dictionary with comprehensive debugging information
     /// - Parameter error: The error to serialize
     /// - Returns: A dictionary containing error details including message, type, domain, code, location, and cause chain
     static func serialize(_ error: Error) -> [String: Any] {
         // Check if this is a LocatedError wrapper and extract location + underlying error
         let (actualError, locationInfo) = extractLocationInfo(from: error)
-
+        
         var errorDict: [String: Any] = [
             "message": actualError.localizedDescription,
             "type": String(describing: type(of: actualError))
         ]
-
+        
         // Add location info if available
         if let location = locationInfo {
             errorDict["file"] = location.file
             errorDict["line"] = location.line
             errorDict["function"] = location.function
         }
-
+        
         // Extract NSError properties - Swift automatically bridges Error to NSError
         let nsError = actualError as NSError
         errorDict["domain"] = nsError.domain
         errorDict["code"] = nsError.code
-
+        
         if let reason = nsError.localizedFailureReason {
             errorDict["reason"] = reason
         }
         if let suggestion = nsError.localizedRecoverySuggestion {
             errorDict["suggestion"] = suggestion
         }
-
+        
         // Check for location info in NSError userInfo (for locatedNSError)
         if locationInfo == nil {
             if let file = nsError.userInfo["file"] as? String {
@@ -69,22 +69,22 @@ struct ErrorSerializer {
                 errorDict["function"] = function
             }
         }
-
+        
         // Recursively serialize the cause chain
         if let underlying = nsError.userInfo[NSUnderlyingErrorKey] as? Error {
             errorDict["cause"] = serialize(underlying)
         }
-
+        
         // Include userInfo in debug builds for additional context
-        #if DEBUG
+#if DEBUG
         if !nsError.userInfo.isEmpty {
             errorDict["userInfo"] = filterUserInfo(nsError.userInfo)
         }
-        #endif
-
+#endif
+        
         return errorDict
     }
-
+    
     /// Extracts location information from a LocatedError wrapper
     /// - Parameter error: The error to check
     /// - Returns: A tuple of the actual error and optional location info
@@ -94,7 +94,7 @@ struct ErrorSerializer {
         }
         return (error, nil)
     }
-
+    
     /// Filters userInfo dictionary to include only JSON-serializable types
     /// - Parameter userInfo: The userInfo dictionary from an NSError
     /// - Returns: A filtered dictionary containing only JSON-serializable values

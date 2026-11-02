@@ -22,6 +22,7 @@ import {
 } from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data";
 import { v4 as uuidv4 } from "uuid";
 import PermissionEntity from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity";
+import { folderWithOwnershipDto } from "./foldersCollection.test.data";
 
 describe("Folders collection entity", () => {
   it("schema must validate", () => {
@@ -402,6 +403,65 @@ describe("Folders collection entity", () => {
 
       expect(filteredResources).toHaveLength(2);
       expect(filteredResources.ids).toEqual([folder1Id, folder4Id]);
+    });
+  });
+
+  describe("::getOwnedDescendantsStoppingAtNotOwned", () => {
+    it("collects every descendant when the whole branch is owned", () => {
+      expect.assertions(2);
+
+      const rootId = uuidv4();
+      const childId = uuidv4();
+      const grandchildId = uuidv4();
+      const folders = new FoldersCollection([
+        folderWithOwnershipDto(rootId, null, true),
+        folderWithOwnershipDto(childId, rootId, true),
+        folderWithOwnershipDto(grandchildId, childId, true),
+      ]);
+
+      const result = folders.getOwnedDescendantsStoppingAtNotOwned(rootId);
+
+      expect(result).toHaveLength(2);
+      expect(result.ids.sort()).toEqual([childId, grandchildId].sort());
+    });
+
+    it("excludes a not-owned folder and everything nested beneath it, even folders the operator owns", () => {
+      expect.assertions(2);
+
+      const rootId = uuidv4();
+      const notOwnedChildId = uuidv4();
+      const ownedGrandchildId = uuidv4();
+      const folders = new FoldersCollection([
+        folderWithOwnershipDto(rootId, null, true),
+        folderWithOwnershipDto(notOwnedChildId, rootId, false),
+        // Owned, but sitting under a folder the operator does not own. The branch already stopped there.
+        folderWithOwnershipDto(ownedGrandchildId, notOwnedChildId, true),
+      ]);
+
+      const result = folders.getOwnedDescendantsStoppingAtNotOwned(rootId);
+
+      expect(result).toHaveLength(0);
+      expect(result.ids).not.toContain(ownedGrandchildId);
+    });
+
+    it("gates per branch: a not-owned branch does not affect a sibling owned branch", () => {
+      expect.assertions(2);
+
+      const rootId = uuidv4();
+      const notOwnedBranchId = uuidv4();
+      const ownedBranchId = uuidv4();
+      const ownedBranchChildId = uuidv4();
+      const folders = new FoldersCollection([
+        folderWithOwnershipDto(rootId, null, true),
+        folderWithOwnershipDto(notOwnedBranchId, rootId, false),
+        folderWithOwnershipDto(ownedBranchId, rootId, true),
+        folderWithOwnershipDto(ownedBranchChildId, ownedBranchId, true),
+      ]);
+
+      const result = folders.getOwnedDescendantsStoppingAtNotOwned(rootId);
+
+      expect(result.ids.sort()).toEqual([ownedBranchId, ownedBranchChildId].sort());
+      expect(result.ids).not.toContain(notOwnedBranchId);
     });
   });
 });

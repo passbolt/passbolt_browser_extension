@@ -14,6 +14,7 @@
 import Pagemod from "./pagemod";
 import ParseAppUrlService from "../service/app/parseAppUrlService";
 import { PortEvents } from "../event/portEvents";
+import { AppBootstrapEvents } from "../event/appBootstrapEvents";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import FindAndUpdateActiveSessionLocalStorageService from "../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
@@ -45,7 +46,7 @@ class AppBootstrap extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [PortEvents];
+    return [PortEvents, AppBootstrapEvents];
   }
 
   /**

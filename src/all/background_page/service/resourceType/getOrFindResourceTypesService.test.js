@@ -100,6 +100,25 @@ describe("GetOrFindResourceTypesService", () => {
       );
     });
 
+    it("returns the cache for an online session even when it logged in after the cache was written if server is not reachable.", async () => {
+      expect.assertions(2);
+      const resourceTypesDto = resourceTypesCollectionDto();
+      await storage.setData(new ResourceTypesCollection(resourceTypesDto));
+      await storage.setMetadata(new LocalStorageMetadataEntity({ last_updated: "2025-08-02T00:00:00+00:00" }));
+      mockActiveSession({
+        is_server_reachable: false,
+        last_logged_in: "2025-08-04T18:58:11+00:00",
+      });
+      jest.spyOn(service.resourceTypeService, "findAll");
+
+      const result = await service.getOrFindAll();
+
+      expect(service.resourceTypeService.findAll).not.toHaveBeenCalled();
+      expect(result.toDto(storage.DEFAULT_CONTAIN)).toEqual(
+        new ResourceTypesCollection(resourceTypesDto).toDto(storage.DEFAULT_CONTAIN),
+      );
+    });
+
     it("returns the cache for an offline session even when it logged in after the cache was written.", async () => {
       expect.assertions(2);
       const resourceTypesDto = resourceTypesCollectionDto();

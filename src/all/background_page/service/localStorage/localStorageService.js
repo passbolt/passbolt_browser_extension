@@ -21,6 +21,7 @@ import PasswordGeneratorLocalStorage from "../local_storage/passwordGeneratorLoc
 import PostponeUserSettingInvitationService from "../invitation/postponeUserSettingInvitationService";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import SsoKitTemporaryStorageService from "../session_storage/ssoKitTemporaryStorageService";
+import WebauthnSetupCeremonySessionStorageService from "../sessionStorage/webauthnSetupCeremonySessionStorageService";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
 import User from "../../model/user";
@@ -67,6 +68,7 @@ class LocalStorageService {
       PasswordGeneratorLocalStorage.flush(),
       PassphraseStorageService.flush(),
       SsoKitTemporaryStorageService.flush(),
+      WebauthnSetupCeremonySessionStorageService.flush(),
       KeepSessionAliveService.stop(),
       LocalStorageService.flushAccountBasedStorages(),
     ]).then(LocalStorageService.logFlushFailures);

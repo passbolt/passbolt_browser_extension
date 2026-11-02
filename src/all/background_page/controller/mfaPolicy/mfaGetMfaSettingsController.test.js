@@ -33,4 +33,17 @@ describe("MfaGetMfaSettingsController", () => {
     const result = await controller.exec();
     expect(result.toJSON()).toEqual(mockApiResult);
   });
+
+  it("can get the mfa settings including the webauthn provider", async () => {
+    const mockApiResult = mfaDto({
+      MfaAccountSettings: { totp: false, duo: false, yubikey: false, webauthn: false },
+      MfaOrganizationSettings: { totp: true, duo: false, yubikey: false, webauthn: true },
+    });
+    fetch.doMock(() => mockApiResponse(mockApiResult));
+
+    expect.assertions(1);
+    const controller = new MfaGetMfaSettingsController(null, null, defaultApiClientOptions());
+    const result = await controller.exec();
+    expect(result.toJSON()).toEqual(mockApiResult);
+  });
 });

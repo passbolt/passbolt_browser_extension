@@ -26,7 +26,7 @@ import Testing
 
 @Suite("OpenSafariSettingsController")
 struct OpenSafariSettingsControllerTests {
-
+    
     @Test("OpenSafariSettingsController conforms to AbstractController")
     func conformance() {
         let _: any AbstractController = OpenSafariSettingsController()

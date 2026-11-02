@@ -48,7 +48,7 @@ beforeEach(() => {
 describe("LocalStorageService", () => {
   describe("LocalStorageService::flush", () => {
     it("Should flush all storage (with no account set)", async () => {
-      expect.assertions(23);
+      expect.assertions(24);
       // spy on
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
@@ -68,7 +68,7 @@ describe("LocalStorageService", () => {
       await LocalStorageService.flush();
       // expectations
       expect(browser.storage.local.remove).toHaveBeenCalledTimes(5);
-      expect(browser.storage.session.remove).toHaveBeenCalledTimes(2);
+      expect(browser.storage.session.remove).toHaveBeenCalledTimes(3);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
       expect(browser.storage.local.remove).toHaveBeenCalledWith("folders");
@@ -80,6 +80,7 @@ describe("LocalStorageService", () => {
       expect(browser.alarms.clear).toHaveBeenCalledWith("PassphraseStorageFlush");
       expect(browser.alarms.clear).toHaveBeenCalledWith("SessionKeepAlive");
       expect(browser.storage.session.remove).toHaveBeenCalledWith("temp_server_part_sso_kit");
+      expect(browser.storage.session.remove).toHaveBeenCalledWith("webauthn-setup-ceremony");
       expect(GetLegacyAccountService.get).not.toHaveBeenCalled();
       expect(UserMeLocalStorage.prototype.flush).not.toHaveBeenCalled();
       expect(MetadataTypesSettingsLocalStorage.prototype.flush).not.toHaveBeenCalled();

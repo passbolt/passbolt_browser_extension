@@ -26,11 +26,11 @@ import Testing
 
 @Suite("SecureProfileSessionManager", .serialized)
 struct SecureProfileSessionManagerTests {
-
+    
     init() {
         SecureProfileSessionManager.invalidateAllSessions()
     }
-
+    
     @Test("same profile returns same session, different profile returns different session")
     func sessionCachingAndIsolation() {
         let sessionA1 = SecureProfileSessionManager.session(forProfile: "profile-A")
@@ -39,7 +39,7 @@ struct SecureProfileSessionManagerTests {
         #expect(sessionA1 === sessionA2)
         #expect(sessionA1 !== sessionB)
     }
-
+    
     @Test("session disables cookies, credentials, and caching for security")
     func sessionSecurityConfiguration() {
         let session = SecureProfileSessionManager.session(forProfile: "security-test")
@@ -50,7 +50,7 @@ struct SecureProfileSessionManagerTests {
         #expect(config.urlCredentialStorage == nil)
         #expect(config.requestCachePolicy == .reloadIgnoringLocalAndRemoteCacheData)
     }
-
+    
     @Test("invalidateSession removes only that profile's session")
     func invalidateSessionSelectiveRemoval() {
         let sessionA = SecureProfileSessionManager.session(forProfile: "keep")
@@ -61,7 +61,7 @@ struct SecureProfileSessionManagerTests {
         #expect(sessionA === sessionAAfter)
         #expect(sessionB !== sessionBAfter)
     }
-
+    
     @Test("invalidateAllSessions clears all cached sessions")
     func invalidateAllSessions() {
         let session1 = SecureProfileSessionManager.session(forProfile: "all-1")
@@ -72,13 +72,13 @@ struct SecureProfileSessionManagerTests {
         #expect(session1 !== session1After)
         #expect(session2 !== session2After)
     }
-
+    
     @Test("session has a delegate set")
     func sessionHasDelegate() {
         let session = SecureProfileSessionManager.session(forProfile: "delegate-test")
         #expect(session.delegate != nil)
     }
-
+    
     @Test("concurrent session access and invalidation do not crash")
     func concurrentAccess() async {
         await withTaskGroup(of: Void.self) { group in

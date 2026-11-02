@@ -428,7 +428,6 @@
 		82EE777D2F3C9D57000B30B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -443,14 +442,13 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Passbolt - password manager";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/[DEBUG] Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/[DEBUG] Passbolt - password manager";
 			};
 			name = Debug;
 		};
 		82EE777E2F3C9D57000B30B5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -464,7 +462,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Passbolt - password manager";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/[DEBUG] Passbolt - password manager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/[DEBUG] Passbolt - password manager";
 			};
 			name = Release;
 		};
@@ -595,7 +593,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager Extension/Passbolt - password manager Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 13;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -622,7 +620,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.16.1;
+				MARKETING_VERSION = 5.17.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -641,7 +639,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager Extension/Passbolt - password manager Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 13;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -668,7 +666,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.16.1;
+				MARKETING_VERSION = 5.17.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -690,7 +688,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager/Passbolt - password manager.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 13;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -718,7 +716,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.16.1;
+				MARKETING_VERSION = 5.17.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -741,7 +739,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Passbolt - password manager/Passbolt - password manager.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 13;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = UHX38H22ZT;
 				ENABLE_APP_SANDBOX = YES;
@@ -769,7 +767,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.16.1;
+				MARKETING_VERSION = 5.17.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,

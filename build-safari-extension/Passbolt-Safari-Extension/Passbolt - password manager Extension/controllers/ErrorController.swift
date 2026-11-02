@@ -25,7 +25,7 @@ import Foundation
 
 class ErrorController: AbstractController {
     required init() {}
-
+    
     func run(_ context: NSExtensionContext, _ payload: [String: Any], profileUUID: String) -> Void {
         guard let errorDict = payload["error"] as? [String: Any] else {
             let fallbackError = NSError(
@@ -36,7 +36,7 @@ class ErrorController: AbstractController {
             self.respondAsError(context, fallbackError)
             return
         }
-
+        
         let body: [String: Any] = [
             "success": false,
             "error": errorDict

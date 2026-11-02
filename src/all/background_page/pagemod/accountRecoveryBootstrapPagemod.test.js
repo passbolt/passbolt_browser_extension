@@ -20,7 +20,7 @@ import AccountRecoveryBootstrap from "./accountRecoveryBootstrapPagemod";
 import AccountLocalStorage from "../service/local_storage/accountLocalStorage";
 import { initialAccountAccountRecoveryDto } from "../model/entity/account/accountAccountRecoveryEntity.test.data";
 
-const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
+const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorkerAndEvictSameFrame");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());

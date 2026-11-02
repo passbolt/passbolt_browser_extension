@@ -17,6 +17,9 @@ import { defaultProfileDto } from "passbolt-styleguide/src/shared/models/entity/
 import { defaultGroupSearchResultDto, defaultUserSearchResultDto } from "./userAndGroupSearchResultEntity.test.data";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import { v4 as uuid } from "uuid";
+import SiteSettingsEntity from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity";
+import { customEmailValidationProSiteSettings } from "passbolt-styleguide/src/shared/models/entity/siteSettings/siteSettingsEntity.test.data";
+import SiteSettingsRuntimeCache from "../../../service/siteSettings/siteSettingsRuntimeCache";
 
 describe("UserAndGroupSearchResultEntity", () => {
   describe("UserAndGroupSearchResultEntity::getSchema", () => {
@@ -35,7 +38,6 @@ describe("UserAndGroupSearchResultEntity", () => {
 
     it("validates username property", () => {
       assertEntityProperty.string(UserAndGroupSearchResultEntity, "username");
-      assertEntityProperty.email(UserAndGroupSearchResultEntity, "username");
       assertEntityProperty.notRequired(UserAndGroupSearchResultEntity, "username");
     });
 
@@ -88,6 +90,22 @@ describe("UserAndGroupSearchResultEntity", () => {
       const dto = defaultGroupSearchResultDto();
       const entity = new UserAndGroupSearchResultEntity(dto);
       expect(entity.toDto()).toEqual(dto);
+    });
+
+    it("accepts a username rejected by the default email validation", () => {
+      expect.assertions(1);
+      const dto = defaultUserSearchResultDto({ username: "ada@passbolt.c" });
+      const entity = new UserAndGroupSearchResultEntity(dto);
+      expect(entity.toDto()).toEqual(dto);
+    });
+
+    it("does not apply the organization custom email validation to the username", () => {
+      expect.assertions(1);
+      SiteSettingsRuntimeCache.set(new SiteSettingsEntity(customEmailValidationProSiteSettings()));
+      const dto = defaultUserSearchResultDto({ username: "ada@local.com" });
+      const entity = new UserAndGroupSearchResultEntity(dto);
+      expect(entity.toDto()).toEqual(dto);
+      SiteSettingsRuntimeCache.flushAll();
     });
   });
 });

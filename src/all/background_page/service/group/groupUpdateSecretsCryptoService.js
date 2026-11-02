@@ -94,7 +94,7 @@ class GroupUpdateSecretsCryptoService {
       const secret = new SecretEntity({ resource_id, user_id, data });
       groupUpdateSecrets.push(secret);
 
-      onProgress?.(i18n.t("Encrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }));
+      await onProgress?.(i18n.t("Encrypting {{counter}}/{{total}}", { counter: i + 1, total: collectionLength }));
     }
 
     return groupUpdateSecrets;

@@ -41,9 +41,10 @@ export default class GetOrFindOfflineSettingsService {
    */
   async getOrFind() {
     const activeSession = await this.getOrFindActiveSessionService.getOrFind();
-    // Only an online session refreshes stale data; an offline session cannot reach the API.
+    // Only an online session with a server reachable refreshes stale data; an offline session cannot reach the API.
     const isStale =
       activeSession.isSessionOnline &&
+      activeSession.isServerReachable &&
       (await this.offlineSettingsLocalStorage.isStaleSinceLastLoggedIn(activeSession.lastLoggedIn));
     if (!isStale) {
       const offlineSettingsDto = await this.offlineSettingsLocalStorage.getData();

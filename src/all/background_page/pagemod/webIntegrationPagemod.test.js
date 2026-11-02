@@ -26,7 +26,7 @@ import GetActiveAccountService from "../service/account/getActiveAccountService"
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import { v4 as uuid } from "uuid";
 
-const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
+const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorkerAndEvictSameFrame");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());

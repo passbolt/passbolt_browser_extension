@@ -155,19 +155,23 @@ class FoldersCollection extends EntityV2Collection {
   static getAllChildren(parentId, inputCollection, outputCollection) {
     const children = inputCollection.folders.filter((item) => item.folderParentId === parentId);
     if (children.length) {
-      try {
-        outputCollection.pushMany(children);
-      } catch (error) {
-        console.error(error);
-        /*
-         * children are already in collection
-         * skip...
-         */
-      }
+      // A child already collected through another branch is skipped, the rest of the batch is not.
+      outputCollection.pushMany(children, { ignoreInvalidEntity: true });
       const childrenIds = children.map((child) => child.id);
       childrenIds.forEach((id) => FoldersCollection.getAllChildren(id, inputCollection, outputCollection));
     }
     return outputCollection;
+  }
+
+  /**
+   * The folders nested under the given one that the operator owns, each branch stopping at the
+   * first folder they do not own. Leaving out the folders they do not own detaches those branches,
+   * so the search never reaches what sits below them.
+   * @param {string} parentId
+   * @returns {FoldersCollection}
+   */
+  getOwnedDescendantsStoppingAtNotOwned(parentId) {
+    return this.filterByIsOwner().getAllChildren(parentId);
   }
 
   /**

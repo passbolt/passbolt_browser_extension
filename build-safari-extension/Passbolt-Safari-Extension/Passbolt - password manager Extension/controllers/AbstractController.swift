@@ -41,14 +41,14 @@ extension AbstractController {
         var body: [String: Any] = [
             "success": true,
         ]
-
+        
         if (responseBody != nil) {
             body["returnedValue"] = responseBody
         }
-
+        
         self.respond(context, body)
     }
-
+    
     // Respond to the extension with an error
     // This should be used after aborting the request from the extension
     func respondAsError(_ context: NSExtensionContext, _ error: Error) {
@@ -56,10 +56,10 @@ extension AbstractController {
             "success": false,
             "error": ErrorSerializer.serialize(error)
         ]
-
+        
         self.respond(context, body)
     }
-
+    
     // Sends the response to the extension
     internal func respond(_ context: NSExtensionContext, _ responseBody: [String: Any] = [:]) {
         let reply = NSExtensionItem()

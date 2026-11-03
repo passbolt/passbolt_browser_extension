@@ -93,6 +93,7 @@
     "test:ci:coverage": "npm run test:coverage -- --runInBand"
   },
   "overrides": {
+    "@xmldom/xmldom": "0.8.15",
     "eslint-plugin-react": {
       "eslint": "$eslint"
     }

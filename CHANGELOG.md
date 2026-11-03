@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [5.17.1] - 2026-10-26
+### Fixed
+PB-55748 Upgrade passbolt-styleguide to v5.17.2
+
+### Maintenance
+PB-55514 Improve autofill performances and skip disabled inputs
+PB-55543 Clarify WebAuthn error on the MFA organisation settings page
+
 ## [5.17.0] - 2026-10-15
 ### Added
 PB-53327 Include group membership changes in the permission drift calculation before saving
@@ -3235,7 +3243,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.17.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.17.1...HEAD
+[5.17.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.17.0...v5.17.1
 [5.17.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.16.2...v5.17.0
 [5.16.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.16.1...v5.16.2
 [5.16.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.16.0...v5.16.1

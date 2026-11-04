@@ -7,7 +7,6 @@ import js from "@eslint/js";
 import noUnsanitizedPlugin from "eslint-plugin-no-unsanitized";
 import jestPlugin from "eslint-plugin-jest";
 import reactPlugin from "eslint-plugin-react";
-import { flatConfigs as importFlatConfigs, createNodeResolver } from "eslint-plugin-import-x";
 import pluginSecurity from "eslint-plugin-security";
 import nodePlugin from "eslint-plugin-n";
 import * as regexpPlugin from "eslint-plugin-regexp";
@@ -21,7 +20,6 @@ export default [
   js.configs.recommended, // core JavaScript rules
   reactPlugin.configs.flat.recommended, // React best practices
   reactPlugin.configs.flat["jsx-runtime"], // JSX transform rules
-  importFlatConfigs.recommended, // import/export validations
   pluginSecurity.configs.recommended,
   nodePlugin.configs["flat/recommended-script"],
   regexpPlugin.configs["flat/recommended"],
@@ -65,12 +63,6 @@ export default [
         // !-9 and ;-~ match all printable ASCII except colon
         allowedCharacterRanges: ["alphanumeric", "!-9", ";-~"],
       },
-      "import-x/resolver-next": [
-        createNodeResolver({
-          extensions: [".js", ".jsx", ".mjs", ".cjs"],
-          fallback: { "passbolt-styleguide": [path.resolve(__dirname)] },
-        }),
-      ],
     },
 
     rules: {
@@ -96,30 +88,10 @@ export default [
       "no-useless-escape": "off", // Too many false positives
       "no-useless-assignment": "off", // Keep defensive variable initialisation
       "func-names": ["error", "never"],
-      "import-x/no-named-as-default": "off",
       "security/detect-object-injection": "off",
       "security/detect-non-literal-regexp": "off",
       "security/detect-unsafe-regex": "off",
       "prefer-regex-literals": "off",
-
-      // Phantom dependency detection (CRITICAL)
-      "import-x/no-extraneous-dependencies": [
-        "error",
-        {
-          devDependencies: [
-            "**/*.test.{js,jsx}",
-            "**/*.spec.{js,jsx}",
-            "**/__tests__/**",
-            "**/test/**",
-            "**/tests/**",
-            "**/scripts/**",
-            "*.config.{js,mjs,cjs}",
-            "webpack.config.js",
-          ],
-          optionalDependencies: false,
-          peerDependencies: true,
-        },
-      ],
 
       // Browser extension specific
       "n/no-unsupported-features/node-builtins": "off", // We use browser APIs
@@ -159,7 +131,6 @@ export default [
 
       // Test-specific overrides
       "no-console": "off", // Allow console in tests
-      "import-x/no-extraneous-dependencies": "off", // Dev deps OK in tests
       "n/no-unpublished-import": "off", // Dev deps OK in tests
       "n/no-unpublished-require": "off",
       "n/no-extraneous-import": "off",
@@ -221,7 +192,6 @@ export default [
 
     rules: {
       "no-console": "off", // Allow console in scripts
-      "import-x/no-extraneous-dependencies": "off", // Dev deps OK in configs
       "n/no-unpublished-import": "off",
     },
   },

@@ -32,7 +32,7 @@ import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSetti
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
-import ActiveSessionLocalStorage from "../local_storage/activeSessionLocalStorage";
+import ActiveSessionSessionStorage from "../session_storage/activeSessionSessionStorage";
 import UserMeLocalStorage from "../local_storage/userMeLocalStorage";
 import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage";
 import SiteSettingsRuntimeCache from "../siteSettings/siteSettingsRuntimeCache";
@@ -119,7 +119,7 @@ class LocalStorageService {
      */
     if (!canUseOfflineStorage) {
       flushes.push(
-        new ActiveSessionLocalStorage(account).flush(),
+        new ActiveSessionSessionStorage(account).flush(),
         new SessionTimestampsLocalStorage(account).flush(),
         new RbacsLocalStorage(account).flush(),
         new ResourceTypeLocalStorage(account).flush(),

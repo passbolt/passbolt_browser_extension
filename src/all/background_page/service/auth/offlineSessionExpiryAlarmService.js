@@ -14,7 +14,7 @@
 import GetActiveAccountService from "../account/getActiveAccountService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import GetOrFindOfflineSettingsService from "../offline/getOrFindOfflineSettingsService";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 import PostLogoutService from "./postLogoutService";
 import { assertNumber } from "passbolt-styleguide/src/shared/utils/assertions";
 
@@ -98,7 +98,7 @@ export default class OfflineSessionExpiryAlarmService {
       return;
     }
     const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-    await new FindAndUpdateActiveSessionLocalStorageService(account, apiClientOptions).resetAuthentication();
+    await new FindAndUpdateActiveSessionSessionStorageService(account, apiClientOptions).resetAuthentication();
     await PostLogoutService.exec();
   }
 

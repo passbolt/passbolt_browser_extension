@@ -14,7 +14,7 @@
 import PostLoginOfflineService from "./postLoginOfflineService";
 import PostLoginService from "./postLoginService";
 import OfflineSessionExpiryAlarmService from "./offlineSessionExpiryAlarmService";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 import toolbarService from "../toolbar/toolbarService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
@@ -34,7 +34,7 @@ describe("PostLoginOfflineService", () => {
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = defaultApiClientOptions();
     jest.spyOn(PassphraseStorageService, "set").mockResolvedValue();
-    jest.spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "authenticateOffline").mockResolvedValue();
+    jest.spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "authenticateOffline").mockResolvedValue();
     jest
       .spyOn(FindAndUpdateMetadataKeysSessionStorageFromOPFSService.prototype, "findAndUpdateAll")
       .mockResolvedValue();
@@ -51,7 +51,7 @@ describe("PostLoginOfflineService", () => {
       await service.exec(passphrase, 300);
 
       expect(PassphraseStorageService.set).toHaveBeenCalledWith(passphrase, 300);
-      expect(FindAndUpdateActiveSessionLocalStorageService.prototype.authenticateOffline).toHaveBeenCalledTimes(1);
+      expect(FindAndUpdateActiveSessionSessionStorageService.prototype.authenticateOffline).toHaveBeenCalledTimes(1);
       expect(FindAndUpdateMetadataKeysSessionStorageFromOPFSService.prototype.findAndUpdateAll).toHaveBeenCalledTimes(
         1,
       );

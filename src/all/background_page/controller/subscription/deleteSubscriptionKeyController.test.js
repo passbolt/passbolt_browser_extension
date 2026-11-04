@@ -16,7 +16,7 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 
 import DeleteSubscriptionKeyController from "./deleteSubscriptionKeyController";
 import PostLogoutService from "../../service/auth/postLogoutService";
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
@@ -25,7 +25,7 @@ describe("DeleteSubscriptionKeyController", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "resetAuthentication").mockResolvedValue();
+    jest.spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "resetAuthentication").mockResolvedValue();
   });
 
   describe("::exec", () => {
@@ -38,7 +38,7 @@ describe("DeleteSubscriptionKeyController", () => {
 
       await expect(controller.exec()).resolves.toBeUndefined();
       expect(controller.deleteSubscriptionService.delete).toHaveBeenCalledTimes(1);
-      expect(FindAndUpdateActiveSessionLocalStorageService.prototype.resetAuthentication).toHaveBeenCalledTimes(1);
+      expect(FindAndUpdateActiveSessionSessionStorageService.prototype.resetAuthentication).toHaveBeenCalledTimes(1);
       expect(PostLogoutService.exec).toHaveBeenCalledTimes(1);
     });
 
@@ -51,7 +51,7 @@ describe("DeleteSubscriptionKeyController", () => {
       jest.spyOn(PostLogoutService, "exec").mockImplementation(async () => {});
 
       await expect(controller.exec()).rejects.toStrictEqual(expectedError);
-      expect(FindAndUpdateActiveSessionLocalStorageService.prototype.resetAuthentication).not.toHaveBeenCalled();
+      expect(FindAndUpdateActiveSessionSessionStorageService.prototype.resetAuthentication).not.toHaveBeenCalled();
       expect(PostLogoutService.exec).not.toHaveBeenCalled();
     });
   });

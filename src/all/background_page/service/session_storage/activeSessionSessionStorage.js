@@ -18,7 +18,7 @@ import AbstractAccountEntity from "../../model/entity/account/abstractAccountEnt
 
 export const ACTIVE_SESSION_LOCAL_STORAGE_KEY = "active_session";
 
-class ActiveSessionLocalStorage {
+class ActiveSessionSessionStorage {
   /**
    * Runtime cached data.
    * @type {Object} Key: account_id, value: cached data as dto.
@@ -53,7 +53,7 @@ class ActiveSessionLocalStorage {
    * @returns {boolean}
    */
   hasCachedData() {
-    return Boolean(ActiveSessionLocalStorage._runtimeCachedData[this.account.id]);
+    return Boolean(ActiveSessionSessionStorage._runtimeCachedData[this.account.id]);
   }
 
   /**
@@ -62,8 +62,8 @@ class ActiveSessionLocalStorage {
    */
   async flush() {
     await browser.storage.session.remove(this.storageKey);
-    delete ActiveSessionLocalStorage._runtimeCachedData[this.account.id];
-    Log.write({ level: "debug", message: `ActiveSessionLocalStorage flushed for (${this.account.id})` });
+    delete ActiveSessionSessionStorage._runtimeCachedData[this.account.id];
+    Log.write({ level: "debug", message: `ActiveSessionSessionStorage flushed for (${this.account.id})` });
   }
 
   /**
@@ -71,15 +71,15 @@ class ActiveSessionLocalStorage {
    * @return {Promise<object|undefined>}
    */
   async get() {
-    if (!ActiveSessionLocalStorage._runtimeCachedData[this.account.id]) {
+    if (!ActiveSessionSessionStorage._runtimeCachedData[this.account.id]) {
       const data = await browser.storage.session.get(this.storageKey);
       if (!data[this.storageKey]) {
         return;
       }
-      ActiveSessionLocalStorage._runtimeCachedData[this.account.id] = data[this.storageKey];
+      ActiveSessionSessionStorage._runtimeCachedData[this.account.id] = data[this.storageKey];
     }
 
-    return ActiveSessionLocalStorage._runtimeCachedData[this.account.id];
+    return ActiveSessionSessionStorage._runtimeCachedData[this.account.id];
   }
 
   /**
@@ -97,7 +97,7 @@ class ActiveSessionLocalStorage {
     await navigator.locks.request(this.storageKey, async () => {
       const activeSessionDto = activeSession.toDto();
       await this._setBrowserStorage({ [this.storageKey]: activeSessionDto });
-      ActiveSessionLocalStorage._runtimeCachedData[this.account.id] = activeSessionDto;
+      ActiveSessionSessionStorage._runtimeCachedData[this.account.id] = activeSessionDto;
     });
   }
 
@@ -114,4 +114,4 @@ class ActiveSessionLocalStorage {
   }
 }
 
-export default ActiveSessionLocalStorage;
+export default ActiveSessionSessionStorage;

@@ -19,7 +19,7 @@ import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getO
 import GetOrFindMetadataTypesController from "../controller/metadata/getMetadataTypesSettingsController";
 import IsApplicationOverlaidController from "../controller/applicationOverlaid/IsApplicationOverlaidController";
 import GetResourceTypesController from "../controller/resourceType/getResourceTypesController";
-import FindAndUpdateActiveSessionLocalStorageController from "../controller/auth/findAndUpdateActiveSessionLocalStorageController";
+import FindAndUpdateActiveSessionSessionStorageController from "../controller/auth/findAndUpdateActiveSessionSessionStorageController";
 
 /**
  * Listens the inform menu events
@@ -147,7 +147,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.auth.find-and-update-authentication-status", async (requestId) => {
-    const controller = new FindAndUpdateActiveSessionLocalStorageController(
+    const controller = new FindAndUpdateActiveSessionSessionStorageController(
       worker,
       requestId,
       apiClientOptions,

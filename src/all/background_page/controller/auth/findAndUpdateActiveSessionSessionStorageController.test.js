@@ -13,7 +13,7 @@
  */
 
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
-import FindAndUpdateActiveSessionLocalStorageController from "./findAndUpdateActiveSessionLocalStorageController";
+import FindAndUpdateActiveSessionSessionStorageController from "./findAndUpdateActiveSessionSessionStorageController";
 import UserActiveSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
@@ -27,12 +27,12 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("FindAndUpdateActiveSessionLocalStorageController", () => {
+describe("FindAndUpdateActiveSessionSessionStorageController", () => {
   it("should return the auth status matching the unauthenticated state", async () => {
     expect.assertions(3);
 
     const account = new AccountEntity(defaultAccountDto());
-    const controller = new FindAndUpdateActiveSessionLocalStorageController(
+    const controller = new FindAndUpdateActiveSessionSessionStorageController(
       null,
       null,
       defaultApiClientOptions(),
@@ -40,20 +40,20 @@ describe("FindAndUpdateActiveSessionLocalStorageController", () => {
     );
 
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage, "get")
       .mockImplementation(() => undefined);
-    jest.spyOn(controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "flush");
+    jest.spyOn(controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage, "flush");
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.findServerStatusService, "find")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.findServerStatusService, "find")
       .mockImplementation(() => true);
 
     const authStatus = await controller.exec(true);
 
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get,
+      controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage.get,
     ).toHaveBeenCalledTimes(1);
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.flush,
+      controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage.flush,
     ).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual(
       new UserActiveSessionEntity(
@@ -70,7 +70,7 @@ describe("FindAndUpdateActiveSessionLocalStorageController", () => {
     expect.assertions(3);
 
     const account = new AccountEntity(defaultAccountDto());
-    const controller = new FindAndUpdateActiveSessionLocalStorageController(
+    const controller = new FindAndUpdateActiveSessionSessionStorageController(
       null,
       null,
       defaultApiClientOptions(),
@@ -78,23 +78,23 @@ describe("FindAndUpdateActiveSessionLocalStorageController", () => {
     );
 
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage, "get")
       .mockImplementation(() => minimalUserActiveSessionDto());
-    jest.spyOn(controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "flush");
+    jest.spyOn(controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage, "flush");
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.findServerStatusService, "find")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.findServerStatusService, "find")
       .mockImplementation(() => true);
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.authenticationStatusService, "isAuthenticated")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.authenticationStatusService, "isAuthenticated")
       .mockImplementation(() => true);
 
     const authStatus = await controller.exec();
 
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get,
+      controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage.get,
     ).toHaveBeenCalledTimes(1);
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.flush,
+      controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage.flush,
     ).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual(
       new UserActiveSessionEntity(
@@ -111,7 +111,7 @@ describe("FindAndUpdateActiveSessionLocalStorageController", () => {
     expect.assertions(3);
 
     const account = new AccountEntity(defaultAccountDto());
-    const controller = new FindAndUpdateActiveSessionLocalStorageController(
+    const controller = new FindAndUpdateActiveSessionSessionStorageController(
       null,
       null,
       defaultApiClientOptions(),
@@ -119,14 +119,14 @@ describe("FindAndUpdateActiveSessionLocalStorageController", () => {
     );
 
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage, "get")
       .mockImplementation(() => minimalUserActiveSessionDto());
-    jest.spyOn(controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "flush");
+    jest.spyOn(controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage, "flush");
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.findServerStatusService, "find")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.findServerStatusService, "find")
       .mockImplementation(() => true);
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.authenticationStatusService, "isAuthenticated")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.authenticationStatusService, "isAuthenticated")
       .mockImplementation(() => {
         throw new MfaAuthenticationRequiredError();
       });
@@ -134,10 +134,10 @@ describe("FindAndUpdateActiveSessionLocalStorageController", () => {
     const authStatus = await controller.exec();
 
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get,
+      controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage.get,
     ).toHaveBeenCalledTimes(1);
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.flush,
+      controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage.flush,
     ).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual(
       new UserActiveSessionEntity(
@@ -158,7 +158,7 @@ describe("FindAndUpdateActiveSessionLocalStorageController", () => {
     });
     const account = new AccountEntity(defaultAccountDto());
 
-    const controller = new FindAndUpdateActiveSessionLocalStorageController(
+    const controller = new FindAndUpdateActiveSessionSessionStorageController(
       null,
       null,
       defaultApiClientOptions(),
@@ -166,26 +166,26 @@ describe("FindAndUpdateActiveSessionLocalStorageController", () => {
     );
 
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "get")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage, "get")
       .mockImplementation(() => expectedAuthStatus);
-    jest.spyOn(controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage, "flush");
+    jest.spyOn(controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage, "flush");
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.findServerStatusService, "find")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.findServerStatusService, "find")
       .mockImplementation(() => true);
     jest
-      .spyOn(controller.findAndUpdateActiveSessionLocalStorageService.authenticationStatusService, "isAuthenticated")
+      .spyOn(controller.findAndUpdateActiveSessionSessionStorageService.authenticationStatusService, "isAuthenticated")
       .mockImplementation(() => false);
 
     const authStatus = await controller.exec();
 
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.get,
+      controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage.get,
     ).toHaveBeenCalledTimes(1);
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.activeSessionLocalStorage.flush,
+      controller.findAndUpdateActiveSessionSessionStorageService.activeSessionSessionStorage.flush,
     ).not.toHaveBeenCalled();
     expect(
-      controller.findAndUpdateActiveSessionLocalStorageService.authenticationStatusService.isAuthenticated,
+      controller.findAndUpdateActiveSessionSessionStorageService.authenticationStatusService.isAuthenticated,
     ).toHaveBeenCalledTimes(1);
     expect(authStatus.toDto()).toStrictEqual(expectedAuthStatus);
   });

@@ -19,7 +19,7 @@ import GetActiveAccountService from "../account/getActiveAccountService";
 import UserActiveSessionEntity, {
   USER_ACTIVE_SESSION_ONLINE,
 } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 import UpdateSessionTimestampsService from "../sessionTimestamps/updateSessionTimestampsService";
 
 jest.useFakeTimers();
@@ -46,7 +46,7 @@ describe("StartLoopAuthSessionCheckService", () => {
       type: USER_ACTIVE_SESSION_ONLINE,
     });
     const spyIsAuthenticated = jest
-      .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
+      .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
       .mockImplementation(() => Promise.resolve(sessionEntity));
     const spyUpdateLastSeenOnline = jest.spyOn(UpdateSessionTimestampsService.prototype, "updateLastSeenOnline");
 
@@ -85,7 +85,7 @@ describe("StartLoopAuthSessionCheckService", () => {
       type: USER_ACTIVE_SESSION_ONLINE,
     });
     const spyIsAuthenticated = jest
-      .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
+      .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
       .mockImplementation(() => Promise.resolve(sessionEntity));
     const spyUpdateLastSeenOnline = jest.spyOn(UpdateSessionTimestampsService.prototype, "updateLastSeenOnline");
     const spyOnPostLogout = jest.spyOn(PostLogoutService, "exec").mockImplementation(async () => {});
@@ -119,7 +119,7 @@ describe("StartLoopAuthSessionCheckService", () => {
       type: USER_ACTIVE_SESSION_ONLINE,
     });
     const spyIsAuthenticated = jest
-      .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
+      .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
       .mockImplementation(() => Promise.resolve(sessionEntity));
     const spyUpdateLastSeenOnline = jest.spyOn(UpdateSessionTimestampsService.prototype, "updateLastSeenOnline");
     const spyOnPostLogout = jest.spyOn(PostLogoutService, "exec").mockImplementation(async () => {});

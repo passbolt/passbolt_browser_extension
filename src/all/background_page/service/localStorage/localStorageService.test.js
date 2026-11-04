@@ -34,9 +34,9 @@ import { METADATA_KEYS_SETTINGS_LOCAL_STORAGE_KEY } from "../local_storage/metad
 import GroupLocalStorage, { GROUP_LOCAL_STORAGE_KEY } from "../local_storage/groupLocalStorage";
 import UserMeLocalStorage, { USER_ME_STORAGE_KEY_PREFIX } from "../local_storage/userMeLocalStorage";
 import ResourceTypeLocalStorage, { RESOURCE_TYPES_LOCAL_STORAGE_KEY } from "../local_storage/resourceTypeLocalStorage";
-import ActiveSessionLocalStorage, {
+import ActiveSessionSessionStorage, {
   ACTIVE_SESSION_LOCAL_STORAGE_KEY,
-} from "../local_storage/activeSessionLocalStorage";
+} from "../session_storage/activeSessionSessionStorage";
 import SiteSettingsLocalStorage, { SITE_SETTINGS } from "../local_storage/siteSettingsLocalStorage";
 import CanUseOfflineStorageService from "../offline/canUseOfflineStorageService";
 import OfflineRetentionDataFlushService from "../offline/offlineRetentionDataFlushService";
@@ -63,7 +63,7 @@ describe("LocalStorageService", () => {
       jest.spyOn(GroupLocalStorage.prototype, "flush");
       jest.spyOn(ResourceTypeLocalStorage.prototype, "flush");
       jest.spyOn(RbacLocalStorage.prototype, "flush");
-      jest.spyOn(ActiveSessionLocalStorage.prototype, "flush");
+      jest.spyOn(ActiveSessionSessionStorage.prototype, "flush");
       jest.spyOn(SiteSettingsLocalStorage.prototype, "flush");
       // process
       await LocalStorageService.flush();
@@ -90,7 +90,7 @@ describe("LocalStorageService", () => {
       expect(GroupLocalStorage.prototype.flush).not.toHaveBeenCalled();
       expect(ResourceTypeLocalStorage.prototype.flush).not.toHaveBeenCalled();
       expect(RbacLocalStorage.prototype.flush).not.toHaveBeenCalled();
-      expect(ActiveSessionLocalStorage.prototype.flush).not.toHaveBeenCalled();
+      expect(ActiveSessionSessionStorage.prototype.flush).not.toHaveBeenCalled();
       expect(SiteSettingsLocalStorage.prototype.flush).not.toHaveBeenCalled();
     });
   });

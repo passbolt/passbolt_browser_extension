@@ -14,7 +14,7 @@
 import PostLogoutService from "./postLogoutService";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 import UpdateSessionTimestampsService from "../sessionTimestamps/updateSessionTimestampsService";
 
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
@@ -55,11 +55,12 @@ class StartLoopAuthSessionCheckService {
     }
     const account = await GetActiveAccountService.get();
     const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-    const findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    const findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
-    const activeSessionEntity = await findAndUpdateActiveSessionLocalStorageService.findAndUpdateAuthenticationStatus();
+    const activeSessionEntity =
+      await findAndUpdateActiveSessionSessionStorageService.findAndUpdateAuthenticationStatus();
     if (!activeSessionEntity.isAuthenticated) {
       PostLogoutService.exec();
     } else if (activeSessionEntity.isServerReachable) {

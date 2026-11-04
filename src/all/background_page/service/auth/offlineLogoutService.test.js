@@ -15,7 +15,7 @@
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import OfflineLogoutService from "./offlineLogoutService";
 import PostLogoutService from "./postLogoutService";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 import OfflineSessionExpiryAlarmService from "./offlineSessionExpiryAlarmService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
@@ -32,7 +32,7 @@ describe("OfflineLogoutService", () => {
       expect.assertions(1);
       const calls = [];
       jest
-        .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "resetAuthentication")
+        .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "resetAuthentication")
         .mockImplementation(async () => calls.push("resetAuthentication"));
       jest
         .spyOn(OfflineSessionExpiryAlarmService, "clearAlarm")

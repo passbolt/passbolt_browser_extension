@@ -13,7 +13,7 @@
  */
 
 import PostLogoutService from "./postLogoutService";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 import OfflineSessionExpiryAlarmService from "./offlineSessionExpiryAlarmService";
 
 /**
@@ -26,7 +26,7 @@ class OfflineLogoutService {
    * @param {ApiClientOptions} apiClientOptions The api client options
    */
   constructor(account, apiClientOptions) {
-    this.findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    this.findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
@@ -37,7 +37,7 @@ class OfflineLogoutService {
    * @return {Promise<void>}
    */
   async exec() {
-    await this.findAndUpdateActiveSessionLocalStorageService.resetAuthentication();
+    await this.findAndUpdateActiveSessionSessionStorageService.resetAuthentication();
     // clear offline alarm if any
     await OfflineSessionExpiryAlarmService.clearAlarm();
     await PostLogoutService.exec();

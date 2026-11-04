@@ -27,7 +27,7 @@ import AppBootstrapPagemod from "../../pagemod/appBootstrapPagemod";
 import GetActiveAccountService from "../../service/account/getActiveAccountService";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import GetOrFindActiveSessionService from "../../service/activeSession/getOrFindActiveSessionService";
-import ActiveSessionLocalStorage from "../../service/local_storage/activeSessionLocalStorage";
+import ActiveSessionSessionStorage from "../../service/session_storage/activeSessionSessionStorage";
 import AuthenticationStatusService from "../../service/authenticationStatusService";
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
 import LocalLogoutService from "../../service/auth/localLogoutService";
@@ -118,7 +118,7 @@ class OnExtensionInstalledController {
       // Throws if no account is associated with the extension.
       account = await GetActiveAccountService.get();
       // Remove any residual legacy local storage for active session
-      await browser.storage.local.remove(new ActiveSessionLocalStorage(account).storageKey);
+      await browser.storage.local.remove(new ActiveSessionSessionStorage(account).storageKey);
       apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     } catch (error) {
       console.error(error);

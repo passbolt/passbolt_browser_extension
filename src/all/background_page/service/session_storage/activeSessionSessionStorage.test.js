@@ -15,18 +15,18 @@
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultUserActiveSessionDto } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
-import ActiveSessionLocalStorage from "./activeSessionLocalStorage";
+import ActiveSessionSessionStorage from "./activeSessionSessionStorage";
 import UserActiveSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("ActiveSessionLocalStorage", () => {
+describe("ActiveSessionSessionStorage", () => {
   let account, storage;
   beforeEach(() => {
     account = new AccountEntity(defaultAccountDto());
-    storage = new ActiveSessionLocalStorage(account);
+    storage = new ActiveSessionSessionStorage(account);
     // flush account related storage before each.
     storage.flush();
   });
@@ -34,12 +34,12 @@ describe("ActiveSessionLocalStorage", () => {
   describe("::constructor", () => {
     it("throws an error if no account is provided.", () => {
       expect.assertions(1);
-      expect(() => new ActiveSessionLocalStorage()).toThrow(TypeError);
+      expect(() => new ActiveSessionSessionStorage()).toThrow(TypeError);
     });
 
     it("throws an error if parameter account is not a valid AccountEntity.", () => {
       expect.assertions(1);
-      expect(() => new ActiveSessionLocalStorage({})).toThrow(TypeError);
+      expect(() => new ActiveSessionSessionStorage({})).toThrow(TypeError);
     });
   });
 
@@ -62,7 +62,7 @@ describe("ActiveSessionLocalStorage", () => {
       const activeSessionDto = defaultUserActiveSessionDto();
       expect.assertions(2);
       // Force the runtime cache, to ensure it is hit even if the session storage is empty.
-      ActiveSessionLocalStorage._runtimeCachedData[account.id] = activeSessionDto;
+      ActiveSessionSessionStorage._runtimeCachedData[account.id] = activeSessionDto;
       const result = await storage.get();
       expect(result).toEqual(activeSessionDto);
       // Control the session storage was well empty.
@@ -78,7 +78,7 @@ describe("ActiveSessionLocalStorage", () => {
       // Expect the session storage (mocked here) to be set.
       expect(browser.storage.session.store[storage.storageKey]).toEqual(activeSessionDto.toDto());
       // Expect the runtime cache to be set.
-      expect(ActiveSessionLocalStorage._runtimeCachedData[account.id]).toEqual(activeSessionDto.toDto());
+      expect(ActiveSessionSessionStorage._runtimeCachedData[account.id]).toEqual(activeSessionDto.toDto());
       // Expect the get to retrieve the set data.
       const resultGet = await storage.get();
       expect(resultGet).toEqual(activeSessionDto.toDto());
@@ -90,7 +90,7 @@ describe("ActiveSessionLocalStorage", () => {
       // Expect the session storage (mocked here) to not be set.
       expect(browser.storage.session.store[storage.storageKey]).toBeUndefined();
       // Expect the runtime cache to not be set.
-      expect(ActiveSessionLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
+      expect(ActiveSessionSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
     it("throws if invalid data is given to store.", async () => {
@@ -99,7 +99,7 @@ describe("ActiveSessionLocalStorage", () => {
       // Expect the session storage (mocked here) to not be set.
       expect(browser.storage.session.store[storage.storageKey]).toBeUndefined();
       // Expect the runtime cache to not be set.
-      expect(ActiveSessionLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
+      expect(ActiveSessionSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
     it("waits any on-going call to set to perform another set.", async () => {
@@ -133,7 +133,7 @@ describe("ActiveSessionLocalStorage", () => {
       // Expect the session storage (mocked here) to not be set.
       expect(browser.storage.session.store[storage.storageKey]).toBeUndefined();
       // Expect the runtime cache to not be set.
-      expect(ActiveSessionLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
+      expect(ActiveSessionSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
 
     it("flushes content of the session storage.", async () => {
@@ -144,7 +144,7 @@ describe("ActiveSessionLocalStorage", () => {
       // Expect the session storage (mocked here) to not be set.
       expect(browser.storage.session.store[storage.storageKey]).toBeUndefined();
       // Expect the runtime cache to not be set.
-      expect(ActiveSessionLocalStorage._runtimeCachedData[account.id]).toBeUndefined();
+      expect(ActiveSessionSessionStorage._runtimeCachedData[account.id]).toBeUndefined();
     });
   });
 });

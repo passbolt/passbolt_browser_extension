@@ -25,7 +25,7 @@ import MockPort from "passbolt-styleguide/src/react-extension/test/mock/MockPort
 jest.mock("../../service/progress/progressService");
 jest.mock("../../service/local_storage/resourceLocalStorage");
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

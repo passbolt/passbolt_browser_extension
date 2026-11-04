@@ -40,7 +40,7 @@ class ParseSetupUrlService {
       new URL(domain);
     } catch (error) {
       console.error(error);
-      throw new Error("Cannot parse setup url. The domain is not valid.");
+      throw new Error("Cannot parse setup url. The domain is not valid.", { cause: error });
     }
 
     return { domain, user_id, authentication_token_token };

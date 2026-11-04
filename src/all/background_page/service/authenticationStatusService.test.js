@@ -19,7 +19,7 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import MfaAuthenticationRequiredError from "../error/mfaAuthenticationRequiredError";
 import PassboltBadResponseError from "../error/passboltBadResponseError";
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

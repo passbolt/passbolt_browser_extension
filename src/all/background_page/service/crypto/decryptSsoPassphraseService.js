@@ -67,7 +67,7 @@ class DecryptSsoPassphraseService {
        * This can happen if the local SSO kit nek and/or iv1 has changed (manually?).
        */
       console.error(e);
-      throw new Error(`Unable to decrypt passphrase with the local SSO kit: ${e.message}`);
+      throw new Error(`Unable to decrypt passphrase with the local SSO kit: ${e.message}`, { cause: e });
     }
 
     return Buffer.from(secondDecryptionBuffer).toString();

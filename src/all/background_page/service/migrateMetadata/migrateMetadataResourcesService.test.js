@@ -47,10 +47,10 @@ import GetOrFindResourceTypesService from "../resourceType/getOrFindResourceType
 describe("MigrateMetadataResourcesService", () => {
   let account = null;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
 
-    MockExtension.withConfiguredAccount();
+    await MockExtension.withConfiguredAccount();
     account = new AccountEntity(defaultAccountDto());
     const metadataKeysDtos = defaultDecryptedSharedMetadataKeysDtos({ armored_key: pgpKeys.metadataKey.public });
     const metadataKeys = new MetadataKeysCollection(metadataKeysDtos);

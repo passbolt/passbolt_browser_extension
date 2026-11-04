@@ -224,7 +224,7 @@ const User = function () {
       return user;
     } catch (error) {
       console.error(error);
-      throw new Error("The user is not set");
+      throw new Error("The user is not set", { cause: error });
     }
   };
 
@@ -255,7 +255,7 @@ const User = function () {
       } catch (error) {
         console.error(error);
         this._user[varName] = {};
-        throw new Error("The user is not set");
+        throw new Error("The user is not set", { cause: error });
       }
     }
 

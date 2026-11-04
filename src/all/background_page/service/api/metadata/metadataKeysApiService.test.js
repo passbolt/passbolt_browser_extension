@@ -47,7 +47,7 @@ describe("MetadataKeysApiService", () => {
       const service = new MetadataKeysApiService(apiClientOptions, account);
       const resultDto = await service.findAll();
 
-      expect(resultDto).toBeInstanceOf(Array);
+      expect(Array.isArray(resultDto)).toBe(true);
       expect(resultDto).toHaveLength(apiMetadataKeysCollection.length);
     });
 

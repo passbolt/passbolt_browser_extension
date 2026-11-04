@@ -77,7 +77,7 @@ class SsoLoginUrlEntity extends Entity {
       url = new URL(value);
     } catch (error) {
       console.error(error);
-      throw new Error("The url should be a valid url.");
+      throw new Error("The url should be a valid url.", { cause: error });
     }
 
     if (ssoProvider === OAuth2SsoSettingsEntity.PROVIDER_ID || ssoProvider === AdfsSsoSettingsEntity.PROVIDER_ID) {

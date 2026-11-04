@@ -15,7 +15,7 @@ import "../../../../../test/mocks/mockSsoDataStorage";
 import { enableFetchMocks } from "jest-fetch-mock";
 import HasSsoLoginErrorController from "./hasSsoLoginErrorController";
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

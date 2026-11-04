@@ -26,7 +26,7 @@ import { adminAccountDto } from "../../model/entity/account/accountEntity.test.d
 const keyring = new Keyring();
 jest.mock("../../service/passphrase/getPassphraseService");
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

@@ -40,7 +40,7 @@ describe("ActionLogService", () => {
       const service = new ActionLogApiService(apiClientOptions, account);
       const result = await service.findAllFor("Resource", uuidv4(), 1, 5);
 
-      expect(result).toBeInstanceOf(Array);
+      expect(Array.isArray(result)).toBe(true);
       expect(result).toHaveLength(apiResponse.length);
     });
 

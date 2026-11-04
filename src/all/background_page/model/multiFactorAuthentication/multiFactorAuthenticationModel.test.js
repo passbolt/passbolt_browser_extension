@@ -52,7 +52,7 @@ describe("MultiFactorAuthenticationModel", () => {
 
     fetch.doMock(() => mockApiResponse(defaultVerifyProviderData()));
 
-    const result = await model.verifyProvider(new defaultMfaProviderData());
+    const result = await model.verifyProvider(defaultMfaProviderData());
 
     expect(model.multiFactorAuthenticationService.verifyProvider).toHaveBeenCalledWith("totp");
     expect(result).toEqual(new MfaVerifyProviderEntity(defaultVerifyProviderData()));

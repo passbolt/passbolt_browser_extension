@@ -23,7 +23,7 @@ import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entit
 import SsoDisabledError from "../../error/ssoDisabledError";
 import SsoProviderMismatchError from "../../error/ssoProviderMismatchError";
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

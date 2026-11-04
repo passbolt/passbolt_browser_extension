@@ -7,7 +7,7 @@
   "homepage": "https://www.passbolt.com",
   "repository": "https://github.com/passbolt/passbolt_browser_extension",
   "engines": {
-    "node": ">=22.14.0",
+    "node": "^22.18.0 || >=24.11.0",
     "npm": ">=10.9.2"
   },
   "dependencies": {
@@ -26,63 +26,46 @@
     "react-dom": "^18.3.1",
     "uuid": "^14.0.0",
     "validator": "^13.15.26",
-    "webextension-polyfill": "^0.10.0",
+    "webextension-polyfill": "^0.12.0",
     "xregexp": "~5.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.7",
-    "@babel/helpers": "^7.26.10",
-    "@babel/plugin-transform-runtime": "^7.22.9",
-    "@babel/preset-env": "^7.29.5",
-    "@babel/preset-react": "^7.28.5",
-    "@babel/runtime": "^7.27.0",
-    "@babel/runtime-corejs3": "^7.26.10",
-    "@eslint/js": "^9.39.4",
+    "@babel/core": "^8.0.10",
+    "@babel/preset-env": "^8.0.7",
+    "@babel/preset-react": "^8.0.1",
+    "@eslint/js": "^10.0.1",
     "@svgr/webpack": "^8.1.0",
-    "babel-jest": "^30.3.0",
-    "babel-loader": "^8.2.3",
+    "babel-jest": "^30.5.2",
+    "babel-loader": "^10.1.1",
     "buffer": "^6.0.3",
     "copy-webpack-plugin": "^14.0.0",
-    "dotenv": "^16.4.5",
-    "eslint": "^9.39.4",
+    "dotenv": "^18.0.9",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jest": "^29.15.1",
-    "eslint-plugin-n": "^17.24.0",
+    "eslint-plugin-jest": "^29.17.0",
+    "eslint-plugin-n": "^18.5.0",
     "eslint-plugin-no-unsanitized": "^4.1.5",
-    "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-prettier": "^5.5.7",
+    "eslint-plugin-promise": "^7.3.0",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-regexp": "^3.1.0",
-    "eslint-plugin-security": "^4.0.0",
+    "eslint-plugin-regexp": "^3.3.2",
+    "eslint-plugin-security": "^4.2.1",
     "filereader": "^0.10.3",
-    "formdata-node": "^6.0.3",
-    "globals": "^16.4.0",
-    "i18next-cli": "^1.58.0",
-    "jest": "^30.3.0",
-    "jest-environment-jsdom": "^30.3.0",
-    "jest-environment-node": "^30.3.0",
-    "jest-fetch-mock": "^3.0.3",
-    "jest-junit": "^16.0.0",
-    "jest-webextension-mock": "^4.1.1",
-    "lockfile-lint": "^5.0.1",
-    "prettier": "3.6.2",
-    "terser-webpack-plugin": "^5.4.0",
+    "globals": "^17.13.0",
+    "i18next-cli": "^1.80.7",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
+    "jest-environment-node": "^30.5.2",
+    "jest-fetch-mock": "^4.2.0",
+    "jest-junit": "^17.0.0",
+    "jest-webextension-mock": "^4.2.0",
+    "lockfile-lint": "^5.1.0",
+    "prettier": "3.9.10",
+    "terser-webpack-plugin": "^5.6.1",
     "text-encoding-utf-8": "^1.0.2",
-    "web-ext": "^10.7.0",
-    "webpack": "^5.107.2",
-    "webpack-cli": "^7.0.2"
-  },
-  "overrides": {
-    "@xmldom/xmldom": "0.8.15",
-    "uuid": "^14.0.0",
-    "shell-quote": "1.12.0",
-    "js-yaml": "^4.3.2",
-    "adm-zip": "0.6.1",
-    "qrcode": {
-      "yargs": "^18.1.0"
-    }
+    "web-ext": "^10.8.0",
+    "webpack": "^5.112.2",
+    "webpack-cli": "^7.3.1"
   },
   "scripts": {
     "build": "webpack",
@@ -104,5 +87,16 @@
     "test:unit": "jest --no-cache ./src/all/ ./src/chrome-mv3/ ./src/chrome/ ./src/safari/",
     "test:coverage": "jest --no-cache ./src/all/ ./src/chrome-mv3/ ./src/safari/ --coverage",
     "test:ci:coverage": "npm run test:coverage -- --runInBand"
+  },
+  "overrides": {
+    "glob": "14.0.3",
+    "@xmldom/xmldom": "0.8.15",
+    "eslint-plugin-react": {
+      "eslint": "$eslint"
+    },
+    "minimatch": "11.0.1",
+    "multimatch@6.0.0": {
+      "minimatch": "3.1.5"
+    }
   }
 }

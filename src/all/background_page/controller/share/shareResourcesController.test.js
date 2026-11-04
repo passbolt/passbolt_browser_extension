@@ -105,7 +105,7 @@ describe("ShareResourcesController", () => {
         JSON.stringify(secretDto),
         await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public),
       );
-      const resourceForShareDto = new defaultResourceV4Dto({
+      const resourceForShareDto = defaultResourceV4Dto({
         ...resourceDto,
         secrets: [plaintextSecretPasswordAndDescriptionDto({ resource_id: resourceId, data: resourceSecretData })],
       });
@@ -115,7 +115,7 @@ describe("ShareResourcesController", () => {
       // Mock keyring.
       jest.spyOn(Keyring.prototype, "sync").mockImplementation(jest.fn);
       const keyring = new Keyring();
-      keyring.importPublic(pgpKeys.carol.public, pgpKeys.carol.userId);
+      await keyring.importPublic(pgpKeys.carol.public, pgpKeys.carol.userId);
       // Mock the share request.
       let shareRequestData;
       jest

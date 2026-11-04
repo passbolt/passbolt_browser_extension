@@ -41,13 +41,13 @@ describe("OnExtensionInstalledController", () => {
       const tabs = [
         {
           id: 1,
-          url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
         {
           id: 2,
-          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
-        { id: 3, url: "https://passbolt.dev/auth/login" },
+        { id: 3, url: "https://passbolt.local/auth/login" },
         { id: 4, url: "https://localhost" },
         { id: 5, url: "https://chromewebstore.google.com/id/passbolt" },
         { id: 6, url: "https://addons.mozilla.org/id/passbolt" },
@@ -83,14 +83,14 @@ describe("OnExtensionInstalledController", () => {
       const tabs = [
         {
           id: 1,
-          url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
         {
           id: 2,
-          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
-        { id: 3, url: "https://passbolt.dev/auth/login" },
-        { id: 4, url: "https://passbolt.dev" },
+        { id: 3, url: "https://passbolt.local/auth/login" },
+        { id: 4, url: "https://passbolt.local" },
         { id: 5, url: "https://passbolt.com" },
         { id: 6, url: "https://localhost" },
       ];
@@ -98,8 +98,8 @@ describe("OnExtensionInstalledController", () => {
       jest.spyOn(OnExtensionInstalledController, "onUpdate");
       jest.spyOn(WebNavigationService, "exec");
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => Promise.resolve(tabs));
-      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
+      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
       // process
       await OnExtensionInstalledController.exec(details);
       // expectation
@@ -139,20 +139,20 @@ describe("OnExtensionInstalledController", () => {
         reason: browser.runtime.OnInstalledReason.BROWSER_UPDATE,
       };
       const tabs = [
-        { id: 1, url: "https://passbolt.dev/app/passwords" },
+        { id: 1, url: "https://passbolt.local/app/passwords" },
         {
           id: 2,
-          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
-        { id: 3, url: "https://passbolt.dev/auth/login" },
-        { id: 4, url: "https://passbolt.dev" },
+        { id: 3, url: "https://passbolt.local/auth/login" },
+        { id: 4, url: "https://passbolt.local" },
         { id: 5, url: "https://passbolt.com" },
         { id: 6, url: "https://localhost" },
       ];
       // mock function
       jest.spyOn(OnExtensionInstalledController, "onBrowserUpdate");
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
       jest.spyOn(browser.tabs, "query").mockImplementation(() => Promise.resolve(tabs));

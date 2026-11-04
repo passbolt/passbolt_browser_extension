@@ -13,14 +13,12 @@
  */
 
 import ParseAuthUrlService from "./parseAuthUrlService";
-import { Config } from "../../model/config";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 describe("ParseAuthUrlService", () => {
-  const domain = "https://passbolt.dev";
-
-  beforeEach(() => {
-    Config.write("user.settings.trustedDomain", domain);
-  });
+  const domain = "https://passbolt.local";
+  const account = new AccountEntity(defaultAccountDto());
 
   describe("ParseAuthUrlService:test", () => {
     describe.each([
@@ -29,7 +27,7 @@ describe("ParseAuthUrlService", () => {
       { scenario: "Passbolt login page with anchors", url: `${domain}/auth/login#test` },
     ])("should parse", (_props) => {
       it(`should match: ${_props.scenario}`, () => {
-        const parseResult = ParseAuthUrlService.regex.test(_props.url);
+        const parseResult = ParseAuthUrlService.test(account, _props.url);
         expect.assertions(1);
         expect(parseResult).toBeTruthy();
       });
@@ -37,16 +35,16 @@ describe("ParseAuthUrlService", () => {
 
     describe.each([
       { scenario: "No domain given", url: "https://auth/login" },
-      { scenario: "No protocol given", url: "passbolt.dev/auth/login" },
-      { scenario: "Wrong protocol given", url: "http://passbolt.dev/auth/login" },
-      { scenario: "Domain look alike attack", url: `https://passbolt.dev.attacker.com/auth/login` },
-      { scenario: "Sub domain look alike attack", url: `https://attacker.passbolt.dev.com/auth/login` },
-      { scenario: "Regex wild mark attack", url: "https://passboltxdev/auth/login" },
+      { scenario: "No protocol given", url: "passbolt.local/auth/login" },
+      { scenario: "Wrong protocol given", url: "http://passbolt.local/auth/login" },
+      { scenario: "Domain look alike attack", url: `https://passbolt.local.attacker.com/auth/login` },
+      { scenario: "Sub domain look alike attack", url: `https://attacker.passbolt.local.com/auth/login` },
+      { scenario: "Regex wild mark attack", url: "https://passboltxlocal/auth/login" },
       { scenario: "Domain look alike as hash attack", url: `https://www.attacker.com#${domain}` },
       { scenario: "Wrong entry point", url: `${domain}/auth/login/wrong-entry-point` },
     ])("should not parse", (_props) => {
       it(`should not match: ${_props.scenario}`, () => {
-        const parseResult = ParseAuthUrlService.regex.test(_props.url);
+        const parseResult = ParseAuthUrlService.test(account, _props.url);
         expect.assertions(1);
         expect(parseResult).toBeFalsy();
       });

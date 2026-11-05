@@ -12,29 +12,26 @@
  * @since         3.6.0
  */
 
-import { Config } from "../../model/config";
 import ParseAppUrlService from "./parseAppUrlService";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 const errorMatchPattern = "Cannot parse application url. The url does not match the pattern.";
 const errorDomainInvalid = "Cannot parse application url. The domain is not valid.";
 
-const domain = "https://passbolt.dev";
-
-beforeEach(() => {
-  Config.write("user.settings.trustedDomain", "https://passbolt.dev");
-});
+const domain = "https://passbolt.local";
 
 describe("ParseAppUrlService", () => {
   describe("ParseAppUrlService:parse", () => {
     describe.each([
       {
         scenario: "TLD",
-        url: "https://passbolt.dev/app/folders/view/5452ecb2-0625-50d1-b1ef-d2038f5830b6",
+        url: "https://passbolt.local/app/folders/view/5452ecb2-0625-50d1-b1ef-d2038f5830b6",
         domain: domain,
       },
       {
         scenario: "TLD with Port",
-        url: "https://passbolt.dev:4443/app/passwords",
+        url: "https://passbolt.local:4443/app/passwords",
         domain: `${domain}:4443`,
       },
       {
@@ -64,7 +61,7 @@ describe("ParseAppUrlService", () => {
       },
       {
         scenario: "Trailing /",
-        url: "https://passbolt.dev/app/administration/account-recovery//",
+        url: "https://passbolt.local/app/administration/account-recovery//",
         domain: `${domain}/app/administration/account-recovery/`,
       },
       {
@@ -78,13 +75,14 @@ describe("ParseAppUrlService", () => {
         domain: `https://demo.passbolt.com`,
       },
     ])("should parse", (_props) => {
+      let account;
       beforeEach(() => {
-        Config.write("user.settings.trustedDomain", _props.domain);
+        account = new AccountEntity(defaultAccountDto({ domain: _props.domain }));
       });
       it(`should parse: ${_props.scenario}`, () => {
         expect.assertions(2);
-        expect(() => ParseAppUrlService.parse(_props.url)).not.toThrow(errorMatchPattern);
-        expect(() => ParseAppUrlService.parse(_props.url)).not.toThrow(errorDomainInvalid);
+        expect(() => ParseAppUrlService.parse(account, _props.url)).not.toThrow(errorMatchPattern);
+        expect(() => ParseAppUrlService.parse(account, _props.url)).not.toThrow(errorDomainInvalid);
       });
     });
 
@@ -95,7 +93,7 @@ describe("ParseAppUrlService", () => {
       },
       {
         scenario: "Wrong protocol",
-        url: "http://passbolt.dev",
+        url: "http://passbolt.local",
       },
       {
         scenario: "Not a domain allowed",
@@ -103,40 +101,42 @@ describe("ParseAppUrlService", () => {
       },
       {
         scenario: "Original domain as subdomain attack",
-        url: "https://passbolt.dev.attacker.com",
+        url: "https://passbolt.local.attacker.com",
       },
       {
         scenario: "Subdomain attack",
-        url: "https://attack.passbolt.dev",
+        url: "https://attack.passbolt.local",
       },
       {
         scenario: "Regex wild mark attack",
-        url: "https://passboltxdev",
+        url: "https://passboltxlocal",
       },
       {
         scenario: "Non application entry point",
-        url: "https://passbolt.dev/auth/login",
+        url: "https://passbolt.local/auth/login",
       },
       {
         scenario: "Domain look alike as hash attack",
         url: `https://www.attacker.com#${domain}`,
       },
     ])("should not parse", (_props) => {
+      const account = new AccountEntity(defaultAccountDto());
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);
-        expect(() => ParseAppUrlService.parse(_props.url)).toThrow(errorMatchPattern);
+        expect(() => ParseAppUrlService.parse(account, _props.url)).toThrow(errorMatchPattern);
       });
     });
   });
   describe("ParseAppUrlService:getContext", () => {
     it(`should return regex based on trusted domain`, () => {
       expect.assertions(1);
-      expect(ParseAppUrlService.getRegex()).toBe("^https\\:\\/\\/passbolt\\.dev/?(/app.*)?(#.*)?$");
+      const account = new AccountEntity(defaultAccountDto());
+      expect(ParseAppUrlService.getRegex(account)).toBe("^https\\:\\/\\/passbolt\\.local/?(/app.*)?(#.*)?$");
     });
     it(`should escaped characters from domain`, () => {
-      Config.write("user.settings.trustedDomain", "https://passbolt.dev/#/");
+      const account = new AccountEntity(defaultAccountDto({ domain: "https://passbolt.local/#/" }));
       expect.assertions(1);
-      expect(ParseAppUrlService.getRegex()).toBe("^https\\:\\/\\/passbolt\\.dev\\/\\#\\//?(/app.*)?(#.*)?$");
+      expect(ParseAppUrlService.getRegex(account)).toBe("^https\\:\\/\\/passbolt\\.local\\/\\#\\//?(/app.*)?(#.*)?$");
     });
   });
 });

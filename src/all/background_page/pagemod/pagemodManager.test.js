@@ -97,7 +97,6 @@ describe("PagemodManager", () => {
       jest
         .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
         .mockImplementation(async () => new UserActiveSessionEntity(defaultUserActiveSessionDto()));
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
       // process
       await PagemodManager.exec(details);
       // expectations
@@ -133,7 +132,6 @@ describe("PagemodManager", () => {
       };
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
       // process
       await PagemodManager.exec(details);
       // expectations
@@ -188,7 +186,6 @@ describe("PagemodManager", () => {
       expect.assertions(7);
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
       // expectations
       expect(await PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.local")).toBeTruthy();
       expect(await PagemodManager.hasPagemodMatchUrlToReload("https://www.passbolt.com")).toBeFalsy();

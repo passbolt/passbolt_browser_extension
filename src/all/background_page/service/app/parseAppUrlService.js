@@ -1,3 +1,6 @@
+import { assertString, assertType } from "../../utils/assertions";
+import AccountEntity from "../../model/entity/account/accountEntity";
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -11,27 +14,29 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import User from "../../model/user";
-
 class ParseAppUrlService {
   /**
    * Get regex to check URI validity
+   * @param {AccountEntity} account The account
    * @returns {string}
    */
-  static getRegex() {
-    const user = User.getInstance();
-    const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
+  static getRegex(account) {
+    assertType(account, AccountEntity);
+    const escapedDomain = account.domain.replace(/\W/g, "\\$&");
     return `^${escapedDomain}/?(/app.*)?(#.*)?$`;
   }
 
   /**
    * Parse url to match .
+   * @param {AccountEntity} account The account
    * @param {string} url The url to parse.
    * @returns {{domain: string}}
    * @throw {Error} If the setup url cannot be parsed.
    */
-  static parse(url) {
-    const regex = new RegExp(this.getRegex());
+  static parse(account, url) {
+    assertType(account, AccountEntity);
+    assertString(url);
+    const regex = new RegExp(this.getRegex(account));
 
     if (!regex.test(url)) {
       throw new Error("Cannot parse application url. The url does not match the pattern.");
@@ -49,12 +54,15 @@ class ParseAppUrlService {
 
   /**
    * Test the url against the regex.
+   * @param {AccountEntity} account The account
    * @param {string} url The url to test
    * @returns {boolean}
    */
-  static test(url) {
+  static test(account, url) {
     try {
-      this.parse(url);
+      assertType(account, AccountEntity);
+      assertString(url);
+      this.parse(account, url);
       return true;
     } catch {
       return false;

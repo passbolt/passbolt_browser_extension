@@ -16,7 +16,6 @@ import pagemod from "./pagemod";
 import RecoverBootstrapPagemod from "./recoverBootstrapPagemod";
 import SetupBootstrapPagemod from "./setupBootstrapPagemod";
 import AuthBootstrapPagemod from "./authBootstrapPagemod";
-import UserSettings from "../model/userSettings/userSettings";
 import AppBootstrapPagemod from "./appBootstrapPagemod";
 import WebIntegrationPagemod from "./webIntegrationPagemod";
 import PublicWebsiteSignInPagemod from "./publicWebsiteSignInPagemod";
@@ -113,8 +112,7 @@ describe("PagemodManager", () => {
         url: "https://test.dev/auth/login",
       };
       // mock functions
-      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       // process
       await PagemodManager.exec(details);
       // expectations

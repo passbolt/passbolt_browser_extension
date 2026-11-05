@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import User from "../model/user";
-import UserSettings from "../model/userSettings/userSettings";
 import WebIntegration from "./webIntegrationPagemod";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../model/entity/worker/workerEntity";
@@ -25,6 +23,8 @@ import { PortEvents } from "../event/portEvents";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import { v4 as uuid } from "uuid";
+import AccountEntity from "../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../model/entity/account/accountEntity.test.data";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorkerAndEvictSameFrame");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -67,30 +67,30 @@ describe("WebIntegration", () => {
     it("Should be able to attach web integration pagemod to browser frame", async () => {
       expect.assertions(1);
       // mock functions
-      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       const result = await WebIntegration.canBeAttachedTo({ frameId: 1, url: "https://test.dev/auth/login" });
       expect(result).toBeFalsy();
     });
 
     describe.each([
-      { scenario: "Passbolt domain", url: "https://passbolt.dev/auth/login", frameId: Pagemod.TOP_FRAME_ID },
+      { scenario: "Passbolt domain", url: "https://passbolt.local/auth/login", frameId: Pagemod.TOP_FRAME_ID },
       { scenario: "No domain", url: "about:blank", frameId: 1 },
     ])("Should not be able to attach a pagemod to browser frame", (_props) => {
       it(`Should not be able to attach a pagemod to browser frame: ${_props.scenario}`, async () => {
         expect.assertions(1);
         // mock functions
-        jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-        jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+        jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
         const result = await WebIntegration.canBeAttachedTo({ frameId: _props.frameId, url: _props.url });
         expect(result).toBeFalsy();
       });
     });
 
-    it("Should have the constraint not valid if the user is not valid", async () => {
+    it("Should have the constraint not valid if the account is not configured", async () => {
       expect.assertions(1);
       // mock functions
-      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => false);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {
+        throw new Error("The user is not set");
+      });
       // process
       const result = await WebIntegration.canBeAttachedTo({ frameId: 0 });
       // expectations

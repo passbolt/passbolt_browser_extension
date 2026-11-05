@@ -94,8 +94,8 @@ class WebIntegration extends Pagemod {
    */
   async assertUrlAttachConstraint(frameDetails) {
     try {
-      await GetActiveAccountService.get();
-      return ParseWebIntegrationUrlService.test(frameDetails.url);
+      const account = await GetActiveAccountService.get();
+      return ParseWebIntegrationUrlService.test(account, frameDetails.url);
     } catch (error) {
       console.log(error);
       return false;

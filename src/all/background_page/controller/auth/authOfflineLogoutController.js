@@ -9,12 +9,10 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         5.16.0
+ * @since         5.13.0
  */
 
-import PostLogoutService from "../../service/auth/postLogoutService";
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
-import OfflineSessionExpiryAlarmService from "../../service/auth/offlineSessionExpiryAlarmService";
+import OfflineLogoutService from "../../service/auth/offlineLogoutService";
 
 class AuthOfflineLogoutController {
   /**
@@ -27,10 +25,7 @@ class AuthOfflineLogoutController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
-      account,
-      apiClientOptions,
-    );
+    this.offlineLogoutService = new OfflineLogoutService(account, apiClientOptions);
   }
 
   /**
@@ -52,10 +47,7 @@ class AuthOfflineLogoutController {
    * @return {Promise<void>}
    */
   async exec() {
-    await this.findAndUpdateActiveSessionLocalStorageService.resetAuthentication();
-    // clear offline alarm if any
-    await OfflineSessionExpiryAlarmService.clearAlarm();
-    await PostLogoutService.exec();
+    await this.offlineLogoutService.exec();
   }
 }
 

@@ -7,7 +7,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 import AuthVerifyServerKeyController from "../controller/auth/authVerifyServerKeyController";
-import FindAndUpdateActiveSessionLocalStorageController from "../controller/auth/findAndUpdateActiveSessionLocalStorageController";
+import FindAndUpdateActiveSessionSessionStorageController from "../controller/auth/findAndUpdateActiveSessionSessionStorageController";
 import IsMfaRequiredController from "../controller/auth/isMfaRequiredController";
 import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
 import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
@@ -50,7 +50,7 @@ const listen = function (worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on("passbolt.auth.find-and-update-authentication-status", async (requestId) => {
-    const controller = new FindAndUpdateActiveSessionLocalStorageController(
+    const controller = new FindAndUpdateActiveSessionSessionStorageController(
       worker,
       requestId,
       apiClientOptions,

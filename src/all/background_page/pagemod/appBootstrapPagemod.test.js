@@ -27,7 +27,7 @@ import {
   defaultUserActiveSessionDto,
   offlineUserActiveSessionDto,
 } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
-import FindAndUpdateActiveSessionLocalStorageService from "../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 import PassboltBadResponseError from "../error/passboltBadResponseError";
 import AuthenticationStatusService from "../service/authenticationStatusService";
 import ServerStatusApiService from "../service/api/status/serverStatusApiService";
@@ -75,7 +75,7 @@ describe("AppBootstrap", () => {
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       jest
-        .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
+        .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
         .mockImplementation(async () => new UserActiveSessionEntity(defaultUserActiveSessionDto()));
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       const result = await AppBootstrap.canBeAttachedTo({
@@ -113,7 +113,7 @@ describe("AppBootstrap", () => {
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
       jest
-        .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
+        .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
         .mockImplementation(
           async () => new UserActiveSessionEntity(defaultUserActiveSessionDto({ is_authenticated: false })),
         );
@@ -129,7 +129,7 @@ describe("AppBootstrap", () => {
       // mock functions
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
       jest
-        .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
+        .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
         .mockImplementation(
           async () => new UserActiveSessionEntity(offlineUserActiveSessionDto({ is_authenticated: false })),
         );

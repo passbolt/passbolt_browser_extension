@@ -20,7 +20,7 @@ import { BrowserExtensionIconService } from "../ui/browserExtensionIcon.service"
 import User from "../../model/user";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 
 class OnStartUpService {
   /**
@@ -48,7 +48,7 @@ class OnStartUpService {
     const account = await GetActiveAccountService.get();
     const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
     // Rest authentication
-    await new FindAndUpdateActiveSessionLocalStorageService(account, apiClientOptions).resetAuthentication();
+    await new FindAndUpdateActiveSessionSessionStorageService(account, apiClientOptions).resetAuthentication();
   }
 }
 

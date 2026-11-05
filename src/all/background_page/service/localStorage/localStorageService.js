@@ -32,7 +32,7 @@ import MetadataKeysSettingsLocalStorage from "../local_storage/metadataKeysSetti
 import MetadataTypesSettingsLocalStorage from "../local_storage/metadataTypesSettingsLocalStorage";
 import MetadataKeysSessionStorage from "../session_storage/metadataKeysSessionStorage";
 import SessionKeysBundlesSessionStorageService from "../sessionStorage/sessionKeysBundlesSessionStorageService";
-import ActiveSessionLocalStorage from "../local_storage/activeSessionLocalStorage";
+import ActiveSessionSessionStorage from "../session_storage/activeSessionSessionStorage";
 import UserMeLocalStorage from "../local_storage/userMeLocalStorage";
 import SiteSettingsLocalStorage from "../local_storage/siteSettingsLocalStorage";
 import SiteSettingsRuntimeCache from "../siteSettings/siteSettingsRuntimeCache";
@@ -40,6 +40,7 @@ import OfflineSettingsLocalStorage from "../local_storage/offlineSettingsLocalSt
 import CanUseOfflineStorageService from "../offline/canUseOfflineStorageService";
 import OfflineRetentionDataFlushService from "../offline/offlineRetentionDataFlushService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
+import SessionTimestampsLocalStorage from "../local_storage/sessionTimestampsLocalStorage";
 
 /**
  * Flush storage data when:
@@ -118,7 +119,8 @@ class LocalStorageService {
      */
     if (!canUseOfflineStorage) {
       flushes.push(
-        new ActiveSessionLocalStorage(account).flush(),
+        new ActiveSessionSessionStorage(account).flush(),
+        new SessionTimestampsLocalStorage(account).flush(),
         new RbacsLocalStorage(account).flush(),
         new ResourceTypeLocalStorage(account).flush(),
         new UserMeLocalStorage(account).flush(),

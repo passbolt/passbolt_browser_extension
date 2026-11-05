@@ -15,14 +15,14 @@ import { v4 as uuid } from "uuid";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AuthOfflineLogoutController from "./authOfflineLogoutController";
 import PostLogoutService from "../../service/auth/postLogoutService";
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import OfflineSessionExpiryAlarmService from "../../service/auth/offlineSessionExpiryAlarmService";
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "resetAuthentication").mockResolvedValue();
+  jest.spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "resetAuthentication").mockResolvedValue();
 });
 
 describe("AuthOfflineLogoutController", () => {
@@ -37,7 +37,7 @@ describe("AuthOfflineLogoutController", () => {
       const controller = new AuthOfflineLogoutController(null, null, defaultApiClientOptions(), account);
       await controller.exec();
 
-      expect(FindAndUpdateActiveSessionLocalStorageService.prototype.resetAuthentication).toHaveBeenCalledTimes(1);
+      expect(FindAndUpdateActiveSessionSessionStorageService.prototype.resetAuthentication).toHaveBeenCalledTimes(1);
       expect(postLogoutSpy).toHaveBeenCalledTimes(1);
       expect(clearOfflineAlarmSpy).toHaveBeenCalledTimes(1);
     });

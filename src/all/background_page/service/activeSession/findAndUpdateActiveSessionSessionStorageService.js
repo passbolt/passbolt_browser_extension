@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         6.0.0
  */
-import ActiveSessionLocalStorage from "../local_storage/activeSessionLocalStorage";
+import ActiveSessionSessionStorage from "../session_storage/activeSessionSessionStorage";
 import AuthenticationStatusService from "../authenticationStatusService";
 import UserActiveSessionEntity, {
   USER_ACTIVE_SESSION_OFFLINE,
@@ -20,14 +20,14 @@ import UserActiveSessionEntity, {
 import FindServerStatusService from "../status/findServerStatusService";
 import Log from "../../model/log";
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
-import { assertType } from "../../utils/assertions";
+import UpdateSessionTimestampsService from "../sessionTimestamps/updateSessionTimestampsService";
 
 const FIND_AND_UPDATE_ACTIVE_SESSION_LS_LOCK_PREFIX = "FIND_AND_UPDATE_ACTIVE_SESSION_LS_LOCK-";
 
 /**
  * The service aims to find and update user active session and store it in the local storage.
  */
-export default class FindAndUpdateActiveSessionLocalStorageService {
+export default class FindAndUpdateActiveSessionSessionStorageService {
   /**
    * @constructor
    * @param {AccountEntity} account The user account
@@ -37,7 +37,8 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
     this.account = account;
     this.authenticationStatusService = new AuthenticationStatusService(apiClientOptions);
     this.findServerStatusService = new FindServerStatusService(apiClientOptions);
-    this.activeSessionLocalStorage = new ActiveSessionLocalStorage(account);
+    this.activeSessionSessionStorage = new ActiveSessionSessionStorage(account);
+    this.updateSessionTimestampsService = new UpdateSessionTimestampsService(account);
   }
 
   /**
@@ -61,12 +62,12 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
         return await navigator.locks.request(
           lockKey,
           { mode: "shared" },
-          async () => new UserActiveSessionEntity(await this.activeSessionLocalStorage.get()),
+          async () => new UserActiveSessionEntity(await this.activeSessionSessionStorage.get()),
         );
       }
 
       // Lock is granted, retrieve the user active session.
-      const userActiveSessionDto = await this.activeSessionLocalStorage.get();
+      const userActiveSessionDto = await this.activeSessionSessionStorage.get();
       let userActiveSessionEntity;
       // If no active session create a default one
       if (!userActiveSessionDto) {
@@ -85,7 +86,7 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
         }
       }
 
-      await this.activeSessionLocalStorage.set(userActiveSessionEntity);
+      await this.activeSessionSessionStorage.set(userActiveSessionEntity);
       return userActiveSessionEntity;
     });
   }
@@ -164,12 +165,12 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
    */
   async _persistSafeDefaultSession() {
     const userActiveSessionEntity = await this._createDefaultUserActiveSession();
-    await this.activeSessionLocalStorage.set(userActiveSessionEntity);
+    await this.activeSessionSessionStorage.set(userActiveSessionEntity);
   }
 
   /**
-   * Logout and offline session expiry transition: reset the authentication flags in place. The storage is NOT
-   * flushed so durable fields (last_seen_online, last_logged_in) survive.
+   * Logout and offline session expiry transition: reset the authentication flags in place. The session timestamps are
+   * kept apart (SessionTimestampsLocalStorage) and are not affected.
    * A logout flow must run this before the post-logout service, because the storages flush
    * stays the last update on the active session: it removes it for a non-offline user, or keeps the
    * signed-out record written here for an offline user, whose session is retained across logout.
@@ -180,7 +181,7 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
   async resetAuthentication() {
     return await navigator.locks.request(this._lockKey, async () => {
       try {
-        const storedSession = await this.activeSessionLocalStorage.get();
+        const storedSession = await this.activeSessionSessionStorage.get();
         if (!storedSession) {
           // Nothing to reset; the read path will rebuild a default on the next getOrFind.
           return null;
@@ -188,7 +189,7 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
         const userActiveSessionEntity = new UserActiveSessionEntity(storedSession);
         userActiveSessionEntity.isAuthenticated = false;
         userActiveSessionEntity.isMfaRequired = false;
-        await this.activeSessionLocalStorage.set(userActiveSessionEntity);
+        await this.activeSessionSessionStorage.set(userActiveSessionEntity);
       } catch (error) {
         console.error(error);
         await this._persistSafeDefaultSession();
@@ -197,92 +198,58 @@ export default class FindAndUpdateActiveSessionLocalStorageService {
   }
 
   /**
-   * Online login transition: find-or-create the active session, assert it authenticated + online, stamp
-   * the login date, then persist it.
+   * Online login transition: find-or-create the active session, assert it authenticated + online, persist it, then
+   * stamp the login and last seen online dates in the session timestamps.
    * @return {Promise<void>}
    */
   async authenticateOnline() {
-    return await navigator.locks.request(this._lockKey, async () => {
-      const nowDate = new Date().toISOString();
+    await navigator.locks.request(this._lockKey, async () => {
       try {
-        const storedSession = await this.activeSessionLocalStorage.get();
+        const storedSession = await this.activeSessionSessionStorage.get();
         const userActiveSessionEntity = new UserActiveSessionEntity({
           ...storedSession,
           is_authenticated: true,
           type: USER_ACTIVE_SESSION_ONLINE,
-          last_logged_in: nowDate,
-          last_seen_online: nowDate,
         });
-        await this.activeSessionLocalStorage.set(userActiveSessionEntity);
+        await this.activeSessionSessionStorage.set(userActiveSessionEntity);
       } catch (error) {
         console.error(error);
         // In case of failure, keep the user signed in online.
         const userActiveSessionEntity = new UserActiveSessionEntity({
           is_authenticated: true,
           type: USER_ACTIVE_SESSION_ONLINE,
-          last_logged_in: nowDate,
         });
-        await this.activeSessionLocalStorage.set(userActiveSessionEntity);
+        await this.activeSessionSessionStorage.set(userActiveSessionEntity);
       }
     });
+    await this.updateSessionTimestampsService.updateOnOnlineLogin();
   }
 
   /**
-   * Offline login transition: find-or-create the active session, assert it authenticated + offline, stamp
-   * the login date.
+   * Offline login transition: find-or-create the active session, assert it authenticated + offline, persist it, then
+   * stamp the login date in the session timestamps.
    * @return {Promise<void>}
    */
   async authenticateOffline() {
-    return await navigator.locks.request(this._lockKey, async () => {
-      const lastLoggedIn = new Date().toISOString();
+    await navigator.locks.request(this._lockKey, async () => {
       try {
-        const storedSession = await this.activeSessionLocalStorage.get();
+        const storedSession = await this.activeSessionSessionStorage.get();
         const userActiveSessionEntity = new UserActiveSessionEntity({
           ...storedSession,
           is_authenticated: true,
           type: USER_ACTIVE_SESSION_OFFLINE,
-          last_logged_in: lastLoggedIn,
         });
-        await this.activeSessionLocalStorage.set(userActiveSessionEntity);
+        await this.activeSessionSessionStorage.set(userActiveSessionEntity);
       } catch (error) {
         console.error(error);
         // In case of failure, keep the user signed in offline.
         const userActiveSessionEntity = new UserActiveSessionEntity({
           is_authenticated: true,
           type: USER_ACTIVE_SESSION_OFFLINE,
-          last_logged_in: lastLoggedIn,
         });
-        await this.activeSessionLocalStorage.set(userActiveSessionEntity);
+        await this.activeSessionSessionStorage.set(userActiveSessionEntity);
       }
     });
-  }
-
-  /**
-   * Update the last seen online property of a user active session
-   * If any error create a default user active session and update last seen online property anyway
-   * Persist the user active session updated
-   * @param lastSeenOnline
-   * @return {Promise<void>}
-   */
-  async updateLastSeenOnline(lastSeenOnline) {
-    assertType(lastSeenOnline, Date);
-    return await navigator.locks.request(this._lockKey, async () => {
-      try {
-        const userActiveSessionDto = await this.activeSessionLocalStorage.get();
-        // If no active session create a default one
-        const userActiveSessionEntity = !userActiveSessionDto
-          ? await this._createDefaultUserActiveSession()
-          : new UserActiveSessionEntity(userActiveSessionDto);
-        // update the date
-        userActiveSessionEntity.lastSeenOnline = lastSeenOnline.toISOString();
-        await this.activeSessionLocalStorage.set(userActiveSessionEntity);
-      } catch (error) {
-        console.error(error);
-        const userActiveSessionEntity = await this._createDefaultUserActiveSession();
-        // Update the date, even if there is an error
-        userActiveSessionEntity.lastSeenOnline = lastSeenOnline.toISOString();
-        await this.activeSessionLocalStorage.set(userActiveSessionEntity);
-      }
-    });
+    await this.updateSessionTimestampsService.updateOnOfflineLogin();
   }
 }

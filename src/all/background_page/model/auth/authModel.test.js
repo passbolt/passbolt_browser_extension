@@ -15,7 +15,7 @@ import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiC
 import AuthModel from "../../model/auth/authModel";
 import AuthLogoutService from "passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService";
 import PostLogoutService from "../../service/auth/postLogoutService";
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 import AccountEntity from "../entity/account/accountEntity";
 import { defaultAccountDto } from "../entity/account/accountEntity.test.data";
 
@@ -33,7 +33,7 @@ describe("AuthModel", () => {
 
       const logoutServiceSpy = jest.spyOn(AuthLogoutService.prototype, "logout").mockImplementation(() => {});
       const resetAuthenticationSpy = jest
-        .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "resetAuthentication")
+        .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "resetAuthentication")
         .mockResolvedValue();
       const postLogoutSpy = jest.spyOn(PostLogoutService, "exec");
 

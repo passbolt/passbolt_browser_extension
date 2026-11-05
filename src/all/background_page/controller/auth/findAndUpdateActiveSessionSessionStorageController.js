@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         6.0.0
  */
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 
-class FindAndUpdateActiveSessionLocalStorageController {
+class FindAndUpdateActiveSessionSessionStorageController {
   /**
-   * FindAndUpdateActiveSessionLocalStorageController Constructor
+   * FindAndUpdateActiveSessionSessionStorageController Constructor
    *
    * @param {Worker} worker
    * @param {string} requestId
@@ -25,7 +25,7 @@ class FindAndUpdateActiveSessionLocalStorageController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    this.findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
@@ -50,8 +50,8 @@ class FindAndUpdateActiveSessionLocalStorageController {
    * @returns {Promise<UserActiveSessionEntity>}
    */
   async exec() {
-    return await this.findAndUpdateActiveSessionLocalStorageService.findAndUpdateAuthenticationStatus();
+    return await this.findAndUpdateActiveSessionSessionStorageService.findAndUpdateAuthenticationStatus();
   }
 }
 
-export default FindAndUpdateActiveSessionLocalStorageController;
+export default FindAndUpdateActiveSessionSessionStorageController;

@@ -12,10 +12,7 @@
  * @since         5.13.0
  */
 
-import PostLogoutService from "../../service/auth/postLogoutService";
-import SessionCookieFlushService from "../../service/auth/sessionCookieFlushService";
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
-import OfflineSessionExpiryAlarmService from "../../service/auth/offlineSessionExpiryAlarmService";
+import LocalLogoutService from "../../service/auth/localLogoutService";
 
 class AuthLocalLogoutController {
   /**
@@ -28,11 +25,7 @@ class AuthLocalLogoutController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
-      account,
-      apiClientOptions,
-    );
-    this.sessionCookieFlushSrvice = new SessionCookieFlushService(account);
+    this.localLogoutService = new LocalLogoutService(account, apiClientOptions);
   }
 
   /**
@@ -54,11 +47,7 @@ class AuthLocalLogoutController {
    * @return {Promise<void>}
    */
   async exec() {
-    await this.sessionCookieFlushSrvice.flush();
-    await this.findAndUpdateActiveSessionLocalStorageService.resetAuthentication();
-    // clear offline alarm if any
-    await OfflineSessionExpiryAlarmService.clearAlarm();
-    await PostLogoutService.exec();
+    await this.localLogoutService.exec();
   }
 }
 

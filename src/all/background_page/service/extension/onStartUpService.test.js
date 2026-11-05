@@ -20,7 +20,7 @@ import { BrowserExtensionIconService } from "../ui/browserExtensionIcon.service"
 import GetActiveAccountService from "../account/getActiveAccountService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -54,13 +54,13 @@ describe("OnStartUpService", () => {
       jest.spyOn(LocalStorageService, "flush");
       jest.spyOn(BrowserExtensionIconService, "deactivate");
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
-      jest.spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "resetAuthentication");
+      jest.spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "resetAuthentication");
       // process
       await OnStartUpService.exec();
       // expectation
       expect(LocalStorageService.flush).toHaveBeenCalledTimes(1);
       expect(BrowserExtensionIconService.deactivate).toHaveBeenCalledTimes(1);
-      expect(FindAndUpdateActiveSessionLocalStorageService.prototype.resetAuthentication).toHaveBeenCalledTimes(1);
+      expect(FindAndUpdateActiveSessionSessionStorageService.prototype.resetAuthentication).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         6.0.0
  */
-import ActiveSessionLocalStorage from "../local_storage/activeSessionLocalStorage";
+import ActiveSessionSessionStorage from "../session_storage/activeSessionSessionStorage";
 import UserActiveSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
-import FindAndUpdateActiveSessionLocalStorageService from "./findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "./findAndUpdateActiveSessionSessionStorageService";
 
 /**
  * The service aims to find a user active session.
@@ -26,8 +26,8 @@ export default class GetOrFindActiveSessionService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
-    this.activeSessionLocalStorage = new ActiveSessionLocalStorage(account);
-    this.findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    this.activeSessionSessionStorage = new ActiveSessionSessionStorage(account);
+    this.findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
@@ -39,8 +39,8 @@ export default class GetOrFindActiveSessionService {
    * @returns {Promise<UserActiveSessionEntity>}
    */
   async getOrFind() {
-    const hasRuntimeCache = this.activeSessionLocalStorage.hasCachedData();
-    const userActiveSessionDto = await this.activeSessionLocalStorage.get();
+    const hasRuntimeCache = this.activeSessionSessionStorage.hasCachedData();
+    const userActiveSessionDto = await this.activeSessionSessionStorage.get();
     // Return local storage data if the storage was initialized.
     if (userActiveSessionDto) {
       try {
@@ -49,11 +49,11 @@ export default class GetOrFindActiveSessionService {
       } catch (error) {
         console.error(error);
         // If any validation error, retrieve or create a default user active session and update the local storage.
-        return await this.findAndUpdateActiveSessionLocalStorageService.findAndUpdateAuthenticationStatus();
+        return await this.findAndUpdateActiveSessionSessionStorageService.findAndUpdateAuthenticationStatus();
       }
     }
 
     // Otherwise retrieve the user active session and update the local storage.
-    return await this.findAndUpdateActiveSessionLocalStorageService.findAndUpdateAuthenticationStatus();
+    return await this.findAndUpdateActiveSessionSessionStorageService.findAndUpdateAuthenticationStatus();
   }
 }

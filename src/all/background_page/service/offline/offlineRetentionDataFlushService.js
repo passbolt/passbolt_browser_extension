@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         6.0.0
  */
-import GetOrFindActiveSessionService from "../activeSession/getOrFindActiveSessionService";
 import GetOrFindOfflineSettingsService from "./getOrFindOfflineSettingsService";
 import MetadataKeyOPFSStorage from "../opfsStorage/metadataKeyOPFSStorage";
 import OfflineResourcesOPFSStorage from "../opfsStorage/offlineResourcesOPFSStorage";
 import OfflineSecretsOPFSStorage from "../opfsStorage/offlineSecretsOPFSStorage";
+import GetSessionTimestampsService from "../sessionTimestamps/getSessionTimestampsService";
 
 /**
  * Flush offline data if time is exceeded.
@@ -28,7 +28,7 @@ export default class OfflineRetentionDataFlushService {
    * @param {ApiClientOptions} apiClientOptions The api client options.
    */
   constructor(account, apiClientOptions) {
-    this.getOrFindActiveSessionService = new GetOrFindActiveSessionService(account, apiClientOptions);
+    this.getSessionTimestampsService = new GetSessionTimestampsService(account, apiClientOptions);
     this.getOrFindOfflineSettingsService = new GetOrFindOfflineSettingsService(account, apiClientOptions);
     this.metadataKeyOPFSStorage = new MetadataKeyOPFSStorage(account);
     this.offlineResourcesOPFSStorage = new OfflineResourcesOPFSStorage(account);
@@ -42,18 +42,21 @@ export default class OfflineRetentionDataFlushService {
    */
   async flushIfExceeded() {
     try {
-      const userActiveSessionEntity = await this.getOrFindActiveSessionService.getOrFind();
+      const sessionTimestampsEntity = await this.getSessionTimestampsService.get();
       const offlineSettingsEntity = await this.getOrFindOfflineSettingsService.getOrFind();
 
-      if (userActiveSessionEntity.lastSeenOnline == null || offlineSettingsEntity === null) {
+      if (offlineSettingsEntity === null) {
         return;
       }
 
-      // Create the date (last seen online + maximum retention period in days) to compare with now
-      const retentionPeriodDate = new Date(userActiveSessionEntity.lastSeenOnline);
-      retentionPeriodDate.setDate(retentionPeriodDate.getDate() + offlineSettingsEntity.maximumRetentionPeriod);
-
-      const isExpired = retentionPeriodDate.getTime() < Date.now();
+      // A missing last seen online date counts as expired.
+      let isExpired = !sessionTimestampsEntity?.lastSeenOnline;
+      if (!isExpired) {
+        // Create the date (last seen online + maximum retention period in days) to compare with now
+        const retentionPeriodDate = new Date(sessionTimestampsEntity.lastSeenOnline);
+        retentionPeriodDate.setDate(retentionPeriodDate.getDate() + offlineSettingsEntity.maximumRetentionPeriod);
+        isExpired = retentionPeriodDate.getTime() < Date.now();
+      }
       if (isExpired) {
         // Keep a trace if any error happen during the flush
         const logErrorFlushOPFSStorage = (settledResults) => {

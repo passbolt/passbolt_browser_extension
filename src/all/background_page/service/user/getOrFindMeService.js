@@ -16,6 +16,7 @@ import UserMeLocalStorage from "../local_storage/userMeLocalStorage";
 import UserEntity from "../../model/entity/user/userEntity";
 import GetOrFindSiteSettingsService from "../siteSettings/getOrFindSiteSettingsService";
 import GetOrFindActiveSessionService from "../activeSession/getOrFindActiveSessionService";
+import GetSessionTimestampsService from "../sessionTimestamps/getSessionTimestampsService";
 
 /**
  * The service aims to get user me from the local storage if it is set, or retrieve them from the API and
@@ -33,6 +34,7 @@ class GetOrFindMeService {
     this.getOrFindSiteSettingsService = new GetOrFindSiteSettingsService(account, apiClientOptions);
     this.userMeLocalStorageService = new UserMeLocalStorage(account);
     this.getOrFindActiveSessionService = new GetOrFindActiveSessionService(account, apiClientOptions);
+    this.getSessionTimestampsService = new GetSessionTimestampsService(account);
   }
 
   /**
@@ -43,11 +45,12 @@ class GetOrFindMeService {
   async getOrFindMe(refreshCache = false) {
     if (!refreshCache) {
       const activeSession = await this.getOrFindActiveSessionService.getOrFind();
+      const lastLoggedIn = (await this.getSessionTimestampsService.get())?.lastLoggedIn;
       // Only an online session with a server reachable refreshes stale data; an offline session cannot reach the API.
       const isStale =
         activeSession.isSessionOnline &&
         activeSession.isServerReachable &&
-        (await this.userMeLocalStorageService.isStaleSinceLastLoggedIn(activeSession.lastLoggedIn));
+        (await this.userMeLocalStorageService.isStaleSinceLastLoggedIn(lastLoggedIn));
       if (!isStale) {
         const userDto = await this.userMeLocalStorageService.getData();
         if (typeof userDto !== "undefined") {

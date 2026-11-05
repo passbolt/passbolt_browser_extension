@@ -14,7 +14,7 @@
 import toolbarService from "../toolbar/toolbarService";
 import PostLoginService from "./postLoginService";
 import OfflineSessionExpiryAlarmService from "./offlineSessionExpiryAlarmService";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import FindAndUpdateMetadataKeysSessionStorageFromOPFSService from "../metadata/findAndUpdateMetadataKeysSessionStorageFromOPFSService";
 
@@ -28,7 +28,7 @@ class PostLoginOfflineService {
    */
   constructor(account, apiClientOptions) {
     this.account = account;
-    this.findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    this.findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
@@ -44,7 +44,7 @@ class PostLoginOfflineService {
    */
   async exec(passphrase, sessionDuration) {
     await PassphraseStorageService.set(passphrase, sessionDuration);
-    await this.findAndUpdateActiveSessionLocalStorageService.authenticateOffline();
+    await this.findAndUpdateActiveSessionSessionStorageService.authenticateOffline();
     await this.findAndUpdateMetadataKeysSessionStorageFromOPFSService.findAndUpdateAll();
     await OfflineSessionExpiryAlarmService.scheduleSessionExpiry(this.account, sessionDuration);
     // Safe subset shared with the online flow (no server dependency).

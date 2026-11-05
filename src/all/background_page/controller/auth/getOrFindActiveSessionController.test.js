@@ -24,19 +24,19 @@ beforeEach(() => {
 });
 
 describe("GetOrFindActiveSessionController", () => {
-  it("Should call findAndUpdateActiveSessionLocalStorageService if there is no active session in the local storage", async () => {
+  it("Should call findAndUpdateActiveSessionSessionStorageService if there is no active session in the local storage", async () => {
     expect.assertions(3);
 
     const account = new AccountEntity(defaultAccountDto());
     const controller = new GetOrFindActiveSessionController(null, null, defaultApiClientOptions(), account);
 
     jest
-      .spyOn(controller.getOrFindActiveSessionService.activeSessionLocalStorage, "get")
+      .spyOn(controller.getOrFindActiveSessionService.activeSessionSessionStorage, "get")
       .mockImplementation(() => undefined);
-    jest.spyOn(controller.getOrFindActiveSessionService.activeSessionLocalStorage, "flush");
+    jest.spyOn(controller.getOrFindActiveSessionService.activeSessionSessionStorage, "flush");
     jest
       .spyOn(
-        controller.getOrFindActiveSessionService.findAndUpdateActiveSessionLocalStorageService,
+        controller.getOrFindActiveSessionService.findAndUpdateActiveSessionSessionStorageService,
         "findAndUpdateAuthenticationStatus",
       )
       .mockImplementation(
@@ -48,8 +48,8 @@ describe("GetOrFindActiveSessionController", () => {
 
     const authStatus = await controller.exec();
 
-    expect(controller.getOrFindActiveSessionService.activeSessionLocalStorage.get).toHaveBeenCalledTimes(1);
-    expect(controller.getOrFindActiveSessionService.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
+    expect(controller.getOrFindActiveSessionService.activeSessionSessionStorage.get).toHaveBeenCalledTimes(1);
+    expect(controller.getOrFindActiveSessionService.activeSessionSessionStorage.flush).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual(
       new UserActiveSessionEntity(
         minimalUserActiveSessionDto({
@@ -68,20 +68,20 @@ describe("GetOrFindActiveSessionController", () => {
     const controller = new GetOrFindActiveSessionController(null, null, defaultApiClientOptions(), account);
 
     jest
-      .spyOn(controller.getOrFindActiveSessionService.activeSessionLocalStorage, "get")
+      .spyOn(controller.getOrFindActiveSessionService.activeSessionSessionStorage, "get")
       .mockImplementation(() => minimalUserActiveSessionDto({ is_mfa_required: false, is_server_reachable: true }));
-    jest.spyOn(controller.getOrFindActiveSessionService.activeSessionLocalStorage, "flush");
+    jest.spyOn(controller.getOrFindActiveSessionService.activeSessionSessionStorage, "flush");
     jest.spyOn(
-      controller.getOrFindActiveSessionService.findAndUpdateActiveSessionLocalStorageService,
+      controller.getOrFindActiveSessionService.findAndUpdateActiveSessionSessionStorageService,
       "findAndUpdateAuthenticationStatus",
     );
 
     const authStatus = await controller.exec();
 
-    expect(controller.getOrFindActiveSessionService.activeSessionLocalStorage.get).toHaveBeenCalledTimes(1);
-    expect(controller.getOrFindActiveSessionService.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
+    expect(controller.getOrFindActiveSessionService.activeSessionSessionStorage.get).toHaveBeenCalledTimes(1);
+    expect(controller.getOrFindActiveSessionService.activeSessionSessionStorage.flush).not.toHaveBeenCalled();
     expect(
-      controller.getOrFindActiveSessionService.findAndUpdateActiveSessionLocalStorageService
+      controller.getOrFindActiveSessionService.findAndUpdateActiveSessionSessionStorageService
         .findAndUpdateAuthenticationStatus,
     ).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual(
@@ -94,10 +94,10 @@ describe("GetOrFindActiveSessionController", () => {
       ),
     );
 
-    await controller.getOrFindActiveSessionService.activeSessionLocalStorage.flush();
+    await controller.getOrFindActiveSessionService.activeSessionSessionStorage.flush();
   });
 
-  it("should call findAndUpdateActiveSessionLocalStorageService if there is any error during the entity validation", async () => {
+  it("should call findAndUpdateActiveSessionSessionStorageService if there is any error during the entity validation", async () => {
     expect.assertions(4);
     const expectedAuthStatus = minimalUserActiveSessionDto({
       is_authenticated: false,
@@ -108,11 +108,13 @@ describe("GetOrFindActiveSessionController", () => {
 
     const controller = new GetOrFindActiveSessionController(null, null, defaultApiClientOptions(), account);
 
-    jest.spyOn(controller.getOrFindActiveSessionService.activeSessionLocalStorage, "get").mockImplementation(() => {});
-    jest.spyOn(controller.getOrFindActiveSessionService.activeSessionLocalStorage, "flush");
+    jest
+      .spyOn(controller.getOrFindActiveSessionService.activeSessionSessionStorage, "get")
+      .mockImplementation(() => {});
+    jest.spyOn(controller.getOrFindActiveSessionService.activeSessionSessionStorage, "flush");
     jest
       .spyOn(
-        controller.getOrFindActiveSessionService.findAndUpdateActiveSessionLocalStorageService,
+        controller.getOrFindActiveSessionService.findAndUpdateActiveSessionSessionStorageService,
         "findAndUpdateAuthenticationStatus",
       )
       .mockImplementation(
@@ -124,10 +126,10 @@ describe("GetOrFindActiveSessionController", () => {
 
     const authStatus = await controller.exec();
 
-    expect(controller.getOrFindActiveSessionService.activeSessionLocalStorage.get).toHaveBeenCalledTimes(1);
-    expect(controller.getOrFindActiveSessionService.activeSessionLocalStorage.flush).not.toHaveBeenCalled();
+    expect(controller.getOrFindActiveSessionService.activeSessionSessionStorage.get).toHaveBeenCalledTimes(1);
+    expect(controller.getOrFindActiveSessionService.activeSessionSessionStorage.flush).not.toHaveBeenCalled();
     expect(
-      controller.getOrFindActiveSessionService.findAndUpdateActiveSessionLocalStorageService
+      controller.getOrFindActiveSessionService.findAndUpdateActiveSessionSessionStorageService
         .findAndUpdateAuthenticationStatus,
     ).toHaveBeenCalledTimes(1);
     expect(authStatus.toDto()).toStrictEqual(expectedAuthStatus);

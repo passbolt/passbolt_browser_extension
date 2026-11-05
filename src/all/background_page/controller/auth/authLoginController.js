@@ -22,7 +22,7 @@ import PostLoginService from "../../service/auth/postLoginService";
 import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginChallengeService";
 import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 import GetOrFindActiveSessionService from "../../service/activeSession/getOrFindActiveSessionService";
-import ActiveSessionLocalStorage from "../../service/local_storage/activeSessionLocalStorage";
+import ActiveSessionSessionStorage from "../../service/session_storage/activeSessionSessionStorage";
 
 class AuthLoginController {
   /**
@@ -42,7 +42,7 @@ class AuthLoginController {
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
     this.userRememberMeLatestChoiceLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
     this.getOrFindActiveSessionService = new GetOrFindActiveSessionService(account, apiClientOptions);
-    this.activeSessionLocalStorage = new ActiveSessionLocalStorage(account);
+    this.activeSessionSessionStorage = new ActiveSessionSessionStorage(account);
   }
 
   /**

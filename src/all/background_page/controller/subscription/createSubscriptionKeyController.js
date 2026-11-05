@@ -15,7 +15,7 @@
 import UpdateSubscriptionEntity from "../../model/entity/subscription/update/updateSubscriptionEntity";
 import PostLogoutService from "../../service/auth/postLogoutService";
 import CreateSubscriptionKeyService from "../../service/subscription/createSubscriptionKeyService";
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 
 export default class CreateSubscriptionKeyController {
   /**
@@ -30,7 +30,7 @@ export default class CreateSubscriptionKeyController {
     this.requestId = requestId;
 
     this.createSubscriptionService = new CreateSubscriptionKeyService(apiClientOptions);
-    this.findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    this.findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
@@ -63,7 +63,7 @@ export default class CreateSubscriptionKeyController {
     const subscriptionEntity = await this.createSubscriptionService.create(subscriptionKeyEntity);
 
     // Mark the active session as signed out, before the post-logout cleanup flushes the storages.
-    await this.findAndUpdateActiveSessionLocalStorageService.resetAuthentication();
+    await this.findAndUpdateActiveSessionSessionStorageService.resetAuthentication();
     await PostLogoutService.exec();
 
     return subscriptionEntity;

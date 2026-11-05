@@ -13,7 +13,6 @@
  */
 
 import { enableFetchMocks } from "jest-fetch-mock";
-import User from "../../model/user";
 import AccountRecoverySaveUserSettingsController from "./accountRecoverySaveUserSettingController";
 import AccountRecoveryUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import {
@@ -43,7 +42,8 @@ beforeEach(async () => {
 describe("AccountRecoverySaveUserSettingsController", () => {
   describe("AccountRecoverySaveUserSettingsController::exec", () => {
     it("Should save a rejected account recovery user setting.", async () => {
-      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions(), account);
 
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
@@ -51,7 +51,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       fetch.doMockOnce(async (req) => mockApiResponse(JSON.parse(await req.text())));
 
       const accountRecoveryUserSettingDto = createRejectedAccountRecoveryUserSettingDto({
-        user_id: User.getInstance().get().id,
+        user_id: account.userId,
       });
       const savedAccountRecoveryUserSetting = await controller.exec(accountRecoveryUserSettingDto);
 
@@ -74,7 +74,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       fetch.doMockOnce(async (req) => mockApiResponse(JSON.parse(await req.text())));
 
       const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({
-        user_id: User.getInstance().get().id,
+        user_id: account.userId,
       });
       const savedAccountRecoveryUserSetting = await controller.exec(accountRecoveryUserSettingDto);
 
@@ -91,7 +91,8 @@ describe("AccountRecoverySaveUserSettingsController", () => {
     });
 
     it("Should throw an error if no account recovery organization policy is found.", async () => {
-      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions(), account);
 
       // Mock user passphrase capture.
       controller.getPassphraseService.requestPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
@@ -99,7 +100,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       fetch.doMockOnce(() => mockApiResponse(null));
 
       const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({
-        user_id: User.getInstance().get().id,
+        user_id: account.userId,
       });
       const result = controller.exec(accountRecoveryUserSettingDto);
 
@@ -108,7 +109,8 @@ describe("AccountRecoverySaveUserSettingsController", () => {
     });
 
     it("Should throw an error if the account recovery organization policy is disabled.", async () => {
-      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions(), account);
 
       // Mock user passphrase capture.
       controller.getPassphraseService.requestPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
@@ -116,7 +118,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       fetch.doMockOnce(() => mockApiResponse(disabledAccountRecoveryOrganizationPolicyDto()));
 
       const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({
-        user_id: User.getInstance().get().id,
+        user_id: account.userId,
       });
       const result = controller.exec(accountRecoveryUserSettingDto);
 

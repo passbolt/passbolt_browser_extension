@@ -83,8 +83,8 @@ class AppBootstrap extends Pagemod {
    */
   async assertUrlAttachConstraint(frameDetails) {
     try {
-      await GetActiveAccountService.get();
-      return ParseAppUrlService.test(frameDetails.url);
+      const account = await GetActiveAccountService.get();
+      return ParseAppUrlService.test(account, frameDetails.url);
     } catch (error) {
       console.log(error);
       return false;

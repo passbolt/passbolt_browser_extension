@@ -80,7 +80,7 @@
     "dev:watch:build:chromium-mv3": "npm run dev:build:chromium-mv3 -- -w",
     "dev:watch:build:safari": "npm run dev:build:safari -- -w",
     "lint": "npm run lint:lockfile && npm run lint:eslint",
-    "lint:lockfile": "lockfile-lint --path package-lock.json --allowed-hosts npm --allowed-schemes \"https:\" --empty-hostname false",
+    "lint:lockfile": "lockfile-lint --path package-lock.json --allowed-hosts npm --allowed-schemes \"https:\" --empty-hostname false --validate-integrity-strict",
     "lint:eslint": "eslint src --max-warnings 0",
     "lint:eslint-fix": "eslint --fix src",
     "test": "npm run test:unit",

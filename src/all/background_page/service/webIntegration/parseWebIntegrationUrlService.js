@@ -11,30 +11,35 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.10.0
  */
-import User from "../../model/user";
+import { assertString, assertType } from "../../utils/assertions";
+import AccountEntity from "../../model/entity/account/accountEntity";
 
 class ParseWebIntegrationUrlService {
   /**
    * Get regex to check URI validity
+   * @param {AccountEntity} account The account
    * @returns {RegExp}
    */
-  static get regex() {
-    const user = User.getInstance();
-    const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
+  static getRegex(account) {
+    assertType(account, AccountEntity);
+    const escapedDomain = account.domain.replace(/\W/g, "\\$&");
     // Regex to check this is not our domain or chrome and about page
     return new RegExp(`^(?!(${escapedDomain}|chrome:|about:|https:\\/\\/(www\\.passbolt|mail\\.google)\\.com)).*$`);
   }
 
   /**
    * Test regex with the url.
+   * @param {AccountEntity} account The account
    * @param {string} url The url to test.
    * @returns {boolean}
    */
-  static test(url) {
+  static test(account, url) {
+    assertType(account, AccountEntity);
+    assertString(url);
     try {
       // Check if the url is valid
       new URL(url);
-      return this.regex.test(url);
+      return this.getRegex(account).test(url);
     } catch {
       return false;
     }

@@ -13,14 +13,12 @@
  */
 
 import ParseWebIntegrationUrlService from "./parseWebIntegrationUrlService";
-import { Config } from "../../model/config";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
 describe("ParseWebIntegrationUrlService", () => {
-  const domain = "https://passbolt.dev";
-
-  beforeEach(() => {
-    Config.write("user.settings.trustedDomain", domain);
-  });
+  const domain = "https://passbolt.local";
+  const account = new AccountEntity(defaultAccountDto());
 
   describe("ParseWebIntegrationUrlService:test", () => {
     describe.each([
@@ -30,14 +28,14 @@ describe("ParseWebIntegrationUrlService", () => {
       { scenario: "Web page with no domain", url: "https://auth/login" },
     ])("should parse", (_props) => {
       it(`should match: ${_props.scenario}`, () => {
-        const parseResult = ParseWebIntegrationUrlService.test(_props.url);
+        const parseResult = ParseWebIntegrationUrlService.test(account, _props.url);
         expect.assertions(1);
         expect(parseResult).toBeTruthy();
       });
     });
 
     describe.each([
-      { scenario: "No protocol given", url: "passbolt.dev/auth/login" },
+      { scenario: "No protocol given", url: "passbolt.local/auth/login" },
       { scenario: "Passbolt domain", url: domain },
       { scenario: "Chrome page", url: "chrome://settings/" },
       { scenario: "Blank page", url: "about:blank" },
@@ -46,7 +44,7 @@ describe("ParseWebIntegrationUrlService", () => {
       { scenario: "gmail page", url: "https://mail.google.com/" },
     ])("should not parse", (_props) => {
       it(`should not match: ${_props.scenario}`, () => {
-        const parseResult = ParseWebIntegrationUrlService.test(_props.url);
+        const parseResult = ParseWebIntegrationUrlService.test(account, _props.url);
         expect.assertions(1);
         expect(parseResult).toBeFalsy();
       });

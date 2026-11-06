@@ -12,7 +12,6 @@
  * @since         2.0.0
  */
 
-import User from "../model/user";
 import GetExtensionVersionController from "../controller/extension/getExtensionVersionController";
 import { Config } from "../model/config";
 
@@ -41,17 +40,6 @@ const listen = function (worker) {
       conf[names[i]] = Config.read(names[i]);
     }
     worker.port.emit(requestId, "SUCCESS", conf);
-  });
-
-  /*
-   * Check if the plugin is well configured
-   *
-   * @listens passbolt.addon.is-configured
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on("passbolt.addon.is-configured", (requestId) => {
-    const user = User.getInstance();
-    worker.port.emit(requestId, "SUCCESS", user.isValid());
   });
 
   /*

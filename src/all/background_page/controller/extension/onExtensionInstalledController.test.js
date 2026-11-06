@@ -103,6 +103,7 @@ describe("OnExtensionInstalledController", () => {
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => Promise.resolve(tabs));
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => false);
       // process
       await OnExtensionInstalledController.exec(details);
       // expectation
@@ -194,11 +195,10 @@ describe("OnExtensionInstalledController", () => {
   });
 
   describe("OnExtensionInstalledController::signOutIfAuthenticated", () => {
-    const appTab = { id: 1, url: "https://passbolt.dev/app/passwords" };
+    const appTab = { id: 1, url: "https://passbolt.local/app/passwords" };
 
     beforeEach(() => {
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       jest.spyOn(browser.tabs, "query").mockImplementation(() => Promise.resolve([appTab]));
       jest.spyOn(browser.tabs, "reload");

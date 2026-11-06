@@ -15,7 +15,6 @@ import { BrowserExtensionIconService } from "../ui/browserExtensionIcon.service"
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import GetActiveAccountService from "../account/getActiveAccountService";
 import GetOrFindResourcesService from "../resource/getOrFindResourcesService";
-import User from "../../../../all/background_page/model/user";
 import OpenWebsiteGettingStartedPageService from "../ui/openWebsiteGettingStartedPageService";
 import OpenTrustedDomainTabService from "../ui/openTrustedDomainTabService";
 import GetOrFindActiveSessionService from "../activeSession/getOrFindActiveSessionService";
@@ -62,9 +61,8 @@ class ToolbarService {
       return;
     }
 
-    const user = User.getInstance();
-    if (!user.isValid()) {
-      // if the user is not set, a tab on passbolt start page is opened
+    if (!(await this.hasAccount())) {
+      // if the account is not set, a tab on passbolt start page is opened
       await this.openGettingStartedPage();
       return;
     }
@@ -129,9 +127,8 @@ class ToolbarService {
    * The event is called by the browser only if no quickaccess popup URL is set (neither from the manifest nor in script).
    */
   async handleIconToolbarClicked() {
-    const user = User.getInstance();
-    if (!user.isValid()) {
-      // if the user is not set, a tab on passbolt start page is opened
+    if (!(await this.hasAccount())) {
+      // if the account is not set, a tab on passbolt start page is opened
       await this.openGettingStartedPage();
       return;
     }
@@ -139,6 +136,20 @@ class ToolbarService {
     // if the user account is set, sets the QA popup to the expected URL and open it.
     this.setQuickaccessPopup();
     browserAction?.openPopup(); // 'openPopup' is not available in Edge
+  }
+
+  /**
+   * Has an account configured.
+   * @returns {Promise<boolean>}
+   * @private
+   */
+  async hasAccount() {
+    try {
+      await GetActiveAccountService.get();
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /**

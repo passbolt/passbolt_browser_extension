@@ -30,6 +30,7 @@ import CsvDashlaneRowParser from "./csvRowParser/csvDashlaneRowParser";
 import CsvMozillaPlatformRowParser from "./csvRowParser/csvMozillaPlatformRowParser";
 import CsvNordpassRowParser from "./csvRowParser/csvNordpassRowParser";
 import CsvLogMeOnceRowParser from "./csvRowParser/csvLogMeOnceRowParser";
+import CsvNetwrixRowParser from "./csvRowParser/csvNetwrixRowParser";
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto,
@@ -40,6 +41,7 @@ import {
   defaultMetadataTypesSettingsV50FreshDto,
 } from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity.test.data";
 import MetadataTypesSettingsEntity from "passbolt-styleguide/src/shared/models/entity/metadata/metadataTypesSettingsEntity";
+import { netwrixCsvFile } from "../../entity/import/importResourcesFileEntity.test.data";
 
 describe("ResourcesCsvImportParser", () => {
   let resourceTypesCollection;
@@ -50,7 +52,7 @@ describe("ResourcesCsvImportParser", () => {
   });
 
   it("should be aware of the supported row parsers", () => {
-    expect(ResourcesCsvImportParser.register).toHaveLength(10);
+    expect(ResourcesCsvImportParser.register).toHaveLength(11);
     const supportedRowParsers = [
       Csv1PasswordRowParser,
       CsvKdbxRowParser,
@@ -62,6 +64,7 @@ describe("ResourcesCsvImportParser", () => {
       CsvMozillaPlatformRowParser,
       CsvNordpassRowParser,
       CsvLogMeOnceRowParser,
+      CsvNetwrixRowParser,
     ];
     expect(ResourcesCsvImportParser.register).toEqual(expect.arrayContaining(supportedRowParsers));
   });
@@ -130,6 +133,21 @@ describe("ResourcesCsvImportParser", () => {
       const { fields } = importer.readCsv();
       const RowParser = importer.getRowParser(fields);
       expect(RowParser).toEqual(CsvKdbxRowParser);
+    });
+
+    it(`should determine the netwrix row parser for a semicolon separated file <${test.scenario}>`, () => {
+      expect.assertions(1);
+
+      const importDto = {
+        ref: "import-ref",
+        file_type: "csv",
+        file: btoa(BinaryConvert.toBinary(netwrixCsvFile)),
+      };
+      const importEntity = new ImportResourcesFileEntity(importDto);
+      const importer = new ResourcesCsvImportParser(importEntity, resourceTypesCollection, test.metadataTypesSettings);
+      const { fields } = importer.readCsv();
+      const RowParser = importer.getRowParser(fields);
+      expect(RowParser).toEqual(CsvNetwrixRowParser);
     });
 
     it(`should throw an error if no row parser is identified <${test.scenario}>`, async () => {

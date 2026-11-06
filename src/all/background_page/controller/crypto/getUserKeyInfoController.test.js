@@ -23,7 +23,7 @@ import { OpenpgpAssertion } from "../../utils/openpgp/openpgpAssertions";
 
 const keyring = new Keyring();
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

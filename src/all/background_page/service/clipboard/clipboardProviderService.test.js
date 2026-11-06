@@ -14,7 +14,6 @@
 import "../../../../../test/mocks/mockNavigatorClipboard";
 import ClipboardProviderService from "./clipboardProviderService";
 import BrowserService from "../browser/browserService";
-import EdgeBackgroundPageClipboardService from "../../../../chrome/polyfill/clipboard/edgeBackgroundPageClipboardService";
 
 beforeEach(() => {
   global.customNavigatorClipboard = undefined;
@@ -29,15 +28,6 @@ describe("ClipboardProviderService", () => {
       global.customNavigatorClipboard = customNavigatorClipboard;
 
       expect(ClipboardProviderService.getClipboard()).toStrictEqual(customNavigatorClipboard);
-    });
-
-    it("should return the EdgeBackgroundPageClipboardService if not on Firefox and is on MV2", async () => {
-      expect.assertions(1);
-
-      chrome.runtime.getManifest.mockImplementation(() => ({ manifest_version: 2 }));
-      jest.spyOn(BrowserService, "isFirefox").mockImplementation(() => false);
-
-      expect(ClipboardProviderService.getClipboard()).toStrictEqual(EdgeBackgroundPageClipboardService);
     });
 
     it("should return the navigator.clipboard in every other cases: Firefox", async () => {

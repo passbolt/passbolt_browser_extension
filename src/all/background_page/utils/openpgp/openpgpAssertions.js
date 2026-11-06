@@ -141,7 +141,7 @@ const readClearMessageOrFail = async (cleartextMessage) => {
     return await openpgp.readCleartextMessage({ cleartextMessage });
   } catch (error) {
     console.error(error);
-    throw new Error(i18n.t("The message should be a valid openpgp message."));
+    throw new Error(i18n.t("The message should be a valid openpgp message."), { cause: error });
   }
 };
 

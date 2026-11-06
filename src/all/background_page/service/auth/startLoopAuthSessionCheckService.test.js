@@ -19,7 +19,8 @@ import GetActiveAccountService from "../account/getActiveAccountService";
 import UserActiveSessionEntity, {
   USER_ACTIVE_SESSION_ONLINE,
 } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
+import UpdateSessionTimestampsService from "../sessionTimestamps/updateSessionTimestampsService";
 
 jest.useFakeTimers();
 
@@ -41,15 +42,13 @@ describe("StartLoopAuthSessionCheckService", () => {
     const sessionEntity = new UserActiveSessionEntity({
       is_authenticated: true,
       is_mfa_required: false,
+      is_server_reachable: true,
       type: USER_ACTIVE_SESSION_ONLINE,
     });
     const spyIsAuthenticated = jest
-      .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
+      .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
       .mockImplementation(() => Promise.resolve(sessionEntity));
-    const spyUpdateLastSeenOnline = jest.spyOn(
-      FindAndUpdateActiveSessionLocalStorageService.prototype,
-      "updateLastSeenOnline",
-    );
+    const spyUpdateLastSeenOnline = jest.spyOn(UpdateSessionTimestampsService.prototype, "updateLastSeenOnline");
 
     //mocking top-level alarm handler
     browser.alarms.onAlarm.addListener(
@@ -75,22 +74,20 @@ describe("StartLoopAuthSessionCheckService", () => {
     expect(spyUpdateLastSeenOnline).toHaveBeenCalledTimes(2);
   });
 
-  it("should send logout event if not authenticated anymore", async () => {
+  it("should send logout event and not update the last seen online date if not authenticated anymore", async () => {
     expect.assertions(5);
     // Function mocked
     const spyClearAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
     const sessionEntity = new UserActiveSessionEntity({
       is_authenticated: false,
       is_mfa_required: false,
+      is_server_reachable: true,
       type: USER_ACTIVE_SESSION_ONLINE,
     });
     const spyIsAuthenticated = jest
-      .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus")
+      .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
       .mockImplementation(() => Promise.resolve(sessionEntity));
-    const spyUpdateLastSeenOnline = jest.spyOn(
-      FindAndUpdateActiveSessionLocalStorageService.prototype,
-      "updateLastSeenOnline",
-    );
+    const spyUpdateLastSeenOnline = jest.spyOn(UpdateSessionTimestampsService.prototype, "updateLastSeenOnline");
     const spyOnPostLogout = jest.spyOn(PostLogoutService, "exec").mockImplementation(async () => {});
 
     //mocking top-level alarm handler
@@ -109,6 +106,32 @@ describe("StartLoopAuthSessionCheckService", () => {
 
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
     expect(spyOnPostLogout).toHaveBeenCalledTimes(1);
-    expect(spyUpdateLastSeenOnline).toHaveBeenCalledTimes(1);
+    expect(spyUpdateLastSeenOnline).not.toHaveBeenCalled();
+  });
+
+  it("should not update the last seen online date if the server is not reachable", async () => {
+    expect.assertions(3);
+    // Function mocked
+    const sessionEntity = new UserActiveSessionEntity({
+      is_authenticated: true,
+      is_mfa_required: false,
+      is_server_reachable: false,
+      type: USER_ACTIVE_SESSION_ONLINE,
+    });
+    const spyIsAuthenticated = jest
+      .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus")
+      .mockImplementation(() => Promise.resolve(sessionEntity));
+    const spyUpdateLastSeenOnline = jest.spyOn(UpdateSessionTimestampsService.prototype, "updateLastSeenOnline");
+    const spyOnPostLogout = jest.spyOn(PostLogoutService, "exec").mockImplementation(async () => {});
+
+    // Process
+    await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm({
+      name: StartLoopAuthSessionCheckService.ALARM_NAME,
+    });
+
+    // Expectation
+    expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
+    expect(spyOnPostLogout).not.toHaveBeenCalled();
+    expect(spyUpdateLastSeenOnline).not.toHaveBeenCalled();
   });
 });

@@ -17,7 +17,7 @@ import { pgpKeys } from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import Keyring from "./keyring";
 import UserSettings from "./userSettings/userSettings";
 
-beforeAll(() => {
+beforeEach(() => {
   enableFetchMocks();
 });
 

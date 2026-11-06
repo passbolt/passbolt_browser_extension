@@ -17,7 +17,7 @@ import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService
 import InformCallToActionPagemod from "../../pagemod/informCallToActionPagemod";
 import WorkerService from "../worker/workerService";
 import SiteSettingsRuntimeCache from "../siteSettings/siteSettingsRuntimeCache";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 
 class PostLoginService {
   /**
@@ -30,11 +30,11 @@ class PostLoginService {
     // Clear the in-memory site settings cache so the next authenticated read refetches.
     SiteSettingsRuntimeCache.flushAll();
     // Record the online login transition (is_authenticated + login date) on the active session.
-    const findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    const findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
-    await findAndUpdateActiveSessionLocalStorageService.authenticateOnline();
+    await findAndUpdateActiveSessionSessionStorageService.authenticateOnline();
     // Start the session check first, so it never depends on the workers' ability to answer.
     await StartLoopAuthSessionCheckService.exec();
     await PostLoginService.sendLoginEventForWorkers();

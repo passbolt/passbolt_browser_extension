@@ -43,7 +43,7 @@ describe("ActionLogService", () => {
       const service = new CommentApiService(apiClientOptions, account);
       const resultDto = await service.findAll("Resource", uuidv4(), { creator: true });
 
-      expect(resultDto).toBeInstanceOf(Array);
+      expect(Array.isArray(resultDto)).toBe(true);
       expect(resultDto).toHaveLength(commentsCollection.length);
     });
 

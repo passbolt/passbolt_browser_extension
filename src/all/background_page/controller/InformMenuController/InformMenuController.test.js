@@ -28,11 +28,19 @@ import ResourcesCollection from "../../model/entity/resource/resourcesCollection
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 import ResourceMetadataEntity from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity";
 import { sortResourcesByUriMatchingScore } from "passbolt-styleguide/src/shared/utils/sortUtils";
-import { defaultResourceDto } from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import {
+  defaultResourceDto,
+  resourceStandaloneCustomFieldsDto,
+  resourceStandaloneNoteDto,
+  resourceStandaloneTotpDto,
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 import GetOrFindOfflineResourcesService from "../../service/resource/getOrFindOfflineResourcesService";
 import GetOrFindActiveSessionService from "../../service/activeSession/getOrFindActiveSessionService";
+import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
+import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
+import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import UserActiveSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
 import {
   defaultUserActiveSessionDto,
@@ -126,6 +134,42 @@ describe("InformMenuController", () => {
         noMatch.id,
       ]);
     });
+
+    it.each(["username", "password", "otp"])(
+      "Should offer only the password or TOTP resource, never a matching note or custom fields resource, for a %s field",
+      async (fieldType) => {
+        expect.assertions(2);
+        // Let the real service run against the local storage to check the resource type filtering.
+        GetOrFindResourcesService.prototype.getOrFindSuggested.mockRestore();
+
+        const matchingPassword = defaultResourceDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingTotp = resourceStandaloneTotpDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingNote = resourceStandaloneNoteDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingCustomFields = resourceStandaloneCustomFieldsDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const expectedResource = fieldType === "otp" ? matchingTotp : matchingPassword;
+
+        jest.spyOn(webIntegrationPort, "request").mockResolvedValue({ type: fieldType, value: "test" });
+        jest
+          .spyOn(ResourceLocalStorage, "get")
+          .mockResolvedValue([matchingPassword, matchingTotp, matchingNote, matchingCustomFields]);
+        jest.spyOn(ResourceTypeLocalStorage.prototype, "isStaleSinceLastLoggedIn").mockResolvedValue(false);
+        jest.spyOn(ResourceTypeLocalStorage.prototype, "getData").mockResolvedValue(resourceTypesCollectionDto());
+
+        await controller.getInitialConfiguration(requestId);
+
+        const emittedConfiguration = port.emit.mock.calls[0][2];
+        expect(port.emit).toHaveBeenCalledWith(requestId, "SUCCESS", expect.anything());
+        expect(emittedConfiguration.suggestedResources.map((resource) => resource.id)).toEqual([expectedResource.id]);
+      },
+    );
 
     it("Should catch and emit ERROR when WorkerService throws an error", async () => {
       expect.assertions(1);

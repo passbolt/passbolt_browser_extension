@@ -28,7 +28,7 @@ module.exports = function buildPassboltEnvPlugin() {
   const isDevelopment = process.env.NODE_ENV === "development";
 
   if (isDevelopment) {
-    require("dotenv").config({ path: path.resolve(__dirname, "..", ".env") });
+    require("dotenv").config({ path: path.resolve(__dirname, "..", ".env"), quiet: true });
   } else {
     // Strip any inherited shell value so EnvironmentPlugin falls back to defaults.
     for (const key of PASSBOLT_ENV_KEYS) {

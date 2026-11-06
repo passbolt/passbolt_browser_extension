@@ -58,10 +58,36 @@ export default class GetOrFindOfflineResourcesService {
   /**
    * Returns the possible resources to suggest given an url.
    * @param {string} url The url to suggest for.
-   * @param {"username"|"password"|"otp" | null} fieldType The field type to suggest for
+   * @param {"username"|"password"|"otp"} fieldType The field type to suggest for
    * @return {Promise<ResourcesCollection>}
    */
-  async getOrFindSuggested(url, fieldType = null) {
+  async getOrFindSuggested(url, fieldType) {
+    const filterResourceTypes =
+      fieldType === "otp"
+        ? (resourceTypes) => resourceTypes.filterByTOTPResourceTypes()
+        : (resourceTypes) => resourceTypes.filterByPasswordResourceTypes();
+    return this._getOrFindSuggestedByResourceTypes(url, filterResourceTypes);
+  }
+
+  /**
+   * Returns the resources to suggest given an url, restricted to the resource types the quick access supports.
+   * @param {string} url The url to suggest for.
+   * @return {Promise<ResourcesCollection>}
+   */
+  async getOrFindSuggestedForQuickAccess(url) {
+    return this._getOrFindSuggestedByResourceTypes(url, (resourceTypes) =>
+      resourceTypes.filterByQuickAccessResourceTypes(),
+    );
+  }
+
+  /**
+   * Returns the possible resources to suggest given an url, restricted to the given resource types filter.
+   * @param {string} url The url to suggest for.
+   * @param {function(ResourceTypesCollection): void} filterResourceTypes The filter to apply on the resource types.
+   * @return {Promise<ResourcesCollection>}
+   * @private
+   */
+  async _getOrFindSuggestedByResourceTypes(url, filterResourceTypes) {
     if (!url) {
       return new ResourcesCollection([]);
     }
@@ -69,14 +95,8 @@ export default class GetOrFindOfflineResourcesService {
     const resourcesCollection = await this.getOrFindAll();
     const resourceTypesCollection = await this.getOrFindResourceTypesService.getOrFindAll();
 
-    // Filter resource types according to what we need
-    if (fieldType === null) {
-      resourceTypesCollection.filterByPasswordAndTOTPResourceTypes();
-    } else if (fieldType === "otp") {
-      resourceTypesCollection.filterByTOTPResourceTypes();
-    } else {
-      resourceTypesCollection.filterByPasswordResourceTypes();
-    }
+    // Filter resource types according to what we need.
+    filterResourceTypes(resourceTypesCollection);
 
     // Filter by resource types.
     resourcesCollection.filterByResourceTypes(resourceTypesCollection);

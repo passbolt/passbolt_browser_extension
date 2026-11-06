@@ -97,7 +97,7 @@ describe("FormDataUtils", () => {
       const arrayObject = await FormDataUtils.formDataToArray(formData);
       const formDataReceived = FormDataUtils.arrayToFormData(arrayObject);
       // expectations
-      expect(formData).toStrictEqual(formDataReceived);
+      expect(await FormDataUtils.formDataToArray(formDataReceived)).toStrictEqual(arrayObject);
     });
   });
 });

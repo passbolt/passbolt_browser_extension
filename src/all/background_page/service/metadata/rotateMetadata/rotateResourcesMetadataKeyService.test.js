@@ -38,10 +38,10 @@ import GetOrFindResourceTypesService from "../../resourceType/getOrFindResourceT
 describe("RotateResourcesMetadataKeyService", () => {
   let account, metadataKeysDtos;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
 
-    MockExtension.withConfiguredAccount();
+    await MockExtension.withConfiguredAccount();
     account = new AccountEntity(defaultAccountDto());
     metadataKeysDtos = [
       ...defaultDecryptedSharedMetadataKeysDtos(),

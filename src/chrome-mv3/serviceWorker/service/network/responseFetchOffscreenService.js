@@ -64,13 +64,16 @@ export default class ResponseFetchOffscreenService {
    * @private
    */
   static buildFetchResponse(data) {
-    return new Response(data.text, {
+    const response = new Response(data.text, {
       status: data.status,
       statusText: data.statusText,
       headers: data.headers,
-      redirected: data.redirected,
-      url: data.url,
-      ok: data.ok,
     });
+    // The Response constructor ignores url and redirected, and ok is derived from status.
+    Object.defineProperties(response, {
+      url: { value: data.url },
+      redirected: { value: data.redirected },
+    });
+    return response;
   }
 }

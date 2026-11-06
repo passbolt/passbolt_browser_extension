@@ -119,7 +119,7 @@ You can build the crx or xpi (zip) packages using the following command.
 ```
 grunt build
 ```
-The build can be found under ```dist/chromium-mv3``` or ```dist/chromium-mv2``` or ```dist/firefox```.
+The build can be found under ```dist/chromium-mv3``` or ```dist/firefox```.
 
 ## Updating the vendors or the styleguide
 
@@ -131,7 +131,7 @@ npm update
 grunt copy:vendors
 grunt copy:styleguide
 ```
-The build can be found under ```dist/chromium-mv3``` or ```dist/chromium-mv2``` or ```dist/firefox```.
+The build can be found under ```dist/chromium-mv3``` or ```dist/firefox```.
 
 ## Unit testing
 

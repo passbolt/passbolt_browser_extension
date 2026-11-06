@@ -55,7 +55,7 @@ class DecryptPrivateKeyPasswordDataService {
       privateKeyPasswordDecryptedDataDto = JSON.parse(privateKeyPasswordDecryptedDataSerialized);
     } catch (error) {
       console.error(error);
-      throw new Error("Unable to parse the decrypted private key password data.");
+      throw new Error("Unable to parse the decrypted private key password data.", { cause: error });
     }
 
     const privateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(

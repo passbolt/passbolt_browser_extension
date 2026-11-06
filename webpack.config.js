@@ -22,12 +22,11 @@
  * does not propagate the `parallelism` array property, so this dependency
  * chain is the reliable way to enforce ordering.
  */
-const firefox = require('./webpack.firefox.config.js');
-const chromiumMv2 = require('./webpack.chromium-mv2.config.js');
-const chromiumMv3 = require('./webpack.chromium-mv3.config.js');
-const safari = require('./webpack.safari.config.js');
+const firefox = require("./webpack.firefox.config.js");
+const chromiumMv3 = require("./webpack.chromium-mv3.config.js");
+const safari = require("./webpack.safari.config.js");
 
-const configs = [...firefox, ...chromiumMv2, ...chromiumMv3, ...safari];
+const configs = [...firefox, ...chromiumMv3, ...safari];
 configs.forEach((config, index) => {
   config.name = `pkg-${index}`;
   if (index > 0) {

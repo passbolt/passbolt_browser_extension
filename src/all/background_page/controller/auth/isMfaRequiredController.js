@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 
 class IsMfaRequiredController {
   /**
-   * FindAndUpdateActiveSessionLocalStorageController Constructor
+   * FindAndUpdateActiveSessionSessionStorageController Constructor
    *
    * @param {Worker} worker
    * @param {string} requestId
@@ -25,7 +25,7 @@ class IsMfaRequiredController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    this.findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
@@ -48,7 +48,8 @@ class IsMfaRequiredController {
    * @returns {Promise<boolean>}
    */
   async exec() {
-    const activeSession = await this.findAndUpdateActiveSessionLocalStorageService.findAndUpdateAuthenticationStatus();
+    const activeSession =
+      await this.findAndUpdateActiveSessionSessionStorageService.findAndUpdateAuthenticationStatus();
     return activeSession.isMfaRequired;
   }
 }

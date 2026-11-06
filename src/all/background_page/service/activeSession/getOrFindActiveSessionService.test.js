@@ -15,12 +15,12 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GetOrFindActiveSessionService from "./getOrFindActiveSessionService";
-import FindAndUpdateActiveSessionLocalStorageService from "./findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "./findAndUpdateActiveSessionSessionStorageService";
 import FindServerStatusService from "../status/findServerStatusService";
 import UserActiveSessionEntity, {
   USER_ACTIVE_SESSION_ONLINE,
 } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
-import ActiveSessionLocalStorage from "../local_storage/activeSessionLocalStorage";
+import ActiveSessionSessionStorage from "../session_storage/activeSessionSessionStorage";
 
 describe("GetOrFindActiveSessionService", () => {
   let service, account;
@@ -30,37 +30,37 @@ describe("GetOrFindActiveSessionService", () => {
     account = new AccountEntity(defaultAccountDto());
     service = new GetOrFindActiveSessionService(account, defaultApiClientOptions());
     // flush account related storage before each.
-    await service.activeSessionLocalStorage.flush();
+    await service.activeSessionSessionStorage.flush();
   });
 
   describe("::getOrFindAll", () => {
     it("fetches from the API the server status and initializes the local storage with a user active session.", async () => {
       expect.assertions(3);
       jest.spyOn(FindServerStatusService.prototype, "find").mockImplementation(() => true);
-      jest.spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus");
+      jest.spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus");
 
       const userActiveSessionEntity = await service.getOrFind();
 
       expect(
-        FindAndUpdateActiveSessionLocalStorageService.prototype.findAndUpdateAuthenticationStatus,
+        FindAndUpdateActiveSessionSessionStorageService.prototype.findAndUpdateAuthenticationStatus,
       ).toHaveBeenCalledTimes(1);
       expect(userActiveSessionEntity).toBeInstanceOf(UserActiveSessionEntity);
-      expect(await service.activeSessionLocalStorage.get()).toEqual(userActiveSessionEntity.toDto());
+      expect(await service.activeSessionSessionStorage.get()).toEqual(userActiveSessionEntity.toDto());
     });
 
     it("If any validation error happen, fetches from the API the server status and set the local storage with a user active session.", async () => {
       expect.assertions(3);
       jest.spyOn(FindServerStatusService.prototype, "find").mockImplementation(() => true);
-      jest.spyOn(service.activeSessionLocalStorage, "get").mockImplementationOnce(() => {});
-      jest.spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "findAndUpdateAuthenticationStatus");
+      jest.spyOn(service.activeSessionSessionStorage, "get").mockImplementationOnce(() => {});
+      jest.spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "findAndUpdateAuthenticationStatus");
 
       const userActiveSessionEntity = await service.getOrFind();
 
       expect(
-        FindAndUpdateActiveSessionLocalStorageService.prototype.findAndUpdateAuthenticationStatus,
+        FindAndUpdateActiveSessionSessionStorageService.prototype.findAndUpdateAuthenticationStatus,
       ).toHaveBeenCalledTimes(1);
       expect(userActiveSessionEntity).toBeInstanceOf(UserActiveSessionEntity);
-      expect(await service.activeSessionLocalStorage.get()).toEqual(userActiveSessionEntity.toDto());
+      expect(await service.activeSessionSessionStorage.get()).toEqual(userActiveSessionEntity.toDto());
     });
 
     it("retrieves user active session from the local storage when the local storage is initialized.", async () => {
@@ -71,15 +71,15 @@ describe("GetOrFindActiveSessionService", () => {
         type: USER_ACTIVE_SESSION_ONLINE,
       };
       jest.spyOn(FindServerStatusService.prototype, "find");
-      await service.activeSessionLocalStorage.set(new UserActiveSessionEntity(userActiveSession));
+      await service.activeSessionSessionStorage.set(new UserActiveSessionEntity(userActiveSession));
 
-      expect(service.activeSessionLocalStorage.hasCachedData()).toBeTruthy();
+      expect(service.activeSessionSessionStorage.hasCachedData()).toBeTruthy();
 
       const userActiveSessionEntity = await service.getOrFind();
 
       expect(FindServerStatusService.prototype.find).not.toHaveBeenCalled();
       expect(userActiveSessionEntity.toDto()).toEqual(userActiveSession);
-      expect(await service.activeSessionLocalStorage.get()).toEqual(userActiveSessionEntity.toDto());
+      expect(await service.activeSessionSessionStorage.get()).toEqual(userActiveSessionEntity.toDto());
     });
 
     it("does not validate the user active session if the information is retrieved from the runtime cache.", async () => {
@@ -90,7 +90,7 @@ describe("GetOrFindActiveSessionService", () => {
         type: USER_ACTIVE_SESSION_ONLINE,
       };
       jest.spyOn(FindServerStatusService.prototype, "find");
-      await service.activeSessionLocalStorage.set(new UserActiveSessionEntity(userActiveSession));
+      await service.activeSessionSessionStorage.set(new UserActiveSessionEntity(userActiveSession));
       jest.spyOn(UserActiveSessionEntity.prototype, "validateSchema");
 
       await service.getOrFind();
@@ -108,8 +108,8 @@ describe("GetOrFindActiveSessionService", () => {
         type: USER_ACTIVE_SESSION_ONLINE,
       };
       jest.spyOn(FindServerStatusService.prototype, "find");
-      await service.activeSessionLocalStorage.set(new UserActiveSessionEntity(userActiveSession));
-      ActiveSessionLocalStorage._runtimeCachedData = {};
+      await service.activeSessionSessionStorage.set(new UserActiveSessionEntity(userActiveSession));
+      ActiveSessionSessionStorage._runtimeCachedData = {};
       jest.spyOn(UserActiveSessionEntity.prototype, "validateSchema");
 
       await service.getOrFind();

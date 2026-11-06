@@ -149,7 +149,7 @@
      * @returns {boolean}
      */
     isValidTheme(theme) {
-      const whitelist = ["default", "midgar", "solarized_light", "solarized_dark"];
+      const whitelist = ["default", "midgar", "solarized_light", "solarized_dark", "sakura", "layette"];
       return whitelist.includes(theme);
     }
   }

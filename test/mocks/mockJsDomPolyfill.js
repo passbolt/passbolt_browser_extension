@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.1.0
  */
-import {File} from "formdata-node";
 
 /**
  * Node environement lacks a FileReader and this breaks some tests
@@ -44,6 +43,5 @@ const mockedWindow = {
 };
 
 Object.defineProperty(global, "FileReader", {value: MockedFileReader});
-Object.defineProperty(global, "File", {value: File});
 Object.defineProperty(global, "self", {value: global});
 Object.defineProperty(global, "window", {value: mockedWindow});

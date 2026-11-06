@@ -38,7 +38,7 @@ beforeEach(() => {
 describe("ShareResourceService", () => {
   let apiClientOptions, account, mockedProgressService, service;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     apiClientOptions = defaultApiClientOptions();
     account = new AccountEntity(adminAccountDto());
     mockedProgressService = { finishStep: jest.fn(), updateGoals: jest.fn(), updateStepMessage: jest.fn() };
@@ -48,9 +48,9 @@ describe("ShareResourceService", () => {
     // Mock keyring.
     jest.spyOn(Keyring.prototype, "sync").mockImplementation(jest.fn);
     const keyring = new Keyring();
-    keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
-    keyring.importPublic(pgpKeys.betty.public, pgpKeys.betty.userId);
-    keyring.importPublic(pgpKeys.carol.public, pgpKeys.carol.userId);
+    await keyring.importPublic(pgpKeys.ada.public, pgpKeys.ada.userId);
+    await keyring.importPublic(pgpKeys.betty.public, pgpKeys.betty.userId);
+    await keyring.importPublic(pgpKeys.carol.public, pgpKeys.carol.userId);
   });
 
   describe("::shareOne", () => {

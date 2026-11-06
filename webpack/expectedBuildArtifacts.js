@@ -19,7 +19,7 @@
  * Paths are relative to `build/all/`.
  */
 
-// Entries common to every browser target (chromium-mv2, chromium-mv3, firefox, safari).
+// Entries common to every browser target (chromium-mv3, firefox, safari).
 const COMMON_EXPECTED_FILES = [
   "manifest.json",
   "contentScripts/js/dist/app.js",

@@ -15,7 +15,7 @@ import OfflineSessionExpiryAlarmService from "./offlineSessionExpiryAlarmService
 import GetActiveAccountService from "../account/getActiveAccountService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import GetOrFindOfflineSettingsService from "../offline/getOrFindOfflineSettingsService";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import PostLogoutService from "./postLogoutService";
 import toolbarService from "../toolbar/toolbarService";
@@ -125,7 +125,7 @@ describe("OfflineSessionExpiryAlarmService", () => {
       expect.assertions(4);
       jest.spyOn(GetActiveAccountService, "get").mockResolvedValue(account);
       const spyOnResetAuthentication = jest
-        .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "resetAuthentication")
+        .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "resetAuthentication")
         .mockResolvedValue();
       const spyOnSendLogout = jest.spyOn(PostLogoutService, "sendLogoutEventForWorkers").mockResolvedValue();
       const spyOnToolbar = jest.spyOn(toolbarService, "handleUserLoggedOut").mockImplementation(() => {});
@@ -145,7 +145,7 @@ describe("OfflineSessionExpiryAlarmService", () => {
         .spyOn(GetActiveAccountService, "get")
         .mockRejectedValue(new Error("No account associated with this extension."));
       const spyOnResetAuthentication = jest.spyOn(
-        FindAndUpdateActiveSessionLocalStorageService.prototype,
+        FindAndUpdateActiveSessionSessionStorageService.prototype,
         "resetAuthentication",
       );
       const spyOnSendLogout = jest.spyOn(PostLogoutService, "sendLogoutEventForWorkers");

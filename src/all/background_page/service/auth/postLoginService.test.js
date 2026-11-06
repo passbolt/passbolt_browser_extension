@@ -27,7 +27,7 @@ import SiteSettingsRuntimeCache from "../siteSettings/siteSettingsRuntimeCache";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultApiClientOptions } from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import FindAndUpdateActiveSessionLocalStorageService from "../activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../activeSession/findAndUpdateActiveSessionSessionStorageService";
 
 let account, apiClientOptions;
 
@@ -37,7 +37,7 @@ beforeEach(async () => {
   account = new AccountEntity(defaultAccountDto());
   apiClientOptions = defaultApiClientOptions();
   jest
-    .spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "authenticateOnline")
+    .spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "authenticateOnline")
     .mockImplementation(async () => {});
 });
 
@@ -111,7 +111,7 @@ describe("PostLoginService", () => {
       expect(StartLoopAuthSessionCheckService.exec).toHaveBeenCalledTimes(1);
       expect(toolbarService.handleUserLoggedIn).toHaveBeenCalledTimes(1);
       // The online login transition is recorded on the active session.
-      expect(FindAndUpdateActiveSessionLocalStorageService.prototype.authenticateOnline).toHaveBeenCalledTimes(1);
+      expect(FindAndUpdateActiveSessionSessionStorageService.prototype.authenticateOnline).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -18,7 +18,7 @@ import AbstractAccountEntity from "../../model/entity/account/abstractAccountEnt
 
 export const ACTIVE_SESSION_LOCAL_STORAGE_KEY = "active_session";
 
-class ActiveSessionLocalStorage {
+class ActiveSessionSessionStorage {
   /**
    * Runtime cached data.
    * @type {Object} Key: account_id, value: cached data as dto.
@@ -53,38 +53,38 @@ class ActiveSessionLocalStorage {
    * @returns {boolean}
    */
   hasCachedData() {
-    return Boolean(ActiveSessionLocalStorage._runtimeCachedData[this.account.id]);
+    return Boolean(ActiveSessionSessionStorage._runtimeCachedData[this.account.id]);
   }
 
   /**
-   * Flush the active session from local storage and runtime cached data.
+   * Flush the active session from the session storage and runtime cached data.
    * @return {Promise<void>}
    */
   async flush() {
-    await browser.storage.local.remove(this.storageKey);
-    delete ActiveSessionLocalStorage._runtimeCachedData[this.account.id];
-    Log.write({ level: "debug", message: `ActiveSessionLocalStorage flushed for (${this.account.id})` });
+    await browser.storage.session.remove(this.storageKey);
+    delete ActiveSessionSessionStorage._runtimeCachedData[this.account.id];
+    Log.write({ level: "debug", message: `ActiveSessionSessionStorage flushed for (${this.account.id})` });
   }
 
   /**
-   * Get the active session from the local storage.
+   * Get the active session from the session storage.
    * @return {Promise<object|undefined>}
    */
   async get() {
-    if (!ActiveSessionLocalStorage._runtimeCachedData[this.account.id]) {
-      const data = await browser.storage.local.get([this.storageKey]);
+    if (!ActiveSessionSessionStorage._runtimeCachedData[this.account.id]) {
+      const data = await browser.storage.session.get(this.storageKey);
       if (!data[this.storageKey]) {
         return;
       }
-      ActiveSessionLocalStorage._runtimeCachedData[this.account.id] = data[this.storageKey];
+      ActiveSessionSessionStorage._runtimeCachedData[this.account.id] = data[this.storageKey];
     }
 
-    return ActiveSessionLocalStorage._runtimeCachedData[this.account.id];
+    return ActiveSessionSessionStorage._runtimeCachedData[this.account.id];
   }
 
   /**
-   * Set the active session in the local storage.
-   * @param {UserActiveSessionEntity} activeSession The active session to insert in the local storage.
+   * Set the active session in the session storage.
+   * @param {UserActiveSessionEntity} activeSession The active session to insert in the session storage.
    * @return {Promise<void>}
    * @throws {TypeError} If parameter settings is not of type UserActiveSessionEntity.
    */
@@ -97,7 +97,7 @@ class ActiveSessionLocalStorage {
     await navigator.locks.request(this.storageKey, async () => {
       const activeSessionDto = activeSession.toDto();
       await this._setBrowserStorage({ [this.storageKey]: activeSessionDto });
-      ActiveSessionLocalStorage._runtimeCachedData[this.account.id] = activeSessionDto;
+      ActiveSessionSessionStorage._runtimeCachedData[this.account.id] = activeSessionDto;
     });
   }
 
@@ -105,13 +105,13 @@ class ActiveSessionLocalStorage {
    * Set the browser storage.
    * @todo Tool to test the semaphore. A dedicated local storage service could be implemented later on top
    * of the browser provided one to ease the testing.
-   * @param {object} data The data to store in the local storage.
+   * @param {object} data The data to store in the session storage.
    * @returns {Promise<void>}
    * @private
    */
   async _setBrowserStorage(data) {
-    await browser.storage.local.set(data);
+    await browser.storage.session.set(data);
   }
 }
 
-export default ActiveSessionLocalStorage;
+export default ActiveSessionSessionStorage;

@@ -114,6 +114,11 @@ export const logMeOnceCsvFile = [
   '"Password 1","https://url1.com","Description 1","Folder 1","Username 1","Password 1",""',
 ].join("\r\n");
 
+export const netwrixCsvFile = [
+  '"DataTags";"Description";"User name";"Password";"Internet address";"Email address"',
+  '"";"Password 1";"Username 1";"Password 1";"https://url1.com";""',
+].join("\r\n");
+
 export const KdbxCsvFile = [
   '"Title","Username","URL","Password","Notes","Group","TOTP"',
   '"Password 1","Username 1","https://url1.com","Password 1","Description 1","Folder 1","otpauth://totp/Password%201%3AUsername%201?secret=THISISASECRET&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30"',

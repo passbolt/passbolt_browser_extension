@@ -23,6 +23,9 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 import { defaultUserActiveSessionDto } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
 import GetOrFindActiveSessionService from "../../service/activeSession/getOrFindActiveSessionService";
+import AuthenticationStatusService from "../../service/authenticationStatusService";
+import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
+import LocalLogoutService from "../../service/auth/localLogoutService";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -41,13 +44,13 @@ describe("OnExtensionInstalledController", () => {
       const tabs = [
         {
           id: 1,
-          url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
         {
           id: 2,
-          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
-        { id: 3, url: "https://passbolt.dev/auth/login" },
+        { id: 3, url: "https://passbolt.local/auth/login" },
         { id: 4, url: "https://localhost" },
         { id: 5, url: "https://chromewebstore.google.com/id/passbolt" },
         { id: 6, url: "https://addons.mozilla.org/id/passbolt" },
@@ -83,14 +86,14 @@ describe("OnExtensionInstalledController", () => {
       const tabs = [
         {
           id: 1,
-          url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
         {
           id: 2,
-          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
-        { id: 3, url: "https://passbolt.dev/auth/login" },
-        { id: 4, url: "https://passbolt.dev" },
+        { id: 3, url: "https://passbolt.local/auth/login" },
+        { id: 4, url: "https://passbolt.local" },
         { id: 5, url: "https://passbolt.com" },
         { id: 6, url: "https://localhost" },
       ];
@@ -98,8 +101,9 @@ describe("OnExtensionInstalledController", () => {
       jest.spyOn(OnExtensionInstalledController, "onUpdate");
       jest.spyOn(WebNavigationService, "exec");
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => Promise.resolve(tabs));
-      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {});
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
+      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => false);
       // process
       await OnExtensionInstalledController.exec(details);
       // expectation
@@ -122,14 +126,17 @@ describe("OnExtensionInstalledController", () => {
       };
       // mock function
       jest.spyOn(OnExtensionInstalledController, "onBrowserUpdate");
-      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => false);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {
+        throw new Error("No account");
+      });
       jest.spyOn(AuthModel.prototype, "logout");
+      jest.spyOn(browser.tabs, "reload");
       // process
       await OnExtensionInstalledController.exec(details);
       // expectation
       expect(OnExtensionInstalledController.onBrowserUpdate).toHaveBeenCalled();
-      expect(User.getInstance().isValid).toHaveBeenCalledTimes(1);
       expect(AuthModel.prototype.logout).toHaveBeenCalledTimes(0);
+      expect(browser.tabs.reload).not.toHaveBeenCalled();
     });
 
     it("Should exec browser update if the reason is browser update", async () => {
@@ -139,27 +146,25 @@ describe("OnExtensionInstalledController", () => {
         reason: browser.runtime.OnInstalledReason.BROWSER_UPDATE,
       };
       const tabs = [
-        { id: 1, url: "https://passbolt.dev/app/passwords" },
+        { id: 1, url: "https://passbolt.local/app/passwords" },
         {
           id: 2,
-          url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
+          url: "https://passbolt.local/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0",
         },
-        { id: 3, url: "https://passbolt.dev/auth/login" },
-        { id: 4, url: "https://passbolt.dev" },
+        { id: 3, url: "https://passbolt.local/auth/login" },
+        { id: 4, url: "https://passbolt.local" },
         { id: 5, url: "https://passbolt.com" },
         { id: 6, url: "https://localhost" },
       ];
       // mock function
       jest.spyOn(OnExtensionInstalledController, "onBrowserUpdate");
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.local");
       jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
       jest.spyOn(browser.tabs, "query").mockImplementation(() => Promise.resolve(tabs));
       jest.spyOn(browser.tabs, "reload");
-      jest
-        .spyOn(GetOrFindActiveSessionService.prototype, "getOrFind")
-        .mockImplementation(() => new UserActiveSessionEntity(defaultUserActiveSessionDto({ is_authenticated: true })));
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => true);
       // process
       await OnExtensionInstalledController.exec(details);
       // expectation
@@ -186,6 +191,113 @@ describe("OnExtensionInstalledController", () => {
       expect(OnExtensionInstalledController.onUpdate).not.toHaveBeenCalled();
       expect(OnExtensionInstalledController.onInstall).not.toHaveBeenCalled();
       expect(OnExtensionInstalledController.onBrowserUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("OnExtensionInstalledController::signOutIfAuthenticated", () => {
+    const appTab = { id: 1, url: "https://passbolt.local/app/passwords" };
+
+    beforeEach(() => {
+      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
+      jest.spyOn(browser.tabs, "query").mockImplementation(() => Promise.resolve([appTab]));
+      jest.spyOn(browser.tabs, "reload");
+      jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
+      // The toolbar icon reads the active session once the user is signed out.
+      jest
+        .spyOn(GetOrFindActiveSessionService.prototype, "getOrFind")
+        .mockImplementation(
+          () => new UserActiveSessionEntity(defaultUserActiveSessionDto({ is_authenticated: false })),
+        );
+    });
+
+    it("Should sign out a user who still has to complete the MFA on the server", async () => {
+      expect.assertions(2);
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => {
+        throw new MfaAuthenticationRequiredError();
+      });
+      jest.spyOn(LocalLogoutService.prototype, "exec");
+
+      await OnExtensionInstalledController.exec({ reason: browser.runtime.OnInstalledReason.UPDATE });
+
+      expect(AuthModel.prototype.logout).toHaveBeenCalledTimes(1);
+      expect(LocalLogoutService.prototype.exec).not.toHaveBeenCalled();
+    });
+
+    it("Should not sign out a user who is not signed in on the server", async () => {
+      expect.assertions(3);
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => false);
+      jest.spyOn(LocalLogoutService.prototype, "exec");
+
+      await OnExtensionInstalledController.exec({ reason: browser.runtime.OnInstalledReason.UPDATE });
+
+      expect(AuthModel.prototype.logout).not.toHaveBeenCalled();
+      expect(LocalLogoutService.prototype.exec).not.toHaveBeenCalled();
+      expect(browser.tabs.reload).toHaveBeenCalledWith(appTab.id);
+    });
+
+    it("Should sign out with the local logout if the server is not reachable", async () => {
+      expect.assertions(3);
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => {
+        throw new Error("Server not reachable");
+      });
+      jest.spyOn(LocalLogoutService.prototype, "exec").mockImplementation(() => {});
+
+      await OnExtensionInstalledController.exec({ reason: browser.runtime.OnInstalledReason.UPDATE });
+
+      expect(AuthModel.prototype.logout).not.toHaveBeenCalled();
+      expect(LocalLogoutService.prototype.exec).toHaveBeenCalledTimes(1);
+      expect(browser.tabs.reload).toHaveBeenCalledWith(appTab.id);
+    });
+
+    it("Should sign out with the local logout if the server logout fails", async () => {
+      expect.assertions(2);
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => true);
+      jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {
+        throw new Error("Unexpected error");
+      });
+      jest.spyOn(LocalLogoutService.prototype, "exec").mockImplementation(() => {});
+
+      await OnExtensionInstalledController.exec({ reason: browser.runtime.OnInstalledReason.UPDATE });
+
+      expect(LocalLogoutService.prototype.exec).toHaveBeenCalledTimes(1);
+      expect(browser.tabs.reload).toHaveBeenCalledWith(appTab.id);
+    });
+
+    it("Should remove the legacy active session from the local storage", async () => {
+      expect.assertions(1);
+      const account = new AccountEntity(defaultAccountDto());
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => false);
+      const legacyStorageKey = `active_session-${account.id}`;
+      await browser.storage.local.set({ [legacyStorageKey]: defaultUserActiveSessionDto() });
+
+      await OnExtensionInstalledController.exec({ reason: browser.runtime.OnInstalledReason.UPDATE });
+
+      expect(browser.storage.local.store[legacyStorageKey]).toBeUndefined();
+    });
+
+    it("Should still process the tabs if no account is associated with the extension", async () => {
+      expect.assertions(3);
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {
+        throw new Error("No account");
+      });
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated");
+
+      await OnExtensionInstalledController.exec({ reason: browser.runtime.OnInstalledReason.UPDATE });
+
+      expect(AuthenticationStatusService.prototype.isAuthenticated).not.toHaveBeenCalled();
+      expect(AuthModel.prototype.logout).not.toHaveBeenCalled();
+      expect(browser.tabs.query).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should reload the app tabs on browser update even if the user was not signed in", async () => {
+      expect.assertions(2);
+      jest.spyOn(AuthenticationStatusService.prototype, "isAuthenticated").mockImplementation(async () => false);
+
+      await OnExtensionInstalledController.exec({ reason: browser.runtime.OnInstalledReason.BROWSER_UPDATE });
+
+      expect(AuthModel.prototype.logout).not.toHaveBeenCalled();
+      expect(browser.tabs.reload).toHaveBeenCalledWith(appTab.id);
     });
   });
 });

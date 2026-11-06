@@ -11,26 +11,31 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.10.0
  */
-import User from "../../model/user";
+import { assertString, assertType } from "../../utils/assertions";
+import AccountEntity from "../../model/entity/account/accountEntity";
 
 class ParseAuthUrlService {
   /**
    * Get regex to check URI validity
+   * @param {AccountEntity} account The user account
    * @returns {RegExp}
    */
-  static get regex() {
-    const user = User.getInstance();
-    const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
+  static getRegex(account) {
+    assertType(account, AccountEntity);
+    const escapedDomain = account.domain.replace(/\W/g, "\\$&");
     return new RegExp(`^${escapedDomain}/auth/login/?(#.*)?(\\?.*)?$`);
   }
 
   /**
    * Test regex with the url.
+   * @param {AccountEntity} account The user account
    * @param {string} url The url to test.
    * @returns {boolean}
    */
-  static test(url) {
-    return this.regex.test(url);
+  static test(account, url) {
+    assertType(account, AccountEntity);
+    assertString(url);
+    return this.getRegex(account).test(url);
   }
 }
 

@@ -27,6 +27,10 @@ import AppBootstrapPagemod from "../../pagemod/appBootstrapPagemod";
 import GetActiveAccountService from "../../service/account/getActiveAccountService";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import GetOrFindActiveSessionService from "../../service/activeSession/getOrFindActiveSessionService";
+import ActiveSessionSessionStorage from "../../service/session_storage/activeSessionSessionStorage";
+import AuthenticationStatusService from "../../service/authenticationStatusService";
+import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
+import LocalLogoutService from "../../service/auth/localLogoutService";
 
 class OnExtensionInstalledController {
   /**
@@ -68,9 +72,11 @@ class OnExtensionInstalledController {
   }
 
   /**
-   * On update the extension, for pagemod with refresh option and tabs that match the url refresh it
+   * On update the extension, sign the user out, then for pagemod with refresh option and tabs that match the url
+   * refresh it.
    */
   static async onUpdate() {
+    await OnExtensionInstalledController.signOutIfAuthenticated();
     // Apply on tabs that match the pagemod url regex with refresh option
     await browser.tabs.query({}).then(reloadTabsMatchPagemodUrl);
     await OnExtensionInstalledController.updateToolbarIcon();
@@ -82,35 +88,7 @@ class OnExtensionInstalledController {
    * deteriorates the user experience, therefore it has been decided to sign the user out.
    */
   static async onBrowserUpdate() {
-    const user = User.getInstance();
-    // Check if user is valid
-    if (!user.isValid()) {
-      return;
-    }
-    let activeSessionEntity, account;
-    try {
-      account = await GetActiveAccountService.get();
-      const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-      const getOrFindActiveSessionService = new GetOrFindActiveSessionService(account, apiClientOptions);
-      // use the cached data as the worker could wake up every 30 secondes.
-      activeSessionEntity = await getOrFindActiveSessionService.getOrFind();
-    } catch (error) {
-      console.error(error);
-      // Service is unavailable, do nothing...
-      Log.write({
-        level: "debug",
-        message: "Could not check if the user is authenticated, the service is unavailable.",
-      });
-      return;
-    }
-    // Do nothing if user is not authenticated
-    if (!activeSessionEntity.isAuthenticated) {
-      return;
-    }
-    // Logout authenticated user to prevent to ask passphrase for SSO users
-    const apiClientOptions = await user.getApiClientOptions();
-    const authModel = new AuthModel(apiClientOptions, account);
-    await authModel.logout();
+    await OnExtensionInstalledController.signOutIfAuthenticated();
     /*
      * Reload only tabs that match passbolt app url. Reload is necessary as the application loaded in the tab
      * could be unresponsive due to the forced triggered sign-out.
@@ -119,6 +97,59 @@ class OnExtensionInstalledController {
      * - The pagemod of the app starts and throw an error as the user has been signed-out
      */
     await browser.tabs.query({}).then(reloadTabsMatchPassboltAppUrl);
+  }
+
+  /**
+   * Sign the user out if they are still signed in on the server, or if the server cannot be reached.
+   * The extension and browser updates clear the session storage (passphrase, metadata keys, active session), the user
+   * is still signed in on the server but would be asked for their passphrase, which SSO users may not know. Therefore
+   * it has been decided to sign the user out.
+   * - Signed in on the server: sign out with the API, and locally if the API logout fails.
+   * - Server not reachable: the session cookie may still be valid (online session) or an offline session may have
+   *   been running, sign out locally.
+   * The active session was kept in the local storage before it moved to the session storage, the legacy entry is
+   * removed.
+   * It never throws, so the callers can continue with the tabs reload.
+   * @returns {Promise<void>}
+   */
+  static async signOutIfAuthenticated() {
+    let account, apiClientOptions;
+    try {
+      // Throws if no account is associated with the extension.
+      account = await GetActiveAccountService.get();
+      // Remove any residual legacy local storage for active session
+      await browser.storage.local.remove(new ActiveSessionSessionStorage(account).storageKey);
+      apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
+    } catch (error) {
+      console.error(error);
+      Log.write({ level: "debug", message: "Could not retrieve the account associated with the extension." });
+      return;
+    }
+
+    try {
+      // The session storage is cleared, ask the server if the user is still signed in.
+      let isAuthenticated;
+      try {
+        isAuthenticated = await new AuthenticationStatusService(apiClientOptions).isAuthenticated();
+      } catch (error) {
+        if (!(error instanceof MfaAuthenticationRequiredError)) {
+          throw error;
+        }
+        isAuthenticated = true;
+      }
+      if (isAuthenticated) {
+        await new AuthModel(apiClientOptions, account).logout();
+      }
+    } catch (error) {
+      console.error(error);
+      // The server is not reachable or the API logout failed, the session cookie may still be valid.
+      try {
+        await new LocalLogoutService(account, apiClientOptions).exec();
+      } catch (error) {
+        console.error(error);
+        Log.write({ level: "debug", message: "Could not sign the user out after the update." });
+      }
+    }
   }
 
   /**

@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         5.3.2
  */
-import EdgeBackgroundPageClipboardService from "../../../../chrome/polyfill/clipboard/edgeBackgroundPageClipboardService";
-import BrowserService from "../browser/browserService";
 
 /**
  * The service retrieves the appropriate clipboard provider for the current environment: Edge, Chrome, Safari or Firefox.
@@ -29,11 +27,6 @@ export default class ClipboardProviderService {
       return customNavigatorClipboard;
     }
 
-    const isMV2 = chrome.runtime.getManifest().manifest_version === 2;
-    if (!BrowserService.isFirefox() && isMV2) {
-      //it's not firefox and it's MV2 => it's most probably Edge then
-      return EdgeBackgroundPageClipboardService;
-    }
     //by default we provide the default clipboard
     return navigator.clipboard;
   }

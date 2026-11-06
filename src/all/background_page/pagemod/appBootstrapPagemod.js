@@ -17,7 +17,7 @@ import { PortEvents } from "../event/portEvents";
 import { AppBootstrapEvents } from "../event/appBootstrapEvents";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import FindAndUpdateActiveSessionLocalStorageService from "../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 
 class AppBootstrap extends Pagemod {
   /**
@@ -83,8 +83,8 @@ class AppBootstrap extends Pagemod {
    */
   async assertUrlAttachConstraint(frameDetails) {
     try {
-      await GetActiveAccountService.get();
-      return ParseAppUrlService.test(frameDetails.url);
+      const account = await GetActiveAccountService.get();
+      return ParseAppUrlService.test(account, frameDetails.url);
     } catch (error) {
       console.log(error);
       return false;
@@ -98,11 +98,12 @@ class AppBootstrap extends Pagemod {
   async assertUserAuthenticated() {
     const account = await GetActiveAccountService.get();
     const apiClientOptions = BuildApiClientOptionsService.buildFromAccount(account);
-    const findAndUpdateActiveSessionLocalStorageService = new FindAndUpdateActiveSessionLocalStorageService(
+    const findAndUpdateActiveSessionSessionStorageService = new FindAndUpdateActiveSessionSessionStorageService(
       account,
       apiClientOptions,
     );
-    const activeSessionEntity = await findAndUpdateActiveSessionLocalStorageService.findAndUpdateAuthenticationStatus();
+    const activeSessionEntity =
+      await findAndUpdateActiveSessionSessionStorageService.findAndUpdateAuthenticationStatus();
     return activeSessionEntity.isSessionOnline && activeSessionEntity.isAuthenticated;
   }
 }

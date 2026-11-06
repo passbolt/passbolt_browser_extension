@@ -18,7 +18,7 @@ import { mockSubscriptionUpdated } from "passbolt-styleguide/src/react-extension
 
 import CreateSubscriptionKeyController from "./createSubscriptionKeyController";
 import PostLogoutService from "../../service/auth/postLogoutService";
-import FindAndUpdateActiveSessionLocalStorageService from "../../service/activeSession/findAndUpdateActiveSessionLocalStorageService";
+import FindAndUpdateActiveSessionSessionStorageService from "../../service/activeSession/findAndUpdateActiveSessionSessionStorageService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import { defaultAccountDto } from "../../model/entity/account/accountEntity.test.data";
 
@@ -27,7 +27,7 @@ describe("CreateSubscriptionKeyController", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(FindAndUpdateActiveSessionLocalStorageService.prototype, "resetAuthentication").mockResolvedValue();
+    jest.spyOn(FindAndUpdateActiveSessionSessionStorageService.prototype, "resetAuthentication").mockResolvedValue();
   });
 
   describe("::exec", () => {
@@ -44,7 +44,7 @@ describe("CreateSubscriptionKeyController", () => {
 
       expect(result).toEqual(new SubscriptionEntity(mockSubscriptionUpdated));
       expect(controller.createSubscriptionService.create).toHaveBeenCalledTimes(1);
-      expect(FindAndUpdateActiveSessionLocalStorageService.prototype.resetAuthentication).toHaveBeenCalledTimes(1);
+      expect(FindAndUpdateActiveSessionSessionStorageService.prototype.resetAuthentication).toHaveBeenCalledTimes(1);
       expect(PostLogoutService.exec).toHaveBeenCalledTimes(1);
     });
 
@@ -57,7 +57,7 @@ describe("CreateSubscriptionKeyController", () => {
       jest.spyOn(PostLogoutService, "exec").mockImplementation(async () => {});
 
       await expect(controller.exec({ data: mockSubscriptionUpdated.data })).rejects.toStrictEqual(expectedError);
-      expect(FindAndUpdateActiveSessionLocalStorageService.prototype.resetAuthentication).not.toHaveBeenCalled();
+      expect(FindAndUpdateActiveSessionSessionStorageService.prototype.resetAuthentication).not.toHaveBeenCalled();
       expect(PostLogoutService.exec).not.toHaveBeenCalled();
     });
   });

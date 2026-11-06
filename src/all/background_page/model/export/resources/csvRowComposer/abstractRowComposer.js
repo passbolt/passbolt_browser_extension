@@ -21,6 +21,14 @@ class AbstractRowComposer {
   }
 
   /**
+   * Get the csv delimiter
+   * @returns {string}
+   */
+  static get delimiter() {
+    return ",";
+  }
+
+  /**
    * Get the row composer properties mapping.
    * Key values object where key represents the passbolt entity property name and the value represents the CSV property name.
    * @returns {object}

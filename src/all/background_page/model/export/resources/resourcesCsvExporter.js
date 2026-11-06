@@ -22,6 +22,7 @@ import CsvSafariRowComposer from "./csvRowComposer/csvSafariRowComposer";
 import CsvDashlaneRowComposer from "./csvRowComposer/csvDashlaneRowComposer";
 import CsvNordpassRowComposer from "./csvRowComposer/csvNordpassRowComposer";
 import CsvLogMeOnceRowComposer from "./csvRowComposer/csvLogMeOnceRowComposer";
+import CsvNetwrixRowComposer from "./csvRowComposer/csvNetwrixRowComposer";
 
 /**
  * Register of csv row parsers
@@ -38,6 +39,7 @@ const register = [
   CsvDashlaneRowComposer,
   CsvNordpassRowComposer,
   CsvLogMeOnceRowComposer,
+  CsvNetwrixRowComposer,
 ];
 
 class ResourcesCsvExporter {
@@ -69,9 +71,10 @@ class ResourcesCsvExporter {
     const data = this.exportResources(RowComposer);
     // Insert the header manually, Papaparse doesn't insert it if there is not content to write.
     const headerColumns = Object.values(RowComposer.mapping);
-    let file = `"${headerColumns.join('","')}"\r\n`;
+    const delimiter = RowComposer.delimiter;
+    let file = `"${headerColumns.join(`"${delimiter}"`)}"\r\n`;
     // Unparse the content and add it to the result.
-    file = file + PapaParse.unparse(data, { header: false, quotes: true, columns: headerColumns });
+    file = file + PapaParse.unparse(data, { header: false, quotes: true, columns: headerColumns, delimiter });
     this.exportEntity.file = file;
   }
 

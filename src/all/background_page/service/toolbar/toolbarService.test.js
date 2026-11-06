@@ -21,11 +21,20 @@ import { defaultResourceDtosCollection } from "passbolt-styleguide/src/shared/mo
 import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import { resourceTypesCollectionDto } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import ResourceTypeLocalStorage from "../local_storage/resourceTypeLocalStorage";
-import User from "../../../../all/background_page/model/user";
 import OpenWebsiteGettingStartedPageService from "../ui/openWebsiteGettingStartedPageService";
+import OpenTrustedDomainTabService from "../ui/openTrustedDomainTabService";
+import GetActiveAccountService from "../account/getActiveAccountService";
 import UserActiveSessionEntity from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity";
-import { defaultUserActiveSessionDto } from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
+import {
+  defaultUserActiveSessionDto,
+  offlineUserActiveSessionDto,
+} from "passbolt-styleguide/src/shared/models/entity/session/userActiveSessionEntity.test.data";
 import GetOrFindActiveSessionService from "../activeSession/getOrFindActiveSessionService";
+import {
+  resourceStandaloneCustomFieldsDto,
+  resourceStandaloneNoteDto,
+} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
+import { defaultResourceMetadataDto } from "passbolt-styleguide/src/shared/models/entity/resource/metadata/resourceMetadataEntity.test.data";
 
 jest.useFakeTimers();
 
@@ -91,6 +100,40 @@ describe("ToolbarService", () => {
       expect(browserExtensionIconServiceActivateMock).toHaveBeenCalled();
       expect(browserExtensionIconServiceSetCountMock).toHaveBeenCalledWith(4);
     });
+
+    it.each([
+      { session: "online", sessionDto: defaultUserActiveSessionDto() },
+      { session: "offline", sessionDto: offlineUserActiveSessionDto() },
+    ])(
+      "Given the user is $session on a tab matching a note and a custom fields resource, it should count them in the suggested resources.",
+      async ({ sessionDto }) => {
+        expect.assertions(1);
+        const account = new AccountEntity(defaultAccountDto());
+        const matchingNote = resourceStandaloneNoteDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+        const matchingCustomFields = resourceStandaloneCustomFieldsDto({
+          metadata: defaultResourceMetadataDto({ uris: ["https://passbolt.com"] }),
+        });
+
+        jest.spyOn(browser.cookies, "get").mockImplementation(() => ({ value: "csrf-token" }));
+        jest.spyOn(browser.tabs, "query").mockImplementation(() => [{ url: "https://www.passbolt.com" }]);
+        jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
+        jest
+          .spyOn(ResourceLocalStorage, "get")
+          .mockImplementation(() => [...defaultResourceDtosCollection(), matchingNote, matchingCustomFields]);
+        jest
+          .spyOn(ResourceTypeLocalStorage.prototype, "getData")
+          .mockImplementation(() => resourceTypesCollectionDto());
+        jest
+          .spyOn(GetOrFindActiveSessionService.prototype, "getOrFind")
+          .mockImplementation(() => new UserActiveSessionEntity(sessionDto));
+
+        await toolbarService.handleUserLoggedIn();
+
+        expect(browserExtensionIconServiceSetCountMock).toHaveBeenCalledWith(6);
+      },
+    );
   });
 
   describe("handleUserLoggedOut", () => {
@@ -230,10 +273,12 @@ describe("ToolbarService", () => {
     it("Given that no account is set on the local storage, a tab should be opened on the passbolt start URL.", async () => {
       expect.assertions(1);
 
-      jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => {});
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {
+        throw new Error("The user is not set");
+      });
       jest.spyOn(OpenWebsiteGettingStartedPageService.prototype, "openTab").mockImplementation(() => {});
 
-      toolbarService.handleIconToolbarClicked();
+      await toolbarService.handleIconToolbarClicked();
 
       expect(OpenWebsiteGettingStartedPageService.prototype.openTab).toHaveBeenCalledTimes(1);
     });
@@ -241,17 +286,48 @@ describe("ToolbarService", () => {
     it("Given that an account is set on the local storage, the popup should be set with the right URL and the popup should be opened", async () => {
       expect.assertions(3);
 
-      jest.spyOn(User, "getInstance").mockImplementation(() => ({ isValid: () => true }));
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
       jest.spyOn(browser.browserAction, "setPopup").mockImplementation(() => {});
       jest.spyOn(browser.browserAction, "openPopup").mockImplementation(() => {});
 
-      toolbarService.handleIconToolbarClicked();
+      await toolbarService.handleIconToolbarClicked();
 
       expect(browser.browserAction.setPopup).toHaveBeenCalledTimes(1);
       expect(browser.browserAction.setPopup).toHaveBeenCalledWith({
         popup: "webAccessibleResources/quickaccess.html?passbolt=quickaccess",
       });
       expect(browser.browserAction.openPopup).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("handleShortcutPressed", () => {
+    beforeEach(() => {
+      jest.spyOn(OpenWebsiteGettingStartedPageService.prototype, "openTab").mockImplementation(() => {});
+      jest.spyOn(OpenTrustedDomainTabService.prototype, "openTab").mockImplementation(() => {});
+    });
+
+    it("Given that no account is set on the local storage, a tab should be opened on the passbolt start URL.", async () => {
+      expect.assertions(2);
+
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => {
+        throw new Error("The user is not set");
+      });
+
+      await toolbarService.handleShortcutPressed("passbolt-open");
+
+      expect(OpenWebsiteGettingStartedPageService.prototype.openTab).toHaveBeenCalledTimes(1);
+      expect(OpenTrustedDomainTabService.prototype.openTab).not.toHaveBeenCalled();
+    });
+
+    it("Given that an account is set on the local storage, a tab should be opened on the trusted domain.", async () => {
+      expect.assertions(2);
+
+      jest.spyOn(GetActiveAccountService, "get").mockImplementation(() => new AccountEntity(defaultAccountDto()));
+
+      await toolbarService.handleShortcutPressed("passbolt-open");
+
+      expect(OpenTrustedDomainTabService.prototype.openTab).toHaveBeenCalledTimes(1);
+      expect(OpenWebsiteGettingStartedPageService.prototype.openTab).not.toHaveBeenCalled();
     });
   });
 });

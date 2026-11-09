@@ -24,11 +24,12 @@ function send_to_chrome() {
   token=$(curl "https://www.googleapis.com/oauth2/v4/token" -H 'Content-Type: application/json' -d "$PAYLOAD_WS" | grep access_token | awk '{print $2}' | awk -F'"' '$0=$2')
   local id="$1"
   curl \
+      -H "Content-Type: application/json" \
+      -d '{"publishType":"STAGED_PUBLISH","blockOnWarnings":true}' \
     -H "Authorization: Bearer $token"  \
-    -H "x-goog-api-version: 2" \
     -H "Content-Length: 0" \
     -X POST \
-    https://www.googleapis.com/chromewebstore/v1.1/items/"$id"/publish
+    https://chromewebstore.googleapis.com/v2/publishers/${CHROME_PUBLISHER_ID}/items/"$id":publish
 }
 
 if is_release_candidate "$CI_COMMIT_TAG"; then

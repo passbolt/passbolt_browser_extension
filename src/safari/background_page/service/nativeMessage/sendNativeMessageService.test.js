@@ -33,7 +33,7 @@ describe("SendNativeMessageService", () => {
 
       expect(result).toBeUndefined();
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedMessage);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedMessage);
     });
 
     it("should call chrome.runtime.sendNativeMessage with the right arguments and return an object value", async () => {
@@ -50,7 +50,7 @@ describe("SendNativeMessageService", () => {
 
       expect(result).toStrictEqual(returnedValue);
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedMessage);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedMessage);
     });
 
     it("should call chrome.runtime.sendNativeMessage with the right arguments and return an array value", async () => {
@@ -67,7 +67,7 @@ describe("SendNativeMessageService", () => {
 
       expect(result).toStrictEqual(returnedValue);
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedMessage);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedMessage);
     });
 
     it("should call chrome.runtime.sendNativeMessage with the right arguments and return a scalar", async () => {
@@ -84,7 +84,7 @@ describe("SendNativeMessageService", () => {
 
       expect(result).toStrictEqual(returnedValue);
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedMessage);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedMessage);
     });
 
     it("should call chrome.runtime.sendNativeMessage with the right arguments and return a string", async () => {
@@ -101,7 +101,7 @@ describe("SendNativeMessageService", () => {
 
       expect(result).toStrictEqual(returnedValue);
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedMessage);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedMessage);
     });
 
     it("should call chrome.runtime.sendNativeMessage with the right arguments and return nothing", async () => {
@@ -117,7 +117,7 @@ describe("SendNativeMessageService", () => {
 
       expect(result).toBeUndefined();
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedMessage);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedMessage);
     });
 
     it("should call chrome.runtime.sendNativeMessage with the right arguments and return null", async () => {
@@ -133,7 +133,7 @@ describe("SendNativeMessageService", () => {
 
       expect(result).toBeNull();
       expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledTimes(1);
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedMessage);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedMessage);
     });
 
     it("should throw an error if the messaging went wrong", async () => {

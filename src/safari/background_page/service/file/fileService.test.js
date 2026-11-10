@@ -40,7 +40,7 @@ describe("FileService", () => {
         base64Data: "VGV4dA==",
       };
 
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedArgument);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedArgument);
     });
   });
 });

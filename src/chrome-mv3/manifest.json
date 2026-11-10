@@ -46,15 +46,23 @@
     "cookies",
     "clipboardWrite",
     "background",
-    "offscreen"
+    "offscreen",
+    "nativeMessaging",
+    "contextMenus"
   ],
   "host_permissions": [
     "*://*/*"
   ],
-  "web_accessible_resources": [{
-    "resources": ["webAccessibleResources/*"],
-    "matches": ["*://*/*"]
-  }],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "webAccessibleResources/*"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
+  ],
   "content_security_policy": {
     "extension_pages": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http: ; font-src 'self'; connect-src 'self' https: http: ; form-action 'self' https: ; frame-src 'self' ; frame-ancestors 'self' https: http: ; worker-src 'self' ; base-uri 'none' ;"
   }

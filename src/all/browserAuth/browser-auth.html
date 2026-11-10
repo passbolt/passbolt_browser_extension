@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Authorize Passbolt CLI</title>
+  <script id="stylesheet-manager" data-file="ext_authentication.min.css" src="/webAccessibleResources/js/themes/stylesheet.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: var(--Background-Body-background, #f5f5f5);
+      color: var(--Text-and-icons-Main-text, #333);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .skeleton.page.login {
+      width: 100%;
+      max-width: 520px;
+      padding: 2.4rem;
+      box-sizing: border-box;
+    }
+    .content .logo {
+      margin: 0 auto 2.4rem auto;
+      width: 20rem;
+      height: 4.5rem;
+      background: transparent url(/webAccessibleResources/img/logo/logo.svg) center/contain no-repeat;
+    }
+    .dialog {
+      background: var(--Dialog-Dialog-header-and-footer, #ffffff);
+      border-radius: var(--Section-border-radius, 8px);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+      border: 1px solid var(--Workspace-Dividers, rgba(0, 0, 0, 0.08));
+      overflow: hidden;
+    }
+    .dialog-header {
+      padding: 1.6rem 2rem;
+      border-bottom: 1px solid var(--Workspace-Dividers, rgba(0, 0, 0, 0.08));
+    }
+    .dialog-header h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--Text-and-icons-Main-text, inherit);
+    }
+    .dialog-body {
+      padding: 2rem;
+      background: var(--Dialog-Dialog-fill, #fafafa);
+    }
+    .message {
+      padding: 1rem 1.4rem;
+      border-radius: 4px;
+      font-size: 1.3rem;
+      line-height: 1.45;
+      margin-bottom: 1.6rem;
+    }
+    .message.notice {
+      background: var(--States-Info-background, #eef6fc);
+      color: var(--States-Info-text, #1d5f96);
+      border: 1px solid var(--States-Info-border, #cbe2f4);
+    }
+    .message.error {
+      background: var(--States-Error-background, #fdeded);
+      color: var(--States-Error-text, #d32f2f);
+      border: 1px solid var(--States-Error-border, #f5c2c2);
+    }
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.6rem;
+      font-size: 1.3rem;
+    }
+    .details-table td {
+      padding: 0.6rem 0;
+      vertical-align: top;
+    }
+    .details-table .label {
+      width: 130px;
+      color: var(--Text-and-icons-Secondary-text, #666);
+      font-weight: 500;
+    }
+    .details-table .val {
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .details-table .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 1.15rem;
+      letter-spacing: 0.5px;
+    }
+    .dialog-footer {
+      padding: 1.4rem 2rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      align-items: center;
+      background: var(--Dialog-Dialog-header-and-footer, #ffffff);
+      border-top: 1px solid var(--Workspace-Dividers, rgba(0, 0, 0, 0.08));
+    }
+    .dialog-footer button {
+      cursor: pointer;
+    }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+  </style>
+</head>
+<body spellcheck="false">
+  <div class="skeleton page login">
+    <div class="content">
+      <div class="header">
+        <div class="logo"><span class="visually-hidden">Passbolt</span></div>
+      </div>
+      <div class="dialog">
+        <div class="dialog-header">
+          <div class="dialog-title-wrapper">
+            <h2>Authorize CLI Access</h2>
+          </div>
+        </div>
+        <div class="dialog-body">
+          <div id="status" class="message notice" role="status">Checking for a pending CLI request…</div>
+          <table class="details-table">
+            <tbody>
+              <tr>
+                <td class="label">Server:</td>
+                <td id="origin" class="val">—</td>
+              </tr>
+              <tr>
+                <td class="label">Account:</td>
+                <td id="account" class="val">—</td>
+              </tr>
+              <tr>
+                <td class="label">Key Fingerprint:</td>
+                <td id="fingerprint" class="val mono">—</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="color: var(--Text-and-icons-Secondary-text, #666); font-size: 1.25rem; line-height: 1.45; margin: 0;">
+            Approval grants the local CLI access to this account. The private key will only be held in memory by the local CLI agent.
+          </p>
+          <div id="passphrase-group" style="margin-top: 1.6rem;" hidden>
+            <label for="passphrase-input" style="display: block; font-weight: 500; font-size: 1.3rem; margin-bottom: 0.6rem; color: var(--Text-and-icons-Secondary-text, #666);">Passphrase</label>
+            <input type="password" id="passphrase-input" class="input" style="width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--Workspace-Dividers, rgba(0,0,0,0.15)); border-radius: 4px; font-size: 1.3rem; background: var(--Dialog-Dialog-fill, #fff); color: var(--Text-and-icons-Main-text, #333);" placeholder="Enter your passphrase to unlock your private key" autocomplete="current-password" />
+          </div>
+        </div>
+        <div class="dialog-footer submit-wrapper">
+          <button id="cancel" type="button" class="button cancel">Cancel</button>
+          <button id="retry" type="button" class="button">Retry</button>
+          <button id="signin" type="button" class="button" hidden>Sign in to Passbolt</button>
+          <button id="approve" type="button" class="button primary" disabled>Approve</button>
+        </div>
+        <p id="signin-url" hidden style="margin: 0.8rem 2rem; font-size: 1.2rem; color: var(--Text-and-icons-Secondary-text, #666);"></p>
+      </div>
+    </div>
+  </div>
+  <script src="/browserAuth/vendors.js"></script>
+  <script src="/browserAuth/app.js"></script>
+</body>
+</html>

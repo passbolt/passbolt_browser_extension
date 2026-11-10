@@ -12,7 +12,7 @@
  * @since         5.6.0
  */
 
-const SAFARI_APP_ID = "com.passbolt.safari";
+const SAFARI_APP_ID = "dev.haspr.safari";
 
 /**
  * Custom error class for Safari native messaging errors.

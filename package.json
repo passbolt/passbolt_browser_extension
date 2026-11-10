@@ -94,7 +94,7 @@
     "dev:build:chromium-mv2": "NODE_ENV=development webpack --config webpack.chromium-mv2.config.js",
     "dev:build:chromium-mv3": "NODE_ENV=development webpack --config webpack.chromium-mv3.config.js",
     "dev:build:safari": "NODE_ENV=development webpack --config webpack.safari.config.js",
-    "dev:safari:convert": "xcrun safari-web-extension-converter --app-name Passbolt-Safari-Extension --swift --macos-only --project-location ./build-safari-extension --bundle-identifier com.passbolt.safari-extension --force --no-open build/all/",
+    "dev:safari:convert": "xcrun safari-web-extension-converter --app-name haspr-Safari-Extension --swift --macos-only --project-location ./build-safari-extension --bundle-identifier dev.haspr.safari-extension --force --no-open build/all/",
     "dev:watch:build:firefox": "npm run dev:build:firefox -- -w",
     "dev:watch:build:chromium-mv2": "npm run dev:build:chromium-mv2 -- -w",
     "dev:watch:build:chromium-mv3": "npm run dev:build:chromium-mv3 -- -w",

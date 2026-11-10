@@ -22,6 +22,8 @@
 // Entries common to every browser target (chromium-mv2, chromium-mv3, firefox, safari).
 const COMMON_EXPECTED_FILES = [
   "manifest.json",
+  "browser-auth.html",
+  "browserAuth/app.js",
   "contentScripts/js/dist/app.js",
   "contentScripts/js/dist/browser-integration/browser-integration.js",
   "contentScripts/js/dist/browser-integration/vendors.js",

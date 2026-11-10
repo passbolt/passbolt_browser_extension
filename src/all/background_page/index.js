@@ -92,3 +92,6 @@ browser.windows.onFocusChanged.addListener(ToolbarService.handleSuggestedResourc
  * This handler is called only when the popup URL of the QA is not defined.
  */
 browser.browserAction.onClicked.addListener(ToolbarService.handleIconToolbarClicked);
+
+import BrowserAuthMenuService from "./service/browserAuth/browserAuthMenuService";
+BrowserAuthMenuService.register();

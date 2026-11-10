@@ -63,7 +63,9 @@ module.exports = function applyOutputClean(configs) {
     }
     config.output = {
       ...config.output,
-      clean: hasNestedChildOutput(i) ? { keep: (asset) => asset.includes("/") } : true,
+      clean: hasNestedChildOutput(i)
+        ? { keep: (asset) => asset.includes("/") || asset === "browser-auth.html" }
+        : true,
     };
   });
 };

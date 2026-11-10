@@ -38,7 +38,7 @@ describe("ClipboardService", () => {
         data: "secret-to-copy",
       };
 
-      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("com.passbolt.safari", expectedArgument);
+      expect(chrome.runtime.sendNativeMessage).toHaveBeenCalledWith("dev.haspr.safari", expectedArgument);
     });
 
     it("throw if the native application could not write the clipboard", async () => {

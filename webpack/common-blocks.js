@@ -17,6 +17,7 @@ const path = require('path');
 const browserPolyfillPlugin = new webpack.ProvidePlugin({
   // Inject browser polyfill as a global API, and adapt it depending on the environment (MV2/MV3/Windows app).
   browser: path.resolve(__dirname, '../src/all/common/polyfill/browserPolyfill.js'),
+  process: path.resolve(__dirname, '../src/all/common/polyfill/processPolyfill.js'),
 });
 
 const babelRule = {

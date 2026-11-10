@@ -42,7 +42,9 @@
     "downloads",
     "*://*/*",
     "alarms",
-    "cookies"
+    "cookies",
+    "nativeMessaging",
+    "contextMenus"
   ],
   "web_accessible_resources": [
     "webAccessibleResources/*"

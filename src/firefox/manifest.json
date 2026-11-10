@@ -7,10 +7,12 @@
   "default_locale": "en",
   "browser_specific_settings": {
     "gecko": {
-      "id": "passbolt@passbolt.com",
+      "id": "dev.haspr",
       "strict_min_version": "140.0",
       "data_collection_permissions": {
-        "required": ["none"]
+        "required": [
+          "none"
+        ]
       }
     }
   },
@@ -49,7 +51,9 @@
     "unlimitedStorage",
     "*://*/*",
     "alarms",
-    "cookies"
+    "cookies",
+    "nativeMessaging",
+    "contextMenus"
   ],
   "web_accessible_resources": [
     "webAccessibleResources/*"

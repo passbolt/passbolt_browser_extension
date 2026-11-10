@@ -1,30 +1,30 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/pbolt-dev/.github/main/assets/pbolt-logo.svg" alt="pbolt logo" width="160" height="160" />
+  <img src="https://raw.githubusercontent.com/haspr-dev/.github/main/assets/haspr-logo.svg" alt="Haspr logo" width="160" height="160" />
 </p>
 
-<h1 align="center">pbolt-browser-extension</h1>
+<h1 align="center">haspr-browser-extension</h1>
 
 <p align="center">
-  <strong>Browser extension (Firefox, Chrome, Edge) for the pbolt ecosystem, compatible with Passbolt.</strong>
+  <strong>Browser extension (Firefox, Chrome, Edge) for the Haspr ecosystem, compatible with Passbolt.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/pbolt-dev/pbolt-browser-extension/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/pbolt-dev/pbolt-browser-extension" alt="License" /></a>
-  <a href="https://github.com/pbolt-dev/pbolt-api"><img src="https://img.shields.io/badge/API-pbolt--api-256af2?style=flat-square" alt="API" /></a>
-  <a href="https://github.com/pbolt-dev/go-pbolt-cli"><img src="https://img.shields.io/badge/CLI-go--pbolt--cli-0bddec?style=flat-square&logo=go" alt="go-pbolt-cli" /></a>
+  <a href="https://github.com/haspr-dev/haspr-browser-extension/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/haspr-dev/haspr-browser-extension" alt="License" /></a>
+  <a href="https://github.com/haspr-dev/haspr-api"><img src="https://img.shields.io/badge/API-haspr--api-256af2?style=flat-square" alt="API" /></a>
+  <a href="https://github.com/haspr-dev/go-pbolt-cli"><img src="https://img.shields.io/badge/CLI-go--pbolt--cli-0bddec?style=flat-square&logo=go" alt="CLI" /></a>
 </p>
 
 ---
 
 ## ⚡ Overview
 
-The **pbolt browser extension** delivers seamless cryptographic password management, quick access, autofill, and native messaging integration with `go-pbolt-cli` and background credential agents.
+The **Haspr browser extension** delivers seamless cryptographic password management, quick access, autofill, and native messaging integration with `go-pbolt-cli` and background credential agents.
 
 ---
 
 ## ⚖️ Trademark Notice
 
-*Passbolt is a registered trademark of Passbolt SA. **pbolt** is an independent community project and is not affiliated with, endorsed by, or sponsored by Passbolt SA.*
+*Passbolt is a registered trademark of Passbolt SA. **Haspr** is an independent community project and is not affiliated with, endorsed by, or sponsored by Passbolt SA.*
 
 ---
 
@@ -35,8 +35,8 @@ The **pbolt browser extension** delivers seamless cryptographic password managem
 - npm >= 10.9.2
 
 ```bash
-git clone git@github.com:pbolt-dev/pbolt-browser-extension.git
-cd pbolt-browser-extension
+git clone git@github.com:haspr-dev/haspr-browser-extension.git
+cd haspr-browser-extension
 npm ci
 ```
 

@@ -1,11 +1,11 @@
 {
-  "name": "pbolt-browser-extension",
+  "name": "haspr-browser-extension",
   "version": "5.17.1",
   "license": "AGPL-3.0",
-  "copyright": "Copyright 2026 pbolt-dev contributors and Passbolt SA",
-  "description": "Browser extension (Firefox, Chrome, Edge) for pbolt and Passbolt password manager",
-  "homepage": "https://doc.pbolt.dev",
-  "repository": "https://github.com/pbolt-dev/pbolt-browser-extension",
+  "copyright": "Copyright 2026 haspr-dev contributors and Passbolt SA",
+  "description": "Browser extension (Firefox, Chrome, Edge) for Haspr and Passbolt password manager",
+  "homepage": "https://doc.haspr.dev",
+  "repository": "https://github.com/haspr-dev/haspr-browser-extension",
   "engines": {
     "node": ">=22.14.0",
     "npm": ">=10.9.2"

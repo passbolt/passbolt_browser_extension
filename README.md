@@ -1,155 +1,62 @@
-	      ____                  __          ____
-	     / __ \____  _____ ____/ /_  ____  / / /_
-	    / /_/ / __ `/ ___/ ___/ __ \/ __ \/ / __/
-	   / ____/ /_/ (__  |__  ) /_/ / /_/ / / /_
-	  /_/    \__,_/____/____/_.___/\____/_/\__/
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pbolt-dev/.github/main/assets/pbolt-logo.svg" alt="pbolt logo" width="160" height="160" />
+</p>
 
-	Open source password manager for teams
-	(c) 2026 Passbolt SA
-	https://www.passbolt.com
+<h1 align="center">pbolt-browser-extension</h1>
 
-## License
+<p align="center">
+  <strong>Browser extension (Firefox, Chrome, Edge) for the pbolt ecosystem, compatible with Passbolt.</strong>
+</p>
 
-Passbolt - Open source password manager for teams
+<p align="center">
+  <a href="https://github.com/pbolt-dev/pbolt-browser-extension/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/pbolt-dev/pbolt-browser-extension" alt="License" /></a>
+  <a href="https://github.com/pbolt-dev/pbolt-api"><img src="https://img.shields.io/badge/API-pbolt--api-256af2?style=flat-square" alt="API" /></a>
+  <a href="https://github.com/pbolt-dev/go-pbolt-cli"><img src="https://img.shields.io/badge/CLI-go--pbolt--cli-0bddec?style=flat-square&logo=go" alt="go-pbolt-cli" /></a>
+</p>
 
-(c) 2026 Passbolt SA
+---
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
-Public License (AGPL) as published by the Free Software Foundation version 3.
+## ⚡ Overview
 
-The name "Passbolt" is a registered trademark of Passbolt SA, and Passbolt SA hereby declines to grant a trademark
-license to "Passbolt" pursuant to the GNU Affero General Public License version 3 Section 7(e), without a separate
-agreement with Passbolt SA.
+The **pbolt browser extension** delivers seamless cryptographic password management, quick access, autofill, and native messaging integration with `go-pbolt-cli` and background credential agents.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See GNU Affero General Public License for more details.
+---
 
-You should have received a copy of the GNU Affero General Public License along with this program. If not,
-see [GNU Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html).
+## ⚖️ Trademark Notice
 
-## About passbolt
+*Passbolt is a registered trademark of Passbolt SA. **pbolt** is an independent community project and is not affiliated with, endorsed by, or sponsored by Passbolt SA.*
 
-Passbolt is an open source password manager for teams. It allows to securely share and store credentials.
-For instance, the wifi password of your office, or the administrator password of a router, or your organisation social
-media account password, all of them can be secured using Passbolt.
+---
 
-You can try a demo of passbolt at [https://demo.passbolt.com](https://demo.passbolt.com).
+## 🛠️ Development & Building
 
-You will need to install a plugin, you can find a step by step guide in the website
-[help section](https://www.passbolt.com/help/start/firefox)
+### Prerequisites
+- Node.js >= 22.14.0
+- npm >= 10.9.2
 
-Or, of course, you can use the code in this repository to build it yourself and run it!
-
-## About passbolt browser extension
-
-A browser extension is needed to maintain a higher level of security, e.g. to ensure the integrity of the
-cryptographic code and provide a secure random number generator. In the future it will also be used to provide feature
-such as auto filling your passwords when visiting known websites.
-
-### How does it look like?
-
-[![Login](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-login-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-login.png)
-[![Browse passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot4-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot4.png)
-[![Share passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share.png)
-
-# Contributing
-
-Please check [CONTRIBUTING.md](CONTRIBUTING.md) for more information about how to get involved.
-
-## Reporting a security Issue
-
-If you've found a security related issue in Passbolt, please don't open an issue on GitHub. Follow our responsible disclosure process: https://www.passbolt.com/docs/contribute/security/vulnerability/.
-
-# Quick how-to for developers
-
-This is just a quick getting started guide, for more information and productivity tips checkout CONTRIBUTING.md
-
-## Prerequisite
-
-You will need ```node```, ```grunt``` and the dependencies listed in ```packages.json```.
-```
-git clone git@github.com:passbolt/passbolt_browser_extension.git
-cd passbolt_browser_extension
+```bash
+git clone git@github.com:pbolt-dev/pbolt-browser-extension.git
+cd pbolt-browser-extension
 npm ci
 ```
 
-For convenience you can also install ```web-ext``` (for firefox), ```crx``` (for chrome) globally,
-otherwise can can be found in ```node_modules```.
-```
-sudo npm install web-ext -g
-sudo npm install crx -g
-```
+### Build Commands
+```bash
+# Build all web-accessible bundles
+npm run build
 
-## Quick bundling the build/all source
-
-The non-minified source code is located in ```/src```. It can be 'bundled' ```to build/all``` as follow:
-```
-grunt
+# Run unit tests
+npm test
 ```
 
-In order to rebuild the code in this directory automatically while you are editing the src
-you can use the grunt watch task:
-```
-grunt watch
-```
+### Loading the Unpacked Extension
+- **Firefox**: Open `about:debugging#/runtime/this-firefox`, click "Load Temporary Add-on", and select `build/all/manifest.json`.
+- **Chrome / Brave / Edge**: Open `chrome://extensions/`, enable "Developer mode", click "Load unpacked", and select `build/all`.
 
-## Test a local version of the plugin
-### Firefox
+---
 
-To launch an instance of Firefox with your local version of the add-on installed.
-```
-cd build/all
-web-ext run
-```
+## 📄 License
 
-This instance will be reloaded everytime there is a change in the /build/all code or by pressing the ```r```
-key on the keyboard when web-ext is running.
-You can debug the application script by opening the
-[browser console](https://developer.mozilla.org/en/docs/Tools/Browser_Console).
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License (AGPL) as published by the Free Software Foundation version 3.
 
-### Chrome
-
-Go to the the extension page at [chrome://extensions/](chrome://extensions/) click on the
-'load unpacked extension' button. Point to your build/all directory and you are good to go.
-You debug the application script by clicking on index.html in "inspect views".
-
-## Packaging the application
-
-You can build the crx or xpi (zip) packages using the following command.
-```
-grunt build
-```
-The build can be found under ```dist/chromium-mv3``` or ```dist/chromium-mv2``` or ```dist/firefox```.
-
-## Updating the vendors or the styleguide
-
-You can update the vendors or the styleguide in the ```package.json``` and run the copy task
-in grunt to deploy them in the appropriate places. Check the ```Gruntfile.js```
-for more information.
-```
-npm update
-grunt copy:vendors
-grunt copy:styleguide
-```
-The build can be found under ```dist/chromium-mv3``` or ```dist/chromium-mv2``` or ```dist/firefox```.
-
-## Unit testing
-
-Unit testing is handle by Jest. It provides ways to run them and also build code coverage reports.
-
-To run unit tests:
-```
-grunt test
-```
-
-To run unit tests with coverage:
-```
-grunt test-coverage
-```
-
-Once the code coverage report is generated you can find the result in the folder `coverage`.
-Jest also provides an HTML version of the reports avaiable at `coverage/lcov-report/index.html`.
-
-# Credits
-
-https://www.passbolt.com/credits
+See [LICENSE.txt](LICENSE.txt) for details.

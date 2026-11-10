@@ -1,11 +1,11 @@
 {
-  "name": "passbolt-browser-extension",
+  "name": "pbolt-browser-extension",
   "version": "5.17.1",
   "license": "AGPL-3.0",
-  "copyright": "Copyright 2025 Passbolt SA",
-  "description": "Passbolt web extension for the open source password manager for teams",
-  "homepage": "https://www.passbolt.com",
-  "repository": "https://github.com/passbolt/passbolt_browser_extension",
+  "copyright": "Copyright 2026 pbolt-dev contributors and Passbolt SA",
+  "description": "Browser extension (Firefox, Chrome, Edge) for pbolt and Passbolt password manager",
+  "homepage": "https://github.com/pbolt-dev",
+  "repository": "https://github.com/pbolt-dev/pbolt-browser-extension",
   "engines": {
     "node": ">=22.14.0",
     "npm": ">=10.9.2"

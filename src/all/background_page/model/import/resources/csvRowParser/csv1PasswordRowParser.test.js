@@ -21,6 +21,7 @@ import {
 import ResourceTypesCollection from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection";
 import {
   RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_SLUG,
   RESOURCE_TYPE_V5_STANDALONE_NOTE_SLUG,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeSchemasDefinition";
@@ -36,7 +37,7 @@ describe("Csv1PasswordRowParser", () => {
     let fields = ["Title", "Password"];
     expect(Csv1PasswordRowParser.canParse(fields)).toEqual(2);
     // all fields
-    fields = ["Title", "Username", "Url", "Password", "Notes", "Type"];
+    fields = ["Title", "Username", "Url", "Password", "Notes", "Type", "OTPAuth"];
     expect(Csv1PasswordRowParser.canParse(fields)).toEqual(6);
     // Missing one required field
     fields = ["Title", "Username", "Url", "Notes", "Type"];
@@ -80,6 +81,58 @@ describe("Csv1PasswordRowParser", () => {
       secret_clear: data.Password,
       description: data.Notes,
       folder_parent_path: data.Type,
+    });
+
+    const externalResourceEntity = Csv1PasswordRowParser.parse(
+      data,
+      importEntity,
+      resourceTypesCollection,
+      metadataTypesSettings,
+    );
+
+    expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
+    expect(externalResourceEntity.toDto()).toEqual(expectedEntity.toDto());
+  });
+
+  it("parses resource of type password-description-totp with an OTPAuth token", () => {
+    expect.assertions(2);
+
+    const data = {
+      Title: "Password 1",
+      Username: "Username 1",
+      Url: "https://url1.com",
+      Password: "Secret 1",
+      Notes: "Description 1",
+      Type: "Folder 1",
+      OTPAuth:
+        "otpauth://totp/test.com%20%3A%20admin%40passbolt.com:admin%40passbolt.com?secret=BA3RB63PNKCSXIDUNQBJRFU3G53ITJ6F&period=30&digits=6&issuer=test.com%20%3A%20admin%40passbolt.com",
+    };
+
+    const importDto = {
+      ref: "import-ref",
+      file_type: "csv",
+      file: btoa(BinaryConvert.toBinary(data)),
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const metadataTypesSettings = new MetadataTypesSettingsEntity(defaultMetadataTypesSettingsV4Dto());
+    const expectedResourceType = resourceTypesCollection.items.find(
+      (resourceType) => resourceType.slug === RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+    );
+    const expectedEntity = new ExternalResourceEntity({
+      name: data.Title,
+      username: data.Username,
+      uris: [data.Url],
+      resource_type_id: expectedResourceType.id,
+      secret_clear: data.Password,
+      description: data.Notes,
+      folder_parent_path: data.Type,
+      totp: {
+        period: 30,
+        digits: 6,
+        algorithm: "SHA1",
+        secret_key: "BA3RB63PNKCSXIDUNQBJRFU3G53ITJ6F",
+      },
     });
 
     const externalResourceEntity = Csv1PasswordRowParser.parse(

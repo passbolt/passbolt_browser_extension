@@ -4,7 +4,7 @@
   "license": "AGPL-3.0",
   "copyright": "Copyright 2026 pbolt-dev contributors and Passbolt SA",
   "description": "Browser extension (Firefox, Chrome, Edge) for pbolt and Passbolt password manager",
-  "homepage": "https://github.com/pbolt-dev",
+  "homepage": "https://doc.pbolt.dev",
   "repository": "https://github.com/pbolt-dev/pbolt-browser-extension",
   "engines": {
     "node": ">=22.14.0",

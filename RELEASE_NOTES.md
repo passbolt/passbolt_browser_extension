@@ -1,8 +1,44 @@
-Release song - TBD
+# Passbolt 5.18.0 Superstylin
 
-# v5.18.0
-Passbolt 5.18.0 provide 2 new themes, generic healthcheck message on the organisation settings, improvements on the offline mode and availability for all content type in the quickaccess.
-It comes also with security fixes and posture improvements.
+Passbolt 5.18.0 Superstylin introduces themes, expands QuickAccess to support more resource types, improves autofill behaviour, and makes large sharing operations faster. This release also includes dependency updates and several security fixes.
+
+## Themes
+
+Passbolt 5.18 introduces themes, giving users more control over how the application looks.
+
+The new theme options make it possible to adapt the interface to personal preferences while keeping the same Passbolt experience across the application.
+
+## More resource types in QuickAccess
+
+QuickAccess now supports more than passwords.
+
+Secure Notes, custom fields, and other supported resource types can now be accessed directly through QuickAccess. This makes it easier to retrieve different types of information without opening the full Passbolt application.
+
+## Autofill improvements
+
+This release includes several fixes to improve autofill reliability.
+
+Autofill has been improved on high-resolution displays, and a regression introduced in 5.17.0 has been fixed. In some cases, Passbolt could place a password into an unlabelled username field when nearby text contained the word “password”.
+
+## Faster sharing for large numbers of resources
+
+Sharing performance has also been improved for larger operations.
+
+The optimisation is particularly noticeable when sharing around 200 resources or more, reducing the time required to process larger sharing changes.
+
+## Dependency updates
+
+Several dependencies have been updated as part of this release.
+
+## Security updates
+
+Passbolt 5.18 also includes several security fixes.
+
+One issue addressed in this release involved a private OpenPGP key being accepted as a public key, which could result in the key being disclosed to another authenticated user.
+
+This release also includes improvements related to Duo verification, along with other security fixes.
+
+A detailed security bulletin will follow with more information about the security issues addressed in this release.
 
 ## Changelogs
 ### Added

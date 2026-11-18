@@ -25,7 +25,11 @@ import Cocoa
 import SafariServices
 import WebKit
 
+#if !DEBUG
 let extensionBundleIdentifier = "com.passbolt.safari.Extension"
+#else
+let extensionBundleIdentifier = "com.passbolt.safari-debug.Extension"
+#endif
 
 class ViewController: NSViewController, WKNavigationDelegate, WKScriptMessageHandler {
     
@@ -49,11 +53,7 @@ class ViewController: NSViewController, WKNavigationDelegate, WKScriptMessageHan
             }
             
             DispatchQueue.main.async {
-                if #available(macOS 13, *) {
-                    webView.evaluateJavaScript("show(\(state.isEnabled), true)")
-                } else {
-                    webView.evaluateJavaScript("show(\(state.isEnabled), false)")
-                }
+                webView.evaluateJavaScript("show(\(state.isEnabled), true)")
             }
         }
     }

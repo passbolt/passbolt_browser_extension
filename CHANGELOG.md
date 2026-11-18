@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v5.18.1] - 2026-11-18
+### Fixed
+- PB-56388 - Fix folder and subfolder alignment in the resource workspace
+
 ## [v5.18.0] - 2026-11-12
 ### Added
 - PB-54816 - OFM - CE admins need to be informed why their offline-settings forms are disabled
@@ -3333,7 +3337,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.18.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.18.1...HEAD
+[5.18.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.18.0...v5.18.1
 [5.18.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.17.1...v5.18.0
 [5.17.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.17.0...v5.17.1
 [5.17.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v5.16.2...v5.17.0

@@ -16,6 +16,7 @@ import CopyToClipboardController from "../controller/clipboard/copyToClipboardCo
 import CopyTemporarilyToClipboardController from "../controller/clipboard/copyTemporarilyToClipboardController";
 import PrepareResourceController from "../controller/quickaccess/prepareResourceController";
 import ConsumeInProgressCreationResourceController from "../controller/quickaccess/consumeInProgressCreationResourceController";
+import OpenEditResourceInDetachedModeController from "../controller/quickaccess/openEditResourceInDetachedModeController";
 import GetOrFindMetadataKeysSettingsController from "../controller/metadata/getOrFindMetadataKeysSettingsController";
 import GetOrFindOfflineSettingsController from "../controller/offline/getOrFindOfflineSettingsController";
 import AuthLocalLogoutController from "../controller/auth/authLocalLogoutController";
@@ -78,6 +79,22 @@ const listen = function (worker, apiClientOptions, account) {
     const controller = new ConsumeInProgressCreationResourceController(worker, requestId);
     await controller._exec();
   });
+
+  /*
+   * Open the resource edit form in a separate window which stays open while the user changes the password on a website.
+   *
+   * @listens passbolt.quickaccess.open-edit-resource-in-detached-mode
+   * @param requestId {uuid} The request identifier
+   * @param resourceId {uuid} The resource to edit
+   * @param openerTabId {string} The tab the quickaccess was opened from
+   */
+  worker.port.on(
+    "passbolt.quickaccess.open-edit-resource-in-detached-mode",
+    async (requestId, resourceId, openerTabId) => {
+      const controller = new OpenEditResourceInDetachedModeController(worker, requestId);
+      await controller._exec(resourceId, openerTabId);
+    },
+  );
 
   /*
    * Update the quickacess window height

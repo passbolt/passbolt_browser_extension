@@ -30,6 +30,7 @@ import { ResourceTypeEvents } from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import { AccountEvents } from "../event/accountEvents";
+import { PermissionEvents } from "../event/permissionEvents";
 
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
@@ -45,6 +46,7 @@ jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ResourceTypeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PermissionEvents, "listen").mockImplementation(jest.fn());
 
 describe("QuickAccess", () => {
   beforeEach(async () => {
@@ -55,7 +57,7 @@ describe("QuickAccess", () => {
 
   describe("QuickAccess::attachEvents", () => {
     it("Should attach events", async () => {
-      expect.assertions(17);
+      expect.assertions(18);
       // data mocked
       const port = {
         _port: {
@@ -85,6 +87,7 @@ describe("QuickAccess", () => {
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ResourceTypeEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(AccountEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(PermissionEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(QuickAccess.events).toStrictEqual([
         AuthEvents,
         ConfigEvents,
@@ -100,6 +103,7 @@ describe("QuickAccess", () => {
         RememberMeEvents,
         ResourceTypeEvents,
         AccountEvents,
+        PermissionEvents,
       ]);
       expect(QuickAccess.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(QuickAccess.appName).toBe("QuickAccess");

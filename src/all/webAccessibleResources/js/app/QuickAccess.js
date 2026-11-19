@@ -38,6 +38,7 @@ async function main() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const bootstrapFeature = urlSearchParams.get("feature");
   const bootstrapRequestId = urlSearchParams.get("requestId");
+  const bootstrapResourceId = urlSearchParams.get("resourceId");
   const openerTabId = urlSearchParams.get("tabId");
   const detached = urlSearchParams.get("uiMode") === "detached";
 
@@ -48,6 +49,7 @@ async function main() {
       storage={storage}
       bootstrapFeature={bootstrapFeature}
       bootstrapRequestId={bootstrapRequestId}
+      bootstrapResourceId={bootstrapResourceId}
       openerTabId={openerTabId}
       detached={detached}
     />,
